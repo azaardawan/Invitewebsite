@@ -1,7 +1,16 @@
-# Architecture Proposal — Digital Invitation Platform (V1)
+# Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **PROPOSAL — awaiting owner approval. No implementation has started.**
-Date: 2026-09-28
+Status: **PROPOSAL — revision 2, awaiting final approval. No implementation has started.**
+Date: 2026-09-29
+
+**Revision 2 changes (owner feedback):**
+- Public lifetime is now **30 days** from publication.
+- New **printable invitation card** per theme (Decision M).
+- D, E, F and G are confirmed.
+- RSVP and messages are merged into **one guest form**: name, attending / not attending, message.
+- Working brand name: **Bahja / بهجه**.
+- Theme isolation guarantees are now spelled out in §7.1.
+- Step-by-step theme guide added: `docs/THEME_GUIDE.md`.
 
 ---
 
@@ -18,9 +27,10 @@ Storefront (ar default, en, ckb, badini)          Admin (/admin, RBAC, 2FA)
 Platform core (Next.js server)  ◄───────────────────────┘
    ├─ Orders/Invoices (immutable snapshots)
    ├─ Payments (WAYL link create, webhook inbox, verify, reconcile)
-   ├─ Publication (published_at, expires_at = +15d, derived expiry)
+   ├─ Publication (published_at, expires_at = +30d, derived expiry)
    ├─ Theme Engine (registry of versioned theme code, contract validation)
-   ├─ RSVP / Congratulations (rate-limited public endpoints)
+   ├─ Guest responses: name + attendance + message (rate-limited public endpoint)
+   ├─ Print documents: printable invitation card + keepsake PDF (per-theme print companions)
    └─ Jobs (PDF, reconciliation, cleanup) — Postgres-backed queue
 Postgres (source of truth)      Object storage + CDN (music, images, PDFs)
 ```
@@ -43,12 +53,12 @@ Customer-facing routes:
 
 ## 2. Contradictions and decisions that need the owner
 
-**A. 15-day lifetime vs the event date (the most important one).**
-Expiry is `published_at + 15 days`, and payment publishes immediately. So a customer who pays 30 days before a wedding has a dead link 15 days before the event. Customers will do this, and it will create support load and refund disputes.
+**A. 30-day lifetime vs the event date (still open — the most important remaining decision).**
+Expiry is `published_at + 30 days`, and payment publishes immediately. So a customer who pays 45 days before a wedding has a dead link 15 days before the event. The risk is smaller than with 15 days, but real. Customers will do this, and it will create support load and refund disputes.
 Options:
 1. Keep the rule strictly. Checkout shows the computed expiry date and blocks, or warns, when `event_date > expiry`. This is the simplest option and needs no rule change.
-2. **(Recommended)** Keep "15 days from publication" but let the customer pick a **go-live date** (today by default, never later than the event date). Payment is verified immediately, the order becomes `PAID`, and publication happens automatically at the chosen date. The rule is preserved; only *when* publication happens changes.
-3. `expires_at = max(published_at + 15d, event_date + 1d)`. This changes the business rule.
+2. **(Recommended)** Keep "30 days from publication" but let the customer pick a **go-live date** (today by default, never later than the event date). Payment is verified immediately, the order becomes `PAID`, and publication happens automatically at the chosen date. The rule is preserved; only *when* publication happens changes.
+3. `expires_at = max(published_at + 30d, event_date + 1d)`. This changes the business rule.
 
 **B. Theme code cannot be added "without rebuilding the application."**
 Sections, packages, prices, fields, labels, music, ordering, translations and legal content are all managed from Admin with no rebuild. **Theme code** (unique layouts and animations) is executable code. Loading arbitrary JS uploaded at runtime into production is a real security and stability risk (supply-chain issues, XSS reaching admin sessions, no review). Recommendation: theme code ships through git → CI checks → a zero-downtime deploy (minutes). Admin then registers or activates the deployed version. Signed, pre-built theme bundles hosted on the CDN can come later if deploy frequency becomes a bottleneck.
@@ -59,16 +69,15 @@ If an invoice number is created at checkout start, abandoned checkouts consume n
 - `invoice_number` (`INV-2026-00184`, gap-free sequence per year) is assigned **in the same transaction that marks the order PAID**.
 Both are shown on the receipt. If you prefer a single number, I can do that; gaps will then exist.
 
-**D. The customer has no way back to their receipt or link once they leave the page.**
+**D. ✅ CONFIRMED — private receipt URL + one transactional email.** The customer has no way back to their receipt or link once they leave the page.**
 There are no accounts and cookies are not a security mechanism, so the post-payment page gets a private `/r/[token]` URL (256-bit random token, only a hash is stored). That URL is shown on screen and included in the prepared WhatsApp message. **Recommendation: also send one transactional email** with the receipt link (Resend or Postmark, costs cents). You are already collecting email; without it, a customer whose browser dies after the WAYL redirect has nothing. Please confirm.
 
-**E. RSVP guest identity.**
-With only "attending / not attending" and no name, the couple gets anonymous counts. Recommendation: guest name is required and attending/not attending is chosen. Guest count is **not** included in V1. Please confirm.
+**E. ✅ CONFIRMED — one guest form.** The guest writes their **name** (required), chooses **attending / not attending** (required) and writes a **message to the couple**. The message is required when the package includes the `congratulations` feature; without that feature the form has only name + attendance. Messages feed the keepsake PDF. Guest count is not included in V1.
 
-**F. Badini script and locale code.**
+**F. ✅ CONFIRMED — Arabic script, and every font must support Kurdish letters.**
 Badini is usually written in Arabic script in Duhok, but Latin script is also used. Please confirm **Arabic script** (RTL). Internal locale codes: `ar`, `en`, `ckb` (Sorani), and `bdn` as an internal code (displayed as "بادینی"; the BCP-47 tag in `lang` would be `kmr-Arab`). Fonts must cover Kurdish letters (ڕ ۆ ێ ڵ ە ڤ). Many "Arabic" web fonts do not, so fonts will be checked for this.
 
-**G. Music replacement and existing invitations.**
+**G. ✅ CONFIRMED — invitations snapshot their song.**
 Following the versioning principle, an invitation **snapshots its music track** at publication. Replacing a theme's song affects new invitations only. Admin can still change a specific invitation's track, and that change is audited. Please confirm.
 
 **H. Short invitation IDs are guessable.**
@@ -87,11 +96,26 @@ Anything rendered in a browser can be screenshotted, so a watermark alone is not
 
 This removes the practical value of sharing a preview link. It cannot stop screenshots, and nothing can.
 
-**K. Collection period for congratulations messages.**
+**K. Collection period for messages (30 days).**
 Messages can only be written while the invitation is public, so the collection period equals the publication window. The keepsake PDF is generated automatically at expiry, and Admin can regenerate it at any time.
 
 **L. Price or theme changes during checkout.**
 Price, package, fields and theme version are snapshotted when the order is created. If a theme is archived or re-priced after a WAYL link is issued, that order is honored at the snapshotted price until the link expires. After that, the customer must restart and sees current availability.
+
+**M. NEW — Printable invitation card (per theme).**
+Every theme ships a **print companion**: a static, print-ready design of the same visual identity. It is not a screenshot of the animated page.
+- **What the customer gets.** After payment, the receipt page (`/r/<token>`) and the receipt email have a **Download printable card (PDF)** button. It uses the same names, date, venue and text as the online invitation, in the invitation's language.
+- **Print specifications**, declared per theme in the manifest:
+  - one finished size per theme (default **A5, 148×210 mm**; 5×7 in is allowed);
+  - **3 mm bleed** and a 5 mm safe area;
+  - artwork supplied at **300 dpi** at the printed size;
+  - fonts embedded in the PDF;
+  - optional crop marks for print shops.
+- **Colour.** Chromium produces RGB PDFs. Most local print shops accept RGB. If a shop needs CMYK, a conversion step (Ghostscript + ICC profile) can be added. Designers should keep print colours CMYK-safe because very saturated RGB colours shift in print.
+- **QR code (recommended default).** The card can carry a QR code to the online invitation. After 30 days the QR opens the branded "invitation ended" page, never an error.
+- **Preview.** Before payment, the personalized preview shows a low-resolution, watermarked card. The full-resolution PDF exists only after payment, and is served only through the private receipt token or from Admin.
+- **Regeneration.** The PDF is generated by the worker after publication. If Admin edits the invitation, `source_hash` changes and the card is regenerated automatically. Admin can also regenerate or download it at any time.
+- **Package control.** It is a feature key, `print_card`, so you decide per package whether it is included. **Question: include it in every package, or only higher ones?**
 
 ---
 
@@ -188,9 +212,8 @@ A single polymorphic `translations(entity_type, entity_id, ...)` table would los
   - `unpublished_reason`, `version` int (optimistic locking for concurrent admin edits)
   - **EXPIRED is derived** (`status = PUBLISHED AND now() >= expires_at`), not a stored flip. There is no cron race: expiry is exact to the second, and extending it is a single update.
   - `field_values` is JSONB rather than an EAV `invitation_field_values` table because values are always read and written as a whole, validated as a whole, snapshotted and diffed for audit. EAV adds joins without adding integrity, since type integrity comes from the Zod schema either way.
-- `rsvps` (invitation_id, guest_name, response ATTENDING/NOT_ATTENDING, ip_hash, client_token_hash, created_at). Dedupe uses a unique (invitation_id, client_token_hash) with upsert.
-- `congratulation_messages` (invitation_id, guest_name, body ≤ 500 chars, status VISIBLE/HIDDEN, ip_hash, created_at)
-- `keepsake_documents` (invitation_id, storage_key, theme_version_id, message_count, generated_at, generated_by, status)
+- `guest_responses` (invitation_id, guest_name, attendance ATTENDING/NOT_ATTENDING, message nullable ≤ 500 chars, message_status VISIBLE/HIDDEN, ip_hash, client_token_hash, created_at, updated_at). This replaces separate RSVP and message tables because the guest fills in one form. A unique (invitation_id, client_token_hash) with upsert lets a guest correct their own answer from the same device without creating duplicates.
+- `generated_documents` (invitation_id, type PRINT_CARD/KEEPSAKE_PDF, variant e.g. `A5`/`5x7`, storage_key, theme_version_id, source_hash, message_count, generated_at, generated_by, status). `source_hash` tells us when a document is stale after an admin edit.
 
 ### Content, legal, settings
 - `website_settings`: a single typed JSONB row (business name, phone, WhatsApp, email, address, socials) with version history in the audit log
@@ -260,14 +283,17 @@ A single polymorphic `translations(entity_type, entity_id, ...)` table would los
 export default defineTheme({
   key: 'royal-garden', version: 1, sections: ['wedding'],
   fields: ['person_1_name','person_2_name','event_date','event_time','venue_name','venue_map_url','invitation_message'],
-  features: ['music','countdown','map','rsvp','congratulations','keepsake_pdf'],
+  features: ['music','countdown','map','rsvp','congratulations','keepsake_pdf','print_card'],
   // Every package combination Admin may configure must be a declared, designed state:
   validStates: [
     { features: ['music'], fields: ['person_1_name','person_2_name','event_date','event_time','venue_name'] },
     { features: ['music','countdown','map','rsvp'], fields: [...] },
     { features: '*', fields: '*' },            // complete theme = top package
   ],
-  pdfCompanion: './pdf/Keepsake.tsx',
+  print: {
+    card:     { component: './print/Card.tsx', size: 'A5', bleedMm: 3, qr: true },
+    keepsake: { component: './print/Keepsake.tsx', size: 'A4' },
+  },
   budget: { jsKb: 80, initialImageKb: 400 },
   assets: { cover: './assets/cover.webp', og: './assets/og.jpg' },
 });
@@ -288,7 +314,7 @@ type ThemeProps = {
 
 The theme gets platform capabilities only through `theme-sdk`:
 - `useMusic()`: play and pause, respects autoplay rules. The first "Open invitation" gesture unlocks audio.
-- `<RsvpSlot render={…}/>` and `<CongratsSlot render={…}/>`: headless components. The theme supplies the markup and styling; the platform owns submission, validation, Turnstile and error states. In `sample` or `preview` mode they are inert.
+- `<GuestFormSlot render={…}/>`: a headless component for the guest form (name, attendance, and message when the package has `congratulations`). The theme supplies the markup and styling; the platform owns submission, validation, Turnstile and error states. In `sample` or `preview` mode it is inert.
 - `useReducedMotion()`, `<ThemeImage>` (responsive, lazy), and `formatDate()` for the invitation's locale and calendar.
 
 **Enforcement:**
@@ -299,7 +325,8 @@ The theme gets platform capabilities only through `theme-sdk`:
   - The theme renders every `validStates` entry at 360, 390, 430 and 1280 px without errors.
   - Playwright screenshots of every state are saved for human review.
   - JS and image budgets are met; missing assets are reported.
-  - The PDF companion renders with 0, 1 and 200 messages.
+  - The print card renders for every valid state, with short and very long names, in Arabic and English.
+  - The keepsake companion renders with 0, 1 and 200 messages, including a 500-character message.
 - **Runtime isolation.** The theme is rendered inside `<div data-theme-root>` with CSS Modules. `/i/*` pages include no storefront CSS. Sample previews in the storefront and admin run in a sandboxed **iframe** so theme CSS and JS can never affect the platform page.
 - **Admin package editor.** It only allows feature and field combinations that match a declared `validStates` entry. This enforces "remain visually intentional when features are removed."
 - **Security.** Field values are rendered as text; no theme gets `dangerouslySetInnerHTML` (lint rule). URLs such as the map link are validated against an allowlist (Google Maps, Apple Maps and similar) on the server.
@@ -316,6 +343,24 @@ The theme gets platform capabilities only through `theme-sdk`:
 4. Admin assigns the section, labels, packages, prices, features and music, then previews every package on mobile and desktop and marks it **READY_FOR_REVIEW**.
 5. The OWNER or MANAGER completes the package-validation checklist (§63 of the spec) and sets it **ACTIVE**, which puts it in the storefront.
 6. Archiving hides the theme from the storefront. Existing invitations keep rendering, and restore is one click. Themes with purchases can never be hard-deleted (foreign key plus UI rule).
+
+### 7.1 Guarantee: adding a theme does not affect anything else
+
+The owner asked: *"If I add a new theme to GitHub, will it affect anything else in my code?"* The design goal is **no**. This is how it is enforced, not just intended:
+
+| Risk | How it is prevented |
+|---|---|
+| Having to edit central platform files to register a theme | The theme registry is **generated automatically** by scanning `themes/*/v*/manifest.ts` at build time. Adding a theme means adding one folder and nothing else. |
+| The theme's CSS leaking into the site or other themes | CSS Modules only. A lint rule rejects global selectors. Invitation pages load no storefront CSS, and previews run in a sandboxed iframe. |
+| The theme's JavaScript slowing down the site | Each theme version is a separate lazy-loaded chunk that is downloaded only on its own invitation page or preview. |
+| A theme importing another theme or platform internals | A lint boundary rule: a theme may import only from `theme-sdk`, its own folder and approved libraries. The build fails otherwise. |
+| A theme accidentally changing old themes or live invitations | Purchased versions are **frozen by content hash**; CI fails if a frozen folder changes. |
+| A new theme going live half-finished | New versions always start in **DEVELOPMENT** and are invisible to customers until Admin activates them. |
+| A theme crashing in the browser | Each theme renders inside an error boundary. A crash shows a branded fallback for that invitation and reports to Sentry; the rest of the site is unaffected. |
+| A broken theme breaking the deploy | CI runs `theme:validate` on every PR. A broken theme **cannot be merged**, so it never reaches production. |
+| A theme needing a new npm library | This is the one shared touchpoint (`package.json`). New libraries need an explicit review in the PR; most themes need none. |
+
+The honest limit: theme code is still deployed with the app (Decision B). The protection comes from automated checks that block a bad theme before it ships. The runtime does not isolate an already-deployed bad theme; the error boundary contains a crash, but not every kind of fault.
 
 ---
 
@@ -357,7 +402,7 @@ The sandbox blocked access to wayl.io and api.thewayl.com, so nothing below depe
     - verify amount == snapshot amount, currency == IQD, reference matches order
     - TX: SELECT … FOR UPDATE order; if already PAID → no-op
           payment SUCCEEDED; order PAID + invoice_number assigned; status history
-          invitation → PUBLISHED, published_at=now(), expires_at=now()+15d
+          invitation → PUBLISHED, published_at=now(), expires_at=now()+30d
           (or scheduled_publish_at if Decision A option 2)
           audit + analytics(payment_success, invitation_published)
     - after commit: send receipt email (if approved)
@@ -428,8 +473,8 @@ Failure modes covered:
 
 | Data | Public lifetime | Retained | Then |
 |---|---|---|---|
-| Invitation page | 15 days after publication (plus extensions) | Record kept 24 months after expiry | Field values anonymized; record stub kept |
-| RSVP / messages | Readable by Admin | 12 months after expiry (keepsake PDF produced first) | Deleted |
+| Invitation page | 30 days after publication (plus extensions) | Record kept 24 months after expiry | Field values anonymized; record stub kept |
+| Guest responses (attendance + messages) | Readable by Admin | 12 months after expiry (keepsake PDF produced first) | Deleted |
 | Keepsake PDF | Admin download | 12 months after expiry | Deleted from storage |
 | Orders, invoices, payments, legal acceptances | — | 7 years (typical accounting horizon; confirm the Iraqi requirement) | Archived |
 | Customer contact info | — | Same as the order | Anonymized with the order |
@@ -456,7 +501,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M5 | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
 | M6 | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
 | M7 | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
-| M8 | Guest features | 14–15 | RSVP, congratulations, moderation, keepsake PDF companion and jobs |
+| M8 | Guest features + print | 14–15 | Guest form (name, attendance, message), moderation, **printable card** and keepsake PDF companions, document jobs |
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |
 | M10 | Legal, settings, contact, WhatsApp | 17 | Editable policies with versions, settings-driven footer and contact, WhatsApp flows |
 | M11 | Hardening | 18–19 | Lighthouse/WebPageTest on real 4G profiles, axe accessibility, security review, backup + **tested restore**, runbooks |
@@ -470,12 +515,12 @@ Tests are written inside each milestone. Coverage focuses on payment verificatio
 
 **Needed now** (to start M1–M3):
 1. Approval of this architecture, or changes to it.
-2. Answers to decisions **A, C, D, E, F, G** (the others have defaults I will apply unless you object).
-3. A working brand or business name (it can change later).
+2. Answers to the remaining decisions: **A** (go-live date), **C** (separate order and invoice numbers), and **M** (which packages include the printable card; QR yes/no). D, E, F and G are confirmed.
+3. ~~Brand name~~ — **Bahja / بهجه** (working name).
 4. WAYL: a merchant account and **test-mode API token**, access to the official API reference, and your merchant dashboard settings. Also allow `wayl.io` and `api.thewayl.com` in this environment's network access so I can read the docs directly. They are currently blocked by the environment's network policy.
 
 **Needed by M3/M4:**
-- The first theme's design reference plus exported layered web assets (separate PNG/WebP/SVG for anything that moves), its interaction notes, and which features each package removes.
+- The first theme, delivered following **`docs/THEME_GUIDE.md`**. That covers the design, layered assets, motion sheet, package states, printable card and keepsake PDF.
 - Homepage design reference(s).
 - One or more MP3s for the music library.
 
@@ -486,7 +531,7 @@ Tests are written inside each milestone. Coverage focuses on payment verificatio
 - The business WhatsApp number and email
 - Legal text review by an Iraqi lawyer (I will draft the policies from the actual system behaviour)
 - Kurdish (Sorani/Badini) translator
-- Email provider account (if D is approved)
+- Email provider account (D is approved)
 
 ## Sources
 - [Wayl Checkout – WordPress plugin](https://wordpress.org/plugins/wayl-checkout/)
