@@ -89,18 +89,18 @@ or the Arabic-style ones.
 
 | Key | Arabic | Suggested Badini | Conf. | Status |
 |---|---|---|---|---|
-| `invitation.months.m1` | كانون الثاني | کانوونا دووێ | ○ | PENDING |
-| `invitation.months.m2` | شباط | شوبات | ○ | PENDING |
-| `invitation.months.m3` | آذار | ئادار | ○ | PENDING |
-| `invitation.months.m4` | نيسان | نیسان | ○ | PENDING |
-| `invitation.months.m5` | أيار | گولان | ○ | PENDING |
-| `invitation.months.m6` | حزيران | حزیران | ○ | PENDING |
-| `invitation.months.m7` | تموز | تیرمەه | ○ | PENDING |
-| `invitation.months.m8` | آب | تەباخ | ○ | PENDING |
-| `invitation.months.m9` | أيلول | ئیلون | ○ | PENDING |
-| `invitation.months.m10` | تشرين الأول | چریا ئێکێ | ○ | PENDING |
-| `invitation.months.m11` | تشرين الثاني | چریا دووێ | ○ | PENDING |
-| `invitation.months.m12` | كانون الأول | کانوونا ئێکێ | ○ | PENDING |
+| `invitation.months.m1` | كانون الثاني | کانوونا دووێ | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m2` | شباط | شوبات | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m3` | آذار | ئادار | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m4` | نيسان | نیسان | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m5` | أيار | گولان | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m6` | حزيران | حزیران | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m7` | تموز | تیرمەه | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m8` | آب | تەباخ | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m9` | أيلول | ئیلون | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m10` | تشرين الأول | چریا ئێکێ | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m11` | تشرين الثاني | چریا دووێ | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.months.m12` | كانون الأول | کانوونا ئێکێ | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.weekdays.d0` | الأحد | یەکشەمب | ○ | PENDING |
 | `invitation.weekdays.d1` | الاثنين | دووشەمب | ○ | PENDING |
 | `invitation.weekdays.d2` | الثلاثاء | سێشەمب | ○ | PENDING |
