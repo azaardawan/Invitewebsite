@@ -1,7 +1,12 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **FINAL DRAFT — revision 3. All decisions answered; awaiting the go-ahead to start M1. No implementation has started.**
+Status: **APPROVED — revision 4. M1 (foundation) implemented.**
 Date: 2026-09-30
+
+**Revision 4 changes (owner feedback at approval):**
+- A **future section with a different format** is planned, where people add **pictures and messages**. The architecture reserves room for it (§13), but none of it is built yet.
+- **Kurdish translations are owner-approved only.** New strings get suggested Sorani/Badini wording in `docs/translations/KURDISH_REVIEW.md`; nothing Kurdish ships until the owner approves it.
+- The **admin panel is Arabic/English only** (staff tool); Kurdish applies to all customer-facing pages.
 
 **Revision 3 changes:**
 - A: no go-live date; publish immediately for 30 days; extensions by Admin on request.
@@ -177,7 +182,7 @@ A single polymorphic `translations(entity_type, entity_id, ...)` table would los
 - `auth_attempts` (rate limiting and lockout)
 
 ### Catalog
-- `sections` (key, name_i18n, image_asset_id, status ACTIVE/ARCHIVED, sort_order)
+- `sections` (key, name_i18n, image_asset_id, status ACTIVE/ARCHIVED, sort_order, **`experience_type`** — `INVITATION` in V1; see §13)
 - `field_definitions`: **the Field Library**. `key` is unique (`person_1_name`, `event_date`, `venue_map_url`, …). `type` is one of text/longtext/date/time/url/phone. `constraints` jsonb holds length, pattern and similar. `default_label_i18n`.
 - `section_default_fields` (section_id, field_definition_id, sort_order, label_i18n override)
 - `themes` (key, section_id, name_i18n, description_i18n, status DEVELOPMENT/READY_FOR_REVIEW/ACTIVE/ARCHIVED, sort_order, cover_asset_id, default_music_id, current_version_id)
@@ -497,8 +502,8 @@ Each milestone ends with a demo and a checklist before the next one starts.
 
 | # | Milestone | Spec phases | Exit criteria |
 |---|---|---|---|
-| M0 | Approval of this document | 1–3 | ✅ All decisions answered; awaiting final go-ahead |
-| M1 | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data, Sentry |
+| M0 | Approval of this document | 1–3 | ✅ Approved |
+| M1 ✅ | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data. (Sentry and the nonce-based CSP moved to M11: Sentry needs an account, and CSP is best tuned once real pages exist.) |
 | M2 | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
 | M3 | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 | Storefront | 7 | Home skeleton (awaiting the design), occasions, catalog, theme page with sample preview, SEO, sitemap, robots |
@@ -536,6 +541,27 @@ Tests are written inside each milestone. Coverage focuses on payment verificatio
 - Legal text review by an Iraqi lawyer (I will draft the policies from the actual system behaviour)
 - Kurdish (Sorani/Badini) translator
 - Email provider account (D is approved)
+
+## 13. Future: sections with a different format (pictures and messages)
+
+The owner plans a section where people **add pictures and messages**, for example a shared memory book or guestbook. It is **not built in V1**, and V1 still has no customer uploads. These choices keep it addable later without a redesign:
+
+1. **Experience type per section.** `sections.experience_type` is `INVITATION` for everything in V1. A new type (working name `CONTRIBUTION_BOOK`) will have:
+   - its own customer flow and public page renderer, selected by this type at `/i/...`;
+   - its own theme contract, extending the same theme SDK.
+
+   Payments, orders, publication, expiry, packages, audit and analytics stay shared, so a new format reuses the whole commerce and lifecycle core.
+2. **Guest contributions generalize guest responses.** `guest_responses` (name, attendance, message) is the V1 case. Pictures would be added as attachments linked to a response through the `assets` table, with a per-item moderation status. They would not be stored in new columns on the invitation.
+3. **Field types are open-ended.** The Field Library's `type` list can gain `image`/`gallery` for owner-provided photos without changing how fields, packages or validation work.
+4. **Storage is already external.** All media goes to object storage (R2) behind the CDN, never into database rows.
+5. **What that future build must add, since user uploads change the risk profile:**
+   - an upload pipeline: type/size checks, re-encoding, EXIF/location stripping, and possibly malware scanning;
+   - rate limits and moderation tools in Admin;
+   - storage quotas per package;
+   - retention rules for photos;
+   - Privacy Policy and Terms updates.
+
+   These are deliberately not built now ("future-ready" does not mean building unused systems).
 
 ## Sources
 - [Wayl Checkout – WordPress plugin](https://wordpress.org/plugins/wayl-checkout/)
