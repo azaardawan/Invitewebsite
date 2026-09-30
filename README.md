@@ -26,6 +26,8 @@ Curated digital invitations for the Iraqi market. Arabic first, plus English, Ku
 - Packages (1–3) built from the theme's designed states, priced in IQD; every price change is audited.
 - Theme lifecycle (development → review → on sale → archived/restored) with a readiness checklist; activated versions are frozen.
 
+**Since M2:** an owner-set USD exchange rate (Admin → Website settings) lets visitors switch prices between IQD and USD next to the language choice. Payment is always IQD.
+
 ## Local development
 
 Requirements: Node 22+, pnpm 10, PostgreSQL 16.

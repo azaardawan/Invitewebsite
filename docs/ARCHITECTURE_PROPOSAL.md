@@ -4,7 +4,7 @@ Status: **APPROVED — revision 5. M1 (foundation) and M2 (admin catalog) implem
 Date: 2026-09-30
 
 **Revision 6 changes (owner feedback after M2):**
-- **Dual currency:** packages have IQD (required) and USD (optional for now) prices set by the owner (Decision N).
+- **Currency (Decision N):** all payments in IQD. An owner-set exchange rate lets visitors view prices in USD, with the switch next to the language choice.
 - **Music loops** automatically; one song can be assigned to any number of themes.
 
 **Revision 5 changes (M2 implementation notes):**
@@ -121,14 +121,13 @@ Messages can only be written while the invitation is public, so the collection p
 **L. Price or theme changes during checkout.**
 Price, package, fields and theme version are snapshotted when the order is created. If a theme is archived or re-priced after a WAYL link is issued, that order is honored at the snapshotted price until the link expires. After that, the customer must restart and sees current availability.
 
-**N. OWNER REQUEST — Prices in IQD and USD (card payments via WAYL).**
-This changes the original "IQD only in V1" rule. The owner plans to accept Mastercard through WAYL and wants every package priced in both currencies.
-- **Implemented now:** each package has a required IQD price and an optional USD price (`price_usd_cents`). The owner enters both; there is **no automatic exchange-rate conversion**, so prices never drift. Both are audited on change.
-- **Still to confirm with WAYL (before M6):**
-  - WAYL's public description is an *IQD* payments API. It's unconfirmed whether a card payment can be *charged in USD*, or whether cards are charged in IQD and the bank converts.
-  - This decides which amount goes to WAYL. Either the customer pays the USD price when paying by card, or the IQD price is always charged and USD is shown for information.
-- **Orders (M5)** will snapshot the currency and amount actually charged, so receipts stay correct whatever happens later.
-- **Until confirmed,** checkout charges IQD. USD becomes required per package only once USD card charging is switched on.
+**N. ✅ DECIDED — Pay in IQD; show USD as an option.**
+- **Every payment is charged in Iraqi dinars**, including future Mastercard payments through WAYL. Package prices are set by the owner in IQD only.
+- The owner sets **one exchange rate** (IQD per 1 USD) in Admin → Website settings. It is audited on every change; leaving it empty hides the USD option.
+- Visitors can switch the display between **IQD and USD next to the language choice**. USD amounts are shown as approximate (≈) with the note "payment is made in Iraqi dinars".
+- The preference is kept in the visitor's browser only, as a convenience. It never affects the amount charged.
+- **Orders (M5)** snapshot the IQD amount charged. If the checkout shows a USD approximation, the exchange rate used is snapshotted too, so the receipt can show it.
+- An earlier per-package USD price (added briefly) was removed by migration `0005` in favour of this simpler model.
 
 **M. ✅ DECIDED — Printable invitation card.**
 Every theme ships a **print companion**: a static, print-ready design of the same visual identity. It is not a screenshot of the animated page.

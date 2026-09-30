@@ -2,7 +2,11 @@
   "common": {
     "brand": "Bahja",
     "language": "Language",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "currency": "Currency",
+    "currencyIqd": "IQD",
+    "currencyUsd": "USD",
+    "usdApproxNote": "USD prices are approximate at our exchange rate; payment is made in Iraqi dinars."
   },
   "home": {
     "preparingTitle": "The website is being prepared",
@@ -31,7 +35,8 @@
       "sections": "Sections",
       "themes": "Themes",
       "fields": "Field library",
-      "music": "Music library"
+      "music": "Music library",
+      "settings": "Website settings"
     },
     "modules": {
       "sections": "Sections",
@@ -355,6 +360,16 @@
         "unauthorized": "Your session ended; please sign in again.",
         "uploadFailed": "Upload failed. Please try again."
       }
+    },
+    "settings": {
+      "heading": "Website settings",
+      "currencyHeading": "Currency and exchange rate",
+      "currencyIntro": "All payments are in Iraqi dinars. Visitors can choose to see prices in US dollars next to the language choice; they are converted with the exchange rate you set here.",
+      "usdRate": "Dollar rate (IQD per 1 USD)",
+      "usdRateHint": "For example 1310. Leave empty to hide the dollar option on the website.",
+      "example": "Example: {iqd} is shown as ≈ {usd}",
+      "save": "Save",
+      "more": "Business and contact information will be added here later (milestone 10)."
     }
   }
 }

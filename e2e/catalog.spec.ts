@@ -3,7 +3,7 @@ import sharp from 'sharp';
 import { makeMp3, signInAsNewOwner } from './helpers';
 
 // Stateful owner journey; runs once, on desktop.
-test('owner configures a theme end to end: music → cover → package → review → on sale', async ({ page }, testInfo) => {
+test('owner configures a theme end to end: music → cover → package → review → on sale', async ({ page, browser }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
   test.setTimeout(90_000);
   await signInAsNewOwner(page);
@@ -39,11 +39,9 @@ test('owner configures a theme end to end: music → cover → package → revie
   await add.getByLabel('العربية').first().fill('باقة ذهبية');
   await add.getByLabel('الإنجليزية').first().fill('Gold');
   await add.getByLabel('السعر (دينار عراقي)').fill('75000');
-  await add.getByLabel('السعر (دولار أمريكي)').fill('50');
   await add.getByRole('radio').last().check();
   await add.getByRole('button', { name: 'إنشاء' }).click();
   await expect(page.getByText('التصميم مستوفٍ لكل الشروط.')).toBeVisible();
-  await expect(page.getByText(/US\$|\$/).first()).toBeVisible();
 
   // Lifecycle: review → on sale.
   page.on('dialog', (d) => d.accept());
@@ -64,4 +62,19 @@ test('owner configures a theme end to end: music → cover → package → revie
   for (const action of ['music.created', 'theme.settings_updated', 'package.created', 'theme.status_changed']) {
     await expect(page.getByText(action).first()).toBeVisible();
   }
+
+  // Exchange rate → visitors can switch prices to USD next to the language choice.
+  await page.goto('/admin/settings');
+  await page.getByLabel('سعر الدولار (دينار لكل ١ دولار)').fill('1310');
+  await page.getByRole('button', { name: 'حفظ' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'تم الحفظ.' })).toBeVisible();
+  await expect(page.getByText('≈')).toBeVisible();
+  const visitorContext = await browser.newContext({ baseURL: testInfo.project.use.baseURL });
+  const visitor = await visitorContext.newPage();
+  await visitor.goto('/');
+  await visitor.getByRole('button', { name: 'دولار' }).click();
+  await expect(visitor.getByRole('button', { name: 'دولار' })).toHaveAttribute('aria-pressed', 'true');
+  await visitor.reload();
+  await expect(visitor.getByRole('button', { name: 'دولار' })).toHaveAttribute('aria-pressed', 'true');
+  await visitorContext.close();
 });

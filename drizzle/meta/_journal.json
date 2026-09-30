@@ -36,6 +36,13 @@
       "when": 1790759518135,
       "tag": "0004_package_price_usd",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790760061627,
+      "tag": "0005_display_currency",
+      "breakpoints": true
     }
   ]
 }

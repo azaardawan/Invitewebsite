@@ -218,7 +218,6 @@ function packageFields(form: FormData) {
     name: readI18n(form, 'name'),
     description: readI18n(form, 'description'),
     priceIqd: Number(String(form.get('priceIqd') ?? '').replace(/[,\s٬]/g, '')),
-    priceUsd: String(form.get('priceUsd') ?? '').replace(/[,\s$]/g, ''),
   };
 }
 

@@ -31,3 +31,14 @@ Glossary established by the owner (reuse in later batches):
 - Brand: **بەهجە** (both dialects); Arabic **بهجه**.
 - Badini "page": **لاپەر**; "occasions/celebrations": **ئاهەنگ**; "soon": **ب زیترین دەم**.
 - Sorani "website": **ماڵپەر**; "page": **پەرە**.
+
+## Batch 2 — currency switcher (PENDING)
+
+Shown next to the language choice once you set an exchange rate in Admin → Website settings.
+
+| # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|---|
+| 13 | `common.currency` | العملة | Currency | دراو | دراڤ | ◐ | PENDING |
+| 14 | `common.currencyIqd` | دينار | IQD | دینار | دینار | ● | PENDING |
+| 15 | `common.currencyUsd` | دولار | USD | دۆلار | دۆلار | ● | PENDING |
+| 16 | `common.usdApproxNote` | الأسعار بالدولار تقريبية حسب سعر الصرف؛ يتم الدفع بالدينار العراقي. | USD prices are approximate at our exchange rate; payment is made in Iraqi dinars. | نرخەکان بە دۆلار نزیکەیین بەپێی نرخی ئاڵوگۆڕ؛ پارەدان بە دیناری عێراقی دەکرێت. | بهایێن ب دۆلاری نێزیکن ل دویڤ بهایێ گوهۆڕینێ؛ پارەدان ب دینارێ عیراقی دهێتە کرن. | ○ | PENDING |

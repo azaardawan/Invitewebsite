@@ -216,31 +216,6 @@ describe('packages', () => {
   });
 });
 
-describe('dual-currency prices (owner sets both)', () => {
-  it('stores an optional USD price in cents and audits USD changes', async () => {
-    const t = await registeredTheme();
-    const noUsd = await createPackage(db(), t.id, basic(25000), actor);
-    expect(noUsd.priceUsdCents).toBeNull();
-
-    const p = await createPackage(db(), t.id, { ...full(60000), priceUsd: '49.99' }, actor);
-    expect(p.priceUsdCents).toBe(4999);
-
-    await updatePackage(db(), p.id, { ...full(60000), priceUsd: '55' }, actor);
-    const [log] = await db()
-      .select()
-      .from(auditLogs)
-      .where(sql`${auditLogs.objectId} = ${p.id} and ${auditLogs.action} = 'package.price_changed'`);
-    expect(log).toMatchObject({ before: { priceIqd: 60000, priceUsdCents: 4999 }, after: { priceIqd: 60000, priceUsdCents: 5500 } });
-  });
-
-  it('rejects malformed or out-of-range USD prices', async () => {
-    const t = await registeredTheme();
-    for (const bad of ['12.345', '-5', 'abc', '0', '200000']) {
-      await expect(createPackage(db(), t.id, { ...basic(), priceUsd: bad }, actor)).rejects.toThrow();
-    }
-  });
-});
-
 describe('music reuse', () => {
   it('lets one song be used by several themes', async () => {
     const song = await track();

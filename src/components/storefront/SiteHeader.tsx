@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { CurrencySwitcher } from './currency';
 
 export async function SiteHeader() {
   const t = await getTranslations('common');
@@ -10,7 +11,10 @@ export async function SiteHeader() {
         <Link href="/" className="text-xl font-semibold">
           {t('brand')}
         </Link>
-        <LanguageSwitcher label={t('language')} />
+        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+          <LanguageSwitcher label={t('language')} />
+          <CurrencySwitcher />
+        </div>
       </div>
     </header>
   );
