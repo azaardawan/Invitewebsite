@@ -17,14 +17,22 @@
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --conditions=react-server --env-file-if-exists=.env scripts/migrate.ts",
-    "db:seed": "tsx --conditions=react-server --env-file-if-exists=.env scripts/seed.ts",
+    "db:seed": "pnpm -s themes:registry && tsx --conditions=react-server --env-file-if-exists=.env scripts/seed.ts",
     "admin:create": "tsx --conditions=react-server --env-file-if-exists=.env scripts/create-admin.ts",
-    "i18n:check": "tsx scripts/i18n-check.ts"
+    "i18n:check": "tsx scripts/i18n-check.ts",
+    "themes:registry": "tsx scripts/generate-theme-registry.ts",
+    "predev": "pnpm -s themes:registry",
+    "prebuild": "pnpm -s themes:registry",
+    "pretypecheck": "pnpm -s themes:registry",
+    "pretest": "pnpm -s themes:registry",
+    "prelint": "pnpm -s themes:registry"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1143.0",
     "@fontsource-variable/noto-sans-arabic": "^5.3.0",
     "@node-rs/argon2": "^2.2.1",
     "drizzle-orm": "^0.45.3",
+    "music-metadata": "^11.16.1",
     "next": "^16.3.7",
     "next-intl": "^4.14.8",
     "otplib": "^12.0.1",
@@ -33,6 +41,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "server-only": "^0.0.1",
+    "sharp": "^0.35.5",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -54,7 +63,8 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "unrs-resolver",
-      "@swc/core"
+      "@swc/core",
+      "sharp"
     ],
     "ignoredBuiltDependencies": [
       "@parcel/watcher"

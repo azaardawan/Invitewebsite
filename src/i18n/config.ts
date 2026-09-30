@@ -23,7 +23,7 @@ export const localeMeta: Record<
 > = {
   ar: { dir: 'rtl', htmlLang: 'ar-IQ', intlLocale: 'ar-IQ', autonym: 'العربية' },
   en: { dir: 'ltr', htmlLang: 'en', intlLocale: 'en-GB', autonym: 'English' },
-  // Kurdish autonyms are pending owner confirmation (docs/translations/KURDISH_REVIEW.md).
+  // Kurdish autonyms approved by the owner (docs/translations/KURDISH_REVIEW.md, batch 1).
   ckb: { dir: 'rtl', htmlLang: 'ckb-IQ', intlLocale: 'ckb-IQ', autonym: 'کوردی - سۆرانی' },
   bdn: { dir: 'rtl', htmlLang: 'kmr-Arab-IQ', intlLocale: 'ar-IQ', autonym: 'کوردی - بادینی' },
 };

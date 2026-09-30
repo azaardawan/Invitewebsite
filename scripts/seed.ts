@@ -1,6 +1,24 @@
+/**
+ * Idempotent setup, run on every deploy after migrations:
+ * permissions/roles, the field library, starter sections, and theme
+ * versions found in the deployed code.
+ */
 import { closeDb, db } from '../src/server/db/client';
 import { seedRbac } from '../src/server/rbac/seed';
+import { seedCatalog } from '../src/server/catalog/seed';
+import { syncThemesFromRegistry } from '../src/server/catalog/themes';
+import { themeManifests } from '../src/theme-registry';
 
-await seedRbac(db());
-await closeDb();
-console.log('Seeded permissions and built-in roles.');
+try {
+  await seedRbac(db());
+  await seedCatalog(db());
+  const report = await syncThemesFromRegistry(db(), themeManifests(), { adminId: null, ipHash: null });
+  console.log('Seeded permissions, roles, field library and starter sections.');
+  console.log('Theme sync:', JSON.stringify(report));
+  if (report.conflicts.length) {
+    console.error(`ERROR: activated theme versions changed in code: ${report.conflicts.join(', ')}. Create a new version folder instead.`);
+    process.exitCode = 1;
+  }
+} finally {
+  await closeDb();
+}

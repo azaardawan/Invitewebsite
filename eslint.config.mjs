@@ -12,5 +12,23 @@ export default defineConfig([
       'no-restricted-imports': ['error', { patterns: ['@/server/*'] }],
     },
   },
+  {
+    // Theme Contract: themes are presentation only. They may use the theme SDK and
+    // shared catalog definitions, never platform internals, the database, cookies or Node APIs.
+    files: ['themes/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { group: ['@/*', '!@/theme-sdk', '!@/theme-sdk/*', '!@/catalog/*'], message: 'Themes may only import @/theme-sdk and @/catalog.' },
+            { group: ['../../*', '../../../*'], message: 'Themes must not import other themes or platform files.' },
+            { group: ['next/headers', 'next/server', 'server-only', 'drizzle-orm', 'drizzle-orm/*', 'postgres', 'node:*'], message: 'Themes must not access the server, database or Node APIs.' },
+          ],
+        },
+      ],
+      'react/no-danger': 'error',
+    },
+  },
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'drizzle/**']),
 ]);

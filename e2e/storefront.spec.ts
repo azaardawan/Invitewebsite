@@ -14,16 +14,16 @@ test.describe('storefront languages', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('The website is being prepared');
   });
 
-  test('Kurdish routes are right-to-left and fall back to Arabic until translations are approved', async ({ page }) => {
-    const cases: [string, string][] = [
-      ['/ckb', 'ckb-IQ'],
-      ['/bdn', 'kmr-Arab-IQ'],
+  test('Kurdish routes are right-to-left and use the owner-approved translations', async ({ page }) => {
+    const cases: [string, string, string][] = [
+      ['/ckb', 'ckb-IQ', 'ماڵپەرەکە ئامادە دەکرێت'],
+      ['/bdn', 'kmr-Arab-IQ', 'مالپەر یێ دهێتە ئامادەکرن'],
     ];
-    for (const [path, lang] of cases) {
+    for (const [path, lang, heading] of cases) {
       await page.goto(path);
       await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
       await expect(page.locator('html')).toHaveAttribute('lang', lang);
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText('الموقع قيد التجهيز');
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     }
   });
 

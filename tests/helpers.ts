@@ -31,3 +31,18 @@ export async function makeAdmin(roleKeys: string[] = ['OWNER'], password = 'corr
 export function totpCode(secret: string, offsetSteps = 0) {
   return authenticator.clone({ ...authenticator.options, epoch: Date.now() + offsetSteps * 30_000 }).generate(secret);
 }
+
+/** A structurally valid MPEG-1 Layer III file (silent frames) of roughly `seconds` length. */
+export function makeMp3(seconds = 2): Buffer {
+  const header = Buffer.from([0xff, 0xfb, 0x90, 0x64]); // MPEG1 L3, 128 kbps, 44.1 kHz, no padding
+  const frameSize = Math.floor((144 * 128000) / 44100); // 417 bytes
+  const frames = Math.ceil((seconds * 44100) / 1152);
+  const frame = Buffer.concat([header, Buffer.alloc(frameSize - header.length)]);
+  return Buffer.concat(Array.from({ length: frames }, () => frame));
+}
+
+let keyCounter = 0;
+export function uniqueKey(prefix: string) {
+  keyCounter += 1;
+  return `${prefix}-${Date.now().toString(36)}-${keyCounter}`;
+}
