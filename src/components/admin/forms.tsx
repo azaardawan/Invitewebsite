@@ -62,14 +62,29 @@ export function Field({
   );
 }
 
+/** Turns `code` or `code (subject)` details into readable text using the readiness problem labels. */
+function describeDetail(t: ReturnType<typeof useTranslations<'admin'>>, detail: string) {
+  const m = /^([a-zA-Z]+)(?: \((.*)\))?$/.exec(detail);
+  const key = `catalog.themes.problems.${m?.[1]}`;
+  if (m && t.has(key as never)) return m[2] ? `${t(key as never)}: ${m[2]}` : t(key as never);
+  return detail;
+}
+
 /** Shows the action's error or success message (translated from `admin.*` keys). */
 export function FormStatus({ state }: { state: ActionState }) {
   const t = useTranslations('admin');
   if (state.error) {
     return (
-      <p role="alert" className="text-sm text-danger">
-        {t(state.error as never)}
-      </p>
+      <div role="alert" className="text-sm text-danger">
+        <p>{t(state.error as never)}</p>
+        {state.details?.length ? (
+          <ul className="mt-1 list-disc ps-5">
+            {state.details.map((d) => (
+              <li key={d}>{describeDetail(t, d)}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     );
   }
   if (state.message && state.ok) {

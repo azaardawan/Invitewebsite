@@ -86,7 +86,8 @@ export function storage(): StorageDriver {
   driver =
     e.STORAGE_DRIVER === 's3'
       ? new S3Driver(e.S3_BUCKET!, e.S3_ENDPOINT!, e.S3_REGION, e.S3_ACCESS_KEY_ID!, e.S3_SECRET_ACCESS_KEY!)
-      : new LocalDriver(path.resolve(process.cwd(), e.LOCAL_STORAGE_DIR));
+      : // Local storage is development-only; keep it out of production file tracing.
+        new LocalDriver(path.resolve(/*turbopackIgnore: true*/ process.cwd(), e.LOCAL_STORAGE_DIR));
   return driver;
 }
 

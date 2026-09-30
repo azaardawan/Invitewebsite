@@ -15,6 +15,7 @@ export default async function globalSetup() {
 
   const env = { ...process.env, DATABASE_URL: url };
   execFileSync('pnpm', ['-s', 'db:migrate'], { env, stdio: 'inherit' });
+  execFileSync('pnpm', ['-s', 'db:seed'], { env, stdio: 'inherit' });
   const out = execFileSync('pnpm', ['-s', 'admin:create', '--email', 'owner@bahja.test', '--name', 'مالك بهجه'], { env }).toString();
   const password = out.match(/Temporary password \(shown once\): (\S+)/)?.[1];
   if (!password) throw new Error(`Could not read temporary password from:\n${out}`);

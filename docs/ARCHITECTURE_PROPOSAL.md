@@ -1,7 +1,15 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **APPROVED — revision 4. M1 (foundation) implemented.**
+Status: **APPROVED — revision 5. M1 (foundation) and M2 (admin catalog) implemented.**
 Date: 2026-09-30
+
+**Revision 5 changes (M2 implementation notes):**
+- **Owner approval for design.** The storefront's visual design will be presented for approval before it is built (M4); admin screens stay functional.
+- **Section rule:** "features included in every package" (`sections.required_features`) enforces decision M. Wedding requires `print_card`; a wedding theme designed without a printable card cannot be sold.
+- **Package editor:** a package is created by choosing one of the theme's **designed states** (from its manifest), so invalid combinations can't be configured.
+- **Field Library:** field keys and types are defined in code (themes render them), while labels and length limits are editable in Admin, including Kurdish.
+- **Internal demo theme** (`themes/demo-wedding`) exists for development and tests; it can only be activated when `APP_ENV=development`.
+- **Uploads** go through a dedicated admin route. Images are re-encoded to WebP with metadata such as GPS removed; MP3s are verified by parsing; SVG uploads are refused.
 
 **Revision 4 changes (owner feedback at approval):**
 - A **future section with a different format** is planned, where people add **pictures and messages**. The architecture reserves room for it (§13), but none of it is built yet.
@@ -504,7 +512,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 |---|---|---|---|
 | M0 | Approval of this document | 1–3 | ✅ Approved |
 | M1 ✅ | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data. (Sentry and the nonce-based CSP moved to M11: Sentry needs an account, and CSP is best tuned once real pages exist.) |
-| M2 | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
+| M2 ✅ | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
 | M3 | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 | Storefront | 7 | Home skeleton (awaiting the design), occasions, catalog, theme page with sample preview, SEO, sitemap, robots |
 | M5 | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |

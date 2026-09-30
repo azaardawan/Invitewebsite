@@ -7,14 +7,11 @@ import { logoutAction } from '../_actions/auth';
 import { setAdminLocaleAction } from '../_actions/preferences';
 
 const UPCOMING = [
-  'sections',
-  'themes',
   'invitations',
   'orders',
   'payments',
   'customers',
   'guests',
-  'music',
   'translations',
   'analytics',
   'settings',
@@ -27,6 +24,10 @@ export default async function PanelLayout({ children }: LayoutProps<'/admin'>) {
 
   const links = [
     { href: '/admin', label: t('nav.dashboard'), show: true },
+    { href: '/admin/sections', label: t('nav.sections'), show: can(authz, 'sections.manage') },
+    { href: '/admin/themes', label: t('nav.themes'), show: can(authz, 'themes.view') },
+    { href: '/admin/fields', label: t('nav.fields'), show: can(authz, 'sections.manage') },
+    { href: '/admin/music', label: t('nav.music'), show: can(authz, 'music.manage') },
     { href: '/admin/users', label: t('nav.users'), show: can(authz, 'users.manage') },
     { href: '/admin/audit', label: t('nav.audit'), show: can(authz, 'audit.view') },
     { href: '/admin/account/password', label: t('nav.account'), show: true },

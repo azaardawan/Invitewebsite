@@ -18,6 +18,14 @@ Curated digital invitations for the Iraqi market. Arabic first, plus English, Ku
 - Security headers; `noindex` on admin, invitation, preview and receipt paths.
 - Unit, integration and browser tests (360/390/430 px and desktop), and CI.
 
+**Milestone M2 (admin catalog) is complete:**
+- Sections with four-language names, image, ordering, archive/restore, default fields, and features required in every package.
+- Field library with editable labels and length limits.
+- Music library: MP3 upload, validation, preview, one file stored once, assignment to themes.
+- Themes auto-registered from `themes/<key>/v<N>/`, with search/filter, settings, cover image, song, per-theme field labels and order, and versions.
+- Packages (1–3) built from the theme's designed states, priced in IQD; every price change is audited.
+- Theme lifecycle (development → review → on sale → archived/restored) with a readiness checklist; activated versions are frozen.
+
 ## Local development
 
 Requirements: Node 22+, pnpm 10, PostgreSQL 16.
@@ -26,7 +34,7 @@ Requirements: Node 22+, pnpm 10, PostgreSQL 16.
 pnpm install
 cp .env.example .env            # then fill TOTP_ENCRYPTION_KEY and IP_HASH_SALT (commands inside)
 createdb bahja_dev && createdb bahja_test && createdb bahja_e2e_test
-pnpm db:migrate && pnpm db:seed
+pnpm db:migrate && pnpm db:seed   # also registers themes found in themes/ and the starter sections
 pnpm admin:create --email you@example.com --name "Your Name"   # prints a temporary password once
 pnpm dev                        # http://localhost:3000 and http://localhost:3000/admin
 ```

@@ -17,3 +17,10 @@ product spec's §74 business rules override assumptions.
   Custom SQL (triggers, grants) goes in `pnpm drizzle-kit generate --custom` migrations.
 - Before pushing: `pnpm lint && pnpm typecheck && pnpm i18n:check && pnpm test && pnpm build`,
   plus `pnpm exec playwright test` for UI changes.
+- Themes live in `themes/<key>/v<N>/` with a `manifest.ts` (`defineTheme`). The registry
+  (`src/theme-registry/generated.ts`) is generated automatically; never hand-register a theme.
+  Theme code may only import `@/theme-sdk` and `@/catalog` (ESLint enforces this).
+- A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
+- `pnpm db:seed` is idempotent and runs on every deploy: permissions/roles, field library, starter
+  sections, theme registration. It never overwrites owner edits.
+- Catalog changes go through `src/server/catalog/*` services (validation, locking, audit), never direct SQL from pages.
