@@ -1,4 +1,6 @@
-import '@fontsource-variable/noto-sans-arabic';
+import '@fontsource-variable/vazirmatn';
+import '@fontsource/aref-ruqaa/400.css';
+import '@fontsource/aref-ruqaa/700.css';
 import '../globals.css';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

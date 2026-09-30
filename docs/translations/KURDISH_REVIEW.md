@@ -155,3 +155,79 @@ a hall name and a short and a long invitation sentence. Until then the Arabic sa
 | `receipt.notFound` | هذا الرابط غير صالح. | This link is not valid. | ئەم بەستەرە دروست نییە. | ئەڤ لینکە نە دروستە. | ◐ | PENDING |
 | `receipt.notPublishedYet` | ستظهر دعوتكم هنا فور تأكيد الدفع. | Your invitation will appear here as soon as payment is confirmed. | بانگهێشتنامەکەتان لێرە دەردەکەوێت هەر کە پارەدان پشتڕاست کرایەوە. | داخوازناما هەوە دێ ل ڤێرە دیار بیت هەر کو پارەدان هاتە پشتڕاستکرن. | ○ | PENDING |
 | `receipt.statuses.*` | بانتظار الدفع · مدفوع · ملغى · انتهت مهلة الدفع · مسترد | Awaiting payment · Paid · Cancelled · Payment window expired · Refunded | چاوەڕوانی پارەدان · پارەدراو · هەڵوەشێنراوە · کاتی پارەدان بەسەرچوو · گەڕێنراوەتەوە | ل هیڤیا پارەدانێ · پارە هاتیە دان · هاتیە هەلوەشاندن · دەمێ پارەدانێ ب دوماهی هات · هاتیە زڤڕاندن | ○ | PENDING |
+
+## Batch 5 — storefront navigation and homepage (PENDING)
+
+The homepage replaces the old "website is being prepared" page, so the approved `home.preparing*`
+wording (batch 1, rows 5–6) is no longer shown.
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `nav.home` | الرئيسية | Home | سەرەکی | سەرەکی | ● | PENDING |
+| `nav.themes` | التصاميم | Themes | دیزاینەکان | دیزاین | ◐ | PENDING |
+| `nav.occasions` | المناسبات | Occasions | بۆنەکان | بۆنە | ◐ | PENDING |
+| `nav.how` | كيف تعمل | How it works | چۆن کار دەکات | چاوا کار دکەت | ◐ | PENDING |
+| `nav.contact` | تواصل معنا | Contact us | پەیوەندیمان پێوە بکە | پەیوەندیێ ب مە بکە | ◐ | PENDING |
+| `nav.menu` | القائمة | Menu | لیست | لیست | ◐ | PENDING |
+| `nav.close` | إغلاق | Close | داخستن | گرتن | ◐ | PENDING |
+| `footer.tagline` | دعوات رقمية مختارة بعناية. | Carefully curated digital invitations. | بانگهێشتنامەی دیجیتاڵی بە وردی هەڵبژێردراو. | داخوازنامێن دیجیتالی یێن ب هووری هاتینە هەلبژارتن. | ◐ | PENDING |
+| `home.heroLine1` | دعوات صُممت | Invitations designed | بانگهێشتنامە دیزاینکراون | داخوازنامە هاتینە دیزاینکرن | ○ | PENDING |
+| `home.heroLine2` | للحظات لا تُنسى. | for unforgettable moments. | بۆ ساتە لەبیرنەکراوەکان. | بۆ دەمێن ژبیرنەبوونی. | ○ | PENDING |
+| `home.heroSubtitle` | تصاميم استثنائية لكل مناسبة. | Exceptional designs for every occasion. | دیزاینی نایاب بۆ هەموو بۆنەیەک. | دیزاینێن ناوازە بۆ هەمی بۆنان. | ◐ | PENDING |
+| `home.browse` | تصفّح التصاميم | Browse designs | سەیرکردنی دیزاینەکان | دیتنا دیزاینان | ◐ | PENDING |
+| `home.occasionsTitle` | اختر مناسبتك | Choose your occasion | بۆنەکەت هەڵبژێرە | بۆنا خۆ هەلبژێرە | ◐ | PENDING |
+| `home.themesTitle` | تصاميم مختارة | Featured designs | دیزاینە هەڵبژێردراوەکان | دیزاینێن هەلبژارتی | ◐ | PENDING |
+| `home.themesSubtitle` | كل تصميم مرسوم ومتحرك بعناية. اسحبوا لتتصفحوا المزيد. | Every design is drawn and animated with care. Swipe to see more. | هەر دیزاینێک بە وردی کێشراوە و جووڵەی پێدراوە. ڕایبکێشن بۆ بینینی زیاتر. | هەر دیزاینەک ب هووری هاتیە کێشان و لڤاندن. بکێشن بۆ دیتنا پتر. | ○ | PENDING |
+| `home.allThemes` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | PENDING |
+| `home.prev` / `home.next` | السابق / التالي | Previous / Next | پێشوو / دواتر | بەری / پاشی | ◐ | PENDING |
+| `home.preview` | معاينة | Preview | پێشبینین | پێشدیتن | ◐ | PENDING |
+| `home.choose` | اختيار | Choose | هەڵبژاردن | هەلبژارتن | ● | PENDING |
+| `home.from` | يبدأ من | From | لە | ژ | ◐ | PENDING |
+| `home.noThemes` | التصاميم الأولى في الطريق، تابعونا قريباً. | Our first designs are on their way. See you soon. | یەکەم دیزاینەکانمان لە ڕێگان، بەم زووانە. | دیزاینێن مە یێن ئێکێ ل ڕێکێنە، ب زیترین دەم. | ○ | PENDING |
+| `home.howTitle` | كيف تعمل؟ | How it works | چۆن کار دەکات؟ | چاوا کار دکەت؟ | ◐ | PENDING |
+| `home.step1Title` | اختاروا تصميمكم | Choose your design | دیزاینەکەتان هەڵبژێرن | دیزاینێ خۆ هەلبژێرن | ◐ | PENDING |
+| `home.step1Body` | تصميم يشبهكم، وباقة تناسب مناسبتكم. | A design that feels like you, and a package that fits your occasion. | دیزاینێک لە ئێوە بچێت، و پاکێجێک گونجاو بۆ بۆنەکەتان. | دیزاینەک وەکی هەوە، و پاکێجەک گونجای بۆ بۆنا هەوە. | ○ | PENDING |
+| `home.step2Title` | اكتبوا تفاصيلكم | Add your details | وردەکارییەکانتان بنووسن | هوورگیێن خۆ بنڤیسن | ◐ | PENDING |
+| `home.step2Body` | الأسماء والتاريخ والمكان، وشاهدوا دعوتكم كاملة قبل الدفع. | Names, date and venue, and see your complete invitation before paying. | ناو و بەروار و شوێن، و بانگهێشتنامەکەتان بە تەواوی ببینن پێش پارەدان. | ناڤ و دیرۆک و جه، و داخوازناما خۆ ب تەمامی ببینن بەری پارەدانێ. | ○ | PENDING |
+| `home.step3Title` | شاركوا الرابط | Share the link | بەستەرەکە هاوبەش بکەن | لینکێ پارڤە بکەن | ◐ | PENDING |
+| `home.step3Body` | بعد الدفع تُنشر الدعوة فوراً، وترسلونها على واتساب. | After payment your invitation goes live instantly; send it on WhatsApp. | دوای پارەدان بانگهێشتنامەکە یەکسەر بڵاو دەکرێتەوە، و لە واتسئاپ بینێرن. | پشتی پارەدانێ داخوازنامە دەستبەجێ دێ هێتە بەلاڤکرن، و ل واتسئاپێ بفرێکەن. | ○ | PENDING |
+| `home.featuresTitle` | دعوة واحدة فيها كل شيء | One invitation, everything in it | یەک بانگهێشتنامە، هەموو شتێکی تێدایە | ئێک داخوازنامە، هەمی تشت تێدا | ○ | PENDING |
+| `home.sampleMessage` | يسعدنا حضوركم فرحتنا | We'd love you to celebrate with us | خۆشحاڵ دەبین بە ئامادەبوونتان لە خۆشیمان | دێ دلخۆش بین ب ئامادەبوونا هەوە د شاهیا مە دا | ○ | PENDING |
+| `home.featureMusic` | موسيقى تبدأ مع فتح الدعوة | Music that starts when it opens | مۆسیقا لەگەڵ کردنەوەی بانگهێشتنامە دەست پێدەکات | مۆسیقا دگەل ڤەکرنا داخوازنامێ دەست پێدکەت | ◐ | PENDING |
+| `home.featureRsvp` | تأكيد حضور ورسائل تهنئة | RSVPs and congratulation messages | پشتڕاستکردنەوەی ئامادەبوون و نامەی پیرۆزبایی | پشتڕاستکرنا ئامادەبوونێ و نامێن پیرۆزباهیێ | ◐ | PENDING |
+| `home.featurePrint` | بطاقة دعوة جاهزة للطباعة | A print-ready invitation card | کارتی بانگهێشتی ئامادە بۆ چاپ | کارتا داخوازیێ ئامادە بۆ چاپێ | ◐ | PENDING |
+| `home.featureDays` | متاحة ٣٠ يوماً من النشر | Live for 30 days after publishing | ٣٠ ڕۆژ دوای بڵاوکردنەوە بەردەستە | ٣٠ ڕۆژان پشتی بەلاڤکرنێ بەردەستە | ◐ | PENDING |
+| `home.faqTitle` | أسئلة شائعة | Frequently asked questions | پرسیارە باوەکان | پسیارێن بەربەلاڤ | ◐ | PENDING |
+| `home.faq1q`–`faq4a` | (see `ar.json`) | (see `en.json`) | I'll suggest these once the wording above is settled. | | | PENDING |
+| `home.ctaTitle` | جاهزون لدعوتكم؟ | Ready for your invitation? | ئامادەن بۆ بانگهێشتنامەکەتان؟ | ئامادەنە بۆ داخوازناما خۆ؟ | ○ | PENDING |
+| `home.ctaButton` | ابدأوا الآن | Get started | ئێستا دەست پێبکەن | نوکە دەست پێبکەن | ◐ | PENDING |
+| `home.and` | و | & | و | و | ● | PENDING |
+| `home.cards.*` | Sample names on the hero cards | | Please give Kurdish sample names (see batch 3c). | | | PENDING |
+
+## Batch 6 — catalog, theme page and ordering (PENDING)
+
+All keys are under `store.*` in `src/i18n/messages/ar.json` / `en.json`. The main labels are below.
+Once you have settled the wording in batch 5, I'll suggest the longer sentences (hints, errors, notes).
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `store.catalogTitle` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | PENDING |
+| `store.all` | الكل | All | هەموو | هەمی | ● | PENDING |
+| `store.livePreview` | معاينة حيّة | Live preview | پێشبینینی ڕاستەوخۆ | پێشدیتنا ڕاستەوخۆ | ◐ | PENDING |
+| `store.shortNames` / `longNames` | أسماء قصيرة / طويلة | Short / Long names | ناوی کورت / درێژ | ناڤێن کورت / درێژ | ◐ | PENDING |
+| `store.openFull` | فتح بملء الشاشة | Open full screen | کردنەوە بە پڕی شاشە | ڤەکرن ب تژیا شاشێ | ○ | PENDING |
+| `store.packagesTitle` | اختر باقتك | Choose your package | پاکێجەکەت هەڵبژێرە | پاکێجا خۆ هەلبژێرە | ◐ | PENDING |
+| `store.includes` | تشمل | Includes | لەخۆدەگرێت | تێدایە | ◐ | PENDING |
+| `store.choose` | اختر هذه الباقة | Choose this package | ئەم پاکێجە هەڵبژێرە | ڤێ پاکێجێ هەلبژێرە | ◐ | PENDING |
+| `store.orderTitle` | تفاصيل دعوتك | Your invitation details | وردەکارییەکانی بانگهێشتنامەکەت | هوورگیێن داخوازناما تە | ○ | PENDING |
+| `store.stepDetails` / `stepReview` / `stepPay` | التفاصيل / المراجعة / الدفع | Details / Review / Payment | وردەکاری / پێداچوونەوە / پارەدان | هوورگی / پێداچوون / پارەدان | ◐ | PENDING |
+| `store.packageLabel` | الباقة | Package | پاکێج | پاکێج | ◐ | PENDING |
+| `store.languageLabel` | لغة الدعوة | Invitation language | زمانی بانگهێشتنامە | زمانێ داخوازنامێ | ◐ | PENDING |
+| `store.continue` | اعرض المعاينة | See my preview | پێشبینینەکەم پیشان بدە | پێشدیتنا من نیشان بدە | ○ | PENDING |
+| `store.reviewTitle` | راجع دعوتك | Review your invitation | پێداچوونەوە بە بانگهێشتنامەکەتدا بکە | پێداچوونێ ب داخوازناما خۆ دا بکە | ○ | PENDING |
+| `store.edit` | تعديل التفاصيل | Edit details | دەستکاریکردنی وردەکارییەکان | گوهۆڕینا هوورگیان | ○ | PENDING |
+| `store.contactTitle` | بيانات التواصل | Your contact details | زانیاری پەیوەندی | زانیاریێن پەیوەندیێ | ◐ | PENDING |
+| `store.name` / `phone` / `email` | الاسم الكامل / رقم الهاتف / البريد الإلكتروني | Full name / Phone number / Email | ناوی تەواو / ژمارەی تەلەفۆن / ئیمەیڵ | ناڤێ تەمام / ژمارا تەلەفۆنێ / ئیمەیل | ◐ | PENDING |
+| `store.total` | المجموع | Total | کۆی گشتی | کۆم | ◐ | PENDING |
+| `store.placeOrder` | تأكيد الطلب | Confirm order | پشتڕاستکردنەوەی داواکاری | پشتڕاستکرنا داخوازیێ | ◐ | PENDING |
+| `store.features.*` | (feature names shown on packages) | | I'll suggest these with the batch 6 sentences. | | | PENDING |

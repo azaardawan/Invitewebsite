@@ -21,7 +21,7 @@ Date: 2026-09-30
 - **Admin → Orders:** search and filter. Phone and email are masked for staff without `customers.view`.
 - **Rate limits** (fixed window, in Postgres) on draft creation and checkout per visitor.
 - **Legal acceptance** is recorded with placeholder policy versions (`draft-2026-09`) until Admin-managed legal policies exist (M10).
-- **Customer screens** (personalization form, checkout) will be built with the approved storefront design (M4). The homepage design v2 is awaiting owner approval.
+- **Customer screens** (personalization form, checkout) are built in the approved v2 storefront design (M4).
 
 **Revision 7 changes (M3 implementation notes):**
 - **Theme SDK and contract implemented.**
@@ -559,7 +559,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M1 ✅ | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data. (Sentry and the nonce-based CSP moved to M11: Sentry needs an account, and CSP is best tuned once real pages exist.) |
 | M2 ✅ | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
 | M3 ✅ | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
-| M4 | Storefront | 7 | Home skeleton (awaiting the design), occasions, catalog, theme page with sample preview, SEO, sitemap, robots |
+| M4 ✅ | Storefront | 7 | Homepage in the approved v2 design, occasions, catalog, theme page with live sample preview per package, order screens (details → preview/edit → contact + terms → receipt), SEO, sitemap, robots |
 | M5 ✅ (backend) | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
 | M6 | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
 | M7 | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |

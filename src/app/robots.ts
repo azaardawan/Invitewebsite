@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     // Staging and development are never indexed.
     rules: isProduction
-      ? { userAgent: '*', allow: '/', disallow: ['/admin', '/api/', '/i/', '/p/', '/r/'] }
+      ? { userAgent: '*', allow: '/', disallow: ['/admin', '/api/', '/i/', '/p/', '/r/', '/t/', '/order/', '/*/order/'] }
       : { userAgent: '*', disallow: '/' },
     sitemap: isProduction ? `${base}/sitemap.xml` : undefined,
   };

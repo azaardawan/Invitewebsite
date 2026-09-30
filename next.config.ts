@@ -41,6 +41,10 @@ const nextConfig: NextConfig = {
       { source: '/i/:path*', headers: [noIndex] },
       { source: '/p/:path*', headers: [noIndex] },
       { source: '/r/:path*', headers: [noIndex] },
+      { source: '/t/:path*', headers: [noIndex] },
+      // A customer's order screens carry their private preview token in the URL.
+      { source: '/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
+      { source: '/:locale(en|ckb|bdn)/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
     ];
   },
 };

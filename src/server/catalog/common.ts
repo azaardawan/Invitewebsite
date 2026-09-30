@@ -50,12 +50,7 @@ export function optionalI18nContent(max: number) {
     });
 }
 
-/** Pick the text for a website locale, falling back to Arabic. */
-export function localized(content: I18nContent | null | undefined, locale: string): string {
-  if (!content) return '';
-  const value = (content as Record<string, string | null | undefined>)[locale];
-  return value || content.ar;
-}
+export { localized } from '@/lib/localized';
 
 /** Returns `ids` with `id` moved one step up/down (no-op at the ends). */
 export function moveInList(ids: string[], id: string, direction: 'up' | 'down'): string[] {
