@@ -460,7 +460,39 @@
       "allStatuses": "All statuses",
       "filter": "Filter",
       "empty": "No orders yet.",
-      "receipt": "View receipt"
+      "receipt": "View receipt",
+      "payment": "Payment",
+      "noPayment": "No payment attempt yet",
+      "attempt": "Attempt {n}",
+      "lastChecked": "Checked {when}",
+      "checkWayl": "Check with WAYL",
+      "markPaid": "Mark as paid manually",
+      "markPaidReason": "Reason (e.g. cash received, transfer reference)",
+      "markPaidConfirm": "Mark this order as paid and publish the invitation now? This is recorded in the audit log.",
+      "markedPaid": "Marked as paid; the invitation is published.",
+      "alreadyPaid": "This order was already paid.",
+      "paymentStatuses": {
+        "CREATED": "Link being created",
+        "PENDING": "Waiting for payment",
+        "SUCCEEDED": "Paid (verified)",
+        "FAILED": "Failed",
+        "EXPIRED": "Link expired"
+      },
+      "check": {
+        "PAID": "WAYL confirms the payment; the order is paid.",
+        "OPEN": "WAYL: not paid yet.",
+        "FAILED": "WAYL: the payment failed or was cancelled.",
+        "EXPIRED": "The link expired without payment.",
+        "MISMATCH": "WAYL reports a payment that does not match this order (amount/currency). Not accepted; please investigate.",
+        "RETURNED": "WAYL reports this payment as returned.",
+        "UNKNOWN": "There is no WAYL payment to check (or WAYL is not configured)."
+      },
+      "errors": {
+        "invalid": "This order cannot be changed.",
+        "reason": "Please write a reason (5–500 characters).",
+        "refunded": "This order was refunded.",
+        "wayl": "Couldn't reach WAYL. Try again in a moment."
+      }
     }
   },
   "invitation": {
@@ -574,7 +606,14 @@
     "shareText": "You're invited: {url}",
     "confirmText": "Bahja order confirmation\nInvoice: {invoice}\nInvitation link: {url}\nAvailable until: {expires}",
     "notFound": "This link is not valid.",
-    "notPublishedYet": "Your invitation will appear here as soon as payment is confirmed."
+    "notPublishedYet": "Your invitation will appear here as soon as payment is confirmed.",
+    "payNow": "Pay {amount}",
+    "payOpening": "Opening the secure payment page…",
+    "payNote": "You'll be taken to WAYL's secure payment page, then back here.",
+    "payError": "We couldn't open the payment page right now. Please try again in a moment.",
+    "payManual": "Our team will contact you to complete payment.",
+    "confirming": "Confirming your payment with WAYL…",
+    "confirmingSlow": "Your payment is still being confirmed. This can take a few minutes. Keep this page's link; it will update on its own once confirmed."
   },
   "nav": {
     "home": "Home",
@@ -670,6 +709,7 @@
     "cancel": "Cancel",
     "lockedNote": "This order is confirmed, so its details can no longer be changed here.",
     "metaThemes": "Invitation designs",
-    "metaHome": "Digital invitations for your occasions"
+    "metaHome": "Digital invitations for your occasions",
+    "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed."
   }
 }

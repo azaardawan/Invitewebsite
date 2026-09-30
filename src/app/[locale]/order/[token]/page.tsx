@@ -8,6 +8,7 @@ import { draftByToken } from '@/server/storefront/order';
 import { Price } from '@/components/storefront/currency';
 import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
+import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
 export const dynamicParams = true;
@@ -80,7 +81,12 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               </h2>
               <p className="mt-1 text-sm text-muted">{t('contactNote')}</p>
             </div>
-            <CheckoutForm action={placeOrderAction} token={token} idempotencyKey={randomBytes(18).toString('base64url')} />
+            <CheckoutForm
+              action={placeOrderAction}
+              token={token}
+              idempotencyKey={randomBytes(18).toString('base64url')}
+              paymentNote={onlinePaymentsEnabled() ? t('paymentNext') : t('paymentSoon')}
+            />
           </section>
         </div>
       </div>

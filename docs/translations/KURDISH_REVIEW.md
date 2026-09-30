@@ -231,3 +231,18 @@ Once you have settled the wording in batch 5, I'll suggest the longer sentences 
 | `store.total` | المجموع | Total | کۆی گشتی | کۆم | ◐ | APPROVED (owner, 2026-09-30) |
 | `store.placeOrder` | تأكيد الطلب | Confirm order | پشتڕاستکردنەوەی داواکاری | پشتڕاستکرنا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
 | `store.features.*` | (feature names shown on packages) | | I'll suggest these with the batch 6 sentences. | | | PENDING |
+
+## Batch 7 — online payment (PENDING)
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `receipt.payNow` | ادفع {amount} | Pay {amount} | پارە بدە {amount} | پارەی بدە {amount} | ◐ | PENDING |
+| `receipt.payOpening` | جارٍ فتح صفحة الدفع الآمنة… | Opening the secure payment page… | پەڕەی پارەدانی پارێزراو دەکرێتەوە… | لاپەرێ پارەدانا پاراستی دهێتە ڤەکرن… | ○ | PENDING |
+| `receipt.payNote` | ستنتقل إلى صفحة الدفع الآمنة لدى WAYL، ثم تعود إلى هنا. | You'll be taken to WAYL's secure payment page, then back here. | دەچیتە سەر پەڕەی پارەدانی پارێزراوی WAYL، پاشان دەگەڕێیتەوە ئێرە. | دێ چیە سەر لاپەرێ پارەدانا پاراستی یێ WAYL، پاشان دێ زڤڕییە ڤێرە. | ○ | PENDING |
+| `receipt.payError` | تعذّر فتح صفحة الدفع الآن. يرجى المحاولة بعد قليل. | We couldn't open the payment page right now. Please try again in a moment. | ئێستا نەتوانرا پەڕەی پارەدان بکرێتەوە. تکایە کەمێکی تر هەوڵ بدەوە. | نوکە نەشیاین لاپەرێ پارەدانێ ڤەکەین. هیڤییە پشتی کێمەکێ دووبارە هەول بدە. | ○ | PENDING |
+| `receipt.payManual` | سيتواصل معكم فريقنا لإتمام الدفع. | Our team will contact you to complete payment. | تیمەکەمان پەیوەندیتان پێوە دەکات بۆ تەواوکردنی پارەدان. | تیما مە دێ پەیوەندیێ ب هەوە کەت بۆ تەمامکرنا پارەدانێ. | ◐ | PENDING |
+| `receipt.confirming` | جارٍ تأكيد دفعتكم مع WAYL… | Confirming your payment with WAYL… | پارەدانەکەتان لەگەڵ WAYL پشتڕاست دەکرێتەوە… | پارەدانا هەوە دگەل WAYL دهێتە پشتڕاستکرن… | ○ | PENDING |
+| `receipt.confirmingSlow` | ما زال تأكيد الدفع جارياً… | Your payment is still being confirmed… (see `en.json`) | پشتڕاستکردنەوەی پارەدان هێشتا بەردەوامە و لەوانەیە چەند خولەکێک بخایەنێت. بەستەری ئەم پەڕەیە بپارێزن؛ دوای پشتڕاستکردنەوە خۆی نوێ دەبێتەوە. | پشتڕاستکرنا پارەدانێ هێشتا بەردەوامە و دبیت چەند خولەکان بکێشیت. لینکا ڤێ لاپەرێ بپارێزن؛ پشتی پشتڕاستکرنێ دێ ب خۆ نوو بیت. | ○ | PENDING |
+| `store.paymentNext` | بعد التأكيد تدفعون بأمان عبر صفحة الدفع لدى WAYL… | After confirming, you'll pay securely on WAYL's payment page… | دوای پشتڕاستکردنەوە، بە پارێزراوی لە پەڕەی پارەدانی WAYL پارە دەدەن. بانگهێشتنامەکەتان هەر کە پارەدان پشتڕاست کرایەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ، ب پاراستی ل لاپەرێ پارەدانا WAYL پارەی ددەن. داخوازناما هەوە هەر کو پارەدان هاتە پشتڕاستکرن دێ هێتە بەلاڤکرن. | ○ | PENDING |
+
+Still to suggest (after you've settled the wording above): FAQ answers (`home.faq*`), package feature names (`store.features.*`), the remaining `store.*` sentences (hints and errors), and Kurdish sample names (3c).

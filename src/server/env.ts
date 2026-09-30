@@ -25,7 +25,17 @@ const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   /** Public CDN base URL for media in the bucket (e.g. https://media.example.com). */
   MEDIA_PUBLIC_BASE_URL: z.url().optional(),
+  /** WAYL merchant API key. Without it, checkout creates the order and the team collects payment manually. */
+  WAYL_API_KEY: z.string().min(8).optional(),
+  WAYL_API_BASE_URL: z.url().default('https://api.thewayl.com'),
+  /** `test` creates WAYL test-mode links (no real money); production must use `live`. */
+  WAYL_ENV: z.enum(['live', 'test']).default('test'),
+  /** Shared secret for the scheduled reconciliation call (`POST /api/cron/reconcile-payments`). */
+  CRON_SECRET: z.string().min(32).optional(),
 }).superRefine((e, ctx) => {
+  if (e.APP_ENV === 'production' && e.WAYL_API_KEY && e.WAYL_ENV !== 'live') {
+    ctx.addIssue({ code: 'custom', path: ['WAYL_ENV'], message: 'must be live in production' });
+  }
   if (e.STORAGE_DRIVER === 's3') {
     for (const k of ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'MEDIA_PUBLIC_BASE_URL'] as const) {
       if (!e[k]) ctx.addIssue({ code: 'custom', path: [k], message: 'is required when STORAGE_DRIVER=s3' });

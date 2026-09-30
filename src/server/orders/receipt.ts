@@ -32,6 +32,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
   if (!row) return null;
   const snapshot = row.order.snapshot as OrderSnapshot;
   return {
+    /** Internal id, for server-side follow-ups (payment checks); never rendered. */
+    orderId: row.order.id,
     orderNumber: row.order.orderNumber,
     invoiceNumber: row.order.invoiceNumber,
     status: row.order.status,

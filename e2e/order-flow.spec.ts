@@ -51,10 +51,34 @@ test('a customer orders an invitation from the storefront', async ({ page, reque
   await page.locator('#c-email').fill('store@bahja.test');
   await page.locator('input[name=terms]').check();
   await page.getByRole('button', { name: 'تأكيد الطلب' }).click();
-  await expect(page).toHaveURL(/\/r\/[\w-]+$/);
+
+  // Straight to WAYL's payment page (the e2e mock). Backing out leaves the order unpaid.
+  await expect(page).toHaveURL(/localhost:3101\/pay\//);
+  await page.getByRole('button', { name: 'Cancel (mock)' }).click();
+  await expect(page).toHaveURL(/\/r\/[\w-]+/);
+  await expect(page.getByRole('heading', { name: 'بانتظار الدفع' })).toBeVisible();
   await expect(page.getByText('زبون المتجر')).toBeVisible();
 
-  // Once ordered, the details are locked.
+  // "Pay" from the receipt reuses the same WAYL link; paying publishes the invitation.
+  await page.getByRole('button', { name: /^ادفع/ }).click();
+  await expect(page).toHaveURL(/localhost:3101\/pay\//);
+  await page.getByRole('button', { name: 'Pay (mock)' }).click();
+  await expect(page).toHaveURL(/\/r\/[\w-]+\?paid=1/);
+  await expect(page.getByRole('heading', { name: 'تم الدفع بنجاح' })).toBeVisible();
+  await expect(page.getByText(/INV-\d{4}-\d{5}/)).toBeVisible();
+  await expect(page.getByText(/\/i\/sara-/)).toBeVisible();
+
+  // Once published, the private preview/edit link stops working.
   await page.goto(`${reviewUrl}/edit`);
-  await expect(page.getByText('تم تأكيد هذا الطلب')).toBeVisible();
+  await expect(page.getByText('انتهت صلاحية هذه المعاينة')).toBeVisible();
+});
+
+test('payment endpoints refuse junk and unauthenticated calls', async ({ request }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'API check runs once');
+  expect((await request.post('/api/webhooks/wayl', { data: '' })).status()).toBe(400);
+  // A forged "paid" webhook is recorded but never marks anything paid.
+  const forged = await request.post('/api/webhooks/wayl', { data: { referenceId: 'ORD-FAKE0000-1', status: 'Complete' }, headers: { 'x-wayl-signature-256': 'deadbeef' } });
+  expect(forged.status()).toBe(200);
+  expect((await forged.json()).outcome).toBe('ignored');
+  expect((await request.post('/api/cron/reconcile-payments')).status()).toBe(401);
 });

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 3100;
+const WAYL_MOCK_PORT = 3101;
 const E2E_DATABASE_URL = process.env.E2E_DATABASE_URL ?? 'postgres://bahja:bahja@localhost:5432/bahja_e2e_test';
 
 export default defineConfig({
@@ -22,10 +23,26 @@ export default defineConfig({
     { name: 'mobile-430', use: { ...devices['Desktop Chrome'], viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } } },
   ],
-  webServer: {
-    command: `pnpm exec next start -p ${PORT}`,
-    url: `http://localhost:${PORT}/robots.txt`,
-    reuseExistingServer: false,
-    env: { DATABASE_URL: E2E_DATABASE_URL, E2E_DATABASE_URL },
-  },
+  webServer: [
+    // Stand-in for WAYL (e2e/wayl-mock.ts); the real API is never called from tests.
+    {
+      command: 'pnpm exec tsx e2e/wayl-mock.ts',
+      url: `http://localhost:${WAYL_MOCK_PORT}/health`,
+      reuseExistingServer: false,
+      env: { WAYL_MOCK_PORT: String(WAYL_MOCK_PORT) },
+    },
+    {
+      command: `pnpm exec next start -p ${PORT}`,
+      url: `http://localhost:${PORT}/robots.txt`,
+      reuseExistingServer: false,
+      env: {
+        DATABASE_URL: E2E_DATABASE_URL,
+        E2E_DATABASE_URL,
+        APP_URL: `http://localhost:${PORT}`,
+        WAYL_API_KEY: 'mock-key',
+        WAYL_API_BASE_URL: `http://localhost:${WAYL_MOCK_PORT}`,
+        WAYL_ENV: 'test',
+      },
+    },
+  ],
 });

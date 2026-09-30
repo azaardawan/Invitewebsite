@@ -13,10 +13,12 @@ export function CheckoutForm({
   action,
   token,
   idempotencyKey,
+  paymentNote,
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   token: string;
   idempotencyKey: string;
+  paymentNote: string;
 }) {
   const t = useTranslations('store');
   const [state, formAction, pending] = useActionState(action, {});
@@ -63,7 +65,7 @@ export function CheckoutForm({
       >
         {pending ? t('placing') : t('placeOrder')}
       </button>
-      <p className="text-sm leading-relaxed text-muted">{t('paymentSoon')}</p>
+      <p className="text-sm leading-relaxed text-muted">{paymentNote}</p>
     </form>
   );
 }

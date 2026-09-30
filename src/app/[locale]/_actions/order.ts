@@ -8,6 +8,7 @@ import { requestContext } from '@/server/auth/request-context';
 import { OrderError } from '@/server/orders/common';
 import { createDraft, updateDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
+import { startPayment } from '@/server/payments/service';
 
 /** What storefront order forms get back when something needs fixing. Codes are keys under `store`. */
 export type OrderFormState = {
@@ -79,8 +80,9 @@ export async function editDraftAction(_prev: OrderFormState, form: FormData): Pr
 export async function placeOrderAction(_prev: OrderFormState, form: FormData): Promise<OrderFormState> {
   const values = { name: str(form, 'name'), phone: str(form, 'phone'), email: str(form, 'email') };
   let receiptToken: string;
+  let orderId: string;
   try {
-    ({ receiptToken } = await createOrder(
+    ({ receiptToken, orderId } = await createOrder(
       db(),
       {
         previewToken: str(form, 'token'),
@@ -93,6 +95,12 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
   } catch (e) {
     return failure(e, values);
   }
-  redirect(`/r/${receiptToken}`);
+  // Straight on to WAYL; if that isn't possible right now, the receipt page offers "Pay now".
+  const pay = await startPayment(db(), orderId).catch((e) => {
+    console.error('[payments] start after checkout failed', e);
+    return { kind: 'error' as const };
+  });
+  if (pay.kind === 'redirect') redirect(pay.url);
+  redirect(`/r/${receiptToken}${pay.kind === 'error' ? '?pay=error' : ''}`);
 }
 

@@ -12,6 +12,8 @@ export function loadTestEnv() {
   process.env.IP_HASH_SALT ||= 'test-salt-test-salt';
   process.env.TOKEN_SECRET ||= Buffer.alloc(32, 9).toString('base64');
   process.env.STORAGE_DRIVER = 'local';
+  // Tests never talk to the real WAYL; payment tests inject a fake client.
+  delete process.env.WAYL_API_KEY;
   process.env.LOCAL_STORAGE_DIR = '.storage-test';
   return url;
 }

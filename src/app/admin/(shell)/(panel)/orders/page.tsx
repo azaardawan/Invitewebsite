@@ -9,6 +9,9 @@ import { receiptTokenFor } from '@/server/orders/tokens';
 import { localized } from '@/server/catalog/common';
 import { formatIqd } from '@/lib/currency';
 import { Badge, Card } from '@/components/admin/bits';
+import { ActionForm, SubmitButton } from '@/components/admin/forms';
+import { latestPayments } from '@/server/payments/admin';
+import { checkPaymentAction, markPaidManuallyAction } from '../../../_actions/orders';
 
 const STATUSES = ['PENDING', 'AWAITING_PAYMENT', 'PAID', 'CANCELLED', 'PAYMENT_EXPIRED', 'REFUNDED'] as const;
 
@@ -23,6 +26,9 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
   const status = z.enum(STATUSES).safeParse(params.status).data;
   const rows = await listOrders(db(), { q: q || undefined, status });
   const showContact = can(authz, 'customers.view');
+  const canSeePayments = can(authz, 'payments.view');
+  const canOverride = can(authz, 'payments.override');
+  const pays = canSeePayments ? await latestPayments(db(), rows.map((r) => r.order.id)) : new Map();
   const date = (d: Date) => new Intl.DateTimeFormat(intl, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Baghdad' }).format(d);
 
   return (
@@ -85,10 +91,54 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
                   {t('receipt')}
                 </Link>
               </div>
+              {canSeePayments ? (
+                <div className="border-t border-line pt-3 text-sm sm:col-span-4">
+                  <PaymentLine p={pays.get(order.id)} date={date} t={t} />
+                  {order.status === 'PENDING' || order.status === 'AWAITING_PAYMENT' ? (
+                    <div className="mt-3 flex flex-wrap items-start gap-4">
+                      {pays.get(order.id) ? (
+                        <ActionForm action={checkPaymentAction}>
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <SubmitButton tone="secondary">{t('checkWayl')}</SubmitButton>
+                        </ActionForm>
+                      ) : null}
+                      {canOverride ? (
+                        <ActionForm action={markPaidManuallyAction} confirmMessage={t('markPaidConfirm')} className="flex flex-wrap items-end gap-2">
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <label className="block">
+                            <span className="mb-1 block text-xs text-muted">{t('markPaidReason')}</span>
+                            <input name="reason" required minLength={5} maxLength={500} className="w-64 rounded-md border border-line bg-surface px-3 py-2" />
+                          </label>
+                          <SubmitButton tone="danger">{t('markPaid')}</SubmitButton>
+                        </ActionForm>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </Card>
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+type Pay = Awaited<ReturnType<typeof latestPayments>> extends Map<string, infer P> ? P : never;
+
+function PaymentLine({ p, date, t }: { p: Pay | undefined; date: (d: Date) => string; t: Awaited<ReturnType<typeof getTranslations<'admin.orders'>>> }) {
+  if (!p) return <p className="text-muted">{t('noPayment')}</p>;
+  return (
+    <p className="flex flex-wrap gap-x-3 gap-y-1">
+      <span className="font-medium">{t('payment')}:</span>
+      <span>{t(`paymentStatuses.${p.status}`)}</span>
+      <span className="text-muted">{t('attempt', { n: p.attempt })}</span>
+      <span className="font-mono text-xs text-muted" dir="ltr">
+        {p.providerReference} · {p.providerEnv}
+        {p.providerStatus ? ` · ${p.providerStatus}` : ''}
+      </span>
+      {p.lastCheckedAt ? <span className="text-muted">{t('lastChecked', { when: date(p.lastCheckedAt) })}</span> : null}
+      {p.problem ? <span className="text-danger">{p.problem}</span> : null}
+    </p>
   );
 }

@@ -429,23 +429,28 @@ The honest limit: theme code is still deployed with the app (Decision B). The pr
 
 ## 8. WAYL payment lifecycle
 
-**What I could confirm** from public sources:
-- A REST API authenticated with an `X-WAYL-AUTHENTICATION` merchant token.
-- Payment **links** are created with a merchant `referenceId`.
-- `webhookUrl` and `webhookSecret` are set per link, with deliveries signed by **HMAC-SHA256** in an `x-wayl-signature-256` header.
-- An official reference exists at api.thewayl.com, with support at jisr@wayl.io.
+**Confirmed from WAYL's official OpenAPI spec** (fetched from api.thewayl.com/reference on 2026-09-30, kept at `docs/vendor/wayl-openapi.v1.json`):
+- Authentication: `X-WAYL-AUTHENTICATION: <merchant key>` on every call; `GET /api/v1/verify-auth-key` checks a key.
+- `POST /api/v1/links` takes `env` (`live`/`test`), `referenceId` (unique), `total` (IQD, min 1000), `currency: IQD`, optional `lineItem[]`, `webhookUrl`, `webhookSecret` (10–255 chars), `redirectionUrl` (WAYL appends `referenceId` and `orderid`) and `linkExpiresIn` (1m–30d, default 1h). The store must be verified to create links.
+- `GET /api/v1/links/{referenceId}` reads a link by **our** reference, which makes independent verification possible. `POST …/invalidate-if-pending` closes an unpaid link.
+- Link statuses: Created, Pending, Processing, Complete, Delivered, Cancelled, Rejected, Returned. We treat Complete/Delivered as paid, Cancelled/Rejected as failed, Returned as flagged for the owner.
+- Servers: production `api.thewayl.com`, testing `api.thewayl-staging.com`.
 
-**Still to confirm** from the official docs:
-- Exact endpoint paths.
-- Status values.
-- Whether a link can be fetched by `referenceId` (needed for independent verification).
-- Redirect query parameters.
-- Link expiry.
-- Test/sandbox mode behaviour.
-- Retry policy.
-- Refunds.
+**Not in the spec:** the webhook payload and signature format. Deliveries are therefore only a *signal*: we store them (deduplicated), check an `x-wayl-signature-256` HMAC-SHA256 when present, and always re-read the link from WAYL before acting. A forged delivery can't mark anything paid.
 
-The sandbox blocked access to wayl.io and api.thewayl.com, so nothing below depends on guessed field names. The integration will live behind one `WaylClient` interface. Code will not be finalized until it has been read against the official docs and exercised in WAYL test mode.
+**As built (M6):**
+- `src/server/payments/wayl.ts` (client), `service.ts` (start, verify, webhook, reconcile), tables `payments` and `payment_webhook_events`.
+- Reference = `<order number>-<attempt>`; links last 2 hours; an unpaid order can start new attempts at its snapshot price for 48 hours, then becomes `PAYMENT_EXPIRED`.
+- Before a new attempt, the previous link is checked (it may have been paid) and cancelled at WAYL.
+- The payment row is written **before** calling WAYL, so a lost response is found again by reference.
+- Webhook secrets are derived per link from `TOKEN_SECRET` (nothing extra to configure).
+- Webhooks are processed inline (fast; no queue yet); the reconciliation job (`POST /api/cron/reconcile-payments` or `pnpm payments:reconcile`) is the safety net.
+- The redirect lands on the private receipt `/r/<token>?paid=1`, which verifies with WAYL and refreshes until confirmed.
+- Admin → Orders shows each order's latest payment, a "Check with WAYL" button (`payments.view`) and "Mark as paid manually" with a required reason (`payments.override`, audited).
+- Without `WAYL_API_KEY`, checkout still works and the team collects payment manually.
+- Refunds through WAYL's API are not wired yet (later milestone).
+
+The original plan, for reference:
 
 ```
 1. Customer taps Pay
@@ -561,7 +566,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M3 ✅ | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 ✅ | Storefront | 7 | Homepage in the approved v2 design, occasions, catalog, theme page with live sample preview per package, order screens (details → preview/edit → contact + terms → receipt), SEO, sitemap, robots |
 | M5 ✅ (backend) | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
-| M6 | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
+| M6 ✅ (test mode pending) | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
 | M7 | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
 | M8 | Guest features + print | 14–15 | Guest form (name, attendance, message), moderation, **printable card** and keepsake PDF companions, document jobs |
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |

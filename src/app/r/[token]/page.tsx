@@ -4,16 +4,27 @@ import { localized } from '@/server/catalog/common';
 import { env } from '@/server/env';
 import { formatIqd } from '@/lib/currency';
 import { ReceiptActions } from '@/components/receipt/ReceiptActions';
+import { ConfirmingPayment, PayButton } from '@/components/receipt/PaymentStatus';
+import { db } from '@/server/db/client';
+import { getReceipt } from '@/server/orders/receipt';
+import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/service';
+import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { receiptFor } from './data';
+import { payAction } from './actions';
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
  * token; rendered from the order's immutable snapshot. (Visual design follows
  * the approved storefront design in M4.)
  */
-export default async function ReceiptPage({ params }: PageProps<'/r/[token]'>) {
+export default async function ReceiptPage({ params, searchParams }: PageProps<'/r/[token]'>) {
   const { token } = await params;
-  const r = await receiptFor(token);
+  const sp = await searchParams;
+  let r = await receiptFor(token);
+  const unpaid = r?.status === 'PENDING' || r?.status === 'AWAITING_PAYMENT';
+  // Coming back from WAYL (or reloading): ask WAYL directly; the redirect itself proves nothing.
+  const check = r && unpaid ? await refreshOrderPayment(db(), r.orderId) : null;
+  if (check === 'PAID') r = await getReceipt(db(), token);
   const locale: Locale = r && isLocale(r.snapshot.invitation.locale) ? r.snapshot.invitation.locale : 'ar';
   const t = await getTranslations({ locale, namespace: 'receipt' });
   const brand = (await getTranslations({ locale, namespace: 'common' }))('brand');
@@ -28,6 +39,10 @@ export default async function ReceiptPage({ params }: PageProps<'/r/[token]'>) {
   const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(d) : '—');
   const url = r.invitation.path ? `${env().APP_URL}${r.invitation.path}` : null;
   const paid = r.status === 'PAID';
+  const stillPayable = paymentWindowOpen(r);
+  const online = onlinePaymentsEnabled();
+  const canPay = stillPayable && online;
+  const waitingManual = stillPayable && !online;
   const rows: [string, string][] = [
     [t('orderNumber'), r.orderNumber],
     ...(r.invoiceNumber ? ([[t('invoiceNumber'), r.invoiceNumber]] as [string, string][]) : []),
@@ -48,6 +63,26 @@ export default async function ReceiptPage({ params }: PageProps<'/r/[token]'>) {
       <p className="text-2xl font-semibold text-accent">{brand}</p>
       <h1 className="mt-6 text-xl font-semibold">{paid ? t('paidTitle') : t('pendingTitle')}</h1>
       <p className="text-sm text-muted">{t('title')}</p>
+
+      {canPay || waitingManual ? (
+        <section className="mt-6 flex flex-col gap-3 print:hidden">
+          {sp.paid === '1' && canPay ? <ConfirmingPayment confirming={t('confirming')} slow={t('confirmingSlow')} /> : null}
+          {sp.pay === 'error' ? (
+            <p role="alert" className="rounded-2xl bg-danger/10 px-4 py-3 text-sm text-danger">
+              {t('payError')}
+            </p>
+          ) : null}
+          {canPay ? (
+            <form action={payAction} className="flex flex-col gap-2">
+              <input type="hidden" name="token" value={token} />
+              <PayButton label={t('payNow', { amount: formatIqd(r.amountIqd, intl) })} pendingLabel={t('payOpening')} />
+              <p className="text-center text-xs text-muted">{t('payNote')}</p>
+            </form>
+          ) : (
+            <p className="rounded-2xl bg-blush px-4 py-3 text-sm">{t('payManual')}</p>
+          )}
+        </section>
+      ) : null}
 
       <dl className="mt-6 divide-y divide-line rounded-xl border border-line bg-surface">
         {rows.map(([k, v]) => (
