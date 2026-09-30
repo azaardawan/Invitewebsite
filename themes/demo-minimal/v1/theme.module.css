@@ -1,0 +1,70 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background: #fff6ee;
+  color: #3b2a22;
+  font-family: system-ui, sans-serif;
+}
+
+.card {
+  width: 100%;
+  max-width: 24rem;
+  display: grid;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 2rem 1.25rem;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(59 42 34 / 0.08);
+}
+
+.name {
+  margin: 0;
+  font-size: clamp(1.6rem, 8vw, 2.2rem);
+  overflow-wrap: anywhere;
+}
+
+.line {
+  margin: 0;
+}
+
+.music,
+.rsvp button {
+  font: inherit;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #e0c7b5;
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+}
+
+.rsvp button[aria-pressed='true'] {
+  background: #3b2a22;
+  color: #fff;
+}
+
+.rsvp {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rsvp input {
+  font: inherit;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e0c7b5;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.rsvp small {
+  color: #a4262c;
+}

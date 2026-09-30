@@ -15,3 +15,4 @@ e2e/.owner.json
 src/theme-registry/generated.ts
 .storage/
 .storage-test/
+src/theme-registry/loaders.generated.tsx

@@ -26,6 +26,12 @@ test('owner configures a theme end to end: music → cover → package → revie
   await page.getByRole('link', { name: 'تصميم تجريبي' }).click();
   await expect(page.getByText('لا توجد صورة غلاف.')).toBeVisible();
 
+  // Live preview (isolated iframe) renders the theme with sample content.
+  const frame = page.frameLocator('iframe[title="المعاينة"]');
+  await expect(frame.getByRole('button', { name: 'افتح الدعوة' })).toBeVisible();
+  await page.getByLabel('لغة الدعوة').selectOption('en');
+  await expect(frame.getByRole('button', { name: 'Open invitation' })).toBeVisible();
+
   // Settings: cover image + song.
   const cover = await sharp({ create: { width: 600, height: 900, channels: 3, background: '#b08d57' } }).png().toBuffer();
   await page.locator('input[type=file]').first().setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: cover });

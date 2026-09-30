@@ -313,7 +313,6 @@
         "confirmActivate": "The theme will be visible to customers and its current version will be frozen. Continue?",
         "confirmArchiveActive": "The theme will disappear from the website and can no longer be bought. Existing invitations are not affected. Continue?",
         "preview": "Preview",
-        "previewLater": "Live preview arrives with the theme engine (milestone 3).",
         "packageSummary": "{price} · {features}",
         "problems": {
           "noSection": "No section chosen.",
@@ -359,6 +358,18 @@
         "forbidden": "You don't have permission.",
         "unauthorized": "Your session ended; please sign in again.",
         "uploadFailed": "Upload failed. Please try again."
+      },
+      "preview": {
+        "contents": "Preview contents",
+        "designedStates": "Designed states",
+        "state": "State {n}",
+        "language": "Invitation language",
+        "names": "Name length",
+        "shortNames": "Short names",
+        "longNames": "Long names",
+        "width": "Screen width",
+        "desktop": "Desktop",
+        "openNewTab": "Open in new tab"
       }
     },
     "settings": {
@@ -370,6 +381,78 @@
       "example": "Example: {iqd} is shown as ≈ {usd}",
       "save": "Save",
       "more": "Business and contact information will be added here later (milestone 10)."
+    }
+  },
+  "invitation": {
+    "openInvitation": "Open invitation",
+    "musicPlay": "Play music",
+    "musicPause": "Pause music",
+    "countdownDays": "days",
+    "countdownHours": "hours",
+    "countdownMinutes": "minutes",
+    "countdownSeconds": "seconds",
+    "eventStarted": "The celebration has begun",
+    "openMap": "Open in maps",
+    "date": "Date",
+    "time": "Time",
+    "venue": "Venue",
+    "guestFormTitle": "Will you attend?",
+    "guestName": "Your name",
+    "attendanceQuestion": "Will you attend?",
+    "attending": "I'll attend",
+    "notAttending": "I can't attend",
+    "message": "Congratulation message",
+    "submit": "Send",
+    "sending": "Sending…",
+    "sent": "Thank you, your response was sent.",
+    "sentPreview": "This is a preview, so the response was not saved.",
+    "errorRequired": "This field is required.",
+    "errorTooLong": "This text is too long.",
+    "errorGeneric": "Couldn't send. Please try again.",
+    "previewRibbon": "Preview",
+    "sampleRibbon": "Sample",
+    "renderError": "The invitation can't be shown right now.",
+    "retry": "Try again",
+    "months": {
+      "m1": "January",
+      "m2": "February",
+      "m3": "March",
+      "m4": "April",
+      "m5": "May",
+      "m6": "June",
+      "m7": "July",
+      "m8": "August",
+      "m9": "September",
+      "m10": "October",
+      "m11": "November",
+      "m12": "December"
+    },
+    "weekdays": {
+      "d0": "Sunday",
+      "d1": "Monday",
+      "d2": "Tuesday",
+      "d3": "Wednesday",
+      "d4": "Thursday",
+      "d5": "Friday",
+      "d6": "Saturday"
+    },
+    "am": "AM",
+    "pm": "PM"
+  },
+  "invitationSamples": {
+    "short": {
+      "person_1_name": "Ali",
+      "person_2_name": "Noor",
+      "family_names": "The Al-Husseini and Al-Karkhi families",
+      "venue_name": "Jasmine Hall",
+      "invitation_message": "We would love you to celebrate with us."
+    },
+    "long": {
+      "person_1_name": "Abdulrahman",
+      "person_2_name": "Fatima Al-Zahraa",
+      "family_names": "The families of Abdulrahman Al-Husseini and Mohammed Al-Karkhi",
+      "venue_name": "The Princesses' Palace Grand Events Hall",
+      "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times."
     }
   }
 }

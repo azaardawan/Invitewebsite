@@ -24,3 +24,6 @@ product spec's §74 business rules override assumptions.
 - `pnpm db:seed` is idempotent and runs on every deploy: permissions/roles, field library, starter
   sections, theme registration. It never overwrites owner edits.
 - Catalog changes go through `src/server/catalog/*` services (validation, locking, audit), never direct SQL from pages.
+- Theme code follows `docs/THEME_CONTRACT.md`. Themes are rendered only via `InvitationView` +
+  the generated `ThemeHost` (per-theme lazy chunks). Never import a theme directly into platform code.
+- `e2e/themes.spec.ts` validates every theme state automatically; a new theme must pass it.

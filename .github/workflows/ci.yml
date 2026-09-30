@@ -44,3 +44,11 @@ jobs:
         run: PGPASSWORD=bahja psql -h localhost -U bahja -d bahja_test -c "CREATE DATABASE bahja_e2e_test"
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm exec playwright test
+      - name: Upload theme screenshots for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme-screenshots
+          path: test-results/**/theme-screenshots/**
+          if-no-files-found: ignore
+          retention-days: 14

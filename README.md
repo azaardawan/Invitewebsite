@@ -28,6 +28,13 @@ Curated digital invitations for the Iraqi market. Arabic first, plus English, Ku
 
 **Since M2:** an owner-set USD exchange rate (Admin → Website settings) lets visitors switch prices between IQD and USD next to the language choice. Payment is always IQD.
 
+**Milestone M3 (theme engine) is complete:**
+- Theme SDK (contract in [`docs/THEME_CONTRACT.md`](docs/THEME_CONTRACT.md)): music (tap to start, always loops), guest form, countdown, localized dates.
+- Themes load lazily, one theme's code and styles per page; they render in an isolated layout with a platform-owned SAMPLE/PREVIEW label.
+- Admin live preview for any package, language, name length, width and version.
+- Automated validation of every theme state in 4 languages and 4 widths, with screenshots.
+- Two internal demo themes exercise the contract; the first real theme comes from the owner's design.
+
 ## Local development
 
 Requirements: Node 22+, pnpm 10, PostgreSQL 16.

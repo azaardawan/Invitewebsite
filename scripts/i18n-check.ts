@@ -39,8 +39,11 @@ for (const [name, file] of [
     failed = true;
     console.error(`${name} has keys not in Arabic:`, unknown);
   }
-  const pending = customerFacing.filter((k) => !have.has(k));
-  console.log(`${name}: ${customerFacing.length - pending.length}/${customerFacing.length} approved` + (pending.length ? `; pending: ${pending.join(', ')}` : ''));
+  // Sorani dates use built-in calendar data; only Badini needs translated month/weekday names.
+  const calendarOnly = (k: string) => /^invitation\.(months|weekdays)\.|^invitation\.(am|pm)$/.test(k);
+  const pending = customerFacing.filter((k) => !have.has(k) && !(name.startsWith('Sorani') && calendarOnly(k)));
+  const total = customerFacing.filter((k) => !(name.startsWith('Sorani') && calendarOnly(k))).length;
+  console.log(`${name}: ${total - pending.length}/${total} approved` + (pending.length ? `; pending ${pending.length} (see docs/translations/KURDISH_REVIEW.md)` : ''));
 }
 
 if (failed) process.exit(1);

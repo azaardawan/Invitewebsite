@@ -1,7 +1,20 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **APPROVED — revision 5. M1 (foundation) and M2 (admin catalog) implemented.**
+Status: **APPROVED — revision 7. M1 (foundation), M2 (admin catalog) and M3 (theme engine) implemented.**
 Date: 2026-09-30
+
+**Revision 7 changes (M3 implementation notes):**
+- **Theme SDK and contract implemented.**
+  - The developer contract is `docs/THEME_CONTRACT.md`.
+  - Music starts on the "Open invitation" tap, always loops, and pauses when the phone locks.
+  - Also included: a headless guest form, countdown, reduced motion, and localized dates (Badini uses owner-approved month names).
+- **Per-theme loading.**
+  - Each theme version is a separate lazy chunk (JS and CSS); an invitation page loads only its own theme.
+  - A test proves this, and also proves no platform styles are loaded.
+- **Invitation pages have their own minimal root layout.** Admin pages moved under `app/admin/(shell)` so previews under `/admin/preview` (where the admin cookie applies) can use one.
+- **Admin preview panel** (isolated iframe): switch package or state, language, name length, width and version.
+- **Automated validation** (`e2e/themes.spec.ts`) covers every state × language × name length × width, plus behaviour checks. Screenshots are uploaded by CI for review.
+- The **registry generator** rejects theme CSS with global selectors, and themes without `Theme.tsx`.
 
 **Revision 6 changes (owner feedback after M2):**
 - **Currency (Decision N):** all payments in IQD. An owner-set exchange rate lets visitors view prices in USD, with the switch next to the language choice.
@@ -525,7 +538,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M0 | Approval of this document | 1–3 | ✅ Approved |
 | M1 ✅ | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data. (Sentry and the nonce-based CSP moved to M11: Sentry needs an account, and CSP is best tuned once real pages exist.) |
 | M2 ✅ | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
-| M3 | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
+| M3 ✅ | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 | Storefront | 7 | Home skeleton (awaiting the design), occasions, catalog, theme page with sample preview, SEO, sitemap, robots |
 | M5 | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
 | M6 | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |

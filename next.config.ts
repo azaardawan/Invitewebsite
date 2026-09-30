@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
         ],
       },
       { source: '/admin', headers: [noIndex, { key: 'X-Frame-Options', value: 'DENY' }, { key: 'Cache-Control', value: 'no-store' }] },
+      // Theme previews are shown inside an iframe on our own admin pages (later header wins).
+      { source: '/admin/preview/:path*', headers: [{ key: 'X-Frame-Options', value: 'SAMEORIGIN' }] },
       // Customer invitations, personalized previews and private receipts are never indexed.
       { source: '/i/:path*', headers: [noIndex] },
       { source: '/p/:path*', headers: [noIndex] },

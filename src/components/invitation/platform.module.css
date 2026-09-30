@@ -1,0 +1,42 @@
+/* Platform-owned UI around a theme. Deliberately minimal and self-contained. */
+.ribbon {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(20 17 14 / 0.82);
+  color: #fff;
+  font: 600 0.8rem/1.4 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+}
+
+[dir='rtl'] .ribbon {
+  translate: 50% 0;
+}
+
+.fallback {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  font: 1rem/1.6 system-ui, sans-serif;
+  background: #fbf8f3;
+  color: #1f1b16;
+}
+
+.fallback button {
+  justify-self: center;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
