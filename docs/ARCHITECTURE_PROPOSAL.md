@@ -77,10 +77,10 @@ There are no accounts and cookies are not a security mechanism, so the post-paym
 **E. ✅ CONFIRMED — one guest form.** The guest writes their **name** (required), chooses **attending / not attending** (required) and writes a **message to the couple**. The message is required when the package includes the `congratulations` feature; without that feature the form has only name + attendance. Messages feed the keepsake PDF. Guest count is not included in V1.
 
 **F. ✅ CONFIRMED — Arabic script, and every font must support Kurdish letters.**
-Badini is usually written in Arabic script in Duhok, but Latin script is also used. Please confirm **Arabic script** (RTL). Internal locale codes: `ar`, `en`, `ckb` (Sorani), and `bdn` as an internal code (displayed as "بادینی"; the BCP-47 tag in `lang` would be `kmr-Arab`). Fonts must cover Kurdish letters (ڕ ۆ ێ ڵ ە ڤ). Many "Arabic" web fonts do not, so fonts will be checked for this.
+Badini is usually written in Arabic script in Duhok, but Latin script is also used. Confirmed: **Arabic script** (RTL). Internal locale codes: `ar`, `en`, `ckb` (Sorani), and `bdn` as an internal code (displayed as "بادینی"; the BCP-47 tag in `lang` would be `kmr-Arab`). Fonts must cover Kurdish letters (ڕ ۆ ێ ڵ ە ڤ). Many "Arabic" web fonts do not, so fonts will be checked for this.
 
 **G. ✅ CONFIRMED — invitations snapshot their song.**
-Following the versioning principle, an invitation **snapshots its music track** at publication. Replacing a theme's song affects new invitations only. Admin can still change a specific invitation's track, and that change is audited. Please confirm.
+Following the versioning principle, an invitation **snapshots its music track** at publication. Replacing a theme's song affects new invitations only. Admin can still change a specific invitation's track, and that change is audited.
 
 **H. Short invitation IDs are guessable.**
 The example `X7K2P` has 5 characters, about 33 million combinations, which a script can enumerate. Recommendation: a 10-character Crockford base32 public ID (about 50 bits), plus rate limiting on `/i/*` misses.
