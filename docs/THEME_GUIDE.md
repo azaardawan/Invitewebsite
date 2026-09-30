@@ -51,7 +51,7 @@ Design the theme **complete first**; that complete design is the highest package
 | Guest form: name + attending/not | ✅ | ✅ | ❌ |
 | Guest message to the couple | ✅ | ❌ | ❌ |
 | Keepsake PDF of messages | ✅ | ❌ | ❌ |
-| Printable invitation card | ✅ | ✅ | ✅ *(your choice)* |
+| Printable invitation card | ✅ | ✅ | ✅ *(all Wedding packages; other sections decided later)* |
 
 **Important:** for every package, decide **what the design looks like when those parts are gone**. Does the gap close up? Does a decorative element take its place? This is Step 5.
 

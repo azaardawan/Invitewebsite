@@ -1,7 +1,12 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **PROPOSAL — revision 2, awaiting final approval. No implementation has started.**
-Date: 2026-09-29
+Status: **FINAL DRAFT — revision 3. All decisions answered; awaiting the go-ahead to start M1. No implementation has started.**
+Date: 2026-09-30
+
+**Revision 3 changes:**
+- A: no go-live date; publish immediately for 30 days; extensions by Admin on request.
+- C: separate order and invoice numbers, as recommended.
+- M: every Wedding package includes the printable card; other sections can enable it later from Admin.
 
 **Revision 2 changes (owner feedback):**
 - Public lifetime is now **30 days** from publication.
@@ -53,24 +58,21 @@ Customer-facing routes:
 
 ## 2. Contradictions and decisions that need the owner
 
-**A. 30-day lifetime vs the event date (still open — the most important remaining decision).**
-Expiry is `published_at + 30 days`, and payment publishes immediately. So a customer who pays 45 days before a wedding has a dead link 15 days before the event. The risk is smaller than with 15 days, but real. Customers will do this, and it will create support load and refund disputes.
-Options:
-1. Keep the rule strictly. Checkout shows the computed expiry date and blocks, or warns, when `event_date > expiry`. This is the simplest option and needs no rule change.
-2. **(Recommended)** Keep "30 days from publication" but let the customer pick a **go-live date** (today by default, never later than the event date). Payment is verified immediately, the order becomes `PAID`, and publication happens automatically at the chosen date. The rule is preserved; only *when* publication happens changes.
-3. `expires_at = max(published_at + 30d, event_date + 1d)`. This changes the business rule.
+**A. ✅ DECIDED — publish immediately, 30 days, extensions on request.**
+There is no go-live date. Verified payment publishes the invitation at once, with `expires_at = published_at + 30 days`. If a customer needs longer, they contact Bahja and Admin extends it (audited, with a reason).
+To avoid surprises, the checkout and the receipt both show the exact expiry date. If the entered `event_date` is later than that expiry, checkout shows a short note: *"Your invitation will be live until X. Contact us if you need an extension."* This is informational only and never blocks payment.
 
 **B. Theme code cannot be added "without rebuilding the application."**
 Sections, packages, prices, fields, labels, music, ordering, translations and legal content are all managed from Admin with no rebuild. **Theme code** (unique layouts and animations) is executable code. Loading arbitrary JS uploaded at runtime into production is a real security and stability risk (supply-chain issues, XSS reaching admin sessions, no review). Recommendation: theme code ships through git → CI checks → a zero-downtime deploy (minutes). Admin then registers or activates the deployed version. Signed, pre-built theme bundles hosted on the CDN can come later if deploy frequency becomes a bottleneck.
 
-**C. Invoice number used as the WAYL reference.**
+**C. ✅ DECIDED — separate order number (WAYL reference) and gap-free invoice number.**
 If an invoice number is created at checkout start, abandoned checkouts consume numbers and leave gaps. Accountants and tax authorities often expect gap-free invoice sequences. Recommendation:
 - `order_number` (e.g. `ORD-7K2P9X4M`, random) is created at checkout and used as the WAYL `referenceId`.
 - `invoice_number` (`INV-2026-00184`, gap-free sequence per year) is assigned **in the same transaction that marks the order PAID**.
-Both are shown on the receipt. If you prefer a single number, I can do that; gaps will then exist.
+Both are shown on the receipt. 
 
-**D. ✅ CONFIRMED — private receipt URL + one transactional email.** The customer has no way back to their receipt or link once they leave the page.**
-There are no accounts and cookies are not a security mechanism, so the post-payment page gets a private `/r/[token]` URL (256-bit random token, only a hash is stored). That URL is shown on screen and included in the prepared WhatsApp message. **Recommendation: also send one transactional email** with the receipt link (Resend or Postmark, costs cents). You are already collecting email; without it, a customer whose browser dies after the WAYL redirect has nothing. Please confirm.
+**D. ✅ CONFIRMED — private receipt URL + one transactional email.**
+There are no accounts and cookies are not a security mechanism, so the post-payment page gets a private `/r/[token]` URL (256-bit random token, only a hash is stored). That URL is shown on screen and included in the prepared WhatsApp message. **Recommendation: also send one transactional email** with the receipt link (Resend or Postmark, costs cents). You are already collecting email; without it, a customer whose browser dies after the WAYL redirect has nothing.
 
 **E. ✅ CONFIRMED — one guest form.** The guest writes their **name** (required), chooses **attending / not attending** (required) and writes a **message to the couple**. The message is required when the package includes the `congratulations` feature; without that feature the form has only name + attendance. Messages feed the keepsake PDF. Guest count is not included in V1.
 
@@ -102,7 +104,7 @@ Messages can only be written while the invitation is public, so the collection p
 **L. Price or theme changes during checkout.**
 Price, package, fields and theme version are snapshotted when the order is created. If a theme is archived or re-priced after a WAYL link is issued, that order is honored at the snapshotted price until the link expires. After that, the customer must restart and sees current availability.
 
-**M. NEW — Printable invitation card (per theme).**
+**M. ✅ DECIDED — Printable invitation card.**
 Every theme ships a **print companion**: a static, print-ready design of the same visual identity. It is not a screenshot of the animated page.
 - **What the customer gets.** After payment, the receipt page (`/r/<token>`) and the receipt email have a **Download printable card (PDF)** button. It uses the same names, date, venue and text as the online invitation, in the invitation's language.
 - **Print specifications**, declared per theme in the manifest:
@@ -112,10 +114,13 @@ Every theme ships a **print companion**: a static, print-ready design of the sam
   - fonts embedded in the PDF;
   - optional crop marks for print shops.
 - **Colour.** Chromium produces RGB PDFs. Most local print shops accept RGB. If a shop needs CMYK, a conversion step (Ghostscript + ICC profile) can be added. Designers should keep print colours CMYK-safe because very saturated RGB colours shift in print.
-- **QR code (recommended default).** The card can carry a QR code to the online invitation. After 30 days the QR opens the branded "invitation ended" page, never an error.
+- **QR code (default on; can be turned off per theme).** The card can carry a QR code to the online invitation. After 30 days the QR opens the branded "invitation ended" page, never an error.
 - **Preview.** Before payment, the personalized preview shows a low-resolution, watermarked card. The full-resolution PDF exists only after payment, and is served only through the private receipt token or from Admin.
 - **Regeneration.** The PDF is generated by the worker after publication. If Admin edits the invitation, `source_hash` changes and the card is regenerated automatically. Admin can also regenerate or download it at any time.
-- **Package control.** It is a feature key, `print_card`, so you decide per package whether it is included. **Question: include it in every package, or only higher ones?**
+- **Package control (decided).**
+  - The card is designed as part of the complete (VVIP) theme.
+  - **Every Wedding package includes it.** The Wedding section's default feature set has `print_card` turned on, so every new Wedding package gets it automatically.
+  - For other sections it stays an ordinary per-package feature, off by default. If you later decide Graduation or Birthday themes should have one, you switch it on in Admin with no code change; that section's themes just need a print companion design.
 
 ---
 
@@ -126,7 +131,7 @@ Every theme ships a **print companion**: a static, print-ready design of the sam
 | App framework | **Next.js (App Router) + TypeScript**, a single app | SSR for SEO pages, per-invitation OG tags and noindex headers. Route handlers for the WAYL webhook. Per-route code splitting, so each invitation loads only its own theme bundle. One deployable. Very well-trodden for AI-assisted development. |
 | Database | **PostgreSQL 16** (managed: Neon, Supabase-hosted Postgres, or Render/Railway PG) | Relational integrity, transactions, row locks for idempotent payment handling, partial unique indexes, JSONB for validated snapshots. |
 | ORM / migrations | **Drizzle ORM** + SQL migrations | SQL-close and type-safe. Check constraints, partial indexes, grants and triggers (audit immutability) are written as plain SQL in migrations rather than fought through an abstraction. |
-| Background jobs | **pg-boss** (queue inside Postgres) | PDF generation, payment reconciliation, scheduled publication, cleanup. No Redis and no extra service. |
+| Background jobs | **pg-boss** (queue inside Postgres) | PDF generation, payment reconciliation, cleanup. No Redis and no extra service. |
 | Object storage / CDN | **Cloudflare R2** + Cloudflare CDN | S3 API, **no egress fees** (music is streamed repeatedly), good edge presence for Iraq. Signed upload URLs for admin uploads only. |
 | Hosting | **One container host** (Render, Railway or Fly; Frankfurt or nearby region) running a `web` process and a `worker` process from the same image, with Cloudflare in front | PDF generation needs headless Chromium, which is awkward on serverless. Long webhook and reconciliation jobs are simpler on containers. Predictable cost. |
 | Styling (platform) | **Tailwind CSS** using logical properties (`ms-*`, `ps-*`, `start-*`) | RTL/LTR from one codebase, small CSS output. |
@@ -208,7 +213,7 @@ A single polymorphic `translations(entity_type, entity_id, ...)` table would los
   - `invitation_locale`
   - **`field_values jsonb`**, validated on the server against the package's field set
   - `preview_token_hash`, `preview_expires_at`
-  - `scheduled_publish_at`, `published_at`, `expires_at`
+  - `published_at`, `expires_at`
   - `unpublished_reason`, `version` int (optimistic locking for concurrent admin edits)
   - **EXPIRED is derived** (`status = PUBLISHED AND now() >= expires_at`), not a stored flip. There is no cron race: expiry is exact to the second, and extending it is a single update.
   - `field_values` is JSONB rather than an EAV `invitation_field_values` table because values are always read and written as a whole, validated as a whole, snapshotted and diffed for audit. EAV adds joins without adding integrity, since type integrity comes from the Zod schema either way.
@@ -266,7 +271,7 @@ A single polymorphic `translations(entity_type, entity_id, ...)` table would los
 │  │  ├─ v1/  manifest.ts  Theme.tsx  theme.module.css  pdf/  assets/  README.md
 │  │  └─ v2/  …
 │  └─ registry.ts                      generated list of code_refs → lazy imports
-├─ worker/                             pg-boss job handlers (pdf, reconcile, publish-scheduled, cleanup)
+├─ worker/                             pg-boss job handlers (pdf, reconcile, cleanup)
 ├─ scripts/                            theme:validate, theme:freeze, backup:verify, seed
 ├─ tests/ (unit, integration) · e2e/ (Playwright) · mocks/wayl/
 └─ docs/                               architecture, theme contract, runbooks, retention, backups
@@ -403,7 +408,6 @@ The sandbox blocked access to wayl.io and api.thewayl.com, so nothing below depe
     - TX: SELECT … FOR UPDATE order; if already PAID → no-op
           payment SUCCEEDED; order PAID + invoice_number assigned; status history
           invitation → PUBLISHED, published_at=now(), expires_at=now()+30d
-          (or scheduled_publish_at if Decision A option 2)
           audit + analytics(payment_success, invitation_published)
     - after commit: send receipt email (if approved)
 5. Customer returns to /checkout/return
@@ -493,7 +497,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 
 | # | Milestone | Spec phases | Exit criteria |
 |---|---|---|---|
-| M0 | Approval of this document | 1–3 | Decisions A–L answered |
+| M0 | Approval of this document | 1–3 | ✅ All decisions answered; awaiting final go-ahead |
 | M1 | Foundation | 4 | Repo, CI, Drizzle schema and migrations, env validation, i18n with RTL, admin login + 2FA + RBAC, audit log, seed data, Sentry |
 | M2 | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
 | M3 | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
@@ -515,7 +519,7 @@ Tests are written inside each milestone. Coverage focuses on payment verificatio
 
 **Needed now** (to start M1–M3):
 1. Approval of this architecture, or changes to it.
-2. Answers to the remaining decisions: **A** (go-live date), **C** (separate order and invoice numbers), and **M** (which packages include the printable card; QR yes/no). D, E, F and G are confirmed.
+2. ~~Remaining decisions~~ — all answered (A, C, D, E, F, G, M).
 3. ~~Brand name~~ — **Bahja / بهجه** (working name).
 4. WAYL: a merchant account and **test-mode API token**, access to the official API reference, and your merchant dashboard settings. Also allow `wayl.io` and `api.thewayl.com` in this environment's network access so I can read the docs directly. They are currently blocked by the environment's network policy.
 
