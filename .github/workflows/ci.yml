@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bahja
+          POSTGRES_PASSWORD: bahja
+          POSTGRES_DB: bahja_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U bahja" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      APP_ENV: development
+      APP_URL: http://localhost:3000
+      DATABASE_URL: postgres://bahja:bahja@localhost:5432/bahja_test
+      TEST_DATABASE_URL: postgres://bahja:bahja@localhost:5432/bahja_test
+      E2E_DATABASE_URL: postgres://bahja:bahja@localhost:5432/bahja_e2e_test
+      # CI-only throwaway values (not secrets).
+      TOTP_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      IP_HASH_SALT: ci-only-salt-not-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm i18n:check
+      - run: pnpm test
+      - run: pnpm build
+      - name: Create e2e database
+        run: PGPASSWORD=bahja psql -h localhost -U bahja -d bahja_test -c "CREATE DATABASE bahja_e2e_test"
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test

@@ -1,0 +1,158 @@
+{
+  "common": {
+    "brand": "Bahja",
+    "language": "Language",
+    "skipToContent": "Skip to content"
+  },
+  "home": {
+    "preparingTitle": "The website is being prepared",
+    "preparingBody": "Soon: carefully designed digital invitations for your occasions."
+  },
+  "footer": {
+    "rights": "© {year} Bahja. All rights reserved."
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The link may have changed or is no longer available.",
+    "backHome": "Back to home",
+    "genericTitle": "Something went wrong",
+    "tryAgain": "Try again"
+  },
+  "admin": {
+    "title": "Bahja Admin",
+    "switchLanguage": "العربية",
+    "nav": {
+      "dashboard": "Dashboard",
+      "users": "Users & roles",
+      "audit": "Audit history",
+      "account": "My account & security",
+      "logout": "Sign out",
+      "upcoming": "Coming next"
+    },
+    "modules": {
+      "sections": "Sections",
+      "themes": "Themes",
+      "invitations": "Invitations",
+      "orders": "Orders & invoices",
+      "payments": "Payments",
+      "customers": "Customers",
+      "guests": "Guest responses & messages",
+      "music": "Music library",
+      "translations": "Translations",
+      "analytics": "Analytics",
+      "settings": "Website settings",
+      "legal": "Legal policies"
+    },
+    "login": {
+      "heading": "Sign in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "invalid": "Incorrect email or password.",
+      "rateLimited": "Too many attempts. Please wait 15 minutes and try again.",
+      "sessionExpired": "Your session ended. Please sign in again."
+    },
+    "verify": {
+      "heading": "Two-step verification",
+      "intro": "Enter the 6-digit code from your authenticator app, or one of your recovery codes.",
+      "code": "Verification code",
+      "submit": "Verify",
+      "invalid": "The code is incorrect or was already used.",
+      "rateLimited": "Too many attempts. Please wait 15 minutes.",
+      "recoveryUsed": "A recovery code was used. You now have fewer codes left; the owner can reset your two-step verification to issue new ones."
+    },
+    "setup2fa": {
+      "heading": "Turn on two-step verification",
+      "intro": "Two-step verification is required for every admin account. Scan the code with an authenticator app (such as Google Authenticator or Microsoft Authenticator), then enter the code it shows.",
+      "manualKey": "Or enter this key manually:",
+      "code": "Code from the app",
+      "submit": "Turn on",
+      "invalid": "Incorrect code. Check that your phone's clock is correct and try again.",
+      "recoveryHeading": "Recovery codes",
+      "recoveryIntro": "Store these codes somewhere safe. Each one works once if you lose your phone. They will not be shown again.",
+      "continue": "I saved them, continue"
+    },
+    "password": {
+      "heading": "Change password",
+      "mustChange": "You must replace your temporary password before continuing.",
+      "current": "Current password",
+      "next": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Save",
+      "saved": "Password changed. Other devices have been signed out.",
+      "mismatch": "The passwords do not match.",
+      "wrongCurrent": "The current password is incorrect.",
+      "sameAsCurrent": "The new password must be different from the current one.",
+      "tooShort": "The password must be at least 12 characters.",
+      "tooLong": "The password is too long.",
+      "tooSimple": "The password is too simple; use a wider mix of characters.",
+      "containsEmail": "The password must not contain your email."
+    },
+    "dashboard": {
+      "welcome": "Welcome, {name}",
+      "intro": "This is the first stage of the admin panel: accounts, roles and audit history. The other sections will be added next.",
+      "roles": "Your roles: {roles}"
+    },
+    "users": {
+      "heading": "Users & roles",
+      "name": "Name",
+      "email": "Email",
+      "roles": "Roles",
+      "status": "Status",
+      "twoFactor": "Two-step verification",
+      "lastLogin": "Last sign-in",
+      "never": "—",
+      "enabled": "On",
+      "notEnabled": "Off",
+      "active": "Active",
+      "disabled": "Disabled",
+      "you": "(you)",
+      "create": "Add user",
+      "createSubmit": "Create account",
+      "created": "Account created. Temporary password (shown only once):",
+      "createdHint": "Send it to the user securely. They must change it and turn on two-step verification at first sign-in.",
+      "saveRoles": "Save roles",
+      "disable": "Disable",
+      "enable": "Enable",
+      "reset2fa": "Reset two-step verification",
+      "resetPassword": "New temporary password",
+      "reason": "Reason (saved in the audit history)",
+      "confirm": "Are you sure? This action is recorded in the audit history.",
+      "done": "Done.",
+      "newPassword": "New temporary password (shown only once):",
+      "errors": {
+        "emailTaken": "This email is already in use.",
+        "unknownRole": "Unknown role.",
+        "noRoles": "Choose at least one role.",
+        "lastOwner": "The last active owner cannot be removed or disabled.",
+        "self": "You can't perform this action on your own account.",
+        "notFound": "User not found.",
+        "invalid": "Please check the fields."
+      }
+    },
+    "roles": {
+      "OWNER": "Owner",
+      "MANAGER": "Manager",
+      "DESIGNER": "Designer",
+      "SUPPORT": "Support"
+    },
+    "audit": {
+      "heading": "Audit history",
+      "intro": "A tamper-resistant record of every important action.",
+      "time": "Time",
+      "actor": "By",
+      "action": "Action",
+      "object": "Item",
+      "details": "Details",
+      "system": "System",
+      "empty": "No actions yet.",
+      "filter": "Filter by action",
+      "apply": "Apply",
+      "older": "Older"
+    },
+    "forbidden": {
+      "heading": "You don't have access",
+      "body": "Ask the owner to grant you the right permission."
+    }
+  }
+}
