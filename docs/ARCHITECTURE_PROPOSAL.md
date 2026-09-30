@@ -335,8 +335,8 @@ export default defineTheme({
 type ThemeProps = {
   mode: 'sample' | 'preview' | 'live';
   locale: 'ar'|'en'|'ckb'|'bdn'; dir: 'rtl'|'ltr';
-  fields: Readonly<Record<FieldKey, string>>;   // already validated & sanitized; plain text only
-  features: ReadonlySet<FeatureKey>;
+  fields: Readonly<Partial<Record<FieldKey, string>>>;   // already validated & sanitized; plain text only
+  features: readonly FeatureKey[];               // an array so it serializes from server to client components
   labels: Record<string,string>;                // localized strings the theme needs
   music: { src: string } | null;
 };

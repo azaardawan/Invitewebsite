@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="90" viewBox="0 0 340 90">
+  <defs><filter id="b" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+  <filter id="b2" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+  <ellipse cx="170" cy="45" rx="129.2" ry="18" fill="#3A331F" opacity="0.38" filter="url(#b)"/>
+  <ellipse cx="170" cy="41" rx="100" ry="6" fill="#2A2616" opacity="0.45" filter="url(#b2)"/></svg>

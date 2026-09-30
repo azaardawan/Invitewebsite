@@ -42,3 +42,24 @@ Shown next to the language choice once you set an exchange rate in Admin → Web
 | 14 | `common.currencyIqd` | دينار | IQD | دینار | دینار | ● | PENDING |
 | 15 | `common.currencyUsd` | دولار | USD | دۆلار | دۆلار | ● | PENDING |
 | 16 | `common.usdApproxNote` | الأسعار بالدولار تقريبية حسب سعر الصرف؛ يتم الدفع بالدينار العراقي. | USD prices are approximate at our exchange rate; payment is made in Iraqi dinars. | نرخەکان بە دۆلار نزیکەیین بەپێی نرخی ئاڵوگۆڕ؛ پارەدان بە دیناری عێراقی دەکرێت. | بهایێن ب دۆلاری نێزیکن ل دویڤ بهایێ گوهۆڕینێ؛ پارەدان ب دینارێ عیراقی دهێتە کرن. | ○ | PENDING |
+
+## Batch 3 — Olive Ring Box theme wording (AWAITING TRANSLATION)
+
+The theme's fixed wording lives in `themes/olive-ring-box/v1/copy.ts` (Arabic and English), not in
+the site message files. Until Kurdish wording is approved, Sorani and Badini invitations of this
+theme show the Arabic. Please supply or approve Kurdish for the guest-facing lines below; the rest
+of the file (form errors, keepsake PDF) can follow in the same batch.
+
+| # | Key (`copy.ts`) | Arabic | English | Status |
+|---|---|---|---|---|
+| 17 | `open` | افتح الدعوة | Open invitation | AWAITING |
+| 18 | `date` / `time` / `venue` | التاريخ / الوقت / المكان | Date / Time / Venue | AWAITING |
+| 19 | `countdownTitle` | يبدأ الحفل بعد | The celebration begins in | AWAITING |
+| 20 | `map` | افتح الموقع على الخريطة | Open location on the map | AWAITING |
+| 21 | `formTitle` | تأكيد الحضور | Kindly reply | AWAITING |
+| 22 | `attending` / `notAttending` | سأحضر بإذن الله / أعتذر عن الحضور | Joyfully attending / Regretfully declining | AWAITING |
+| 23 | `message` | رسالتك للعروسين | Your message to the couple | AWAITING |
+| 24 | `send` / `successTitle` / `successBody` | إرسال الرد / شكرًا لك / تم إرسال ردك إلى العروسين. | Send reply / Thank you / Your reply has been sent to the couple. | AWAITING |
+| 25 | `closing` / `closingSub` | شكرًا لمشاركتكم فرحتنا / حضوركم يتمّ سعادتنا | Thank you for sharing our joy / Your presence completes our happiness | AWAITING |
+
+The basmala (بسم الله الرحمن الرحيم) always stays in Arabic.

@@ -13,5 +13,6 @@ next-env.d.ts
 /playwright-report/
 e2e/.owner.json
 src/theme-registry/generated.ts
+src/theme-registry/generated-components.ts
 .storage/
 .storage-test/

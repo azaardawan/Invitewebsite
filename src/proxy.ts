@@ -5,6 +5,6 @@ export default createMiddleware(routing);
 
 export const config = {
   // Localized storefront only. Admin, API, invitations (/i), previews (/p),
-  // receipts (/r), Next internals and files are not locale-routed.
-  matcher: ['/((?!admin|api|media|i/|p/|r/|_next|_vercel|.*\\..*).*)'],
+  // receipts (/r), the development theme lab (/dev), Next internals and files are not locale-routed.
+  matcher: ['/((?!admin|api|media|i/|p/|r/|dev/|_next|_vercel|.*\\..*).*)'],
 };
