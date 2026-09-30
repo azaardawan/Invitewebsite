@@ -13,6 +13,8 @@ const schema = z.object({
   DATABASE_URL: z.string().startsWith('postgres'),
   TOTP_ENCRYPTION_KEY: base64Key32,
   IP_HASH_SALT: z.string().min(16, 'must be at least 16 characters'),
+  /** 32 random bytes, base64. Derives private receipt links; never rotate unless compromised (old links would stop working). */
+  TOKEN_SECRET: base64Key32,
   /** `local` stores files on disk (development/tests); `s3` uses S3-compatible storage (Cloudflare R2). */
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
   LOCAL_STORAGE_DIR: z.string().default('.storage'),

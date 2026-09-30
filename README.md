@@ -35,6 +35,12 @@ Curated digital invitations for the Iraqi market. Arabic first, plus English, Ku
 - Automated validation of every theme state in 4 languages and 4 widths, with screenshots.
 - Two internal demo themes exercise the contract; the first real theme comes from the owner's design.
 
+**Milestone M5 (orders and invoices, backend) is complete:**
+- Server validation of invitation details, drafts with a private 24-hour preview link, and checkout with an immutable order snapshot (safe against double taps).
+- Gap-free invoice numbers on payment; automatic 30-day publication.
+- Private receipt page with WhatsApp sharing; Admin → Orders.
+- The customer-facing order screens follow once the storefront design is approved.
+
 ## Local development
 
 Requirements: Node 22+, pnpm 10, PostgreSQL 16.

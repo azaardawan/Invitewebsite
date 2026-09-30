@@ -36,7 +36,8 @@
       "themes": "Themes",
       "fields": "Field library",
       "music": "Music library",
-      "settings": "Website settings"
+      "settings": "Website settings",
+      "orders": "Orders & invoices"
     },
     "modules": {
       "sections": "Sections",
@@ -381,6 +382,15 @@
       "example": "Example: {iqd} is shown as ≈ {usd}",
       "save": "Save",
       "more": "Business and contact information will be added here later (milestone 10)."
+    },
+    "orders": {
+      "heading": "Orders & invoices",
+      "intro": "Every order keeps the price, theme and package exactly as they were at purchase.",
+      "search": "Search by order, invoice, phone or name",
+      "allStatuses": "All statuses",
+      "filter": "Filter",
+      "empty": "No orders yet.",
+      "receipt": "View receipt"
     }
   },
   "invitation": {
@@ -437,7 +447,8 @@
       "d6": "Saturday"
     },
     "am": "AM",
-    "pm": "PM"
+    "pm": "PM",
+    "previewExpired": "This preview link has expired. Go back to your order to create a new preview."
   },
   "invitationSamples": {
     "short": {
@@ -454,5 +465,45 @@
       "venue_name": "The Princesses' Palace Grand Events Hall",
       "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times."
     }
+  },
+  "receipt": {
+    "title": "Order receipt",
+    "paidTitle": "Payment received",
+    "pendingTitle": "Awaiting payment",
+    "orderNumber": "Order number",
+    "invoiceNumber": "Invoice number",
+    "status": "Status",
+    "statuses": {
+      "PENDING": "Awaiting payment",
+      "AWAITING_PAYMENT": "Awaiting payment",
+      "PAID": "Paid",
+      "CANCELLED": "Cancelled",
+      "PAYMENT_EXPIRED": "Payment window expired",
+      "REFUNDED": "Refunded"
+    },
+    "customer": "Customer",
+    "phone": "Phone",
+    "email": "Email",
+    "theme": "Theme",
+    "package": "Package",
+    "amount": "Amount",
+    "amountNote": "All payments are in Iraqi dinars.",
+    "purchaseDate": "Order date",
+    "paidDate": "Payment date",
+    "publishedAt": "Published on",
+    "expiresAt": "Available until",
+    "invitationLink": "Your invitation link",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "shareWhatsApp": "Share the invitation on WhatsApp",
+    "saveWhatsApp": "Save the confirmation on WhatsApp",
+    "openInvitation": "Open invitation",
+    "print": "Print receipt",
+    "corrections": "Need a correction in your invitation? Contact us and we'll fix it for you.",
+    "keepLink": "Keep this page's link; it is private to you and shows your receipt any time.",
+    "shareText": "You're invited: {url}",
+    "confirmText": "Bahja order confirmation\nInvoice: {invoice}\nInvitation link: {url}\nAvailable until: {expires}",
+    "notFound": "This link is not valid.",
+    "notPublishedYet": "Your invitation will appear here as soon as payment is confirmed."
   }
 }

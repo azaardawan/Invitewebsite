@@ -1,7 +1,27 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **APPROVED — revision 7. M1 (foundation), M2 (admin catalog) and M3 (theme engine) implemented.**
+Status: **APPROVED — revision 8. M1–M3 implemented; M5 (orders and invoices) backend implemented.**
 Date: 2026-09-30
+
+**Revision 8 changes (M5 implementation notes):**
+- **Drafts.**
+  - Customer details are validated on the server: every package field is required, dates are in Baghdad time (not in the past, at most 2 years ahead), map links are checked, and Arabic-Indic digits are accepted.
+  - A draft is stored as an invitation with a private preview link (`/p/<token>`, valid 24 h after the last edit, PREVIEW label, `noindex`).
+- **Checkout.** It creates one order with an immutable snapshot (theme, exact version, package, price, fields, customer, and the display exchange rate).
+  - A double tap or a second tab returns the same order: there is an idempotency key, plus a database rule allowing one open or paid order per invitation.
+  - Availability and price are re-checked at checkout. If the theme was archived or the package changed since the draft, checkout is refused.
+- **Payment confirmation (`markOrderPaid`).** One transaction with a row lock does all of this:
+  - assigns a gap-free `INV-YYYY-00001` (per Baghdad year);
+  - publishes the invitation for exactly 30 days;
+  - records status history and audit entries.
+
+  It is idempotent: duplicate webhooks, redirect checks, or a manual publish racing a webhook all end in one invoice and one publication. Manual publication requires the admin and a reason. The WAYL wiring arrives in M6.
+- **Private receipt (`/r/<token>`).** The token is derived with HMAC from `TOKEN_SECRET`, so a retried checkout returns the same link without storing it. It is rendered only from the snapshot, and knowing an order or invoice number grants nothing.
+  - The page offers copy link, WhatsApp share, a WhatsApp confirmation to self, and print.
+- **Admin → Orders:** search and filter. Phone and email are masked for staff without `customers.view`.
+- **Rate limits** (fixed window, in Postgres) on draft creation and checkout per visitor.
+- **Legal acceptance** is recorded with placeholder policy versions (`draft-2026-09`) until Admin-managed legal policies exist (M10).
+- **Customer screens** (personalization form, checkout) will be built with the approved storefront design (M4). The homepage design v2 is awaiting owner approval.
 
 **Revision 7 changes (M3 implementation notes):**
 - **Theme SDK and contract implemented.**
@@ -540,7 +560,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M2 ✅ | Admin catalog | 5–6 | Sections, Field Library, themes/versions registry, packages (with validStates enforcement), music library, R2 uploads, ordering |
 | M3 ✅ | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 | Storefront | 7 | Home skeleton (awaiting the design), occasions, catalog, theme page with sample preview, SEO, sitemap, robots |
-| M5 | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
+| M5 ✅ (backend) | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
 | M6 | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
 | M7 | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
 | M8 | Guest features + print | 14–15 | Guest form (name, attendance, message), moderation, **printable card** and keepsake PDF companions, document jobs |

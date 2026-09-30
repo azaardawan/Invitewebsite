@@ -46,7 +46,13 @@ export type SyncReport = { registeredThemes: string[]; registeredVersions: strin
  * activated. A frozen (activated) version's manifest can never change: that
  * is reported as a conflict and the stored manifest is kept.
  */
-export async function syncThemesFromRegistry(db: DbOrTx, manifests: ThemeManifest[], actor: Actor): Promise<SyncReport> {
+export async function syncThemesFromRegistry(
+  db: DbOrTx,
+  manifests: ThemeManifest[],
+  actor: Actor,
+  /** The full build registry marks absent versions as missing; a partial list (tests) must not. */
+  opts: { complete?: boolean } = { complete: true },
+): Promise<SyncReport> {
   const report: SyncReport = { registeredThemes: [], registeredVersions: [], updatedVersions: [], conflicts: [], missing: [] };
   const byKey = new Map<string, ThemeManifest[]>();
   for (const m of manifests) byKey.set(m.key, [...(byKey.get(m.key) ?? []), m].sort((a, b) => a.version - b.version));
@@ -123,6 +129,7 @@ export async function syncThemesFromRegistry(db: DbOrTx, manifests: ThemeManifes
     });
   }
 
+  if (opts.complete === false) return report;
   const present = manifests.map(codeRef);
   const gone = await db
     .update(themeVersions)

@@ -4,8 +4,9 @@ import { ADMIN_LOCALE_COOKIE, isAdminLocale, isLocale, localeMeta, type Locale }
 import { messagesFor } from './messages';
 import { routing } from './routing';
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  const requested = await requestLocale;
+export default getRequestConfig(async ({ requestLocale, locale: explicit }) => {
+  // An explicitly passed locale (e.g. `getTranslations({ locale })` on receipt pages) wins.
+  const requested = explicit ?? (await requestLocale);
   let locale: Locale;
   if (isLocale(requested)) {
     locale = requested;

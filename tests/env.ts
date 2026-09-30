@@ -10,6 +10,7 @@ export function loadTestEnv() {
   process.env.APP_URL ??= 'http://localhost:3000';
   process.env.TOTP_ENCRYPTION_KEY ||= Buffer.alloc(32, 7).toString('base64');
   process.env.IP_HASH_SALT ||= 'test-salt-test-salt';
+  process.env.TOKEN_SECRET ||= Buffer.alloc(32, 9).toString('base64');
   process.env.STORAGE_DRIVER = 'local';
   process.env.LOCAL_STORAGE_DIR = '.storage-test';
   return url;

@@ -27,6 +27,7 @@ jobs:
       # CI-only throwaway values (not secrets).
       TOTP_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       IP_HASH_SALT: ci-only-salt-not-secret
+      TOKEN_SECRET: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

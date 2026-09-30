@@ -116,3 +116,42 @@ or the Arabic-style ones.
 The storefront shows each theme filled with sample content in the visitor's language. For Kurdish, please
 send sample names you like, for example a short pair (like ئازاد & ژیان) and a long pair, plus a family line,
 a hall name and a short and a long invitation sentence. Until then the Arabic samples are shown.
+
+## Batch 4 — preview expiry and the customer's receipt page (PENDING)
+
+`{url}`, `{invoice}`, `{expires}` are filled in automatically; `\n` is a line break.
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `invitation.previewExpired` | انتهت صلاحية رابط المعاينة. ارجعوا إلى صفحة الطلب لإنشاء معاينة جديدة. | This preview link has expired. Go back to your order to create a new preview. | بەستەری پێشبینین بەسەرچووە. بگەڕێنەوە بۆ داواکارییەکەتان بۆ دروستکردنی پێشبینینێکی نوێ. | لینکا پێشدیتنێ ب دوماهی هات. بزڤڕن بۆ داخوازیا خۆ بۆ چێکرنا پێشدیتنەکا نوو. | ○ | PENDING |
+| `receipt.title` | إيصال الطلب | Order receipt | پسوولەی داواکاری | پسوولا داخوازیێ | ◐ | PENDING |
+| `receipt.paidTitle` | تم الدفع بنجاح | Payment received | پارەدان بە سەرکەوتوویی ئەنجامدرا | پارەدان ب سەرکەفتیانە هاتە کرن | ◐ | PENDING |
+| `receipt.pendingTitle` | بانتظار الدفع | Awaiting payment | چاوەڕوانی پارەدان | ل هیڤیا پارەدانێ | ◐ | PENDING |
+| `receipt.orderNumber` | رقم الطلب | Order number | ژمارەی داواکاری | ژمارا داخوازیێ | ◐ | PENDING |
+| `receipt.invoiceNumber` | رقم الفاتورة | Invoice number | ژمارەی پسوولە | ژمارا پسوولێ | ◐ | PENDING |
+| `receipt.status` | الحالة | Status | دۆخ | رەوش | ◐ | PENDING |
+| `receipt.customer` | العميل | Customer | کڕیار | کڕیار | ◐ | PENDING |
+| `receipt.phone` | الهاتف | Phone | تەلەفۆن | تەلەفۆن | ● | PENDING |
+| `receipt.email` | البريد الإلكتروني | Email | ئیمەیڵ | ئیمەیل | ● | PENDING |
+| `receipt.theme` | التصميم | Theme | دیزاین | دیزاین | ◐ | PENDING |
+| `receipt.package` | الباقة | Package | پاکێج | پاکێج | ◐ | PENDING |
+| `receipt.amount` | المبلغ | Amount | بڕی پارە | بڕێ پارەی | ◐ | PENDING |
+| `receipt.amountNote` | جميع المدفوعات بالدينار العراقي. | All payments are in Iraqi dinars. | هەموو پارەدانەکان بە دیناری عێراقین. | هەمی پارەدان ب دینارێ عیراقینە. | ◐ | PENDING |
+| `receipt.purchaseDate` | تاريخ الطلب | Order date | بەرواری داواکاری | دیرۆکا داخوازیێ | ◐ | PENDING |
+| `receipt.paidDate` | تاريخ الدفع | Payment date | بەرواری پارەدان | دیرۆکا پارەدانێ | ◐ | PENDING |
+| `receipt.publishedAt` | تاريخ النشر | Published on | بەرواری بڵاوکردنەوە | دیرۆکا بەلاڤکرنێ | ◐ | PENDING |
+| `receipt.expiresAt` | متاحة حتى | Available until | بەردەستە تا | بەردەستە هەتا | ◐ | PENDING |
+| `receipt.invitationLink` | رابط دعوتكم | Your invitation link | بەستەری بانگهێشتنامەکەتان | لینکا داخوازناما هەوە | ◐ | PENDING |
+| `receipt.copyLink` | نسخ الرابط | Copy link | کۆپیکردنی بەستەر | کۆپیکرنا لینکێ | ◐ | PENDING |
+| `receipt.copied` | تم النسخ | Copied | کۆپی کرا | هاتە کۆپیکرن | ◐ | PENDING |
+| `receipt.shareWhatsApp` | مشاركة الدعوة على واتساب | Share the invitation on WhatsApp | هاوبەشکردنی بانگهێشتنامە لە واتسئاپ | پارڤەکرنا داخوازنامێ ل واتسئاپێ | ◐ | PENDING |
+| `receipt.saveWhatsApp` | حفظ التأكيد على واتساب | Save the confirmation on WhatsApp | پاشەکەوتکردنی پشتڕاستکردنەوە لە واتسئاپ | پاراستنا پشتڕاستکرنێ ل واتسئاپێ | ○ | PENDING |
+| `receipt.openInvitation` | فتح الدعوة | Open invitation | کردنەوەی بانگهێشتنامە | ڤەکرنا داخوازنامێ | ◐ | PENDING |
+| `receipt.print` | طباعة الإيصال | Print receipt | چاپکردنی پسوولە | چاپکرنا پسوولێ | ◐ | PENDING |
+| `receipt.corrections` | تحتاجون تصحيحاً في الدعوة؟ تواصلوا معنا وسنعدّلها لكم. | Need a correction in your invitation? Contact us and we'll fix it for you. | پێویستتان بە ڕاستکردنەوە هەیە لە بانگهێشتنامەکەدا؟ پەیوەندیمان پێوە بکەن و بۆتان ڕاستی دەکەینەوە. | پێدڤی ب راستکرنێ د داخوازنامێ دا هەیە؟ پەیوەندیێ ب مە بکەن و دێ بۆ هەوە راست کەین. | ○ | PENDING |
+| `receipt.keepLink` | احتفظوا برابط هذه الصفحة؛ فهو خاص بكم ويعرض إيصالكم في أي وقت. | Keep this page's link; it is private to you and shows your receipt any time. | بەستەری ئەم پەڕەیە پاشەکەوت بکەن؛ تایبەتە بە ئێوە و هەر کاتێک پسوولەکەتان پیشان دەدات. | لینکا ڤێ لاپەرێ بپارێزن؛ تایبەتە ب هەوە و هەر دەمەکێ پسوولا هەوە نیشان ددەت. | ○ | PENDING |
+| `receipt.shareText` | يسعدنا دعوتكم: {url} | You're invited: {url} | بانگهێشتن کراون: {url} | هوین داخوازکرینە: {url} | ○ | PENDING |
+| `receipt.confirmText` | تأكيد طلب بهجه\nرقم الفاتورة: {invoice}\nرابط الدعوة: {url}\nمتاحة حتى: {expires} | Bahja order confirmation\nInvoice: {invoice}\nInvitation link: {url}\nAvailable until: {expires} | پشتڕاستکردنەوەی داواکاری بەهجە\nژمارەی پسوولە: {invoice}\nبەستەری بانگهێشتنامە: {url}\nبەردەستە تا: {expires} | پشتڕاستکرنا داخوازیا بەهجە\nژمارا پسوولێ: {invoice}\nلینکا داخوازنامێ: {url}\nبەردەستە هەتا: {expires} | ○ | PENDING |
+| `receipt.notFound` | هذا الرابط غير صالح. | This link is not valid. | ئەم بەستەرە دروست نییە. | ئەڤ لینکە نە دروستە. | ◐ | PENDING |
+| `receipt.notPublishedYet` | ستظهر دعوتكم هنا فور تأكيد الدفع. | Your invitation will appear here as soon as payment is confirmed. | بانگهێشتنامەکەتان لێرە دەردەکەوێت هەر کە پارەدان پشتڕاست کرایەوە. | داخوازناما هەوە دێ ل ڤێرە دیار بیت هەر کو پارەدان هاتە پشتڕاستکرن. | ○ | PENDING |
+| `receipt.statuses.*` | بانتظار الدفع · مدفوع · ملغى · انتهت مهلة الدفع · مسترد | Awaiting payment · Paid · Cancelled · Payment window expired · Refunded | چاوەڕوانی پارەدان · پارەدراو · هەڵوەشێنراوە · کاتی پارەدان بەسەرچوو · گەڕێنراوەتەوە | ل هیڤیا پارەدانێ · پارە هاتیە دان · هاتیە هەلوەشاندن · دەمێ پارەدانێ ب دوماهی هات · هاتیە زڤڕاندن | ○ | PENDING |
