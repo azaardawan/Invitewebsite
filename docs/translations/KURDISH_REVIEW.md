@@ -101,13 +101,13 @@ or the Arabic-style ones.
 | `invitation.months.m10` | تشرين الأول | چریا ئێکێ | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.months.m11` | تشرين الثاني | چریا دووێ | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.months.m12` | كانون الأول | کانوونا ئێکێ | ● | APPROVED (owner, 2026-09-30) |
-| `invitation.weekdays.d0` | الأحد | یەکشەمب | ○ | PENDING |
-| `invitation.weekdays.d1` | الاثنين | دووشەمب | ○ | PENDING |
-| `invitation.weekdays.d2` | الثلاثاء | سێشەمب | ○ | PENDING |
-| `invitation.weekdays.d3` | الأربعاء | چارشەمب | ○ | PENDING |
-| `invitation.weekdays.d4` | الخميس | پێنجشەمب | ○ | PENDING |
-| `invitation.weekdays.d5` | الجمعة | ئەینی | ○ | PENDING |
-| `invitation.weekdays.d6` | السبت | شەمبی | ○ | PENDING |
+| `invitation.weekdays.d0` | الأحد | ئێک شەمب | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d1` | الاثنين | دوو شەمب | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d2` | الثلاثاء | سێ شەمب | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d3` | الأربعاء | چوار شەمب | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d4` | الخميس | پێنج شەمب | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d5` | الجمعة | خودبە | ● | APPROVED (owner, 2026-09-30) |
+| `invitation.weekdays.d6` | السبت | شەمبی | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.am` | ص | ب.ن | ○ | PENDING |
 | `invitation.pm` | م | پ.ن | ○ | PENDING |
 
