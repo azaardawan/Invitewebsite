@@ -32,53 +32,53 @@ Glossary established by the owner (reuse in later batches):
 - Badini "page": **لاپەر**; "occasions/celebrations": **ئاهەنگ**; "soon": **ب زیترین دەم**.
 - Sorani "website": **ماڵپەر**; "page": **پەرە**.
 
-## Batch 2 — currency switcher (PENDING)
+## Batch 2 — currency switcher — ✅ APPROVED (2026-09-30)
 
 Shown next to the language choice once you set an exchange rate in Admin → Website settings.
 
 | # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|---|
-| 13 | `common.currency` | العملة | Currency | دراو | دراڤ | ◐ | PENDING |
-| 14 | `common.currencyIqd` | دينار | IQD | دینار | دینار | ● | PENDING |
-| 15 | `common.currencyUsd` | دولار | USD | دۆلار | دۆلار | ● | PENDING |
-| 16 | `common.usdApproxNote` | الأسعار بالدولار تقريبية حسب سعر الصرف؛ يتم الدفع بالدينار العراقي. | USD prices are approximate at our exchange rate; payment is made in Iraqi dinars. | نرخەکان بە دۆلار نزیکەیین بەپێی نرخی ئاڵوگۆڕ؛ پارەدان بە دیناری عێراقی دەکرێت. | بهایێن ب دۆلاری نێزیکن ل دویڤ بهایێ گوهۆڕینێ؛ پارەدان ب دینارێ عیراقی دهێتە کرن. | ○ | PENDING |
+| 13 | `common.currency` | العملة | Currency | دراو | دراڤ | ◐ | APPROVED (owner, 2026-09-30) |
+| 14 | `common.currencyIqd` | دينار | IQD | دینار | دینار | ● | APPROVED (owner, 2026-09-30) |
+| 15 | `common.currencyUsd` | دولار | USD | دۆلار | دۆلار | ● | APPROVED (owner, 2026-09-30) |
+| 16 | `common.usdApproxNote` | الأسعار بالدولار تقريبية حسب سعر الصرف؛ يتم الدفع بالدينار العراقي. | USD prices are approximate at our exchange rate; payment is made in Iraqi dinars. | نرخەکان بە دۆلار نزیکەیین بەپێی نرخی ئاڵوگۆڕ؛ پارەدان بە دیناری عێراقی دەکرێت. | بهایێن ب دۆلاری نێزیکن ل دویڤ بهایێ گوهۆڕینێ؛ پارەدان ب دینارێ عیراقی دهێتە کرن. | ○ | APPROVED (owner, 2026-09-30) |
 
-## Batch 3 — text inside invitations (PENDING)
+## Batch 3 — text inside invitations — ✅ APPROVED (2026-09-30)
 
 Guests see these inside every theme when the invitation is in Kurdish. Until approved, Kurdish
 invitations show the Arabic text.
 
 | # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|---|
-| 17 | `invitation.openInvitation` | افتح الدعوة | Open invitation | کردنەوەی بانگهێشتنامە | ڤەکرنا داخوازنامێ | ◐ | PENDING |
-| 18 | `invitation.musicPlay` | تشغيل الموسيقى | Play music | لێدانی مۆسیقا | لێدانا مۆزیکێ | ○ | PENDING |
-| 19 | `invitation.musicPause` | إيقاف الموسيقى | Pause music | وەستاندنی مۆسیقا | راوەستاندنا مۆزیکێ | ○ | PENDING |
-| 20 | `invitation.countdownDays` | يوم | days | ڕۆژ | ڕۆژ | ● | PENDING |
-| 21 | `invitation.countdownHours` | ساعة | hours | کاتژمێر | دەمژمێر | ◐ | PENDING |
-| 22 | `invitation.countdownMinutes` | دقيقة | minutes | خولەک | خولەک | ● | PENDING |
-| 23 | `invitation.countdownSeconds` | ثانية | seconds | چرکە | چرکە | ● | PENDING |
-| 24 | `invitation.eventStarted` | بدأت المناسبة | The celebration has begun | بۆنەکە دەستی پێکرد | ئاهەنگ دەست پێکر | ◐ | PENDING |
-| 25 | `invitation.openMap` | الموقع على الخريطة | Open in maps | شوێن لەسەر نەخشە | جهـ ل سەر نەخشەی | ◐ | PENDING |
-| 26 | `invitation.date` | التاريخ | Date | ڕێکەوت | دیرۆک | ◐ | PENDING |
-| 27 | `invitation.time` | الوقت | Time | کات | دەم | ◐ | PENDING |
-| 28 | `invitation.venue` | المكان | Venue | شوێن | جهـ | ◐ | PENDING |
-| 29 | `invitation.guestFormTitle` | تأكيد الحضور | Will you attend? | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ◐ | PENDING |
-| 30 | `invitation.guestName` | الاسم | Your name | ناو | ناڤ | ● | PENDING |
-| 31 | `invitation.attendanceQuestion` | هل ستحضر؟ | Will you attend? | ئامادە دەبیت؟ | دێ ئامادە بی؟ | ◐ | PENDING |
-| 32 | `invitation.attending` | سأحضر | I'll attend | ئامادە دەبم | دێ ئامادە بم | ◐ | PENDING |
-| 33 | `invitation.notAttending` | لن أتمكن من الحضور | I can't attend | ناتوانم ئامادە بم | نەشێم ئامادە بم | ◐ | PENDING |
-| 34 | `invitation.message` | رسالة تهنئة | Congratulation message | نامەی پیرۆزبایی | نامەیا پیرۆزباهیێ | ◐ | PENDING |
-| 35 | `invitation.submit` | إرسال | Send | ناردن | هنارتن | ◐ | PENDING |
-| 36 | `invitation.sending` | جارٍ الإرسال… | Sending… | دەنێردرێت… | دهێتە هنارتن… | ◐ | PENDING |
-| 37 | `invitation.sent` | شكراً، تم إرسال ردّك. | Thank you, your response was sent. | سوپاس، وەڵامەکەت نێردرا. | سوپاس، بەرسڤا تە هاتە هنارتن. | ◐ | PENDING |
-| 38 | `invitation.sentPreview` | هذه معاينة، لذلك لم يُحفظ الرد. | This is a preview, so the response was not saved. | ئەمە پێشبینینە، بۆیە وەڵامەکە پاشەکەوت نەکرا. | ئەڤە پێشدیتنە، لەوما بەرسڤ نەهاتە پاراستن. | ○ | PENDING |
-| 39 | `invitation.errorRequired` | هذا الحقل مطلوب. | This field is required. | ئەم خانەیە پێویستە. | ئەڤ خانە پێدڤییە. | ◐ | PENDING |
-| 40 | `invitation.errorTooLong` | النص أطول من المسموح. | This text is too long. | دەقەکە لە ڕادەبەدەر درێژە. | نڤیسین ژ پێدڤی درێژترە. | ○ | PENDING |
-| 41 | `invitation.errorGeneric` | تعذّر الإرسال. حاول مرة أخرى. | Couldn't send. Please try again. | ناردن سەرکەوتوو نەبوو. دووبارە هەوڵ بدەوە. | هنارتن سەرنەکەفت. دووبارە هەول بدە. | ◐ | PENDING |
-| 42 | `invitation.previewRibbon` | معاينة | Preview | پێشبینین | پێشدیتن | ◐ | PENDING |
-| 43 | `invitation.sampleRibbon` | نموذج للعرض | Sample | نموونە | نموونە | ◐ | PENDING |
-| 44 | `invitation.renderError` | تعذّر عرض الدعوة حالياً. | The invitation can't be shown right now. | ئێستا ناتوانرێت بانگهێشتنامەکە پیشان بدرێت. | نوکە نەشێین داخوازنامێ نیشان بدەین. | ○ | PENDING |
-| 45 | `invitation.retry` | إعادة المحاولة | Try again | دووبارە هەوڵدانەوە | دووبارە هەول بدە | ◐ | PENDING |
+| 17 | `invitation.openInvitation` | افتح الدعوة | Open invitation | کردنەوەی بانگهێشتنامە | ڤەکرنا داخوازنامێ | ◐ | APPROVED (owner, 2026-09-30) |
+| 18 | `invitation.musicPlay` | تشغيل الموسيقى | Play music | لێدانی مۆسیقا | لێدانا مۆزیکێ | ○ | APPROVED (owner, 2026-09-30) |
+| 19 | `invitation.musicPause` | إيقاف الموسيقى | Pause music | وەستاندنی مۆسیقا | راوەستاندنا مۆزیکێ | ○ | APPROVED (owner, 2026-09-30) |
+| 20 | `invitation.countdownDays` | يوم | days | ڕۆژ | ڕۆژ | ● | APPROVED (owner, 2026-09-30) |
+| 21 | `invitation.countdownHours` | ساعة | hours | کاتژمێر | دەمژمێر | ◐ | APPROVED (owner, 2026-09-30) |
+| 22 | `invitation.countdownMinutes` | دقيقة | minutes | خولەک | خولەک | ● | APPROVED (owner, 2026-09-30) |
+| 23 | `invitation.countdownSeconds` | ثانية | seconds | چرکە | چرکە | ● | APPROVED (owner, 2026-09-30) |
+| 24 | `invitation.eventStarted` | بدأت المناسبة | The celebration has begun | بۆنەکە دەستی پێکرد | ئاهەنگ دەست پێکر | ◐ | APPROVED (owner, 2026-09-30) |
+| 25 | `invitation.openMap` | الموقع على الخريطة | Open in maps | شوێن لەسەر نەخشە | جهـ ل سەر نەخشەی | ◐ | APPROVED (owner, 2026-09-30) |
+| 26 | `invitation.date` | التاريخ | Date | ڕێکەوت | دیرۆک | ◐ | APPROVED (owner, 2026-09-30) |
+| 27 | `invitation.time` | الوقت | Time | کات | دەم | ◐ | APPROVED (owner, 2026-09-30) |
+| 28 | `invitation.venue` | المكان | Venue | شوێن | جهـ | ◐ | APPROVED (owner, 2026-09-30) |
+| 29 | `invitation.guestFormTitle` | تأكيد الحضور | Will you attend? | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ◐ | APPROVED (owner, 2026-09-30) |
+| 30 | `invitation.guestName` | الاسم | Your name | ناو | ناڤ | ● | APPROVED (owner, 2026-09-30) |
+| 31 | `invitation.attendanceQuestion` | هل ستحضر؟ | Will you attend? | ئامادە دەبیت؟ | دێ ئامادە بی؟ | ◐ | APPROVED (owner, 2026-09-30) |
+| 32 | `invitation.attending` | سأحضر | I'll attend | ئامادە دەبم | دێ ئامادە بم | ◐ | APPROVED (owner, 2026-09-30) |
+| 33 | `invitation.notAttending` | لن أتمكن من الحضور | I can't attend | ناتوانم ئامادە بم | نەشێم ئامادە بم | ◐ | APPROVED (owner, 2026-09-30) |
+| 34 | `invitation.message` | رسالة تهنئة | Congratulation message | نامەی پیرۆزبایی | نامەیا پیرۆزباهیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| 35 | `invitation.submit` | إرسال | Send | ناردن | هنارتن | ◐ | APPROVED (owner, 2026-09-30) |
+| 36 | `invitation.sending` | جارٍ الإرسال… | Sending… | دەنێردرێت… | دهێتە هنارتن… | ◐ | APPROVED (owner, 2026-09-30) |
+| 37 | `invitation.sent` | شكراً، تم إرسال ردّك. | Thank you, your response was sent. | سوپاس، وەڵامەکەت نێردرا. | سوپاس، بەرسڤا تە هاتە هنارتن. | ◐ | APPROVED (owner, 2026-09-30) |
+| 38 | `invitation.sentPreview` | هذه معاينة، لذلك لم يُحفظ الرد. | This is a preview, so the response was not saved. | ئەمە پێشبینینە، بۆیە وەڵامەکە پاشەکەوت نەکرا. | ئەڤە پێشدیتنە، لەوما بەرسڤ نەهاتە پاراستن. | ○ | APPROVED (owner, 2026-09-30) |
+| 39 | `invitation.errorRequired` | هذا الحقل مطلوب. | This field is required. | ئەم خانەیە پێویستە. | ئەڤ خانە پێدڤییە. | ◐ | APPROVED (owner, 2026-09-30) |
+| 40 | `invitation.errorTooLong` | النص أطول من المسموح. | This text is too long. | دەقەکە لە ڕادەبەدەر درێژە. | نڤیسین ژ پێدڤی درێژترە. | ○ | APPROVED (owner, 2026-09-30) |
+| 41 | `invitation.errorGeneric` | تعذّر الإرسال. حاول مرة أخرى. | Couldn't send. Please try again. | ناردن سەرکەوتوو نەبوو. دووبارە هەوڵ بدەوە. | هنارتن سەرنەکەفت. دووبارە هەول بدە. | ◐ | APPROVED (owner, 2026-09-30) |
+| 42 | `invitation.previewRibbon` | معاينة | Preview | پێشبینین | پێشدیتن | ◐ | APPROVED (owner, 2026-09-30) |
+| 43 | `invitation.sampleRibbon` | نموذج للعرض | Sample | نموونە | نموونە | ◐ | APPROVED (owner, 2026-09-30) |
+| 44 | `invitation.renderError` | تعذّر عرض الدعوة حالياً. | The invitation can't be shown right now. | ئێستا ناتوانرێت بانگهێشتنامەکە پیشان بدرێت. | نوکە نەشێین داخوازنامێ نیشان بدەین. | ○ | APPROVED (owner, 2026-09-30) |
+| 45 | `invitation.retry` | إعادة المحاولة | Try again | دووبارە هەوڵدانەوە | دووبارە هەول بدە | ◐ | APPROVED (owner, 2026-09-30) |
 
 ### Batch 3b — Badini calendar names (Badini only)
 
@@ -108,8 +108,8 @@ or the Arabic-style ones.
 | `invitation.weekdays.d4` | الخميس | پێنج شەمب | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.weekdays.d5` | الجمعة | خودبە | ● | APPROVED (owner, 2026-09-30) |
 | `invitation.weekdays.d6` | السبت | شەمبی | ● | APPROVED (owner, 2026-09-30) |
-| `invitation.am` | ص | ب.ن | ○ | PENDING |
-| `invitation.pm` | م | پ.ن | ○ | PENDING |
+| `invitation.am` | ص | ب.ن | ○ | APPROVED (owner, 2026-09-30) |
+| `invitation.pm` | م | پ.ن | ○ | APPROVED (owner, 2026-09-30) |
 
 ### Batch 3c — sample names/text for theme previews
 
@@ -117,117 +117,117 @@ The storefront shows each theme filled with sample content in the visitor's lang
 send sample names you like, for example a short pair (like ئازاد & ژیان) and a long pair, plus a family line,
 a hall name and a short and a long invitation sentence. Until then the Arabic samples are shown.
 
-## Batch 4 — preview expiry and the customer's receipt page (PENDING)
+## Batch 4 — preview expiry and the customer's receipt page — ✅ APPROVED (2026-09-30)
 
 `{url}`, `{invoice}`, `{expires}` are filled in automatically; `\n` is a line break.
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
-| `invitation.previewExpired` | انتهت صلاحية رابط المعاينة. ارجعوا إلى صفحة الطلب لإنشاء معاينة جديدة. | This preview link has expired. Go back to your order to create a new preview. | بەستەری پێشبینین بەسەرچووە. بگەڕێنەوە بۆ داواکارییەکەتان بۆ دروستکردنی پێشبینینێکی نوێ. | لینکا پێشدیتنێ ب دوماهی هات. بزڤڕن بۆ داخوازیا خۆ بۆ چێکرنا پێشدیتنەکا نوو. | ○ | PENDING |
-| `receipt.title` | إيصال الطلب | Order receipt | پسوولەی داواکاری | پسوولا داخوازیێ | ◐ | PENDING |
-| `receipt.paidTitle` | تم الدفع بنجاح | Payment received | پارەدان بە سەرکەوتوویی ئەنجامدرا | پارەدان ب سەرکەفتیانە هاتە کرن | ◐ | PENDING |
-| `receipt.pendingTitle` | بانتظار الدفع | Awaiting payment | چاوەڕوانی پارەدان | ل هیڤیا پارەدانێ | ◐ | PENDING |
-| `receipt.orderNumber` | رقم الطلب | Order number | ژمارەی داواکاری | ژمارا داخوازیێ | ◐ | PENDING |
-| `receipt.invoiceNumber` | رقم الفاتورة | Invoice number | ژمارەی پسوولە | ژمارا پسوولێ | ◐ | PENDING |
-| `receipt.status` | الحالة | Status | دۆخ | رەوش | ◐ | PENDING |
-| `receipt.customer` | العميل | Customer | کڕیار | کڕیار | ◐ | PENDING |
-| `receipt.phone` | الهاتف | Phone | تەلەفۆن | تەلەفۆن | ● | PENDING |
-| `receipt.email` | البريد الإلكتروني | Email | ئیمەیڵ | ئیمەیل | ● | PENDING |
-| `receipt.theme` | التصميم | Theme | دیزاین | دیزاین | ◐ | PENDING |
-| `receipt.package` | الباقة | Package | پاکێج | پاکێج | ◐ | PENDING |
-| `receipt.amount` | المبلغ | Amount | بڕی پارە | بڕێ پارەی | ◐ | PENDING |
-| `receipt.amountNote` | جميع المدفوعات بالدينار العراقي. | All payments are in Iraqi dinars. | هەموو پارەدانەکان بە دیناری عێراقین. | هەمی پارەدان ب دینارێ عیراقینە. | ◐ | PENDING |
-| `receipt.purchaseDate` | تاريخ الطلب | Order date | بەرواری داواکاری | دیرۆکا داخوازیێ | ◐ | PENDING |
-| `receipt.paidDate` | تاريخ الدفع | Payment date | بەرواری پارەدان | دیرۆکا پارەدانێ | ◐ | PENDING |
-| `receipt.publishedAt` | تاريخ النشر | Published on | بەرواری بڵاوکردنەوە | دیرۆکا بەلاڤکرنێ | ◐ | PENDING |
-| `receipt.expiresAt` | متاحة حتى | Available until | بەردەستە تا | بەردەستە هەتا | ◐ | PENDING |
-| `receipt.invitationLink` | رابط دعوتكم | Your invitation link | بەستەری بانگهێشتنامەکەتان | لینکا داخوازناما هەوە | ◐ | PENDING |
-| `receipt.copyLink` | نسخ الرابط | Copy link | کۆپیکردنی بەستەر | کۆپیکرنا لینکێ | ◐ | PENDING |
-| `receipt.copied` | تم النسخ | Copied | کۆپی کرا | هاتە کۆپیکرن | ◐ | PENDING |
-| `receipt.shareWhatsApp` | مشاركة الدعوة على واتساب | Share the invitation on WhatsApp | هاوبەشکردنی بانگهێشتنامە لە واتسئاپ | پارڤەکرنا داخوازنامێ ل واتسئاپێ | ◐ | PENDING |
-| `receipt.saveWhatsApp` | حفظ التأكيد على واتساب | Save the confirmation on WhatsApp | پاشەکەوتکردنی پشتڕاستکردنەوە لە واتسئاپ | پاراستنا پشتڕاستکرنێ ل واتسئاپێ | ○ | PENDING |
-| `receipt.openInvitation` | فتح الدعوة | Open invitation | کردنەوەی بانگهێشتنامە | ڤەکرنا داخوازنامێ | ◐ | PENDING |
-| `receipt.print` | طباعة الإيصال | Print receipt | چاپکردنی پسوولە | چاپکرنا پسوولێ | ◐ | PENDING |
-| `receipt.corrections` | تحتاجون تصحيحاً في الدعوة؟ تواصلوا معنا وسنعدّلها لكم. | Need a correction in your invitation? Contact us and we'll fix it for you. | پێویستتان بە ڕاستکردنەوە هەیە لە بانگهێشتنامەکەدا؟ پەیوەندیمان پێوە بکەن و بۆتان ڕاستی دەکەینەوە. | پێدڤی ب راستکرنێ د داخوازنامێ دا هەیە؟ پەیوەندیێ ب مە بکەن و دێ بۆ هەوە راست کەین. | ○ | PENDING |
-| `receipt.keepLink` | احتفظوا برابط هذه الصفحة؛ فهو خاص بكم ويعرض إيصالكم في أي وقت. | Keep this page's link; it is private to you and shows your receipt any time. | بەستەری ئەم پەڕەیە پاشەکەوت بکەن؛ تایبەتە بە ئێوە و هەر کاتێک پسوولەکەتان پیشان دەدات. | لینکا ڤێ لاپەرێ بپارێزن؛ تایبەتە ب هەوە و هەر دەمەکێ پسوولا هەوە نیشان ددەت. | ○ | PENDING |
-| `receipt.shareText` | يسعدنا دعوتكم: {url} | You're invited: {url} | بانگهێشتن کراون: {url} | هوین داخوازکرینە: {url} | ○ | PENDING |
-| `receipt.confirmText` | تأكيد طلب بهجه\nرقم الفاتورة: {invoice}\nرابط الدعوة: {url}\nمتاحة حتى: {expires} | Bahja order confirmation\nInvoice: {invoice}\nInvitation link: {url}\nAvailable until: {expires} | پشتڕاستکردنەوەی داواکاری بەهجە\nژمارەی پسوولە: {invoice}\nبەستەری بانگهێشتنامە: {url}\nبەردەستە تا: {expires} | پشتڕاستکرنا داخوازیا بەهجە\nژمارا پسوولێ: {invoice}\nلینکا داخوازنامێ: {url}\nبەردەستە هەتا: {expires} | ○ | PENDING |
-| `receipt.notFound` | هذا الرابط غير صالح. | This link is not valid. | ئەم بەستەرە دروست نییە. | ئەڤ لینکە نە دروستە. | ◐ | PENDING |
-| `receipt.notPublishedYet` | ستظهر دعوتكم هنا فور تأكيد الدفع. | Your invitation will appear here as soon as payment is confirmed. | بانگهێشتنامەکەتان لێرە دەردەکەوێت هەر کە پارەدان پشتڕاست کرایەوە. | داخوازناما هەوە دێ ل ڤێرە دیار بیت هەر کو پارەدان هاتە پشتڕاستکرن. | ○ | PENDING |
-| `receipt.statuses.*` | بانتظار الدفع · مدفوع · ملغى · انتهت مهلة الدفع · مسترد | Awaiting payment · Paid · Cancelled · Payment window expired · Refunded | چاوەڕوانی پارەدان · پارەدراو · هەڵوەشێنراوە · کاتی پارەدان بەسەرچوو · گەڕێنراوەتەوە | ل هیڤیا پارەدانێ · پارە هاتیە دان · هاتیە هەلوەشاندن · دەمێ پارەدانێ ب دوماهی هات · هاتیە زڤڕاندن | ○ | PENDING |
+| `invitation.previewExpired` | انتهت صلاحية رابط المعاينة. ارجعوا إلى صفحة الطلب لإنشاء معاينة جديدة. | This preview link has expired. Go back to your order to create a new preview. | بەستەری پێشبینین بەسەرچووە. بگەڕێنەوە بۆ داواکارییەکەتان بۆ دروستکردنی پێشبینینێکی نوێ. | لینکا پێشدیتنێ ب دوماهی هات. بزڤڕن بۆ داخوازیا خۆ بۆ چێکرنا پێشدیتنەکا نوو. | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.title` | إيصال الطلب | Order receipt | پسوولەی داواکاری | پسوولا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.paidTitle` | تم الدفع بنجاح | Payment received | پارەدان بە سەرکەوتوویی ئەنجامدرا | پارەدان ب سەرکەفتیانە هاتە کرن | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.pendingTitle` | بانتظار الدفع | Awaiting payment | چاوەڕوانی پارەدان | ل هیڤیا پارەدانێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.orderNumber` | رقم الطلب | Order number | ژمارەی داواکاری | ژمارا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.invoiceNumber` | رقم الفاتورة | Invoice number | ژمارەی پسوولە | ژمارا پسوولێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.status` | الحالة | Status | دۆخ | رەوش | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.customer` | العميل | Customer | کڕیار | کڕیار | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.phone` | الهاتف | Phone | تەلەفۆن | تەلەفۆن | ● | APPROVED (owner, 2026-09-30) |
+| `receipt.email` | البريد الإلكتروني | Email | ئیمەیڵ | ئیمەیل | ● | APPROVED (owner, 2026-09-30) |
+| `receipt.theme` | التصميم | Theme | دیزاین | دیزاین | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.package` | الباقة | Package | پاکێج | پاکێج | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.amount` | المبلغ | Amount | بڕی پارە | بڕێ پارەی | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.amountNote` | جميع المدفوعات بالدينار العراقي. | All payments are in Iraqi dinars. | هەموو پارەدانەکان بە دیناری عێراقین. | هەمی پارەدان ب دینارێ عیراقینە. | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.purchaseDate` | تاريخ الطلب | Order date | بەرواری داواکاری | دیرۆکا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.paidDate` | تاريخ الدفع | Payment date | بەرواری پارەدان | دیرۆکا پارەدانێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.publishedAt` | تاريخ النشر | Published on | بەرواری بڵاوکردنەوە | دیرۆکا بەلاڤکرنێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.expiresAt` | متاحة حتى | Available until | بەردەستە تا | بەردەستە هەتا | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.invitationLink` | رابط دعوتكم | Your invitation link | بەستەری بانگهێشتنامەکەتان | لینکا داخوازناما هەوە | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.copyLink` | نسخ الرابط | Copy link | کۆپیکردنی بەستەر | کۆپیکرنا لینکێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.copied` | تم النسخ | Copied | کۆپی کرا | هاتە کۆپیکرن | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.shareWhatsApp` | مشاركة الدعوة على واتساب | Share the invitation on WhatsApp | هاوبەشکردنی بانگهێشتنامە لە واتسئاپ | پارڤەکرنا داخوازنامێ ل واتسئاپێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.saveWhatsApp` | حفظ التأكيد على واتساب | Save the confirmation on WhatsApp | پاشەکەوتکردنی پشتڕاستکردنەوە لە واتسئاپ | پاراستنا پشتڕاستکرنێ ل واتسئاپێ | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.openInvitation` | فتح الدعوة | Open invitation | کردنەوەی بانگهێشتنامە | ڤەکرنا داخوازنامێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.print` | طباعة الإيصال | Print receipt | چاپکردنی پسوولە | چاپکرنا پسوولێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.corrections` | تحتاجون تصحيحاً في الدعوة؟ تواصلوا معنا وسنعدّلها لكم. | Need a correction in your invitation? Contact us and we'll fix it for you. | پێویستتان بە ڕاستکردنەوە هەیە لە بانگهێشتنامەکەدا؟ پەیوەندیمان پێوە بکەن و بۆتان ڕاستی دەکەینەوە. | پێدڤی ب راستکرنێ د داخوازنامێ دا هەیە؟ پەیوەندیێ ب مە بکەن و دێ بۆ هەوە راست کەین. | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.keepLink` | احتفظوا برابط هذه الصفحة؛ فهو خاص بكم ويعرض إيصالكم في أي وقت. | Keep this page's link; it is private to you and shows your receipt any time. | بەستەری ئەم پەڕەیە پاشەکەوت بکەن؛ تایبەتە بە ئێوە و هەر کاتێک پسوولەکەتان پیشان دەدات. | لینکا ڤێ لاپەرێ بپارێزن؛ تایبەتە ب هەوە و هەر دەمەکێ پسوولا هەوە نیشان ددەت. | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.shareText` | يسعدنا دعوتكم: {url} | You're invited: {url} | بانگهێشتن کراون: {url} | هوین داخوازکرینە: {url} | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.confirmText` | تأكيد طلب بهجه\nرقم الفاتورة: {invoice}\nرابط الدعوة: {url}\nمتاحة حتى: {expires} | Bahja order confirmation\nInvoice: {invoice}\nInvitation link: {url}\nAvailable until: {expires} | پشتڕاستکردنەوەی داواکاری بەهجە\nژمارەی پسوولە: {invoice}\nبەستەری بانگهێشتنامە: {url}\nبەردەستە تا: {expires} | پشتڕاستکرنا داخوازیا بەهجە\nژمارا پسوولێ: {invoice}\nلینکا داخوازنامێ: {url}\nبەردەستە هەتا: {expires} | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.notFound` | هذا الرابط غير صالح. | This link is not valid. | ئەم بەستەرە دروست نییە. | ئەڤ لینکە نە دروستە. | ◐ | APPROVED (owner, 2026-09-30) |
+| `receipt.notPublishedYet` | ستظهر دعوتكم هنا فور تأكيد الدفع. | Your invitation will appear here as soon as payment is confirmed. | بانگهێشتنامەکەتان لێرە دەردەکەوێت هەر کە پارەدان پشتڕاست کرایەوە. | داخوازناما هەوە دێ ل ڤێرە دیار بیت هەر کو پارەدان هاتە پشتڕاستکرن. | ○ | APPROVED (owner, 2026-09-30) |
+| `receipt.statuses.*` | بانتظار الدفع · مدفوع · ملغى · انتهت مهلة الدفع · مسترد | Awaiting payment · Paid · Cancelled · Payment window expired · Refunded | چاوەڕوانی پارەدان · پارەدراو · هەڵوەشێنراوە · کاتی پارەدان بەسەرچوو · گەڕێنراوەتەوە | ل هیڤیا پارەدانێ · پارە هاتیە دان · هاتیە هەلوەشاندن · دەمێ پارەدانێ ب دوماهی هات · هاتیە زڤڕاندن | ○ | APPROVED (owner, 2026-09-30) |
 
-## Batch 5 — storefront navigation and homepage (PENDING)
+## Batch 5 — storefront navigation and homepage — ✅ APPROVED (2026-09-30, rows marked PENDING still need wording)
 
 The homepage replaces the old "website is being prepared" page, so the approved `home.preparing*`
 wording (batch 1, rows 5–6) is no longer shown.
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
-| `nav.home` | الرئيسية | Home | سەرەکی | سەرەکی | ● | PENDING |
-| `nav.themes` | التصاميم | Themes | دیزاینەکان | دیزاین | ◐ | PENDING |
-| `nav.occasions` | المناسبات | Occasions | بۆنەکان | بۆنە | ◐ | PENDING |
-| `nav.how` | كيف تعمل | How it works | چۆن کار دەکات | چاوا کار دکەت | ◐ | PENDING |
-| `nav.contact` | تواصل معنا | Contact us | پەیوەندیمان پێوە بکە | پەیوەندیێ ب مە بکە | ◐ | PENDING |
-| `nav.menu` | القائمة | Menu | لیست | لیست | ◐ | PENDING |
-| `nav.close` | إغلاق | Close | داخستن | گرتن | ◐ | PENDING |
-| `footer.tagline` | دعوات رقمية مختارة بعناية. | Carefully curated digital invitations. | بانگهێشتنامەی دیجیتاڵی بە وردی هەڵبژێردراو. | داخوازنامێن دیجیتالی یێن ب هووری هاتینە هەلبژارتن. | ◐ | PENDING |
-| `home.heroLine1` | دعوات صُممت | Invitations designed | بانگهێشتنامە دیزاینکراون | داخوازنامە هاتینە دیزاینکرن | ○ | PENDING |
-| `home.heroLine2` | للحظات لا تُنسى. | for unforgettable moments. | بۆ ساتە لەبیرنەکراوەکان. | بۆ دەمێن ژبیرنەبوونی. | ○ | PENDING |
-| `home.heroSubtitle` | تصاميم استثنائية لكل مناسبة. | Exceptional designs for every occasion. | دیزاینی نایاب بۆ هەموو بۆنەیەک. | دیزاینێن ناوازە بۆ هەمی بۆنان. | ◐ | PENDING |
-| `home.browse` | تصفّح التصاميم | Browse designs | سەیرکردنی دیزاینەکان | دیتنا دیزاینان | ◐ | PENDING |
-| `home.occasionsTitle` | اختر مناسبتك | Choose your occasion | بۆنەکەت هەڵبژێرە | بۆنا خۆ هەلبژێرە | ◐ | PENDING |
-| `home.themesTitle` | تصاميم مختارة | Featured designs | دیزاینە هەڵبژێردراوەکان | دیزاینێن هەلبژارتی | ◐ | PENDING |
-| `home.themesSubtitle` | كل تصميم مرسوم ومتحرك بعناية. اسحبوا لتتصفحوا المزيد. | Every design is drawn and animated with care. Swipe to see more. | هەر دیزاینێک بە وردی کێشراوە و جووڵەی پێدراوە. ڕایبکێشن بۆ بینینی زیاتر. | هەر دیزاینەک ب هووری هاتیە کێشان و لڤاندن. بکێشن بۆ دیتنا پتر. | ○ | PENDING |
-| `home.allThemes` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | PENDING |
-| `home.prev` / `home.next` | السابق / التالي | Previous / Next | پێشوو / دواتر | بەری / پاشی | ◐ | PENDING |
-| `home.preview` | معاينة | Preview | پێشبینین | پێشدیتن | ◐ | PENDING |
-| `home.choose` | اختيار | Choose | هەڵبژاردن | هەلبژارتن | ● | PENDING |
-| `home.from` | يبدأ من | From | لە | ژ | ◐ | PENDING |
-| `home.noThemes` | التصاميم الأولى في الطريق، تابعونا قريباً. | Our first designs are on their way. See you soon. | یەکەم دیزاینەکانمان لە ڕێگان، بەم زووانە. | دیزاینێن مە یێن ئێکێ ل ڕێکێنە، ب زیترین دەم. | ○ | PENDING |
-| `home.howTitle` | كيف تعمل؟ | How it works | چۆن کار دەکات؟ | چاوا کار دکەت؟ | ◐ | PENDING |
-| `home.step1Title` | اختاروا تصميمكم | Choose your design | دیزاینەکەتان هەڵبژێرن | دیزاینێ خۆ هەلبژێرن | ◐ | PENDING |
-| `home.step1Body` | تصميم يشبهكم، وباقة تناسب مناسبتكم. | A design that feels like you, and a package that fits your occasion. | دیزاینێک لە ئێوە بچێت، و پاکێجێک گونجاو بۆ بۆنەکەتان. | دیزاینەک وەکی هەوە، و پاکێجەک گونجای بۆ بۆنا هەوە. | ○ | PENDING |
-| `home.step2Title` | اكتبوا تفاصيلكم | Add your details | وردەکارییەکانتان بنووسن | هوورگیێن خۆ بنڤیسن | ◐ | PENDING |
-| `home.step2Body` | الأسماء والتاريخ والمكان، وشاهدوا دعوتكم كاملة قبل الدفع. | Names, date and venue, and see your complete invitation before paying. | ناو و بەروار و شوێن، و بانگهێشتنامەکەتان بە تەواوی ببینن پێش پارەدان. | ناڤ و دیرۆک و جه، و داخوازناما خۆ ب تەمامی ببینن بەری پارەدانێ. | ○ | PENDING |
-| `home.step3Title` | شاركوا الرابط | Share the link | بەستەرەکە هاوبەش بکەن | لینکێ پارڤە بکەن | ◐ | PENDING |
-| `home.step3Body` | بعد الدفع تُنشر الدعوة فوراً، وترسلونها على واتساب. | After payment your invitation goes live instantly; send it on WhatsApp. | دوای پارەدان بانگهێشتنامەکە یەکسەر بڵاو دەکرێتەوە، و لە واتسئاپ بینێرن. | پشتی پارەدانێ داخوازنامە دەستبەجێ دێ هێتە بەلاڤکرن، و ل واتسئاپێ بفرێکەن. | ○ | PENDING |
-| `home.featuresTitle` | دعوة واحدة فيها كل شيء | One invitation, everything in it | یەک بانگهێشتنامە، هەموو شتێکی تێدایە | ئێک داخوازنامە، هەمی تشت تێدا | ○ | PENDING |
-| `home.sampleMessage` | يسعدنا حضوركم فرحتنا | We'd love you to celebrate with us | خۆشحاڵ دەبین بە ئامادەبوونتان لە خۆشیمان | دێ دلخۆش بین ب ئامادەبوونا هەوە د شاهیا مە دا | ○ | PENDING |
-| `home.featureMusic` | موسيقى تبدأ مع فتح الدعوة | Music that starts when it opens | مۆسیقا لەگەڵ کردنەوەی بانگهێشتنامە دەست پێدەکات | مۆسیقا دگەل ڤەکرنا داخوازنامێ دەست پێدکەت | ◐ | PENDING |
-| `home.featureRsvp` | تأكيد حضور ورسائل تهنئة | RSVPs and congratulation messages | پشتڕاستکردنەوەی ئامادەبوون و نامەی پیرۆزبایی | پشتڕاستکرنا ئامادەبوونێ و نامێن پیرۆزباهیێ | ◐ | PENDING |
-| `home.featurePrint` | بطاقة دعوة جاهزة للطباعة | A print-ready invitation card | کارتی بانگهێشتی ئامادە بۆ چاپ | کارتا داخوازیێ ئامادە بۆ چاپێ | ◐ | PENDING |
-| `home.featureDays` | متاحة ٣٠ يوماً من النشر | Live for 30 days after publishing | ٣٠ ڕۆژ دوای بڵاوکردنەوە بەردەستە | ٣٠ ڕۆژان پشتی بەلاڤکرنێ بەردەستە | ◐ | PENDING |
-| `home.faqTitle` | أسئلة شائعة | Frequently asked questions | پرسیارە باوەکان | پسیارێن بەربەلاڤ | ◐ | PENDING |
+| `nav.home` | الرئيسية | Home | سەرەکی | سەرەکی | ● | APPROVED (owner, 2026-09-30) |
+| `nav.themes` | التصاميم | Themes | دیزاینەکان | دیزاین | ◐ | APPROVED (owner, 2026-09-30) |
+| `nav.occasions` | المناسبات | Occasions | بۆنەکان | بۆنە | ◐ | APPROVED (owner, 2026-09-30) |
+| `nav.how` | كيف تعمل | How it works | چۆن کار دەکات | چاوا کار دکەت | ◐ | APPROVED (owner, 2026-09-30) |
+| `nav.contact` | تواصل معنا | Contact us | پەیوەندیمان پێوە بکە | پەیوەندیێ ب مە بکە | ◐ | APPROVED (owner, 2026-09-30) |
+| `nav.menu` | القائمة | Menu | لیست | لیست | ◐ | APPROVED (owner, 2026-09-30) |
+| `nav.close` | إغلاق | Close | داخستن | گرتن | ◐ | APPROVED (owner, 2026-09-30) |
+| `footer.tagline` | دعوات رقمية مختارة بعناية. | Carefully curated digital invitations. | بانگهێشتنامەی دیجیتاڵی بە وردی هەڵبژێردراو. | داخوازنامێن دیجیتالی یێن ب هووری هاتینە هەلبژارتن. | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.heroLine1` | دعوات صُممت | Invitations designed | بانگهێشتنامە دیزاینکراون | داخوازنامە هاتینە دیزاینکرن | ○ | APPROVED (owner, 2026-09-30) |
+| `home.heroLine2` | للحظات لا تُنسى. | for unforgettable moments. | بۆ ساتە لەبیرنەکراوەکان. | بۆ دەمێن ژبیرنەبوونی. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.heroSubtitle` | تصاميم استثنائية لكل مناسبة. | Exceptional designs for every occasion. | دیزاینی نایاب بۆ هەموو بۆنەیەک. | دیزاینێن ناوازە بۆ هەمی بۆنان. | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.browse` | تصفّح التصاميم | Browse designs | سەیرکردنی دیزاینەکان | دیتنا دیزاینان | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.occasionsTitle` | اختر مناسبتك | Choose your occasion | بۆنەکەت هەڵبژێرە | بۆنا خۆ هەلبژێرە | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.themesTitle` | تصاميم مختارة | Featured designs | دیزاینە هەڵبژێردراوەکان | دیزاینێن هەلبژارتی | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.themesSubtitle` | كل تصميم مرسوم ومتحرك بعناية. اسحبوا لتتصفحوا المزيد. | Every design is drawn and animated with care. Swipe to see more. | هەر دیزاینێک بە وردی کێشراوە و جووڵەی پێدراوە. ڕایبکێشن بۆ بینینی زیاتر. | هەر دیزاینەک ب هووری هاتیە کێشان و لڤاندن. بکێشن بۆ دیتنا پتر. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.allThemes` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | APPROVED (owner, 2026-09-30) |
+| `home.prev` / `home.next` | السابق / التالي | Previous / Next | پێشوو / دواتر | بەری / پاشی | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.preview` | معاينة | Preview | پێشبینین | پێشدیتن | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.choose` | اختيار | Choose | هەڵبژاردن | هەلبژارتن | ● | APPROVED (owner, 2026-09-30) |
+| `home.from` | يبدأ من | From | لە | ژ | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.noThemes` | التصاميم الأولى في الطريق، تابعونا قريباً. | Our first designs are on their way. See you soon. | یەکەم دیزاینەکانمان لە ڕێگان، بەم زووانە. | دیزاینێن مە یێن ئێکێ ل ڕێکێنە، ب زیترین دەم. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.howTitle` | كيف تعمل؟ | How it works | چۆن کار دەکات؟ | چاوا کار دکەت؟ | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.step1Title` | اختاروا تصميمكم | Choose your design | دیزاینەکەتان هەڵبژێرن | دیزاینێ خۆ هەلبژێرن | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.step1Body` | تصميم يشبهكم، وباقة تناسب مناسبتكم. | A design that feels like you, and a package that fits your occasion. | دیزاینێک لە ئێوە بچێت، و پاکێجێک گونجاو بۆ بۆنەکەتان. | دیزاینەک وەکی هەوە، و پاکێجەک گونجای بۆ بۆنا هەوە. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.step2Title` | اكتبوا تفاصيلكم | Add your details | وردەکارییەکانتان بنووسن | هوورگیێن خۆ بنڤیسن | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.step2Body` | الأسماء والتاريخ والمكان، وشاهدوا دعوتكم كاملة قبل الدفع. | Names, date and venue, and see your complete invitation before paying. | ناو و بەروار و شوێن، و بانگهێشتنامەکەتان بە تەواوی ببینن پێش پارەدان. | ناڤ و دیرۆک و جه، و داخوازناما خۆ ب تەمامی ببینن بەری پارەدانێ. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.step3Title` | شاركوا الرابط | Share the link | بەستەرەکە هاوبەش بکەن | لینکێ پارڤە بکەن | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.step3Body` | بعد الدفع تُنشر الدعوة فوراً، وترسلونها على واتساب. | After payment your invitation goes live instantly; send it on WhatsApp. | دوای پارەدان بانگهێشتنامەکە یەکسەر بڵاو دەکرێتەوە، و لە واتسئاپ بینێرن. | پشتی پارەدانێ داخوازنامە دەستبەجێ دێ هێتە بەلاڤکرن، و ل واتسئاپێ بفرێکەن. | ○ | APPROVED (owner, 2026-09-30) |
+| `home.featuresTitle` | دعوة واحدة فيها كل شيء | One invitation, everything in it | یەک بانگهێشتنامە، هەموو شتێکی تێدایە | ئێک داخوازنامە، هەمی تشت تێدا | ○ | APPROVED (owner, 2026-09-30) |
+| `home.sampleMessage` | يسعدنا حضوركم فرحتنا | We'd love you to celebrate with us | خۆشحاڵ دەبین بە ئامادەبوونتان لە خۆشیمان | دێ دلخۆش بین ب ئامادەبوونا هەوە د شاهیا مە دا | ○ | APPROVED (owner, 2026-09-30) |
+| `home.featureMusic` | موسيقى تبدأ مع فتح الدعوة | Music that starts when it opens | مۆسیقا لەگەڵ کردنەوەی بانگهێشتنامە دەست پێدەکات | مۆسیقا دگەل ڤەکرنا داخوازنامێ دەست پێدکەت | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.featureRsvp` | تأكيد حضور ورسائل تهنئة | RSVPs and congratulation messages | پشتڕاستکردنەوەی ئامادەبوون و نامەی پیرۆزبایی | پشتڕاستکرنا ئامادەبوونێ و نامێن پیرۆزباهیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.featurePrint` | بطاقة دعوة جاهزة للطباعة | A print-ready invitation card | کارتی بانگهێشتی ئامادە بۆ چاپ | کارتا داخوازیێ ئامادە بۆ چاپێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.featureDays` | متاحة ٣٠ يوماً من النشر | Live for 30 days after publishing | ٣٠ ڕۆژ دوای بڵاوکردنەوە بەردەستە | ٣٠ ڕۆژان پشتی بەلاڤکرنێ بەردەستە | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.faqTitle` | أسئلة شائعة | Frequently asked questions | پرسیارە باوەکان | پسیارێن بەربەلاڤ | ◐ | APPROVED (owner, 2026-09-30) |
 | `home.faq1q`–`faq4a` | (see `ar.json`) | (see `en.json`) | I'll suggest these once the wording above is settled. | | | PENDING |
-| `home.ctaTitle` | جاهزون لدعوتكم؟ | Ready for your invitation? | ئامادەن بۆ بانگهێشتنامەکەتان؟ | ئامادەنە بۆ داخوازناما خۆ؟ | ○ | PENDING |
-| `home.ctaButton` | ابدأوا الآن | Get started | ئێستا دەست پێبکەن | نوکە دەست پێبکەن | ◐ | PENDING |
-| `home.and` | و | & | و | و | ● | PENDING |
+| `home.ctaTitle` | جاهزون لدعوتكم؟ | Ready for your invitation? | ئامادەن بۆ بانگهێشتنامەکەتان؟ | ئامادەنە بۆ داخوازناما خۆ؟ | ○ | APPROVED (owner, 2026-09-30) |
+| `home.ctaButton` | ابدأوا الآن | Get started | ئێستا دەست پێبکەن | نوکە دەست پێبکەن | ◐ | APPROVED (owner, 2026-09-30) |
+| `home.and` | و | & | و | و | ● | APPROVED (owner, 2026-09-30) |
 | `home.cards.*` | Sample names on the hero cards | | Please give Kurdish sample names (see batch 3c). | | | PENDING |
 
-## Batch 6 — catalog, theme page and ordering (PENDING)
+## Batch 6 — catalog, theme page and ordering — ✅ APPROVED (2026-09-30, rows marked PENDING still need wording)
 
 All keys are under `store.*` in `src/i18n/messages/ar.json` / `en.json`. The main labels are below.
 Once you have settled the wording in batch 5, I'll suggest the longer sentences (hints, errors, notes).
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
-| `store.catalogTitle` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | PENDING |
-| `store.all` | الكل | All | هەموو | هەمی | ● | PENDING |
-| `store.livePreview` | معاينة حيّة | Live preview | پێشبینینی ڕاستەوخۆ | پێشدیتنا ڕاستەوخۆ | ◐ | PENDING |
-| `store.shortNames` / `longNames` | أسماء قصيرة / طويلة | Short / Long names | ناوی کورت / درێژ | ناڤێن کورت / درێژ | ◐ | PENDING |
-| `store.openFull` | فتح بملء الشاشة | Open full screen | کردنەوە بە پڕی شاشە | ڤەکرن ب تژیا شاشێ | ○ | PENDING |
-| `store.packagesTitle` | اختر باقتك | Choose your package | پاکێجەکەت هەڵبژێرە | پاکێجا خۆ هەلبژێرە | ◐ | PENDING |
-| `store.includes` | تشمل | Includes | لەخۆدەگرێت | تێدایە | ◐ | PENDING |
-| `store.choose` | اختر هذه الباقة | Choose this package | ئەم پاکێجە هەڵبژێرە | ڤێ پاکێجێ هەلبژێرە | ◐ | PENDING |
-| `store.orderTitle` | تفاصيل دعوتك | Your invitation details | وردەکارییەکانی بانگهێشتنامەکەت | هوورگیێن داخوازناما تە | ○ | PENDING |
-| `store.stepDetails` / `stepReview` / `stepPay` | التفاصيل / المراجعة / الدفع | Details / Review / Payment | وردەکاری / پێداچوونەوە / پارەدان | هوورگی / پێداچوون / پارەدان | ◐ | PENDING |
-| `store.packageLabel` | الباقة | Package | پاکێج | پاکێج | ◐ | PENDING |
-| `store.languageLabel` | لغة الدعوة | Invitation language | زمانی بانگهێشتنامە | زمانێ داخوازنامێ | ◐ | PENDING |
-| `store.continue` | اعرض المعاينة | See my preview | پێشبینینەکەم پیشان بدە | پێشدیتنا من نیشان بدە | ○ | PENDING |
-| `store.reviewTitle` | راجع دعوتك | Review your invitation | پێداچوونەوە بە بانگهێشتنامەکەتدا بکە | پێداچوونێ ب داخوازناما خۆ دا بکە | ○ | PENDING |
-| `store.edit` | تعديل التفاصيل | Edit details | دەستکاریکردنی وردەکارییەکان | گوهۆڕینا هوورگیان | ○ | PENDING |
-| `store.contactTitle` | بيانات التواصل | Your contact details | زانیاری پەیوەندی | زانیاریێن پەیوەندیێ | ◐ | PENDING |
-| `store.name` / `phone` / `email` | الاسم الكامل / رقم الهاتف / البريد الإلكتروني | Full name / Phone number / Email | ناوی تەواو / ژمارەی تەلەفۆن / ئیمەیڵ | ناڤێ تەمام / ژمارا تەلەفۆنێ / ئیمەیل | ◐ | PENDING |
-| `store.total` | المجموع | Total | کۆی گشتی | کۆم | ◐ | PENDING |
-| `store.placeOrder` | تأكيد الطلب | Confirm order | پشتڕاستکردنەوەی داواکاری | پشتڕاستکرنا داخوازیێ | ◐ | PENDING |
+| `store.catalogTitle` | كل التصاميم | All designs | هەموو دیزاینەکان | هەمی دیزاین | ● | APPROVED (owner, 2026-09-30) |
+| `store.all` | الكل | All | هەموو | هەمی | ● | APPROVED (owner, 2026-09-30) |
+| `store.livePreview` | معاينة حيّة | Live preview | پێشبینینی ڕاستەوخۆ | پێشدیتنا ڕاستەوخۆ | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.shortNames` / `longNames` | أسماء قصيرة / طويلة | Short / Long names | ناوی کورت / درێژ | ناڤێن کورت / درێژ | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.openFull` | فتح بملء الشاشة | Open full screen | کردنەوە بە پڕی شاشە | ڤەکرن ب تژیا شاشێ | ○ | APPROVED (owner, 2026-09-30) |
+| `store.packagesTitle` | اختر باقتك | Choose your package | پاکێجەکەت هەڵبژێرە | پاکێجا خۆ هەلبژێرە | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.includes` | تشمل | Includes | لەخۆدەگرێت | تێدایە | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.choose` | اختر هذه الباقة | Choose this package | ئەم پاکێجە هەڵبژێرە | ڤێ پاکێجێ هەلبژێرە | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.orderTitle` | تفاصيل دعوتك | Your invitation details | وردەکارییەکانی بانگهێشتنامەکەت | هوورگیێن داخوازناما تە | ○ | APPROVED (owner, 2026-09-30) |
+| `store.stepDetails` / `stepReview` / `stepPay` | التفاصيل / المراجعة / الدفع | Details / Review / Payment | وردەکاری / پێداچوونەوە / پارەدان | هوورگی / پێداچوون / پارەدان | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.packageLabel` | الباقة | Package | پاکێج | پاکێج | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.languageLabel` | لغة الدعوة | Invitation language | زمانی بانگهێشتنامە | زمانێ داخوازنامێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.continue` | اعرض المعاينة | See my preview | پێشبینینەکەم پیشان بدە | پێشدیتنا من نیشان بدە | ○ | APPROVED (owner, 2026-09-30) |
+| `store.reviewTitle` | راجع دعوتك | Review your invitation | پێداچوونەوە بە بانگهێشتنامەکەتدا بکە | پێداچوونێ ب داخوازناما خۆ دا بکە | ○ | APPROVED (owner, 2026-09-30) |
+| `store.edit` | تعديل التفاصيل | Edit details | دەستکاریکردنی وردەکارییەکان | گوهۆڕینا هوورگیان | ○ | APPROVED (owner, 2026-09-30) |
+| `store.contactTitle` | بيانات التواصل | Your contact details | زانیاری پەیوەندی | زانیاریێن پەیوەندیێ | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.name` / `phone` / `email` | الاسم الكامل / رقم الهاتف / البريد الإلكتروني | Full name / Phone number / Email | ناوی تەواو / ژمارەی تەلەفۆن / ئیمەیڵ | ناڤێ تەمام / ژمارا تەلەفۆنێ / ئیمەیل | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.total` | المجموع | Total | کۆی گشتی | کۆم | ◐ | APPROVED (owner, 2026-09-30) |
+| `store.placeOrder` | تأكيد الطلب | Confirm order | پشتڕاستکردنەوەی داواکاری | پشتڕاستکرنا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
 | `store.features.*` | (feature names shown on packages) | | I'll suggest these with the batch 6 sentences. | | | PENDING |
