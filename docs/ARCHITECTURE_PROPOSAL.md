@@ -3,6 +3,10 @@
 Status: **APPROVED — revision 5. M1 (foundation) and M2 (admin catalog) implemented.**
 Date: 2026-09-30
 
+**Revision 6 changes (owner feedback after M2):**
+- **Dual currency:** packages have IQD (required) and USD (optional for now) prices set by the owner (Decision N).
+- **Music loops** automatically; one song can be assigned to any number of themes.
+
 **Revision 5 changes (M2 implementation notes):**
 - **Owner approval for design.** The storefront's visual design will be presented for approval before it is built (M4); admin screens stay functional.
 - **Section rule:** "features included in every package" (`sections.required_features`) enforces decision M. Wedding requires `print_card`; a wedding theme designed without a printable card cannot be sold.
@@ -116,6 +120,15 @@ Messages can only be written while the invitation is public, so the collection p
 
 **L. Price or theme changes during checkout.**
 Price, package, fields and theme version are snapshotted when the order is created. If a theme is archived or re-priced after a WAYL link is issued, that order is honored at the snapshotted price until the link expires. After that, the customer must restart and sees current availability.
+
+**N. OWNER REQUEST — Prices in IQD and USD (card payments via WAYL).**
+This changes the original "IQD only in V1" rule. The owner plans to accept Mastercard through WAYL and wants every package priced in both currencies.
+- **Implemented now:** each package has a required IQD price and an optional USD price (`price_usd_cents`). The owner enters both; there is **no automatic exchange-rate conversion**, so prices never drift. Both are audited on change.
+- **Still to confirm with WAYL (before M6):**
+  - WAYL's public description is an *IQD* payments API. It's unconfirmed whether a card payment can be *charged in USD*, or whether cards are charged in IQD and the bank converts.
+  - This decides which amount goes to WAYL. Either the customer pays the USD price when paying by card, or the IQD price is always charged and USD is shown for information.
+- **Orders (M5)** will snapshot the currency and amount actually charged, so receipts stay correct whatever happens later.
+- **Until confirmed,** checkout charges IQD. USD becomes required per package only once USD card charging is switched on.
 
 **M. ✅ DECIDED — Printable invitation card.**
 Every theme ships a **print companion**: a static, print-ready design of the same visual identity. It is not a screenshot of the animated page.
@@ -331,7 +344,7 @@ type ThemeProps = {
 ```
 
 The theme gets platform capabilities only through `theme-sdk`:
-- `useMusic()`: play and pause, respects autoplay rules. The first "Open invitation" gesture unlocks audio.
+- `useMusic()`: play and pause, respects autoplay rules. The first "Open invitation" gesture unlocks audio. **Music always loops** (owner requirement); themes cannot turn looping off.
 - `<GuestFormSlot render={…}/>`: a headless component for the guest form (name, attendance, and message when the package has `congratulations`). The theme supplies the markup and styling; the platform owns submission, validation, Turnstile and error states. In `sample` or `preview` mode it is inert.
 - `useReducedMotion()`, `<ThemeImage>` (responsive, lazy), and `formatDate()` for the invitation's locale and calendar.
 

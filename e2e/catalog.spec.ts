@@ -39,9 +39,11 @@ test('owner configures a theme end to end: music → cover → package → revie
   await add.getByLabel('العربية').first().fill('باقة ذهبية');
   await add.getByLabel('الإنجليزية').first().fill('Gold');
   await add.getByLabel('السعر (دينار عراقي)').fill('75000');
+  await add.getByLabel('السعر (دولار أمريكي)').fill('50');
   await add.getByRole('radio').last().check();
   await add.getByRole('button', { name: 'إنشاء' }).click();
   await expect(page.getByText('التصميم مستوفٍ لكل الشروط.')).toBeVisible();
+  await expect(page.getByText(/US\$|\$/).first()).toBeVisible();
 
   // Lifecycle: review → on sale.
   page.on('dialog', (d) => d.accept());

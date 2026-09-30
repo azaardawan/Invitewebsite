@@ -17,6 +17,24 @@ export const packageInput = z.object({
   description: optionalI18nContent(300),
   /** Whole Iraqi dinars. */
   priceIqd: z.coerce.number().int().min(1000).max(100_000_000),
+  /** US dollars as typed by the owner, e.g. "25" or "25.50"; empty = no USD price yet. Stored in cents. */
+  priceUsd: z
+    .union([z.string(), z.number()])
+    .nullish()
+    .transform((v, ctx) => {
+      const text = v === null || v === undefined ? '' : String(v).trim();
+      if (text === '') return null;
+      if (!/^\d{1,6}(\.\d{1,2})?$/.test(text)) {
+        ctx.addIssue({ code: 'custom', message: 'USD price must be a number with up to 2 decimals' });
+        return z.NEVER;
+      }
+      const cents = Math.round(Number(text) * 100);
+      if (cents <= 0 || cents > 10_000_000) {
+        ctx.addIssue({ code: 'custom', message: 'USD price out of range' });
+        return z.NEVER;
+      }
+      return cents;
+    }),
   fieldKeys: z.array(z.enum(FIELD_KEYS as [FieldKey, ...FieldKey[]])).min(1),
   featureKeys: z.array(z.enum(FEATURE_KEYS as [FeatureKey, ...FeatureKey[]])),
 });
@@ -54,8 +72,19 @@ async function writeShape(tx: DbOrTx, packageId: string, fields: string[], featu
   if (features.length) await tx.insert(packageFeatures).values(features.map((featureKey) => ({ packageId, featureKey })));
 }
 
-function snapshot(p: { name: unknown; description: unknown; priceIqd: number }, fields: string[], features: string[]) {
-  return { name: p.name, description: p.description, priceIqd: p.priceIqd, fieldKeys: [...fields].sort(), featureKeys: [...features].sort() };
+function snapshot(
+  p: { name: unknown; description: unknown; priceIqd: number; priceUsdCents: number | null },
+  fields: string[],
+  features: string[],
+) {
+  return {
+    name: p.name,
+    description: p.description,
+    priceIqd: p.priceIqd,
+    priceUsdCents: p.priceUsdCents,
+    fieldKeys: [...fields].sort(),
+    featureKeys: [...features].sort(),
+  };
 }
 
 export async function createPackage(db: DbOrTx, themeId: string, input: PackageInput, actor: Actor) {
@@ -71,7 +100,14 @@ export async function createPackage(db: DbOrTx, themeId: string, input: PackageI
       .where(eq(packages.themeId, themeId));
     const [row] = await tx
       .insert(packages)
-      .values({ themeId, name: data.name, description: data.description, priceIqd: data.priceIqd, sortOrder: (max?.n ?? -1) + 1 })
+      .values({
+        themeId,
+        name: data.name,
+        description: data.description,
+        priceIqd: data.priceIqd,
+        priceUsdCents: data.priceUsd,
+        sortOrder: (max?.n ?? -1) + 1,
+      })
       .returning();
     await writeShape(tx, row!.id, fields, features);
     await recordAudit(tx, {
@@ -96,18 +132,19 @@ export async function updatePackage(db: DbOrTx, packageId: string, input: Packag
     const before = (await packagesWithShape(tx, pkg.themeId)).find((p) => p.id === packageId)!;
     await tx
       .update(packages)
-      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd })
+      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd, priceUsdCents: data.priceUsd })
       .where(eq(packages.id, packageId));
     await writeShape(tx, packageId, fields, features);
     await assertStillReady(tx, pkg.themeId);
     await recordAudit(tx, {
       ...auditActor(actor),
       // Price changes never alter past orders: orders keep their own snapshot (M5).
-      action: before.priceIqd !== data.priceIqd ? 'package.price_changed' : 'package.updated',
+      action:
+        before.priceIqd !== data.priceIqd || before.priceUsdCents !== data.priceUsd ? 'package.price_changed' : 'package.updated',
       objectType: 'package',
       objectId: packageId,
       before: snapshot(before, before.fieldKeys, before.featureKeys),
-      after: snapshot({ ...data, description: data.description }, fields, features),
+      after: snapshot({ ...data, priceUsdCents: data.priceUsd }, fields, features),
     });
   });
 }

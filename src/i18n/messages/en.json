@@ -321,7 +321,9 @@
           "packageMissingRequired": "A package is missing a feature required by the section",
           "noMusic": "A package includes music but no song is chosen.",
           "musicArchived": "The chosen song is archived."
-        }
+        },
+        "priceUsd": "Price (US dollars)",
+        "priceUsdHint": "You set both prices. The USD price is optional for now and will be used once card payments (Mastercard) are enabled."
       },
       "errors": {
         "invalid": "Please check the fields.",

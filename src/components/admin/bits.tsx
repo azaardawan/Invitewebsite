@@ -50,3 +50,12 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
 export function formatIqd(amount: number, locale: string) {
   return new Intl.NumberFormat(locale === 'ar' ? 'ar-IQ' : 'en-US', { style: 'currency', currency: 'IQD', maximumFractionDigits: 0 }).format(amount);
 }
+
+export function formatUsd(cents: number, locale: string) {
+  return new Intl.NumberFormat(locale === 'ar' ? 'ar-IQ' : 'en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+}
+
+/** "75,000 IQD · $50.00" (USD shown only when the owner has set it). */
+export function formatPrices(p: { priceIqd: number; priceUsdCents: number | null }, locale: string) {
+  return [formatIqd(p.priceIqd, locale), p.priceUsdCents ? formatUsd(p.priceUsdCents, locale) : null].filter(Boolean).join(' · ');
+}

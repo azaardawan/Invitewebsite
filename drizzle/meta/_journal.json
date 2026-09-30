@@ -29,6 +29,13 @@
       "when": 1790757341427,
       "tag": "0003_packages_max_three_active",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790759518135,
+      "tag": "0004_package_price_usd",
+      "breakpoints": true
     }
   ]
 }

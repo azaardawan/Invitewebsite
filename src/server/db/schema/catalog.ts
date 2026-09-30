@@ -176,6 +176,11 @@ export const packages = pgTable(
     description: jsonb('description_i18n').$type<I18nContent>(),
     /** Whole Iraqi dinars. */
     priceIqd: bigint('price_iqd', { mode: 'number' }).notNull(),
+    /**
+     * US-dollar price in cents, set by the owner (not converted from IQD).
+     * Optional until card payments in USD are enabled (owner request, see architecture §2 N).
+     */
+    priceUsdCents: integer('price_usd_cents'),
     sortOrder: integer('sort_order').notNull().default(0),
     status: packageStatus('status').notNull().default('ACTIVE'),
     ...timestamps,
@@ -183,6 +188,7 @@ export const packages = pgTable(
   (t) => [
     index('packages_theme_idx').on(t.themeId, t.status, t.sortOrder),
     check('packages_price_range', sql`${t.priceIqd} > 0 and ${t.priceIqd} <= 100000000`),
+    check('packages_price_usd_range', sql`${t.priceUsdCents} is null or (${t.priceUsdCents} > 0 and ${t.priceUsdCents} <= 10000000)`),
   ],
 );
 

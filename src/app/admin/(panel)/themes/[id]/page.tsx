@@ -15,7 +15,7 @@ import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 import { ImageUpload } from '@/components/admin/ImageUpload';
-import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
+import { Badge, Card, MoveButtons, formatPrices } from '@/components/admin/bits';
 import {
   createPackageAction,
   currentVersionAction,
@@ -65,6 +65,29 @@ function StateChoices({
         );
       })}
     </fieldset>
+  );
+}
+
+/** IQD is required; USD is optional until card payments in dollars are enabled. Both are set by the owner. */
+function PriceInputs({ t, iqd, usdCents }: { t: Translate; iqd?: number; usdCents?: number | null }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex flex-wrap gap-4">
+        <div className="w-48">
+          <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={iqd ? String(iqd) : undefined} />
+        </div>
+        <div className="w-48">
+          <Field
+            label={t('themes.priceUsd')}
+            name="priceUsd"
+            required={false}
+            dir="ltr"
+            defaultValue={usdCents ? (usdCents / 100).toFixed(2) : undefined}
+          />
+        </div>
+      </div>
+      <p className="text-xs text-muted">{t('themes.priceUsdHint')}</p>
+    </div>
   );
 }
 
@@ -204,7 +227,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
           <div key={p.id} className="rounded-md border border-line p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-medium">
-                {localized(p.name, locale)} · {formatIqd(p.priceIqd, locale)}
+                {localized(p.name, locale)} · {formatPrices(p, locale)}
               </p>
               {canManage ? (
                 <MoveButtons
@@ -224,9 +247,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <input type="hidden" name="themeId" value={d.theme.id} />
                   <I18nInputs name="name" label={t('themes.packageName')} defaultValue={p.name} maxLength={40} />
                   <I18nInputs name="description" label={t('themes.description')} defaultValue={p.description} required={false} multiline maxLength={300} />
-                  <div className="w-48">
-                    <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
-                  </div>
+                  <PriceInputs t={t} iqd={p.priceIqd} usdCents={p.priceUsdCents} />
                   <StateChoices manifest={manifest} required={required} selected={stateIndex(manifest, p.featureKeys, p.fieldKeys)} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
@@ -249,9 +270,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <input type="hidden" name="themeId" value={d.theme.id} />
                 <I18nInputs name="name" label={t('themes.packageName')} maxLength={40} />
                 <I18nInputs name="description" label={t('themes.description')} required={false} multiline maxLength={300} />
-                <div className="w-48">
-                  <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
-                </div>
+                <PriceInputs t={t} />
                 <StateChoices manifest={manifest} required={required} selected={-1} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
@@ -268,7 +287,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
               {archived.map((p) => (
                 <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <span>
-                    {localized(p.name, locale)} · {formatIqd(p.priceIqd, locale)}
+                    {localized(p.name, locale)} · {formatPrices(p, locale)}
                   </span>
                   {canManage ? (
                     <ActionForm action={packageStatusAction}>

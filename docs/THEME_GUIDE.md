@@ -138,6 +138,8 @@ Triggers you can use:
 ## Step 8 — Music
 
 - Choose **one song**, as an MP3 at 128–192 kbps, trimmed to the part you want (about 1–3 minutes). Bahja only uses music you have the right to use.
+- **The song loops automatically** when it ends, for as long as the guest stays on the invitation. Trim it so the end flows back into the start without a jarring jump.
+- The same song can be used by several themes; you upload it once to the Music library and assign it wherever you want.
 - Phones **block sound until the guest taps**, which is why the "Open invitation" tap in Step 4 is required. Music starts on that tap.
 - Design the small **music on/off button**: where it sits and how it looks in both states.
 
@@ -198,14 +200,15 @@ theme-royal-garden/
 
 ## Step 13 — What happens after you deliver
 
-1. **Build.** The theme is implemented as a new folder (`themes/royal-garden/v1`). **No other theme or platform code is touched.**
-2. **Automatic checks.**
+1. **Build.** The theme becomes one new folder in GitHub (`themes/royal-garden/v1`), written from your design by the developer (or by you, if you code it yourself). **No other theme or platform code is touched.**
+2. **Automatic checks** run every time that folder is pushed to GitHub, before anything can go live:
    - Every package state is rendered at 360 / 390 / 430 / 1280 px, in Arabic and English, with short and long names.
    - Screenshots are produced for you to compare side by side with your frames.
    - Speed and size budgets, the print card, and the keepsake PDF are checked.
+   - The theme is checked for breaking the rules (touching payments, the database, other themes or site-wide styles). If anything fails, it can't be merged.
 3. **Your review.** You compare the screenshots and a live preview link against your design and send corrections. This round is quick when the steps above were followed.
 4. **Deploy.** The theme is deployed; in Admin it appears as **Development**. It is invisible to customers.
-5. **Admin setup.** You set the section, package names, prices, features, song and labels, and test every package using the preview. Then set it to **Ready for review**.
+5. **Admin setup.** You set the section, package names, **prices (IQD, and USD when card payments are enabled)**, song and labels, and test every package using the preview. Then set it to **Ready for review**.
 6. **Activate.** After the final checklist (every package, mobile and desktop, music, guest form, print card, PDF), set it to **Active**. It now appears in the store.
 
 ## Quick checklist before sending
