@@ -23,17 +23,20 @@ adding its variables (see `payments.md`).
    1. Sign up at railway.com with GitHub.
    2. Choose the **Hobby** plan.
 2. **Project**
-   1. Click **New Project → Deploy from GitHub repo → azaardawan/invitewebsite**.
-   2. Under Settings → Source, pick the branch Claude works on (`claude/great-cerf-ccdyba`) or `main` once merged.
-   3. The build uses the repo's `Dockerfile` (`railway.json`).
-3. **Database:** in the project, click **+ New → Database → PostgreSQL**.
+   1. Click **New Project → Deploy from GitHub repo → azaardawan/invitewebsite** (once only: clicking twice creates two projects that are both billed).
+   2. Under Settings → Source, pick the branch **`main`**. Claude's work reaches the site only after its pull request is merged into `main`.
+   3. Under Settings → Regions, pick **EU West (Amsterdam)** (`europe-west4-drams3a`) for the website and, after step 3, for Postgres too.
+   4. The build uses the repo's `Dockerfile` (`railway.json`).
+3. **Database:** in the project, click **+ New → Database → PostgreSQL**. Railway's current template is PostgreSQL 18, which works.
 
    > Railway starts a first deploy immediately, before the database and variables exist, so that first deploy **fails. This is expected.** Its log says *"Bahja cannot start yet"* and lists the missing settings. Once steps 3–5 are done, click **Redeploy**.
 4. **Cloudflare R2**
-   1. Dashboard → R2 → **Create bucket** `bahja-media`.
-   2. Bucket → Settings → **Custom domain** → `media.bahjaaa.com`.
-   3. R2 → **Manage API tokens** → **Create token** with *Object Read & Write* on `bahja-media`.
-   4. Keep the **Access Key ID**, **Secret Access Key** and the **S3 endpoint** (`https://<account-id>.r2.cloudflarestorage.com`) somewhere safe.
+   1. Dashboard → **R2 Object Storage** → **Enable R2** (one time; asks for a payment method, the first 10 GB are free).
+   2. **Create bucket** `bahja-media` (exactly this name, lowercase).
+   3. Bucket → Settings → **Custom Domains** → `media.bahjaaa.com`; wait until it shows **Active**. Leave the `r2.dev` public URL disabled.
+   4. R2 → **Manage API tokens** → **Create Account API token** with *Object Read & Write*, applied to `bahja-media` only, no IP filter.
+   5. Keep the **Access Key ID** and **Secret Access Key** in your password manager (the secret is shown once).
+   6. The **S3 endpoint** is `https://<account-id>.r2.cloudflarestorage.com`. If the bucket was created with the **EU jurisdiction**, it is `https://<account-id>.eu.r2.cloudflarestorage.com` (`.eu` goes **in the middle**, not at the end). Copy it from bucket → Settings → S3 API, without the `/bahja-media` suffix.
 5. **Variables:** in the website service → Variables, add the following.
    - **Secrets:** make each one a random password of **40+ characters** with any password manager. Never reuse them, and never send them in chat.
 
@@ -53,11 +56,17 @@ adding its variables (see `payments.md`).
    | `BOOTSTRAP_OWNER_EMAIL` | your email (first deploy only) |
    | `BOOTSTRAP_OWNER_NAME` | your name |
 
+   > **Saving variables:** after editing, Railway shows a bar with the pending changes at the top of the canvas. Nothing is saved or deployed until you click **Deploy** there. If your Railway account has 2FA, changes staged by Claude or another tool also wait for you to confirm them in this bar.
+
 6. **Deploy and sign in**
    1. Wait for the deploy, then open the **Deploy Logs** and find the line `[bootstrap] Created owner … Temporary password (shown once): …`.
    2. Go to `<APP_URL>/admin` and sign in with that password.
    3. Change the password and set up 2FA (keep the recovery codes).
-   4. Delete `BOOTSTRAP_OWNER_EMAIL` and `BOOTSTRAP_OWNER_NAME` from the variables.
+   4. Delete `BOOTSTRAP_OWNER_EMAIL` and `BOOTSTRAP_OWNER_NAME` from the variables. (Leaving them does no harm: they are ignored once any admin exists.)
+   5. Upload a song in Admin → Music and play it. This proves the R2 settings and `media.bahjaaa.com` work.
+      - *Upload failed* with `NoSuchBucket` in the Deploy Logs: wrong bucket name, or an EU bucket without `.eu` in `S3_ENDPOINT`.
+      - `ENOTFOUND …cloudflarestorage.com.eu`: `.eu` was put at the end of `S3_ENDPOINT` instead of before `.r2`.
+      - `S3_ENDPOINT: Invalid URL` at startup: the value still contains `<account-id>`, lacks `https://`, or has quotes or spaces.
 7. **In Admin**
    1. Website settings: set the exchange rate, the business WhatsApp number and the payment instructions.
    2. Add your first real theme, its packages and its music, then place a test order end to end.
