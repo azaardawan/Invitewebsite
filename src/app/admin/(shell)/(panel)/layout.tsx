@@ -6,13 +6,7 @@ import { LocaleToggle } from '@/components/admin/LocaleToggle';
 import { logoutAction } from '@/app/admin/_actions/auth';
 import { setAdminLocaleAction } from '@/app/admin/_actions/preferences';
 
-const UPCOMING = [
-  'customers',
-  'guests',
-  'translations',
-  'analytics',
-  'legal',
-] as const;
+const UPCOMING = ['customers', 'translations', 'analytics'] as const;
 
 export default async function PanelLayout({ children }: LayoutProps<'/admin'>) {
   const { user, authz } = await requireAdmin();
@@ -27,6 +21,7 @@ export default async function PanelLayout({ children }: LayoutProps<'/admin'>) {
     { href: '/admin/fields', label: t('nav.fields'), show: can(authz, 'sections.manage') },
     { href: '/admin/music', label: t('nav.music'), show: can(authz, 'music.manage') },
     { href: '/admin/settings', label: t('nav.settings'), show: can(authz, 'settings.manage') },
+    { href: '/admin/legal', label: t('nav.legal'), show: can(authz, 'legal.manage') },
     { href: '/admin/users', label: t('nav.users'), show: can(authz, 'users.manage') },
     { href: '/admin/audit', label: t('nav.audit'), show: can(authz, 'audit.view') },
     { href: '/admin/account/password', label: t('nav.account'), show: true },

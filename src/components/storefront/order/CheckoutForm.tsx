@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 type State = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };
 
@@ -21,6 +21,9 @@ export function CheckoutForm({
   paymentNote: string;
 }) {
   const t = useTranslations('store');
+  const locale = useLocale();
+  // Opens in a new tab so the half-filled form isn't lost (Arabic has no locale prefix).
+  const legalHref = (slug: 'terms' | 'refund') => `${locale === 'ar' ? '' : `/${locale}`}/legal/${slug}`;
   const [state, formAction, pending] = useActionState(action, {});
   const v = state.values ?? {};
   const fe = state.fieldErrors ?? {};
@@ -56,7 +59,20 @@ export function CheckoutForm({
       {field('email', { type: 'email', autoComplete: 'email', dir: 'ltr', maxLength: 254 })}
       <label className="flex items-start gap-3 text-sm leading-relaxed">
         <input type="checkbox" name="terms" required className="mt-1 size-5 shrink-0 accent-[#6e1f33]" />
-        <span>{t('acceptTerms')}</span>
+        <span>
+          {t.rich('acceptTerms', {
+            terms: (chunks) => (
+              <a href={legalHref('terms')} target="_blank" rel="noopener" className="font-medium text-accent underline">
+                {chunks}
+              </a>
+            ),
+            refund: (chunks) => (
+              <a href={legalHref('refund')} target="_blank" rel="noopener" className="font-medium text-accent underline">
+                {chunks}
+              </a>
+            ),
+          })}
+        </span>
       </label>
       <button
         type="submit"

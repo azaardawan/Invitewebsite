@@ -7,6 +7,9 @@ import type { Locale } from '@/i18n/config';
 import { isFeatureKey } from '@/catalog/features';
 import { storefrontTheme } from '@/server/storefront/catalog';
 import { ThemeShowcase } from '@/components/storefront/theme/ThemeShowcase';
+import { publicContact } from '@/server/settings/public';
+import { whatsappHref } from '@/lib/contact-links';
+import { env } from '@/server/env';
 
 export const dynamicParams = true;
 
@@ -27,6 +30,8 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
   const th = await storefrontTheme(key);
   if (!th) notFound();
   const t = await getTranslations('store');
+  const { whatsapp } = await publicContact();
+  const pageUrl = `${env().APP_URL.replace(/\/$/, '')}${locale === 'ar' ? '' : `/${locale}`}/themes/${th.key}`;
 
   return (
     <div className="mx-auto max-w-[1440px] px-6 pt-10 lg:px-[110px] lg:pt-16">
@@ -51,6 +56,19 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
           }))}
         />
       </div>
+      {whatsapp ? (
+        <p className="mt-10 text-center text-[15px] text-muted">
+          {t('askTheme')}{' '}
+          <a
+            href={whatsappHref(whatsapp, t('askThemeText', { theme: localized(th.name, locale), url: pageUrl }))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-accent underline"
+          >
+            {t('askThemeLink')}
+          </a>
+        </p>
+      ) : null}
     </div>
   );
 }

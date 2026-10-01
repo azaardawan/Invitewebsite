@@ -12,6 +12,7 @@ export async function SiteHeader() {
     { href: '/themes', label: n('themes') },
     { href: '/#occasions', label: n('occasions') },
     { href: '/#how', label: n('how') },
+    { href: '/contact', label: n('contact') },
   ];
   return (
     <header className="relative z-30">

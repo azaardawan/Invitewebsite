@@ -301,3 +301,35 @@ invitations show the Arabic.
 | `receipt.keepsakeDownload` | تحميل ملف الذكرى (PDF) | Download keepsake (PDF) | | | AWAITING |
 | `receipt.waCardMessage` | مرحباً {name}، هذه بطاقة دعوتكم للطباعة من بهجه (PDF): {url} | Hello {name}, here is your printable invitation card from Bahja (PDF): {url} | | | AWAITING |
 | `receipt.waKeepsakeMessage` | مرحباً {name}، ألف مبروك! هذا ملف الذكرى بكل تهاني ضيوفكم من بهجه (PDF): {url} | Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url} | | | AWAITING |
+
+## Batch 12 — footer, contact page, legal pages, checkout terms (AWAITING WORDING)
+
+Customer-facing labels added in M10. Policy texts themselves are written per language in
+Admin → Legal policies (Kurdish fields are optional there and fall back to Arabic). `<terms>` and
+`<refund>` mark the linked words in `store.acceptTerms` — keep them around the translated words.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `footer.whatsapp` | واتساب | WhatsApp | | | AWAITING |
+| `footer.phone` | الهاتف | Phone | | | AWAITING |
+| `footer.instagram` | إنستغرام | Instagram | | | AWAITING |
+| `footer.facebook` | فيسبوك | Facebook | | | AWAITING |
+| `footer.tiktok` | تيك توك | TikTok | | | AWAITING |
+| `footer.legal` | السياسات | Policies | | | AWAITING |
+| `footer.terms` | شروط الخدمة | Terms of service | | | AWAITING |
+| `footer.privacy` | سياسة الخصوصية | Privacy policy | | | AWAITING |
+| `footer.refund` | سياسة الاسترجاع | Refund policy | | | AWAITING |
+| `contact.title` | تواصل معنا | Contact us | | | AWAITING |
+| `contact.subtitle` | يسعدنا مساعدتك في اختيار دعوتك وتخصيصها. | We're happy to help you choose and personalise your invitation. | | | AWAITING |
+| `contact.whatsappButton` | راسلنا على واتساب | Message us on WhatsApp | | | AWAITING |
+| `contact.waText` | مرحباً بهجه، لدي سؤال عن دعوة. | Hello Bahja, I have a question about an invitation. | | | AWAITING |
+| `contact.email` | البريد الإلكتروني | Email | | | AWAITING |
+| `contact.address` | العنوان | Address | | | AWAITING |
+| `contact.hours` | أوقات العمل | Working hours | | | AWAITING |
+| `contact.soon` | ستُضاف معلومات التواصل قريباً. | Contact details will be added soon. | | | AWAITING |
+| `legal.updated` | الإصدار {version} · آخر تحديث {date} | Version {version} · last updated {date} | | | AWAITING |
+| `legal.preparing` | هذه السياسة قيد الإعداد وستُنشر هنا قريباً. | This policy is being prepared and will be published here soon. | | | AWAITING |
+| `store.acceptTerms` | راجعتُ تفاصيل دعوتي وأوافق على <terms>الشروط</terms> و<refund>سياسة الاسترداد</refund>. | I've checked my invitation details and I accept the <terms>terms</terms> and <refund>refund policy</refund>. | | | AWAITING |
+| `store.askTheme` | لديك سؤال عن هذا التصميم؟ | Have a question about this design? | | | AWAITING |
+| `store.askThemeLink` | اسألنا على واتساب | Ask us on WhatsApp | | | AWAITING |
+| `store.askThemeText` | مرحباً بهجه، لدي سؤال عن دعوة «{theme}»: {url} | Hello Bahja, I have a question about the “{theme}” invitation: {url} | | | AWAITING |

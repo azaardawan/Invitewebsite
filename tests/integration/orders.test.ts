@@ -100,7 +100,8 @@ describe('checkout', () => {
       customer: { phone: '+9647701234567', email: 'buyer@example.com' },
       pricing: { currency: 'IQD' },
     });
-    expect(order!.legalAcceptance).toMatchObject({ terms: 'draft-2026-09', refund: 'draft-2026-09' });
+    // The published policy versions at checkout time (`none` before a policy is published).
+    expect(order!.legalAcceptance).toMatchObject({ terms: expect.stringMatching(/^(none|v\d+)$/), refund: expect.stringMatching(/^(none|v\d+)$/) });
     const [inv] = await db().select().from(invitations).where(eq(invitations.id, order!.invitationId));
     expect(inv!.status).toBe('AWAITING_PAYMENT');
     expect(inv!.musicTrackId).toBe(shop.song.id);

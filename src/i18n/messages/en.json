@@ -83,7 +83,16 @@
   },
   "footer": {
     "rights": "© {year} Bahja. All rights reserved.",
-    "tagline": "Carefully curated digital invitations."
+    "tagline": "Carefully curated digital invitations.",
+    "whatsapp": "WhatsApp",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "legal": "Policies",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "refund": "Refund policy"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -108,7 +117,8 @@
       "music": "Music library",
       "settings": "Website settings",
       "orders": "Orders & invoices",
-      "invitations": "Invitations"
+      "invitations": "Invitations",
+      "legal": "Legal policies"
     },
     "modules": {
       "sections": "Sections",
@@ -455,13 +465,24 @@
       "usdRateHint": "For example 1310. Leave empty to hide the dollar option on the website.",
       "example": "Example: {iqd} is shown as ≈ {usd}",
       "save": "Save",
-      "more": "Business and contact information will be added here later (milestone 10).",
       "paymentHeading": "Payment while online payment is off",
       "paymentIntro": "Until WAYL is switched on, customers confirm their order and pay you directly. These details appear on their private receipt.",
       "whatsapp": "Business WhatsApp number",
       "whatsappHint": "Customers get a button that opens WhatsApp with their order number and amount filled in.",
       "manualInstructions": "Payment instructions (e.g. Zain Cash / bank transfer details)",
-      "invalidWhatsapp": "Please enter a valid phone number."
+      "invalidWhatsapp": "Please enter a valid phone number.",
+      "contactHeading": "Contact details",
+      "contactIntro": "Shown in the website footer and on the Contact page. Leave anything you don't want to show empty. Customers reach you on WhatsApp through the business number above.",
+      "phone": "Phone for calls (optional)",
+      "email": "Email (optional)",
+      "instagram": "Instagram username",
+      "facebook": "Facebook page username",
+      "tiktok": "TikTok username",
+      "handleHint": "Just the username, e.g. bahja.iq (no @ and no link).",
+      "address": "Address (optional)",
+      "hours": "Working hours (optional), e.g. “Every day, 10 am – 10 pm”",
+      "invalidPhone": "Please enter a valid phone number.",
+      "invalidContact": "Please check the email and usernames."
     },
     "orders": {
       "heading": "Orders & invoices",
@@ -609,6 +630,46 @@
         "reason": "Please write a reason (5–500 characters).",
         "days": "Choose between 1 and 365 days.",
         "music": "Choose an active song."
+      }
+    },
+    "legal": {
+      "heading": "Legal policies",
+      "intro": "Terms of service, privacy and refund policies shown on the website. Edit a draft, preview it, then publish. A published version can never be changed: customers' orders record exactly which version they accepted. Have a lawyer review the texts before going live.",
+      "types": {
+        "TERMS": "Terms of service",
+        "PRIVACY": "Privacy policy",
+        "REFUND": "Refund policy"
+      },
+      "liveVersion": "Live: version {version}, published {date}.",
+      "notPublished": "Not published yet: the website says it is being prepared.",
+      "hasDraft": "Draft (version {version}) waiting",
+      "edit": "Edit",
+      "viewOnSite": "View on the website",
+      "draftTitle": "Draft — version {version}",
+      "newDraftTitle": "New version",
+      "markupHelp": "Formatting: start a line with “## ” for a heading, with “- ” for a list item; leave an empty line between paragraphs.",
+      "kurdishHelp": "Arabic and English are required. Kurdish is optional: empty Kurdish shows the Arabic.",
+      "lang": {
+        "ar": "Arabic",
+        "en": "English",
+        "ckb": "Kurdish (Sorani), optional",
+        "bdn": "Kurdish (Badini), optional"
+      },
+      "saveDraft": "Save draft",
+      "publish": "Publish this version",
+      "publishConfirm": "Publish? It will be shown on the website and can never be edited afterwards.",
+      "discard": "Discard draft",
+      "discardConfirm": "Discard this draft?",
+      "previewTitle": "Preview of the draft",
+      "historyTitle": "Published versions",
+      "historyRow": "Version {version} — {date}",
+      "historyNote": "Each order records the versions the customer accepted.",
+      "draftSaved": "Draft saved.",
+      "published": "Published. It is now live on the website.",
+      "discarded": "Draft discarded.",
+      "errors": {
+        "invalid": "Arabic and English texts are required (up to 30,000 characters each).",
+        "noDraft": "There is no draft to publish."
       }
     }
   },
@@ -836,7 +897,7 @@
     "name": "Full name",
     "phone": "Phone number",
     "email": "Email",
-    "acceptTerms": "I've checked my invitation details and I accept the terms and refund policy.",
+    "acceptTerms": "I've checked my invitation details and I accept the <terms>terms</terms> and <refund>refund policy</refund>.",
     "total": "Total",
     "placeOrder": "Confirm order",
     "placing": "Confirming…",
@@ -847,6 +908,23 @@
     "lockedNote": "This order is confirmed, so its details can no longer be changed here.",
     "metaThemes": "Invitation designs",
     "metaHome": "Digital invitations for your occasions",
-    "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed."
+    "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed.",
+    "askTheme": "Have a question about this design?",
+    "askThemeLink": "Ask us on WhatsApp",
+    "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "We're happy to help you choose and personalise your invitation.",
+    "whatsappButton": "Message us on WhatsApp",
+    "waText": "Hello Bahja, I have a question about an invitation.",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Working hours",
+    "soon": "Contact details will be added soon."
+  },
+  "legal": {
+    "updated": "Version {version} · last updated {date}",
+    "preparing": "This policy is being prepared and will be published here soon."
   }
 }

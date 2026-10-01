@@ -9,7 +9,8 @@ import { consumeRateLimit } from '@/server/rate-limit';
 import { getSettings } from '@/server/settings/service';
 import { normalizePhone } from '@/lib/phone';
 import { orderNumber } from '@/lib/ids';
-import { LEGAL_VERSIONS, OrderError, loadPurchasable, sameSet } from './common';
+import { OrderError, loadPurchasable, sameSet } from './common';
+import { acceptedVersions } from '@/server/legal/policies';
 import { findByPreviewToken } from './drafts';
 import { receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
@@ -99,6 +100,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       createdAt: now.toISOString(),
     };
 
+    const legal = await acceptedVersions(tx);
     let order: typeof orders.$inferSelect | undefined;
     for (let attempt = 0; attempt < 5 && !order; attempt++) {
       [order] = await tx
@@ -109,7 +111,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
           invitationId: inv!.id,
           amountIqd: p.pkg.priceIqd,
           snapshot,
-          legalAcceptance: { ...LEGAL_VERSIONS, acceptedAt: now.toISOString(), ipHash: ctx.ipHash, userAgent: ctx.userAgent },
+          legalAcceptance: { ...legal, acceptedAt: now.toISOString(), ipHash: ctx.ipHash, userAgent: ctx.userAgent },
           receiptTokenHash: 'pending',
           idempotencyKey: input.idempotencyKey,
         })

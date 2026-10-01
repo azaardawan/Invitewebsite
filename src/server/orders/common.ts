@@ -29,8 +29,6 @@ export const INVITATION_LIFETIME_DAYS = 30;
 /** A draft's preview link stays valid this long after the last edit (decision J). */
 export const PREVIEW_TTL_MS = 24 * 3600_000;
 
-/** Placeholder policy versions until Admin-managed legal policies exist (M10). */
-export const LEGAL_VERSIONS = { terms: 'draft-2026-09', refund: 'draft-2026-09' } as const;
 
 /** A theme + package that can be bought right now, with everything needed to validate an order. */
 export async function loadPurchasable(db: DbOrTx, themeKey: string, packageId: string) {

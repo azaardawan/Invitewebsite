@@ -6,12 +6,14 @@
 import { closeDb, db } from '../src/server/db/client';
 import { seedRbac } from '../src/server/rbac/seed';
 import { seedCatalog } from '../src/server/catalog/seed';
+import { seedLegalDrafts } from '../src/server/legal/seed';
 import { syncThemesFromRegistry } from '../src/server/catalog/themes';
 import { themeManifests } from '../src/theme-registry';
 
 try {
   await seedRbac(db());
   await seedCatalog(db());
+  await seedLegalDrafts(db());
   const report = await syncThemesFromRegistry(db(), themeManifests(), { adminId: null, ipHash: null });
   console.log('Seeded permissions, roles, field library and starter sections.');
   console.log('Theme sync:', JSON.stringify(report));

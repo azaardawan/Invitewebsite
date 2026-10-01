@@ -5,14 +5,14 @@ import { getSettings } from '@/server/settings/service';
 import { formatIqd, formatUsd } from '@/lib/currency';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Card } from '@/components/admin/bits';
-import { currencySettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
+import { contactSettingsAction, currencySettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 
 export default async function SettingsPage() {
   await requireAdmin({ permission: 'settings.manage' });
   const t = await getTranslations('admin.settings');
   const locale = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-US';
-  const { currency, payment } = await getSettings(db());
+  const { currency, payment, contact } = await getSettings(db());
   const example = 75000;
 
   return (
@@ -56,7 +56,23 @@ export default async function SettingsPage() {
           <SubmitButton>{t('save')}</SubmitButton>
         </ActionForm>
       </Card>
-      <p className="text-sm text-muted">{t('more')}</p>
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('contactHeading')}</h2>
+        <p className="text-sm text-muted">{t('contactIntro')}</p>
+        <ActionForm action={contactSettingsAction} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label={t('phone')} name="phone" type="tel" dir="ltr" required={false} defaultValue={contact.phone ?? undefined} />
+            <Field label={t('email')} name="email" type="email" dir="ltr" required={false} defaultValue={contact.email ?? undefined} />
+            <Field label={t('instagram')} name="instagram" dir="ltr" required={false} defaultValue={contact.instagram ?? undefined} />
+            <Field label={t('facebook')} name="facebook" dir="ltr" required={false} defaultValue={contact.facebook ?? undefined} />
+            <Field label={t('tiktok')} name="tiktok" dir="ltr" required={false} defaultValue={contact.tiktok ?? undefined} />
+          </div>
+          <p className="text-xs text-muted">{t('handleHint')}</p>
+          <I18nInputs name="address" label={t('address')} required={false} maxLength={300} defaultValue={contact.address ?? undefined} />
+          <I18nInputs name="hours" label={t('hours')} required={false} maxLength={200} defaultValue={contact.hours ?? undefined} />
+          <SubmitButton>{t('save')}</SubmitButton>
+        </ActionForm>
+      </Card>
     </div>
   );
 }

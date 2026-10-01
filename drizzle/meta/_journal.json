@@ -78,6 +78,20 @@
       "when": 1790863614473,
       "tag": "0010_card_options",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790866346237,
+      "tag": "0011_legal_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790866347462,
+      "tag": "0012_legal_published_immutable",
+      "breakpoints": true
     }
   ]
 }

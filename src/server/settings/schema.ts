@@ -21,11 +21,34 @@ export const paymentSettings = z.object({
   manualInstructions: i18nText.nullable(),
 });
 
+const handle = z
+  .string()
+  .regex(/^[A-Za-z0-9._]{1,60}$/)
+  .nullable();
+
+/**
+ * Public contact details shown in the footer and on the contact page. The
+ * WhatsApp number is shared with payment settings (one business number).
+ */
+export const contactSettings = z.object({
+  /** E.164 phone for calls, e.g. +9647701234567. */
+  phone: z.string().regex(/^\+\d{8,15}$/).nullable(),
+  email: z.email().max(254).nullable(),
+  /** Usernames only (no @, no URL). */
+  instagram: handle,
+  facebook: handle,
+  tiktok: handle,
+  address: i18nText.nullable(),
+  hours: i18nText.nullable(),
+});
+
 export const settingsData = z.object({
   currency: currencySettings.default({ usdRateIqd: null }),
   payment: paymentSettings.default({ whatsapp: null, manualInstructions: null }),
+  contact: contactSettings.default({ phone: null, email: null, instagram: null, facebook: null, tiktok: null, address: null, hours: null }),
 });
 
 export type SettingsData = z.infer<typeof settingsData>;
 export type CurrencySettings = z.infer<typeof currencySettings>;
 export type PaymentSettings = z.infer<typeof paymentSettings>;
+export type ContactSettings = z.infer<typeof contactSettings>;

@@ -68,8 +68,9 @@ adding its variables (see `payments.md`).
       - `ENOTFOUND …cloudflarestorage.com.eu`: `.eu` was put at the end of `S3_ENDPOINT` instead of before `.r2`.
       - `S3_ENDPOINT: Invalid URL` at startup: the value still contains `<account-id>`, lacks `https://`, or has quotes or spaces.
 7. **In Admin**
-   1. Website settings: set the exchange rate, the business WhatsApp number and the payment instructions.
-   2. Add your first real theme, its packages and its music, then place a test order end to end.
+   1. Website settings: set the exchange rate, the business WhatsApp number, the payment instructions and the contact details (footer and Contact page).
+   2. Legal policies: review the seeded drafts (terms, privacy, refund), adjust them (ideally with a lawyer) and publish each. Published versions can't be edited; publish a new version instead.
+   3. Add your first real theme, its packages and its music, then place a test order end to end.
 
 Staging is never indexed by search engines (`robots.txt` blocks everything unless `APP_ENV=production`).
 

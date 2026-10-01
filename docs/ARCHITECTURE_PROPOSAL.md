@@ -20,7 +20,7 @@ Date: 2026-09-30
   - The page offers copy link, WhatsApp share, a WhatsApp confirmation to self, and print.
 - **Admin → Orders:** search and filter. Phone and email are masked for staff without `customers.view`.
 - **Rate limits** (fixed window, in Postgres) on draft creation and checkout per visitor.
-- **Legal acceptance** is recorded with placeholder policy versions (`draft-2026-09`) until Admin-managed legal policies exist (M10).
+- **Legal acceptance** records the published policy versions (`v<N>`, or `none` before a policy is published) since M10.
 - **Customer screens** (personalization form, checkout) are built in the approved v2 storefront design (M4).
 
 **Revision 7 changes (M3 implementation notes):**
@@ -570,7 +570,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M7 ✅ | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
 | M8 ✅ | Guest features + print | 14–15 | Guest form stored (`guest_responses`, per-device correction, per-IP and per-invitation rate limits, live + `rsvp` only) with Admin replies and message hide/restore; optional **Cloudflare Turnstile** (on when its keys are set); **printable card** (receipt download after payment) and **keepsake PDF** (Admin) rendered by Chromium from per-theme print companions, stored with a `source_hash` so edits and new messages regenerate them. Simplification: PDFs are generated on request in the web process instead of a pg-boss worker; automatic keepsake at expiry moves to M11 housekeeping |
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |
-| M10 | Legal, settings, contact, WhatsApp | 17 | Editable policies with versions, settings-driven footer and contact, WhatsApp flows |
+| M10 ✅ | Legal, settings, contact, WhatsApp | 17 | **Legal policies** (terms, privacy, refund) in Admin with drafts → publish; published versions are immutable (DB trigger) and each order records the versions accepted; public `/legal/<type>` pages; starting drafts seeded in Arabic and English for owner/lawyer review. Simplification: policies use light plain-text markup (headings, lists, paragraphs) instead of TipTap. **Contact settings** (phone, email, Instagram/Facebook/TikTok, address, hours) drive the footer and `/contact`. **WhatsApp:** contact page button, "ask about this theme" on theme pages, card/keepsake sending from Admin; checkout links the terms and refund policy |
 | M11 | Hardening | 18–19 | Lighthouse/WebPageTest on real 4G profiles, axe accessibility, security review, backup + **tested restore**, runbooks |
 | (moved up) | Hosting | — | Railway (app + Postgres) + Cloudflare R2/DNS ready now: `Dockerfile`, `railway.json`, `/api/health`, owner bootstrap; guide in `docs/runbooks/deploy.md`. The site can run in **manual payment mode** (owner WhatsApp + instructions, manual mark-paid) until WAYL is switched on |
 | M12 | Staging → production | 20–23 | Staging on a temporary domain, WAYL test-mode check (`pnpm wayl:check`, needs the key in a new session + `api.thewayl-staging.com` allowed) and production validation with a real small payment, domain/DNS/HTTPS, launch checklist |
