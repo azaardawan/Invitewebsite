@@ -1,0 +1,607 @@
+/*
+ * Olive Ring Box: invitation page. Palette:
+ *   beige #F3EBDD · olive #626B45 · deep olive #39412D (text) · champagne #C8AF79 (accents only)
+ * Every selector is scoped under a local class; no global styles.
+ */
+
+.root {
+  --beige: #f3ebdd;
+  --paper: #faf5ea;
+  --olive: #626b45;
+  --deep: #39412d;
+  --champagne: #c8af79;
+  --champagne-ink: #8c7440;
+  --line: rgb(200 175 121 / 0.45);
+  --error: #9a3b2e;
+  --column: 430px;
+  position: relative;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, #faf4e8 0%, rgb(250 244 232 / 0) 70%),
+    #efe5d3;
+  color: var(--deep);
+  font-family: var(--font-read);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+
+/* The phone-width composition; on wider screens it sits centred on the extended beige. */
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  max-width: var(--column);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 24px;
+  background:
+    radial-gradient(ellipse 120% 40% at 50% 0%, #fbf6ec 0%, rgb(251 246 236 / 0) 80%),
+    var(--beige);
+  overflow: hidden;
+  text-align: center;
+}
+@media (min-width: 600px) {
+  .page {
+    box-shadow:
+      0 0 0 1px rgb(200 175 121 / 0.18),
+      0 30px 80px -40px rgb(57 65 45 / 0.35);
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- reveal */
+
+.reveal[data-reveal='waiting'],
+.root:not([data-stage='open']):not([data-stage='done']) .reveal[data-reveal='shown'] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.reveal[data-still][data-reveal] {
+  transform: none;
+}
+.reveal[data-reveal='shown'] {
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal[data-reveal] {
+    transform: none !important;
+    transition: none !important;
+  }
+  .root[data-stage] .reveal[data-reveal] {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- audio toggle (top-left in Arabic) */
+
+.audio {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  inset-inline-end: max(12px, calc(50% - var(--column) / 2 + 12px));
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgb(250 245 234 / 0.88);
+  backdrop-filter: blur(6px);
+  color: var(--olive);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.audio[aria-pressed='true'] {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: #fbf6ec;
+}
+.audio:focus-visible {
+  outline: 2px solid var(--deep);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- hero */
+
+.hero {
+  position: relative;
+  padding-top: 118px;
+}
+.branchTop {
+  position: absolute;
+  top: 0;
+  inset-inline-start: -24px;
+  width: 150px;
+  height: 110px;
+  background: url(./assets/olive-branch-top.svg) center / contain no-repeat;
+  pointer-events: none;
+}
+.root[dir='ltr'] .branchTop,
+.root[dir='ltr'] .branchSide {
+  transform: scaleX(-1);
+}
+.basmala {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.8;
+  color: var(--deep);
+}
+.basmalaTranslation {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--olive);
+}
+.divider {
+  display: block;
+  width: 140px;
+  height: 12px;
+  margin: 18px auto 0;
+  color: var(--champagne);
+}
+
+/* ---------------------------------------------------------------- names */
+
+.namesHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  font-weight: 400;
+}
+.name {
+  display: block;
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(36px, 11vw, 46px);
+  line-height: 1.35;
+  color: var(--deep);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.and {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--champagne-ink);
+}
+
+/* ---------------------------------------------------------------- message */
+
+.message p {
+  max-width: 32ch;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.95;
+  color: var(--deep);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- date, time, venue */
+
+.detailList {
+  margin: 0;
+  padding: 6px 20px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  text-align: start;
+}
+.detail {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  grid-template-areas:
+    'icon label'
+    'icon value';
+  column-gap: 12px;
+  padding: 14px 0;
+}
+.detail + .detail {
+  border-top: 1px solid rgb(200 175 121 / 0.3);
+}
+.detailIcon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(98 107 69 / 0.08);
+  color: var(--olive);
+}
+.detailLabel {
+  grid-area: label;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--olive);
+}
+.detailValue {
+  grid-area: value;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--deep);
+  overflow-wrap: anywhere;
+}
+
+/* Second olive point: a branch leaning in from the page edge, on its own row so it never meets text. */
+.branchSideRow {
+  position: relative;
+  height: 64px;
+  margin: -34px 0 -34px;
+  pointer-events: none;
+}
+.branchSide {
+  position: absolute;
+  top: -8px;
+  inset-inline-end: -30px;
+  width: 80px;
+  height: 100px;
+  background: url(./assets/olive-branch-side.svg) center / contain no-repeat;
+}
+
+/* ---------------------------------------------------------------- countdown + map */
+
+.countdownSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.countdown {
+  width: 100%;
+}
+.countdownTitle {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: var(--olive);
+}
+.countdownUnits {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  min-height: 86px;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+}
+.unitValue {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--deep);
+  font-variant-numeric: tabular-nums;
+}
+.unitLabel {
+  font-size: 13px;
+  color: var(--olive);
+}
+.mapButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 24px;
+  border: 1.5px solid var(--olive);
+  border-radius: 999px;
+  color: var(--deep);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.mapButton:hover {
+  background: rgb(98 107 69 / 0.08);
+}
+.mapButton:focus-visible {
+  outline: 2px solid var(--deep);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- guest form */
+
+.form,
+.success {
+  padding: 26px 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+  text-align: start;
+}
+.formTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--deep);
+}
+.formIntro {
+  margin: 4px 0 20px;
+  font-size: 15px;
+  text-align: center;
+  color: var(--olive);
+}
+.field {
+  min-width: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.label {
+  display: block;
+  margin: 0 0 6px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--deep);
+}
+.optional {
+  font-weight: 400;
+  color: var(--olive);
+}
+.input {
+  display: block;
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 14px;
+  border: 1px solid #cfc3a6;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--deep);
+  font: inherit;
+  font-size: 16px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.input::placeholder {
+  color: #8d8a73;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--olive);
+  box-shadow: 0 0 0 3px rgb(98 107 69 / 0.18);
+}
+.textarea {
+  min-height: 124px;
+  line-height: 1.8;
+  resize: vertical;
+}
+.field[data-invalid] .input {
+  border-color: var(--error);
+}
+.field[data-invalid] .input:focus {
+  box-shadow: 0 0 0 3px rgb(154 59 46 / 0.15);
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid #cfc3a6;
+  border-radius: 12px;
+  background: #fffdf8;
+  font-size: 15px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+.field[data-invalid] .choice {
+  border-color: var(--error);
+}
+.choice[data-checked] {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: #fbf6ec;
+}
+.choice:has(.choiceInput:focus-visible) {
+  outline: 2px solid var(--deep);
+  outline-offset: 2px;
+}
+.choiceInput {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.choiceDot {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px transparent;
+}
+.choice[data-checked] .choiceDot {
+  background: #fbf6ec;
+  box-shadow: inset 0 0 0 3.5px var(--olive);
+  border-color: #fbf6ec;
+}
+.fieldFoot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+.counter {
+  flex: none;
+  font-size: 12.5px;
+  color: var(--olive);
+  font-variant-numeric: tabular-nums;
+}
+.counter[data-over] {
+  color: var(--error);
+}
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--error);
+}
+.error svg {
+  flex: none;
+  margin-top: 3px;
+}
+.fieldFoot .error {
+  margin: 0;
+}
+.formError {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgb(154 59 46 / 0.07);
+  font-size: 14px;
+  color: var(--error);
+}
+.submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 4px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--olive);
+  color: #fbf6ec;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.submit:hover:not(:disabled) {
+  background: #555d3b;
+}
+.submit:focus-visible {
+  outline: 2px solid var(--deep);
+  outline-offset: 3px;
+}
+.submit:disabled {
+  background: #7d8560;
+  cursor: progress;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgb(251 246 236 / 0.35);
+  border-top-color: #fbf6ec;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}
+.success {
+  text-align: center;
+}
+.successMark {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border: 1.5px solid var(--olive);
+  border-radius: 50%;
+  color: var(--olive);
+}
+.successTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.4;
+}
+.successBody {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--olive);
+}
+
+/* ---------------------------------------------------------------- closing */
+
+.closing {
+  padding-bottom: 72px;
+}
+.sprig {
+  display: block;
+  width: 132px;
+  height: 39px;
+  margin: 0 auto 14px;
+  background: url(./assets/olive-sprig.svg) center / contain no-repeat;
+}
+.closingTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.5;
+  color: var(--deep);
+}
+.closingSub {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--olive);
+}

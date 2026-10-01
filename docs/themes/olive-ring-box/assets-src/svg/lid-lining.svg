@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="satin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4EAD2"/><stop offset="0.22" stop-color="#E2D1A8"/><stop offset="0.38" stop-color="#F7EFDC"/>
+      <stop offset="0.55" stop-color="#DCC89C"/><stop offset="0.72" stop-color="#F0E4C8"/><stop offset="1" stop-color="#CDB684"/>
+    </linearGradient>
+    <radialGradient id="vig" cx="0.5" cy="0.55" r="0.7"><stop offset="0.6" stop-color="#6B5A2E" stop-opacity="0"/><stop offset="1" stop-color="#6B5A2E" stop-opacity="0.28"/></radialGradient>
+    <filter id="silk" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.004 0.06" numOctaves="2" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.09999999999999999 0.09999999999999999 0.09999999999999999 0 0.35  0.09999999999999999 0.09999999999999999 0.09999999999999999 0 0.35  0.09999999999999999 0.09999999999999999 0.09999999999999999 0 0.35  0 0 0 0 1" result="s"/>
+      <feBlend in="s" in2="SourceGraphic" mode="soft-light" result="b"/>
+      <feComposite in="b" in2="SourceAlpha" operator="in"/>
+    </filter>
+    
+  <filter id="v" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" seed="31" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.3 0.3 0.3 0 0.04999999999999999  0.3 0.3 0.3 0 0.04999999999999999  0.3 0.3 0.3 0 0.04999999999999999  0 0 0 0 1" result="fineS"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.03" numOctaves="3" seed="48" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0 0 0 0 1" result="broadS"/>
+    <feBlend in="broadS" in2="SourceGraphic" mode="soft-light" result="a"/>
+    <feBlend in="fineS" in2="a" mode="soft-light" result="b"/>
+    <feComposite in="b" in2="SourceAlpha" operator="in"/>
+  </filter>
+  </defs>
+  <rect width="200" height="140" rx="4" fill="#58603D" filter="url(#v)"/>
+  <g filter="url(#silk)">
+    <rect x="7" y="7" width="186" height="126" rx="6" fill="url(#satin)"/>
+    <rect x="7" y="7" width="186" height="126" rx="6" fill="url(#vig)"/>
+  </g>
+  <rect x="16" y="16" width="168" height="108" rx="4" fill="none" stroke="#C8AF79" stroke-opacity="0.55" stroke-width="0.8"/></svg>

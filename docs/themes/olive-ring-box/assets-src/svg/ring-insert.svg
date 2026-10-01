@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    
+  <filter id="v" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" seed="23" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.3 0.3 0.3 0 0.04999999999999999  0.3 0.3 0.3 0 0.04999999999999999  0.3 0.3 0.3 0 0.04999999999999999  0 0 0 0 1" result="fineS"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.018 0.03" numOctaves="3" seed="40" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0.11666666666666665 0.11666666666666665 0.11666666666666665 0 0.325  0 0 0 0 1" result="broadS"/>
+    <feBlend in="broadS" in2="SourceGraphic" mode="soft-light" result="a"/>
+    <feBlend in="fineS" in2="a" mode="soft-light" result="b"/>
+    <feComposite in="b" in2="SourceAlpha" operator="in"/>
+  </filter>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E6742"/><stop offset="1" stop-color="#6E774D"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+  </defs>
+  <g filter="url(#v)">
+    <rect width="200" height="140" rx="4" fill="url(#rim)"/>
+    <rect x="9" y="9" width="182" height="122" rx="9" fill="#2F3420" opacity="0.8" filter="url(#soft)"/>
+    
+    <radialGradient id="p1" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#6F7850"/><stop offset="0.7" stop-color="#555D3A"/><stop offset="1" stop-color="#3C4228"/></radialGradient>
+    <rect x="11" y="11" width="178" height="59" rx="24.583333333333336" fill="url(#p1)"/>
+    
+    <radialGradient id="p2" cx="0.5" cy="0.45" r="0.7"><stop offset="0" stop-color="#6F7850"/><stop offset="0.7" stop-color="#555D3A"/><stop offset="1" stop-color="#3C4228"/></radialGradient>
+    <rect x="11" y="70" width="178" height="59" rx="24.583333333333336" fill="url(#p2)"/>
+    <rect x="17" y="68.8" width="166" height="2.4" rx="1.2" fill="#1F2315"/>
+    <rect x="17" y="67" width="166" height="6" rx="3" fill="#20241A" opacity="0.45" filter="url(#soft)"/>
+  </g></svg>
