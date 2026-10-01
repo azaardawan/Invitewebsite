@@ -27,6 +27,8 @@ adding its variables (see `payments.md`).
    2. Under Settings → Source, pick the branch Claude works on (`claude/great-cerf-ccdyba`) or `main` once merged.
    3. The build uses the repo's `Dockerfile` (`railway.json`).
 3. **Database:** in the project, click **+ New → Database → PostgreSQL**.
+
+   > Railway starts a first deploy immediately, before the database and variables exist, so that first deploy **fails. This is expected.** Its log says *"Bahja cannot start yet"* and lists the missing settings. Once steps 3–5 are done, click **Redeploy**.
 4. **Cloudflare R2**
    1. Dashboard → R2 → **Create bucket** `bahja-media`.
    2. Bucket → Settings → **Custom domain** → `media.bahjaaa.com`.
