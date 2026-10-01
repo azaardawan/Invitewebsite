@@ -291,8 +291,13 @@ invitations show the Arabic.
 | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
 |---|---|---|---|---|---|
 | `receipt.printCardTitle` | بطاقة الدعوة للطباعة | Printable invitation card | | | AWAITING |
-| `receipt.printCardHelp` | ملف PDF جاهز للطباعة (A5 مع هامش القص) بنفس الأسماء والتاريخ والمكان، مع رمز QR يفتح الدعوة الإلكترونية. قد يستغرق تجهيزه بضع ثوانٍ. | A print-ready PDF (A5 with bleed) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare. | | | AWAITING |
+| `receipt.printCardHelp` | ملف PDF جاهز للطباعة بحجم A5 (148 × 210 مم) بنفس الأسماء والتاريخ والمكان، مع رمز QR يفتح الدعوة الإلكترونية. قد يستغرق تجهيزه بضع ثوانٍ. | A print-ready A5 PDF (148 × 210 mm) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare. | | | AWAITING |
 | `receipt.printCardDownload` | تحميل بطاقة الطباعة (PDF) | Download printable card (PDF) | | | AWAITING |
 | `invitation.print.scanToOpen` | امسح الرمز لفتح الدعوة | Scan to open the invitation | | | AWAITING |
 | `invitation.print.keepsakeTitle` | رسائل المحبة | Messages of love | | | AWAITING |
 | `invitation.print.keepsakeEmpty` | لم تصل رسائل بعد. | No messages yet. | | | AWAITING |
+| `receipt.keepsakeTitle` | ذكرى التهاني | Your keepsake of wishes | | | AWAITING |
+| `receipt.keepsakeHelp` | كل الرسائل التي كتبها ضيوفكم، مجموعة في ملف PDF بتصميم دعوتكم. | Every message your guests wrote, gathered in a PDF in the design of your invitation. | | | AWAITING |
+| `receipt.keepsakeDownload` | تحميل ملف الذكرى (PDF) | Download keepsake (PDF) | | | AWAITING |
+| `receipt.waCardMessage` | مرحباً {name}، هذه بطاقة دعوتكم للطباعة من بهجه (PDF): {url} | Hello {name}, here is your printable invitation card from Bahja (PDF): {url} | | | AWAITING |
+| `receipt.waKeepsakeMessage` | مرحباً {name}، ألف مبروك! هذا ملف الذكرى بكل تهاني ضيوفكم من بهجه (PDF): {url} | Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url} | | | AWAITING |

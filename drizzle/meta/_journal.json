@@ -71,6 +71,13 @@
       "when": 1790860703686,
       "tag": "0009_generated_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790863614473,
+      "tag": "0010_card_options",
+      "breakpoints": true
     }
   ]
 }

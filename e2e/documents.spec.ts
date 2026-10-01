@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, signInAsNewOwner } from './helpers';
 
 function paidCardOrder(): { receiptToken: string } {
   const out = execFileSync('pnpm', ['exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-card-order.ts'], {
@@ -23,13 +23,26 @@ test('the customer downloads a real printable card PDF from their receipt', asyn
   expect(res.headers()['content-type']).toBe('application/pdf');
   const pdf = await res.body();
   expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
-  // A5 plus 3 mm bleed on each side = 154 × 216 mm ≈ 436.5 × 612.3 pt (Chromium rounds to whole pixels).
+  // Exactly A5 = 148 × 210 mm ≈ 419.5 × 595.3 pt (Chromium rounds to whole pixels).
   const box = /\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/.exec(pdf.toString('latin1'));
-  expect(Math.abs(Number(box?.[1]) - 436.5)).toBeLessThan(1);
-  expect(Math.abs(Number(box?.[2]) - 612.3)).toBeLessThan(1);
+  expect(Math.abs(Number(box?.[1]) - 419.5)).toBeLessThan(1);
+  expect(Math.abs(Number(box?.[2]) - 595.3)).toBeLessThan(1);
   await testInfo.attach('card.pdf', { body: pdf, contentType: 'application/pdf' });
 
   // The print page itself is not reachable without a valid signed token.
   expect((await request.get('/print/card.00000000-0000-0000-0000-000000000000.9999999999.bad')).status()).toBe(404);
   expect((await request.get('/r/not-a-real-token/card')).status()).toBe(404);
+  // The keepsake isn't offered before the celebration.
+  expect((await request.get(`/r/${receiptToken}/keepsake`)).status()).toBe(404);
+
+  // Admin: the print-shop version keeps the 3 mm bleed (154 × 216 mm ≈ 436.5 × 612.3 pt).
+  await signInAsNewOwner(page);
+  await page.goto('/admin/invitations');
+  await page.getByRole('link', { name: 'إدارة' }).first().click();
+  const href = await page.getByRole('link', { name: 'نسخة المطبعة (هامش قص ٣ مم)' }).getAttribute('href');
+  const shop = await page.request.get(href!);
+  expect(shop.status()).toBe(200);
+  const shopBox = /\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/.exec((await shop.body()).toString('latin1'));
+  expect(Math.abs(Number(shopBox?.[1]) - 436.5)).toBeLessThan(1);
+  expect(Math.abs(Number(shopBox?.[2]) - 612.3)).toBeLessThan(1);
 });

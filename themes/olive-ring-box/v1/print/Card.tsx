@@ -8,7 +8,7 @@ import p from './print.module.css';
  * bleed (the platform sets the page to 154 × 216 mm); background and branches
  * run into the 3 mm bleed, all text stays inside the safe area.
  */
-export default function Card({ locale, dir, lang, fields, event, labels, qrDataUrl }: PrintCardProps) {
+export default function Card({ locale, dir, lang, fields, event, labels, qrDataUrl, extraLine }: PrintCardProps) {
   const t = copyFor(locale);
   return (
     <div className={`${fonts.fonts} ${p.card}`} dir={dir} lang={lang}>
@@ -49,6 +49,7 @@ export default function Card({ locale, dir, lang, fields, event, labels, qrDataU
             </div>
           ) : null}
         </dl>
+        {extraLine ? <p className={p.cardExtra}>{extraLine}</p> : null}
         {qrDataUrl ? (
           <figure className={p.cardQr}>
             {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}

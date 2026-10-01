@@ -7,7 +7,11 @@ import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
 import { updateInvitationValues } from '@/server/invitation/admin';
 import { submitGuestResponse } from '@/server/guests/responses';
-import { DocumentError, ensureDocument } from '@/server/documents/documents';
+import { DocumentError, ensureDocument, printShopCard, removeCustomCard, updateCardOptions, uploadCustomCard } from '@/server/documents/documents';
+import { customerDelivery, keepsakeReady } from '@/server/documents/delivery';
+import { receiptTokenHash } from '@/server/orders/tokens';
+import { orders } from '@/server/db/schema';
+import { PDFDocument } from 'pdf-lib';
 import { printData } from '@/server/documents/data';
 import { printToken, verifyPrintToken } from '@/server/documents/tokens';
 import { storage } from '@/server/storage';
@@ -55,7 +59,8 @@ describe('printable card', () => {
     const inv = await order(true);
     const data = await printData(db(), inv, 'card');
     expect(data.kind).toBe('card');
-    expect(data.page).toEqual({ width: '154mm', height: '216mm', margin: '0' });
+    expect(data.page).toEqual({ width: '148mm', height: '210mm', margin: '0', cropMm: 3 }); // exactly A5, bleed cropped
+    expect((await printData(db(), inv, 'cardBleed')).page).toMatchObject({ width: '154mm', height: '216mm', cropMm: 0 });
     expect(data.props.labels.scanToOpen).toBe('امسح الرمز لفتح الدعوة');
     expect(data.props.fields.person_1_name).toBe(inv.fieldValues.person_1_name);
     expect('qrDataUrl' in data.props && data.props.qrDataUrl?.startsWith('data:image/png;base64,')).toBe(true);
@@ -123,3 +128,72 @@ describe('keepsake', () => {
     expect(doc?.messageCount).toBe(1);
   });
 });
+
+async function pdfWithPage(width: number, height: number) {
+  const doc = await PDFDocument.create();
+  doc.addPage([width, height]);
+  return Buffer.from(await doc.save());
+}
+
+describe('changing the card', () => {
+  it('applies the team\'s wording and QR choice, and regenerates', async () => {
+    const inv = await order(true);
+    const actor = { adminId: shop.admin.id, ipHash: null };
+    const r = fakeRenderer();
+    await ensureDocument(db(), inv.id, 'card', { render: r.render });
+
+    await updateCardOptions(db(), inv.id, { message: 'دعوة خاصة للأهل', extraLine: 'الدعوة عائلية', showQr: false }, actor);
+    const [row] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
+    const data = await printData(db(), row!, 'card');
+    expect(data.props.fields.invitation_message).toBe('دعوة خاصة للأهل');
+    expect('extraLine' in data.props && data.props.extraLine).toBe('الدعوة عائلية');
+    expect('qrDataUrl' in data.props && data.props.qrDataUrl).toBeNull();
+    await ensureDocument(db(), inv.id, 'card', { render: r.render });
+    expect(r.calls).toHaveLength(2);
+
+    await updateCardOptions(db(), inv.id, { message: '' }, actor); // empty = no message on the card
+    const [row2] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
+    expect((await printData(db(), row2!, 'card')).props.fields.invitation_message).toBeUndefined();
+    await expect(updateCardOptions(db(), inv.id, { extraLine: 'x'.repeat(121) }, actor)).rejects.toMatchObject({ code: 'tooLong' });
+  });
+
+  it('accepts an uploaded A5 design that replaces the automatic card, and can go back', async () => {
+    const inv = await order(true);
+    const actor = { adminId: shop.admin.id, ipHash: null };
+    await expect(uploadCustomCard(db(), inv.id, Buffer.from('not a pdf'), actor)).rejects.toMatchObject({ code: 'notPdf' });
+    await expect(uploadCustomCard(db(), inv.id, await pdfWithPage(595.28, 841.89), actor)).rejects.toMatchObject({ code: 'notA5' }); // A4
+
+    const mine = await pdfWithPage(419.53, 595.28);
+    expect(await uploadCustomCard(db(), inv.id, mine, actor)).toBe(1);
+    const r = fakeRenderer();
+    expect((await ensureDocument(db(), inv.id, 'card', { render: r.render })).pdf.equals(mine)).toBe(true);
+    expect((await printShopCard(db(), inv.id, r.render)).pdf.equals(mine)).toBe(true);
+    expect(r.calls).toHaveLength(0);
+
+    await removeCustomCard(db(), inv.id, actor);
+    await ensureDocument(db(), inv.id, 'card', { render: r.render });
+    expect(r.calls).toEqual([`card:${inv.id}`]);
+    expect((await printShopCard(db(), inv.id, r.render)).fileName).toContain('print-shop');
+    expect(r.calls.at(-1)).toBe(`cardBleed:${inv.id}`);
+    const actions = (await db().select().from(auditLogs).where(eq(auditLogs.objectId, inv.id))).map((l) => l.action);
+    expect(actions).toEqual(expect.arrayContaining(['card.custom_uploaded', 'card.custom_removed']));
+  });
+});
+
+describe('keepsake delivery', () => {
+  it('reaches the customer once the event has started, with a WhatsApp-ready receipt link', async () => {
+    const inv = await order(true);
+    const withKeepsake = { ...inv, featureKeys: [...inv.featureKeys, 'keepsake_pdf'] };
+    expect(keepsakeReady(withKeepsake, new Date())).toBe(false); // the wedding is weeks away
+    expect(keepsakeReady(withKeepsake, new Date(Date.now() + 400 * 86400_000))).toBe(true);
+    expect(keepsakeReady(inv, new Date(Date.now() + 400 * 86400_000))).toBe(false); // package without keepsake
+
+    const d = await customerDelivery(db(), inv.id);
+    expect(d?.phone).toBe('+9647701234567');
+    const token = d!.receiptUrl.split('/r/')[1]!;
+    const [o] = await db().select().from(orders).where(eq(orders.invitationId, inv.id));
+    expect(o!.receiptTokenHash).toBe(receiptTokenHash(token));
+    expect(d!.keepsakeUrl).toBe(`${d!.receiptUrl}/keepsake`);
+  });
+});
+

@@ -1,9 +1,9 @@
 import 'server-only';
 import { chromium } from 'playwright-core';
 import { env } from '@/server/env';
-import { printToken, type DocumentKind } from './tokens';
+import { printToken, type RenderKind } from './tokens';
 
-export type PdfRenderer = (kind: DocumentKind, invitationId: string) => Promise<Buffer>;
+export type PdfRenderer = (kind: RenderKind, invitationId: string) => Promise<Buffer>;
 
 function printOrigin() {
   return (env().PRINT_ORIGIN ?? `http://127.0.0.1:${process.env.PORT ?? 3000}`).replace(/\/$/, '');

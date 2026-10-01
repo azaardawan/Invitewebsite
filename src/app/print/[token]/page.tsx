@@ -22,15 +22,26 @@ export default async function PrintPage({ params }: PageProps<'/print/[token]'>)
   if (!inv) notFound();
   const data = await printData(db(), inv, claim.kind);
   const loaders = printComponents[data.codeRef];
-  const pageCss = `@page{size:${data.page.width} ${data.page.height};margin:${data.page.margin}}html,body{margin:0;padding:0;background:#fff}`;
+  const base = 'html,body{margin:0;padding:0;background:#fff}';
+  // Keepsake: a full-bleed cover page, then message pages with margins and page numbers.
+  const pageCss =
+    data.kind === 'keepsake'
+      ? `@page{size:A4;margin:18mm 16mm 20mm;@bottom-center{content:counter(page);font:9pt serif;color:#777}}@page :first{margin:0;@bottom-center{content:none}}${base}`
+      : `@page{size:${data.page.width} ${data.page.height};margin:${data.page.margin}}${base}`;
 
   if (data.kind === 'card') {
     if (!loaders?.card) notFound();
     const Card = (await loaders.card()).default;
+    const crop = data.page.cropMm;
+    // The theme draws trim + bleed; for the exact-A5 page the bleed is cropped evenly on every side.
     return (
       <>
         <style>{pageCss}</style>
-        <Card {...(data.props as PrintCardProps)} />
+        <div style={{ width: data.page.width, height: data.page.height, overflow: 'hidden' }}>
+          <div style={{ margin: crop ? `-${crop}mm` : undefined }}>
+            <Card {...(data.props as PrintCardProps)} />
+          </div>
+        </div>
       </>
     );
   }

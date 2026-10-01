@@ -151,6 +151,19 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         </section>
       ) : null}
 
+      {paid && r.invitation.keepsakeReady ? (
+        <section className="mt-8 space-y-2 print:hidden">
+          <h2 className="font-semibold">{t('keepsakeTitle')}</h2>
+          <p className="text-sm text-muted">{t('keepsakeHelp')}</p>
+          <a
+            href={`/r/${encodeURIComponent(token)}/keepsake`}
+            className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 font-semibold text-accent-ink"
+          >
+            {t('keepsakeDownload')}
+          </a>
+        </section>
+      ) : null}
+
       <p className="mt-8 text-sm">{t('corrections')}</p>
       <p className="mt-2 text-xs text-muted print:hidden">{t('keepLink')}</p>
     </main>

@@ -77,12 +77,16 @@ animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/the
 
 - `fields`, `event.date` / `event.time` (localized), `locale`, `dir`, `lang`;
 - `labels` (`date`, `time`, `venue`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
-- the card gets `qrDataUrl` (null when `print.card.qr` is false); the keepsake gets the visible
+- the card gets `qrDataUrl` (null when `print.card.qr` is false or the team hid it) and `extraLine`
+  (one line the team added, or null); the keepsake gets the visible
   `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`).
 
 The platform sets `@page` from the manifest: the card page is the trim size plus `bleedMm` on every
-side (A5 + 3 mm = 154 × 216 mm) with no margin, so the card's root fills exactly that box; the keepsake
-is A4 with 20 × 16 mm margins. Use physical units and `print-color-adjust: exact`. Chromium renders
+side (A5 + 3 mm = 154 × 216 mm) so the card's root fills exactly that box; the customer's PDF is exactly
+A5 with the bleed cropped evenly (the print-shop version keeps it), so keep text inside the 5 mm safe
+area. The keepsake is A4: the first page (the cover) has no margin, so the cover section should fill
+210 × 297 mm and end with `break-after: page`; the following pages have 18 / 16 / 20 mm margins and a
+page number added by the platform. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
 ## 7. Preview and review

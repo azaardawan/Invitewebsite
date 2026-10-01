@@ -35,8 +35,10 @@ type PrintBase = {
 };
 
 export type PrintCardProps = PrintBase & {
-  /** QR code image (data URL) linking to the online invitation; null when the theme turns it off. */
+  /** QR code image (data URL) linking to the online invitation; null when the theme or the team turns it off. */
   qrDataUrl: string | null;
+  /** One extra line the team added for this card only (e.g. "Family invitation"); null when none. Print it near the details. */
+  extraLine: string | null;
 };
 
 export type KeepsakeMessage = { guestName: string; message: string };

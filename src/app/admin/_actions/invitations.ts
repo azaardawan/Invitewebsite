@@ -13,6 +13,7 @@ import {
   updateInvitationValues,
 } from '@/server/invitation/admin';
 import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
+import { DocumentError, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
 import type { ActionState } from './state';
 
 const uuid = z.uuid();
@@ -100,5 +101,38 @@ export async function guestMessageStatusAction(_: ActionState, form: FormData): 
     throw e;
   }
   revalidatePath(`/admin/invitations/${invitationId.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function cardOptionsAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'documents.generate' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  try {
+    const useOwnMessage = form.get('messageMode') === 'custom';
+    await updateCardOptions(
+      db(),
+      id.data,
+      {
+        message: useOwnMessage ? String(form.get('message') ?? '') : undefined,
+        extraLine: String(form.get('extraLine') ?? ''),
+        showQr: form.get('showQr') === 'on',
+      },
+      { adminId: user.id, ipHash: (await requestContext()).ipHash },
+    );
+  } catch (e) {
+    if (e instanceof DocumentError) return { error: `invitations.cardErrors.${e.code}` };
+    throw e;
+  }
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function removeCustomCardAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'documents.generate' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  await removeCustomCard(db(), id.data, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  revalidatePath(`/admin/invitations/${id.data}`);
   return { ok: true, message: 'invitations.saved', nonce: Date.now() };
 }

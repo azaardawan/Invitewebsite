@@ -3,7 +3,7 @@ import type { PrintCardProps } from '@/theme-sdk';
 import styles from './print.module.css';
 
 /** Internal demo print card (A5). */
-export default function DemoCard({ dir, lang, fields, event, labels, qrDataUrl }: PrintCardProps) {
+export default function DemoCard({ dir, lang, fields, event, labels, qrDataUrl, extraLine }: PrintCardProps) {
   return (
     <div className={styles.card} dir={dir} lang={lang}>
       <h1 className={styles.names}>{[fields.person_1_name, fields.person_2_name].filter(Boolean).join(' & ')}</h1>
@@ -28,6 +28,7 @@ export default function DemoCard({ dir, lang, fields, event, labels, qrDataUrl }
           </>
         ) : null}
       </dl>
+      {extraLine ? <p className={styles.message}>{extraLine}</p> : null}
       {qrDataUrl ? (
         <figure className={styles.qr}>
           {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}

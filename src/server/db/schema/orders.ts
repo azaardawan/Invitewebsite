@@ -17,6 +17,12 @@ import {
 import { adminUsers } from './admin';
 import { musicTracks, packages, sections, themeVersions, themes } from './catalog';
 
+/**
+ * Admin tweaks to the automatic printable card. `message`: undefined = the invitation's own message,
+ * '' = no message, any other text replaces it on the card only. `showQr: false` hides the QR code.
+ */
+export type CardOptions = { message?: string; extraLine?: string; showQr?: boolean };
+
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -75,6 +81,10 @@ export const invitations = pgTable(
     previewExpiresAt: timestamp('preview_expires_at', { withTimezone: true }),
     publishedAt: timestamp('published_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
+    /** Admin tweaks to the automatic printable card (see CardOptions). */
+    cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
+    /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */
+    cardCustomKey: text('card_custom_key'),
     /** Optimistic locking for concurrent admin edits. */
     version: integer('version').notNull().default(1),
     ...timestamps,
