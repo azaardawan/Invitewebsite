@@ -3,10 +3,17 @@ import '@fontsource/aref-ruqaa/400.css';
 import '@fontsource/aref-ruqaa/700.css';
 import '../../globals.css';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { isLocale, localeMeta } from '@/i18n/config';
 import { receiptFor } from './data';
 
-export const metadata: Metadata = { robots: { index: false, follow: false }, referrer: 'no-referrer' };
+export async function generateMetadata({ params }: LayoutProps<'/r/[token]'>): Promise<Metadata> {
+  const r = await receiptFor((await params).token);
+  const locale = r && isLocale(r.snapshot.invitation.locale) ? r.snapshot.invitation.locale : 'ar';
+  const t = await getTranslations({ locale, namespace: 'receipt' });
+  const brand = (await getTranslations({ locale, namespace: 'common' }))('brand');
+  return { title: `${t('title')} · ${brand}`, robots: { index: false, follow: false }, referrer: 'no-referrer' };
+}
 
 export default async function ReceiptRootLayout({ children, params }: LayoutProps<'/r/[token]'>) {
   const { token } = await params;

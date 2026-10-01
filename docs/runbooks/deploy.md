@@ -109,8 +109,13 @@ Admin → Invitations → an invitation has **Download printable card** and **Do
 
 ## Backups
 
-On the Hobby plan, check that Railway Postgres **backups** are enabled for the database. A tested
-restore is part of M11.
+Turn on Railway Postgres backups and know how to restore: see `backups.md` (includes the restore drill).
+
+## Background jobs
+
+The website runs its own daily housekeeping (guest data retention, keepsakes at expiry, cleanup) and,
+when WAYL is on, the payment safety net every 10 minutes. Nothing to schedule. `DISABLE_SCHEDULER=1`
+turns them off; `POST /api/cron/housekeeping` with `Authorization: Bearer $CRON_SECRET` runs it by hand.
 
 ## Later: WAYL
 

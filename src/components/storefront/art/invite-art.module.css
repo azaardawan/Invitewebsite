@@ -111,6 +111,11 @@
 .blush .body {
   padding-top: 44px;
 }
+/* Small text on the light blush card needs full contrast (WCAG AA). */
+.blush .date {
+  color: #5f3540;
+  opacity: 1;
+}
 .flowersTop {
   position: absolute;
   top: -6px;

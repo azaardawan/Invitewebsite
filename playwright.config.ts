@@ -44,6 +44,8 @@ export default defineConfig({
         WAYL_ENV: 'test',
         // PDFs: the renderer opens this server's own print pages.
         PRINT_ORIGIN: `http://localhost:${PORT}`,
+        // Background jobs (src/server/scheduler.ts) stay off so test runs are deterministic.
+        DISABLE_SCHEDULER: '1',
         ...(process.env.PW_CHROMIUM_PATH ? { CHROMIUM_PATH: process.env.PW_CHROMIUM_PATH } : {}),
       },
     },
