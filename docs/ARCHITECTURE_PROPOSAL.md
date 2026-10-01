@@ -572,6 +572,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |
 | M10 | Legal, settings, contact, WhatsApp | 17 | Editable policies with versions, settings-driven footer and contact, WhatsApp flows |
 | M11 | Hardening | 18–19 | Lighthouse/WebPageTest on real 4G profiles, axe accessibility, security review, backup + **tested restore**, runbooks |
+| (moved up) | Hosting | — | Railway (app + Postgres) + Cloudflare R2/DNS ready now: `Dockerfile`, `railway.json`, `/api/health`, owner bootstrap; guide in `docs/runbooks/deploy.md`. The site can run in **manual payment mode** (owner WhatsApp + instructions, manual mark-paid) until WAYL is switched on |
 | M12 | Staging → production | 20–23 | Staging on a temporary domain, WAYL test-mode check (`pnpm wayl:check`, needs the key in a new session + `api.thewayl-staging.com` allowed) and production validation with a real small payment, domain/DNS/HTTPS, launch checklist |
 
 Tests are written inside each milestone. Coverage focuses on payment verification, webhook idempotency, state transitions, publication and expiry, RBAC, package field validation, theme availability, invoice totals, URL resolution and RSVP. The full E2E journey runs against the WAYL mock in CI and against WAYL test mode manually before M12.

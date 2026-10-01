@@ -10,6 +10,12 @@
 | `CRON_SECRET` | hosting env (secret) | 32+ random characters, for the reconciliation call. |
 | `APP_URL` | hosting env | Must be the public URL (`https://bahjaaa.com`); WAYL sends webhooks and redirects there. |
 
+## Manual mode (no WAYL key)
+
+- Customers confirm their order, then see your payment instructions and a WhatsApp button on their receipt. These are set in Admin → Website settings; the WhatsApp message includes the order number and amount.
+- When the money arrives, open Admin → Orders and use **Mark as paid manually** with a reason. The invoice number is assigned and the invitation is published.
+- Unpaid orders never expire automatically in manual mode.
+
 ## Checks
 
 - `pnpm wayl:check`: verifies the key, creates a 1,000 IQD **test** link, reads it back and cancels it. It refuses to run with `WAYL_ENV=live`.

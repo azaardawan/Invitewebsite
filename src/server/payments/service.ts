@@ -4,7 +4,7 @@ import { and, desc, eq, gt, inArray, lt, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { orderStatusHistory, orders, paymentWebhookEvents, payments } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
-import { env } from '@/server/env';
+import { env, secretKey } from '@/server/env';
 import { safeEqual, sha256Buffer } from '@/lib/crypto';
 import { localized } from '@/lib/localized';
 import { OrderError } from '@/server/orders/common';
@@ -27,7 +27,7 @@ const REUSE_MARGIN_MS = 10 * 60_000;
 
 /** Per-link webhook secret, derived so nothing extra has to be stored or configured. */
 export function webhookSecretFor(reference: string) {
-  return createHmac('sha256', Buffer.from(env().TOKEN_SECRET, 'base64')).update(`wayl-webhook:${reference}`).digest('hex');
+  return createHmac('sha256', secretKey('TOKEN_SECRET')).update(`wayl-webhook:${reference}`).digest('hex');
 }
 
 /** HMAC-SHA256 of the raw body with the link's secret; accepts hex with or without a `sha256=` prefix. */
@@ -256,7 +256,9 @@ export async function reconcilePayments(db: DbOrTx, now = new Date()) {
     results[r] = (results[r] ?? 0) + 1;
   }
 
-  // Unpaid orders past their window with no open payment left.
+  // Unpaid orders past their window with no open payment left. While payment is
+  // collected manually (no WAYL key) orders never expire on their own.
+  if (!waylClient()) return { checked: open.length, results, expiredOrders: 0 };
   const stale = await db
     .select({ id: orders.id, status: orders.status })
     .from(orders)

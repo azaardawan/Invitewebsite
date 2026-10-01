@@ -20,7 +20,6 @@ const noIndex = { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' };
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  output: 'standalone',
   serverExternalPackages: ['@node-rs/argon2'],
   experimental: { globalNotFound: true },
   async headers() {

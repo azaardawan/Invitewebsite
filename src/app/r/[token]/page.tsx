@@ -9,6 +9,7 @@ import { db } from '@/server/db/client';
 import { getReceipt } from '@/server/orders/receipt';
 import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/service';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
+import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
 import { payAction } from './actions';
 
@@ -42,7 +43,10 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   const stillPayable = paymentWindowOpen(r);
   const online = onlinePaymentsEnabled();
   const canPay = stillPayable && online;
-  const waitingManual = stillPayable && !online;
+  // Manual collection has no time limit: the team confirms whenever the customer pays.
+  const waitingManual = (r.status === 'PENDING' || r.status === 'AWAITING_PAYMENT') && !online;
+  const { payment } = waitingManual ? await getSettings(db()) : { payment: null };
+  const waText = t('waMessage', { order: r.orderNumber, amount: formatIqd(r.amountIqd, intl) });
   const rows: [string, string][] = [
     [t('orderNumber'), r.orderNumber],
     ...(r.invoiceNumber ? ([[t('invoiceNumber'), r.invoiceNumber]] as [string, string][]) : []),
@@ -79,7 +83,21 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               <p className="text-center text-xs text-muted">{t('payNote')}</p>
             </form>
           ) : (
-            <p className="rounded-2xl bg-blush px-4 py-3 text-sm">{t('payManual')}</p>
+            <div className="flex flex-col gap-3 rounded-2xl bg-blush px-4 py-4 text-sm">
+              <p className="whitespace-pre-line leading-relaxed" dir="auto">
+                {payment?.manualInstructions ? localized(payment.manualInstructions, locale) : t('payManual')}
+              </p>
+              {payment?.whatsapp ? (
+                <a
+                  href={`https://wa.me/${payment.whatsapp.slice(1)}?text=${encodeURIComponent(waText)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 font-semibold text-accent-ink"
+                >
+                  {t('payWhatsApp')}
+                </a>
+              ) : null}
+            </div>
           )}
         </section>
       ) : null}

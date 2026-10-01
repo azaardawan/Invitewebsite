@@ -247,12 +247,20 @@ Once you have settled the wording in batch 5, I'll suggest the longer sentences 
 
 Still to suggest (after you've settled the wording above): FAQ answers (`home.faq*`), package feature names (`store.features.*`), the remaining `store.*` sentences (hints and errors), and Kurdish sample names (3c).
 
-## Batch 8 — public invitation page (PENDING)
+## Batch 8 — public invitation page — ✅ APPROVED (2026-10-01)
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
-| `invitation.and` | و | & | و | و | ● | PENDING |
-| `invitation.youreInvited` | يسعدنا دعوتكم | You're invited | بە خۆشحاڵییەوە بانگهێشتتان دەکەین | ب دلخۆشی داخوازا هەوە دکەین | ○ | PENDING |
-| `invitation.endedTitle` | انتهت هذه الدعوة | This invitation has ended | ئەم بانگهێشتنامەیە کۆتایی هات | ئەڤ داخوازنامە ب دوماهی هات | ◐ | PENDING |
-| `invitation.endedBody` | شكراً لمشاركتكم فرحتنا. هذه الدعوة لم تعد متاحة. | Thank you for celebrating with us. This invitation is no longer available. | سوپاس بۆ بەشداریکردنتان لە خۆشیمان. ئەم بانگهێشتنامەیە چیتر بەردەست نییە. | سوپاس بۆ پشکداریا هەوە د شاهیا مە دا. ئەڤ داخوازنامە ئێدی بەردەست نینە. | ○ | PENDING |
-| `invitation.brand` | بهجه | Bahja | بەهجە | بەهجە | ● | PENDING |
+| `invitation.and` | و | & | و | و | ● | APPROVED (owner, 2026-10-01) |
+| `invitation.youreInvited` | يسعدنا دعوتكم | You're invited | بە خۆشحاڵییەوە بانگهێشتتان دەکەین | ب دلخۆشی داخوازا هەوە دکەین | ○ | APPROVED (owner, 2026-10-01) |
+| `invitation.endedTitle` | انتهت هذه الدعوة | This invitation has ended | ئەم بانگهێشتنامەیە کۆتایی هات | ئەڤ داخوازنامە ب دوماهی هات | ◐ | APPROVED (owner, 2026-10-01) |
+| `invitation.endedBody` | شكراً لمشاركتكم فرحتنا. هذه الدعوة لم تعد متاحة. | Thank you for celebrating with us. This invitation is no longer available. | سوپاس بۆ بەشداریکردنتان لە خۆشیمان. ئەم بانگهێشتنامەیە چیتر بەردەست نییە. | سوپاس بۆ پشکداریا هەوە د شاهیا مە دا. ئەڤ داخوازنامە ئێدی بەردەست نینە. | ○ | APPROVED (owner, 2026-10-01) |
+| `invitation.brand` | بهجه | Bahja | بەهجە | بەهجە | ● | APPROVED (owner, 2026-10-01) |
+
+## Batch 9 — paying while online payment is off (PENDING)
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `receipt.payWhatsApp` | إرسال طلبي على واتساب | Send my order on WhatsApp | ناردنی داواکارییەکەم لە واتسئاپ | هنارتنا داخوازیا من ل واتسئاپێ | ◐ | PENDING |
+| `receipt.waMessage` | مرحباً بهجه، قمت بالطلب {order} بمبلغ {amount}. كيف أُكمل الدفع؟ | Hello Bahja, I placed order {order} for {amount}. How do I complete payment? | سڵاو بەهجە، داواکاری {order} م کرد بە بڕی {amount}. چۆن پارەدان تەواو بکەم؟ | سلاڤ بەهجە، من داخوازیا {order} کر ب بڕێ {amount}. چاوا پارەدانێ تەمام بکەم؟ | ○ | PENDING |
+| `store.paymentSoon` | بعد التأكيد ستحصلون على إيصال خاص فيه طريقة الدفع… | After confirming, you'll get a private receipt with how to pay… | دوای پشتڕاستکردنەوە پسوولەیەکی تایبەتتان پێدەگات کە ڕێگای پارەدانی تێدایە. بانگهێشتنامەکەتان هەر کە پارەدانمان پشتڕاست کردەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ دێ پسوولەکا تایبەت گەهیتە هەوە کو ڕێکا پارەدانێ تێدایە. داخوازناما هەوە هەر کو مە پارەدان پشتڕاست کر دێ هێتە بەلاڤکرن. | ○ | PENDING |

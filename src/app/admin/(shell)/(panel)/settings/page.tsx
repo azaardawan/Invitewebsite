@@ -5,13 +5,14 @@ import { getSettings } from '@/server/settings/service';
 import { formatIqd, formatUsd } from '@/lib/currency';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Card } from '@/components/admin/bits';
-import { currencySettingsAction } from '@/app/admin/_actions/settings';
+import { currencySettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
+import { I18nInputs } from '@/components/admin/I18nInputs';
 
 export default async function SettingsPage() {
   await requireAdmin({ permission: 'settings.manage' });
   const t = await getTranslations('admin.settings');
   const locale = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-US';
-  const { currency } = await getSettings(db());
+  const { currency, payment } = await getSettings(db());
   const example = 75000;
 
   return (
@@ -40,6 +41,18 @@ export default async function SettingsPage() {
               })}
             </p>
           ) : null}
+          <SubmitButton>{t('save')}</SubmitButton>
+        </ActionForm>
+      </Card>
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('paymentHeading')}</h2>
+        <p className="text-sm text-muted">{t('paymentIntro')}</p>
+        <ActionForm action={paymentSettingsAction} className="space-y-4">
+          <div className="w-72">
+            <Field label={t('whatsapp')} name="whatsapp" type="tel" dir="ltr" required={false} defaultValue={payment.whatsapp ?? undefined} />
+          </div>
+          <p className="text-xs text-muted">{t('whatsappHint')}</p>
+          <I18nInputs name="manualInstructions" label={t('manualInstructions')} multiline required={false} maxLength={1000} defaultValue={payment.manualInstructions ?? undefined} />
           <SubmitButton>{t('save')}</SubmitButton>
         </ActionForm>
       </Card>

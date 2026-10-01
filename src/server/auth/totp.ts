@@ -1,7 +1,7 @@
 import 'server-only';
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 import { authenticator } from 'otplib';
-import { env } from '@/server/env';
+import { secretKey } from '@/server/env';
 import { randomToken, sha256 } from '@/lib/crypto';
 
 authenticator.options = { step: 30, window: 1, digits: 6 };
@@ -29,7 +29,7 @@ export function verifyTotp(secret: string, code: string, now = Date.now()): numb
 }
 
 function key(): Buffer {
-  return Buffer.from(env().TOTP_ENCRYPTION_KEY, 'base64');
+  return secretKey('TOTP_ENCRYPTION_KEY');
 }
 
 /** AES-256-GCM. Output: base64url(iv).base64url(tag).base64url(ciphertext) */

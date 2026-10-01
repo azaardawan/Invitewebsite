@@ -1,6 +1,6 @@
 import 'server-only';
 import { createHmac } from 'node:crypto';
-import { env } from '@/server/env';
+import { secretKey } from '@/server/env';
 import { randomToken, sha256 } from '@/lib/crypto';
 
 /** Opaque preview link token for a draft (only its hash is stored). */
@@ -17,7 +17,7 @@ export function previewTokenHash(token: string) {
  * a repeated checkout request can return the same link without storing it.
  */
 export function receiptTokenFor(orderId: string) {
-  return createHmac('sha256', Buffer.from(env().TOKEN_SECRET, 'base64')).update(`receipt:${orderId}`).digest('base64url');
+  return createHmac('sha256', secretKey('TOKEN_SECRET')).update(`receipt:${orderId}`).digest('base64url');
 }
 
 export function receiptTokenHash(token: string) {

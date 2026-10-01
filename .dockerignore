@@ -1,0 +1,11 @@
+.git
+.next
+node_modules
+.env
+.env.*
+!.env.example
+.storage
+.storage-test
+test-results
+playwright-report
+tsconfig.tsbuildinfo

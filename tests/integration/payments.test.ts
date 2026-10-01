@@ -198,3 +198,23 @@ describe('reconciliation', () => {
     expect((await orderRow(o.orderId)).status).toBe('PAYMENT_EXPIRED');
   });
 });
+
+describe('manual payment mode (no WAYL key)', () => {
+  it('unpaid orders never expire on their own; the owner marks them paid', async () => {
+    setWaylClientForTests(null);
+    const past = new Date(Date.now() - ORDER_PAYMENT_WINDOW_MS - 3 * 3600_000);
+    const o = await newOrder();
+    await db().update(orders).set({ createdAt: past }).where(eq(orders.id, o.orderId));
+    expect(await startPayment(db(), o.orderId)).toEqual({ kind: 'manual' });
+    expect((await reconcilePayments(db())).expiredOrders).toBe(0);
+    expect((await orderRow(o.orderId)).status).toBe('PENDING');
+  });
+
+  it('stores the WhatsApp number and payment instructions, audited', async () => {
+    const { updatePaymentSettings, getSettings } = await import('@/server/settings/service');
+    const instructions = { ar: 'ادفع عبر زين كاش', en: 'Pay with Zain Cash', ckb: null, bdn: null };
+    await updatePaymentSettings(db(), { whatsapp: '+9647701234567', manualInstructions: instructions }, { adminId: null, ipHash: null });
+    expect((await getSettings(db())).payment).toEqual({ whatsapp: '+9647701234567', manualInstructions: instructions });
+    await expect(updatePaymentSettings(db(), { whatsapp: '0770', manualInstructions: null }, { adminId: null, ipHash: null })).rejects.toThrow();
+  });
+});

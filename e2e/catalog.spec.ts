@@ -71,8 +71,9 @@ test('owner configures a theme end to end: music → cover → package → revie
 
   // Exchange rate → visitors can switch prices to USD next to the language choice.
   await page.goto('/admin/settings');
-  await page.getByLabel('سعر الدولار (دينار لكل ١ دولار)').fill('1310');
-  await page.getByRole('button', { name: 'حفظ' }).click();
+  const rateForm = page.locator('form', { has: page.getByLabel('سعر الدولار (دينار لكل ١ دولار)') });
+  await rateForm.getByLabel('سعر الدولار (دينار لكل ١ دولار)').fill('1310');
+  await rateForm.getByRole('button', { name: 'حفظ' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'تم الحفظ.' })).toBeVisible();
   await expect(page.getByText('≈')).toBeVisible();
   const visitorContext = await browser.newContext({ baseURL: testInfo.project.use.baseURL });
