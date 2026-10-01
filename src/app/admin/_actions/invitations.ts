@@ -12,6 +12,7 @@ import {
   setInvitationPublished,
   updateInvitationValues,
 } from '@/server/invitation/admin';
+import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
 import type { ActionState } from './state';
 
 const uuid = z.uuid();
@@ -84,4 +85,20 @@ export async function invitationMusicAction(_: ActionState, form: FormData): Pro
   } catch (e) {
     return fail(e);
   }
+}
+
+export async function guestMessageStatusAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'guests.moderate' });
+  const id = uuid.safeParse(form.get('responseId'));
+  const invitationId = uuid.safeParse(form.get('id'));
+  if (!id.success || !invitationId.success) return { error: 'invitations.errors.notFound' };
+  try {
+    const status = form.get('status') === 'HIDDEN' ? 'HIDDEN' : 'VISIBLE';
+    await setGuestMessageStatus(db(), id.data, status, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  } catch (e) {
+    if (e instanceof GuestResponseError) return { error: 'invitations.errors.notFound' };
+    throw e;
+  }
+  revalidatePath(`/admin/invitations/${invitationId.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
 }

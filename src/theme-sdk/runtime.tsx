@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import type { GuestResponseInput, GuestSubmitResult, InvitationMode, ThemeLabels } from './types';
+import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationMode, type ThemeLabels } from './types';
 
 type RuntimeValue = {
   mode: InvitationMode;
@@ -167,7 +167,7 @@ export function useInvitationMode(): InvitationMode {
 
 // ---------------- Guest form ----------------
 
-export const GUEST_LIMITS = { name: 80, message: 500 } as const;
+export { GUEST_LIMITS };
 
 export type GuestFormApi = {
   /** Package includes the guest form (RSVP). */

@@ -568,7 +568,7 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M5 ✅ (backend) | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
 | M6 ✅ (live WAYL test deferred to M12, owner decision) | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
 | M7 ✅ | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
-| M8 | Guest features + print | 14–15 | Guest form (name, attendance, message), moderation, **printable card** and keepsake PDF companions, document jobs |
+| M8 (guest form ✅) | Guest features + print | 14–15 | ✅ Guest form stored (`guest_responses`, per-device correction, per-IP and per-invitation rate limits, live + `rsvp` only), replies and message hide/restore in Admin → Invitations. Still to do: Cloudflare Turnstile (needs a site key), **printable card** and keepsake PDF companions, document jobs |
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |
 | M10 | Legal, settings, contact, WhatsApp | 17 | Editable policies with versions, settings-driven footer and contact, WhatsApp flows |
 | M11 | Hardening | 18–19 | Lighthouse/WebPageTest on real 4G profiles, axe accessibility, security review, backup + **tested restore**, runbooks |

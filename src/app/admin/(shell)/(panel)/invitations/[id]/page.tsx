@@ -7,13 +7,20 @@ import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
 import { env } from '@/server/env';
 import { activeMusicTracks, getInvitation, invitationState } from '@/server/invitation/admin';
+import { guestResponseCounts, listGuestResponses } from '@/server/guests/responses';
 import { orderFields } from '@/server/storefront/catalog';
 import { localized } from '@/server/catalog/common';
 import { localeMeta } from '@/i18n/config';
 import { invitationPath } from '@/lib/ids';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
-import { editInvitationAction, extendInvitationAction, invitationMusicAction, publishInvitationAction } from '../../../../_actions/invitations';
+import {
+  editInvitationAction,
+  extendInvitationAction,
+  guestMessageStatusAction,
+  invitationMusicAction,
+  publishInvitationAction,
+} from '../../../../_actions/invitations';
 
 const BADGE = { live: 'ACTIVE', expired: 'ARCHIVED', unpublished: 'ARCHIVED', awaiting: 'READY_FOR_REVIEW', paid: 'READY_FOR_REVIEW', draft: 'DEVELOPMENT' } as const;
 const input = 'w-full rounded-md border border-line bg-surface px-3 py-2 text-base';
@@ -33,7 +40,14 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const url = `${env().APP_URL.replace(/\/$/, '')}${path}`;
   const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Baghdad' }).format(d) : '—');
   const published = Boolean(inv.publishedAt);
-  const [fields, tracks] = await Promise.all([orderFields(inv.themeId, inv.sectionId, inv.fieldKeys), activeMusicTracks(db())]);
+  const showGuests = inv.featureKeys.includes('rsvp') && can(authz, 'guests.view');
+  const canModerate = can(authz, 'guests.moderate');
+  const [fields, tracks, guests, counts] = await Promise.all([
+    orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
+    activeMusicTracks(db()),
+    showGuests ? listGuestResponses(db(), inv.id) : Promise.resolve([]),
+    showGuests ? guestResponseCounts(db(), inv.id) : Promise.resolve(null),
+  ]);
   const reason = (
     <label className="block">
       <span className="mb-1 block text-sm">{t('reason')}</span>
@@ -101,6 +115,62 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           </p>
         ))}
       </Card>
+
+      {showGuests ? (
+        <Card>
+          <h2 className="mb-1 font-semibold">{t('guestsTitle')}</h2>
+          {counts ? <p className="mb-3 text-sm text-muted">{t('guestsSummary', counts)}</p> : null}
+          {guests.length === 0 ? (
+            <p className="text-sm text-muted">{t('guestsEmpty')}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-start text-muted">
+                  <tr>
+                    <th className="p-2 text-start font-normal">{t('guestName')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestAttendance')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestMessage')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestAt')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {guests.map((g) => (
+                    <tr key={g.id} className="border-t border-line align-top">
+                      <td className="p-2" dir="auto">
+                        {g.guestName}
+                      </td>
+                      <td className="p-2">{g.attendance === 'ATTENDING' ? t('attending') : t('notAttending')}</td>
+                      <td className="max-w-md p-2">
+                        {g.message ? (
+                          <div className="space-y-2">
+                            <p dir="auto" className={g.messageStatus === 'HIDDEN' ? 'text-muted line-through' : 'whitespace-pre-line'}>
+                              {g.message}
+                            </p>
+                            {g.messageStatus === 'HIDDEN' ? <Badge status="ARCHIVED">{t('messageHidden')}</Badge> : null}
+                            {canModerate ? (
+                              <ActionForm action={guestMessageStatusAction}>
+                                <input type="hidden" name="id" value={inv.id} />
+                                <input type="hidden" name="responseId" value={g.id} />
+                                <input type="hidden" name="status" value={g.messageStatus === 'HIDDEN' ? 'VISIBLE' : 'HIDDEN'} />
+                                <SubmitButton tone={g.messageStatus === 'HIDDEN' ? 'primary' : 'danger'}>
+                                  {g.messageStatus === 'HIDDEN' ? t('restoreMessage') : t('hideMessage')}
+                                </SubmitButton>
+                              </ActionForm>
+                            ) : null}
+                          </div>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap p-2">{date(g.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      ) : null}
 
       {published && can(authz, 'invitations.extend') ? (
         <Card>

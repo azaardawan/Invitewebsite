@@ -79,6 +79,9 @@ export function hasFeature(props: Pick<ThemeProps, 'features'>, feature: Feature
   return props.features.includes(feature);
 }
 
+/** Guest form limits, shared by the theme runtime and the server. */
+export const GUEST_LIMITS = { name: 80, message: 500 } as const;
+
 export type GuestAttendance = 'ATTENDING' | 'NOT_ATTENDING';
 export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string };
 export type GuestSubmitResult = { ok: true } | { ok: false; error: 'invalid' | 'rateLimited' | 'closed' | 'failed' };
