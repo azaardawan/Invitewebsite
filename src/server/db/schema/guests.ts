@@ -7,8 +7,8 @@ export const guestMessageStatus = pgEnum('guest_message_status', ['VISIBLE', 'HI
 
 /**
  * One guest form (owner decision E): name + attendance, plus a message when the
- * package has `congratulations`. A guest correcting their answer from the same
- * device updates their row instead of adding one (unique client token).
+ * package has `congratulations`. The same guest name from the same device updates
+ * its row (a correction); other names on a shared phone add their own rows.
  */
 export const guestResponses = pgTable(
   'guest_responses',
@@ -22,7 +22,7 @@ export const guestResponses = pgTable(
     message: text('message'),
     messageStatus: guestMessageStatus('message_status').notNull().default('VISIBLE'),
     ipHash: text('ip_hash'),
-    /** SHA-256 of a random per-device cookie; never the raw token. */
+    /** SHA-256 of the per-device cookie plus the normalized guest name; never the raw token. */
     clientTokenHash: text('client_token_hash').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })

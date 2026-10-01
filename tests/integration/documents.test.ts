@@ -126,6 +126,15 @@ describe('keepsake', () => {
     const docs = await db().select().from(generatedDocuments).where(eq(generatedDocuments.invitationId, inv.id));
     const doc = docs.find((d) => d.kind === 'KEEPSAKE_PDF');
     expect(doc?.messageCount).toBe(1);
+
+    // Several guests writing from one shared phone all appear, in order.
+    const phone = randomToken(24);
+    for (const [name, message] of [['أحمد', 'مبروك'], ['ليلى', 'بالرفاه والبنين'], ['Omar', 'Congratulations!']]) {
+      await submitGuestResponse(db(), { invitationId: inv.id, response: { name: name!, attendance: 'ATTENDING', message }, ipHash: randomToken(8), clientToken: phone });
+    }
+    const [row] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
+    const keepsake = await printData(db(), row!, 'keepsake');
+    expect('messages' in keepsake.props && keepsake.props.messages.map((m) => m.guestName)).toEqual(['سارة', 'أحمد', 'ليلى', 'Omar']);
   });
 });
 

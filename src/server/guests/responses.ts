@@ -10,7 +10,8 @@ import { sha256 } from '@/lib/crypto';
 import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult } from '@/theme-sdk/types';
 
 /** Per visitor (IP) across all invitations, and per invitation across all visitors. */
-export const GUEST_RATE_LIMITS = { perIpPerHour: 10, perInvitationPerHour: 300 } as const;
+// Mobile carriers put many users behind one address (CGNAT), so the per-IP limit stays generous.
+export const GUEST_RATE_LIMITS = { perIpPerHour: 30, perInvitationPerHour: 300 } as const;
 
 export class GuestResponseError extends Error {
   constructor(public readonly code: 'notFound') {
@@ -18,11 +19,17 @@ export class GuestResponseError extends Error {
   }
 }
 
+/** Case- and spacing-insensitive form of a guest name, so "Ahmed  Ali" and "ahmed ali" are one person. */
+function nameKey(name: string) {
+  return name.normalize('NFKC').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
 /**
  * Stores a guest's answer from the public invitation page. Only live
  * invitations whose package includes the guest form accept answers; the
  * message is required exactly when the package has `congratulations`. The
- * same device (client token) updates its earlier answer instead of adding one.
+ * same device and name updates its earlier answer; a family sharing one phone
+ * can still each leave their own reply.
  */
 export async function submitGuestResponse(
   db: DbOrTx,
@@ -62,7 +69,8 @@ export async function submitGuestResponse(
     attendance,
     message: withMessage ? message : null,
     ipHash: input.ipHash,
-    clientTokenHash: sha256(input.clientToken),
+    // Same phone + same name = a correction (updates the earlier reply); another name on a shared phone is a new reply.
+    clientTokenHash: sha256(`${input.clientToken}:${nameKey(name)}`),
   };
   await db
     .insert(guestResponses)

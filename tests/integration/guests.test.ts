@@ -29,22 +29,24 @@ const submit = (invitationId: string, response: { name: string; attendance: 'ATT
   submitGuestResponse(db(), { invitationId, response, ipHash: randomToken(8), clientToken });
 
 describe('guest responses', () => {
-  it('stores name and attendance; the same device updates its answer instead of adding one', async () => {
+  it('stores replies; the same name from the same phone corrects it, other names on a shared phone add their own', async () => {
     const inv = await published();
-    const device = randomToken(24);
-    expect(await submit(inv.id, { name: '  أحمد  ', attendance: 'ATTENDING' }, device)).toEqual({ ok: true });
-    expect(await submit(inv.id, { name: 'أحمد علي', attendance: 'NOT_ATTENDING' }, device)).toEqual({ ok: true });
-    expect(await submit(inv.id, { name: 'سارة', attendance: 'ATTENDING' })).toEqual({ ok: true });
+    const phone = randomToken(24);
+    expect(await submit(inv.id, { name: '  أحمد علي ', attendance: 'ATTENDING' }, phone)).toEqual({ ok: true });
+    expect(await submit(inv.id, { name: 'أحمد   علي', attendance: 'NOT_ATTENDING' }, phone)).toEqual({ ok: true }); // correction
+    expect(await submit(inv.id, { name: 'سارة', attendance: 'ATTENDING' }, phone)).toEqual({ ok: true }); // family member, same phone
+    expect(await submit(inv.id, { name: 'ليلى', attendance: 'ATTENDING' })).toEqual({ ok: true });
 
     const rows = await listGuestResponses(db(), inv.id);
     expect(rows.map((r) => [r.guestName, r.attendance])).toEqual([
-      ['أحمد علي', 'NOT_ATTENDING'],
+      ['أحمد   علي', 'NOT_ATTENDING'],
       ['سارة', 'ATTENDING'],
+      ['ليلى', 'ATTENDING'],
     ]);
     // Without `congratulations` no message is stored, even if one is sent.
     expect(rows.every((r) => r.message === null)).toBe(true);
-    expect(rows.every((r) => r.clientTokenHash !== device)).toBe(true);
-    expect(await guestResponseCounts(db(), inv.id)).toEqual({ attending: 1, notAttending: 1 });
+    expect(rows.every((r) => r.clientTokenHash !== phone)).toBe(true);
+    expect(await guestResponseCounts(db(), inv.id)).toEqual({ attending: 2, notAttending: 1 });
   });
 
   it('rejects missing or too-long values', async () => {
