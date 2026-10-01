@@ -15,17 +15,20 @@ export function InvitationView({
   ribbon,
   errorText,
   submitGuestResponse,
+  turnstileSiteKey,
 }: {
   codeRef: string;
   props: ThemeProps;
   ribbon: string | null;
   errorText: { message: string; retry: string };
-  submitGuestResponse?: (input: GuestResponseInput) => Promise<GuestSubmitResult>;
+  submitGuestResponse?: (input: GuestResponseInput, captchaToken?: string) => Promise<GuestSubmitResult>;
+  turnstileSiteKey?: string | null;
 }) {
   const guest = {
     enabled: props.features.includes('rsvp'),
     withMessage: props.features.includes('congratulations'),
     submit: submitGuestResponse,
+    turnstileSiteKey: turnstileSiteKey ?? null,
   };
   return (
     <InvitationRuntime mode={props.mode} labels={props.labels} musicSrc={props.music?.src ?? null} guest={guest}>

@@ -138,6 +138,19 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         />
       </section>
 
+      {paid && r.invitation.hasPrintCard ? (
+        <section className="mt-8 space-y-2 print:hidden">
+          <h2 className="font-semibold">{t('printCardTitle')}</h2>
+          <p className="text-sm text-muted">{t('printCardHelp')}</p>
+          <a
+            href={`/r/${encodeURIComponent(token)}/card`}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-accent px-6 font-semibold text-accent"
+          >
+            {t('printCardDownload')}
+          </a>
+        </section>
+      ) : null}
+
       <p className="mt-8 text-sm">{t('corrections')}</p>
       <p className="mt-2 text-xs text-muted print:hidden">{t('keepLink')}</p>
     </main>

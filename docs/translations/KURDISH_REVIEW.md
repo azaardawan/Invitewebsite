@@ -280,3 +280,19 @@ Arabic. The basmala always stays in Arabic.
 | `formIntro` | يسعدنا أن نعرف إن كنت ستشاركنا فرحتنا. | We would love to know if you can join us. | | | AWAITING |
 | `closing` | شكرًا لمشاركتكم فرحتنا | Thank you for sharing our joy | | | AWAITING |
 | `closingSub` | حضوركم يتمّ سعادتنا | Your presence completes our happiness | | | AWAITING |
+| `keepsakeSubtitle` | تهاني الأهل والأحبة | Wishes from family and friends | | | AWAITING |
+| `keepsakeClosing` | مع خالص الشكر لكل من شاركنا الفرح | With heartfelt thanks to everyone who shared our joy | | | AWAITING |
+
+## Batch 11 — printable card and keepsake (AWAITING WORDING)
+
+Shown on the customer's receipt page and printed on the card / keepsake PDF. Until approved, Kurdish
+invitations show the Arabic.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `receipt.printCardTitle` | بطاقة الدعوة للطباعة | Printable invitation card | | | AWAITING |
+| `receipt.printCardHelp` | ملف PDF جاهز للطباعة (A5 مع هامش القص) بنفس الأسماء والتاريخ والمكان، مع رمز QR يفتح الدعوة الإلكترونية. قد يستغرق تجهيزه بضع ثوانٍ. | A print-ready PDF (A5 with bleed) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare. | | | AWAITING |
+| `receipt.printCardDownload` | تحميل بطاقة الطباعة (PDF) | Download printable card (PDF) | | | AWAITING |
+| `invitation.print.scanToOpen` | امسح الرمز لفتح الدعوة | Scan to open the invitation | | | AWAITING |
+| `invitation.print.keepsakeTitle` | رسائل المحبة | Messages of love | | | AWAITING |
+| `invitation.print.keepsakeEmpty` | لم تصل رسائل بعد. | No messages yet. | | | AWAITING |

@@ -10,6 +10,8 @@ themes/<key>/v<N>/
 ├─ manifest.ts        what the theme supports (defineTheme)
 ├─ Theme.tsx          'use client' default export: (props: ThemeProps) => JSX
 ├─ theme.module.css   styles: CSS Modules only
+├─ print/Card.tsx     printable card (required when the manifest has print.card)
+├─ print/Keepsake.tsx keepsake PDF (required when the manifest has print.keepsake)
 └─ assets/            optimized WebP/SVG/MP4… imported by relative path
 ```
 
@@ -24,8 +26,8 @@ themes/<key>/v<N>/
 - `sections`: where it belongs. `fields` and `features`: what the complete theme renders.
 - **`validStates`**: the package combinations the designer actually designed. The complete theme
   must be one of them. Admin can only create packages matching a state.
-- `print` companions are required when `print_card` / `keepsake_pdf` are listed. The companions
-  themselves arrive with M8.
+- `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
+  generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
 
 ## 3. What the theme receives: `ThemeProps`
@@ -68,7 +70,22 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 
 Performance budgets (JS/image size) are reported during M11 hardening.
 
-## 6. Preview and review
+## 6. Print companions
+
+`print/Card.tsx` and `print/Keepsake.tsx` default-export **server components** (no hooks, no
+animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/theme-sdk`:
+
+- `fields`, `event.date` / `event.time` (localized), `locale`, `dir`, `lang`;
+- `labels` (`date`, `time`, `venue`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
+- the card gets `qrDataUrl` (null when `print.card.qr` is false); the keepsake gets the visible
+  `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`).
+
+The platform sets `@page` from the manifest: the card page is the trim size plus `bleedMm` on every
+side (A5 + 3 mm = 154 × 216 mm) with no margin, so the card's root fills exactly that box; the keepsake
+is A4 with 20 × 16 mm margins. Use physical units and `print-color-adjust: exact`. Chromium renders
+it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
+
+## 7. Preview and review
 
 - Admin → Themes → theme → **Preview**: pick a package or state, language, name length and width.
   It renders in an isolated iframe.

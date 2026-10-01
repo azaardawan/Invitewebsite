@@ -64,6 +64,7 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
       ribbon={null}
       errorText={{ message: msgs.renderError, retry: msgs.retry }}
       submitGuestResponse={submitGuestAction.bind(null, r.invitation.id)}
+      turnstileSiteKey={env().TURNSTILE_SITE_KEY ?? null}
     />
   );
 }

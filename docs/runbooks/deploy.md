@@ -87,6 +87,25 @@ Staging is never indexed by search engines (`robots.txt` blocks everything unles
    - `/robots.txt` allows indexing and lists the sitemap.
    - A test invitation link opens on a phone and shows a preview when shared on WhatsApp.
 
+## Bot protection on the guest form (Cloudflare Turnstile)
+
+Optional but recommended before going live. Without it, the guest form is protected by rate limits only.
+
+1. Cloudflare dashboard → **Turnstile** → **Add widget**. Name it `Bahja`, add the hostnames
+   (`invitewebsite-production.up.railway.app` now, `bahjaaa.com` later), widget mode **Managed**.
+2. Copy the **Site Key** and the **Secret Key**.
+3. Railway → website service → Variables: add `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` (both, or
+   neither), then Deploy.
+
+Guests normally see nothing; Cloudflare shows a checkbox only to suspicious visitors.
+
+## Printable card and keepsake PDFs
+
+PDFs are made on request by the Chromium inside the website container (the Docker image installs it)
+and stored in R2 under `documents/`. Customers download the card from their receipt after payment;
+Admin → Invitations → an invitation has **Download printable card** and **Download keepsake PDF**
+(with **Regenerate**). Nothing to configure.
+
 ## Backups
 
 On the Hobby plan, check that Railway Postgres **backups** are enabled for the database. A tested

@@ -13,5 +13,6 @@ export type {
   GuestResponseInput,
 } from './types';
 export { hasFeature, formatNumber } from './types';
+export type { PrintCardProps, KeepsakeProps, KeepsakeMessage, PrintLabels } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';

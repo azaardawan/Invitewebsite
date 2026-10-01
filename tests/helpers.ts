@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { authenticator } from 'otplib';
 import { db } from '@/server/db/client';
 import { createAdminUser } from '@/server/admin/users';
@@ -38,7 +39,9 @@ export function makeMp3(seconds = 2): Buffer {
   const frameSize = Math.floor((144 * 128000) / 44100); // 417 bytes
   const frames = Math.ceil((seconds * 44100) / 1152);
   const frame = Buffer.concat([header, Buffer.alloc(frameSize - header.length)]);
-  return Buffer.concat(Array.from({ length: frames }, () => frame));
+  // Random audio bytes in the first frame make every file unique, so fixtures never collide as duplicate songs.
+  const first = Buffer.concat([header, randomBytes(frameSize - header.length)]);
+  return Buffer.concat([first, ...Array.from({ length: frames - 1 }, () => frame)]);
 }
 
 let keyCounter = 0;

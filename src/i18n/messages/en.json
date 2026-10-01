@@ -552,6 +552,13 @@
       "save": "Save changes",
       "saved": "Saved.",
       "preview": "What guests see",
+      "documentsTitle": "Print documents",
+      "documentsHelp": "PDFs are prepared on request (a few seconds) and reused until something they show changes.",
+      "downloadCard": "Download printable card",
+      "downloadKeepsake": "Download keepsake PDF",
+      "regenerate": "Regenerate",
+      "cardAfterPayment": "The printable card is available after payment.",
+      "keepsakeAfterPublish": "The keepsake is available once the invitation is published.",
       "guestsTitle": "Guest replies",
       "guestsSummary": "{attending} attending · {notAttending} not attending",
       "guestsEmpty": "No replies yet.",
@@ -636,7 +643,12 @@
     "youreInvited": "You're invited",
     "endedTitle": "This invitation has ended",
     "endedBody": "Thank you for celebrating with us. This invitation is no longer available.",
-    "brand": "Bahja"
+    "brand": "Bahja",
+    "print": {
+      "scanToOpen": "Scan to open the invitation",
+      "keepsakeTitle": "Messages of love",
+      "keepsakeEmpty": "No messages yet."
+    }
   },
   "invitationSamples": {
     "short": {
@@ -701,7 +713,10 @@
     "confirming": "Confirming your payment with WAYL…",
     "confirmingSlow": "Your payment is still being confirmed. This can take a few minutes. Keep this page's link; it will update on its own once confirmed.",
     "payWhatsApp": "Send my order on WhatsApp",
-    "waMessage": "Hello Bahja, I placed order {order} for {amount}. How do I complete payment?"
+    "waMessage": "Hello Bahja, I placed order {order} for {amount}. How do I complete payment?",
+    "printCardTitle": "Printable invitation card",
+    "printCardHelp": "A print-ready PDF (A5 with bleed) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare.",
+    "printCardDownload": "Download printable card (PDF)"
   },
   "nav": {
     "home": "Home",

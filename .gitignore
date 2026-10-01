@@ -16,3 +16,4 @@ src/theme-registry/generated.ts
 .storage/
 .storage-test/
 src/theme-registry/loaders.generated.tsx
+src/theme-registry/print.generated.ts

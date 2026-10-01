@@ -7,7 +7,13 @@ type RuntimeValue = {
   mode: InvitationMode;
   labels: ThemeLabels;
   musicSrc: string | null;
-  guest: { enabled: boolean; withMessage: boolean; submit?: (input: GuestResponseInput) => Promise<GuestSubmitResult> };
+  guest: {
+    enabled: boolean;
+    withMessage: boolean;
+    submit?: (input: GuestResponseInput, captchaToken?: string) => Promise<GuestSubmitResult>;
+    /** Cloudflare Turnstile site key; when set, live submissions carry a bot-check token. */
+    turnstileSiteKey?: string | null;
+  };
 };
 
 const RuntimeContext = createContext<RuntimeValue | null>(null);
@@ -183,6 +189,84 @@ export type GuestFormApi = {
   submit: (input: GuestResponseInput) => Promise<void>;
 };
 
+// ---------------- Bot check (Cloudflare Turnstile) ----------------
+
+type TurnstileApi = {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+  reset: (id: string) => void;
+  remove: (id: string) => void;
+};
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+let turnstileScript: Promise<void> | null = null;
+function loadTurnstile(): Promise<void> {
+  turnstileScript ??= new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    el.async = true;
+    el.onload = () => resolve();
+    el.onerror = () => {
+      turnstileScript = null;
+      reject(new Error('turnstile'));
+    };
+    document.head.appendChild(el);
+  });
+  return turnstileScript;
+}
+
+/** Holds the latest Turnstile token for one guest form; filled by `TurnstileBox`. */
+class TurnstileHandle {
+  private token: string | null = null;
+  private widget: string | null = null;
+
+  attach(el: HTMLElement, siteKey: string) {
+    let cancelled = false;
+    loadTurnstile()
+      .then(() => {
+        if (cancelled || !window.turnstile) return;
+        this.widget = window.turnstile.render(el, {
+          sitekey: siteKey,
+          appearance: 'interaction-only',
+          callback: (t: string) => {
+            this.token = t;
+          },
+          'expired-callback': () => {
+            this.token = null;
+          },
+          'error-callback': () => {
+            this.token = null;
+          },
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      if (this.widget && window.turnstile) window.turnstile.remove(this.widget);
+      this.widget = null;
+    };
+  }
+
+  /** Waits up to 10 s for a token, then hands it out once and asks for a fresh one. */
+  async take(): Promise<string | undefined> {
+    for (let i = 0; i < 40 && !this.token; i++) await new Promise((r) => setTimeout(r, 250));
+    const t = this.token;
+    this.token = null;
+    if (this.widget && window.turnstile) window.turnstile.reset(this.widget);
+    return t ?? undefined;
+  }
+}
+
+/** Invisible unless Cloudflare needs the guest to tick a box. */
+function TurnstileBox({ handle, siteKey }: { handle: TurnstileHandle; siteKey: string }) {
+  const [el, setEl] = useState<HTMLDivElement | null>(null);
+  useEffect(() => (el ? handle.attach(el, siteKey) : undefined), [el, handle, siteKey]);
+  return <div ref={setEl} />;
+}
+
 /**
  * Headless guest form. The theme designs the markup; the platform validates,
  * submits, protects against spam and stores responses. Renders nothing when
@@ -194,6 +278,8 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
   const [fieldErrors, setFieldErrors] = useState<GuestFormApi['fieldErrors']>({});
   const [error, setError] = useState<string | null>(null);
   const isPreview = mode !== 'live';
+  const [bot] = useState(() => new TurnstileHandle());
+  const botKey = isPreview ? null : (guest.turnstileSiteKey ?? null);
 
   const submit = useCallback(
     async (input: GuestResponseInput) => {
@@ -218,7 +304,8 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
         setStatus('sent');
         return;
       }
-      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined }).catch(
+      const captcha = botKey ? await bot.take() : undefined;
+      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined }, captcha).catch(
         () => ({ ok: false, error: 'failed' }) as const,
       );
       if (result.ok) setStatus('sent');
@@ -227,9 +314,14 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
         setError(labels.errorGeneric);
       }
     },
-    [guest, labels, isPreview],
+    [guest, labels, isPreview, bot, botKey],
   );
 
   if (!guest.enabled) return null;
-  return <>{render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}</>;
+  return (
+    <>
+      {render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}
+      {botKey ? <TurnstileBox handle={bot} siteKey={botKey} /> : null}
+    </>
+  );
 }

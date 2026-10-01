@@ -42,6 +42,9 @@ export default defineConfig({
         WAYL_API_KEY: 'mock-key',
         WAYL_API_BASE_URL: `http://localhost:${WAYL_MOCK_PORT}`,
         WAYL_ENV: 'test',
+        // PDFs: the renderer opens this server's own print pages.
+        PRINT_ORIGIN: `http://localhost:${PORT}`,
+        ...(process.env.PW_CHROMIUM_PATH ? { CHROMIUM_PATH: process.env.PW_CHROMIUM_PATH } : {}),
       },
     },
   ],

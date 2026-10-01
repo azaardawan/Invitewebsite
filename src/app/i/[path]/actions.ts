@@ -7,6 +7,7 @@ import { db } from '@/server/db/client';
 import { requestContext } from '@/server/auth/request-context';
 import { env } from '@/server/env';
 import { submitGuestResponse } from '@/server/guests/responses';
+import { verifyTurnstile } from '@/server/guests/turnstile';
 import type { GuestResponseInput, GuestSubmitResult } from '@/theme-sdk/types';
 
 /** Random per-device token: lets a guest correct their answer without creating a duplicate. */
@@ -19,11 +20,12 @@ const inputSchema = z.object({
 });
 
 /** Public guest form submission, bound to one invitation id by the invitation page. */
-export async function submitGuestAction(invitationId: string, raw: GuestResponseInput): Promise<GuestSubmitResult> {
+export async function submitGuestAction(invitationId: string, raw: GuestResponseInput, captchaToken?: string): Promise<GuestSubmitResult> {
   const id = z.uuid().safeParse(invitationId);
   const response = inputSchema.safeParse(raw);
   if (!id.success || !response.success) return { ok: false, error: 'invalid' };
   try {
+    if (!(await verifyTurnstile(typeof captchaToken === 'string' ? captchaToken : undefined))) return { ok: false, error: 'invalid' };
     const jar = await cookies();
     let clientToken = jar.get(GUEST_COOKIE)?.value ?? '';
     if (!/^[A-Za-z0-9_-]{32}$/.test(clientToken)) {

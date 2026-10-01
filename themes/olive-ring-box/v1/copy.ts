@@ -14,6 +14,8 @@ const ar = {
   formIntro: 'يسعدنا أن نعرف إن كنت ستشاركنا فرحتنا.',
   closing: 'شكرًا لمشاركتكم فرحتنا',
   closingSub: 'حضوركم يتمّ سعادتنا',
+  keepsakeSubtitle: 'تهاني الأهل والأحبة',
+  keepsakeClosing: 'مع خالص الشكر لكل من شاركنا الفرح',
 } as const;
 
 export type Copy = { [K in keyof typeof ar]: string };
@@ -26,6 +28,8 @@ const en: Copy = {
   formIntro: 'We would love to know if you can join us.',
   closing: 'Thank you for sharing our joy',
   closingSub: 'Your presence completes our happiness',
+  keepsakeSubtitle: 'Wishes from family and friends',
+  keepsakeClosing: 'With heartfelt thanks to everyone who shared our joy',
 };
 
 export function copyFor(locale: InvitationLocale): Copy {

@@ -8,6 +8,7 @@ import { can } from '@/server/rbac/authz';
 import { env } from '@/server/env';
 import { activeMusicTracks, getInvitation, invitationState } from '@/server/invitation/admin';
 import { guestResponseCounts, listGuestResponses } from '@/server/guests/responses';
+import { documentAvailable } from '@/server/documents/documents';
 import { orderFields } from '@/server/storefront/catalog';
 import { localized } from '@/server/catalog/common';
 import { localeMeta } from '@/i18n/config';
@@ -115,6 +116,33 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           </p>
         ))}
       </Card>
+
+      {can(authz, 'documents.generate') && (inv.featureKeys.includes('print_card') || inv.featureKeys.includes('keepsake_pdf')) ? (
+        <Card>
+          <h2 className="mb-1 font-semibold">{t('documentsTitle')}</h2>
+          <p className="mb-3 text-sm text-muted">{t('documentsHelp')}</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
+            {(['card', 'keepsake'] as const)
+              .filter((kind) => inv.featureKeys.includes(kind === 'card' ? 'print_card' : 'keepsake_pdf'))
+              .map((kind) =>
+                documentAvailable(inv, kind) ? (
+                  <p key={kind} className="flex flex-wrap gap-3">
+                    <a href={`/admin/api/documents/${inv.id}/${kind}`} className="font-medium text-accent underline">
+                      {t(kind === 'card' ? 'downloadCard' : 'downloadKeepsake')}
+                    </a>
+                    <a href={`/admin/api/documents/${inv.id}/${kind}?fresh=1`} className="text-muted underline">
+                      {t('regenerate')}
+                    </a>
+                  </p>
+                ) : (
+                  <p key={kind} className="text-muted">
+                    {t(kind === 'card' ? 'cardAfterPayment' : 'keepsakeAfterPublish')}
+                  </p>
+                ),
+              )}
+          </div>
+        </Card>
+      ) : null}
 
       {showGuests ? (
         <Card>
