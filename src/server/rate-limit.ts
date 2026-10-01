@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, lt, sql } from 'drizzle-orm';
+import { and, eq, lt, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { rateLimitBuckets } from '@/server/db/schema';
 
@@ -18,6 +18,16 @@ export async function consumeRateLimit(db: DbOrTx, key: string, limit: number, w
     })
     .returning({ count: rateLimitBuckets.count });
   return (row?.count ?? 0) <= limit;
+}
+
+/** Whether `key` has already used up its window, without counting this call. */
+export async function rateLimited(db: DbOrTx, key: string, limit: number, windowSeconds: number, now = new Date()) {
+  const windowStart = new Date(Math.floor(now.getTime() / (windowSeconds * 1000)) * windowSeconds * 1000);
+  const [row] = await db
+    .select({ count: rateLimitBuckets.count })
+    .from(rateLimitBuckets)
+    .where(and(eq(rateLimitBuckets.key, key), eq(rateLimitBuckets.windowStart, windowStart)));
+  return (row?.count ?? 0) >= limit;
 }
 
 /** Housekeeping (scheduled job in M11): drop windows older than a day. */

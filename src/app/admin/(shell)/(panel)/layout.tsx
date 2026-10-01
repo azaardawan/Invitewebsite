@@ -7,8 +7,6 @@ import { logoutAction } from '@/app/admin/_actions/auth';
 import { setAdminLocaleAction } from '@/app/admin/_actions/preferences';
 
 const UPCOMING = [
-  'invitations',
-  'payments',
   'customers',
   'guests',
   'translations',
@@ -23,6 +21,7 @@ export default async function PanelLayout({ children }: LayoutProps<'/admin'>) {
   const links = [
     { href: '/admin', label: t('nav.dashboard'), show: true },
     { href: '/admin/orders', label: t('nav.orders'), show: can(authz, 'orders.view') },
+    { href: '/admin/invitations', label: t('nav.invitations'), show: can(authz, 'invitations.view') },
     { href: '/admin/sections', label: t('nav.sections'), show: can(authz, 'sections.manage') },
     { href: '/admin/themes', label: t('nav.themes'), show: can(authz, 'themes.view') },
     { href: '/admin/fields', label: t('nav.fields'), show: can(authz, 'sections.manage') },

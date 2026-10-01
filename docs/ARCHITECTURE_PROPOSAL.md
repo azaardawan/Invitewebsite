@@ -566,13 +566,13 @@ Each milestone ends with a demo and a checklist before the next one starts.
 | M3 ✅ | Theme engine + first theme | 8 | theme-sdk, registry, validate/freeze scripts, one reference theme in all its package states |
 | M4 ✅ | Storefront | 7 | Homepage in the approved v2 design, occasions, catalog, theme page with live sample preview per package, order screens (details → preview/edit → contact + terms → receipt), SEO, sitemap, robots |
 | M5 ✅ (backend) | Personalization → order | 9–10 | Field forms, server validation, personalized preview, customer info, legal acceptance, order snapshot, receipt page |
-| M6 ✅ (test mode pending) | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
-| M7 | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
+| M6 ✅ (live WAYL test deferred to M12, owner decision) | WAYL | 11–12 | Client against the official docs, mock server, sandbox tests, webhook inbox, verification, publication, reconciliation, manual publish |
+| M7 ✅ | Invitation runtime | 13 | `/i` routing, canonical slug redirects, expiry page, OG, noindex, admin invitation view/edit/extend/unpublish |
 | M8 | Guest features + print | 14–15 | Guest form (name, attendance, message), moderation, **printable card** and keepsake PDF companions, document jobs |
 | M9 | Analytics + dashboard | 16 | Event capture, dashboard metrics |
 | M10 | Legal, settings, contact, WhatsApp | 17 | Editable policies with versions, settings-driven footer and contact, WhatsApp flows |
 | M11 | Hardening | 18–19 | Lighthouse/WebPageTest on real 4G profiles, axe accessibility, security review, backup + **tested restore**, runbooks |
-| M12 | Staging → production | 20–23 | Staging on a temporary domain, WAYL production validation with a real small payment, domain/DNS/HTTPS, launch checklist |
+| M12 | Staging → production | 20–23 | Staging on a temporary domain, WAYL test-mode check (`pnpm wayl:check`, needs the key in a new session + `api.thewayl-staging.com` allowed) and production validation with a real small payment, domain/DNS/HTTPS, launch checklist |
 
 Tests are written inside each milestone. Coverage focuses on payment verification, webhook idempotency, state transitions, publication and expiry, RBAC, package field validation, theme availability, invoice totals, URL resolution and RSVP. The full E2E journey runs against the WAYL mock in CI and against WAYL test mode manually before M12.
 

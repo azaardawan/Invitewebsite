@@ -107,7 +107,8 @@
       "fields": "Field library",
       "music": "Music library",
       "settings": "Website settings",
-      "orders": "Orders & invoices"
+      "orders": "Orders & invoices",
+      "invitations": "Invitations"
     },
     "modules": {
       "sections": "Sections",
@@ -493,6 +494,65 @@
         "refunded": "This order was refunded.",
         "wayl": "Couldn't reach WAYL. Try again in a moment."
       }
+    },
+    "invitations": {
+      "heading": "Invitations",
+      "intro": "Published invitations, their links and dates. Every change here needs a reason and is recorded in the audit log.",
+      "search": "Search by name, link id or order number",
+      "filters": {
+        "all": "All",
+        "live": "Live",
+        "expired": "Ended",
+        "unpublished": "Taken down",
+        "awaiting": "Awaiting payment",
+        "draft": "Drafts"
+      },
+      "empty": "No invitations found.",
+      "open": "Manage",
+      "states": {
+        "live": "Live",
+        "expired": "Ended",
+        "unpublished": "Taken down",
+        "awaiting": "Awaiting payment",
+        "draft": "Draft",
+        "paid": "Paid"
+      },
+      "link": "Public link",
+      "openLink": "Open",
+      "publishedAt": "Published",
+      "expiresAt": "Available until",
+      "theme": "Theme",
+      "package": "Package",
+      "language": "Language",
+      "order": "Order",
+      "music": "Song",
+      "noMusic": "No music",
+      "reason": "Reason (shown in the audit log)",
+      "extendTitle": "Extend",
+      "extendDays": "Add days",
+      "extend": "Extend",
+      "unpublishTitle": "Take down",
+      "unpublish": "Take the invitation down",
+      "unpublishHelp": "Guests will see \"This invitation has ended\". You can put it back at any time; the dates stay the same.",
+      "unpublishConfirm": "Take this invitation down now?",
+      "republish": "Put the invitation back online",
+      "musicTitle": "Change song",
+      "saveMusic": "Save song",
+      "editTitle": "Edit details",
+      "editHelp": "Changing the names also changes the link; the old link keeps working and redirects.",
+      "save": "Save changes",
+      "saved": "Saved.",
+      "preview": "What guests see",
+      "errors": {
+        "notFound": "Invitation not found.",
+        "stale": "Someone else changed this invitation. Reload the page and try again.",
+        "notPublished": "Only a published invitation can be extended or taken down.",
+        "notUnpublished": "This invitation is not taken down.",
+        "invalidFields": "Please fix the highlighted details.",
+        "reason": "Please write a reason (5–500 characters).",
+        "days": "Choose between 1 and 365 days.",
+        "music": "Choose an active song."
+      }
     }
   },
   "invitation": {
@@ -550,7 +610,12 @@
     },
     "am": "AM",
     "pm": "PM",
-    "previewExpired": "This preview link has expired. Go back to your order to create a new preview."
+    "previewExpired": "This preview link has expired. Go back to your order to create a new preview.",
+    "and": "&",
+    "youreInvited": "You're invited",
+    "endedTitle": "This invitation has ended",
+    "endedBody": "Thank you for celebrating with us. This invitation is no longer available.",
+    "brand": "Bahja"
   },
   "invitationSamples": {
     "short": {

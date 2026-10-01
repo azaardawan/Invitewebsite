@@ -246,3 +246,13 @@ Once you have settled the wording in batch 5, I'll suggest the longer sentences 
 | `store.paymentNext` | بعد التأكيد تدفعون بأمان عبر صفحة الدفع لدى WAYL… | After confirming, you'll pay securely on WAYL's payment page… | دوای پشتڕاستکردنەوە، بە پارێزراوی لە پەڕەی پارەدانی WAYL پارە دەدەن. بانگهێشتنامەکەتان هەر کە پارەدان پشتڕاست کرایەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ، ب پاراستی ل لاپەرێ پارەدانا WAYL پارەی ددەن. داخوازناما هەوە هەر کو پارەدان هاتە پشتڕاستکرن دێ هێتە بەلاڤکرن. | ○ | PENDING |
 
 Still to suggest (after you've settled the wording above): FAQ answers (`home.faq*`), package feature names (`store.features.*`), the remaining `store.*` sentences (hints and errors), and Kurdish sample names (3c).
+
+## Batch 8 — public invitation page (PENDING)
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `invitation.and` | و | & | و | و | ● | PENDING |
+| `invitation.youreInvited` | يسعدنا دعوتكم | You're invited | بە خۆشحاڵییەوە بانگهێشتتان دەکەین | ب دلخۆشی داخوازا هەوە دکەین | ○ | PENDING |
+| `invitation.endedTitle` | انتهت هذه الدعوة | This invitation has ended | ئەم بانگهێشتنامەیە کۆتایی هات | ئەڤ داخوازنامە ب دوماهی هات | ◐ | PENDING |
+| `invitation.endedBody` | شكراً لمشاركتكم فرحتنا. هذه الدعوة لم تعد متاحة. | Thank you for celebrating with us. This invitation is no longer available. | سوپاس بۆ بەشداریکردنتان لە خۆشیمان. ئەم بانگهێشتنامەیە چیتر بەردەست نییە. | سوپاس بۆ پشکداریا هەوە د شاهیا مە دا. ئەڤ داخوازنامە ئێدی بەردەست نینە. | ○ | PENDING |
+| `invitation.brand` | بهجه | Bahja | بەهجە | بەهجە | ● | PENDING |

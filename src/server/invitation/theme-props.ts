@@ -7,7 +7,7 @@ import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type Calen
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
 
 type InvitationMessages = ThemeLabels &
-  CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string };
+  CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string; and: string; youreInvited: string; endedTitle: string; endedBody: string; brand: string };
 
 export function invitationMessages(locale: Locale): InvitationMessages {
   return (messagesFor(locale) as unknown as { invitation: InvitationMessages }).invitation;
