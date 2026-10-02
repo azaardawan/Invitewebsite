@@ -2,6 +2,8 @@
 
 This guide is for the **designer or owner**. It explains exactly what to prepare so a theme can be built to match your vision on the first attempt, without guessing.
 
+Giving the work to another AI? See `docs/THEME_AI_HANDOFF.md` for what it needs besides this guide and a prompt to paste.
+
 **The golden rule:** anything you don't specify has to be guessed. Guessing is where "that's not what I meant" comes from. Every step below removes a guess.
 
 ## The conditions at a glance (must-haves)
