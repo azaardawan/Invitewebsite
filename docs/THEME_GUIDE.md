@@ -2,7 +2,7 @@
 
 This guide is for the **designer or owner**. It explains exactly what to prepare so a theme can be built to match your vision on the first attempt, without guessing.
 
-Giving the work to another AI? See `docs/THEME_AI_HANDOFF.md` for what it needs besides this guide and a prompt to paste.
+Working with a partner or another AI? Start with **`docs/themes/PARTNER_THEME_PACK.md`** (all conditions, the opening animation, and instructions for a person or an AI).
 
 **The golden rule:** anything you don't specify has to be guessed. Guessing is where "that's not what I meant" comes from. Every step below removes a guess.
 
@@ -14,7 +14,7 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 1. Designed **mobile-first at 390 × 844 px**; must also work at 360 px, 430 px and on desktop (1280 px), with no sideways scrolling.
 2. **Arabic (right-to-left) is the main design**; English (left-to-right) must work too. Kurdish uses the Arabic layout.
 3. Every screen works with **short and long names**, using the field limits: names ≤ 40 characters, venue ≤ 80, family names ≤ 150, invitation message ≤ 300.
-4. Starts on a closed screen with an **"Open invitation" button**. Music can only start on that tap.
+4. **Every invitation opens with an animation.** It starts on a closed cover with an **"Open invitation" button**; tapping it plays the **opening animation** (the envelope opens, the box lifts, the curtain parts… about **1.5–3.5 s**, finished within 4 s) and starts the music. A subtle looping "breathing" before the tap is welcome. With reduced motion turned on, the cover simply fades to the invitation. See **Step 7A**. The automatic check fails a theme without it.
 
 **Content**
 5. Only fields from the **Field Library**: `person_1_name`, `person_2_name`, `family_names`, `event_date`, `event_time`, `venue_name`, `venue_map_url`, `invitation_message`. New fields are added to the library first.
@@ -103,8 +103,8 @@ Tool: Figma is best; Photoshop or Illustrator also work.
 
 1. **Frame size:** design at **390 × 844 px** (a normal iPhone/Android size). Also check that everything still works at **360 px** (small Android) and **430 px** (large phones).
 2. **Design every "scene" in order.** One frame per moment:
-   - `01-closed`: what the guest sees before tapping (the "Open invitation" button is required; see Step 8)
-   - `02-opening`: the middle of the opening animation (optional, helps explain the motion)
+   - `01-closed`: the cover the guest sees before tapping, with the "Open invitation" button (required; see Steps 7A and 8)
+   - `02-opening-a`, `02-opening-b`, …: key moments of the opening animation (required: at least the start, middle and end)
    - `03-names`, `04-date-venue`, `05-countdown`, `06-guest-form`, `07-thank-you`, …
    - If the invitation scrolls as one long page, you can design one tall frame instead, but mark where each scene begins.
 3. **Use real sample text, twice:**
@@ -152,6 +152,39 @@ Export rules:
 - **Text must NOT be baked into images.** Names, dates and so on are live text, so they can change for every customer. Decorative words that never change (e.g. "بسم الله الرحمن الرحيم" as calligraphy art) may be an image; say so.
 - **Keep the same canvas/position logic.** Either export every layer with the full-frame canvas (easy to position) or give me x/y positions. Full-frame canvas export from Figma is simplest.
 - **Naming:** lowercase, hyphens, no spaces, English letters: `flower-left.webp`, not `Flower Left final (2).png`.
+
+## Step 7A — The opening animation (required for every theme)
+
+Every Bahja invitation begins with an animated opening. It is the "wow" moment, so plan it first.
+
+**What it must be**
+- **Cover → tap → opening → invitation.** The cover shows the names (live text) and the "Open invitation" button.
+  The opening plays **only after the tap** (phones only allow sound after a tap, and the tap starts the music).
+- **Length:** about **1.5–3.5 seconds**; everything must be finished within **4 seconds**, then the guest can read and scroll.
+- **Optional idle loop before the tap:** a small, slow movement (a glow, a shimmer, a breathing seal) so the cover feels alive.
+- **Reduced motion:** when the phone asks for less animation, the cover just fades (≤ 0.3 s) to the invitation.
+- **Light and smooth:** only moving, scaling, rotating and fading layers (no heavy video unless it is short and small).
+  The cover and its layers together about **≤ 500 KB**, so it appears fast on 4G.
+- Works in **Arabic (RTL) and English (LTR)**. Say whether anything mirrors; artwork usually does not.
+
+**Ideas** (pick one per theme, or invent your own): envelope with a wax seal that breaks and the flap opens; a ring box
+whose lid lifts (our Olive Ring Box); curtains or doors that part; a scroll that unrolls; a gate with ornaments that
+swing open; petals or confetti falling as the card rises; a painted cover that dissolves into the scene (our Zaxo Watercolor).
+
+**What to deliver for it**
+1. **Storyboard frames** `02-opening-a`, `-b`, `-c` (start, middle, end) at 390 × 844.
+2. **Each moving piece as its own layer** (Step 6): e.g. `seal.webp`, `flap.webp`, `card.webp`, `glow.svg`.
+3. **Motion sheet rows** (Step 7) for every piece: trigger, what happens, duration, delay, feel.
+4. **A reference video** of the opening (screen recording, After Effects/Figma prototype export, or even a phone video of a paper mock-up).
+5. **The reduced-motion version** (usually "fade straight to the invitation").
+
+**How we build it** (for the developer or the AI)
+- **CSS animations** (`@keyframes` in the theme's CSS Module) on the separate layers: `transform` (move, scale, rotate, 3D flip)
+  and `opacity` only, so it stays smooth on cheap phones. This is how Olive Ring Box (3D lid, 3.2 s) and Zaxo Watercolor (cover fade + content rise) are built.
+- The tap handler calls `useMusic().start()` and switches the theme to its "opening" state, which starts the keyframes.
+- `useReducedMotion()` from the theme SDK: when true, skip the sequence and fade.
+- Optional for complex motion: a **Lottie** animation (JSON exported from After Effects) or a short **MP4/WebM** (≤ 300 KB, muted, plays inline) as one layer. Only npm UI libraries are allowed, and they count toward the size budget.
+- The automatic theme check taps "Open", confirms that an animation plays, that it ends within 4 s, and that with reduced motion the invitation shows within 1 s.
 
 ## Step 7 — The motion sheet (how things move)
 
@@ -248,6 +281,7 @@ theme-royal-garden/
 1. **Build.** The theme becomes one new folder in GitHub (`themes/royal-garden/v1`), written from your design by the developer (or by you, if you code it yourself). **No other theme or platform code is touched.**
 2. **Automatic checks** run every time that folder is pushed to GitHub, before anything can go live:
    - Every package state is rendered at 360 / 390 / 430 / 1280 px, in Arabic and English, with short and long names.
+   - The opening animation is tapped and checked (it plays, ends within 4 s, and is skipped with reduced motion).
    - Screenshots are produced for you to compare side by side with your frames.
    - Speed and size budgets, the print card, and the keepsake PDF are checked.
    - The theme is checked for breaking the rules (touching payments, the database, other themes or site-wide styles). If anything fails, it can't be merged.
@@ -264,6 +298,7 @@ theme-royal-garden/
 - [ ] Every scene designed at 390 px, with short and long names, Arabic + one English
 - [ ] Every lower-package state designed
 - [ ] Every moving part exported as its own file, named correctly, no text baked in
+- [ ] **Opening animation:** cover frame, storyboard (start / middle / end), layers, reference video, 1.5–3.5 s
 - [ ] Motion sheet filled in, with reference videos
 - [ ] Reduced-motion behaviour stated
 - [ ] Song (MP3) + music button design

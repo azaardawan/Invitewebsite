@@ -1,5 +1,9 @@
 # Handing a Theme to Another AI
 
+> The complete partner instructions (conditions, opening animation, person and AI workflows, and the
+> up-to-date prompt) are in **`docs/themes/PARTNER_THEME_PACK.md`**. Use the prompt there; this page
+> explains why an AI needs repository access.
+
 `docs/THEME_GUIDE.md` is a **design brief**: it tells a designer (or an AI) what to make. On its own it
 is not enough for an AI to produce a theme that plugs into Bahja, because the theme must also follow
 the code contract and pass the automatic checks. This page lists what the other AI needs and gives a
@@ -14,7 +18,7 @@ prompt you can paste.
 | `docs/THEME_GUIDE.md` | Your conditions and the design steps. |
 | `docs/THEME_CONTRACT.md` | The code contract: folder, manifest, props, allowed imports, print companions. |
 | `src/theme-sdk/types.ts`, `src/theme-sdk/print.ts` | The exact props and labels the theme receives. |
-| `themes/olive-ring-box/v1/` | A complete working example (opening, music, countdown, map, guest form, guest messages, card, keepsake). |
+| `themes/olive-ring-box/v1/`, `themes/zaxo-watercolor/v1/` | Complete working examples (opening animation, music, countdown, map, guest form, guest messages, card, keepsake). |
 | Your design files | Layers, fonts, music, motion notes, in a folder inside the repo (for example `docs/themes/<key>/`). |
 
 If you can only give it the files (no repository access), give it **all** of the files above and
@@ -45,8 +49,8 @@ should be there, or features that should not be.
 > 4. Follow the contract exactly: `manifest.ts` with `defineTheme` and the `validStates` from my brief;
 >    `Theme.tsx` as a `'use client'` default export taking `ThemeProps`; CSS Modules only; import only
 >    `@/theme-sdk` and `@/catalog`; all visible text from `labels` or the invitation `fields` (never
->    hard-coded words, in any language); honor `useReducedMotion()`; start music only from the
->    "open" tap with `useMusic().start()`; use `GuestFormSlot` for the guest form; render `guestbook`
+>    hard-coded words, in any language); **an opening animation** after the "open" tap (1.5–3.5 s,
+>    done within 4 s) that also starts music with `useMusic().start()`; honor `useReducedMotion()`; use `GuestFormSlot` for the guest form; render `guestbook`
 >    under the invitation when it is not null (`labels.guestbookTitle`, `labels.guestbookEmpty`);
 >    add `print/Card.tsx` (A5 + 3 mm bleed) and `print/Keepsake.tsx` (A4) when the manifest lists
 >    `print_card` / `keepsake_pdf`.

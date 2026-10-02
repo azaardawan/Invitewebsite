@@ -56,6 +56,14 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
 | `formatNumber(n, locale)` | Arabic-Indic digits for Arabic/Kurdish |
 
+## 4A. Opening animation (required for sellable themes)
+
+Every non-internal theme starts on a cover with a button labelled `labels.openInvitation`. Its click handler
+calls `useMusic().start()` and plays the opening animation (CSS `@keyframes`/transitions on `transform` and
+`opacity`; optionally a Lottie or a small muted inline video layer). The opening finishes within **4 s**
+(looping idle effects are allowed). When `useReducedMotion()` is true, the cover fades and the invitation is
+visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
+
 ## 5. Rules (enforced)
 
 | Rule | Enforced by |
@@ -65,6 +73,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | CSS Modules only; no `:global`, `:root`, `html`, `body` | Registry generator (fails dev/build/CI) |
 | Renders every designed state at 360/390/430/1280 px in all 4 languages with short and long names, with no errors and no sideways scrolling | `e2e/themes.spec.ts` (fails CI; saves screenshots) |
 | Features absent from a package are really absent (map, guest form) | `e2e/themes.spec.ts` |
+| Opens with an animation after tapping "Open", finished within 4 s; reduced motion shows the invitation within 1 s | `e2e/themes.spec.ts` |
 | Loads no platform styles and no other theme's code or styles | `e2e/themes.spec.ts` + per-theme lazy loading |
 | A crash only affects that invitation | Platform error boundary |
 | The PREVIEW/SAMPLE label can't be removed | Rendered by the platform outside the theme |
