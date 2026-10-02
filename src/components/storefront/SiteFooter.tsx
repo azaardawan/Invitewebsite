@@ -7,13 +7,14 @@ import { socialLinks, whatsappHref, type ContactInfo } from '@/lib/contact-links
 export async function SiteFooter({ contact }: { contact: ContactInfo }) {
   const t = await getTranslations('footer');
   const nav = await getTranslations('nav');
+  const common = await getTranslations('common');
   const locale = await getLocale();
   const social = socialLinks(contact);
   return (
     <footer className="mt-28 bg-heading text-[#eed9d1] lg:mt-40">
       <div className="mx-auto grid max-w-[1440px] gap-10 px-6 py-14 text-center lg:grid-cols-3 lg:px-[110px] lg:text-start">
         <div className="flex flex-col items-center gap-2 lg:items-start">
-          <span className="font-display text-[40px] leading-none">بهجه</span>
+          <span className="font-display text-[40px] leading-none">{common('brand')}</span>
           <p className="text-sm opacity-80">{t('tagline')}</p>
         </div>
         <nav aria-label={nav('menu')} className="flex flex-col items-center gap-2 text-sm lg:items-start">

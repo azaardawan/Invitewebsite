@@ -1,5 +1,8 @@
 # Kurdish translation review
 
+> **Everything still waiting for Kurdish is gathered and numbered in [`KURDISH_FULL_LIST.md`](./KURDISH_FULL_LIST.md)**
+> (policy texts in [`KURDISH_POLICIES.md`](./KURDISH_POLICIES.md)). The pending batches below are kept for history.
+
 **How to reply:** for each row, say **"approve"** or give your corrected wording (for Sorani, Badini,
 or both). Nothing in the "Suggested" columns is live until you approve it; until then the Kurdish
 pages show the Arabic text.
