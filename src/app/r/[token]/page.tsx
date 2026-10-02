@@ -11,7 +11,7 @@ import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/servic
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
-import { payAction } from './actions';
+import { guestbookAction, payAction } from './actions';
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
@@ -148,6 +148,37 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           >
             {t('printCardDownload')}
           </a>
+        </section>
+      ) : null}
+
+      {paid && r.invitation.hasMessages ? (
+        <section id="guestbook" className="mt-8 space-y-3 print:hidden">
+          <h2 className="font-semibold">{t('guestbookTitle')}</h2>
+          <p className="text-sm text-muted">{t('guestbookHelp')}</p>
+          <form action={guestbookAction} className="flex flex-col gap-3">
+            <input type="hidden" name="token" value={token} />
+            <fieldset className="flex flex-col gap-2 text-sm">
+              <legend className="sr-only">{t('guestbookTitle')}</legend>
+              <label className="flex items-start gap-3">
+                <input type="radio" name="visibility" value="private" defaultChecked={!r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
+                <span>{t('guestbookPrivate')}</span>
+              </label>
+              <label className="flex items-start gap-3">
+                <input type="radio" name="visibility" value="public" defaultChecked={r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
+                <span>{t('guestbookPublic')}</span>
+              </label>
+            </fieldset>
+            <div className="flex items-center gap-3">
+              <button type="submit" className="inline-flex h-11 items-center justify-center rounded-full border border-accent px-6 text-sm font-semibold text-accent">
+                {t('guestbookSave')}
+              </button>
+              {sp.guestbook === 'saved' ? (
+                <span role="status" className="text-sm text-muted">
+                  {t('guestbookSaved')}
+                </span>
+              ) : null}
+            </div>
+          </form>
         </section>
       ) : null}
 

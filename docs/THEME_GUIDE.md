@@ -23,24 +23,25 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 8. The complete design is the top package (VVIP). **Every lower package state is designed too**, showing what the screen looks like without the removed parts.
 9. **Every Wedding package includes the printable card.**
 10. Guest form (if included): name + "attending / not attending", plus a **required** message in packages with messages. Design the empty, error, sending and thank-you states.
+11. **Public guest messages** (packages with messages): the customer can choose to show all messages **under the invitation** for everyone with the link. Design that list (title, each message with the guest's name, long messages, "be the first" empty state, 1 and 50 messages). When the customer keeps them private, the list is simply absent.
 
 **Motion and media**
-11. Everything that moves is **its own layer**: WebP for pictures (2× size, about ≤ 150 KB each, background ≤ 250 KB), SVG for simple shapes.
-12. A **motion sheet** (what moves, when, how long) with reference videos.
-13. A **reduced-motion version**: what people see if their phone asks for less animation.
-14. One **MP3 song** (128–192 kbps, 1–3 min). It loops, so trim it so the end flows into the start.
+12. Everything that moves is **its own layer**: WebP for pictures (2× size, about ≤ 150 KB each, background ≤ 250 KB), SVG for simple shapes.
+13. A **motion sheet** (what moves, when, how long) with reference videos.
+14. A **reduced-motion version**: what people see if their phone asks for less animation.
+15. One **MP3 song** (128–192 kbps, 1–3 min). It loops, so trim it so the end flows into the start.
 
 **Readability and speed**
-15. Text must be readable: contrast at least **4.5 : 1** for normal text (3 : 1 for big headings). Tap targets at least **44 × 44 px**.
-16. Keep it light: the whole invitation (images + fonts) **about 1.5 MB at most**, with the first screen under ~500 KB. It must open quickly on slow 4G.
-17. Fonts must show **Kurdish letters ڕ ۆ ێ ڵ ە ڤ ک گ پ چ ژ**, be licensed for **web and PDF**, and use at most **2 families and 3–4 weights**. Google Fonts are safe.
+16. Text must be readable: contrast at least **4.5 : 1** for normal text (3 : 1 for big headings). Tap targets at least **44 × 44 px**.
+17. Keep it light: the whole invitation (images + fonts) **about 1.5 MB at most**, with the first screen under ~500 KB. It must open quickly on slow 4G.
+18. Fonts must show **Kurdish letters ڕ ۆ ێ ڵ ە ڤ ک گ پ چ ژ**, be licensed for **web and PDF**, and use at most **2 families and 3–4 weights**. Google Fonts are safe.
 
 **Print**
-18. **Printable card:** A5 portrait. Design it at **154 × 216 mm** (A5 + 3 mm bleed on every side); the customer's PDF is cut to exactly **148 × 210 mm**. Keep all text and important art **at least 5 mm inside** the A5 edge. 300 dpi artwork. Leave space for the **QR code** (about 25 mm) and **one extra line** of text the team may add, and make sure it still looks right **without the message** and **without the QR**.
-19. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. The cover page has **no margin** (design the full 210 × 297 mm). Message pages have 18 / 16 / 20 mm margins, and the site adds the **page number at the bottom centre**, so keep that clear. Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+19. **Printable card:** A5 portrait. Design it at **154 × 216 mm** (A5 + 3 mm bleed on every side); the customer's PDF is cut to exactly **148 × 210 mm**. Keep all text and important art **at least 5 mm inside** the A5 edge. 300 dpi artwork. Leave space for the **QR code** (about 25 mm) and **one extra line** of text the team may add, and make sure it still looks right **without the message** and **without the QR**.
+20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. The cover page has **no margin** (design the full 210 × 297 mm). Message pages have 18 / 16 / 20 mm margins, and the site adds the **page number at the bottom centre**, so keep that clear. Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
 
 **Delivery**
-20. One folder in the structure of Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
+21. One folder in the structure of Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
 
 
 You deliver **one folder per theme** (see Step 12). A blank brief to fill in is at `docs/themes/THEME_BRIEF_TEMPLATE.md`.
@@ -266,6 +267,7 @@ theme-royal-garden/
 - [ ] Song (MP3) + music button design
 - [ ] Fonts tested with ڕ ۆ ێ ڵ ە ڤ + license confirmed
 - [ ] Guest form states (if included)
+- [ ] Public guest messages list: title, long message, empty state, 1 and 50 messages (if messages included)
 - [ ] Printable card: A5 + 3 mm bleed, 5 mm safe area, 300 dpi, QR + extra-line positions, works without message/QR
 - [ ] Keepsake PDF: full-bleed cover, message pages (margins, page number clear), 0 / 3 / 200 messages
 - [ ] Text contrast and tap sizes checked; total size about ≤ 1.5 MB

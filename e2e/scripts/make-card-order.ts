@@ -14,6 +14,7 @@ import { storeAudio, storeImage } from '../../src/server/media/assets';
 import { createDraft } from '../../src/server/orders/drafts';
 import { createOrder } from '../../src/server/orders/checkout';
 import { markOrderPaid } from '../../src/server/orders/payment';
+import { getReceipt } from '../../src/server/orders/receipt';
 import { randomToken } from '../../src/lib/crypto';
 
 function mp3(seconds: number) {
@@ -46,14 +47,33 @@ try {
     if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
     await transitionTheme(db(), t.id, 'ACTIVE', actor);
   }
-  const packageId = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE')!.id;
+  // WITH_MESSAGES=1: the complete (VVIP) package, which has the guest form and congratulation messages.
+  const allFields = ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name', 'venue_map_url', 'invitation_message'] as const;
+  let packageId = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE')!.id;
+  if (process.env.WITH_MESSAGES === '1') {
+    const vvip =
+      (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.featureKeys.includes('congratulations')) ??
+      (await createPackage(
+        db(),
+        t.id,
+        {
+          name: { ar: 'مميز جداً', en: 'VVIP' },
+          priceIqd: 60000,
+          fieldKeys: [...allFields],
+          featureKeys: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card'],
+        },
+        actor,
+      ));
+    packageId = vvip.id;
+  }
   const date = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
-  const values = { invitation_message: 'بكل الحب ندعوكم لمشاركتنا فرحتنا', person_1_name: 'علي', person_2_name: 'نور', event_date: date, event_time: '19:30', venue_name: 'قاعة الياسمين' };
+  const values = { venue_map_url: 'https://maps.google.com/?q=Baghdad', invitation_message: 'بكل الحب ندعوكم لمشاركتنا فرحتنا', person_1_name: 'علي', person_2_name: 'نور', event_date: date, event_time: '19:30', venue_name: 'قاعة الياسمين' };
   const ctx = { ipHash: randomToken(8), userAgent: 'e2e' };
   const d = await createDraft(db(), { themeKey: 'olive-ring-box', packageId, locale: 'ar', values }, ctx);
   const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'e2e@bahja.test' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, ctx);
   await markOrderPaid(db(), o.orderId, { kind: 'WAYL' });
-  console.log(JSON.stringify({ receiptToken: o.receiptToken }));
+  const paid = await getReceipt(db(), o.receiptToken);
+  console.log(JSON.stringify({ receiptToken: o.receiptToken, path: paid?.invitation.path }));
 } finally {
   await closeDb();
 }

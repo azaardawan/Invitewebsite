@@ -161,6 +161,28 @@ export default function OliveRingBox(props: ThemeProps) {
           </Reveal>
         )}
 
+        {props.guestbook ? (
+          <Reveal className={s.guestbook}>
+            <h2 className={s.formTitle}>{labels.guestbookTitle}</h2>
+            {props.guestbook.length === 0 ? (
+              <p className={s.guestbookEmpty}>{labels.guestbookEmpty}</p>
+            ) : (
+              <ul className={s.guestbookList}>
+                {props.guestbook.map((m, i) => (
+                  <li key={i} className={s.guestbookItem}>
+                    <p className={s.guestbookMessage} dir="auto">
+                      {m.message}
+                    </p>
+                    <p className={s.guestbookName} dir="auto">
+                      — {m.guestName}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Reveal>
+        ) : null}
+
         <Reveal as="footer" className={s.closing}>
           <span className={s.sprig} aria-hidden="true" />
           <p className={s.closingTitle}>{t.closing}</p>

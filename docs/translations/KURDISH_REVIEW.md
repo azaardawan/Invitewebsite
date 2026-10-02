@@ -333,3 +333,25 @@ Admin → Legal policies (Kurdish fields are optional there and fall back to Ara
 | `store.askTheme` | لديك سؤال عن هذا التصميم؟ | Have a question about this design? | | | AWAITING |
 | `store.askThemeLink` | اسألنا على واتساب | Ask us on WhatsApp | | | AWAITING |
 | `store.askThemeText` | مرحباً بهجه، لدي سؤال عن دعوة «{theme}»: {url} | Hello Bahja, I have a question about the “{theme}” invitation: {url} | | | AWAITING |
+
+## Batch 13 — public guest messages (AWAITING WORDING)
+
+Shown under the invitation when the customer makes messages public, the sample messages in theme
+previews, and the choice on the customer's receipt.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `invitation.guestbookTitle` | رسائل الضيوف | Messages from our guests | | | AWAITING |
+| `invitation.guestbookEmpty` | كن أول من يكتب تهنئة. | Be the first to write a congratulation. | | | AWAITING |
+| `invitationSamples.m1Name` | سارة | Sara | | | AWAITING |
+| `invitationSamples.m1Text` | ألف مبروك! نتمنى لكما حياة مليئة بالحب والسعادة. | Congratulations! Wishing you a lifetime of love and happiness. | | | AWAITING |
+| `invitationSamples.m2Name` | أحمد | Ahmed | | | AWAITING |
+| `invitationSamples.m2Text` | مبارك لكما، الله يتمم عليكما بخير ويجعل بيتكما عامراً بالفرح. | Mabrook to you both, may your home be full of joy. | | | AWAITING |
+| `invitationSamples.m3Name` | ليلى | Laila | | | AWAITING |
+| `invitationSamples.m3Text` | فرحانة جداً لكم، نشوفكم بالحفلة! | So happy for you. See you at the celebration! | | | AWAITING |
+| `receipt.guestbookTitle` | رسائل الضيوف | Guest messages | | | AWAITING |
+| `receipt.guestbookHelp` | اختر من يرى رسائل التهنئة التي يكتبها ضيوفكم. في الحالتين تُجمع كلها في ملف الذكرى. | Choose who sees the congratulation messages your guests write. Either way, they are all collected in your keepsake PDF. | | | AWAITING |
+| `receipt.guestbookPrivate` | أنا فقط (في ملف الذكرى) | Only me (in the keepsake PDF) | | | AWAITING |
+| `receipt.guestbookPublic` | كل من لديه رابط الدعوة (تظهر تحت الدعوة) | Everyone with the invitation link (shown under the invitation) | | | AWAITING |
+| `receipt.guestbookSave` | حفظ الاختيار | Save choice | | | AWAITING |
+| `receipt.guestbookSaved` | تم الحفظ. | Saved. | | | AWAITING |

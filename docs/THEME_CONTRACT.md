@@ -44,6 +44,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `event.startsAt` / `event.date` / `event.time` | Countdown target (Baghdad time) and localized date/time parts |
 | `mapUrl` | A safe map link or null |
 | `music` | `{ src }` or null |
+| `guestbook` | Guest messages to show **under the invitation**, newest first (`{ guestName, message }[]`, possibly empty) when the customer made them public; `null` when they stay private (keepsake only) or the package has no messages. Render nothing when null; show `labels.guestbookEmpty` when empty. Samples are filled in previews. |
 
 ## 4. What the theme may use: `@/theme-sdk`
 

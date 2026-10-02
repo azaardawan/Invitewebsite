@@ -1,7 +1,7 @@
 import 'server-only';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, isNotNull } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { assets, invitations, musicTracks, themeVersions } from '@/server/db/schema';
+import { assets, guestResponses, invitations, musicTracks, themeVersions } from '@/server/db/schema';
 import { publicMediaUrl } from '@/server/storage';
 import type { InvitationMode } from '@/theme-sdk/types';
 import { buildThemeProps } from './theme-props';
@@ -27,6 +27,19 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       features: inv.featureKeys,
       values: inv.fieldValues,
       musicSrc: music ? publicMediaUrl(music.key) : null,
+      guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
     }),
   };
 }
+
+/** Visible guest messages for the public list under the invitation, newest first (hidden ones never appear). */
+export async function publicGuestbook(db: DbOrTx, invitationId: string) {
+  const rows = await db
+    .select({ guestName: guestResponses.guestName, message: guestResponses.message })
+    .from(guestResponses)
+    .where(and(eq(guestResponses.invitationId, invitationId), eq(guestResponses.messageStatus, 'VISIBLE'), isNotNull(guestResponses.message)))
+    .orderBy(desc(guestResponses.createdAt), desc(guestResponses.id))
+    .limit(500);
+  return rows.map((r) => ({ guestName: r.guestName, message: r.message! }));
+}
+

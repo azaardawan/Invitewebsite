@@ -47,6 +47,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
       keepsakeReady: keepsakeReady(row.invitation, now),
+      hasMessages: row.invitation.featureKeys.includes('congratulations'),
+      publicGuestbook: row.invitation.publicGuestbook,
       status: row.invitation.status,
       live: isLive(row.invitation, now),
       publishedAt: row.invitation.publishedAt,

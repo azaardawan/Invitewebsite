@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   bigint,
+  boolean,
   bigserial,
   check,
   index,
@@ -83,6 +84,8 @@ export const invitations = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
+    /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
+    publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */
     cardCustomKey: text('card_custom_key'),
     /** Optimistic locking for concurrent admin edits. */

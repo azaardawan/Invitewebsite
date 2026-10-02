@@ -33,7 +33,14 @@ export type ThemeLabels = {
   errorRequired: string;
   errorTooLong: string;
   errorGeneric: string;
+  /** Heading of the public guest messages list. */
+  guestbookTitle: string;
+  /** Shown when the public list is on but nobody has written yet. */
+  guestbookEmpty: string;
 };
+
+/** One guest message shown under the invitation (only when the customer made them public). */
+export type GuestbookMessage = { guestName: string; message: string };
 
 export type EventDateParts = {
   /** e.g. "الخميس، ١٢ تشرين الثاني ٢٠٢٦" — already localized. */
@@ -71,6 +78,12 @@ export type ThemeProps = {
   mapUrl: string | null;
   /** Assigned song; null when the package has no music or none is assigned. */
   music: { src: string } | null;
+  /**
+   * Guest messages to show under the invitation, newest first: an array (possibly empty) when the
+   * customer chose to show them to everyone; null when they stay private (keepsake only) or the
+   * package has no messages. Render nothing when null.
+   */
+  guestbook: GuestbookMessage[] | null;
 };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;

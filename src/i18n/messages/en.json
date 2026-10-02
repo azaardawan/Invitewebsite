@@ -631,7 +631,11 @@
         "reason": "Please write a reason (5–500 characters).",
         "days": "Choose between 1 and 365 days.",
         "music": "Choose an active song."
-      }
+      },
+      "guestbookPublicOn": "Guest messages are shown under the invitation (the customer's choice).",
+      "guestbookPublicOff": "Guest messages are private (keepsake only).",
+      "guestbookMakePublic": "Show messages under the invitation",
+      "guestbookMakePrivate": "Make messages private"
     },
     "legal": {
       "heading": "Legal policies",
@@ -782,7 +786,9 @@
       "scanToOpen": "Scan to open the invitation",
       "keepsakeTitle": "Messages of love",
       "keepsakeEmpty": "No messages yet."
-    }
+    },
+    "guestbookTitle": "Messages from our guests",
+    "guestbookEmpty": "Be the first to write a congratulation."
   },
   "invitationSamples": {
     "short": {
@@ -798,7 +804,13 @@
       "family_names": "The families of Abdulrahman Al-Husseini and Mohammed Al-Karkhi",
       "venue_name": "The Princesses' Palace Grand Events Hall",
       "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times."
-    }
+    },
+    "m1Name": "Sara",
+    "m1Text": "Congratulations! Wishing you a lifetime of love and happiness.",
+    "m2Name": "Ahmed",
+    "m2Text": "Mabrook to you both, may your home be full of joy.",
+    "m3Name": "Laila",
+    "m3Text": "So happy for you. See you at the celebration!"
   },
   "receipt": {
     "title": "Order receipt",
@@ -855,7 +867,13 @@
     "keepsakeHelp": "Every message your guests wrote, gathered in a PDF in the design of your invitation.",
     "keepsakeDownload": "Download keepsake (PDF)",
     "waCardMessage": "Hello {name}, here is your printable invitation card from Bahja (PDF): {url}",
-    "waKeepsakeMessage": "Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url}"
+    "waKeepsakeMessage": "Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url}",
+    "guestbookTitle": "Guest messages",
+    "guestbookHelp": "Choose who sees the congratulation messages your guests write. Either way, they are all collected in your keepsake PDF.",
+    "guestbookPrivate": "Only me (in the keepsake PDF)",
+    "guestbookPublic": "Everyone with the invitation link (shown under the invitation)",
+    "guestbookSave": "Save choice",
+    "guestbookSaved": "Saved."
   },
   "nav": {
     "home": "Home",

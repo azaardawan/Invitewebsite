@@ -13,6 +13,7 @@ import {
   updateInvitationValues,
 } from '@/server/invitation/admin';
 import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
+import { setPublicGuestbook } from '@/server/guests/guestbook';
 import { DocumentError, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
 import type { ActionState } from './state';
 
@@ -133,6 +134,15 @@ export async function removeCustomCardAction(_: ActionState, form: FormData): Pr
   const id = uuid.safeParse(form.get('id'));
   if (!id.success) return { error: 'invitations.errors.notFound' };
   await removeCustomCard(db(), id.data, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function guestbookVisibilityAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  await setPublicGuestbook(db(), id.data, form.get('public') === 'true', { type: 'ADMIN', adminId: user.id, ipHash: (await requestContext()).ipHash });
   revalidatePath(`/admin/invitations/${id.data}`);
   return { ok: true, message: 'invitations.saved', nonce: Date.now() };
 }

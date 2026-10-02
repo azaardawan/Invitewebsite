@@ -11,6 +11,7 @@ export type {
   EventDateParts,
   GuestAttendance,
   GuestResponseInput,
+  GuestbookMessage,
 } from './types';
 export { hasFeature, formatNumber } from './types';
 export type { PrintCardProps, KeepsakeProps, KeepsakeMessage, PrintLabels } from './print';

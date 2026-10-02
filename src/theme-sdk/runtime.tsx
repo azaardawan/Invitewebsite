@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationMode, type ThemeLabels } from './types';
 
 type RuntimeValue = {
@@ -278,6 +279,7 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
   const [fieldErrors, setFieldErrors] = useState<GuestFormApi['fieldErrors']>({});
   const [error, setError] = useState<string | null>(null);
   const isPreview = mode !== 'live';
+  const router = useRouter();
   const [bot] = useState(() => new TurnstileHandle());
   const botKey = isPreview ? null : (guest.turnstileSiteKey ?? null);
 
@@ -308,13 +310,17 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
       const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined }, captcha).catch(
         () => ({ ok: false, error: 'failed' }) as const,
       );
-      if (result.ok) setStatus('sent');
+      if (result.ok) {
+        setStatus('sent');
+        // Re-render the invitation so a public guest messages list shows the new message.
+        router.refresh();
+      }
       else {
         setStatus('error');
         setError(labels.errorGeneric);
       }
     },
-    [guest, labels, isPreview, bot, botKey],
+    [guest, labels, isPreview, bot, botKey, router],
   );
 
   if (!guest.enabled) return null;

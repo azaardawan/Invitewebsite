@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "public_guestbook" boolean DEFAULT false NOT NULL;
