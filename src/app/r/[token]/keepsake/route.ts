@@ -4,6 +4,7 @@ import { clientIpFrom, hashIp } from '@/server/auth/request-context';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { getReceipt } from '@/server/orders/receipt';
 import { DocumentError, ensureDocument } from '@/server/documents/documents';
+import { trackEvent } from '@/server/analytics/events';
 
 /** Rendering a PDF costs a few seconds of Chromium; cap it per visitor. */
 const DOWNLOADS_PER_HOUR = 20;
@@ -19,6 +20,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/ke
   }
   try {
     const { pdf, fileName } = await ensureDocument(db(), r.invitation.id, 'keepsake');
+    await trackEvent(db(), { name: 'keepsake_download', invitationId: r.invitation.id, orderId: r.orderId });
     return new Response(new Uint8Array(pdf), {
       headers: {
         'Content-Type': 'application/pdf',

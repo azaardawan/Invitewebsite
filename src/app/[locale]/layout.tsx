@@ -11,6 +11,7 @@ import { routing } from '@/i18n/routing';
 import { SiteHeader } from '@/components/storefront/SiteHeader';
 import { SiteFooter } from '@/components/storefront/SiteFooter';
 import { publicContact } from '@/server/settings/public';
+import { PageViewBeacon } from '@/components/analytics/Beacon';
 
 // Only the four known locales exist; anything else (e.g. `/favicon.ico`) is a 404.
 export const dynamicParams = false;
@@ -52,6 +53,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             {children}
           </main>
           <SiteFooter contact={contact} />
+          <PageViewBeacon locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>

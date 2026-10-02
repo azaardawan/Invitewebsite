@@ -92,6 +92,13 @@
       "when": 1790866347462,
       "tag": "0012_legal_published_immutable",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790939686326,
+      "tag": "0013_analytics_events",
+      "breakpoints": true
     }
   ]
 }

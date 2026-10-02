@@ -1,7 +1,7 @@
 import 'server-only';
 import { and, eq, inArray, isNotNull, lt, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { generatedDocuments, guestResponses, invitations } from '@/server/db/schema';
+import { analyticsEvents, generatedDocuments, guestResponses, invitations } from '@/server/db/schema';
 import { pruneRateLimits } from '@/server/rate-limit';
 import { storage } from '@/server/storage';
 import { ensureDocument } from '@/server/documents/documents';
@@ -14,6 +14,7 @@ const DAY = 86_400_000;
  * Daily cleanup, safe to run any number of times:
  * - prepares the keepsake of invitations that ended in the last 7 days (so it is ready to download);
  * - deletes guest replies and keepsake PDFs 12 months after an invitation ended;
+ * - deletes raw analytics events older than 13 months;
  * - drops old rate-limit counters.
  */
 export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prepareKeepsakes?: boolean } = {}) {
@@ -63,6 +64,12 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
     }
   }
 
+  // Raw analytics events are kept 13 months.
+  const analytics = await db
+    .delete(analyticsEvents)
+    .where(lt(analyticsEvents.occurredAt, new Date(now.getTime() - 396 * DAY)))
+    .returning({ id: analyticsEvents.id });
+
   await pruneRateLimits(db, now);
-  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared };
+  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length };
 }

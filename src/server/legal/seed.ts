@@ -78,6 +78,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 
 ## الكوكيز
 - نستخدم ملفات ضرورية فقط: لتذكّر لغة الموقع، ولربط رد الضيف بجهازه حتى يتمكن من تصحيحه، ولتسجيل دخول فريق العمل. لا نستخدم كوكيز إعلانية.
+- نحسب الزيارات بشكل مجهول الهوية عبر رقم عشوائي يُحفظ في المتصفح طوال الجلسة فقط، دون أي معلومات شخصية.
 
 ## لماذا نستخدمها
 - لتنفيذ طلبك ونشر دعوتك وإرسال ملفاتها إليك، وللتواصل معك بخصوص الطلب، ولحماية الموقع.
@@ -100,6 +101,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 
 ## Cookies
 - We use only essential cookies: to remember the site language, to link a guest's reply to their device so they can correct it, and to keep our team signed in. We use no advertising cookies.
+- We count visits anonymously with a random number kept in the browser for the current visit only, without any personal information.
 
 ## Why we use it
 - To fulfil your order, publish your invitation and deliver its files, to contact you about your order, and to protect the site.

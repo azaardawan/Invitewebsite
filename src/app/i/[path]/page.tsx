@@ -14,6 +14,7 @@ import { isLocale } from '@/i18n/config';
 import { InvitationView } from '@/components/invitation/InvitationView';
 import { InvitationEnded } from '@/components/invitation/InvitationEnded';
 import { submitGuestAction } from './actions';
+import { InvitationOpenBeacon } from '@/components/analytics/Beacon';
 
 export async function generateMetadata({ params }: PageProps<'/i/[path]'>): Promise<Metadata> {
   const { path } = await params;
@@ -58,13 +59,16 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
   const { codeRef, props } = await invitationRenderData(db(), r.invitation, 'live');
   const msgs = invitationMessages(r.invitation.locale);
   return (
-    <InvitationView
-      codeRef={codeRef}
-      props={props}
-      ribbon={null}
-      errorText={{ message: msgs.renderError, retry: msgs.retry }}
-      submitGuestResponse={submitGuestAction.bind(null, r.invitation.id)}
-      turnstileSiteKey={env().TURNSTILE_SITE_KEY ?? null}
-    />
+    <>
+      <InvitationOpenBeacon publicId={r.invitation.publicId} locale={r.invitation.locale} />
+      <InvitationView
+        codeRef={codeRef}
+        props={props}
+        ribbon={null}
+        errorText={{ message: msgs.renderError, retry: msgs.retry }}
+        submitGuestResponse={submitGuestAction.bind(null, r.invitation.id)}
+        turnstileSiteKey={env().TURNSTILE_SITE_KEY ?? null}
+      />
+    </>
   );
 }

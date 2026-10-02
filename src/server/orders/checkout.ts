@@ -11,6 +11,7 @@ import { normalizePhone } from '@/lib/phone';
 import { orderNumber } from '@/lib/ids';
 import { OrderError, loadPurchasable, sameSet } from './common';
 import { acceptedVersions } from '@/server/legal/policies';
+import { trackEvent } from '@/server/analytics/events';
 import { findByPreviewToken } from './drafts';
 import { receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
@@ -134,6 +135,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       after: { orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: p.theme.key, package: p.pkg.id },
       ipHash: ctx.ipHash,
     });
+    await trackEvent(tx, { name: 'order_placed', locale: inv!.locale, themeId: p.theme.id, packageId: p.pkg.id, invitationId: inv!.id, orderId: order.id, occurredAt: now });
     return { orderId: order.id, orderNumber: order.orderNumber, receiptToken, amountIqd: order.amountIqd, reused: false };
   });
 }

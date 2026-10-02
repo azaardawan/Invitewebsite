@@ -118,7 +118,8 @@
       "settings": "Website settings",
       "orders": "Orders & invoices",
       "invitations": "Invitations",
-      "legal": "Legal policies"
+      "legal": "Legal policies",
+      "analytics": "Analytics"
     },
     "modules": {
       "sections": "Sections",
@@ -671,6 +672,49 @@
         "invalid": "Arabic and English texts are required (up to 30,000 characters each).",
         "noDraft": "There is no draft to publish."
       }
+    },
+    "analytics": {
+      "heading": "Analytics",
+      "intro": "Anonymous visits and the order funnel. Money figures come from paid orders.",
+      "period": "Period",
+      "lastDays": "Last {n} days",
+      "visitors": "Visitors",
+      "pageViews": "{n} page views",
+      "paidOrders": "Paid orders",
+      "conversion": "{pct} of visitors",
+      "revenue": "Revenue",
+      "invitationOpens": "Invitation opens",
+      "published": "{n} invitations published",
+      "guestReplies": "Guest replies",
+      "downloads": "PDF downloads",
+      "downloadsSplit": "{card} cards · {keepsake} keepsakes",
+      "dailyVisitors": "Visitors per day",
+      "dayTooltip": "{day}: {visitors} visitors, {paid} paid orders",
+      "showTable": "Show as table",
+      "day": "Day",
+      "funnel": "From visit to payment",
+      "funnelHelp": "How many visitors reach each step in this period.",
+      "steps": {
+        "visitors": "Visited the site",
+        "themeViews": "Viewed a theme",
+        "started": "Started an order",
+        "placed": "Placed an order",
+        "paid": "Paid"
+      },
+      "topThemes": "Themes",
+      "theme": "Theme",
+      "views": "Views",
+      "sources": "Where visitors come from",
+      "direct": "Direct / WhatsApp app / unknown",
+      "devices": {
+        "mobile": "Phone",
+        "tablet": "Tablet",
+        "desktop": "Computer"
+      },
+      "noData": "No data in this period yet.",
+      "privacyNote": "No IP addresses, names or phone numbers are stored for analytics. Raw events are kept 13 months.",
+      "dashboardTitle": "Last 7 days",
+      "dashboardMore": "Open analytics"
     }
   },
   "invitation": {

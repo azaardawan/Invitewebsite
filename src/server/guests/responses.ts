@@ -6,6 +6,7 @@ import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { isLive } from '@/server/orders/payment';
+import { trackEvent } from '@/server/analytics/events';
 import { sha256 } from '@/lib/crypto';
 import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult } from '@/theme-sdk/types';
 
@@ -80,6 +81,7 @@ export async function submitGuestResponse(
       // A corrected message is visible again only if it wasn't hidden by the team.
       set: { guestName: values.guestName, attendance: values.attendance, message: values.message, ipHash: values.ipHash, updatedAt: now },
     });
+  await trackEvent(db, { name: 'guest_reply', invitationId: inv.id, occurredAt: now });
   return { ok: true };
 }
 
