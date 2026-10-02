@@ -17,6 +17,9 @@ import { markOrderPaid } from '../../src/server/orders/payment';
 import { getReceipt } from '../../src/server/orders/receipt';
 import { randomToken } from '../../src/lib/crypto';
 
+/** THEME_KEY picks the theme (default: Olive Ring Box). */
+const THEME = process.env.THEME_KEY ?? 'olive-ring-box';
+
 function mp3(seconds: number) {
   const frame = Buffer.concat([Buffer.from([0xff, 0xfb, 0x90, 0x64]), Buffer.alloc(413)]);
   return Buffer.concat(Array.from({ length: Math.ceil((seconds * 44100) / 1152) }, () => frame));
@@ -24,8 +27,8 @@ function mp3(seconds: number) {
 
 try {
   const actor = { adminId: null, ipHash: null };
-  const [t] = await db().select().from(themes).where(eq(themes.key, 'olive-ring-box'));
-  if (!t) throw new Error('olive-ring-box not registered (run db:seed)');
+  const [t] = await db().select().from(themes).where(eq(themes.key, THEME));
+  if (!t) throw new Error(`${THEME} not registered (run db:seed)`);
   if (t.status !== 'ACTIVE') {
     const cover = await storeImage(db(), await sharp({ create: { width: 420, height: 600, channels: 3, background: '#f6e3d8' } }).png().toBuffer(), { uploadedBy: null });
     const audio = await storeAudio(db(), mp3(3.3), { uploadedBy: null });
@@ -69,11 +72,11 @@ try {
   const date = new Date(Date.now() + 30 * 86400_000).toISOString().slice(0, 10);
   const values = { venue_map_url: 'https://maps.google.com/?q=Baghdad', invitation_message: 'بكل الحب ندعوكم لمشاركتنا فرحتنا', person_1_name: 'علي', person_2_name: 'نور', event_date: date, event_time: '19:30', venue_name: 'قاعة الياسمين' };
   const ctx = { ipHash: randomToken(8), userAgent: 'e2e' };
-  const d = await createDraft(db(), { themeKey: 'olive-ring-box', packageId, locale: 'ar', values }, ctx);
+  const d = await createDraft(db(), { themeKey: THEME, packageId, locale: 'ar', values }, ctx);
   const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'e2e@bahja.test' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, ctx);
   await markOrderPaid(db(), o.orderId, { kind: 'WAYL' });
   const paid = await getReceipt(db(), o.receiptToken);
-  console.log(JSON.stringify({ receiptToken: o.receiptToken, path: paid?.invitation.path }));
+  console.log(JSON.stringify({ receiptToken: o.receiptToken, path: paid?.invitation.path, invitationId: d.invitationId }));
 } finally {
   await closeDb();
 }

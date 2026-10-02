@@ -40,7 +40,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `locale`, `dir`, `lang` | Invitation language (independent of the website language) |
 | `fields` | Only the fields the package includes. Absent means don't render it. |
 | `features` | Only the features the package includes. Use `hasFeature(props, 'map')`. |
-| `labels` | Every UI string a theme may show. **Never hard-code text.** |
+| `labels` | Every UI string a theme may show, including `and` (the word between two names). **Never hard-code text**, not even "&". |
 | `event.startsAt` / `event.date` / `event.time` | Countdown target (Baghdad time) and localized date/time parts |
 | `mapUrl` | A safe map link or null |
 | `music` | `{ src }` or null |
@@ -77,7 +77,7 @@ Performance budgets (JS/image size) are reported during M11 hardening.
 animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/theme-sdk`:
 
 - `fields`, `event.date` / `event.time` (localized), `locale`, `dir`, `lang`;
-- `labels` (`date`, `time`, `venue`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
+- `labels` (`date`, `time`, `venue`, `and`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
 - the card gets `qrDataUrl` (null when `print.card.qr` is false or the team hid it) and `extraLine`
   (one line the team added, or null); the keepsake gets the visible
   `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`).

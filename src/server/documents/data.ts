@@ -40,7 +40,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
   const manifest = manifestByCodeRef(codeRef);
   const theme = buildThemeProps({ mode: 'live', locale: inv.locale, fieldKeys: inv.fieldKeys, features: inv.featureKeys, values: inv.fieldValues, musicSrc: null });
   const msgs = invitationMessages(inv.locale) as unknown as { print: PrintMessages };
-  const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, ...msgs.print };
+  const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...msgs.print };
   const base = { locale: theme.locale, dir: theme.dir, lang: theme.lang, fields: theme.fields, event: { date: theme.event.date, time: theme.event.time }, labels };
 
   if (kind === 'card' || kind === 'cardBleed') {

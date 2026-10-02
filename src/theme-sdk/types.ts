@@ -37,6 +37,8 @@ export type ThemeLabels = {
   guestbookTitle: string;
   /** Shown when the public list is on but nobody has written yet. */
   guestbookEmpty: string;
+  /** Word between two names ("و" / "&"), in the invitation's language. */
+  and: string;
 };
 
 /** One guest message shown under the invitation (only when the customer made them public). */

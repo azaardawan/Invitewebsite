@@ -15,6 +15,8 @@ export type PrintLabels = {
   date: string;
   time: string;
   venue: string;
+  /** Word between two names, in the invitation's language. */
+  and: string;
   /** Caption under the QR code. */
   scanToOpen: string;
   /** Keepsake title, e.g. "Messages of love". */
