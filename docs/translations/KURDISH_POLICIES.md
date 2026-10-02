@@ -1,4 +1,6 @@
-# Kurdish suggestions for the policy texts
+# Kurdish policy texts — ✅ APPROVED by the owner (2026-10-02)
+
+Seeded into the policy drafts (Admin → Legal policies); publishing a policy now requires all four languages.
 
 These are suggestions for the three policies (terms, privacy, refund), translated from the Arabic
 drafts in Admin → Legal policies. My confidence is **○** throughout: legal wording should be checked

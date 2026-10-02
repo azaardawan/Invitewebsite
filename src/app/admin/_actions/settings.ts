@@ -33,7 +33,12 @@ export async function paymentSettingsAction(_: ActionState, form: FormData): Pro
   const rawPhone = String(form.get('whatsapp') ?? '').trim();
   const whatsapp = rawPhone ? normalizePhone(rawPhone) : null;
   if (rawPhone && !whatsapp) return { error: 'settings.invalidWhatsapp' };
-  const instructions = optionalI18nContent(1000).safeParse(readI18n(form, 'manualInstructions'));
+  let instructions;
+  try {
+    instructions = optionalI18nContent(1000).safeParse(readI18n(form, 'manualInstructions'));
+  } catch (e) {
+    return catalogFailure(e);
+  }
   if (!instructions.success) return { error: 'catalog.errors.invalid' };
   try {
     await updatePaymentSettings(db(), { whatsapp, manualInstructions: instructions.data }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
@@ -52,8 +57,13 @@ export async function contactSettingsAction(_: ActionState, form: FormData): Pro
   const rawPhone = text('phone');
   const phone = rawPhone ? normalizePhone(rawPhone) : null;
   if (rawPhone && !phone) return { error: 'settings.invalidPhone' };
-  const address = optionalI18nContent(300).safeParse(readI18n(form, 'address'));
-  const hours = optionalI18nContent(200).safeParse(readI18n(form, 'hours'));
+  let address, hours;
+  try {
+    address = optionalI18nContent(300).safeParse(readI18n(form, 'address'));
+    hours = optionalI18nContent(200).safeParse(readI18n(form, 'hours'));
+  } catch (e) {
+    return catalogFailure(e);
+  }
   if (!address.success || !hours.success) return { error: 'catalog.errors.invalid' };
   try {
     await updateContactSettings(

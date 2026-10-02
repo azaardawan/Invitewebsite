@@ -59,6 +59,8 @@ export async function Occasions({ sections }: { sections: { key: string; name: I
 
 export async function HowItWorks() {
   const t = await getTranslations('home');
+  // Step numbers in the page's script: Arabic-Indic for Arabic and Kurdish, Western for English.
+  const stepNumber = new Intl.NumberFormat((await getLocale()) === 'en' ? 'en' : 'ar-IQ');
   const steps = [
     { title: t('step1Title'), body: t('step1Body'), tone: 'bg-accent text-[#f3e3d3]', icon: <path d="M4 3h11v15H4zM10 21h9V8" /> },
     { title: t('step2Title'), body: t('step2Body'), tone: 'bg-blush text-accent', icon: <path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4" /> },
@@ -78,7 +80,7 @@ export async function HowItWorks() {
               </span>
               <span className="flex flex-col gap-1.5 pt-1.5">
                 <span className="font-display text-2xl text-accent lg:text-[32px]">
-                  <span className="hidden lg:inline">{['١', '٢', '٣'][i]} · </span>
+                  <span className="hidden lg:inline">{stepNumber.format(i + 1)} · </span>
                   {s.title}
                 </span>
                 <span className="text-[15px] leading-[1.8] text-muted lg:max-w-[300px] lg:text-[17px]">{s.body}</span>

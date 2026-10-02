@@ -1,7 +1,8 @@
 # Kurdish translation review
 
-> **Everything still waiting for Kurdish is gathered and numbered in [`KURDISH_FULL_LIST.md`](./KURDISH_FULL_LIST.md)**
-> (policy texts in [`KURDISH_POLICIES.md`](./KURDISH_POLICIES.md)). The pending batches below are kept for history.
+> **2026-10-02: the owner approved every remaining row** in [`KURDISH_FULL_LIST.md`](./KURDISH_FULL_LIST.md) and the
+> policy texts in [`KURDISH_POLICIES.md`](./KURDISH_POLICIES.md). Rows below still marked PENDING/AWAITING are
+> history; they are all approved and live. New texts go through the same review before shipping.
 
 **How to reply:** for each row, say **"approve"** or give your corrected wording (for Sorani, Badini,
 or both). Nothing in the "Suggested" columns is live until you approve it; until then the Kurdish

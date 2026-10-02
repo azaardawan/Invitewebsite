@@ -3,13 +3,20 @@ import { ZodError } from 'zod';
 import { CatalogError } from '@/server/catalog/common';
 import type { ActionState } from './state';
 
-/** Reads `<prefix>.ar`, `.en`, `.ckb`, `.bdn` from a form. */
+/**
+ * Reads `<prefix>.ar`, `.en`, `.ckb`, `.bdn` from a form. A text is either
+ * left empty in every language or written in all four, so a visitor never sees
+ * another language after switching (owner rule).
+ */
 export function readI18n(form: FormData, prefix: string) {
   const get = (l: string) => {
     const v = form.get(`${prefix}.${l}`);
     return typeof v === 'string' ? v : '';
   };
-  return { ar: get('ar'), en: get('en'), ckb: get('ckb'), bdn: get('bdn') };
+  const value = { ar: get('ar'), en: get('en'), ckb: get('ckb'), bdn: get('bdn') };
+  const filled = Object.values(value).filter((v) => v.trim() !== '').length;
+  if (filled > 0 && filled < 4) throw new CatalogError('allLanguages');
+  return value;
 }
 
 export function readString(form: FormData, name: string): string | undefined {

@@ -99,10 +99,11 @@ export function Price({ iqd, className }: { iqd: number; className?: string }) {
   const [currency] = useDisplayCurrency();
   const rate = useUsdRate();
   const intlLocale = useIntlLocale();
+  const locale = useLocale();
   const showUsd = currency === 'USD' && rate !== null;
   return (
     <span className={className} title={showUsd ? t('usdApproxNote') : undefined}>
-      {formatDisplayPrice(iqd, showUsd ? 'USD' : 'IQD', rate, intlLocale)}
+      {formatDisplayPrice(iqd, showUsd ? 'USD' : 'IQD', rate, locale, intlLocale)}
     </span>
   );
 }

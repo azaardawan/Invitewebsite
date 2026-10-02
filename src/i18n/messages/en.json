@@ -186,7 +186,17 @@
       "roles": "Your roles: {roles}",
       "awaitingPayment": "{count, plural, =0 {No orders waiting for payment} one {# order waiting for payment} other {# orders waiting for payment}}",
       "liveInvitations": "{count, plural, =0 {No live invitations} one {# live invitation} other {# live invitations}}",
-      "viewOrders": "Open orders"
+      "viewOrders": "Open orders",
+      "missingKurdishTitle": "{count, plural, one {# text still needs Kurdish} other {# texts still need Kurdish}}",
+      "missingKurdishBody": "Kurdish visitors see these in Arabic until you add the Sorani and Badini wording.",
+      "missingKurdishKind": {
+        "theme": "Design",
+        "package": "Package",
+        "section": "Occasion",
+        "field": "Field label",
+        "contact": "Contact details (address or hours)",
+        "payment": "Payment instructions"
+      }
     },
     "users": {
       "heading": "Users & roles",
@@ -268,7 +278,8 @@
         "remove": "Remove",
         "active": "Active",
         "archived": "Archived",
-        "kurdishHint": "Kurdish fields are optional; if empty, visitors see the Arabic text.",
+        "kurdishHint": "Fill in all four languages so visitors never see another language after switching.",
+        "kurdishHintOptional": "Optional: leave all four empty, or fill in all four languages.",
         "optional": "optional",
         "order": "Order",
         "lang": {
@@ -443,7 +454,8 @@
         "audioTooLong": "The song is longer than 10 minutes.",
         "forbidden": "You don't have permission.",
         "unauthorized": "Your session ended; please sign in again.",
-        "uploadFailed": "Upload failed. Please try again."
+        "uploadFailed": "Upload failed. Please try again.",
+        "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty."
       },
       "preview": {
         "contents": "Preview contents",
@@ -653,7 +665,7 @@
       "draftTitle": "Draft — version {version}",
       "newDraftTitle": "New version",
       "markupHelp": "Formatting: start a line with “## ” for a heading, with “- ” for a list item; leave an empty line between paragraphs.",
-      "kurdishHelp": "Arabic and English are required. Kurdish is optional: empty Kurdish shows the Arabic.",
+      "kurdishHelp": "All four languages are needed to publish; drafts can be saved with any of them.",
       "lang": {
         "ar": "Arabic",
         "en": "English",
@@ -674,7 +686,8 @@
       "discarded": "Draft discarded.",
       "errors": {
         "invalid": "Arabic and English texts are required (up to 30,000 characters each).",
-        "noDraft": "There is no draft to publish."
+        "noDraft": "There is no draft to publish.",
+        "allLanguages": "Write the Sorani and Badini texts too before publishing, so every language has the policy."
       }
     },
     "analytics": {

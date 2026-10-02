@@ -1,8 +1,9 @@
 import { getTranslations } from 'next-intl/server';
-import { isLocale, localeMeta, type Locale } from '@/i18n/config';
+import { isLocale, type Locale } from '@/i18n/config';
 import { localized } from '@/server/catalog/common';
 import { env } from '@/server/env';
-import { formatIqd } from '@/lib/currency';
+import { formatIqdIn } from '@/lib/currency';
+import { formatLongDate } from '@/server/invitation/theme-props';
 import { ReceiptActions } from '@/components/receipt/ReceiptActions';
 import { ConfirmingPayment, PayButton } from '@/components/receipt/PaymentStatus';
 import { db } from '@/server/db/client';
@@ -36,8 +37,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       </main>
     );
   }
-  const intl = localeMeta[locale].intlLocale;
-  const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(d) : '—');
+  const date = (d: Date | null) => (d ? formatLongDate(d, locale) : '—');
   const url = r.invitation.path ? `${env().APP_URL}${r.invitation.path}` : null;
   const paid = r.status === 'PAID';
   const stillPayable = paymentWindowOpen(r);
@@ -46,7 +46,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // Manual collection has no time limit: the team confirms whenever the customer pays.
   const waitingManual = (r.status === 'PENDING' || r.status === 'AWAITING_PAYMENT') && !online;
   const { payment } = waitingManual ? await getSettings(db()) : { payment: null };
-  const waText = t('waMessage', { order: r.orderNumber, amount: formatIqd(r.amountIqd, intl) });
+  const waText = t('waMessage', { order: r.orderNumber, amount: formatIqdIn(r.amountIqd, locale) });
   const rows: [string, string][] = [
     [t('orderNumber'), r.orderNumber],
     ...(r.invoiceNumber ? ([[t('invoiceNumber'), r.invoiceNumber]] as [string, string][]) : []),
@@ -56,7 +56,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('email'), r.snapshot.customer.email],
     [t('theme'), localized(r.snapshot.theme.name, locale)],
     [t('package'), localized(r.snapshot.package.name, locale)],
-    [t('amount'), formatIqd(r.amountIqd, intl)],
+    [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
     ...(r.invitation.publishedAt ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
@@ -79,7 +79,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           {canPay ? (
             <form action={payAction} className="flex flex-col gap-2">
               <input type="hidden" name="token" value={token} />
-              <PayButton label={t('payNow', { amount: formatIqd(r.amountIqd, intl) })} pendingLabel={t('payOpening')} />
+              <PayButton label={t('payNow', { amount: formatIqdIn(r.amountIqd, locale) })} pendingLabel={t('payOpening')} />
               <p className="text-center text-xs text-muted">{t('payNote')}</p>
             </form>
           ) : (

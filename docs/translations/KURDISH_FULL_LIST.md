@@ -1,4 +1,7 @@
-# Kurdish: everything still to check (complete list)
+# Kurdish: complete list — ✅ APPROVED by the owner (2026-10-02)
+
+All rows below were approved as suggested and are live (site texts in `src/i18n/messages/{ckb,bdn}.json`,
+Olive Ring Box lines in its `copy.ts`, occasion and field names through `pnpm db:seed`).
 
 This file has **every piece of customer-facing text that still has no approved Kurdish**, in one place
 and numbered. When these are approved, the customer website, the invitations, the printable card,

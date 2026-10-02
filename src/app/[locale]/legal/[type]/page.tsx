@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { localized } from '@/lib/localized';
-import { localeMeta, type Locale } from '@/i18n/config';
+import type { Locale } from '@/i18n/config';
+import { formatLongDate } from '@/server/invitation/theme-props';
 import { db } from '@/server/db/client';
 import { currentPolicy, policyTypeFromSlug, type PolicyType } from '@/server/legal/policies';
 import { PageHeading } from '@/components/storefront/ThemeGrid';
@@ -27,7 +28,7 @@ export default async function LegalPage({ params }: PageProps<'/[locale]/legal/[
   const t = await getTranslations('legal');
   const f = await getTranslations('footer');
   const row = await currentPolicy(db(), policy);
-  const date = row?.publishedAt ? new Intl.DateTimeFormat(localeMeta[locale].intlLocale ?? 'ar-IQ', { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(row.publishedAt) : null;
+  const date = row?.publishedAt ? formatLongDate(row.publishedAt, locale) : null;
 
   return (
     <>

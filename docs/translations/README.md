@@ -18,6 +18,15 @@
 `pnpm i18n:check` reports how many keys are approved/pending per Kurdish dialect and fails CI if
 English and Arabic drift apart.
 
+## No text in another language (owner rule)
+After switching language, nothing stays in the previous language:
+- every site text has approved Sorani and Badini (`pnpm i18n:check` shows 100%);
+- texts the owner writes in Admin (design, package and occasion names, field labels, contact details) must
+  be filled in all four languages, or left empty in all four; policies can only be published with all four;
+- the Admin dashboard lists anything still missing Kurdish;
+- prices and dates follow the language (Kurdish writes «دینار»; Badini uses its own month names);
+- `e2e/languages.spec.ts` fails if a storefront page shows text from another language.
+
 ## Admin panel
 The admin panel is **Arabic and English only**. It is used by Bahja staff, not customers, so it
 doesn't create Kurdish translation work. `admin.*` keys are excluded from the Kurdish review.

@@ -37,6 +37,9 @@ test('owner configures a theme end to end: music → cover → package → revie
   await page.locator('input[type=file]').first().setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: cover });
   await expect(page.locator('img[src*="/media/images/"]')).toBeVisible();
   await page.getByLabel('الأغنية').selectOption({ label: 'أغنية تجريبية' });
+  // Every language is required, so Kurdish visitors never see another language.
+  await page.getByLabel('الكردية السورانية').first().fill('دیزاینی تاقیکاری');
+  await page.getByLabel('الكردية البادينية').first().fill('دیزاینێ تاقیکرنێ');
   await page.getByRole('button', { name: 'حفظ' }).first().click();
   await expect(page.getByRole('status').filter({ hasText: 'تم الحفظ.' }).first()).toBeVisible();
 
@@ -44,6 +47,8 @@ test('owner configures a theme end to end: music → cover → package → revie
   const add = page.locator('details', { hasText: 'إضافة باقة' });
   await add.getByLabel('العربية').first().fill('باقة ذهبية');
   await add.getByLabel('الإنجليزية').first().fill('Gold');
+  await add.getByLabel('الكردية السورانية').first().fill('پاکێجی زێڕین');
+  await add.getByLabel('الكردية البادينية').first().fill('پاکێجا زێڕین');
   await add.getByLabel('السعر (دينار عراقي)').fill('75000');
   await add.getByRole('radio').last().check();
   await add.getByRole('button', { name: 'إنشاء' }).click();

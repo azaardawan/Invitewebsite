@@ -23,7 +23,7 @@ export const legalContentSchema = z.object({
 });
 
 export class LegalError extends Error {
-  constructor(public readonly code: 'noDraft' | 'invalid') {
+  constructor(public readonly code: 'noDraft' | 'invalid' | 'allLanguages') {
     super(code);
   }
 }
@@ -86,6 +86,8 @@ export async function publishDraft(db: DbOrTx, type: PolicyType, actor: Actor) {
       .where(and(eq(legalPolicyVersions.type, type), eq(legalPolicyVersions.status, 'DRAFT')))
       .for('update');
     if (!draft) throw new LegalError('noDraft');
+    // Every language must be written before a policy goes live (no fallback to another language).
+    if (!draft.content.ckb?.trim() || !draft.content.bdn?.trim()) throw new LegalError('allLanguages');
     await tx.update(legalPolicyVersions).set({ status: 'PUBLISHED', publishedAt: new Date(), publishedBy: actor.adminId }).where(eq(legalPolicyVersions.id, draft.id));
     await recordAudit(tx, { ...auditActor(actor), action: 'legal.published', objectType: 'legal_policy', objectId: draft.id, after: { type, version: draft.version } });
     return draft.version;

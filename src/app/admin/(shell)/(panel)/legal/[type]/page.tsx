@@ -58,7 +58,7 @@ export default async function LegalEditPage({ params }: PageProps<'/admin/legal/
               <textarea
                 name={code}
                 dir={dir}
-                rows={code === 'ar' || code === 'en' ? 16 : 6}
+                rows={16}
                 required={code === 'ar' || code === 'en'}
                 maxLength={30000}
                 defaultValue={(base as Record<string, string | null | undefined> | null)?.[code] ?? ''}

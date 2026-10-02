@@ -20,6 +20,18 @@ const LABEL_KEYS = [
   'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
 ] as const satisfies readonly (keyof ThemeLabels)[];
 
+/**
+ * A date such as a receipt or policy date ("1 November 2026"), in the site
+ * language. Badini uses its approved month names (no standard locale data).
+ */
+export function formatLongDate(at: Date, locale: Locale): string {
+  if (locale !== 'bdn') return new Intl.DateTimeFormat(localeMeta[locale].intlLocale, { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(at);
+  const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Baghdad' }).format(at).split('-').map(Number);
+  const digits = new Intl.NumberFormat('ar-IQ', { useGrouping: false });
+  const months = (invitationMessages('bdn') as unknown as { months: Record<string, string> }).months;
+  return `${digits.format(d!)} ${months[`m${m}`] ?? ''} ${digits.format(y!)}`;
+}
+
 /** Badini has no standard calendar locale data; its names come from owner-approved translations. */
 function calendarLocale(locale: Locale): string | null {
   return locale === 'bdn' ? null : localeMeta[locale].intlLocale;

@@ -33,6 +33,9 @@ describe('legal policies', () => {
 
   it('edits a draft, publishes it, and freezes the published version', async () => {
     await saveDraft(db(), 'TERMS', { ar: 'نص الشروط', en: 'Terms text' }, actor);
+    // Not without the Kurdish texts.
+    await expect(publishDraft(db(), 'TERMS', actor)).rejects.toMatchObject({ code: 'allLanguages' });
+    await saveDraft(db(), 'TERMS', { ar: 'نص الشروط', en: 'Terms text', ckb: 'دەقی مەرجەکان', bdn: 'نڤیسینا مەرجان' }, actor);
     expect(await publishDraft(db(), 'TERMS', actor)).toBe(1);
     const live = await currentPolicy(db(), 'TERMS');
     expect(live?.content.en).toBe('Terms text');

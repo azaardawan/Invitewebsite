@@ -8,6 +8,7 @@ import { invitations, orders } from '@/server/db/schema';
 import { Card } from '@/components/admin/bits';
 import { analyticsReport } from '@/server/analytics/report';
 import { formatIqd } from '@/lib/currency';
+import { missingKurdish } from '@/server/catalog/translations';
 
 async function counts(now = new Date()) {
   const [[awaiting], [live]] = await Promise.all([
@@ -24,6 +25,7 @@ export default async function DashboardPage({ searchParams }: PageProps<'/admin'
   const c = await counts();
   const week = can(authz, 'analytics.view') ? await analyticsReport(db(), 7) : null;
   const intl = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-GB';
+  const untranslated = can(authz, 'themes.manage') ? await missingKurdish(db()) : [];
   const roleNames = authz.roleKeys.map((k) => (['OWNER', 'MANAGER', 'DESIGNER', 'SUPPORT'].includes(k) ? t(`roles.${k}` as never) : k));
 
   return (
@@ -51,6 +53,22 @@ export default async function DashboardPage({ searchParams }: PageProps<'/admin'
           </Card>
         ) : null}
       </div>
+      {untranslated.length > 0 ? (
+        <Card className="space-y-2 border-accent">
+          <h2 className="font-semibold">{t('dashboard.missingKurdishTitle', { count: untranslated.length })}</h2>
+          <p className="text-sm text-muted">{t('dashboard.missingKurdishBody')}</p>
+          <ul className="space-y-1 text-sm">
+            {untranslated.map((m, i) => (
+              <li key={i}>
+                <Link href={m.href} className="text-accent underline">
+                  {t(`dashboard.missingKurdishKind.${m.kind}`)}
+                  {m.name ? `: ${m.name}` : ''}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
       {week ? (
         <Card className="space-y-3">
           <h2 className="font-semibold">{t('analytics.dashboardTitle')}</h2>
