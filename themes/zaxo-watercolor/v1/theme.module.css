@@ -1,0 +1,460 @@
+/* Zaxo Watercolor. Scoped by CSS Modules; no global selectors allowed. */
+@font-face {
+  font-family: 'Zaxo DejaVu Sans';
+  src: url('./assets/dejavu-sans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.root {
+  --ink: #463b2b;
+  --ivory: #fbf2e2;
+  --paper: #e9e2d7;
+  --terracotta: #a45436;
+  --terracotta-ink: #92482e;
+  --rust: #995239;
+  --sand: #f3e7d3;
+  --teal: #2d6565;
+  box-sizing: border-box;
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Zaxo DejaVu Sans', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.root button,
+.root input,
+.root textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.root :focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 4px;
+}
+
+/* Phone-sized composition (max 430px) centered on a warm neutral background. */
+.card {
+  position: relative;
+  isolation: isolate;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin-inline: auto;
+  background: var(--ivory);
+  overflow: clip;
+}
+
+@media (min-width: 481px) {
+  .root {
+    padding-block: 24px;
+  }
+
+  .card {
+    min-height: calc(100dvh - 48px);
+    box-shadow: 0 8px 45px rgb(70 59 43 / 0.13);
+  }
+}
+
+/* Heritage border strips. Artwork: physical left/right, never mirrored with text direction. */
+.side {
+  position: absolute;
+  inset-block: 0;
+  width: 24px;
+  background-image: url('./assets/heritage-border.webp');
+  background-size: 24px auto;
+  background-repeat: repeat-y;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sideLeft {
+  left: 4px;
+}
+
+.sideRight {
+  right: 4px;
+}
+
+/* ---------- Cover ---------- */
+
+.cover {
+  min-height: inherit;
+  padding: 100px 36px 55px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* On Open the content mounts underneath; the cover lies over it and fades away. */
+.cover[data-opening='true'] {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  box-sizing: border-box;
+  background: var(--ivory);
+  pointer-events: none;
+  animation: coverOut 450ms ease-out forwards;
+}
+
+.seal {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  background: #f1dfc1;
+  transform: rotate(45deg);
+  border: 1px solid #bb8b55;
+}
+
+.sealDiamond {
+  width: 38px;
+  height: 38px;
+  transform: rotate(-45deg);
+}
+
+.coverNames,
+.names {
+  margin: 0;
+  font-size: 35px;
+  font-weight: 400;
+  line-height: 1.7;
+  /* Break between words; only split a word that is wider than the line on its own. */
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+.amp {
+  padding-inline: 0.1em;
+  color: var(--terracotta);
+}
+
+.coverArt {
+  display: block;
+  width: calc(100% + 36px);
+  max-width: none;
+  height: auto;
+  margin: 12px -18px;
+}
+
+.primary,
+.outline {
+  display: inline-block;
+  min-height: 44px;
+  border: 1px solid var(--terracotta);
+  border-radius: 28px;
+  padding: 12px 24px;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.primary {
+  background: var(--terracotta);
+  color: #fffaf2 !important;
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.outline {
+  margin-top: 6px;
+  padding: 8px 18px;
+  min-height: 0;
+  background: transparent;
+  color: var(--terracotta-ink);
+  font-size: 13px;
+}
+
+/* ---------- Content ---------- */
+
+.content {
+  position: relative;
+  padding: 40px 36px 28px;
+}
+
+.content[data-animate='true'] {
+  animation: contentIn 700ms 300ms both cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.content[data-animate='true'] .landmarks {
+  animation: fadeIn 700ms 400ms both ease-out;
+}
+
+.musicButton {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 36px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #d5bd96;
+  background: var(--sand);
+  color: var(--terracotta-ink) !important;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 3;
+}
+
+.heading {
+  text-align: center;
+}
+
+.names {
+  margin: 12px 0 8px;
+}
+
+.divider {
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 14px auto;
+}
+
+.message {
+  max-width: 310px;
+  margin: 0 auto;
+  font-size: 14px;
+  line-height: 2.15;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.landmarks {
+  display: block;
+  width: calc(100% + 40px);
+  max-width: none;
+  height: auto;
+  margin: 16px -20px 12px;
+}
+
+.details {
+  display: grid;
+  gap: 14px;
+  padding: 14px 0;
+  text-align: center;
+}
+
+.details p {
+  margin: 4px 0;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.details .caption {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--rust);
+}
+
+.detailValue {
+  font-size: 17px;
+}
+
+.smallDivider {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  min-height: 62px;
+  margin: 12px 0 22px;
+}
+
+.countUnit {
+  display: grid;
+  gap: 4px;
+  min-width: 56px;
+  padding: 9px 4px;
+  border-radius: 8px;
+  background: var(--sand);
+  text-align: center;
+  font-size: 11px;
+}
+
+.countUnit b {
+  font-size: 20px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdownDone {
+  margin: 12px 0 22px;
+  text-align: center;
+  color: var(--rust);
+}
+
+.coupleScene {
+  margin: 14px 0 28px;
+  transition:
+    opacity 800ms,
+    transform 800ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.coupleScene[data-pending='true'] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.coupleScene img {
+  display: block;
+  width: min(100%, 290px);
+  height: auto;
+  max-height: 350px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* ---------- Guest form ---------- */
+
+.rsvp {
+  padding: 22px 16px;
+  background: #f6ead7;
+  border: 1px solid #d5bd96;
+  border-radius: 90px 90px 12px 12px;
+}
+
+.rsvp h2 {
+  margin: 4px 0 12px;
+  font-size: 19px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.field input,
+.field textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid #c6ac88;
+  border-radius: 6px;
+  background: #fffcf7;
+  resize: vertical;
+}
+
+.fieldset {
+  margin: 14px 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-inline-end: 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.choice input {
+  accent-color: var(--terracotta);
+}
+
+.error {
+  display: block;
+  margin: 4px 0 0;
+  color: #a52323;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.submit {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.success {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.success p {
+  margin: 0;
+}
+
+.successDiamond {
+  width: 35px;
+  height: 35px;
+}
+
+.note {
+  font-size: 12px;
+  color: #71665a;
+}
+
+.ending {
+  margin: 18px 0 0;
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes coverOut {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion: instant cover removal, no translation; content fully visible. */
+.root[data-reduced='true'] .cover,
+.root[data-reduced='true'] .content,
+.root[data-reduced='true'] .landmarks,
+.root[data-reduced='true'] .coupleScene {
+  animation: none;
+  transition: none;
+  opacity: 1;
+  transform: none;
+}
