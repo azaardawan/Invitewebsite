@@ -1,5 +1,9 @@
 # Kurdish translation review
 
+> **2026-10-02: the owner approved every remaining row** in [`KURDISH_FULL_LIST.md`](./KURDISH_FULL_LIST.md) and the
+> policy texts in [`KURDISH_POLICIES.md`](./KURDISH_POLICIES.md). Rows below still marked PENDING/AWAITING are
+> history; they are all approved and live. New texts go through the same review before shipping.
+
 **How to reply:** for each row, say **"approve"** or give your corrected wording (for Sorani, Badini,
 or both). Nothing in the "Suggested" columns is live until you approve it; until then the Kurdish
 pages show the Arabic text.
@@ -264,3 +268,94 @@ Still to suggest (after you've settled the wording above): FAQ answers (`home.fa
 | `receipt.payWhatsApp` | إرسال طلبي على واتساب | Send my order on WhatsApp | ناردنی داواکارییەکەم لە واتسئاپ | هنارتنا داخوازیا من ل واتسئاپێ | ◐ | PENDING |
 | `receipt.waMessage` | مرحباً بهجه، قمت بالطلب {order} بمبلغ {amount}. كيف أُكمل الدفع؟ | Hello Bahja, I placed order {order} for {amount}. How do I complete payment? | سڵاو بەهجە، داواکاری {order} م کرد بە بڕی {amount}. چۆن پارەدان تەواو بکەم؟ | سلاڤ بەهجە، من داخوازیا {order} کر ب بڕێ {amount}. چاوا پارەدانێ تەمام بکەم؟ | ○ | PENDING |
 | `store.paymentSoon` | بعد التأكيد ستحصلون على إيصال خاص فيه طريقة الدفع… | After confirming, you'll get a private receipt with how to pay… | دوای پشتڕاستکردنەوە پسوولەیەکی تایبەتتان پێدەگات کە ڕێگای پارەدانی تێدایە. بانگهێشتنامەکەتان هەر کە پارەدانمان پشتڕاست کردەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ دێ پسوولەکا تایبەت گەهیتە هەوە کو ڕێکا پارەدانێ تێدایە. داخوازناما هەوە هەر کو مە پارەدان پشتڕاست کر دێ هێتە بەلاڤکرن. | ○ | PENDING |
+
+## Batch 10 — Olive Ring Box theme wording (AWAITING WORDING)
+
+These fixed lines live in `themes/olive-ring-box/v1/copy.ts`, not in the site message files. Every
+other text in the theme (buttons, guest form, countdown units, errors) uses the already-translated
+site labels. Until Kurdish wording is approved, Sorani and Badini invitations show these lines in
+Arabic. The basmala always stays in Arabic.
+
+| Key (`copy.ts`) | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `openHint` | اضغط لفتح علبة الدعوة | Tap to open the invitation box | | | AWAITING |
+| `and` | و | & | | | AWAITING |
+| `countdownTitle` | يبدأ الحفل بعد | The celebration begins in | | | AWAITING |
+| `formIntro` | يسعدنا أن نعرف إن كنت ستشاركنا فرحتنا. | We would love to know if you can join us. | | | AWAITING |
+| `closing` | شكرًا لمشاركتكم فرحتنا | Thank you for sharing our joy | | | AWAITING |
+| `closingSub` | حضوركم يتمّ سعادتنا | Your presence completes our happiness | | | AWAITING |
+| `keepsakeSubtitle` | تهاني الأهل والأحبة | Wishes from family and friends | | | AWAITING |
+| `keepsakeClosing` | مع خالص الشكر لكل من شاركنا الفرح | With heartfelt thanks to everyone who shared our joy | | | AWAITING |
+
+## Batch 11 — printable card and keepsake (AWAITING WORDING)
+
+Shown on the customer's receipt page and printed on the card / keepsake PDF. Until approved, Kurdish
+invitations show the Arabic.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `receipt.printCardTitle` | بطاقة الدعوة للطباعة | Printable invitation card | | | AWAITING |
+| `receipt.printCardHelp` | ملف PDF جاهز للطباعة بحجم A5 (148 × 210 مم) بنفس الأسماء والتاريخ والمكان، مع رمز QR يفتح الدعوة الإلكترونية. قد يستغرق تجهيزه بضع ثوانٍ. | A print-ready A5 PDF (148 × 210 mm) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare. | | | AWAITING |
+| `receipt.printCardDownload` | تحميل بطاقة الطباعة (PDF) | Download printable card (PDF) | | | AWAITING |
+| `invitation.print.scanToOpen` | امسح الرمز لفتح الدعوة | Scan to open the invitation | | | AWAITING |
+| `invitation.print.keepsakeTitle` | رسائل المحبة | Messages of love | | | AWAITING |
+| `invitation.print.keepsakeEmpty` | لم تصل رسائل بعد. | No messages yet. | | | AWAITING |
+| `receipt.keepsakeTitle` | ذكرى التهاني | Your keepsake of wishes | | | AWAITING |
+| `receipt.keepsakeHelp` | كل الرسائل التي كتبها ضيوفكم، مجموعة في ملف PDF بتصميم دعوتكم. | Every message your guests wrote, gathered in a PDF in the design of your invitation. | | | AWAITING |
+| `receipt.keepsakeDownload` | تحميل ملف الذكرى (PDF) | Download keepsake (PDF) | | | AWAITING |
+| `receipt.waCardMessage` | مرحباً {name}، هذه بطاقة دعوتكم للطباعة من بهجه (PDF): {url} | Hello {name}, here is your printable invitation card from Bahja (PDF): {url} | | | AWAITING |
+| `receipt.waKeepsakeMessage` | مرحباً {name}، ألف مبروك! هذا ملف الذكرى بكل تهاني ضيوفكم من بهجه (PDF): {url} | Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url} | | | AWAITING |
+
+## Batch 12 — footer, contact page, legal pages, checkout terms (AWAITING WORDING)
+
+Customer-facing labels added in M10. Policy texts themselves are written per language in
+Admin → Legal policies (Kurdish fields are optional there and fall back to Arabic). `<terms>` and
+`<refund>` mark the linked words in `store.acceptTerms` — keep them around the translated words.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `footer.whatsapp` | واتساب | WhatsApp | | | AWAITING |
+| `footer.phone` | الهاتف | Phone | | | AWAITING |
+| `footer.instagram` | إنستغرام | Instagram | | | AWAITING |
+| `footer.facebook` | فيسبوك | Facebook | | | AWAITING |
+| `footer.tiktok` | تيك توك | TikTok | | | AWAITING |
+| `footer.legal` | السياسات | Policies | | | AWAITING |
+| `footer.terms` | شروط الخدمة | Terms of service | | | AWAITING |
+| `footer.privacy` | سياسة الخصوصية | Privacy policy | | | AWAITING |
+| `footer.refund` | سياسة الاسترجاع | Refund policy | | | AWAITING |
+| `contact.title` | تواصل معنا | Contact us | | | AWAITING |
+| `contact.subtitle` | يسعدنا مساعدتك في اختيار دعوتك وتخصيصها. | We're happy to help you choose and personalise your invitation. | | | AWAITING |
+| `contact.whatsappButton` | راسلنا على واتساب | Message us on WhatsApp | | | AWAITING |
+| `contact.waText` | مرحباً بهجه، لدي سؤال عن دعوة. | Hello Bahja, I have a question about an invitation. | | | AWAITING |
+| `contact.email` | البريد الإلكتروني | Email | | | AWAITING |
+| `contact.address` | العنوان | Address | | | AWAITING |
+| `contact.hours` | أوقات العمل | Working hours | | | AWAITING |
+| `contact.soon` | ستُضاف معلومات التواصل قريباً. | Contact details will be added soon. | | | AWAITING |
+| `legal.updated` | الإصدار {version} · آخر تحديث {date} | Version {version} · last updated {date} | | | AWAITING |
+| `legal.preparing` | هذه السياسة قيد الإعداد وستُنشر هنا قريباً. | This policy is being prepared and will be published here soon. | | | AWAITING |
+| `store.acceptTerms` | راجعتُ تفاصيل دعوتي وأوافق على <terms>الشروط</terms> و<refund>سياسة الاسترداد</refund>. | I've checked my invitation details and I accept the <terms>terms</terms> and <refund>refund policy</refund>. | | | AWAITING |
+| `store.askTheme` | لديك سؤال عن هذا التصميم؟ | Have a question about this design? | | | AWAITING |
+| `store.askThemeLink` | اسألنا على واتساب | Ask us on WhatsApp | | | AWAITING |
+| `store.askThemeText` | مرحباً بهجه، لدي سؤال عن دعوة «{theme}»: {url} | Hello Bahja, I have a question about the “{theme}” invitation: {url} | | | AWAITING |
+
+## Batch 13 — public guest messages (AWAITING WORDING)
+
+Shown under the invitation when the customer makes messages public, the sample messages in theme
+previews, and the choice on the customer's receipt.
+
+| Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Status |
+|---|---|---|---|---|---|
+| `invitation.guestbookTitle` | رسائل الضيوف | Messages from our guests | | | AWAITING |
+| `invitation.guestbookEmpty` | كن أول من يكتب تهنئة. | Be the first to write a congratulation. | | | AWAITING |
+| `invitationSamples.m1Name` | سارة | Sara | | | AWAITING |
+| `invitationSamples.m1Text` | ألف مبروك! نتمنى لكما حياة مليئة بالحب والسعادة. | Congratulations! Wishing you a lifetime of love and happiness. | | | AWAITING |
+| `invitationSamples.m2Name` | أحمد | Ahmed | | | AWAITING |
+| `invitationSamples.m2Text` | مبارك لكما، الله يتمم عليكما بخير ويجعل بيتكما عامراً بالفرح. | Mabrook to you both, may your home be full of joy. | | | AWAITING |
+| `invitationSamples.m3Name` | ليلى | Laila | | | AWAITING |
+| `invitationSamples.m3Text` | فرحانة جداً لكم، نشوفكم بالحفلة! | So happy for you. See you at the celebration! | | | AWAITING |
+| `receipt.guestbookTitle` | رسائل الضيوف | Guest messages | | | AWAITING |
+| `receipt.guestbookHelp` | اختر من يرى رسائل التهنئة التي يكتبها ضيوفكم. في الحالتين تُجمع كلها في ملف الذكرى. | Choose who sees the congratulation messages your guests write. Either way, they are all collected in your keepsake PDF. | | | AWAITING |
+| `receipt.guestbookPrivate` | أنا فقط (في ملف الذكرى) | Only me (in the keepsake PDF) | | | AWAITING |
+| `receipt.guestbookPublic` | كل من لديه رابط الدعوة (تظهر تحت الدعوة) | Everyone with the invitation link (shown under the invitation) | | | AWAITING |
+| `receipt.guestbookSave` | حفظ الاختيار | Save choice | | | AWAITING |
+| `receipt.guestbookSaved` | تم الحفظ. | Saved. | | | AWAITING |

@@ -5,6 +5,26 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const isProd = process.env.NODE_ENV === 'production';
 
+/**
+ * Content-Security-Policy (production; dev needs eval for hot reload). Scripts only from this site and
+ * Cloudflare Turnstile; Next's inline bootstrap scripts need 'unsafe-inline' until nonces are added.
+ * Media/images may come from the R2 CDN, whose host is only known at runtime, hence `https:`.
+ * No form-action: paying redirects the form to the payment provider.
+ */
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://challenges.cloudflare.com",
+  "frame-src 'self' https://challenges.cloudflare.com",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+].join('; ');
+
 const baseSecurityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -12,9 +32,13 @@ const baseSecurityHeaders = [
   // Same-origin framing is allowed so the storefront/admin can sandbox theme previews in iframes.
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   ...(isProd
-    ? [{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' }]
+    ? [
+        { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+        { key: 'Content-Security-Policy', value: csp },
+      ]
     : []),
 ];
+
 
 const noIndex = { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' };
 

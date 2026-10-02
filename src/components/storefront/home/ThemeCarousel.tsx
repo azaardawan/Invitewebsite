@@ -99,6 +99,7 @@ export function ThemeCarousel({
           >
             <Link
               href={`/themes/${t.key}`}
+              aria-label={t.name}
               className={`block h-[340px] overflow-hidden rounded-t-[128px] rounded-b-[18px] lg:h-[400px] lg:rounded-t-[150px] ${TINTS[i % TINTS.length]}`}
             >
               {t.coverUrl ? (

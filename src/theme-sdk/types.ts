@@ -33,7 +33,16 @@ export type ThemeLabels = {
   errorRequired: string;
   errorTooLong: string;
   errorGeneric: string;
+  /** Heading of the public guest messages list. */
+  guestbookTitle: string;
+  /** Shown when the public list is on but nobody has written yet. */
+  guestbookEmpty: string;
+  /** Word between two names ("و" / "&"), in the invitation's language. */
+  and: string;
 };
+
+/** One guest message shown under the invitation (only when the customer made them public). */
+export type GuestbookMessage = { guestName: string; message: string };
 
 export type EventDateParts = {
   /** e.g. "الخميس، ١٢ تشرين الثاني ٢٠٢٦" — already localized. */
@@ -71,6 +80,12 @@ export type ThemeProps = {
   mapUrl: string | null;
   /** Assigned song; null when the package has no music or none is assigned. */
   music: { src: string } | null;
+  /**
+   * Guest messages to show under the invitation, newest first: an array (possibly empty) when the
+   * customer chose to show them to everyone; null when they stay private (keepsake only) or the
+   * package has no messages. Render nothing when null.
+   */
+  guestbook: GuestbookMessage[] | null;
 };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;
@@ -78,6 +93,9 @@ export type ThemeComponent = (props: ThemeProps) => React.ReactNode;
 export function hasFeature(props: Pick<ThemeProps, 'features'>, feature: FeatureKey): boolean {
   return props.features.includes(feature);
 }
+
+/** Guest form limits, shared by the theme runtime and the server. */
+export const GUEST_LIMITS = { name: 80, message: 500 } as const;
 
 export type GuestAttendance = 'ATTENDING' | 'NOT_ATTENDING';
 export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string };

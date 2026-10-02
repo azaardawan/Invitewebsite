@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { auditLogs } from '@/server/db/schema';
 import { getSettings, updateCurrencySettings } from '@/server/settings/service';
@@ -17,7 +17,11 @@ describe('exchange rate setting', () => {
     await updateCurrencySettings(db(), { usdRateIqd: 1310 }, actor);
     await updateCurrencySettings(db(), { usdRateIqd: 1320 }, actor);
     expect((await getSettings(db())).currency.usdRateIqd).toBe(1320);
-    const logs = await db().select().from(auditLogs).where(eq(auditLogs.action, 'settings.currency_updated'));
+    const logs = await db()
+      .select()
+      .from(auditLogs)
+      .where(and(eq(auditLogs.action, 'settings.currency_updated'), eq(auditLogs.actorAdminId, actor.adminId)))
+      .orderBy(asc(auditLogs.id));
     expect(logs.at(-1)).toMatchObject({ before: { usdRateIqd: 1310 }, after: { usdRateIqd: 1320 }, actorAdminId: actor.adminId });
   });
 

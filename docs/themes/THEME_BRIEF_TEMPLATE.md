@@ -53,8 +53,10 @@ Reduced-motion behaviour:
 - License:
 
 ## 11. Print
-- Card size (A5 / 5×7):
-- QR code: yes / no — position:
+- Card: A5 portrait, designed at 154 × 216 mm (3 mm bleed), text 5 mm inside the edge, 300 dpi
+- QR code position (about 25 mm) and the optional extra line position:
+- How the card looks without the message / without the QR:
 - Keepsake PDF included: yes / no
+- Keepsake cover (full page, no margin) and message page design (margins 18 / 16 / 20 mm, page number bottom centre):
 
 ## Notes

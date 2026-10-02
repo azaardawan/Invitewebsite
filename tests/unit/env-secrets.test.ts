@@ -17,3 +17,16 @@ describe('secret keys', () => {
     process.env.TOKEN_SECRET = b64;
   });
 });
+
+describe('optional settings', () => {
+  it('treats a variable left empty in the dashboard as not set', async () => {
+    vi.resetModules();
+    process.env.TURNSTILE_SITE_KEY = '';
+    process.env.TURNSTILE_SECRET_KEY = '';
+    const { env } = await import('@/server/env');
+    expect(env().TURNSTILE_SITE_KEY).toBeUndefined();
+    expect(env().TURNSTILE_SECRET_KEY).toBeUndefined();
+    delete process.env.TURNSTILE_SITE_KEY;
+    delete process.env.TURNSTILE_SECRET_KEY;
+  });
+});

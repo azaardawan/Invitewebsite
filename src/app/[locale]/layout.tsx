@@ -10,6 +10,8 @@ import { localeMeta } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 import { SiteHeader } from '@/components/storefront/SiteHeader';
 import { SiteFooter } from '@/components/storefront/SiteFooter';
+import { publicContact } from '@/server/settings/public';
+import { PageViewBeacon } from '@/components/analytics/Beacon';
 
 // Only the four known locales exist; anything else (e.g. `/favicon.ico`) is a 404.
 export const dynamicParams = false;
@@ -34,6 +36,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'common' });
   const meta = localeMeta[locale];
+  const contact = await publicContact();
 
   return (
     <html lang={meta.htmlLang} dir={meta.dir}>
@@ -49,7 +52,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
           <main id="main" className="flex-1">
             {children}
           </main>
-          <SiteFooter />
+          <SiteFooter contact={contact} />
+          <PageViewBeacon locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>

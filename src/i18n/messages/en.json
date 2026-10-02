@@ -83,7 +83,16 @@
   },
   "footer": {
     "rights": "© {year} Bahja. All rights reserved.",
-    "tagline": "Carefully curated digital invitations."
+    "tagline": "Carefully curated digital invitations.",
+    "whatsapp": "WhatsApp",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "legal": "Policies",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "refund": "Refund policy"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -108,7 +117,9 @@
       "music": "Music library",
       "settings": "Website settings",
       "orders": "Orders & invoices",
-      "invitations": "Invitations"
+      "invitations": "Invitations",
+      "legal": "Legal policies",
+      "analytics": "Analytics"
     },
     "modules": {
       "sections": "Sections",
@@ -175,7 +186,17 @@
       "roles": "Your roles: {roles}",
       "awaitingPayment": "{count, plural, =0 {No orders waiting for payment} one {# order waiting for payment} other {# orders waiting for payment}}",
       "liveInvitations": "{count, plural, =0 {No live invitations} one {# live invitation} other {# live invitations}}",
-      "viewOrders": "Open orders"
+      "viewOrders": "Open orders",
+      "missingKurdishTitle": "{count, plural, one {# text still needs Kurdish} other {# texts still need Kurdish}}",
+      "missingKurdishBody": "Kurdish visitors see these in Arabic until you add the Sorani and Badini wording.",
+      "missingKurdishKind": {
+        "theme": "Design",
+        "package": "Package",
+        "section": "Occasion",
+        "field": "Field label",
+        "contact": "Contact details (address or hours)",
+        "payment": "Payment instructions"
+      }
     },
     "users": {
       "heading": "Users & roles",
@@ -257,7 +278,8 @@
         "remove": "Remove",
         "active": "Active",
         "archived": "Archived",
-        "kurdishHint": "Kurdish fields are optional; if empty, visitors see the Arabic text.",
+        "kurdishHint": "Fill in all four languages so visitors never see another language after switching.",
+        "kurdishHintOptional": "Optional: leave all four empty, or fill in all four languages.",
         "optional": "optional",
         "order": "Order",
         "lang": {
@@ -432,7 +454,8 @@
         "audioTooLong": "The song is longer than 10 minutes.",
         "forbidden": "You don't have permission.",
         "unauthorized": "Your session ended; please sign in again.",
-        "uploadFailed": "Upload failed. Please try again."
+        "uploadFailed": "Upload failed. Please try again.",
+        "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty."
       },
       "preview": {
         "contents": "Preview contents",
@@ -455,13 +478,24 @@
       "usdRateHint": "For example 1310. Leave empty to hide the dollar option on the website.",
       "example": "Example: {iqd} is shown as ≈ {usd}",
       "save": "Save",
-      "more": "Business and contact information will be added here later (milestone 10).",
       "paymentHeading": "Payment while online payment is off",
       "paymentIntro": "Until WAYL is switched on, customers confirm their order and pay you directly. These details appear on their private receipt.",
       "whatsapp": "Business WhatsApp number",
       "whatsappHint": "Customers get a button that opens WhatsApp with their order number and amount filled in.",
       "manualInstructions": "Payment instructions (e.g. Zain Cash / bank transfer details)",
-      "invalidWhatsapp": "Please enter a valid phone number."
+      "invalidWhatsapp": "Please enter a valid phone number.",
+      "contactHeading": "Contact details",
+      "contactIntro": "Shown in the website footer and on the Contact page. Leave anything you don't want to show empty. Customers reach you on WhatsApp through the business number above.",
+      "phone": "Phone for calls (optional)",
+      "email": "Email (optional)",
+      "instagram": "Instagram username",
+      "facebook": "Facebook page username",
+      "tiktok": "TikTok username",
+      "handleHint": "Just the username, e.g. bahja.iq (no @ and no link).",
+      "address": "Address (optional)",
+      "hours": "Working hours (optional), e.g. “Every day, 10 am – 10 pm”",
+      "invalidPhone": "Please enter a valid phone number.",
+      "invalidContact": "Please check the email and usernames."
     },
     "orders": {
       "heading": "Orders & invoices",
@@ -552,6 +586,54 @@
       "save": "Save changes",
       "saved": "Saved.",
       "preview": "What guests see",
+      "documentsTitle": "Print documents",
+      "documentsHelp": "PDFs are prepared on request (a few seconds) and reused until something they show changes.",
+      "downloadCard": "Download printable card",
+      "downloadKeepsake": "Download keepsake PDF",
+      "regenerate": "Regenerate",
+      "cardAfterPayment": "The printable card is available after payment.",
+      "keepsakeAfterPublish": "The keepsake is available once the invitation is published.",
+      "cardTitle": "Printable card (A5)",
+      "downloadCardBleed": "Print-shop version (3 mm bleed)",
+      "sendWhatsApp": "Send to the customer on WhatsApp",
+      "cardCustomActive": "Your uploaded design is used instead of the automatic card.",
+      "cardBackToAutomatic": "Back to the automatic card",
+      "cardAdjust": "Change the card design",
+      "cardMessage": "Message on the card",
+      "cardMessageSame": "Same as the invitation",
+      "cardMessageCustom": "Use this text instead (leave empty for no message)",
+      "cardExtraLine": "Extra line (optional), e.g. “Family invitation”",
+      "cardShowQr": "Show the QR code to the online invitation",
+      "cardSaveOptions": "Save card changes",
+      "cardUploadHelp": "Or upload your own design: a PDF with A5 pages (148 × 210 mm, portrait). It replaces the automatic card for this customer.",
+      "cardUploadLabel": "Card PDF",
+      "cardUpload": "Upload design",
+      "cardUploading": "Uploading…",
+      "cardUploaded": "Your design is now this invitation's card.",
+      "keepsakeTitle": "Keepsake PDF",
+      "keepsakeCustomerReady": "The customer can also download it from their receipt now.",
+      "keepsakeCustomerLater": "The customer gets it on their receipt automatically once the event has started.",
+      "cardErrors": {
+        "notPdf": "That file is not a valid PDF.",
+        "notA5": "Every page must be A5 portrait (148 × 210 mm). Export the design at A5 without bleed.",
+        "tooLarge": "The PDF is larger than 15 MB.",
+        "tooLong": "The message or extra line is too long.",
+        "notIncluded": "This package does not include a printable card.",
+        "notFound": "Invitation not found.",
+        "failed": "The upload failed. Please try again."
+      },
+      "guestsTitle": "Guest replies",
+      "guestsSummary": "{attending} attending · {notAttending} not attending",
+      "guestsEmpty": "No replies yet.",
+      "guestName": "Name",
+      "guestAttendance": "Attendance",
+      "guestMessage": "Message",
+      "guestAt": "Received",
+      "attending": "Attending",
+      "notAttending": "Not attending",
+      "messageHidden": "Hidden",
+      "hideMessage": "Hide message",
+      "restoreMessage": "Show message",
       "errors": {
         "notFound": "Invitation not found.",
         "stale": "Someone else changed this invitation. Reload the page and try again.",
@@ -561,7 +643,95 @@
         "reason": "Please write a reason (5–500 characters).",
         "days": "Choose between 1 and 365 days.",
         "music": "Choose an active song."
+      },
+      "guestbookPublicOn": "Guest messages are shown under the invitation (the customer's choice).",
+      "guestbookPublicOff": "Guest messages are private (keepsake only).",
+      "guestbookMakePublic": "Show messages under the invitation",
+      "guestbookMakePrivate": "Make messages private"
+    },
+    "legal": {
+      "heading": "Legal policies",
+      "intro": "Terms of service, privacy and refund policies shown on the website. Edit a draft, preview it, then publish. A published version can never be changed: customers' orders record exactly which version they accepted. Have a lawyer review the texts before going live.",
+      "types": {
+        "TERMS": "Terms of service",
+        "PRIVACY": "Privacy policy",
+        "REFUND": "Refund policy"
+      },
+      "liveVersion": "Live: version {version}, published {date}.",
+      "notPublished": "Not published yet: the website says it is being prepared.",
+      "hasDraft": "Draft (version {version}) waiting",
+      "edit": "Edit",
+      "viewOnSite": "View on the website",
+      "draftTitle": "Draft — version {version}",
+      "newDraftTitle": "New version",
+      "markupHelp": "Formatting: start a line with “## ” for a heading, with “- ” for a list item; leave an empty line between paragraphs.",
+      "kurdishHelp": "All four languages are needed to publish; drafts can be saved with any of them.",
+      "lang": {
+        "ar": "Arabic",
+        "en": "English",
+        "ckb": "Kurdish (Sorani), optional",
+        "bdn": "Kurdish (Badini), optional"
+      },
+      "saveDraft": "Save draft",
+      "publish": "Publish this version",
+      "publishConfirm": "Publish? It will be shown on the website and can never be edited afterwards.",
+      "discard": "Discard draft",
+      "discardConfirm": "Discard this draft?",
+      "previewTitle": "Preview of the draft",
+      "historyTitle": "Published versions",
+      "historyRow": "Version {version} — {date}",
+      "historyNote": "Each order records the versions the customer accepted.",
+      "draftSaved": "Draft saved.",
+      "published": "Published. It is now live on the website.",
+      "discarded": "Draft discarded.",
+      "errors": {
+        "invalid": "Arabic and English texts are required (up to 30,000 characters each).",
+        "noDraft": "There is no draft to publish.",
+        "allLanguages": "Write the Sorani and Badini texts too before publishing, so every language has the policy."
       }
+    },
+    "analytics": {
+      "heading": "Analytics",
+      "intro": "Anonymous visits and the order funnel. Money figures come from paid orders.",
+      "period": "Period",
+      "lastDays": "Last {n} days",
+      "visitors": "Visitors",
+      "pageViews": "{n} page views",
+      "paidOrders": "Paid orders",
+      "conversion": "{pct} of visitors",
+      "revenue": "Revenue",
+      "invitationOpens": "Invitation opens",
+      "published": "{n} invitations published",
+      "guestReplies": "Guest replies",
+      "downloads": "PDF downloads",
+      "downloadsSplit": "{card} cards · {keepsake} keepsakes",
+      "dailyVisitors": "Visitors per day",
+      "dayTooltip": "{day}: {visitors} visitors, {paid} paid orders",
+      "showTable": "Show as table",
+      "day": "Day",
+      "funnel": "From visit to payment",
+      "funnelHelp": "How many visitors reach each step in this period.",
+      "steps": {
+        "visitors": "Visited the site",
+        "themeViews": "Viewed a theme",
+        "started": "Started an order",
+        "placed": "Placed an order",
+        "paid": "Paid"
+      },
+      "topThemes": "Themes",
+      "theme": "Theme",
+      "views": "Views",
+      "sources": "Where visitors come from",
+      "direct": "Direct / WhatsApp app / unknown",
+      "devices": {
+        "mobile": "Phone",
+        "tablet": "Tablet",
+        "desktop": "Computer"
+      },
+      "noData": "No data in this period yet.",
+      "privacyNote": "No IP addresses, names or phone numbers are stored for analytics. Raw events are kept 13 months.",
+      "dashboardTitle": "Last 7 days",
+      "dashboardMore": "Open analytics"
     }
   },
   "invitation": {
@@ -624,7 +794,14 @@
     "youreInvited": "You're invited",
     "endedTitle": "This invitation has ended",
     "endedBody": "Thank you for celebrating with us. This invitation is no longer available.",
-    "brand": "Bahja"
+    "brand": "Bahja",
+    "print": {
+      "scanToOpen": "Scan to open the invitation",
+      "keepsakeTitle": "Messages of love",
+      "keepsakeEmpty": "No messages yet."
+    },
+    "guestbookTitle": "Messages from our guests",
+    "guestbookEmpty": "Be the first to write a congratulation."
   },
   "invitationSamples": {
     "short": {
@@ -640,7 +817,13 @@
       "family_names": "The families of Abdulrahman Al-Husseini and Mohammed Al-Karkhi",
       "venue_name": "The Princesses' Palace Grand Events Hall",
       "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times."
-    }
+    },
+    "m1Name": "Sara",
+    "m1Text": "Congratulations! Wishing you a lifetime of love and happiness.",
+    "m2Name": "Ahmed",
+    "m2Text": "Mabrook to you both, may your home be full of joy.",
+    "m3Name": "Laila",
+    "m3Text": "So happy for you. See you at the celebration!"
   },
   "receipt": {
     "title": "Order receipt",
@@ -689,7 +872,21 @@
     "confirming": "Confirming your payment with WAYL…",
     "confirmingSlow": "Your payment is still being confirmed. This can take a few minutes. Keep this page's link; it will update on its own once confirmed.",
     "payWhatsApp": "Send my order on WhatsApp",
-    "waMessage": "Hello Bahja, I placed order {order} for {amount}. How do I complete payment?"
+    "waMessage": "Hello Bahja, I placed order {order} for {amount}. How do I complete payment?",
+    "printCardTitle": "Printable invitation card",
+    "printCardHelp": "A print-ready A5 PDF (148 × 210 mm) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare.",
+    "printCardDownload": "Download printable card (PDF)",
+    "keepsakeTitle": "Your keepsake of wishes",
+    "keepsakeHelp": "Every message your guests wrote, gathered in a PDF in the design of your invitation.",
+    "keepsakeDownload": "Download keepsake (PDF)",
+    "waCardMessage": "Hello {name}, here is your printable invitation card from Bahja (PDF): {url}",
+    "waKeepsakeMessage": "Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url}",
+    "guestbookTitle": "Guest messages",
+    "guestbookHelp": "Choose who sees the congratulation messages your guests write. Either way, they are all collected in your keepsake PDF.",
+    "guestbookPrivate": "Only me (in the keepsake PDF)",
+    "guestbookPublic": "Everyone with the invitation link (shown under the invitation)",
+    "guestbookSave": "Save choice",
+    "guestbookSaved": "Saved."
   },
   "nav": {
     "home": "Home",
@@ -775,7 +972,7 @@
     "name": "Full name",
     "phone": "Phone number",
     "email": "Email",
-    "acceptTerms": "I've checked my invitation details and I accept the terms and refund policy.",
+    "acceptTerms": "I've checked my invitation details and I accept the <terms>terms</terms> and <refund>refund policy</refund>.",
     "total": "Total",
     "placeOrder": "Confirm order",
     "placing": "Confirming…",
@@ -786,6 +983,23 @@
     "lockedNote": "This order is confirmed, so its details can no longer be changed here.",
     "metaThemes": "Invitation designs",
     "metaHome": "Digital invitations for your occasions",
-    "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed."
+    "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed.",
+    "askTheme": "Have a question about this design?",
+    "askThemeLink": "Ask us on WhatsApp",
+    "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "We're happy to help you choose and personalise your invitation.",
+    "whatsappButton": "Message us on WhatsApp",
+    "waText": "Hello Bahja, I have a question about an invitation.",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Working hours",
+    "soon": "Contact details will be added soon."
+  },
+  "legal": {
+    "updated": "Version {version} · last updated {date}",
+    "preparing": "This policy is being prepared and will be published here soon."
   }
 }

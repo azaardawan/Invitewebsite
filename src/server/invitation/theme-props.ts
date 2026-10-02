@@ -17,8 +17,20 @@ const LABEL_KEYS = [
   'openInvitation', 'musicPlay', 'musicPause', 'countdownDays', 'countdownHours', 'countdownMinutes',
   'countdownSeconds', 'eventStarted', 'openMap', 'date', 'time', 'venue', 'guestFormTitle', 'guestName',
   'attendanceQuestion', 'attending', 'notAttending', 'message', 'submit', 'sending', 'sent', 'sentPreview',
-  'errorRequired', 'errorTooLong', 'errorGeneric',
+  'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
 ] as const satisfies readonly (keyof ThemeLabels)[];
+
+/**
+ * A date such as a receipt or policy date ("1 November 2026"), in the site
+ * language. Badini uses its approved month names (no standard locale data).
+ */
+export function formatLongDate(at: Date, locale: Locale): string {
+  if (locale !== 'bdn') return new Intl.DateTimeFormat(localeMeta[locale].intlLocale, { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(at);
+  const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Baghdad' }).format(at).split('-').map(Number);
+  const digits = new Intl.NumberFormat('ar-IQ', { useGrouping: false });
+  const months = (invitationMessages('bdn') as unknown as { months: Record<string, string> }).months;
+  return `${digits.format(d!)} ${months[`m${m}`] ?? ''} ${digits.format(y!)}`;
+}
 
 /** Badini has no standard calendar locale data; its names come from owner-approved translations. */
 function calendarLocale(locale: Locale): string | null {
@@ -36,6 +48,8 @@ export function buildThemeProps(input: {
   features: readonly string[];
   values: Partial<Record<string, string>>;
   musicSrc: string | null;
+  /** Public guest messages (live, customer opted in); omitted = private. Sample mode shows examples. */
+  guestbook?: { guestName: string; message: string }[] | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -62,7 +76,18 @@ export function buildThemeProps(input: {
     },
     mapUrl: features.includes('map') ? safeMapUrl(fields.venue_map_url) : null,
     music: features.includes('music') && input.musicSrc ? { src: input.musicSrc } : null,
+    guestbook: !features.includes('congratulations')
+      ? null
+      : input.mode === 'sample'
+        ? sampleGuestbook(input.locale)
+        : (input.guestbook ?? null),
   };
+}
+
+/** Example messages so theme samples and Admin previews show the public messages section. */
+function sampleGuestbook(locale: Locale) {
+  const s = (messagesFor(locale) as unknown as { invitationSamples: Record<string, string> }).invitationSamples;
+  return [1, 2, 3].map((i) => ({ guestName: s[`m${i}Name`] ?? '', message: s[`m${i}Text`] ?? '' })).filter((m) => m.guestName && m.message);
 }
 
 /** Sample content for theme previews (short or long names), in the invitation language. */

@@ -7,13 +7,26 @@ import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
 import { env } from '@/server/env';
 import { activeMusicTracks, getInvitation, invitationState } from '@/server/invitation/admin';
+import { guestResponseCounts, listGuestResponses } from '@/server/guests/responses';
+import { documentAvailable } from '@/server/documents/documents';
+import { customerDelivery, keepsakeReady, whatsappLink } from '@/server/documents/delivery';
+import { CardUploadForm } from '@/components/admin/CardUploadForm';
 import { orderFields } from '@/server/storefront/catalog';
 import { localized } from '@/server/catalog/common';
 import { localeMeta } from '@/i18n/config';
 import { invitationPath } from '@/lib/ids';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
-import { editInvitationAction, extendInvitationAction, invitationMusicAction, publishInvitationAction } from '../../../../_actions/invitations';
+import {
+  cardOptionsAction,
+  editInvitationAction,
+  extendInvitationAction,
+  removeCustomCardAction,
+  guestMessageStatusAction,
+  guestbookVisibilityAction,
+  invitationMusicAction,
+  publishInvitationAction,
+} from '../../../../_actions/invitations';
 
 const BADGE = { live: 'ACTIVE', expired: 'ARCHIVED', unpublished: 'ARCHIVED', awaiting: 'READY_FOR_REVIEW', paid: 'READY_FOR_REVIEW', draft: 'DEVELOPMENT' } as const;
 const input = 'w-full rounded-md border border-line bg-surface px-3 py-2 text-base';
@@ -33,7 +46,20 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const url = `${env().APP_URL.replace(/\/$/, '')}${path}`;
   const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Baghdad' }).format(d) : '—');
   const published = Boolean(inv.publishedAt);
-  const [fields, tracks] = await Promise.all([orderFields(inv.themeId, inv.sectionId, inv.fieldKeys), activeMusicTracks(db())]);
+  const showGuests = inv.featureKeys.includes('rsvp') && can(authz, 'guests.view');
+  const canDocs = can(authz, 'documents.generate');
+  const hasCard = inv.featureKeys.includes('print_card');
+  const hasKeepsake = inv.featureKeys.includes('keepsake_pdf');
+  const delivery = canDocs && (hasCard || hasKeepsake) ? await customerDelivery(db(), inv.id) : null;
+  // WhatsApp messages go to the customer in their invitation's language.
+  const tr = await getTranslations({ locale: inv.locale, namespace: 'receipt' });
+  const canModerate = can(authz, 'guests.moderate');
+  const [fields, tracks, guests, counts] = await Promise.all([
+    orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
+    activeMusicTracks(db()),
+    showGuests ? listGuestResponses(db(), inv.id) : Promise.resolve([]),
+    showGuests ? guestResponseCounts(db(), inv.id) : Promise.resolve(null),
+  ]);
   const reason = (
     <label className="block">
       <span className="mb-1 block text-sm">{t('reason')}</span>
@@ -101,6 +127,189 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           </p>
         ))}
       </Card>
+
+      {canDocs && (hasCard || hasKeepsake) ? (
+        <Card className="space-y-5">
+          <div>
+            <h2 className="mb-1 font-semibold">{t('documentsTitle')}</h2>
+            <p className="text-sm text-muted">{t('documentsHelp')}</p>
+          </div>
+
+          {hasCard ? (
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold">{t('cardTitle')}</h3>
+              {documentAvailable(inv, 'card') ? (
+                <p className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <a href={`/admin/api/documents/${inv.id}/card`} className="font-medium text-accent underline">
+                    {t('downloadCard')}
+                  </a>
+                  <a href={`/admin/api/documents/${inv.id}/card?bleed=1`} className="text-accent underline">
+                    {t('downloadCardBleed')}
+                  </a>
+                  {!inv.cardCustomKey ? (
+                    <a href={`/admin/api/documents/${inv.id}/card?fresh=1`} className="text-muted underline">
+                      {t('regenerate')}
+                    </a>
+                  ) : null}
+                  {delivery ? (
+                    <a
+                      href={whatsappLink(delivery.phone, tr('waCardMessage', { name: delivery.name, url: delivery.cardUrl }))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent underline"
+                    >
+                      {t('sendWhatsApp')}
+                    </a>
+                  ) : null}
+                </p>
+              ) : (
+                <p className="text-sm text-muted">{t('cardAfterPayment')}</p>
+              )}
+
+              {inv.cardCustomKey ? (
+                <div className="flex flex-wrap items-center gap-3 rounded-md bg-canvas px-3 py-2 text-sm">
+                  <span>{t('cardCustomActive')}</span>
+                  <ActionForm action={removeCustomCardAction}>
+                    <input type="hidden" name="id" value={inv.id} />
+                    <SubmitButton tone="secondary">{t('cardBackToAutomatic')}</SubmitButton>
+                  </ActionForm>
+                </div>
+              ) : (
+                <details className="rounded-md border border-line px-3 py-2">
+                  <summary className="cursor-pointer text-sm font-medium">{t('cardAdjust')}</summary>
+                  <ActionForm action={cardOptionsAction} className="mt-3 grid gap-3">
+                    <input type="hidden" name="id" value={inv.id} />
+                    <fieldset className="space-y-1 text-sm">
+                      <legend className="mb-1">{t('cardMessage')}</legend>
+                      <label className="flex items-center gap-2">
+                        <input type="radio" name="messageMode" value="invitation" defaultChecked={inv.cardOptions.message === undefined} />
+                        {t('cardMessageSame')}
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input type="radio" name="messageMode" value="custom" defaultChecked={inv.cardOptions.message !== undefined} />
+                        {t('cardMessageCustom')}
+                      </label>
+                    </fieldset>
+                    <textarea name="message" rows={3} maxLength={300} defaultValue={inv.cardOptions.message ?? ''} dir="auto" className={input} aria-label={t('cardMessage')} />
+                    <label className="block">
+                      <span className="mb-1 block text-sm">{t('cardExtraLine')}</span>
+                      <input name="extraLine" maxLength={120} defaultValue={inv.cardOptions.extraLine ?? ''} dir="auto" className={input} />
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" name="showQr" defaultChecked={inv.cardOptions.showQr !== false} />
+                      {t('cardShowQr')}
+                    </label>
+                    <div>
+                      <SubmitButton>{t('cardSaveOptions')}</SubmitButton>
+                    </div>
+                  </ActionForm>
+                  <div className="mt-4 border-t border-line pt-3">
+                    <p className="mb-2 text-sm text-muted">{t('cardUploadHelp')}</p>
+                    <CardUploadForm invitationId={inv.id} />
+                  </div>
+                </details>
+              )}
+            </section>
+          ) : null}
+
+          {hasKeepsake ? (
+            <section className="space-y-2">
+              <h3 className="text-sm font-semibold">{t('keepsakeTitle')}</h3>
+              {documentAvailable(inv, 'keepsake') ? (
+                <p className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <a href={`/admin/api/documents/${inv.id}/keepsake`} className="font-medium text-accent underline">
+                    {t('downloadKeepsake')}
+                  </a>
+                  <a href={`/admin/api/documents/${inv.id}/keepsake?fresh=1`} className="text-muted underline">
+                    {t('regenerate')}
+                  </a>
+                  {delivery ? (
+                    <a
+                      href={whatsappLink(delivery.phone, tr('waKeepsakeMessage', { name: delivery.name, url: delivery.keepsakeUrl }))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent underline"
+                    >
+                      {t('sendWhatsApp')}
+                    </a>
+                  ) : null}
+                </p>
+              ) : (
+                <p className="text-sm text-muted">{t('keepsakeAfterPublish')}</p>
+              )}
+              <p className="text-xs text-muted">{keepsakeReady(inv) ? t('keepsakeCustomerReady') : t('keepsakeCustomerLater')}</p>
+            </section>
+          ) : null}
+        </Card>
+      ) : null}
+
+      {showGuests ? (
+        <Card>
+          <h2 className="mb-1 font-semibold">{t('guestsTitle')}</h2>
+          {counts ? <p className="mb-3 text-sm text-muted">{t('guestsSummary', counts)}</p> : null}
+          {inv.featureKeys.includes('congratulations') ? (
+            <div className="mb-4 flex flex-wrap items-center gap-3 rounded-md bg-canvas px-3 py-2 text-sm">
+              <span>{inv.publicGuestbook ? t('guestbookPublicOn') : t('guestbookPublicOff')}</span>
+              {can(authz, 'invitations.edit') ? (
+                <ActionForm action={guestbookVisibilityAction}>
+                  <input type="hidden" name="id" value={inv.id} />
+                  <input type="hidden" name="public" value={inv.publicGuestbook ? 'false' : 'true'} />
+                  <SubmitButton tone="secondary">{inv.publicGuestbook ? t('guestbookMakePrivate') : t('guestbookMakePublic')}</SubmitButton>
+                </ActionForm>
+              ) : null}
+            </div>
+          ) : null}
+          {guests.length === 0 ? (
+            <p className="text-sm text-muted">{t('guestsEmpty')}</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-start text-muted">
+                  <tr>
+                    <th className="p-2 text-start font-normal">{t('guestName')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestAttendance')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestMessage')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestAt')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {guests.map((g) => (
+                    <tr key={g.id} className="border-t border-line align-top">
+                      <td className="p-2" dir="auto">
+                        {g.guestName}
+                      </td>
+                      <td className="p-2">{g.attendance === 'ATTENDING' ? t('attending') : t('notAttending')}</td>
+                      <td className="max-w-md p-2">
+                        {g.message ? (
+                          <div className="space-y-2">
+                            <p dir="auto" className={g.messageStatus === 'HIDDEN' ? 'text-muted line-through' : 'whitespace-pre-line'}>
+                              {g.message}
+                            </p>
+                            {g.messageStatus === 'HIDDEN' ? <Badge status="ARCHIVED">{t('messageHidden')}</Badge> : null}
+                            {canModerate ? (
+                              <ActionForm action={guestMessageStatusAction}>
+                                <input type="hidden" name="id" value={inv.id} />
+                                <input type="hidden" name="responseId" value={g.id} />
+                                <input type="hidden" name="status" value={g.messageStatus === 'HIDDEN' ? 'VISIBLE' : 'HIDDEN'} />
+                                <SubmitButton tone={g.messageStatus === 'HIDDEN' ? 'primary' : 'danger'}>
+                                  {g.messageStatus === 'HIDDEN' ? t('restoreMessage') : t('hideMessage')}
+                                </SubmitButton>
+                              </ActionForm>
+                            ) : null}
+                          </div>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap p-2">{date(g.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      ) : null}
 
       {published && can(authz, 'invitations.extend') ? (
         <Card>

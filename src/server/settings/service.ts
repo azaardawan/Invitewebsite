@@ -4,7 +4,16 @@ import type { DbOrTx } from '@/server/db/client';
 import { websiteSettings } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
-import { currencySettings, paymentSettings, settingsData, type CurrencySettings, type PaymentSettings, type SettingsData } from './schema';
+import {
+  contactSettings,
+  currencySettings,
+  paymentSettings,
+  settingsData,
+  type ContactSettings,
+  type CurrencySettings,
+  type PaymentSettings,
+  type SettingsData,
+} from './schema';
 
 /** Current settings with defaults for anything never set. */
 export async function getSettings(db: DbOrTx): Promise<SettingsData> {
@@ -52,3 +61,24 @@ export async function updatePaymentSettings(db: DbOrTx, input: PaymentSettings, 
     return data;
   });
 }
+
+export async function updateContactSettings(db: DbOrTx, input: ContactSettings, actor: Actor) {
+  const next = contactSettings.parse(input);
+  return db.transaction(async (tx) => {
+    await tx.insert(websiteSettings).values({ id: 1 }).onConflictDoNothing();
+    const [row] = await tx.select().from(websiteSettings).where(eq(websiteSettings.id, 1)).for('update');
+    const before = settingsData.parse(row?.data ?? {});
+    const data: SettingsData = { ...before, contact: next };
+    await tx.update(websiteSettings).set({ data, updatedAt: new Date(), updatedBy: actor.adminId }).where(eq(websiteSettings.id, 1));
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: 'settings.contact_updated',
+      objectType: 'website_settings',
+      objectId: '1',
+      before: before.contact,
+      after: next,
+    });
+    return data;
+  });
+}
+

@@ -12,6 +12,9 @@ import {
   setInvitationPublished,
   updateInvitationValues,
 } from '@/server/invitation/admin';
+import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
+import { setPublicGuestbook } from '@/server/guests/guestbook';
+import { DocumentError, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
 import type { ActionState } from './state';
 
 const uuid = z.uuid();
@@ -84,4 +87,62 @@ export async function invitationMusicAction(_: ActionState, form: FormData): Pro
   } catch (e) {
     return fail(e);
   }
+}
+
+export async function guestMessageStatusAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'guests.moderate' });
+  const id = uuid.safeParse(form.get('responseId'));
+  const invitationId = uuid.safeParse(form.get('id'));
+  if (!id.success || !invitationId.success) return { error: 'invitations.errors.notFound' };
+  try {
+    const status = form.get('status') === 'HIDDEN' ? 'HIDDEN' : 'VISIBLE';
+    await setGuestMessageStatus(db(), id.data, status, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  } catch (e) {
+    if (e instanceof GuestResponseError) return { error: 'invitations.errors.notFound' };
+    throw e;
+  }
+  revalidatePath(`/admin/invitations/${invitationId.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function cardOptionsAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'documents.generate' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  try {
+    const useOwnMessage = form.get('messageMode') === 'custom';
+    await updateCardOptions(
+      db(),
+      id.data,
+      {
+        message: useOwnMessage ? String(form.get('message') ?? '') : undefined,
+        extraLine: String(form.get('extraLine') ?? ''),
+        showQr: form.get('showQr') === 'on',
+      },
+      { adminId: user.id, ipHash: (await requestContext()).ipHash },
+    );
+  } catch (e) {
+    if (e instanceof DocumentError) return { error: `invitations.cardErrors.${e.code}` };
+    throw e;
+  }
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function removeCustomCardAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'documents.generate' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  await removeCustomCard(db(), id.data, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function guestbookVisibilityAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  await setPublicGuestbook(db(), id.data, form.get('public') === 'true', { type: 'ADMIN', adminId: user.id, ipHash: (await requestContext()).ipHash });
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
 }

@@ -12,8 +12,8 @@ const LANGS = [
 ] as const;
 
 /**
- * Four-language input group. Arabic and English are required (unless the
- * whole value is optional); Kurdish is always optional and falls back to Arabic.
+ * Four-language input group. Every language is required (or, for an optional
+ * value, all four are left empty), so no visitor sees another language.
  */
 export function I18nInputs({
   name,
@@ -35,7 +35,7 @@ export function I18nInputs({
     <fieldset className="space-y-2">
       <legend className="mb-1 text-sm font-medium">{label}</legend>
       {LANGS.map(({ code, dir, lang }) => {
-        const isRequired = required && (code === 'ar' || code === 'en');
+        const isRequired = required;
         const props = {
           name: `${name}.${code}`,
           defaultValue: defaultValue?.[code] ?? '',
@@ -49,13 +49,12 @@ export function I18nInputs({
           <label key={code} className="block">
             <span className="mb-0.5 block text-xs text-muted">
               {t(`lang.${code}`)}
-              {!isRequired ? ` (${t('optional')})` : ''}
             </span>
             {multiline ? <textarea rows={2} {...props} /> : <input type="text" {...props} />}
           </label>
         );
       })}
-      <p className="text-xs text-muted">{t('kurdishHint')}</p>
+      <p className="text-xs text-muted">{t(required ? 'kurdishHint' : 'kurdishHintOptional')}</p>
     </fieldset>
   );
 }

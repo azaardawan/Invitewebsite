@@ -2,7 +2,49 @@
 
 This guide is for the **designer or owner**. It explains exactly what to prepare so a theme can be built to match your vision on the first attempt, without guessing.
 
+Giving the work to another AI? See `docs/THEME_AI_HANDOFF.md` for what it needs besides this guide and a prompt to paste.
+
 **The golden rule:** anything you don't specify has to be guessed. Guessing is where "that's not what I meant" comes from. Every step below removes a guess.
+
+## The conditions at a glance (must-haves)
+
+A theme is accepted when **all** of these hold. The automatic checks test most of them.
+
+**Screens and languages**
+1. Designed **mobile-first at 390 × 844 px**; must also work at 360 px, 430 px and on desktop (1280 px), with no sideways scrolling.
+2. **Arabic (right-to-left) is the main design**; English (left-to-right) must work too. Kurdish uses the Arabic layout.
+3. Every screen works with **short and long names**, using the field limits: names ≤ 40 characters, venue ≤ 80, family names ≤ 150, invitation message ≤ 300.
+4. Starts on a closed screen with an **"Open invitation" button**. Music can only start on that tap.
+
+**Content**
+5. Only fields from the **Field Library**: `person_1_name`, `person_2_name`, `family_names`, `event_date`, `event_time`, `venue_name`, `venue_map_url`, `invitation_message`. New fields are added to the library first.
+6. **No customer text baked into images.** Names, dates, venue and message are live text. Fixed decorative words (e.g. calligraphy basmala) may be images.
+7. Buttons and form labels use the site's wording (translated automatically); the designer doesn't write them. Extra decorative lines are allowed and are listed for translation.
+
+**Packages**
+8. The complete design is the top package (VVIP). **Every lower package state is designed too**, showing what the screen looks like without the removed parts.
+9. **Every Wedding package includes the printable card.**
+10. Guest form (if included): name + "attending / not attending", plus a **required** message in packages with messages. Design the empty, error, sending and thank-you states.
+11. **Public guest messages** (packages with messages): the customer can choose to show all messages **under the invitation** for everyone with the link. Design that list (title, each message with the guest's name, long messages, "be the first" empty state, 1 and 50 messages). When the customer keeps them private, the list is simply absent.
+
+**Motion and media**
+12. Everything that moves is **its own layer**: WebP for pictures (2× size, about ≤ 150 KB each, background ≤ 250 KB), SVG for simple shapes.
+13. A **motion sheet** (what moves, when, how long) with reference videos.
+14. A **reduced-motion version**: what people see if their phone asks for less animation.
+15. One **MP3 song** (128–192 kbps, 1–3 min). It loops, so trim it so the end flows into the start.
+
+**Readability and speed**
+16. Text must be readable: contrast at least **4.5 : 1** for normal text (3 : 1 for big headings). Tap targets at least **44 × 44 px**.
+17. Keep it light: the whole invitation (images + fonts) **about 1.5 MB at most**, with the first screen under ~500 KB. It must open quickly on slow 4G.
+18. Fonts must show **Kurdish letters ڕ ۆ ێ ڵ ە ڤ ک گ پ چ ژ**, be licensed for **web and PDF**, and use at most **2 families and 3–4 weights**. Google Fonts are safe.
+
+**Print**
+19. **Printable card:** A5 portrait. Design it at **154 × 216 mm** (A5 + 3 mm bleed on every side); the customer's PDF is cut to exactly **148 × 210 mm**. Keep all text and important art **at least 5 mm inside** the A5 edge. 300 dpi artwork. Leave space for the **QR code** (about 25 mm) and **one extra line** of text the team may add, and make sure it still looks right **without the message** and **without the QR**.
+20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. The cover page has **no margin** (design the full 210 × 297 mm). Message pages have 18 / 16 / 20 mm margins, and the site adds the **page number at the bottom centre**, so keep that clear. Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+
+**Delivery**
+21. One folder in the structure of Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
+
 
 You deliver **one folder per theme** (see Step 12). A blank brief to fill in is at `docs/themes/THEME_BRIEF_TEMPLATE.md`.
 
@@ -29,7 +71,7 @@ Choose from the **Field Library** (standard names, so the system handles them au
 | `venue_name` | Hall or place name |
 | `venue_map_url` | Google Maps link |
 | `invitation_message` | Short invitation text |
-| `family_names` *(proposed)* | "Son of…" / "Daughter of…" lines |
+| `family_names` | "Son of…" / "Daughter of…" lines |
 
 For each field you use, state:
 1. **The label the customer sees**, e.g. `person_1_name` → "اسم العروس / Bride's name".
@@ -164,20 +206,23 @@ You design the look only. Saving, spam protection and validation are done by the
 These are **separate print designs**, not screenshots of the animated page.
 
 **A. Printable invitation card** (one per theme)
-- **Size:** A5 (148 × 210 mm) unless you choose otherwise (5 × 7 in also works).
-- **Bleed:** extend the background **3 mm beyond every edge**. Keep text and important art **5 mm inside** the edge.
-- **Resolution:** artwork at **300 dpi** at the printed size (A5 = 1748 × 2480 px, or 1819 × 2551 px with bleed).
+- **Size:** A5 portrait (148 × 210 mm). (5 × 7 in is possible if you decide so for a theme.)
+- **Bleed:** design the background **3 mm beyond every edge** (154 × 216 mm). The customer's PDF is cut to exactly A5; a print-shop version keeps the bleed.
+- **Safe area:** keep text and important art **5 mm inside** the A5 edge.
+- **Resolution:** artwork at **300 dpi** at the printed size (with bleed: 1819 × 2551 px).
 - **Colours:** avoid neon or very saturated colours; they print duller.
-- Mark where the live text goes (names, date, time, venue, message) and the **QR code** position (links to the online invitation), if used.
+- Mark where the live text goes (names, date, time, venue, message), the **QR code** (about 25 mm, links to the online invitation) and **one optional extra line** (the team can add e.g. "Family invitation").
+- It must still look balanced **without the message** and **without the QR code**; the team can turn both off per customer.
 - Design it with the **long** sample names too.
+- The team can always upload a fully custom A5 PDF for one customer instead; your design is the automatic default.
 
-**B. Keepsake PDF** (only themes/packages with guest messages)
-- **Size:** A4 portrait.
-- Design three page types:
-  1. **Cover:** couple names, date, artwork.
-  2. **Message page:** how each message looks (guest name + message). Show how many fit per page and a **long message** (500 characters).
-  3. **Closing page** (optional).
-- It must work with 3 messages and with 200 messages.
+**B. Keepsake PDF** (packages with guest messages)
+- **Size:** A4 portrait, **in the same visual identity as the invitation** (colours, fonts, ornaments).
+- Page types:
+  1. **Cover:** full page with **no margin** (design the whole 210 × 297 mm): names, date, artwork.
+  2. **Message pages:** margins 18 mm top, 16 mm sides, 20 mm bottom; the platform prints the **page number at the bottom centre**. Show how each message looks (guest name + message), how many fit per page, and a **long message** (500 characters). A message is never split across two pages.
+  3. **Closing** (optional): a short thank-you after the last message.
+- It must work with **0**, **3** and **200** messages (with 0, a short "no messages yet" line is shown).
 
 ## Step 12 — Hand-off folder
 
@@ -224,5 +269,7 @@ theme-royal-garden/
 - [ ] Song (MP3) + music button design
 - [ ] Fonts tested with ڕ ۆ ێ ڵ ە ڤ + license confirmed
 - [ ] Guest form states (if included)
-- [ ] Printable card at A5, 3 mm bleed, 300 dpi, QR position
-- [ ] Keepsake PDF pages (if included)
+- [ ] Public guest messages list: title, long message, empty state, 1 and 50 messages (if messages included)
+- [ ] Printable card: A5 + 3 mm bleed, 5 mm safe area, 300 dpi, QR + extra-line positions, works without message/QR
+- [ ] Keepsake PDF: full-bleed cover, message pages (margins, page number clear), 0 / 3 / 200 messages
+- [ ] Text contrast and tap sizes checked; total size about ≤ 1.5 MB

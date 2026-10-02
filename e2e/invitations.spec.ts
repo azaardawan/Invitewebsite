@@ -23,6 +23,12 @@ test('public invitation: canonical URL, redirects, OG, noindex, and admin take-d
   await expect(page.getByRole('note')).toHaveCount(0); // no PREVIEW/SAMPLE ribbon on live invitations
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', 'Layan');
 
+  // A guest replies on the live invitation; the reply is stored (not just shown as sent).
+  await page.getByRole('textbox', { name: 'Your name' }).fill('Omar Guest');
+  await page.getByRole('button', { name: "I'll attend" }).click();
+  await page.getByRole('button', { name: 'Send' }).click();
+  await expect(page.getByRole('status')).toHaveText('Thank you, your response was sent.');
+
   // Any other slug (or none) redirects permanently to the canonical link.
   for (const wrong of [`/i/old-name-${publicId}`, `/i/${publicId}`]) {
     const r = await request.get(wrong, { maxRedirects: 0 });
@@ -36,6 +42,9 @@ test('public invitation: canonical URL, redirects, OG, noindex, and admin take-d
   await page.goto(`/admin/invitations?q=${publicId}`);
   await page.getByRole('link', { name: 'إدارة' }).click();
   await expect(page.getByText(path).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ردود الضيوف' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Omar Guest' })).toBeVisible();
+  await expect(page.getByText('1 سيحضرون · 0 لن يحضروا')).toBeVisible();
 
   const unpublish = page.locator('form', { has: page.getByRole('button', { name: 'إيقاف الدعوة' }) });
   await unpublish.getByLabel('السبب (يظهر في سجل التدقيق)').fill('Requested by the customer');

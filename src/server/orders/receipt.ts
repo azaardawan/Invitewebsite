@@ -1,4 +1,5 @@
 import 'server-only';
+import { keepsakeReady } from '@/server/documents/delivery';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, orders } from '@/server/db/schema';
@@ -42,6 +43,12 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
     paidAt: row.order.paidAt,
     snapshot,
     invitation: {
+      /** Internal id, for the card download; never rendered. */
+      id: row.invitation.id,
+      hasPrintCard: row.invitation.featureKeys.includes('print_card'),
+      keepsakeReady: keepsakeReady(row.invitation, now),
+      hasMessages: row.invitation.featureKeys.includes('congratulations'),
+      publicGuestbook: row.invitation.publicGuestbook,
       status: row.invitation.status,
       live: isLive(row.invitation, now),
       publishedAt: row.invitation.publishedAt,

@@ -1,8 +1,9 @@
 import { getTranslations } from 'next-intl/server';
-import { isLocale, localeMeta, type Locale } from '@/i18n/config';
+import { isLocale, type Locale } from '@/i18n/config';
 import { localized } from '@/server/catalog/common';
 import { env } from '@/server/env';
-import { formatIqd } from '@/lib/currency';
+import { formatIqdIn } from '@/lib/currency';
+import { formatLongDate } from '@/server/invitation/theme-props';
 import { ReceiptActions } from '@/components/receipt/ReceiptActions';
 import { ConfirmingPayment, PayButton } from '@/components/receipt/PaymentStatus';
 import { db } from '@/server/db/client';
@@ -11,7 +12,7 @@ import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/servic
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
-import { payAction } from './actions';
+import { guestbookAction, payAction } from './actions';
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
@@ -36,8 +37,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       </main>
     );
   }
-  const intl = localeMeta[locale].intlLocale;
-  const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeZone: 'Asia/Baghdad' }).format(d) : '—');
+  const date = (d: Date | null) => (d ? formatLongDate(d, locale) : '—');
   const url = r.invitation.path ? `${env().APP_URL}${r.invitation.path}` : null;
   const paid = r.status === 'PAID';
   const stillPayable = paymentWindowOpen(r);
@@ -46,7 +46,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // Manual collection has no time limit: the team confirms whenever the customer pays.
   const waitingManual = (r.status === 'PENDING' || r.status === 'AWAITING_PAYMENT') && !online;
   const { payment } = waitingManual ? await getSettings(db()) : { payment: null };
-  const waText = t('waMessage', { order: r.orderNumber, amount: formatIqd(r.amountIqd, intl) });
+  const waText = t('waMessage', { order: r.orderNumber, amount: formatIqdIn(r.amountIqd, locale) });
   const rows: [string, string][] = [
     [t('orderNumber'), r.orderNumber],
     ...(r.invoiceNumber ? ([[t('invoiceNumber'), r.invoiceNumber]] as [string, string][]) : []),
@@ -56,7 +56,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('email'), r.snapshot.customer.email],
     [t('theme'), localized(r.snapshot.theme.name, locale)],
     [t('package'), localized(r.snapshot.package.name, locale)],
-    [t('amount'), formatIqd(r.amountIqd, intl)],
+    [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
     ...(r.invitation.publishedAt ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
@@ -79,7 +79,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           {canPay ? (
             <form action={payAction} className="flex flex-col gap-2">
               <input type="hidden" name="token" value={token} />
-              <PayButton label={t('payNow', { amount: formatIqd(r.amountIqd, intl) })} pendingLabel={t('payOpening')} />
+              <PayButton label={t('payNow', { amount: formatIqdIn(r.amountIqd, locale) })} pendingLabel={t('payOpening')} />
               <p className="text-center text-xs text-muted">{t('payNote')}</p>
             </form>
           ) : (
@@ -137,6 +137,63 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           }}
         />
       </section>
+
+      {paid && r.invitation.hasPrintCard ? (
+        <section className="mt-8 space-y-2 print:hidden">
+          <h2 className="font-semibold">{t('printCardTitle')}</h2>
+          <p className="text-sm text-muted">{t('printCardHelp')}</p>
+          <a
+            href={`/r/${encodeURIComponent(token)}/card`}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-accent px-6 font-semibold text-accent"
+          >
+            {t('printCardDownload')}
+          </a>
+        </section>
+      ) : null}
+
+      {paid && r.invitation.hasMessages ? (
+        <section id="guestbook" className="mt-8 space-y-3 print:hidden">
+          <h2 className="font-semibold">{t('guestbookTitle')}</h2>
+          <p className="text-sm text-muted">{t('guestbookHelp')}</p>
+          <form action={guestbookAction} className="flex flex-col gap-3">
+            <input type="hidden" name="token" value={token} />
+            <fieldset className="flex flex-col gap-2 text-sm">
+              <legend className="sr-only">{t('guestbookTitle')}</legend>
+              <label className="flex items-start gap-3">
+                <input type="radio" name="visibility" value="private" defaultChecked={!r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
+                <span>{t('guestbookPrivate')}</span>
+              </label>
+              <label className="flex items-start gap-3">
+                <input type="radio" name="visibility" value="public" defaultChecked={r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
+                <span>{t('guestbookPublic')}</span>
+              </label>
+            </fieldset>
+            <div className="flex items-center gap-3">
+              <button type="submit" className="inline-flex h-11 items-center justify-center rounded-full border border-accent px-6 text-sm font-semibold text-accent">
+                {t('guestbookSave')}
+              </button>
+              {sp.guestbook === 'saved' ? (
+                <span role="status" className="text-sm text-muted">
+                  {t('guestbookSaved')}
+                </span>
+              ) : null}
+            </div>
+          </form>
+        </section>
+      ) : null}
+
+      {paid && r.invitation.keepsakeReady ? (
+        <section className="mt-8 space-y-2 print:hidden">
+          <h2 className="font-semibold">{t('keepsakeTitle')}</h2>
+          <p className="text-sm text-muted">{t('keepsakeHelp')}</p>
+          <a
+            href={`/r/${encodeURIComponent(token)}/keepsake`}
+            className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 font-semibold text-accent-ink"
+          >
+            {t('keepsakeDownload')}
+          </a>
+        </section>
+      ) : null}
 
       <p className="mt-8 text-sm">{t('corrections')}</p>
       <p className="mt-2 text-xs text-muted print:hidden">{t('keepLink')}</p>

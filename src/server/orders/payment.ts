@@ -1,4 +1,5 @@
 import 'server-only';
+import { trackEvent } from '@/server/analytics/events';
 import { eq, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, invoiceCounters, orderStatusHistory, orders } from '@/server/db/schema';
@@ -73,6 +74,8 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
         after: { publishedAt: pub.publishedAt, expiresAt: pub.expiresAt },
       });
     }
+    const [inv] = await tx.select({ themeId: invitations.themeId, packageId: invitations.packageId, locale: invitations.locale }).from(invitations).where(eq(invitations.id, order.invitationId));
+    await trackEvent(tx, { name: 'order_paid', locale: inv?.locale, themeId: inv?.themeId, packageId: inv?.packageId, invitationId: order.invitationId, orderId, occurredAt: now });
     return { alreadyPaid: false, invoiceNumber };
   });
 }

@@ -9,7 +9,9 @@ import { consumeRateLimit } from '@/server/rate-limit';
 import { getSettings } from '@/server/settings/service';
 import { normalizePhone } from '@/lib/phone';
 import { orderNumber } from '@/lib/ids';
-import { LEGAL_VERSIONS, OrderError, loadPurchasable, sameSet } from './common';
+import { OrderError, loadPurchasable, sameSet } from './common';
+import { acceptedVersions } from '@/server/legal/policies';
+import { trackEvent } from '@/server/analytics/events';
 import { findByPreviewToken } from './drafts';
 import { receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
@@ -99,6 +101,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       createdAt: now.toISOString(),
     };
 
+    const legal = await acceptedVersions(tx);
     let order: typeof orders.$inferSelect | undefined;
     for (let attempt = 0; attempt < 5 && !order; attempt++) {
       [order] = await tx
@@ -109,7 +112,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
           invitationId: inv!.id,
           amountIqd: p.pkg.priceIqd,
           snapshot,
-          legalAcceptance: { ...LEGAL_VERSIONS, acceptedAt: now.toISOString(), ipHash: ctx.ipHash, userAgent: ctx.userAgent },
+          legalAcceptance: { ...legal, acceptedAt: now.toISOString(), ipHash: ctx.ipHash, userAgent: ctx.userAgent },
           receiptTokenHash: 'pending',
           idempotencyKey: input.idempotencyKey,
         })
@@ -132,6 +135,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       after: { orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: p.theme.key, package: p.pkg.id },
       ipHash: ctx.ipHash,
     });
+    await trackEvent(tx, { name: 'order_placed', locale: inv!.locale, themeId: p.theme.id, packageId: p.pkg.id, invitationId: inv!.id, orderId: order.id, occurredAt: now });
     return { orderId: order.id, orderNumber: order.orderNumber, receiptToken, amountIqd: order.amountIqd, reused: false };
   });
 }

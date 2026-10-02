@@ -8,6 +8,7 @@ import type { RequestContext } from '@/server/auth/request-context';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { OrderError, PREVIEW_TTL_MS, fieldDefs, loadPurchasable } from './common';
 import { newPreviewToken, previewTokenHash } from './tokens';
+import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
 
 export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown> };
@@ -40,7 +41,10 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
       })
       .onConflictDoNothing({ target: invitations.publicId })
       .returning({ id: invitations.id, publicId: invitations.publicId });
-    if (inserted[0]) return { previewToken: token, invitationId: inserted[0].id };
+    if (inserted[0]) {
+      await trackEvent(db, { name: 'order_started', locale: input.locale, themeId: p.theme.id, packageId: p.pkg.id, invitationId: inserted[0].id, occurredAt: now });
+      return { previewToken: token, invitationId: inserted[0].id };
+    }
   }
   throw new Error('Could not allocate a unique invitation id');
 }

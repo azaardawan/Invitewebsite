@@ -57,6 +57,55 @@
       "when": 1790769682555,
       "tag": "0007_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790859804787,
+      "tag": "0008_guest_responses",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790860703686,
+      "tag": "0009_generated_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790863614473,
+      "tag": "0010_card_options",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790866346237,
+      "tag": "0011_legal_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790866347462,
+      "tag": "0012_legal_published_immutable",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790939686326,
+      "tag": "0013_analytics_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790940703568,
+      "tag": "0014_public_guestbook",
+      "breakpoints": true
     }
   ]
 }

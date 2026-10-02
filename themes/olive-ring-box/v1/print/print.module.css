@@ -1,0 +1,282 @@
+/*
+ * Print companions. Physical units only; colours are the web palette, which
+ * is muted enough to print faithfully. No animation, no fixed positioning.
+ */
+
+/* ---------------------------------------------------------------- A5 card (trim 148 × 210 mm + 3 mm bleed) */
+
+.card {
+  --bleed: 3mm;
+  --safe: 5mm;
+  position: relative;
+  width: calc(148mm + 2 * var(--bleed));
+  height: calc(210mm + 2 * var(--bleed));
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 40%, #fbf6ec 0%, rgb(251 246 236 / 0) 75%),
+    #f3ebdd;
+  color: #39412d;
+  font-family: var(--font-read);
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.keepsake * {
+  box-sizing: border-box;
+}
+.cardBranchTop,
+.cardBranchBottom,
+.coverBranchTop,
+.coverBranchBottom {
+  position: absolute;
+  background: url(../assets/olive-branch-top.svg) center / contain no-repeat;
+}
+/* Branches run into the bleed at the corners, clear of the text block. */
+.cardBranchTop {
+  top: 0;
+  inset-inline-start: 0;
+  width: 44mm;
+  height: 32mm;
+}
+.cardBranchBottom {
+  bottom: 0;
+  inset-inline-end: 0;
+  width: 38mm;
+  height: 28mm;
+  transform: rotate(180deg);
+}
+.card[dir='ltr'] .cardBranchTop {
+  transform: scaleX(-1);
+}
+.card[dir='ltr'] .cardBranchBottom {
+  transform: rotate(180deg) scaleX(-1);
+}
+.cardSafe {
+  position: absolute;
+  /* bleed + safe area, plus generous breathing room at top and bottom for the branches */
+  inset: calc(var(--bleed) + 26mm) calc(var(--bleed) + 12mm) calc(var(--bleed) + 20mm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4.5mm;
+}
+.cardBasmala {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 14pt;
+  line-height: 1.6;
+}
+.rule {
+  display: block;
+  width: 32mm;
+  height: 2.4mm;
+  color: #c8af79;
+}
+.cardNames,
+.coverNames {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 27pt;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.cardAnd {
+  font-weight: 400;
+  font-size: 17pt;
+  line-height: 1.2;
+  color: #8c7440;
+}
+.cardMessage {
+  max-width: 100mm;
+  margin: 0;
+  font-size: 10.5pt;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.cardDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  width: 100%;
+  margin: 1mm 0 0;
+  padding: 3.5mm 0;
+  border-block: 0.3mm solid rgb(200 175 121 / 0.6);
+}
+.cardDetails div {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2.5mm;
+}
+/* The venue can run to 80 characters: label above, value centred beneath. */
+.cardDetails .cardVenue {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5mm;
+}
+.cardDetails dt {
+  flex: none;
+  font-size: 8.5pt;
+  font-weight: 500;
+  color: #626b45;
+}
+.cardDetails dd {
+  margin: 0;
+  font-size: 10.5pt;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.cardQr {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin: 0;
+}
+.cardQr img {
+  width: 18mm;
+  height: 18mm;
+  padding: 1.2mm;
+  border-radius: 1.5mm;
+  background: #fffdf8;
+}
+.cardQr figcaption {
+  font-size: 8pt;
+  color: #626b45;
+}
+
+/* ---------------------------------------------------------------- A4 keepsake */
+
+.keepsake {
+  color: #39412d;
+  font-family: var(--font-read);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 45%, #fbf6ec 0%, rgb(251 246 236 / 0) 75%),
+    #f3ebdd;
+  break-after: page;
+}
+.coverBranchTop {
+  top: 0;
+  inset-inline-start: 0;
+  width: 70mm;
+  height: 51mm;
+}
+.coverBranchBottom {
+  bottom: 0;
+  inset-inline-end: 0;
+  width: 60mm;
+  height: 44mm;
+  transform: rotate(180deg);
+}
+.keepsake[dir='ltr'] .coverBranchTop {
+  transform: scaleX(-1);
+}
+.keepsake[dir='ltr'] .coverBranchBottom {
+  transform: rotate(180deg) scaleX(-1);
+}
+.coverInner {
+  position: absolute;
+  inset: 60mm 25mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6mm;
+  text-align: center;
+}
+.coverEyebrow {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20pt;
+  color: #626b45;
+}
+.coverNames {
+  font-size: 38pt;
+}
+.coverDate {
+  margin: 0;
+  font-size: 12pt;
+  font-weight: 500;
+}
+.coverSub {
+  margin: 0;
+  font-size: 11pt;
+  color: #626b45;
+}
+.messages {
+  padding: 0 4mm;
+}
+.messagesTitle {
+  margin: 0 0 8mm;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20pt;
+  text-align: center;
+}
+.message {
+  padding: 5mm 0;
+  border-top: 0.3mm solid rgb(200 175 121 / 0.55);
+  break-inside: avoid;
+}
+.message:first-of-type {
+  border-top: 0;
+}
+.messageText {
+  margin: 0;
+  font-size: 11pt;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.messageFrom {
+  margin: 2mm 0 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12pt;
+  color: #626b45;
+}
+.empty {
+  margin: 20mm 0;
+  text-align: center;
+  color: #626b45;
+}
+.closing {
+  margin-top: 12mm;
+  text-align: center;
+  break-inside: avoid;
+}
+.closingSprig {
+  display: block;
+  width: 36mm;
+  height: 10.5mm;
+  margin: 0 auto 3mm;
+  background: url(../assets/olive-sprig.svg) center / contain no-repeat;
+}
+.closing p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 14pt;
+}
+
+/* A line the team added for this card only (Admin → invitation → printable card). */
+.cardExtra {
+  margin: 3mm 0 0;
+  font-size: 9.5pt;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}

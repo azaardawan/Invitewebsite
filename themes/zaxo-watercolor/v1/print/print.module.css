@@ -1,0 +1,227 @@
+/*
+ * Print companions. Physical units only; the web palette prints faithfully.
+ * Artwork (border strips, landmark painting) is physical left/right, never mirrored.
+ */
+@font-face {
+  font-family: 'Zaxo DejaVu Sans';
+  src: url('../assets/dejavu-sans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+.card,
+.keepsake {
+  color: #463b2b;
+  font-family: 'Zaxo DejaVu Sans', sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.keepsake * {
+  box-sizing: border-box;
+}
+
+.diamond {
+  display: block;
+  width: 11mm;
+  height: 11mm;
+  flex: none;
+}
+.diamondSmall {
+  display: block;
+  width: 7mm;
+  height: 7mm;
+  margin: 0 auto;
+}
+.amp {
+  font-size: 0.6em;
+  color: #a45436;
+}
+
+/* Heritage border strips down both long edges, into the bleed. */
+.side {
+  position: absolute;
+  inset-block: 0;
+  width: 6mm;
+  background: url('../assets/heritage-border.webp') top center / 6mm auto repeat-y;
+}
+.sideLeft {
+  left: 1.5mm;
+}
+.sideRight {
+  right: 1.5mm;
+}
+
+/* ---------------------------------------------------------------- A5 card (trim 148 × 210 mm + 3 mm bleed) */
+
+.card {
+  --bleed: 3mm;
+  position: relative;
+  width: calc(148mm + 2 * var(--bleed));
+  height: calc(210mm + 2 * var(--bleed));
+  overflow: hidden;
+  background: #fbf2e2;
+  text-align: center;
+}
+.cardScene,
+.coverScene {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  background: url('../assets/landmark-scene.webp') bottom center / contain no-repeat;
+  opacity: 0.9;
+}
+.cardScene {
+  height: 52mm;
+}
+.cardSafe {
+  position: absolute;
+  inset: calc(var(--bleed) + 14mm) calc(var(--bleed) + 14mm) calc(var(--bleed) + 50mm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.cardNames,
+.coverNames {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.cardNames {
+  font-size: 24pt;
+}
+.cardMessage {
+  max-width: 100mm;
+  margin: 0;
+  font-size: 9.5pt;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cardDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6mm;
+  width: 100%;
+  margin: 0;
+  padding: 3mm 0;
+  border-block: 0.3mm solid rgb(164 84 54 / 0.45);
+}
+.cardDetails div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3mm;
+}
+.cardDetails dt {
+  font-size: 7.5pt;
+  color: #92482e;
+}
+.cardDetails dd {
+  margin: 0;
+  font-size: 10pt;
+  overflow-wrap: anywhere;
+}
+.cardExtra {
+  margin: 0;
+  font-size: 9pt;
+  color: #2d6565;
+}
+.cardQr {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin: 0;
+}
+.cardQr img {
+  width: 16mm;
+  height: 16mm;
+  padding: 1mm;
+  background: #fffaf1;
+  border: 0.3mm solid #d5bd96;
+}
+.cardQr figcaption {
+  font-size: 7.5pt;
+  color: #71665a;
+}
+
+/* ---------------------------------------------------------------- A4 keepsake */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: #fbf2e2;
+  break-after: page;
+}
+.coverScene {
+  height: 100mm;
+}
+.coverInner {
+  position: absolute;
+  inset: 45mm 25mm 105mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6mm;
+  text-align: center;
+}
+.coverEyebrow {
+  margin: 0;
+  font-size: 16pt;
+  color: #92482e;
+}
+.coverNames {
+  font-size: 34pt;
+}
+.coverDate {
+  margin: 0;
+  font-size: 12pt;
+}
+.messages {
+  padding: 0 4mm;
+}
+.messagesTitle {
+  margin: 0 0 8mm;
+  font-size: 18pt;
+  font-weight: 400;
+  text-align: center;
+  color: #92482e;
+}
+.message {
+  padding: 5mm 0;
+  border-top: 0.3mm solid rgb(164 84 54 / 0.35);
+  break-inside: avoid;
+}
+.message:first-of-type {
+  border-top: 0;
+}
+.messageText {
+  margin: 0;
+  font-size: 11.5pt;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.messageFrom {
+  margin: 2mm 0 0;
+  font-size: 10pt;
+  color: #2d6565;
+}
+.empty {
+  text-align: center;
+  color: #71665a;
+}
+.closing {
+  margin-top: 10mm;
+  break-inside: avoid;
+}

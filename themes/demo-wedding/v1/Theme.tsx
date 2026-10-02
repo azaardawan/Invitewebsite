@@ -99,6 +99,19 @@ export default function DemoWeddingTheme(props: ThemeProps) {
           {hasFeature(props, 'countdown') ? <Countdown {...props} /> : null}
 
           <GuestFormSlot render={(form) => <GuestForm form={form} labels={labels} />} />
+
+          {props.guestbook ? (
+            <section className={styles.guestbook} aria-labelledby="demo-guestbook">
+              <h2 id="demo-guestbook">{labels.guestbookTitle}</h2>
+              {props.guestbook.length === 0 ? <p>{labels.guestbookEmpty}</p> : null}
+              {props.guestbook.map((m, i) => (
+                <blockquote key={i} className={styles.guestbookItem}>
+                  <p dir="auto">{m.message}</p>
+                  <footer dir="auto">— {m.guestName}</footer>
+                </blockquote>
+              ))}
+            </section>
+          ) : null}
         </div>
       )}
 

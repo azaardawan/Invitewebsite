@@ -36,11 +36,21 @@ const schema = z.object({
   WAYL_API_BASE_URL: z.url().default('https://api.thewayl.com'),
   /** `test` creates WAYL test-mode links (no real money); production must use `live`. */
   WAYL_ENV: z.enum(['live', 'test']).default('test'),
+  /** Cloudflare Turnstile (bot check on the guest form). Both set = on; both unset = off. */
+  TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+  TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+  /** Chromium used to render PDFs; defaults to Playwright's bundled browser (the Docker image sets /usr/bin/chromium). */
+  CHROMIUM_PATH: z.string().optional(),
+  /** Where the PDF renderer reaches this app's print pages; defaults to http://127.0.0.1:$PORT. */
+  PRINT_ORIGIN: z.url().optional(),
   /** Shared secret for the scheduled reconciliation call (`POST /api/cron/reconcile-payments`). */
   CRON_SECRET: z.string().min(32).optional(),
 }).superRefine((e, ctx) => {
   if (e.APP_ENV === 'production' && e.WAYL_API_KEY && e.WAYL_ENV !== 'live') {
     ctx.addIssue({ code: 'custom', path: ['WAYL_ENV'], message: 'must be live in production' });
+  }
+  if (Boolean(e.TURNSTILE_SITE_KEY) !== Boolean(e.TURNSTILE_SECRET_KEY)) {
+    ctx.addIssue({ code: 'custom', path: ['TURNSTILE_SECRET_KEY'], message: 'set both TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY, or neither' });
   }
   if (e.STORAGE_DRIVER === 's3') {
     for (const k of ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'MEDIA_PUBLIC_BASE_URL'] as const) {
@@ -62,7 +72,8 @@ let cached: Env | undefined;
  */
 export function env(): Env {
   if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+  // A variable left empty in the hosting dashboard means "not set", not "invalid".
+  const parsed = schema.safeParse(Object.fromEntries(Object.entries(process.env).filter(([, v]) => v !== '')));
   if (!parsed.success) {
     const problems = parsed.error.issues.map((i) => `  ${i.path.join('.')}: ${i.message}`).join('\n');
     throw new Error(`Invalid environment configuration:\n${problems}`);
