@@ -393,10 +393,6 @@
         "maxPackages": "Maximum reached (3 active packages).",
         "price": "Price (IQD)",
         "packageName": "Package name",
-        "state": "Package contents",
-        "stateHint": "Choose one of the states the theme was designed for.",
-        "stateFields": "Fields: {fields}",
-        "stateMissing": "Unavailable: missing {features}, required in this section.",
         "archivedPackages": "Archived packages",
         "readiness": "Readiness",
         "readyOk": "The theme meets every requirement.",
@@ -424,7 +420,12 @@
           "musicArchived": "The chosen song is archived."
         },
         "priceUsd": "Price (US dollars)",
-        "priceUsdHint": "You set both prices. The USD price is optional for now and will be used once card payments (Mastercard) are enabled."
+        "priceUsdHint": "You set both prices. The USD price is optional for now and will be used once card payments (Mastercard) are enabled.",
+        "packageFeatures": "Features in this package",
+        "packageFeaturesHint": "Tick everything this package includes. Guest messages need the guest form, and the keepsake PDF needs guest messages.",
+        "requiredInSection": "always included in this occasion",
+        "packageFields": "Details the customer fills in",
+        "packageFieldsHint": "The map link is asked only when the map is included; the date is always asked when the countdown is included."
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -437,7 +438,7 @@
         "musicInUse": "This song is used by themes; change them first:",
         "invalidMusic": "The song is not available.",
         "noVersion": "The theme has no current version.",
-        "notValidState": "This combination doesn't match any designed state.",
+        "notValidState": "This combination can't be sold with this theme.",
         "missingRequiredFeature": "Missing a feature required by this section:",
         "tooManyPackages": "A theme can't have more than 3 active packages.",
         "wouldBreakTheme": "This change would leave the theme incomplete:",

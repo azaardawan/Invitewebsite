@@ -9,7 +9,7 @@ import { can } from '@/server/rbac/authz';
 import type { Permission } from '@/server/rbac/permissions';
 import type { Actor } from '@/server/catalog/common';
 import { FIELD_KEYS } from '@/catalog/fields';
-import { FEATURE_KEYS } from '@/catalog/features';
+import { FEATURE_KEYS, FEATURES } from '@/catalog/features';
 import { createSection, moveSection, setSectionDefaultFields, setSectionStatus, updateSection } from '@/server/catalog/sections';
 import { updateField } from '@/server/catalog/fields';
 import { createMusicTrack, renameMusicTrack, setMusicStatus } from '@/server/catalog/music';
@@ -204,13 +204,24 @@ export async function moveThemeAction(_: ActionState, form: FormData): Promise<A
 
 // ---------- Packages ----------
 
-/** The package's contents are one of the theme's designed states, chosen by index. */
+/**
+ * The package's contents, chosen feature by feature and field by field. The
+ * section's required features are always included, a feature's required field
+ * is added for it (map → map link, countdown → date), and the map link is only
+ * asked for when the map is included. Other rules are checked by the service.
+ */
 async function packageShape(themeId: string, form: FormData) {
   const detail = await getThemeDetail(db(), themeId);
-  const index = z.coerce.number().int().min(0).parse(form.get('state'));
-  const state = detail.currentManifest?.validStates[index];
-  if (!state) throw new z.ZodError([]);
-  return { fieldKeys: state.fields, featureKeys: state.features.filter((f) => (FEATURE_KEYS as string[]).includes(f)) };
+  const manifest = detail.currentManifest;
+  if (!manifest) throw new z.ZodError([]);
+  const picked = (name: string) => new Set(form.getAll(name).filter((v): v is string => typeof v === 'string'));
+  const features = picked('features');
+  for (const r of detail.section?.requiredFeatures ?? []) features.add(r);
+  const featureKeys = manifest.features.filter((f) => features.has(f) && (FEATURE_KEYS as string[]).includes(f));
+  const fields = picked('fields');
+  for (const f of featureKeys) for (const k of FEATURES[f].requiresFields as readonly string[]) fields.add(k);
+  if (!featureKeys.includes('map')) fields.delete('venue_map_url');
+  return { featureKeys, fieldKeys: manifest.fields.filter((k) => fields.has(k)) };
 }
 
 function packageFields(form: FormData) {

@@ -169,11 +169,19 @@ describe('theme registry sync', () => {
 });
 
 describe('packages', () => {
-  it('accept only designed states and enforce section-required features', async () => {
+  it('accept any combination the theme supports, checking dependencies and section-required features', async () => {
     const t = await registeredTheme();
+    // Not one of the designed states, but consistent: allowed (the owner builds packages feature by feature).
+    const custom = await createPackage(db(), t.id, { ...full(), featureKeys: ['rsvp', 'print_card'] }, actor);
+    expect(custom.id).toBeTruthy();
+    // The map without its map-link field is not.
     await expect(
       createPackage(db(), t.id, { ...basic(), featureKeys: ['music', 'map', 'print_card'] }, actor),
-    ).rejects.toMatchObject({ code: 'notValidState' });
+    ).rejects.toMatchObject({ code: 'notValidState', details: ['map requires field venue_map_url'] });
+    // Nothing the theme doesn't support.
+    await expect(
+      createPackage(db(), t.id, { ...full(), featureKeys: ['music', 'countdown', 'print_card'] }, actor),
+    ).rejects.toMatchObject({ code: 'notValidState', details: ['theme does not support feature countdown'] });
 
     // A theme designed without the printable card can't have wedding packages at all.
     const noPrint = await registeredTheme({
@@ -277,7 +285,8 @@ describe('theme lifecycle', () => {
       features: ['music', 'print_card'],
       validStates: [{ features: ['music', 'print_card'], fields: [...BASIC_FIELDS] }],
     });
-    const v3 = manifest(t.key, 3, { features: ['music', 'map', 'rsvp', 'print_card'], validStates: [manifest(t.key).validStates[1]!] });
+    // v3 drops music, which the active packages include.
+    const v3 = manifest(t.key, 3, { features: ['map', 'rsvp', 'print_card'], validStates: [{ features: ['map', 'rsvp', 'print_card'], fields: [...FULL_FIELDS] }] });
     await syncThemesFromRegistry(db(), [manifest(t.key, 1), v2, v3], actor);
     const versions = await db().select().from(themeVersions).where(eq(themeVersions.themeId, t.id));
     const byNum = (n: number) => versions.find((v) => v.version === n)!.id;

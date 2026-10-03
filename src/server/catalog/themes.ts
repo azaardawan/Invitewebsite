@@ -18,7 +18,7 @@ import {
 import { recordAudit } from '@/server/audit/audit';
 import { env } from '@/server/env';
 import { sha256 } from '@/lib/crypto';
-import { codeRef, matchesValidState, type ThemeManifest } from '@/theme-sdk/manifest';
+import { codeRef, packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
 import { CatalogError, auditActor, i18nContent, localized, moveInList, optionalI18nContent, type Actor } from './common';
 
 export type ThemeStatus = (typeof themes.$inferSelect)['status'];
@@ -211,7 +211,7 @@ export async function themeReadiness(db: DbOrTx, themeId: string): Promise<Readi
   const required = row.section?.requiredFeatures ?? [];
   for (const p of active) {
     const name = localized(p.name, 'en');
-    if (manifest && !matchesValidState(manifest, p.featureKeys, p.fieldKeys)) problems.push({ code: 'packageInvalid', subject: name });
+    if (manifest && packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0) problems.push({ code: 'packageInvalid', subject: name });
     for (const r of required) if (!p.featureKeys.includes(r)) problems.push({ code: 'packageMissingRequired', subject: `${name}: ${r}` });
   }
   if (active.some((p) => p.featureKeys.includes('music'))) {
@@ -361,7 +361,7 @@ export async function setCurrentVersion(db: DbOrTx, themeId: string, versionId: 
     if (!version.inBuild) throw new CatalogError('versionNotInBuild');
     const manifest = version.manifest as ThemeManifest;
     const invalid = (await packagesWithShape(tx, themeId))
-      .filter((p) => p.status === 'ACTIVE' && !matchesValidState(manifest, p.featureKeys, p.fieldKeys))
+      .filter((p) => p.status === 'ACTIVE' && packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0)
       .map((p) => localized(p.name, 'en'));
     if (invalid.length) throw new CatalogError('packagesInvalidForVersion', invalid);
     await tx.update(themes).set({ currentVersionId: versionId }).where(eq(themes.id, themeId));

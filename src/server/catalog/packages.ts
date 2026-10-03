@@ -6,7 +6,7 @@ import { packageFeatures, packageFields, packages, sections, themeVersions, them
 import { recordAudit } from '@/server/audit/audit';
 import { FEATURE_KEYS, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
-import { matchesValidState, type ThemeManifest } from '@/theme-sdk/manifest';
+import { packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
 import { CatalogError, auditActor, i18nContent, moveInList, optionalI18nContent, type Actor } from './common';
 import { assertStillReady, packagesWithShape } from './themes';
 
@@ -33,7 +33,8 @@ async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], fe
     .for('update', { of: themes });
   if (!row) throw new CatalogError('notFound');
   if (!row.version) throw new CatalogError('noVersion');
-  if (!matchesValidState(row.version.manifest as ThemeManifest, features, fields)) throw new CatalogError('notValidState');
+  const problems = packageShapeProblems(row.version.manifest as ThemeManifest, features, fields);
+  if (problems.length) throw new CatalogError('notValidState', problems);
   const missing = (row.section?.requiredFeatures ?? []).filter((r) => !features.includes(r));
   if (missing.length) throw new CatalogError('missingRequiredFeature', missing);
   return row;

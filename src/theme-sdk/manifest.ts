@@ -23,9 +23,10 @@ export type ThemeManifest = {
   /** Every feature the complete theme supports. */
   features: FeatureKey[];
   /**
-   * The designed package states. A package is valid only if its exact
-   * feature + field set equals one of these. The complete theme (all fields
-   * and features) must be one of them — it is the top package.
+   * Example package states the designer drew (shown in previews and tested
+   * automatically). The owner may build packages from any combination of the
+   * theme's features and fields, so a theme must look right with any subset.
+   * The complete theme (all fields and features) must be one of them.
    */
   validStates: { features: FeatureKey[]; fields: FieldKey[] }[];
   /** Print companions, required when `print_card` / `keepsake_pdf` are supported. */
@@ -83,6 +84,24 @@ export const manifestSchema = z
     if (m.features.includes('print_card') && !m.print?.card) issue('print_card requires print.card');
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
   });
+
+/**
+ * Why a package's feature/field combination can't be sold with this theme (empty = fine):
+ * anything the theme doesn't support, no fields, or a missing dependency
+ * (e.g. guest messages need the guest form, the map needs the map-link field).
+ */
+export function packageShapeProblems(
+  manifest: Pick<ThemeManifest, 'features' | 'fields'>,
+  features: readonly string[],
+  fields: readonly string[],
+): string[] {
+  const problems: string[] = [];
+  for (const f of features) if (!(manifest.features as string[]).includes(f)) problems.push(`theme does not support feature ${f}`);
+  for (const f of fields) if (!(manifest.fields as string[]).includes(f)) problems.push(`theme does not show field ${f}`);
+  if (fields.length === 0) problems.push('at least one field is required');
+  problems.push(...featureDependencyProblems(features as FeatureKey[], fields as FieldKey[]));
+  return problems;
+}
 
 /** True if the exact feature/field combination is one of the manifest's designed states. */
 export function matchesValidState(
