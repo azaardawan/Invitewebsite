@@ -54,9 +54,28 @@ test('every theme renders every designed state correctly', async ({ page }, test
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&state=${i}&names=short`);
       const open = page.getByRole('button', { name: ar.invitation.openInvitation });
+      if (!m.internal) {
+        // Owner rule: every invitation starts closed and opens with an animation on the guest's tap.
+        await expect(open, `${ref} state ${i + 1}: opening screen with the Open button`).toBeVisible();
+        await page.evaluate(() => {
+          const w = window as unknown as { __bahjaAnimated: number };
+          w.__bahjaAnimated = 0;
+          for (const type of ['animationstart', 'transitionstart']) document.addEventListener(type, () => w.__bahjaAnimated++, true);
+        });
+      }
       if (await open.count()) await open.click();
-      // Let entrance animations finish so screenshots show the final state.
-      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
+      if (!m.internal) {
+        const animated = await page
+          .waitForFunction(() => (window as unknown as { __bahjaAnimated: number }).__bahjaAnimated > 0 || document.getAnimations().length > 0, null, { timeout: 1500 })
+          .then(() => true, () => false);
+        expect(animated, `${ref} state ${i + 1}: an opening animation plays after tapping Open`).toBe(true);
+      }
+      // The opening (every non-looping animation) is over within 4 s; then screenshots show the final state.
+      await page.waitForFunction(
+        () => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity),
+        null,
+        { timeout: m.internal ? 30_000 : 4_000 },
+      );
       await expect(page.getByText(ar.invitationSamples.short.person_1_name).first()).toBeVisible();
       const has = (f: string) => (state.features as string[]).includes(f);
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${ref} state ${i + 1}: map`).toHaveCount(has('map') ? 1 : 0);
@@ -68,6 +87,18 @@ test('every theme renders every designed state correctly', async ({ page }, test
       }
       await page.screenshot({ path: testInfo.outputPath(`theme-screenshots/${ref}/state-${i + 1}/ar-opened.png`), fullPage: true });
     }
+  }
+});
+
+test('with reduced motion the opening is skipped and the invitation shows at once', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
+  await signInAsNewOwner(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const m of generatedManifests.filter((x) => !x.internal)) {
+    await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&names=short`);
+    await page.getByRole('button', { name: ar.invitation.openInvitation }).click();
+    await expect(page.getByText(ar.invitationSamples.short.person_1_name).first(), `${m.key}@${m.version}`).toBeVisible({ timeout: 1_000 });
   }
 });
 

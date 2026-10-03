@@ -82,6 +82,7 @@ Staging is never indexed by search engines (`robots.txt` blocks everything unles
    2. Start with **DNS only** (grey cloud) until Railway shows the certificate as issued.
    3. After that, the orange proxy can be turned on with SSL/TLS mode **Full (strict)**.
 3. **Variables:** set `APP_URL=https://bahjaaa.com` and `APP_ENV=production`, then redeploy.
+   `www.bahjaaa.com` redirects permanently to `bahjaaa.com` (next.config.ts), so links and sign-in use one address.
 4. **Checks**
    - `https://bahjaaa.com/api/health` returns `{"ok":true}`.
    - The homepage loads in all four languages.

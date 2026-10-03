@@ -46,6 +46,17 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ['@node-rs/argon2'],
   experimental: { globalNotFound: true },
+  async redirects() {
+    // One address for everything (links, sign-in cookies, SEO): www.<domain> → <domain>.
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www\\.(?<domain>.+)' }],
+        destination: 'https://:domain/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       { source: '/:path*', headers: baseSecurityHeaders },

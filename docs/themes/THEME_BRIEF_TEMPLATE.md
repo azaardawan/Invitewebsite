@@ -35,6 +35,15 @@ What fills the space when a part is removed (per package):
 - Desktop behaviour:
 - What flips in English (left-to-right):
 
+## 7A. Opening animation (required)
+- Cover (what the guest sees before tapping):
+- Idle loop before the tap (optional):
+- What happens after "Open" (step by step):
+- Total length (1.5–3.5 s):
+- Reduced-motion version:
+- Layers used (file names):
+- Reference video (file name):
+
 ## 7. Motion sheet
 | # | Element (file) | Trigger | What happens | Duration | Delay | Easing / feel | Loops? |
 |---|---|---|---|---|---|---|---|
