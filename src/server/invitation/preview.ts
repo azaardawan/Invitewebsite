@@ -14,6 +14,8 @@ export type SampleRequest = {
   version?: number;
   packageId?: string;
   stateIndex?: number;
+  /** Any combination of the theme's features/fields (admin checks), instead of a package or designed state. */
+  custom?: { features: string[]; fields: string[] };
   names?: 'short' | 'long';
 };
 
@@ -41,6 +43,9 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
   if (pkg) {
     features = pkg.featureKeys;
     fieldKeys = pkg.fieldKeys;
+  } else if (req.custom) {
+    features = manifest.features.filter((f) => req.custom!.features.includes(f));
+    fieldKeys = manifest.fields.filter((k) => req.custom!.fields.includes(k));
   } else {
     const complete = manifest.validStates.findIndex((s) => s.features.length === manifest.features.length && s.fields.length === manifest.fields.length);
     const state = manifest.validStates[req.stateIndex ?? complete] ?? manifest.validStates[complete]!;

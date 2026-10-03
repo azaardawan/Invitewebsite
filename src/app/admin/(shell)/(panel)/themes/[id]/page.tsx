@@ -32,48 +32,53 @@ import {
 
 type Translate = Awaited<ReturnType<typeof getTranslations<'admin.catalog'>>>;
 
-/** Radio choices = the theme's designed states. States lacking the section's required features are disabled. */
-function StateChoices({
+/** What a package includes: each feature and field the theme supports, ticked one by one. The section's required features stay on. */
+function PackageContents({
   manifest,
   required,
-  selected,
+  features,
+  fields,
   fieldLabel,
   t,
 }: {
   manifest: ThemeManifest;
   required: string[];
-  selected: number;
+  features: readonly string[];
+  fields: readonly string[];
   fieldLabel: (key: string) => string;
   t: Translate;
 }) {
   return (
-    <fieldset className="space-y-2">
-      <legend className="text-sm font-medium">{t('themes.state')}</legend>
-      <p className="text-xs text-muted">{t('themes.stateHint')}</p>
-      {manifest.validStates.map((s, i) => {
-        const missing = required.filter((r) => !(s.features as string[]).includes(r));
-        return (
-          <label key={i} className={`flex gap-2 rounded-md border border-line p-2 text-sm ${missing.length ? 'opacity-60' : ''}`}>
-            <input type="radio" name="state" value={i} required defaultChecked={i === selected} disabled={missing.length > 0} />
-            <span>
-              <span className="block font-medium">{s.features.map((f) => t(`features.${f}`)).join('، ') || '—'}</span>
-              <span className="block text-xs text-muted">{t('themes.stateFields', { fields: s.fields.map(fieldLabel).join('، ') })}</span>
-              {missing.length ? (
-                <span className="block text-xs text-danger">
-                  {t('themes.stateMissing', { features: missing.map((f) => t(`features.${f}` as never)).join('، ') })}
-                </span>
-              ) : null}
-            </span>
+    <div className="space-y-3">
+      <fieldset className="space-y-1.5">
+        <legend className="text-sm font-medium">{t('themes.packageFeatures')}</legend>
+        <p className="text-xs text-muted">{t('themes.packageFeaturesHint')}</p>
+        {manifest.features.map((f) => {
+          const forced = required.includes(f);
+          return (
+            <label key={f} className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="features" value={f} defaultChecked={forced || features.includes(f)} disabled={forced} />
+              {forced ? <input type="hidden" name="features" value={f} /> : null}
+              <span>
+                {t(`features.${f}` as never)}
+                {forced ? <span className="text-xs text-muted"> · {t('themes.requiredInSection')}</span> : null}
+              </span>
+            </label>
+          );
+        })}
+      </fieldset>
+      <fieldset className="space-y-1.5">
+        <legend className="text-sm font-medium">{t('themes.packageFields')}</legend>
+        <p className="text-xs text-muted">{t('themes.packageFieldsHint')}</p>
+        {manifest.fields.map((k) => (
+          <label key={k} className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="fields" value={k} defaultChecked={fields.includes(k)} />
+            <span>{fieldLabel(k)}</span>
           </label>
-        );
-      })}
-    </fieldset>
+        ))}
+      </fieldset>
+    </div>
   );
-}
-
-function stateIndex(manifest: ThemeManifest, features: string[], fields: string[]) {
-  const same = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((x) => b.includes(x));
-  return manifest.validStates.findIndex((s) => same(s.features, features) && same(s.fields, fields));
 }
 
 export default async function ThemeDetailPage({ params }: PageProps<'/admin/themes/[id]'>) {
@@ -250,7 +255,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <div className="w-48">
                     <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
                   </div>
-                  <StateChoices manifest={manifest} required={required} selected={stateIndex(manifest, p.featureKeys, p.fieldKeys)} fieldLabel={fieldLabel} t={t} />
+                  <PackageContents manifest={manifest} required={required} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
                 <ActionForm action={packageStatusAction} confirmMessage={t('common.confirm')} className="mt-3">
@@ -275,7 +280,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <div className="w-48">
                   <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
                 </div>
-                <StateChoices manifest={manifest} required={required} selected={-1} fieldLabel={fieldLabel} t={t} />
+                <PackageContents manifest={manifest} required={required} features={manifest.features} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
             </details>

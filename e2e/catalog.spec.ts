@@ -50,7 +50,6 @@ test('owner configures a theme end to end: music → cover → package → revie
   await add.getByLabel('الكردية السورانية').first().fill('پاکێجی زێڕین');
   await add.getByLabel('الكردية البادينية').first().fill('پاکێجا زێڕین');
   await add.getByLabel('السعر (دينار عراقي)').fill('75000');
-  await add.getByRole('radio').last().check();
   await add.getByRole('button', { name: 'إنشاء' }).click();
   await expect(page.getByText('التصميم مستوفٍ لكل الشروط.')).toBeVisible();
 

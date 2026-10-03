@@ -24,8 +24,9 @@ themes/<key>/v<N>/
 
 - `key` and `version` must match the folder.
 - `sections`: where it belongs. `fields` and `features`: what the complete theme renders.
-- **`validStates`**: the package combinations the designer actually designed. The complete theme
-  must be one of them. Admin can only create packages matching a state.
+- **`validStates`**: example package combinations the designer drew (previewed and tested). The complete
+  theme must be one of them. Admin builds packages from **any** combination of the theme's `features`
+  and `fields` (dependencies checked), so the theme must render correctly with any subset.
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
@@ -73,6 +74,7 @@ visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
 | CSS Modules only; no `:global`, `:root`, `html`, `body` | Registry generator (fails dev/build/CI) |
 | Renders every designed state at 360/390/430/1280 px in all 4 languages with short and long names, with no errors and no sideways scrolling | `e2e/themes.spec.ts` (fails CI; saves screenshots) |
 | Features absent from a package are really absent (map, guest form) | `e2e/themes.spec.ts` |
+| Looks right with each feature switched off on its own (any package combination) | `e2e/themes.spec.ts` |
 | Opens with an animation after tapping "Open", finished within 4 s; reduced motion shows the invitation within 1 s | `e2e/themes.spec.ts` |
 | Loads no platform styles and no other theme's code or styles | `e2e/themes.spec.ts` + per-theme lazy loading |
 | A crash only affects that invitation | Platform error boundary |

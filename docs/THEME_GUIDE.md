@@ -22,7 +22,7 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 7. Buttons and form labels use the site's wording (translated automatically); the designer doesn't write them. Extra decorative lines are allowed and are listed for translation.
 
 **Packages**
-8. The complete design is the top package (VVIP). **Every lower package state is designed too**, showing what the screen looks like without the removed parts.
+8. **Any feature can be switched off.** The owner builds each package by ticking features one by one (music, countdown, map, guest form, messages, keepsake, card), so the design must look intentional **with any of them removed**: gaps close up or a decorative element takes the place. Design the complete version plus the main lower packages (e.g. Normal / VIP) as examples; the automatic check also renders the theme with each feature switched off.
 9. **Every Wedding package includes the printable card.**
 10. Guest form (if included): name + "attending / not attending", plus a **required** message in packages with messages. Design the empty, error, sending and thank-you states.
 11. **Public guest messages** (packages with messages): the customer can choose to show all messages **under the invitation** for everyone with the link. Design that list (title, each message with the guest's name, long messages, "be the first" empty state, 1 and 50 messages). When the customer keeps them private, the list is simply absent.

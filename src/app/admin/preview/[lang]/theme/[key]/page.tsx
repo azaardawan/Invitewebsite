@@ -13,7 +13,12 @@ const query = z.object({
   pkg: z.uuid().optional(),
   state: z.coerce.number().int().min(0).max(20).optional(),
   names: z.enum(['short', 'long']).optional(),
+  /** Comma-separated custom combination (used by the automatic theme checks). */
+  features: z.string().max(500).optional(),
+  fields: z.string().max(500).optional(),
 });
+
+const list = (v: string | undefined) => (v === undefined ? undefined : v.split(',').filter(Boolean));
 
 /**
  * Admin sample preview of any theme version (including ones not yet on sale).
@@ -30,6 +35,7 @@ export default async function ThemeSamplePreview({ params, searchParams }: PageP
     version: q.data?.v,
     packageId: q.data?.pkg,
     stateIndex: q.data?.state,
+    custom: q.data?.features !== undefined || q.data?.fields !== undefined ? { features: list(q.data?.features) ?? [], fields: list(q.data?.fields) ?? [] } : undefined,
     names: q.data?.names,
   });
   if (!sample) notFound();
