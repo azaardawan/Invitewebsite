@@ -14,6 +14,8 @@ export type {
   GuestbookMessage,
 } from './types';
 export { hasFeature, formatNumber } from './types';
+export { ThemeBorder } from './border';
+export type { ThemeBorderSpec, BorderKind } from './border';
 export type { PrintCardProps, KeepsakeProps, KeepsakeMessage, PrintLabels } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';

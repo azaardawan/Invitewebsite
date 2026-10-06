@@ -66,6 +66,7 @@ Reduced-motion behaviour:
 - QR code position (about 25 mm) and the optional extra line position:
 - How the card looks without the message / without the QR:
 - Keepsake PDF included: yes / no
-- Keepsake cover (full page, no margin) and message page design (margins 18 / 16 / 20 mm, page number bottom centre):
+- Keepsake cover (full page, no margin) and message page design (no page margin; ~20 mm space top and bottom, clear of the border):
+- Border (strips or corners; one layer, used on invitation, card and keepsake):
 
 ## Notes

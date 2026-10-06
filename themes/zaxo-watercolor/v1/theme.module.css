@@ -58,26 +58,6 @@
   }
 }
 
-/* Heritage border strips. Artwork: physical left/right, never mirrored with text direction. */
-.side {
-  position: absolute;
-  inset-block: 0;
-  width: 24px;
-  background-image: url('./assets/heritage-border.webp');
-  background-size: 24px auto;
-  background-repeat: repeat-y;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.sideLeft {
-  left: 4px;
-}
-
-.sideRight {
-  right: 4px;
-}
-
 /* ---------- Cover ---------- */
 
 .cover {

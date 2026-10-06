@@ -78,6 +78,10 @@ test('every theme renders every designed state correctly', async ({ page }, test
         { timeout: m.internal ? 30_000 : 4_000 },
       );
       await expect(page.getByText(ar.invitationSamples.short.person_1_name).first()).toBeVisible();
+      if (!m.internal) {
+        // Owner rule: one border per theme, drawn with <ThemeBorder> on the invitation, the card and the keepsake.
+        await expect(page.locator('[data-bahja-border]'), `${ref}: theme border`).toHaveCount(1);
+      }
       const has = (f: string) => (state.features as string[]).includes(f);
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${ref} state ${i + 1}: map`).toHaveCount(has('map') ? 1 : 0);
       await expect(page.getByRole('button', { name: ar.invitation.submit }), `${ref} state ${i + 1}: guest form`).toHaveCount(has('rsvp') ? 1 : 0);

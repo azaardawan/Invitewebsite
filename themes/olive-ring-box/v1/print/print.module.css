@@ -25,33 +25,6 @@
 .keepsake * {
   box-sizing: border-box;
 }
-.cardBranchTop,
-.cardBranchBottom,
-.coverBranchTop,
-.coverBranchBottom {
-  position: absolute;
-  background: url(../assets/olive-branch-top.svg) center / contain no-repeat;
-}
-/* Branches run into the bleed at the corners, clear of the text block. */
-.cardBranchTop {
-  top: 0;
-  inset-inline-start: 0;
-  width: 44mm;
-  height: 32mm;
-}
-.cardBranchBottom {
-  bottom: 0;
-  inset-inline-end: 0;
-  width: 38mm;
-  height: 28mm;
-  transform: rotate(180deg);
-}
-.card[dir='ltr'] .cardBranchTop {
-  transform: scaleX(-1);
-}
-.card[dir='ltr'] .cardBranchBottom {
-  transform: rotate(180deg) scaleX(-1);
-}
 .cardSafe {
   position: absolute;
   /* bleed + safe area, plus generous breathing room at top and bottom for the branches */
@@ -170,25 +143,6 @@
     #f3ebdd;
   break-after: page;
 }
-.coverBranchTop {
-  top: 0;
-  inset-inline-start: 0;
-  width: 70mm;
-  height: 51mm;
-}
-.coverBranchBottom {
-  bottom: 0;
-  inset-inline-end: 0;
-  width: 60mm;
-  height: 44mm;
-  transform: rotate(180deg);
-}
-.keepsake[dir='ltr'] .coverBranchTop {
-  transform: scaleX(-1);
-}
-.keepsake[dir='ltr'] .coverBranchBottom {
-  transform: rotate(180deg) scaleX(-1);
-}
 .coverInner {
   position: absolute;
   inset: 60mm 25mm;
@@ -219,7 +173,13 @@
   color: #626b45;
 }
 .messages {
-  padding: 0 4mm;
+  /*
+   * Pages have no margins (the border runs along the paper edges). This padding is repeated on every
+   * page the messages flow onto (clone), keeping text clear of the border at the top, sides and bottom.
+   */
+  padding: 30mm 20mm 30mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .messagesTitle {
   margin: 0 0 8mm;

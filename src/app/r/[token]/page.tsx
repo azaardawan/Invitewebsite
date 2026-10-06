@@ -13,6 +13,7 @@ import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
 import { guestbookAction, payAction } from './actions';
+import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
@@ -67,6 +68,16 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       <p className="text-2xl font-semibold text-accent">{brand}</p>
       <h1 className="mt-6 text-xl font-semibold">{paid ? t('paidTitle') : t('pendingTitle')}</h1>
       <p className="text-sm text-muted">{t('title')}</p>
+
+      <section className="mt-6 rounded-2xl border border-line bg-surface p-4" aria-labelledby="access-code-title">
+        <h2 id="access-code-title" className="text-sm font-semibold">
+          {t('accessCodeTitle')}
+        </h2>
+        <p className="mt-1 text-2xl font-semibold tracking-widest" dir="ltr">
+          {r.accessCode}
+        </p>
+        <p className="mt-1 text-xs text-muted">{t('accessCodeHelp', { site: env().APP_URL.replace(/^https?:\/\//, '') })}</p>
+      </section>
 
       {canPay || waitingManual ? (
         <section className="mt-6 flex flex-col gap-3 print:hidden">
@@ -126,7 +137,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         <ReceiptActions
           url={url}
           shareText={t('shareText', { url: url ?? '' })}
-          confirmText={t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}
+          confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('accessCodeLine', { code: r.accessCode })}`}
           labels={{
             copyLink: t('copyLink'),
             copied: t('copied'),
@@ -148,6 +159,30 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           >
             {t('printCardDownload')}
           </a>
+        </section>
+      ) : null}
+
+      {paid && r.invitation.selfEdit.included ? (
+        <section id="edit" className="mt-8 space-y-2 print:hidden">
+          <h2 className="font-semibold">{t('editTitle')}</h2>
+          {sp.edited === '1' ? (
+            <p role="status" className="text-sm text-accent">
+              {t('editSaved')}
+            </p>
+          ) : null}
+          {r.invitation.selfEdit.allowed ? (
+            <>
+              <p className="text-sm text-muted">{t('editHelp', { left: r.invitation.selfEdit.left, total: SELF_EDIT_LIMIT })}</p>
+              <a
+                href={`/r/${encodeURIComponent(token)}/edit`}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-accent px-6 text-sm font-semibold text-accent"
+              >
+                {t('editButton')}
+              </a>
+            </>
+          ) : (
+            <p className="text-sm text-muted">{r.invitation.selfEdit.left === 0 ? t('editLimitReached') : t('editClosed')}</p>
+          )}
         </section>
       ) : null}
 

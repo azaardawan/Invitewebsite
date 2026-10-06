@@ -9,9 +9,11 @@ import { listSections } from '@/server/catalog/sections';
 import { listMusic } from '@/server/catalog/music';
 import { CatalogError, localized } from '@/server/catalog/common';
 import { MAX_ACTIVE_PACKAGES } from '@/server/catalog/packages';
+import { themeBorder } from '@/server/catalog/border';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { PLATFORM_FEATURES } from '@/catalog/features';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 import { ImageUpload } from '@/components/admin/ImageUpload';
@@ -26,6 +28,7 @@ import {
   packageStatusAction,
   themeFieldsAction,
   themeSettingsAction,
+  themeBorderAction,
   themeTransitionAction,
   updatePackageAction,
 } from '@/app/admin/_actions/catalog';
@@ -53,7 +56,7 @@ function PackageContents({
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium">{t('themes.packageFeatures')}</legend>
         <p className="text-xs text-muted">{t('themes.packageFeaturesHint')}</p>
-        {manifest.features.map((f) => {
+        {[...manifest.features, ...PLATFORM_FEATURES].map((f) => {
           const forced = required.includes(f);
           return (
             <label key={f} className="flex items-center gap-2 text-sm">
@@ -98,6 +101,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
     rate ? `${formatIqd(iqd, locale)} (≈ ${formatUsd(iqd / rate, locale === 'ar' ? 'ar-IQ' : 'en-US')})` : formatIqd(iqd, locale);
   const canManage = can(authz, 'themes.manage');
   const manifest = d.currentManifest;
+  const border = await themeBorder(db(), d.theme.id);
   const required = d.section?.requiredFeatures ?? [];
   const labels = new Map(d.fields.map((f) => [f.fieldKey, localized(f.effectiveLabel as I18nContent, locale)]));
   const fieldLabel = (k: string) => labels.get(k) ?? k;
@@ -220,6 +224,36 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             {d.music ? <audio controls preload="none" src={publicMediaUrl(music.find((m) => m.track.id === d.music!.id)!.asset.storageKey)} className="w-full" /> : null}
             <SubmitButton>{t('common.save')}</SubmitButton>
           </ActionForm>
+        </Card>
+      ) : null}
+
+      {canManage ? (
+        <Card>
+          <h2 className="mb-1 text-lg font-semibold">{t('themes.border')}</h2>
+          <p className="mb-4 text-sm text-muted">{t('themes.borderHint')}</p>
+          <p className="mb-3 text-sm">{border ? t('themes.borderCustom') : t('themes.borderOwn')}</p>
+          <ActionForm action={themeBorderAction} className="space-y-4">
+            <input type="hidden" name="id" value={d.theme.id} />
+            <ImageUpload name="borderAssetId" label={t('themes.borderImage')} initial={border && d.theme.borderAssetId ? { id: d.theme.borderAssetId, url: border.src } : null} />
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">{t('themes.borderKind')}</span>
+              <select name="kind" defaultValue={border?.kind ?? 'strips'} className="w-full rounded-md border border-line bg-surface px-3 py-2">
+                <option value="strips">{t('themes.borderStrips')}</option>
+                <option value="corners">{t('themes.borderCorners')}</option>
+              </select>
+            </label>
+            <div className="w-48">
+              <Field label={t('themes.borderSize')} name="size" inputMode="numeric" dir="ltr" defaultValue={String(border?.size ?? 24)} />
+            </div>
+            <SubmitButton>{t('common.save')}</SubmitButton>
+          </ActionForm>
+          {border ? (
+            <ActionForm action={themeBorderAction} className="mt-3">
+              <input type="hidden" name="id" value={d.theme.id} />
+              <input type="hidden" name="restore" value="1" />
+              <SubmitButton tone="danger">{t('themes.borderRestore')}</SubmitButton>
+            </ActionForm>
+          ) : null}
         </Card>
       ) : null}
 

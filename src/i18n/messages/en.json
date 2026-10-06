@@ -92,7 +92,8 @@
     "legal": "Policies",
     "terms": "Terms of service",
     "privacy": "Privacy policy",
-    "refund": "Refund policy"
+    "refund": "Refund policy",
+    "access": "My invitation"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -296,7 +297,8 @@
         "rsvp": "Guest form (name + attendance)",
         "congratulations": "Guest congratulation message",
         "keepsake_pdf": "Keepsake PDF of messages",
-        "print_card": "Printable invitation card"
+        "print_card": "Printable invitation card",
+        "self_edit": "Customer edits after publishing (up to 3)"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -425,7 +427,17 @@
         "packageFeaturesHint": "Tick everything this package includes. Guest messages need the guest form, and the keepsake PDF needs guest messages.",
         "requiredInSection": "always included in this occasion",
         "packageFields": "Details the customer fills in",
-        "packageFieldsHint": "The map link is asked only when the map is included; the date is always asked when the countdown is included."
+        "packageFieldsHint": "The map link is asked only when the map is included; the date is always asked when the countdown is included.",
+        "border": "Border (invitation, printable card and keepsake)",
+        "borderHint": "One border is used on all three so they look like a set. By default each design uses its own; upload artwork here to replace it on every invitation of this design (including ones already sold) and on new card and keepsake PDFs.",
+        "borderOwn": "Using this design's own border.",
+        "borderCustom": "Using your uploaded border.",
+        "borderImage": "Border artwork (PNG or WebP with transparency, at least 200 px)",
+        "borderKind": "Layout",
+        "borderStrips": "Strips down the left and right edges (the image repeats downwards)",
+        "borderCorners": "Corner ornaments (image for the top-right corner; also turned into the bottom-left)",
+        "borderSize": "Size on a phone (px; print uses 0.25 mm per px)",
+        "borderRestore": "Use the design's own border again"
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -648,7 +660,8 @@
       "guestbookPublicOn": "Guest messages are shown under the invitation (the customer's choice).",
       "guestbookPublicOff": "Guest messages are private (keepsake only).",
       "guestbookMakePublic": "Show messages under the invitation",
-      "guestbookMakePrivate": "Make messages private"
+      "guestbookMakePrivate": "Make messages private",
+      "accessCode": "invitation number (for \"My invitation\")"
     },
     "legal": {
       "heading": "Legal policies",
@@ -887,7 +900,18 @@
     "guestbookPrivate": "Only me (in the keepsake PDF)",
     "guestbookPublic": "Everyone with the invitation link (shown under the invitation)",
     "guestbookSave": "Save choice",
-    "guestbookSaved": "Saved."
+    "guestbookSaved": "Saved.",
+    "accessCodeTitle": "Your invitation number",
+    "accessCodeHelp": "Keep it. Type it on {site}/access (My invitation) any time to come back here: your invitation, card, keepsake and edits.",
+    "accessCodeLine": "Invitation number: {code}",
+    "editTitle": "Edit your invitation",
+    "editHelp": "Fix or change your names, date, time, venue or message yourself. You have {left} of {total} edits left.",
+    "editButton": "Edit my invitation",
+    "editSave": "Save changes",
+    "editSaved": "Your invitation is updated. Guests already see the new details.",
+    "editLimitReached": "You have used all your edits. Contact us on WhatsApp for any other change.",
+    "editClosed": "Editing is closed because the invitation is no longer online.",
+    "editBack": "Back to my receipt"
   },
   "nav": {
     "home": "Home",
@@ -921,7 +945,8 @@
       "rsvp": "Guest attendance replies",
       "congratulations": "Congratulation messages from guests",
       "keepsake_pdf": "A keepsake PDF of all messages",
-      "print_card": "Printable invitation card"
+      "print_card": "Printable invitation card",
+      "self_edit": "Edit your invitation yourself after publishing"
     },
     "fieldsCount": "{count} details to fill in",
     "orderTitle": "Your invitation details",
@@ -962,7 +987,9 @@
       "packageChanged": "This package has changed since you started. Please start your order again.",
       "rateLimited": "Too many attempts. Please wait a little and try again.",
       "refunded": "This order was refunded.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "editNotAllowed": "This invitation can no longer be edited here.",
+      "editLimitReached": "You have used all your edits. Contact us for any other change."
     },
     "reviewTitle": "Review your invitation",
     "reviewSubtitle": "This is exactly how your guests will see it. The preview link works for 24 hours after your last edit.",
@@ -1002,5 +1029,17 @@
   "legal": {
     "updated": "Version {version} · last updated {date}",
     "preparing": "This policy is being prepared and will be published here soon."
+  },
+  "access": {
+    "title": "My invitation",
+    "subtitle": "Type your invitation number to see your invitation, receipt, printable card and keepsake.",
+    "label": "Invitation number",
+    "help": "You find it on your receipt and in the WhatsApp message with your order (10 digits).",
+    "submit": "Open",
+    "errors": {
+      "invalid": "Please type the 10 digits of your invitation number.",
+      "notFound": "We couldn't find this number. Please check it, or contact us on WhatsApp.",
+      "rateLimited": "Too many attempts. Please wait an hour and try again."
+    }
   }
 }

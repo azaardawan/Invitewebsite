@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FEATURE_KEYS, featureDependencyProblems, type FeatureKey } from '@/catalog/features';
+import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
 
 /**
@@ -96,7 +96,7 @@ export function packageShapeProblems(
   fields: readonly string[],
 ): string[] {
   const problems: string[] = [];
-  for (const f of features) if (!(manifest.features as string[]).includes(f)) problems.push(`theme does not support feature ${f}`);
+  for (const f of features) if (!(manifest.features as string[]).includes(f) && !isPlatformFeature(f)) problems.push(`theme does not support feature ${f}`);
   for (const f of fields) if (!(manifest.fields as string[]).includes(f)) problems.push(`theme does not show field ${f}`);
   if (fields.length === 0) problems.push('at least one field is required');
   problems.push(...featureDependencyProblems(features as FeatureKey[], fields as FieldKey[]));

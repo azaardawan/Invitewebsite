@@ -1,4 +1,5 @@
 import type { FeatureKey } from '@/catalog/features';
+import type { ThemeBorderSpec } from './border';
 import type { FieldKey } from '@/catalog/fields';
 
 /** `sample`: storefront/admin demo with sample data · `preview`: customer's pre-payment preview · `live`: published invitation. */
@@ -86,6 +87,8 @@ export type ThemeProps = {
    * package has no messages. Render nothing when null.
    */
   guestbook: GuestbookMessage[] | null;
+  /** The owner's replacement border from Admin, or null to use the theme's own. Render it with `<ThemeBorder>`. */
+  border: ThemeBorderSpec | null;
 };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;

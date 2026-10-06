@@ -8,6 +8,7 @@ import { OrderError } from '@/server/orders/common';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { startPayment } from '@/server/payments/service';
 import { setPublicGuestbook } from '@/server/guests/guestbook';
+import { customerEditInvitation } from '@/server/invitation/customer-edit';
 
 /** "Pay now" on the private receipt: sends the customer to WAYL (reusing an open link). */
 export async function payAction(form: FormData) {
@@ -36,4 +37,22 @@ export async function guestbookAction(form: FormData) {
   if (ipHash && !(await consumeRateLimit(db(), `guestbook:${ipHash}`, 30, 3600))) redirect(`/r/${encodeURIComponent(token)}`);
   await setPublicGuestbook(db(), r.invitation.id, form.get('visibility') === 'public', { type: 'CUSTOMER', ipHash });
   redirect(`/r/${encodeURIComponent(token)}?guestbook=saved#guestbook`);
+}
+
+type EditState = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };
+
+/** The customer edits their published invitation (packages with `self_edit`). Errors are keys under `store`. */
+export async function customerEditAction(token: string, _prev: EditState, form: FormData): Promise<EditState> {
+  const values: Record<string, string> = {};
+  for (const [k, v] of form.entries()) if (k.startsWith('f.') && typeof v === 'string') values[k.slice(2)] = v;
+  const result = await customerEditInvitation(db(), {
+    receiptToken: token,
+    values,
+    locale: String(form.get('invitationLocale') ?? ''),
+    ipHash: (await requestContext()).ipHash,
+  });
+  if (result.ok) redirect(`/r/${encodeURIComponent(token)}?edited=1#edit`);
+  if (result.error === 'invalidFields') return { error: 'errors.invalidFields', fieldErrors: result.fieldErrors, values };
+  const code = { notFound: 'errors.notFound', notAllowed: 'errors.editNotAllowed', limitReached: 'errors.editLimitReached', rateLimited: 'errors.rateLimited' }[result.error];
+  return { error: code, values };
 }

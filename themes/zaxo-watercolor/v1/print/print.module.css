@@ -38,20 +38,6 @@
   color: #a45436;
 }
 
-/* Heritage border strips down both long edges, into the bleed. */
-.side {
-  position: absolute;
-  inset-block: 0;
-  width: 6mm;
-  background: url('../assets/heritage-border.webp') top center / 6mm auto repeat-y;
-}
-.sideLeft {
-  left: 1.5mm;
-}
-.sideRight {
-  right: 1.5mm;
-}
-
 /* ---------------------------------------------------------------- A5 card (trim 148 × 210 mm + 3 mm bleed) */
 
 .card {
@@ -188,7 +174,13 @@
   font-size: 12pt;
 }
 .messages {
-  padding: 0 4mm;
+  /*
+   * Pages have no margins (the border runs along the paper edges). This padding is repeated on every
+   * page the messages flow onto (clone), keeping text clear of the border at the top, sides and bottom.
+   */
+  padding: 20mm 22mm 22mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .messagesTitle {
   margin: 0 0 8mm;

@@ -86,6 +86,8 @@ export const invitations = pgTable(
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
+    /** Edits the customer made themselves after publishing (packages with `self_edit`). */
+    selfEdits: integer('self_edits').notNull().default(0),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */
     cardCustomKey: text('card_custom_key'),
     /** Optimistic locking for concurrent admin edits. */
@@ -121,6 +123,8 @@ export const orders = pgTable(
     /** Terms/refund policy versions accepted, when, from where. */
     legalAcceptance: jsonb('legal_acceptance').notNull(),
     receiptTokenHash: text('receipt_token_hash').notNull().unique(),
+    /** Hash of the customer's 10-digit invitation number (see accessCodeFor); null only before backfill. */
+    accessCodeHash: text('access_code_hash').unique(),
     /** Client-generated key: a double-tapped "Pay" returns the same order. */
     idempotencyKey: text('idempotency_key').notNull().unique(),
     paidAt: timestamp('paid_at', { withTimezone: true }),

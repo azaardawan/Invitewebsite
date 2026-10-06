@@ -23,10 +23,11 @@ export default async function PrintPage({ params }: PageProps<'/print/[token]'>)
   const data = await printData(db(), inv, claim.kind);
   const loaders = printComponents[data.codeRef];
   const base = 'html,body{margin:0;padding:0;background:#fff}';
-  // Keepsake: a full-bleed cover page, then message pages with margins and page numbers.
+  // Keepsake: every A4 page edge to edge (no page margins), so the theme's border sits in the same place on
+  // the cover and every message page; the theme spaces its messages with padding (box-decoration-break: clone).
   const pageCss =
     data.kind === 'keepsake'
-      ? `@page{size:A4;margin:18mm 16mm 20mm;@bottom-center{content:counter(page);font:9pt serif;color:#777}}@page :first{margin:0;@bottom-center{content:none}}${base}`
+      ? `@page{size:A4;margin:0}${base}`
       : `@page{size:${data.page.width} ${data.page.height};margin:${data.page.margin}}${base}`;
 
   if (data.kind === 'card') {

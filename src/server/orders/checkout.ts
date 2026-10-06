@@ -13,7 +13,7 @@ import { OrderError, loadPurchasable, sameSet } from './common';
 import { acceptedVersions } from '@/server/legal/policies';
 import { trackEvent } from '@/server/analytics/events';
 import { findByPreviewToken } from './drafts';
-import { receiptTokenFor, receiptTokenHash } from './tokens';
+import { accessCodeFor, accessCodeHash, receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
 
 const customerSchema = z.object({
@@ -121,7 +121,10 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     }
     if (!order) throw new Error('Could not allocate an order number');
     const receiptToken = receiptTokenFor(order.id);
-    await tx.update(orders).set({ receiptTokenHash: receiptTokenHash(receiptToken) }).where(eq(orders.id, order.id));
+    await tx
+      .update(orders)
+      .set({ receiptTokenHash: receiptTokenHash(receiptToken), accessCodeHash: accessCodeHash(accessCodeFor(order.id)) })
+      .where(eq(orders.id, order.id));
     await tx
       .update(invitations)
       .set({ status: 'AWAITING_PAYMENT', fieldValues: fields.values, musicTrackId: p.theme.musicTrackId })

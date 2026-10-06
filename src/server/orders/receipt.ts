@@ -1,10 +1,11 @@
 import 'server-only';
+import { selfEditState } from '@/server/invitation/customer-edit';
 import { keepsakeReady } from '@/server/documents/delivery';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, orders } from '@/server/db/schema';
 import { invitationPath } from '@/lib/ids';
-import { receiptTokenHash } from './tokens';
+import { receiptTokenHash , accessCodeFor, formatAccessCode } from './tokens';
 import { isLive } from './payment';
 
 export type OrderSnapshot = {
@@ -36,6 +37,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
     /** Internal id, for server-side follow-ups (payment checks); never rendered. */
     orderId: row.order.id,
     orderNumber: row.order.orderNumber,
+    /** The customer's 10-digit invitation number for the "My invitation" page. */
+    accessCode: formatAccessCode(accessCodeFor(row.order.id)),
     invoiceNumber: row.order.invoiceNumber,
     status: row.order.status,
     amountIqd: row.order.amountIqd,
@@ -49,6 +52,7 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       keepsakeReady: keepsakeReady(row.invitation, now),
       hasMessages: row.invitation.featureKeys.includes('congratulations'),
       publicGuestbook: row.invitation.publicGuestbook,
+      selfEdit: selfEditState(row.invitation, now),
       status: row.invitation.status,
       live: isLive(row.invitation, now),
       publishedAt: row.invitation.publishedAt,

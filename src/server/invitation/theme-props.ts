@@ -1,4 +1,5 @@
 import 'server-only';
+import type { ThemeBorderSpec } from '@/theme-sdk/border';
 import type { FeatureKey } from '@/catalog/features';
 import type { FieldKey } from '@/catalog/fields';
 import { localeMeta, type Locale } from '@/i18n/config';
@@ -50,6 +51,8 @@ export function buildThemeProps(input: {
   musicSrc: string | null;
   /** Public guest messages (live, customer opted in); omitted = private. Sample mode shows examples. */
   guestbook?: { guestName: string; message: string }[] | null;
+  /** The owner's replacement border (Admin); omitted/null = the theme's own. */
+  border?: ThemeBorderSpec | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -81,6 +84,7 @@ export function buildThemeProps(input: {
       : input.mode === 'sample'
         ? sampleGuestbook(input.locale)
         : (input.guestbook ?? null),
+    border: input.border ?? null,
   };
 }
 

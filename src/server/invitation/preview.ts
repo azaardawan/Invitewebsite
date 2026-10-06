@@ -6,6 +6,7 @@ import { packagesWithShape } from '@/server/catalog/themes';
 import type { Locale } from '@/i18n/config';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { publicMediaUrl } from '@/server/storage';
+import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps, sampleValues } from './theme-props';
 
 export type SampleRequest = {
@@ -68,6 +69,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     features,
     values: sampleValues(req.locale, req.names ?? 'short'),
     musicSrc: music ? publicMediaUrl(music.key) : null,
+    border: await themeBorder(db, theme.id),
   });
   return { theme, version, manifest, props };
 }

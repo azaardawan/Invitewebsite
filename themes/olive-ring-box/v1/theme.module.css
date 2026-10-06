@@ -127,16 +127,6 @@
   position: relative;
   padding-top: 118px;
 }
-.branchTop {
-  position: absolute;
-  top: 0;
-  inset-inline-start: -24px;
-  width: 150px;
-  height: 110px;
-  background: url(./assets/olive-branch-top.svg) center / contain no-repeat;
-  pointer-events: none;
-}
-.root[dir='ltr'] .branchTop,
 .root[dir='ltr'] .branchSide {
   transform: scaleX(-1);
 }

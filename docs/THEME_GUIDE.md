@@ -40,10 +40,11 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 
 **Print**
 19. **Printable card:** A5 portrait. Design it at **154 × 216 mm** (A5 + 3 mm bleed on every side); the customer's PDF is cut to exactly **148 × 210 mm**. Keep all text and important art **at least 5 mm inside** the A5 edge. 300 dpi artwork. Leave space for the **QR code** (about 25 mm) and **one extra line** of text the team may add, and make sure it still looks right **without the message** and **without the QR**.
-20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. The cover page has **no margin** (design the full 210 × 297 mm). Message pages have 18 / 16 / 20 mm margins, and the site adds the **page number at the bottom centre**, so keep that clear. Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. Every page is printed **edge to edge with no page margin**: design the cover as the full 210 × 297 mm, and give message pages their own space inside the page (about 20 mm top and bottom, and clear of the border at the sides). Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+21. **One border for the whole set.** Each theme has **one border** (strips down both edges, or corner ornaments) that appears **identically on the invitation, the printable card and every keepsake page**, so the three look like one set. Deliver it as its own transparent layer: a strip that can repeat downwards, or a top-right corner ornament (it is also turned for the bottom-left). The owner can replace it in Admin with other artwork at any time, so nothing else in the design may depend on its exact shape.
 
 **Delivery**
-21. One folder in the structure of Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
+22. One folder in the structure of Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
 
 
 You deliver **one folder per theme** (see Step 12). A blank brief to fill in is at `docs/themes/THEME_BRIEF_TEMPLATE.md`.
@@ -253,7 +254,7 @@ These are **separate print designs**, not screenshots of the animated page.
 - **Size:** A4 portrait, **in the same visual identity as the invitation** (colours, fonts, ornaments).
 - Page types:
   1. **Cover:** full page with **no margin** (design the whole 210 × 297 mm): names, date, artwork.
-  2. **Message pages:** margins 18 mm top, 16 mm sides, 20 mm bottom; the platform prints the **page number at the bottom centre**. Show how each message looks (guest name + message), how many fit per page, and a **long message** (500 characters). A message is never split across two pages.
+  2. **Message pages:** no page margin (the border runs along the paper edges): keep about 20 mm free at the top and bottom and stay clear of the border at the sides. Show how each message looks (guest name + message), how many fit per page, and a **long message** (500 characters). A message is never split across two pages.
   3. **Closing** (optional): a short thank-you after the last message.
 - It must work with **0**, **3** and **200** messages (with 0, a short "no messages yet" line is shown).
 

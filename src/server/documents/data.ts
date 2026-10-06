@@ -1,4 +1,5 @@
 import 'server-only';
+import { themeBorder } from '@/server/catalog/border';
 import { and, asc, eq, isNotNull } from 'drizzle-orm';
 import QRCode from 'qrcode';
 import type { DbOrTx } from '@/server/db/client';
@@ -38,10 +39,10 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
   const [version] = await db.select({ codeRef: themeVersions.codeRef }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const codeRef = version!.codeRef;
   const manifest = manifestByCodeRef(codeRef);
-  const theme = buildThemeProps({ mode: 'live', locale: inv.locale, fieldKeys: inv.fieldKeys, features: inv.featureKeys, values: inv.fieldValues, musicSrc: null });
+  const theme = buildThemeProps({ mode: 'live', locale: inv.locale, fieldKeys: inv.fieldKeys, features: inv.featureKeys, values: inv.fieldValues, musicSrc: null, border: await themeBorder(db, inv.themeId) });
   const msgs = invitationMessages(inv.locale) as unknown as { print: PrintMessages };
   const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...msgs.print };
-  const base = { locale: theme.locale, dir: theme.dir, lang: theme.lang, fields: theme.fields, event: { date: theme.event.date, time: theme.event.time }, labels };
+  const base = { locale: theme.locale, dir: theme.dir, lang: theme.lang, fields: theme.fields, event: { date: theme.event.date, time: theme.event.time }, labels, border: theme.border };
 
   if (kind === 'card' || kind === 'cardBleed') {
     const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
@@ -63,5 +64,5 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     return { codeRef, kind: 'card' as const, props, page };
   }
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
-  return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0 (cover) · 18mm 16mm 20mm', cropMm: 0 } satisfies PageSpec };
+  return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };
 }

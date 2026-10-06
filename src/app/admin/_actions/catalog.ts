@@ -9,7 +9,7 @@ import { can } from '@/server/rbac/authz';
 import type { Permission } from '@/server/rbac/permissions';
 import type { Actor } from '@/server/catalog/common';
 import { FIELD_KEYS } from '@/catalog/fields';
-import { FEATURE_KEYS, FEATURES } from '@/catalog/features';
+import { FEATURE_KEYS, FEATURES, PLATFORM_FEATURES } from '@/catalog/features';
 import { createSection, moveSection, setSectionDefaultFields, setSectionStatus, updateSection } from '@/server/catalog/sections';
 import { updateField } from '@/server/catalog/fields';
 import { createMusicTrack, renameMusicTrack, setMusicStatus } from '@/server/catalog/music';
@@ -25,6 +25,7 @@ import {
   type ThemeStatus,
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
+import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
 import { catalogFailure, readI18n, readString } from './form-helpers';
 import type { ActionState } from './state';
@@ -145,6 +146,23 @@ export async function syncThemesAction(): Promise<ActionState> {
   }, ['/admin/themes']);
 }
 
+/** Replaces the border on the theme's invitations, cards and keepsakes, or restores the theme's own (empty image). */
+export async function themeBorderAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form);
+  const restore = form.get('restore') === '1';
+  return run(
+    () =>
+      updateThemeBorder(
+        db(),
+        themeId,
+        { assetId: restore ? null : (readString(form, 'borderAssetId') ?? null), kind: form.get('kind') === 'corners' ? 'corners' : 'strips', size: Number(form.get('size') ?? 24) },
+        actor,
+      ),
+    ['/admin/themes', `/admin/themes/${themeId}`],
+  );
+}
+
 export async function themeSettingsAction(_: ActionState, form: FormData): Promise<ActionState> {
   const actor = await actorWith('themes.manage');
   const themeId = id(form);
@@ -217,7 +235,7 @@ async function packageShape(themeId: string, form: FormData) {
   const picked = (name: string) => new Set(form.getAll(name).filter((v): v is string => typeof v === 'string'));
   const features = picked('features');
   for (const r of detail.section?.requiredFeatures ?? []) features.add(r);
-  const featureKeys = manifest.features.filter((f) => features.has(f) && (FEATURE_KEYS as string[]).includes(f));
+  const featureKeys = [...manifest.features, ...PLATFORM_FEATURES].filter((f) => features.has(f) && (FEATURE_KEYS as string[]).includes(f));
   const fields = picked('fields');
   for (const f of featureKeys) for (const k of FEATURES[f].requiresFields as readonly string[]) fields.add(k);
   if (!featureKeys.includes('map')) fields.delete('venue_map_url');

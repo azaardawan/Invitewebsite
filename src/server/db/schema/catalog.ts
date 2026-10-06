@@ -123,6 +123,10 @@ export const themes = pgTable(
     musicTrackId: uuid('music_track_id').references(() => musicTracks.id, { onDelete: 'restrict' }),
     /** The version sold to new customers. Existing invitations keep their own version. */
     currentVersionId: uuid('current_version_id').references((): AnyPgColumn => themeVersions.id, { onDelete: 'restrict' }),
+    /** Owner's replacement border artwork (invitation, card and keepsake); null = the theme's own. */
+    borderAssetId: uuid('border_asset_id').references(() => assets.id, { onDelete: 'restrict' }),
+    /** How the replacement border is laid out (`strips` or `corners`, size in px on a phone). */
+    borderStyle: jsonb('border_style').$type<{ kind: 'strips' | 'corners'; size: number }>(),
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     ...timestamps,
   },

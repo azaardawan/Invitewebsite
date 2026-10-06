@@ -15,6 +15,7 @@ import { orderFields } from '@/server/storefront/catalog';
 import { localized } from '@/server/catalog/common';
 import { localeMeta } from '@/i18n/config';
 import { invitationPath } from '@/lib/ids';
+import { accessCodeFor, formatAccessCode } from '@/server/orders/tokens';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import {
@@ -123,7 +124,11 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
             <Link href={`/admin/orders?q=${o.orderNumber}`} className="font-mono text-accent underline" dir="ltr">
               {o.orderNumber}
             </Link>{' '}
-            <span className="text-muted">({o.status})</span>
+            <span className="text-muted">({o.status})</span>{' '}
+            <span className="text-muted">· {t('accessCode')}: </span>
+            <span className="font-mono" dir="ltr">
+              {formatAccessCode(accessCodeFor(o.id))}
+            </span>
           </p>
         ))}
       </Card>
