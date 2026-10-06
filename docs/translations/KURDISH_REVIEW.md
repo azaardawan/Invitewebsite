@@ -359,3 +359,33 @@ previews, and the choice on the customer's receipt.
 | `receipt.guestbookPublic` | كل من لديه رابط الدعوة (تظهر تحت الدعوة) | Everyone with the invitation link (shown under the invitation) | | | AWAITING |
 | `receipt.guestbookSave` | حفظ الاختيار | Save choice | | | AWAITING |
 | `receipt.guestbookSaved` | تم الحفظ. | Saved. | | | AWAITING |
+
+## Batch 14 — "My invitation" number and editing after publishing (PENDING)
+
+New customer texts. Reply "approve" (all, or by number) or give your wording. Until approved they show in Arabic.
+Same glossary as before (بانگهێشتنامە / داخوازنامە, پسوولە, بەستەر / لینک, تکایە / هیڤییە).
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `footer.access`, `access.title` | دعوتي | My invitation | بانگهێشتنامەکەم | داخوازناما من | ◐ |
+| 2 | `access.subtitle` | اكتب رقم دعوتك لتصل إلى دعوتك وإيصالك وبطاقة الطباعة وملف الذكرى. | Type your invitation number to see your invitation, receipt, printable card and keepsake. | ژمارەی بانگهێشتنامەکەت بنووسە بۆ گەیشتن بە بانگهێشتنامە و پسوولە و کارتی چاپ و فایلی یادگارییەکەت. | ژمارا داخوازناما خۆ بنڤیسە دا بگەهیە داخوازنامە و پسوولە و کارتا چاپێ و فایلا بیرهاتنێ یا خۆ. | ◐ |
+| 3 | `access.label`, `receipt.accessCodeLine` (label part) | رقم الدعوة | Invitation number | ژمارەی بانگهێشتنامە | ژمارا داخوازنامێ | ● |
+| 4 | `access.help` | تجده في إيصالك وفي رسالة واتساب الخاصة بطلبك (١٠ أرقام). | You find it on your receipt and in the WhatsApp message with your order (10 digits). | لە پسوولەکەت و لە نامەی واتسئاپی داواکارییەکەتدا دەیدۆزیتەوە (١٠ ژمارە). | دێ وێ د پسوولا خۆ و د نامەیا واتسئاپێ یا داخوازیا خۆ دا بینی (١٠ ژمارە). | ◐ |
+| 5 | `access.submit` | فتح | Open | کردنەوە | ڤەکرن | ● |
+| 6 | `access.errors.invalid` | يرجى كتابة أرقام رقم دعوتك العشرة. | Please type the 10 digits of your invitation number. | تکایە ١٠ ژمارەکەی ژمارەی بانگهێشتنامەکەت بنووسە. | هیڤییە ١٠ ژمارێن ژمارا داخوازناما خۆ بنڤیسە. | ◐ |
+| 7 | `access.errors.notFound` | لم نجد هذا الرقم. يرجى التأكد منه أو التواصل معنا على واتساب. | We couldn't find this number… | ئەم ژمارەیەمان نەدۆزییەوە. تکایە دڵنیا بەرەوە یان لە واتسئاپ پەیوەندیمان پێوە بکە. | مە ئەڤ ژمارە نەدیت. هیڤییە پشتڕاست بکە یان ل واتسئاپێ پەیوەندیێ ب مە بکە. | ◐ |
+| 8 | `access.errors.rateLimited` | محاولات كثيرة. يرجى الانتظار ساعة ثم المحاولة مجدداً. | Too many attempts. Please wait an hour and try again. | هەوڵدانەکان زۆرن. تکایە کاتژمێرێک چاوەڕێ بکە و دووبارە هەوڵ بدەوە. | هەولدان گەلەک بوون. هیڤییە دەمژمێرەکێ ل هیڤیێ بە و دووبارە هەول بدە. | ◐ |
+| 9 | `receipt.accessCodeTitle` | رقم دعوتك | Your invitation number | ژمارەی بانگهێشتنامەکەت | ژمارا داخوازناما تە | ● |
+| 10 | `receipt.accessCodeHelp` | احتفظ به. اكتبه في {site}/access (دعوتي) في أي وقت لتعود إلى هنا… | Keep it. Type it on {site}/access (My invitation) any time to come back here… | بیپارێزە. هەر کاتێک لە {site}/access (بانگهێشتنامەکەم) بینووسە بۆ گەڕانەوە بۆ ئێرە: بانگهێشتنامە و کارت و فایلی یادگاری و دەستکارییەکانت. | بپارێزە. هەر دەمەکێ ل {site}/access (داخوازناما من) بنڤیسە دا بزڤڕیە ڤێرە: داخوازنامە و کارت و فایلا بیرهاتنێ و گوهۆڕینێن تە. | ◐ |
+| 11 | `receipt.accessCodeLine` | رقم الدعوة: {code} | Invitation number: {code} | ژمارەی بانگهێشتنامە: {code} | ژمارا داخوازنامێ: {code} | ● |
+| 12 | `receipt.editTitle` | تعديل دعوتك | Edit your invitation | دەستکاریکردنی بانگهێشتنامەکەت | گوهۆڕینا داخوازناما تە | ◐ |
+| 13 | `receipt.editHelp` | صحّح أو غيّر الأسماء أو التاريخ أو الوقت أو المكان أو النص بنفسك. متبقٍ لك {left} من {total} تعديلات. | …You have {left} of {total} edits left. | خۆت ناو و بەروار و کات و شوێن و دەق ڕاست بکەرەوە یان بیگۆڕە. {left} لە {total} دەستکاریت ماوە. | ب خۆ ناڤ و دیرۆک و دەم و جه و نڤیسینێ ڕاست بکە یان بگوهۆڕە. {left} ژ {total} گوهۆڕینان بۆ تە مایە. | ◐ |
+| 14 | `receipt.editButton` | تعديل دعوتي | Edit my invitation | دەستکاریکردنی بانگهێشتنامەکەم | گوهۆڕینا داخوازناما من | ◐ |
+| 15 | `receipt.editSave` | حفظ التعديلات | Save changes | پاشەکەوتکردنی گۆڕانکارییەکان | پاراستنا گوهۆڕینان | ● |
+| 16 | `receipt.editSaved` | تم تحديث دعوتك. يرى الضيوف التفاصيل الجديدة الآن. | Your invitation is updated… | بانگهێشتنامەکەت نوێ کرایەوە. میوانەکان ئێستا وردەکارییە نوێیەکان دەبینن. | داخوازناما تە هاتە نووکرن. مێڤان نوکە هوورگیێن نوو دبینن. | ◐ |
+| 17 | `receipt.editLimitReached` | استخدمت كل التعديلات المتاحة. تواصل معنا على واتساب لأي تغيير آخر. | You have used all your edits… | هەموو دەستکارییەکانت بەکارهێناوە. بۆ هەر گۆڕانکارییەکی تر لە واتسئاپ پەیوەندیمان پێوە بکە. | تە هەمی گوهۆڕین بکار ئینان. بۆ هەر گوهۆڕینەکا دی ل واتسئاپێ پەیوەندیێ ب مە بکە. | ◐ |
+| 18 | `receipt.editClosed` | التعديل مغلق لأن الدعوة لم تعد منشورة. | Editing is closed… | دەستکاری داخراوە چونکە بانگهێشتنامەکە چیتر بڵاو نەکراوەتەوە. | گوهۆڕین هاتیە گرتن چونکی داخوازنامە ئێدی نە بەلاڤکریە. | ○ |
+| 19 | `receipt.editBack` | العودة إلى إيصالي | Back to my receipt | گەڕانەوە بۆ پسوولەکەم | زڤڕین بۆ پسوولا من | ● |
+| 20 | `store.features.self_edit` | تعديل دعوتك بنفسك بعد النشر | Edit your invitation yourself after publishing | دەستکاریکردنی بانگهێشتنامە بە خۆت دوای بڵاوکردنەوە | گوهۆڕینا داخوازنامێ ب خۆ پشتی بەلاڤکرنێ | ◐ |
+| 21 | `store.errors.editNotAllowed` | لم يعد بالإمكان تعديل هذه الدعوة من هنا. | This invitation can no longer be edited here. | ئیتر ناتوانرێت ئەم بانگهێشتنامەیە لێرە دەستکاری بکرێت. | ئێدی نابیت ئەڤ داخوازنامە ل ڤێرە بهێتە گوهۆڕین. | ◐ |
+| 22 | `store.errors.editLimitReached` | استخدمت كل التعديلات المتاحة. تواصل معنا لأي تغيير آخر. | You have used all your edits… | هەموو دەستکارییەکانت بەکارهێناوە. بۆ هەر گۆڕانکارییەکی تر پەیوەندیمان پێوە بکە. | تە هەمی گوهۆڕین بکار ئینان. بۆ هەر گوهۆڕینەکا دی پەیوەندیێ ب مە بکە. | ◐ |

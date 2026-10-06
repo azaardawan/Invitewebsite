@@ -1,3 +1,5 @@
+import { ThemeBorder } from '@/theme-sdk';
+import { ZAXO_BORDER } from '../border';
 import type { PrintCardProps } from '@/theme-sdk';
 import { Diamond, Names } from './Ornament';
 import p from './print.module.css';
@@ -7,11 +9,10 @@ import p from './print.module.css';
  * including 3 mm bleed). The ivory paper and heritage border strips run into
  * the bleed; the landmark painting sits at the foot; text stays in the safe area.
  */
-export default function Card({ dir, lang, fields, event, labels, qrDataUrl, extraLine }: PrintCardProps) {
+export default function Card({ dir, lang, fields, event, labels, qrDataUrl, extraLine, border }: PrintCardProps) {
   return (
     <div className={p.card} dir={dir} lang={lang}>
-      <span className={`${p.side} ${p.sideLeft}`} aria-hidden="true" />
-      <span className={`${p.side} ${p.sideRight}`} aria-hidden="true" />
+      <ThemeBorder border={border} fallback={ZAXO_BORDER} medium="print" />
       <span className={p.cardScene} aria-hidden="true" />
       <div className={p.cardSafe}>
         <Diamond />

@@ -8,6 +8,7 @@
  * passes plain, already-localized data.
  */
 import type { FieldKey } from '@/catalog/fields';
+import type { ThemeBorderSpec } from './border';
 import type { EventDateParts, InvitationLocale } from './types';
 
 /** Localized platform strings a print design may show. Never hard-code text. */
@@ -34,6 +35,8 @@ type PrintBase = {
   fields: Readonly<Partial<Record<FieldKey, string>>>;
   event: { date: EventDateParts | null; time: string | null };
   labels: PrintLabels;
+  /** The owner's replacement border, or null for the theme's own: the same one as on the invitation. */
+  border: ThemeBorderSpec | null;
 };
 
 export type PrintCardProps = PrintBase & {

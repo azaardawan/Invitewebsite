@@ -24,8 +24,9 @@ themes/<key>/v<N>/
 
 - `key` and `version` must match the folder.
 - `sections`: where it belongs. `fields` and `features`: what the complete theme renders.
-- **`validStates`**: the package combinations the designer actually designed. The complete theme
-  must be one of them. Admin can only create packages matching a state.
+- **`validStates`**: example package combinations the designer drew (previewed and tested). The complete
+  theme must be one of them. Admin builds packages from **any** combination of the theme's `features`
+  and `fields` (dependencies checked), so the theme must render correctly with any subset.
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
@@ -64,6 +65,20 @@ calls `useMusic().start()` and plays the opening animation (CSS `@keyframes`/tra
 (looping idle effects are allowed). When `useReducedMotion()` is true, the cover fades and the invitation is
 visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
 
+## 4B. One border for invitation, card and keepsake (required for sellable themes)
+
+Each theme exports one `ThemeBorderSpec` (`{ kind: 'strips' | 'corners', src, size, inset? }`, usually in
+`border.ts` with the artwork imported from `assets/`) and renders it with `<ThemeBorder>` from `@/theme-sdk`:
+
+- invitation: `<ThemeBorder border={props.border} fallback={MY_BORDER} medium="screen" />` inside the
+  positioned page/column element;
+- `print/Card.tsx` and `print/Keepsake.tsx`: the same, with `border={props.border}` and `medium="print"` (it is
+  `position: fixed` in print, so it repeats on every keepsake page).
+
+`props.border` is the owner's replacement from Admin → Themes → Border (or null): never ignore it, and never
+let the layout depend on the border's exact artwork. `size` is px on a 390 px phone; print uses 0.25 mm per px.
+`e2e/themes.spec.ts` checks the border is present on the invitation.
+
 ## 5. Rules (enforced)
 
 | Rule | Enforced by |
@@ -73,7 +88,9 @@ visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
 | CSS Modules only; no `:global`, `:root`, `html`, `body` | Registry generator (fails dev/build/CI) |
 | Renders every designed state at 360/390/430/1280 px in all 4 languages with short and long names, with no errors and no sideways scrolling | `e2e/themes.spec.ts` (fails CI; saves screenshots) |
 | Features absent from a package are really absent (map, guest form) | `e2e/themes.spec.ts` |
+| Looks right with each feature switched off on its own (any package combination) | `e2e/themes.spec.ts` |
 | Opens with an animation after tapping "Open", finished within 4 s; reduced motion shows the invitation within 1 s | `e2e/themes.spec.ts` |
+| One border via `<ThemeBorder>` on the invitation (and on the card and keepsake) | `e2e/themes.spec.ts` + print review |
 | Loads no platform styles and no other theme's code or styles | `e2e/themes.spec.ts` + per-theme lazy loading |
 | A crash only affects that invitation | Platform error boundary |
 | The PREVIEW/SAMPLE label can't be removed | Rendered by the platform outside the theme |
@@ -95,8 +112,10 @@ The platform sets `@page` from the manifest: the card page is the trim size plus
 side (A5 + 3 mm = 154 × 216 mm) so the card's root fills exactly that box; the customer's PDF is exactly
 A5 with the bleed cropped evenly (the print-shop version keeps it), so keep text inside the 5 mm safe
 area. The keepsake is A4: the first page (the cover) has no margin, so the cover section should fill
-210 × 297 mm and end with `break-after: page`; the following pages have 18 / 16 / 20 mm margins and a
-page number added by the platform. Use physical units and `print-color-adjust: exact`. Chromium renders
+210 × 297 mm and end with `break-after: page`. Every keepsake page has **no page margin** (so the border sits
+in the same place on every page): give the messages section its own padding (about 20 mm top and bottom,
+clear of the border at the sides) with `box-decoration-break: clone` so it repeats on each page. No page
+numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
 ## 7. Preview and review

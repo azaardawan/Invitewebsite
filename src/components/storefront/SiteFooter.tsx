@@ -22,6 +22,7 @@ export async function SiteFooter({ contact }: { contact: ContactInfo }) {
           <Link href="/#occasions" className="hover:underline">{nav('occasions')}</Link>
           <Link href="/#how" className="hover:underline">{nav('how')}</Link>
           <Link href="/contact" className="hover:underline">{nav('contact')}</Link>
+          <Link href="/access" className="hover:underline">{t('access')}</Link>
         </nav>
         <div className="flex flex-col items-center gap-2 text-sm lg:items-start">
           {contact.whatsapp ? (

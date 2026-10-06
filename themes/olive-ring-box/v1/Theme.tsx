@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
   GuestFormSlot,
+  ThemeBorder,
   formatNumber,
   hasFeature,
   useCountdown,
@@ -14,6 +15,7 @@ import {
   type ThemeProps,
 } from '@/theme-sdk';
 import { copyFor, type Copy } from './copy';
+import { OLIVE_BORDER } from './border';
 import { RingBox } from './RingBox';
 import fonts from './fonts.module.css';
 import o from './opening.module.css';
@@ -93,8 +95,8 @@ export default function OliveRingBox(props: ThemeProps) {
       )}
 
       <main className={s.page} inert={hydrated && (stage === 'closed' || stage === 'opening') ? true : undefined}>
+        <ThemeBorder border={props.border} fallback={OLIVE_BORDER} medium="screen" />
         <Reveal as="header" className={s.hero} still>
-          <span className={s.branchTop} aria-hidden="true" />
           <p className={s.basmala} lang="ar" dir="rtl">
             {copyFor('ar').basmala}
           </p>

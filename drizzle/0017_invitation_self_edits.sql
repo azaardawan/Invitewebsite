@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "self_edits" integer DEFAULT 0 NOT NULL;

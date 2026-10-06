@@ -1,4 +1,5 @@
-import type { PrintCardProps } from '@/theme-sdk';
+import { ThemeBorder, type PrintCardProps } from '@/theme-sdk';
+import { OLIVE_BORDER } from '../border';
 import { copyFor } from '../copy';
 import fonts from '../fonts.module.css';
 import p from './print.module.css';
@@ -8,12 +9,11 @@ import p from './print.module.css';
  * bleed (the platform sets the page to 154 × 216 mm); background and branches
  * run into the 3 mm bleed, all text stays inside the safe area.
  */
-export default function Card({ locale, dir, lang, fields, event, labels, qrDataUrl, extraLine }: PrintCardProps) {
+export default function Card({ locale, dir, lang, fields, event, labels, qrDataUrl, extraLine, border }: PrintCardProps) {
   const t = copyFor(locale);
   return (
     <div className={`${fonts.fonts} ${p.card}`} dir={dir} lang={lang}>
-      <span className={p.cardBranchTop} aria-hidden="true" />
-      <span className={p.cardBranchBottom} aria-hidden="true" />
+      <ThemeBorder border={border} fallback={OLIVE_BORDER} medium="print" />
       <div className={p.cardSafe}>
         <p className={p.cardBasmala} lang="ar" dir="rtl">
           {copyFor('ar').basmala}

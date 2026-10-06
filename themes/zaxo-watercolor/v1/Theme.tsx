@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import {
   GuestFormSlot,
+  ThemeBorder,
   formatNumber,
   hasFeature,
   useCountdown,
@@ -16,6 +17,7 @@ import {
 import couple from './assets/couple-holding-hands.webp';
 import landmarkScene from './assets/landmark-scene.webp';
 import styles from './theme.module.css';
+import { ZAXO_BORDER } from './border';
 
 /**
  * Zaxo Watercolor. Cover → tap "Open" (starts music) → the content mounts
@@ -59,8 +61,7 @@ export default function ZaxoWatercolorTheme(props: ThemeProps) {
   return (
     <main className={styles.root} data-reduced={reduced}>
       <div className={styles.card}>
-        <div className={`${styles.side} ${styles.sideLeft}`} aria-hidden />
-        <div className={`${styles.side} ${styles.sideRight}`} aria-hidden />
+        <ThemeBorder border={props.border} fallback={ZAXO_BORDER} medium="screen" />
 
         {!coverGone ? (
           <section

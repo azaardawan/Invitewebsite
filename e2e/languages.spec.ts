@@ -1,27 +1,37 @@
 import { expect, test, type Page } from '@playwright/test';
 import ar from '../src/i18n/messages/ar.json' with { type: 'json' };
+import ckb from '../src/i18n/messages/ckb.json' with { type: 'json' };
+import bdn from '../src/i18n/messages/bdn.json' with { type: 'json' };
 
 /**
  * Owner rule: after switching language, no text stays in the previous one.
  * English pages contain no Arabic script (except the language names in the
  * switcher), and Kurdish pages contain none of the Arabic site texts.
  */
-const PAGES = ['', '/themes', '/contact', '/legal/terms', '/legal/privacy'];
+const PAGES = ['', '/themes', '/contact', '/access', '/legal/terms', '/legal/privacy'];
 const AUTONYMS = ['العربية', 'کوردی - سۆرانی', 'کوردی - بادینی'];
 
 function flatten(obj: object, prefix = ''): [string, string][] {
   return Object.entries(obj).flatMap(([k, v]) => (typeof v === 'object' && v !== null ? flatten(v, `${prefix}${k}.`) : [[`${prefix}${k}`, String(v)] as [string, string]]));
 }
-// Customer-facing Arabic texts, split around {placeholders}; short pieces are skipped (they can occur inside Kurdish words).
-const arabicTexts = [
-  ...new Set(
-    flatten(ar)
-      .filter(([k]) => !k.startsWith('admin.'))
-      .flatMap(([, v]) => v.split(/\{[^}]*\}|<[^>]*>/))
-      .map((s) => s.trim())
-      .filter((s) => s.length >= 8),
-  ),
-];
+/**
+ * Customer-facing Arabic texts whose Kurdish is approved, split around {placeholders}; short pieces are
+ * skipped (they can occur inside Kurdish words). Texts still awaiting the owner's Kurdish wording show in
+ * Arabic by design and are listed by `pnpm i18n:check` instead.
+ */
+function arabicTextsFor(kurdish: object) {
+  const approved = new Set(flatten(kurdish).map(([k]) => k));
+  return [
+    ...new Set(
+      flatten(ar)
+        .filter(([k]) => !k.startsWith('admin.') && approved.has(k))
+        .flatMap(([, v]) => v.split(/\{[^}]*\}|<[^>]*>/))
+        .map((s) => s.trim())
+        .filter((s) => s.length >= 8),
+    ),
+  ];
+}
+const arabicTexts = { ckb: arabicTextsFor(ckb), bdn: arabicTextsFor(bdn) };
 
 async function visibleText(page: Page) {
   // The language menu lists every language by its own name; that's intended.
@@ -40,7 +50,7 @@ async function expectOnlyLanguage(page: Page, locale: 'en' | 'ckb' | 'bdn') {
     // The brand monogram (ب) is part of the logo artwork.
     expect(leftovers.map((s) => s.trim()).filter((s) => s !== 'ب'), url).toEqual([]);
   } else {
-    expect(arabicTexts.filter((a) => text.includes(a)), url).toEqual([]);
+    expect(arabicTexts[locale].filter((a) => text.includes(a)), url).toEqual([]);
   }
   await expect(page.locator('html')).toHaveAttribute('lang', locale === 'en' ? 'en' : locale === 'ckb' ? 'ckb-IQ' : 'kmr-Arab-IQ');
 }

@@ -17,7 +17,18 @@ export const FEATURES = {
   keepsake_pdf: { requires: ['congratulations'], requiresFields: [] },
   /** Printable invitation card PDF for the customer. */
   print_card: { requires: [], requiresFields: [] },
+  /** The customer can change their invitation's details themselves after publishing (a few times). */
+  self_edit: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
+
+/**
+ * Features handled entirely by the platform: any theme can be sold with them,
+ * so they are never listed in a theme's manifest.
+ */
+export const PLATFORM_FEATURES = ['self_edit'] as const satisfies readonly (keyof typeof FEATURES)[];
+export function isPlatformFeature(key: string) {
+  return (PLATFORM_FEATURES as readonly string[]).includes(key);
+}
 
 export type FeatureKey = keyof typeof FEATURES;
 export const FEATURE_KEYS = Object.keys(FEATURES) as FeatureKey[];

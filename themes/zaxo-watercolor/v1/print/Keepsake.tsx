@@ -1,3 +1,5 @@
+import { ThemeBorder } from '@/theme-sdk';
+import { ZAXO_BORDER } from '../border';
 import type { KeepsakeProps } from '@/theme-sdk';
 import { Diamond, Names } from './Ornament';
 import p from './print.module.css';
@@ -5,14 +7,14 @@ import p from './print.module.css';
 /**
  * Keepsake of guest messages, A4 portrait: a full-page painted cover, then the
  * messages flowing over as many pages as needed (never split inside one).
- * The platform sets `@page` size, margins and page numbers.
+ * The platform sets the A4 page (no margins); the border repeats on every page.
  */
-export default function Keepsake({ dir, lang, fields, event, labels, messages }: KeepsakeProps) {
+export default function Keepsake({ dir, lang, fields, event, labels, messages, border }: KeepsakeProps) {
   return (
     <div className={p.keepsake} dir={dir} lang={lang}>
+      {/* Fixed in print: the same border on the cover and on every message page. */}
+      <ThemeBorder border={border} fallback={ZAXO_BORDER} medium="print" />
       <section className={p.cover}>
-        <span className={`${p.side} ${p.sideLeft}`} aria-hidden="true" />
-        <span className={`${p.side} ${p.sideRight}`} aria-hidden="true" />
         <span className={p.coverScene} aria-hidden="true" />
         <div className={p.coverInner}>
           <Diamond />

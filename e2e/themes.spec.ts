@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { generatedManifests } from '../src/theme-registry/generated';
+import { FEATURES } from '../src/catalog/features';
 import ar from '../src/i18n/messages/ar.json' with { type: 'json' };
 import { signInAsNewOwner } from './helpers';
 
@@ -77,6 +78,10 @@ test('every theme renders every designed state correctly', async ({ page }, test
         { timeout: m.internal ? 30_000 : 4_000 },
       );
       await expect(page.getByText(ar.invitationSamples.short.person_1_name).first()).toBeVisible();
+      if (!m.internal) {
+        // Owner rule: one border per theme, drawn with <ThemeBorder> on the invitation, the card and the keepsake.
+        await expect(page.locator('[data-bahja-border]'), `${ref}: theme border`).toHaveCount(1);
+      }
       const has = (f: string) => (state.features as string[]).includes(f);
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${ref} state ${i + 1}: map`).toHaveCount(has('map') ? 1 : 0);
       await expect(page.getByRole('button', { name: ar.invitation.submit }), `${ref} state ${i + 1}: guest form`).toHaveCount(has('rsvp') ? 1 : 0);
@@ -86,6 +91,39 @@ test('every theme renders every designed state correctly', async ({ page }, test
         await expect(page.getByText(ar.invitation.errorRequired).first()).toBeVisible();
       }
       await page.screenshot({ path: testInfo.outputPath(`theme-screenshots/${ref}/state-${i + 1}/ar-opened.png`), fullPage: true });
+    }
+  }
+});
+
+test('every sellable theme looks right with any single feature switched off', async ({ page }, testInfo) => {
+  // Packages are built feature by feature in Admin, so a theme must handle any subset, not only its designed states.
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
+  test.setTimeout(5 * 60_000);
+  await signInAsNewOwner(page);
+  for (const m of generatedManifests.filter((x) => !x.internal)) {
+    for (const off of m.features) {
+      // Switching a feature off also switches off what depends on it (no messages without the guest form…).
+      const dropped = new Set<string>([off]);
+      for (let grew = true; grew; ) {
+        grew = false;
+        for (const f of m.features) {
+          if (!dropped.has(f) && (FEATURES[f].requires as readonly string[]).some((r) => dropped.has(r))) {
+            dropped.add(f);
+            grew = true;
+          }
+        }
+      }
+      const features = m.features.filter((f) => !dropped.has(f));
+      const fields = m.fields.filter((k) => k !== 'venue_map_url' || features.includes('map'));
+      const url = `/admin/preview/ar/theme/${m.key}?v=${m.version}&names=long&features=${features.join(',')}&fields=${fields.join(',')}`;
+      await renderAndCheck(page, url, 390, testInfo.outputPath(`theme-screenshots/${m.key}@${m.version}/without-${off}.png`));
+      await page.getByRole('button', { name: ar.invitation.openInvitation }).click();
+      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity), null, { timeout: 4_000 });
+      await expect(page.getByText(ar.invitationSamples.long.person_1_name).first()).toBeVisible();
+      await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${m.key} without ${off}: map`).toHaveCount(features.includes('map') ? 1 : 0);
+      await expect(page.getByRole('button', { name: ar.invitation.submit }), `${m.key} without ${off}: guest form`).toHaveCount(features.includes('rsvp') ? 1 : 0);
+      await expect(page.getByRole('timer'), `${m.key} without ${off}: countdown`).toHaveCount(features.includes('countdown') ? 1 : 0);
+      await page.screenshot({ path: testInfo.outputPath(`theme-screenshots/${m.key}@${m.version}/without-${off}-opened.png`), fullPage: true });
     }
   }
 });

@@ -6,7 +6,7 @@
 import { eq } from 'drizzle-orm';
 import sharp from 'sharp';
 import { closeDb, db } from '../../src/server/db/client';
-import { themes } from '../../src/server/db/schema';
+import { invitations, musicTracks, themes } from '../../src/server/db/schema';
 import { createPackage } from '../../src/server/catalog/packages';
 import { createMusicTrack } from '../../src/server/catalog/music';
 import { transitionTheme, updateThemeSettings, packagesWithShape } from '../../src/server/catalog/themes';
@@ -32,7 +32,11 @@ try {
   if (t.status !== 'ACTIVE') {
     const cover = await storeImage(db(), await sharp({ create: { width: 420, height: 600, channels: 3, background: '#f6e3d8' } }).png().toBuffer(), { uploadedBy: null });
     const audio = await storeAudio(db(), mp3(3.3), { uploadedBy: null });
-    const song = await createMusicTrack(db(), { title: `e2e-card-${randomToken(4)}`, assetId: audio.id }, actor).catch(() => null);
+    // The same test audio may already be a track (another theme set up earlier in this run): reuse it.
+    const song =
+      (await createMusicTrack(db(), { title: `e2e-card-${randomToken(4)}`, assetId: audio.id }, actor).catch(() => null)) ??
+      (await db().select().from(musicTracks).where(eq(musicTracks.assetId, audio.id)))[0] ??
+      null;
     await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, coverAssetId: cover.id, musicTrackId: song?.id ?? t.musicTrackId }, actor);
     if (!(await packagesWithShape(db(), t.id)).some((p) => p.status === 'ACTIVE')) {
       await createPackage(
@@ -75,8 +79,13 @@ try {
   const d = await createDraft(db(), { themeKey: THEME, packageId, locale: 'ar', values }, ctx);
   const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'e2e@bahja.test' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, ctx);
   await markOrderPaid(db(), o.orderId, { kind: 'WAYL' });
+  // WITH_SELF_EDIT=1: this invitation's package lets the customer edit it after publishing.
+  if (process.env.WITH_SELF_EDIT === '1') {
+    const [inv] = await db().select().from(invitations).where(eq(invitations.id, d.invitationId));
+    await db().update(invitations).set({ featureKeys: [...inv!.featureKeys, 'self_edit'] }).where(eq(invitations.id, d.invitationId));
+  }
   const paid = await getReceipt(db(), o.receiptToken);
-  console.log(JSON.stringify({ receiptToken: o.receiptToken, path: paid?.invitation.path, invitationId: d.invitationId }));
+  console.log(JSON.stringify({ receiptToken: o.receiptToken, path: paid?.invitation.path, invitationId: d.invitationId, accessCode: paid?.accessCode }));
 } finally {
   await closeDb();
 }

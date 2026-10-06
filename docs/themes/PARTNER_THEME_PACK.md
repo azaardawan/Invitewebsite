@@ -33,7 +33,7 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 7. Buttons and form labels use the site's wording (translated automatically); the designer doesn't write them. Extra decorative lines are allowed and are listed for translation.
 
 **Packages**
-8. The complete design is the top package (VVIP). **Every lower package state is designed too**, showing what the screen looks like without the removed parts.
+8. **Any feature can be switched off.** The owner builds each package by ticking features one by one (music, countdown, map, guest form, messages, keepsake, card), so the design must look intentional **with any of them removed**: gaps close up or a decorative element takes the place. Design the complete version plus the main lower packages (e.g. Normal / VIP) as examples; the automatic check also renders the theme with each feature switched off.
 9. **Every Wedding package includes the printable card.**
 10. Guest form (if included): name + "attending / not attending", plus a **required** message in packages with messages. Design the empty, error, sending and thank-you states.
 11. **Public guest messages** (packages with messages): the customer can choose to show all messages **under the invitation** for everyone with the link. Design that list (title, each message with the guest's name, long messages, "be the first" empty state, 1 and 50 messages). When the customer keeps them private, the list is simply absent.
@@ -51,10 +51,11 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 
 **Print**
 19. **Printable card:** A5 portrait. Design it at **154 × 216 mm** (A5 + 3 mm bleed on every side); the customer's PDF is cut to exactly **148 × 210 mm**. Keep all text and important art **at least 5 mm inside** the A5 edge. 300 dpi artwork. Leave space for the **QR code** (about 25 mm) and **one extra line** of text the team may add, and make sure it still looks right **without the message** and **without the QR**.
-20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. The cover page has **no margin** (design the full 210 × 297 mm). Message pages have 18 / 16 / 20 mm margins, and the site adds the **page number at the bottom centre**, so keep that clear. Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. Every page is printed **edge to edge with no page margin**: design the cover as the full 210 × 297 mm, and give message pages their own space inside the page (about 20 mm top and bottom, and clear of the border at the sides). Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
+21. **One border for the whole set.** Each theme has **one border** (strips down both edges, or corner ornaments) that appears **identically on the invitation, the printable card and every keepsake page**, so the three look like one set. Deliver it as its own transparent layer: a strip that can repeat downwards, or a top-right corner ornament (it is also turned for the bottom-left). The owner can replace it in Admin with other artwork at any time, so nothing else in the design may depend on its exact shape.
 
 **Delivery**
-21. One folder in the structure of `docs/THEME_GUIDE.md` Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
+22. One folder in the structure of `docs/THEME_GUIDE.md` Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
 
 
 ## 3. The opening animation (required for every theme)
@@ -156,6 +157,8 @@ draft that a person must then fix; if you use one, give it every file listed in 
 >    - every visible text comes from `labels` or the invitation `fields`, never hard-coded, not even "&"
 >      (use `labels.and`); any fixed decorative lines go in a `copy.ts` with Arabic and English, and the Kurdish
 >      lines are listed in `docs/themes/<key>/KURDISH.md` for the owner to approve (never invent Kurdish);
+>    - **one border** in `border.ts` (strips or corners, artwork from the hand-off), rendered with `<ThemeBorder>` on the
+>      invitation (`medium="screen"`), the card and the keepsake (`medium="print"`), always passing `props.border`;
 >    - `GuestFormSlot` for the guest form (all states), and the `guestbook` list under the invitation when it is not null;
 >    - `print/Card.tsx` (A5 + 3 mm bleed, 5 mm safe area, QR and extra line) and `print/Keepsake.tsx` (A4,
 >      full-page cover, messages that never split) when the manifest lists `print_card` / `keepsake_pdf`;
@@ -181,6 +184,6 @@ draft that a person must then fix; if you use one, give it every file listed in 
 - [ ] Screenshots of every package state at 360 / 390 / 430 / 1280 px look like the design, in Arabic and English, short and long names.
 - [ ] Kurdish preview (Sorani and Badini) has no Arabic or English left over; Kurdish lines approved.
 - [ ] Guest form states, public guest messages (0, 1, 50), countdown and map behave.
-- [ ] Printable card and keepsake PDF downloaded from a test order and checked on paper size.
+- [ ] Printable card and keepsake PDF downloaded from a test order and checked on paper size; the same border on the invitation, the card and every keepsake page.
 - [ ] Opened on a real phone on mobile data: fast, smooth, readable.
 - [ ] Admin: theme name and packages in all four languages, prices set, song assigned, then **Active**.

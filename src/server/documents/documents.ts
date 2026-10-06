@@ -13,7 +13,7 @@ import { renderPdf, type PdfRenderer } from './render';
 import type { DocumentKind } from './tokens';
 
 /** Bump when the print pipeline changes in a way that should regenerate every stored PDF. */
-const PIPELINE_VERSION = 1;
+const PIPELINE_VERSION = 2;
 
 const KIND = { card: 'PRINT_CARD', keepsake: 'KEEPSAKE_PDF' } as const;
 const FEATURE = { card: 'print_card', keepsake: 'keepsake_pdf' } as const;
