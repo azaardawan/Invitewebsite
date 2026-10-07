@@ -12,6 +12,8 @@ import { orderNumber } from '@/lib/ids';
 import { OrderError, loadPurchasable, sameSet } from './common';
 import { acceptedVersions } from '@/server/legal/policies';
 import { trackEvent } from '@/server/analytics/events';
+import { redeemCoupon } from './coupons';
+import { markOrderPaid } from './payment';
 import { findByPreviewToken } from './drafts';
 import { accessCodeFor, accessCodeHash, receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
@@ -28,6 +30,8 @@ export type CheckoutInput = {
   acceptedTerms: boolean;
   /** Generated once per checkout screen; resubmits (double tap, refresh) reuse it. */
   idempotencyKey: string;
+  /** Optional discount code from Admin → Coupons. */
+  couponCode?: string;
 };
 
 export type CheckoutResult = { orderId: string; orderNumber: string; receiptToken: string; amountIqd: number; reused: boolean };
@@ -97,9 +101,21 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       },
       customer: { name: c.data.name, phone, email: c.data.email },
       invitation: { publicId: inv!.publicId, locale: inv!.locale, fieldValues: fields.values },
-      pricing: { amountIqd: p.pkg.priceIqd, currency: 'IQD', displayUsdRateIqd: currency.usdRateIqd },
+      pricing: { amountIqd: p.pkg.priceIqd, currency: 'IQD', displayUsdRateIqd: currency.usdRateIqd } as {
+        amountIqd: number;
+        currency: 'IQD';
+        displayUsdRateIqd: number | null;
+        listPriceIqd?: number;
+        discountIqd?: number;
+        couponCode?: string | null;
+      },
       createdAt: now.toISOString(),
     };
+
+    // Coupon: checked and counted inside this transaction; a 100% coupon leaves nothing to pay.
+    const coupon = input.couponCode?.trim() ? await redeemCoupon(tx, input.couponCode, p.pkg.priceIqd, now) : null;
+    const amountIqd = p.pkg.priceIqd - (coupon?.discountIqd ?? 0);
+    snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: p.pkg.priceIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null };
 
     const legal = await acceptedVersions(tx);
     let order: typeof orders.$inferSelect | undefined;
@@ -110,7 +126,9 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
           orderNumber: orderNumber(),
           customerId: customer!.id,
           invitationId: inv!.id,
-          amountIqd: p.pkg.priceIqd,
+          amountIqd,
+          couponId: coupon?.couponId ?? null,
+          discountIqd: coupon?.discountIqd ?? 0,
           snapshot,
           legalAcceptance: { ...legal, acceptedAt: now.toISOString(), ipHash: ctx.ipHash, userAgent: ctx.userAgent },
           receiptTokenHash: 'pending',
@@ -135,10 +153,11 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       action: 'order.created',
       objectType: 'order',
       objectId: order.id,
-      after: { orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: p.theme.key, package: p.pkg.id },
+      after: { orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: p.theme.key, package: p.pkg.id, coupon: coupon?.code ?? null, discountIqd: coupon?.discountIqd ?? 0 },
       ipHash: ctx.ipHash,
     });
     await trackEvent(tx, { name: 'order_placed', locale: inv!.locale, themeId: p.theme.id, packageId: p.pkg.id, invitationId: inv!.id, orderId: order.id, occurredAt: now });
+    if (amountIqd === 0) await markOrderPaid(tx, order.id, { kind: 'COUPON', code: coupon!.code }, now);
     return { orderId: order.id, orderNumber: order.orderNumber, receiptToken, amountIqd: order.amountIqd, reused: false };
   });
 }

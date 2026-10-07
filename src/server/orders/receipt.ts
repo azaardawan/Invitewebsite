@@ -15,7 +15,7 @@ export type OrderSnapshot = {
   package: { name: { ar: string; en: string; ckb?: string | null; bdn?: string | null }; priceIqd: number; featureKeys: string[] };
   customer: { name: string; phone: string; email: string };
   invitation: { publicId: string; locale: string; fieldValues: Record<string, string> };
-  pricing: { amountIqd: number; currency: 'IQD'; displayUsdRateIqd: number | null };
+  pricing: { amountIqd: number; currency: 'IQD'; displayUsdRateIqd: number | null; listPriceIqd?: number; discountIqd?: number; couponCode?: string | null };
   createdAt: string;
 };
 

@@ -30,7 +30,8 @@ export async function publishInvitation(tx: DbOrTx, invitationId: string, now: D
   return { published: true, publishedAt: now, expiresAt };
 }
 
-export type PaymentSource = { kind: 'WAYL' } | { kind: 'MANUAL'; adminId: string; reason: string };
+/** COUPON: a 100% coupon left nothing to pay, so the order is paid when it is placed. */
+export type PaymentSource = { kind: 'WAYL' } | { kind: 'MANUAL'; adminId: string; reason: string } | { kind: 'COUPON'; code: string };
 
 /**
  * Marks an order paid and publishes its invitation, in one transaction.
@@ -47,7 +48,7 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
 
     const invoiceNumber = await nextInvoiceNumber(tx, now);
     await tx.update(orders).set({ status: 'PAID', paidAt: now, invoiceNumber }).where(eq(orders.id, orderId));
-    const actorType = source.kind === 'WAYL' ? 'WEBHOOK' : 'ADMIN';
+    const actorType = source.kind === 'WAYL' ? 'WEBHOOK' : source.kind === 'COUPON' ? 'CUSTOMER' : 'ADMIN';
     const actorAdminId = source.kind === 'MANUAL' ? source.adminId : null;
     const reason = source.kind === 'MANUAL' ? source.reason : null;
     await tx.insert(orderStatusHistory).values({ orderId, fromStatus: order.status, toStatus: 'PAID', actorType, actorAdminId, reason });
@@ -57,11 +58,11 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
     await recordAudit(tx, {
       actorType,
       actorAdminId,
-      action: source.kind === 'MANUAL' ? 'order.marked_paid_manually' : 'order.paid',
+      action: source.kind === 'MANUAL' ? 'order.marked_paid_manually' : source.kind === 'COUPON' ? 'order.paid_by_coupon' : 'order.paid',
       objectType: 'order',
       objectId: orderId,
       before: { status: order.status },
-      after: { status: 'PAID', invoiceNumber },
+      after: { status: 'PAID', invoiceNumber, ...(source.kind === 'COUPON' ? { coupon: source.code } : {}) },
       reason,
     });
     if (pub.published) {

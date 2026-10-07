@@ -57,6 +57,26 @@ export function CheckoutForm({
       {field('name', { type: 'text', autoComplete: 'name', minLength: 2, maxLength: 80, dir: 'auto' })}
       {field('phone', { type: 'tel', autoComplete: 'tel', inputMode: 'tel', dir: 'ltr', placeholder: '07XX XXX XXXX' })}
       {field('email', { type: 'email', autoComplete: 'email', dir: 'ltr', maxLength: 254 })}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="c-coupon" className="text-[15px] font-medium text-heading">
+          {t('couponLabel')}
+        </label>
+        <input
+          id="c-coupon"
+          name="coupon"
+          defaultValue={v.coupon ?? ''}
+          autoComplete="off"
+          autoCapitalize="characters"
+          dir="ltr"
+          maxLength={30}
+          aria-invalid={state.error === 'errors.invalidCoupon' ? true : undefined}
+          aria-describedby="c-coupon-hint"
+          className={inputCls}
+        />
+        <p id="c-coupon-hint" className="text-sm text-muted">
+          {t('couponHint')}
+        </p>
+      </div>
       <label className="flex items-start gap-3 text-sm leading-relaxed">
         <input type="checkbox" name="terms" required className="mt-1 size-5 shrink-0 accent-[#6e1f33]" />
         <span>
