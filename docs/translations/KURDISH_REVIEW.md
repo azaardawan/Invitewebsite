@@ -360,7 +360,7 @@ previews, and the choice on the customer's receipt.
 | `receipt.guestbookSave` | حفظ الاختيار | Save choice | | | AWAITING |
 | `receipt.guestbookSaved` | تم الحفظ. | Saved. | | | AWAITING |
 
-## Batch 14 — "My invitation" number and editing after publishing (PENDING)
+## Batch 14 — "My invitation" number and editing after publishing — ✅ APPROVED (owner, 2026-10-07)
 
 New customer texts. Reply "approve" (all, or by number) or give your wording. Until approved they show in Arabic.
 Same glossary as before (بانگهێشتنامە / داخوازنامە, پسوولە, بەستەر / لینک, تکایە / هیڤییە).
@@ -390,7 +390,7 @@ Same glossary as before (بانگهێشتنامە / داخوازنامە, پسو
 | 21 | `store.errors.editNotAllowed` | لم يعد بالإمكان تعديل هذه الدعوة من هنا. | This invitation can no longer be edited here. | ئیتر ناتوانرێت ئەم بانگهێشتنامەیە لێرە دەستکاری بکرێت. | ئێدی نابیت ئەڤ داخوازنامە ل ڤێرە بهێتە گوهۆڕین. | ◐ |
 | 22 | `store.errors.editLimitReached` | استخدمت كل التعديلات المتاحة. تواصل معنا لأي تغيير آخر. | You have used all your edits… | هەموو دەستکارییەکانت بەکارهێناوە. بۆ هەر گۆڕانکارییەکی تر پەیوەندیمان پێوە بکە. | تە هەمی گوهۆڕین بکار ئینان. بۆ هەر گوهۆڕینەکا دی پەیوەندیێ ب مە بکە. | ◐ |
 
-## Batch 15 — coupons at checkout (PENDING)
+## Batch 15 — coupons at checkout — ✅ APPROVED (owner, 2026-10-07)
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|

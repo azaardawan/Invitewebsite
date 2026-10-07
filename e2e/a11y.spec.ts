@@ -5,6 +5,9 @@ import { E2E_DATABASE_URL } from './helpers';
 
 /** Accessibility (WCAG 2.1 A/AA rules via axe) on the pages customers and guests use. */
 async function audit(page: Page, url: string) {
+  // Storefront sections fade in with the scroll position, so one half in view stays half-transparent.
+  // With reduced motion every section is shown fully, so contrast is checked on the final colours.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(url);
   await page.waitForLoadState('networkidle');
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
