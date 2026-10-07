@@ -5,6 +5,8 @@ import { E2E_DATABASE_URL } from './helpers';
 
 /** Accessibility (WCAG 2.1 A/AA rules via axe) on the pages customers and guests use. */
 async function audit(page: Page, url: string) {
+  // Entrance animations fade content in; axe would otherwise measure contrast mid-fade.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(url);
   await page.waitForLoadState('networkidle');
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
