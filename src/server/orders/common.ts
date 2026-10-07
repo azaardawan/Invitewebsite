@@ -17,7 +17,8 @@ export class OrderError extends Error {
       | 'invalidCustomer'
       | 'packageChanged'
       | 'rateLimited'
-      | 'refunded',
+      | 'refunded'
+      | 'invalidCoupon',
     public readonly fieldErrors: Record<string, string> = {},
   ) {
     super(code);

@@ -100,6 +100,35 @@ export const invitations = pgTable(
   ],
 );
 
+export const couponKind = pgEnum('coupon_kind', ['PERCENT', 'AMOUNT']);
+export const couponStatus = pgEnum('coupon_status', ['ACTIVE', 'ARCHIVED']);
+
+/** Discount codes created by the owner (e.g. 50% off, 10,000 IQD off, 100% off for the owner's own invitations). */
+export const coupons = pgTable(
+  'coupons',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** What the customer types; stored upper-case, letters/digits/dashes. */
+    code: text('code').notNull().unique(),
+    kind: couponKind('kind').notNull(),
+    /** PERCENT: 1–100. AMOUNT: whole dinars off. */
+    value: integer('value').notNull(),
+    /** Total orders that may use it (null = unlimited); counted when an order is placed. */
+    maxUses: integer('max_uses'),
+    usedCount: integer('used_count').notNull().default(0),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    status: couponStatus('status').notNull().default('ACTIVE'),
+    /** Private note for the team (who it is for). */
+    note: text('note'),
+    createdBy: uuid('created_by').references(() => adminUsers.id, { onDelete: 'restrict' }),
+    ...timestamps,
+  },
+  (t) => [
+    check('coupons_value_range', sql`${t.value} > 0 and (${t.kind} <> 'PERCENT' or ${t.value} <= 100)`),
+    check('coupons_uses', sql`${t.usedCount} >= 0 and (${t.maxUses} is null or ${t.maxUses} > 0)`),
+  ],
+);
+
 export const orders = pgTable(
   'orders',
   {
@@ -117,6 +146,9 @@ export const orders = pgTable(
     status: orderStatus('status').notNull().default('PENDING'),
     /** Amount charged, whole dinars. Payment is always IQD (decision N). */
     amountIqd: bigint('amount_iqd', { mode: 'number' }).notNull(),
+    /** Coupon used at checkout (null = none) and what it took off the package price. amountIqd is after it. */
+    couponId: uuid('coupon_id').references(() => coupons.id, { onDelete: 'restrict' }),
+    discountIqd: bigint('discount_iqd', { mode: 'number' }).notNull().default(0),
     currency: text('currency').notNull().default('IQD'),
     /** Immutable record of what was bought, at what price. Receipts are rendered from this, never from current prices. */
     snapshot: jsonb('snapshot').notNull(),
@@ -138,7 +170,8 @@ export const orders = pgTable(
       .on(t.invitationId)
       .where(sql`${t.status} in ('PENDING', 'AWAITING_PAYMENT', 'PAID')`),
     check('orders_currency_iqd', sql`${t.currency} = 'IQD'`),
-    check('orders_amount_positive', sql`${t.amountIqd} > 0`),
+    // Zero only for a 100% coupon (paid immediately, nothing to collect).
+    check('orders_amount_positive', sql`${t.amountIqd} >= 0 and ${t.discountIqd} >= 0`),
     check('orders_paid_consistent', sql`(${t.status} <> 'PAID') or (${t.paidAt} is not null and ${t.invoiceNumber} is not null)`),
   ],
 );

@@ -21,6 +21,7 @@ export default async function PanelLayout({ children }: LayoutProps<'/admin'>) {
     { href: '/admin/themes', label: t('nav.themes'), show: can(authz, 'themes.view') },
     { href: '/admin/fields', label: t('nav.fields'), show: can(authz, 'sections.manage') },
     { href: '/admin/music', label: t('nav.music'), show: can(authz, 'music.manage') },
+    { href: '/admin/coupons', label: t('nav.coupons'), show: can(authz, 'coupons.manage') },
     { href: '/admin/settings', label: t('nav.settings'), show: can(authz, 'settings.manage') },
     { href: '/admin/legal', label: t('nav.legal'), show: can(authz, 'legal.manage') },
     { href: '/admin/users', label: t('nav.users'), show: can(authz, 'users.manage') },

@@ -57,6 +57,12 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('email'), r.snapshot.customer.email],
     [t('theme'), localized(r.snapshot.theme.name, locale)],
     [t('package'), localized(r.snapshot.package.name, locale)],
+    ...(r.snapshot.pricing.discountIqd
+      ? ([
+          [t('listPrice'), formatIqdIn(r.snapshot.pricing.listPriceIqd ?? r.amountIqd, locale)],
+          [t('discount', { code: r.snapshot.pricing.couponCode ?? '' }), `− ${formatIqdIn(r.snapshot.pricing.discountIqd, locale)}`],
+        ] as [string, string][])
+      : []),
     [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),

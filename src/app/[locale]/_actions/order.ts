@@ -78,23 +78,27 @@ export async function editDraftAction(_prev: OrderFormState, form: FormData): Pr
 
 /** Step 2: the order is created from the draft; the customer lands on their private receipt. */
 export async function placeOrderAction(_prev: OrderFormState, form: FormData): Promise<OrderFormState> {
-  const values = { name: str(form, 'name'), phone: str(form, 'phone'), email: str(form, 'email') };
+  const values = { name: str(form, 'name'), phone: str(form, 'phone'), email: str(form, 'email'), coupon: str(form, 'coupon') };
   let receiptToken: string;
   let orderId: string;
+  let amountIqd: number;
   try {
-    ({ receiptToken, orderId } = await createOrder(
+    ({ receiptToken, orderId, amountIqd } = await createOrder(
       db(),
       {
         previewToken: str(form, 'token'),
         customer: values,
         acceptedTerms: form.get('terms') === 'on',
         idempotencyKey: str(form, 'idempotencyKey'),
+        couponCode: values.coupon,
       },
       await requestContext(),
     ));
   } catch (e) {
     return failure(e, values);
   }
+  // A 100% coupon: already paid and published, nothing to collect.
+  if (amountIqd === 0) redirect(`/r/${receiptToken}`);
   // Straight on to WAYL; if that isn't possible right now, the receipt page offers "Pay now".
   const pay = await startPayment(db(), orderId).catch((e) => {
     console.error('[payments] start after checkout failed', e);

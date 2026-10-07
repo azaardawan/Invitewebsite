@@ -120,7 +120,8 @@
       "orders": "Orders & invoices",
       "invitations": "Invitations",
       "legal": "Legal policies",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "coupons": "Coupons"
     },
     "modules": {
       "sections": "Sections",
@@ -746,6 +747,33 @@
       "privacyNote": "No IP addresses, names or phone numbers are stored for analytics. Raw events are kept 13 months.",
       "dashboardTitle": "Last 7 days",
       "dashboardMore": "Open analytics"
+    },
+    "coupons": {
+      "heading": "Coupons",
+      "intro": "Discount codes customers type at checkout. You decide what each gives: a percentage, or an amount of dinars. A 100% coupon makes the invitation free: it is published as soon as the order is placed, with nothing to pay.",
+      "create": "New coupon",
+      "code": "Code (letters, digits, dashes; e.g. EID50)",
+      "kind": "Discount",
+      "kindPercent": "Percentage (%)",
+      "kindAmount": "Amount (IQD)",
+      "value": "Value (e.g. 50 for 50%, or 10000 IQD)",
+      "maxUses": "Maximum uses (empty = unlimited)",
+      "expiresAt": "Valid until (empty = no end date)",
+      "note": "Note for the team (who it is for)",
+      "hint": "Tip: for your own free invitations, make a 100% coupon with an unusual code and a few uses, and stop it when you no longer need it.",
+      "createButton": "Create coupon",
+      "list": "All coupons",
+      "empty": "No coupons yet.",
+      "live": "Active",
+      "expired": "Expired",
+      "usedUp": "Used up",
+      "stopped": "Stopped",
+      "percentOff": "{n}% off",
+      "amountOff": "{amount} off",
+      "uses": "Used {used} of {max}",
+      "until": "until {date}",
+      "stop": "Stop",
+      "restart": "Restart"
     }
   },
   "invitation": {
@@ -911,7 +939,9 @@
     "editSaved": "Your invitation is updated. Guests already see the new details.",
     "editLimitReached": "You have used all your edits. Contact us on WhatsApp for any other change.",
     "editClosed": "Editing is closed because the invitation is no longer online.",
-    "editBack": "Back to my receipt"
+    "editBack": "Back to my receipt",
+    "listPrice": "Package price",
+    "discount": "Discount ({code})"
   },
   "nav": {
     "home": "Home",
@@ -989,7 +1019,8 @@
       "refunded": "This order was refunded.",
       "generic": "Something went wrong. Please try again.",
       "editNotAllowed": "This invitation can no longer be edited here.",
-      "editLimitReached": "You have used all your edits. Contact us for any other change."
+      "editLimitReached": "You have used all your edits. Contact us for any other change.",
+      "invalidCoupon": "This coupon code isn't valid, has expired or has been used up."
     },
     "reviewTitle": "Review your invitation",
     "reviewSubtitle": "This is exactly how your guests will see it. The preview link works for 24 hours after your last edit.",
@@ -1014,7 +1045,9 @@
     "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed.",
     "askTheme": "Have a question about this design?",
     "askThemeLink": "Ask us on WhatsApp",
-    "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}"
+    "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}",
+    "couponLabel": "Coupon code (optional)",
+    "couponHint": "If you have a discount code, type it here. The discount is applied when you confirm."
   },
   "contact": {
     "title": "Contact us",

@@ -26,6 +26,7 @@ export const PERMISSIONS = {
   'translations.manage': 'Edit website translations',
   'analytics.view': 'View analytics',
   'settings.manage': 'Edit website/business settings',
+  'coupons.manage': 'Create and stop discount coupons (including free ones)',
   'legal.manage': 'Edit and publish legal policies',
   'users.manage': 'Manage admin users and roles',
   'audit.view': 'View audit history',
@@ -53,7 +54,7 @@ export const SYSTEM_ROLES: Record<
   MANAGER: {
     name: { ar: 'مدير', en: 'Manager' },
     permissions: ALL_PERMISSIONS.filter(
-      (p) => !['users.manage', 'system.manage', 'payments.override'].includes(p),
+      (p) => !['users.manage', 'system.manage', 'payments.override', 'coupons.manage'].includes(p),
     ),
   },
   DESIGNER: {
