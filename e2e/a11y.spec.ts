@@ -10,6 +10,15 @@ async function audit(page: Page, url: string) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(url);
   await page.waitForLoadState('networkidle');
+  // Let entrance animations (e.g. the hero fade-in) finish so contrast is measured at full opacity.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a instanceof CSSAnimation && a.animationName.startsWith('bh-rise'))
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   const problems = result.violations.map((v) => `${v.id} (${v.impact}): ${v.help} — ${v.nodes.map((n) => n.target.join(' ')).slice(0, 3).join(', ')}`);
   expect(problems, url).toEqual([]);
