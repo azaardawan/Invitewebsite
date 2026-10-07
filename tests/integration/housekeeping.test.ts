@@ -55,4 +55,13 @@ describe('housekeeping', () => {
     // Safe to run again.
     expect(await runHousekeeping(db(), new Date(), { prepareKeepsakes: false })).toMatchObject({ repliesDeleted: 0, keepsakesDeleted: 0 });
   });
+
+  it('prepares the keepsake of an invitation that ended in the last 7 days', async () => {
+    const ended = await publishedWithKeepsake();
+    await db().update(invitations).set({ expiresAt: new Date(Date.now() - 2 * 86_400_000) }).where(eq(invitations.id, ended.id));
+
+    // The keepsake already exists, so nothing is rendered; the run must still find the invitation.
+    const result = await runHousekeeping(db(), new Date());
+    expect(result.keepsakesPrepared).toBeGreaterThanOrEqual(1);
+  });
 });

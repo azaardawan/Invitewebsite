@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, eq, inArray, isNotNull, lt, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNotNull, lt, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { analyticsEvents, generatedDocuments, guestResponses, invitations } from '@/server/db/schema';
 import { pruneRateLimits } from '@/server/rate-limit';
@@ -50,7 +50,7 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
         and(
           eq(invitations.status, 'PUBLISHED'),
           lt(invitations.expiresAt, now),
-          sql`${invitations.expiresAt} > ${new Date(now.getTime() - 7 * DAY)}`,
+          gt(invitations.expiresAt, new Date(now.getTime() - 7 * DAY)),
           sql`'keepsake_pdf' = any(${invitations.featureKeys})`,
         ),
       );
