@@ -1,27 +1,30 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Price } from './currency';
+import { RankBadge } from './RankBadge';
 
-export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null };
+export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null; rank?: number | null };
 
 const TINTS = ['bg-[#efe2ea]', 'bg-blush', 'bg-paper', 'bg-sand', 'bg-[#efd0c8]'];
 
-/** Themes as arched cards, two across on phones. */
-export async function ThemeGrid({ themes }: { themes: GridTheme[] }) {
+/** Themes as arched cards, two across on phones. The owner's top 3 come first, with their badges. */
+export async function ThemeGrid({ themes: list }: { themes: GridTheme[] }) {
   const t = await getTranslations('home');
+  const themes = [...list].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
   return (
     <ul className="grid grid-cols-2 gap-x-4 gap-y-10 px-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14 lg:px-[110px]">
       {themes.map((th, i) => (
         <li key={th.key} data-reveal>
           <Link href={`/themes/${th.key}`} className="group flex flex-col gap-3">
             <span
-              className={`block aspect-[3/4.4] overflow-hidden rounded-t-[999px] rounded-b-[16px] transition duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_18px_34px_rgb(74_19_34/0.14)] ${TINTS[i % TINTS.length]}`}
+              className={`relative block aspect-[3/4.4] overflow-hidden rounded-t-[999px] rounded-b-[16px] transition duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_18px_34px_rgb(74_19_34/0.14)] ${TINTS[i % TINTS.length]}`}
             >
               {th.coverUrl ? (
                 // Covers are already optimized WebP from the upload pipeline.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={th.coverUrl} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" />
               ) : null}
+              <RankBadge rank={th.rank} labels={{ bestSeller: t('bestSeller'), topPick: t('topPick') }} className="absolute bottom-3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2" />
             </span>
             <span className="flex flex-col gap-0.5 text-center">
               <span className="text-base font-semibold text-heading lg:text-lg">{th.name}</span>

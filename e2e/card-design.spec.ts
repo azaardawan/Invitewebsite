@@ -16,8 +16,9 @@ test('the owner finds a theme by its number and gives its printable card their o
   await signInAsNewOwner(page);
 
   // Theme number 4 is the minimal demo, which has no printable card of its own.
-  await page.goto('/admin/themes?q=4');
-  await expect(page.getByText('#4')).toBeVisible();
+  await page.goto('/admin/themes?q=%234');
+  await expect(page.locator('main li')).toHaveCount(1);
+  await expect(page.locator('main li').getByText('#4')).toBeVisible();
   await page.getByRole('link', { name: 'تصميم بسيط تجريبي' }).click();
   await expect(page.getByRole('heading', { name: 'تصميم البطاقة المطبوعة' })).toBeVisible();
   await expect(page.getByText('هذا القالب ليس له وجه بطاقة للطباعة')).toBeVisible();

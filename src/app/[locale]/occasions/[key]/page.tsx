@@ -42,6 +42,7 @@ export default async function OccasionPage({ params, searchParams }: PageProps<'
         section: th.subsection ? localized(th.subsection.name, locale) : localized(th.sectionName, locale),
         coverUrl: th.coverUrl,
         minPriceIqd: th.minPriceIqd,
+        rank: th.rank,
       }))}
     />
   );

@@ -10,6 +10,7 @@ import { ThemeShowcase } from '@/components/storefront/theme/ThemeShowcase';
 import { publicContact } from '@/server/settings/public';
 import { whatsappHref } from '@/lib/contact-links';
 import { env } from '@/server/env';
+import { RankBadge } from '@/components/storefront/RankBadge';
 
 export const dynamicParams = true;
 
@@ -30,6 +31,7 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
   const th = await storefrontTheme(key);
   if (!th) notFound();
   const t = await getTranslations('store');
+  const home = await getTranslations('home');
   const { whatsapp } = await publicContact();
   const pageUrl = `${env().APP_URL.replace(/\/$/, '')}${locale === 'ar' ? '' : `/${locale}`}/themes/${th.key}`;
 
@@ -39,6 +41,7 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
         <Link href={`/occasions/${th.section.key}`} className="text-sm font-medium text-gold hover:underline">
           {localized(th.section.name, locale)}
         </Link>
+        <RankBadge rank={th.rank} labels={{ bestSeller: home('bestSeller'), topPick: home('topPick') }} />
         <h1 className="bh-rise font-display text-[42px] leading-[1.3] font-bold text-heading lg:text-[64px]">{localized(th.name, locale)}</h1>
         {th.description ? <p className="bh-rise-2 max-w-2xl text-[15px] leading-relaxed text-muted lg:text-lg">{localized(th.description, locale)}</p> : null}
       </div>

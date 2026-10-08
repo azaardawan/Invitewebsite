@@ -6,6 +6,7 @@ import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, sub
 import { packagesWithShape } from '@/server/catalog/themes';
 import { publicMediaUrl } from '@/server/storage';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { getSettings } from '@/server/settings/service';
 
 /**
  * Read-only queries for the public storefront. Only ACTIVE themes in ACTIVE
@@ -57,8 +58,22 @@ export async function storefrontSubsections(sectionKey: string) {
   return rows.map((r) => ({ key: r.sub.key, name: r.sub.name, description: r.sub.description }));
 }
 
-export async function storefrontThemes(opts: { sectionKey?: string; subsectionKey?: string; limit?: number } = {}) {
+/** The owner's top 3 as theme id → place (1 = best seller, 2 and 3 = top picks). */
+async function featuredRanks() {
+  const { featured } = await getSettings(db());
+  return new Map(featured.themeIds.map((id, i) => [id, i + 1]));
+}
+
+/** The owner's top 3 themes that are on sale, best first (for the homepage). */
+export async function storefrontTopPicks() {
+  const all = await storefrontThemes({ onlyFeatured: true });
+  return all.filter((t) => t.rank !== null).sort((a, b) => a.rank! - b.rank!);
+}
+
+export async function storefrontThemes(opts: { sectionKey?: string; subsectionKey?: string; limit?: number; onlyFeatured?: boolean } = {}) {
   await connection();
+  const ranks = await featuredRanks();
+  if (opts.onlyFeatured && !ranks.size) return [];
   const rows = await db()
     .select({
       theme: themes,
@@ -78,6 +93,7 @@ export async function storefrontThemes(opts: { sectionKey?: string; subsectionKe
         eq(sections.status, 'ACTIVE'),
         opts.sectionKey ? eq(sections.key, opts.sectionKey) : undefined,
         opts.subsectionKey ? eq(subsections.key, opts.subsectionKey) : undefined,
+        opts.onlyFeatured ? inArray(themes.id, [...ranks.keys()]) : undefined,
       ),
     )
     .orderBy(asc(sections.sortOrder), asc(themes.sortOrder), asc(themes.createdAt))
@@ -91,6 +107,7 @@ export async function storefrontThemes(opts: { sectionKey?: string; subsectionKe
     subsection: r.sub ? { key: r.sub.key, name: r.sub.name } : null,
     coverUrl: r.coverKey ? publicMediaUrl(r.coverKey) : null,
     minPriceIqd: r.minPrice === null ? null : Number(r.minPrice),
+    rank: ranks.get(r.theme.id) ?? null,
   }));
 }
 
@@ -117,6 +134,7 @@ export async function storefrontTheme(key: string) {
     description: row.theme.description,
     section: { key: row.section.key, name: row.section.name },
     coverUrl: row.coverKey ? publicMediaUrl(row.coverKey) : null,
+    rank: (await featuredRanks()).get(row.theme.id) ?? null,
     codeRef: row.version.codeRef,
     version: row.version.version,
     manifest,
