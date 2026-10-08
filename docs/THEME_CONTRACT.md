@@ -46,6 +46,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `mapUrl` | A safe map link or null |
 | `music` | `{ src }` or null |
 | `guestbook` | Guest messages to show **under the invitation**, newest first (`{ guestName, message }[]`, possibly empty) when the customer made them public; `null` when they stay private (keepsake only) or the package has no messages. Render nothing when null; show `labels.guestbookEmpty` when empty. Samples are filled in previews. |
+| `attendance` | How many guests replied coming / not coming (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
 
 ## 4. What the theme may use: `@/theme-sdk`
 

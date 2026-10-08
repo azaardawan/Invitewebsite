@@ -29,6 +29,8 @@ export function InvitationView({
     withMessage: props.features.includes('congratulations'),
     submit: submitGuestResponse,
     turnstileSiteKey: turnstileSiteKey ?? null,
+    attendance: props.attendance,
+    locale: props.locale,
   };
   return (
     <InvitationRuntime mode={props.mode} labels={props.labels} musicSrc={props.music?.src ?? null} guest={guest}>

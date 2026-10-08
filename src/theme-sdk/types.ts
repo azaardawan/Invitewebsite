@@ -38,6 +38,12 @@ export type ThemeLabels = {
   guestbookTitle: string;
   /** Shown when the public list is on but nobody has written yet. */
   guestbookEmpty: string;
+  /** Heading of the public reply count (how many are coming / not coming). */
+  attendanceTitle: string;
+  /** Label under the number of guests coming. */
+  attendingCount: string;
+  /** Label under the number of guests not coming. */
+  notAttendingCount: string;
   /** Word between two names ("و" / "&"), in the invitation's language. */
   and: string;
 };
@@ -87,6 +93,12 @@ export type ThemeProps = {
    * package has no messages. Render nothing when null.
    */
   guestbook: GuestbookMessage[] | null;
+  /**
+   * How many guests replied "coming" / "not coming", when the customer chose to show it to everyone;
+   * null when it stays private or the package has no guest form. `GuestFormSlot` already shows it
+   * above the form; a theme that draws its own passes `summary={false}` to the slot.
+   */
+  attendance: { attending: number; notAttending: number } | null;
   /** The owner's replacement border from Admin, or null to use the theme's own. Render it with `<ThemeBorder>`. */
   border: ThemeBorderSpec | null;
 };

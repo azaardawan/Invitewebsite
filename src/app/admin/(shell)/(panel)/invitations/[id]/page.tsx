@@ -25,6 +25,7 @@ import {
   removeCustomCardAction,
   guestMessageStatusAction,
   guestbookVisibilityAction,
+  attendanceVisibilityAction,
   invitationMusicAction,
   publishInvitationAction,
 } from '../../../../_actions/invitations';
@@ -255,6 +256,18 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
         <Card>
           <h2 className="mb-1 font-semibold">{t('guestsTitle')}</h2>
           {counts ? <p className="mb-3 text-sm text-muted">{t('guestsSummary', counts)}</p> : null}
+          {inv.featureKeys.includes('rsvp') ? (
+            <div className="mb-2 flex flex-wrap items-center gap-3 rounded-md bg-canvas px-3 py-2 text-sm">
+              <span>{inv.publicAttendance ? t('attendancePublicOn') : t('attendancePublicOff')}</span>
+              {can(authz, 'invitations.edit') ? (
+                <ActionForm action={attendanceVisibilityAction}>
+                  <input type="hidden" name="id" value={inv.id} />
+                  <input type="hidden" name="public" value={inv.publicAttendance ? 'false' : 'true'} />
+                  <SubmitButton tone="secondary">{inv.publicAttendance ? t('attendanceMakePrivate') : t('attendanceMakePublic')}</SubmitButton>
+                </ActionForm>
+              ) : null}
+            </div>
+          ) : null}
           {inv.featureKeys.includes('congratulations') ? (
             <div className="mb-4 flex flex-wrap items-center gap-3 rounded-md bg-canvas px-3 py-2 text-sm">
               <span>{inv.publicGuestbook ? t('guestbookPublicOn') : t('guestbookPublicOff')}</span>

@@ -9,10 +9,13 @@ type Labels = { title: string; private: string; public: string; saving: string; 
  * with a clear "Saving… / Saved" note; on failure the previous choice comes back.
  */
 export function GuestbookChoice({
+  name = 'visibility',
   initialPublic,
   save,
   labels,
 }: {
+  /** Radio group name; each choice on the page needs its own. */
+  name?: string;
   initialPublic: boolean;
   save: (isPublic: boolean) => Promise<{ ok: boolean }>;
   labels: Labels;
@@ -44,7 +47,7 @@ export function GuestbookChoice({
     >
       <input
         type="radio"
-        name="visibility"
+        name={name}
         value={value ? 'public' : 'private'}
         checked={isPublic === value}
         onChange={() => choose(value)}
