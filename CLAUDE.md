@@ -20,6 +20,11 @@ product spec's §74 business rules override assumptions.
 - Themes live in `themes/<key>/v<N>/` with a `manifest.ts` (`defineTheme`). The registry
   (`src/theme-registry/generated.ts`) is generated automatically; never hand-register a theme.
   Theme code may only import `@/theme-sdk` and `@/catalog` (ESLint enforces this).
+- Every theme has a permanent number in `themes/numbers.json` (shown as `#N` in Admin). When the owner says
+  "theme 7", look the key up there. A new theme folder gets the next number when the registry is generated;
+  commit the file. Numbers are never reused.
+- The owner can replace either side of a theme's printable card with their own artwork in Admin
+  (`themes.card_design`, `src/server/catalog/card-design.ts`); the platform writes the text on it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
 - `pnpm db:seed` is idempotent and runs on every deploy: permissions/roles, field library, starter
   sections, theme registration. It never overwrites owner edits.

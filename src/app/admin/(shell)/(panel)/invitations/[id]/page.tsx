@@ -1,3 +1,4 @@
+import { themeNumber } from '@/theme-registry';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -108,7 +109,8 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
         </p>
         <p>
           <span className="text-muted">{t('theme')}: </span>
-          {localized(row.themeName, locale)} <span className="font-mono text-xs text-muted">({row.themeKey})</span>
+          <span className="font-mono font-semibold" dir="ltr">#{themeNumber(row.themeKey) ?? '—'}</span> {localized(row.themeName, locale)}{' '}
+          <span className="font-mono text-xs text-muted">({row.themeKey})</span>
         </p>
         <p>
           <span className="text-muted">{t('package')}: </span>

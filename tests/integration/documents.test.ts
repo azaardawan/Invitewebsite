@@ -1,7 +1,10 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { auditLogs, generatedDocuments, invitations } from '@/server/db/schema';
+import { auditLogs, generatedDocuments, invitations, themes } from '@/server/db/schema';
+import sharp from 'sharp';
+import { storeImage } from '@/server/media/assets';
+import { themeCardDesign, updateThemeCardSide } from '@/server/catalog/card-design';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
@@ -232,3 +235,44 @@ describe('keepsake delivery', () => {
   });
 });
 
+
+describe('owner card artwork', () => {
+  it('replaces one side of the theme’s card, changes the stored card, and can be removed (audited)', async () => {
+    const inv = await order(true);
+    const actor = { adminId: shop.admin.id, ipHash: null };
+    const r = fakeRenderer();
+    expect((await printData(db(), inv, 'card')) as { design: unknown }).toMatchObject({ design: { front: null, back: null } });
+    await ensureDocument(db(), inv.id, 'card', { render: r.render });
+
+    const png = await sharp({ create: { width: 900, height: 640, channels: 3, background: '#e8dcc8' } }).png().toBuffer();
+    const art = await storeImage(db(), png, { uploadedBy: null });
+    const style = { ink: '#222222', accent: '#7a1f3d', headingFont: 'ruqaa', bodyFont: 'sans', align: 'center', insetMm: 20, scale: 110 } as const;
+    await expect(updateThemeCardSide(db(), shop.theme.id, 'back', { ...style, assetId: art.id, ink: 'red' }, actor)).rejects.toThrow();
+    await updateThemeCardSide(db(), shop.theme.id, 'back', { ...style, assetId: art.id }, actor);
+
+    const data = await printData(db(), inv, 'card');
+    if (data.kind !== 'card') throw new Error('expected a card');
+    expect(data.design.front).toBeNull();
+    expect(data.design.back).toMatchObject({ accent: '#7a1f3d', insetMm: 20, scale: 110 });
+    expect(data.design.back!.src).toContain(art.storageKey);
+    expect(data.sheet).toEqual({ bleedMm: expect.any(Number), pageHasBleed: false });
+    // The stored card no longer matches, so the next download redraws it.
+    await ensureDocument(db(), inv.id, 'card', { render: r.render });
+    expect(r.calls).toHaveLength(2);
+
+    await updateThemeCardSide(db(), shop.theme.id, 'back', { ...style, assetId: null }, actor);
+    expect((await themeCardDesign(db(), shop.theme.id)).back).toBeNull();
+    const [t] = await db().select({ design: themes.cardDesign }).from(themes).where(eq(themes.id, shop.theme.id));
+    expect(t!.design).toBeNull();
+    const actions = (await db().select().from(auditLogs).where(eq(auditLogs.objectId, shop.theme.id))).map((l) => l.action);
+    expect(actions.filter((a) => a === 'theme.card_design_updated')).toHaveLength(2);
+  });
+
+  it('accepts an uploaded design with a landscape back page', async () => {
+    const inv = await order(true);
+    const doc = await PDFDocument.create();
+    doc.addPage([419.53, 595.28]);
+    doc.addPage([595.28, 419.53]);
+    expect(await uploadCustomCard(db(), inv.id, Buffer.from(await doc.save()), { adminId: shop.admin.id, ipHash: null })).toBe(2);
+  });
+});

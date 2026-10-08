@@ -134,6 +134,29 @@ export const musicTracks = pgTable('music_tracks', {
   ...timestamps,
 });
 
+/**
+ * The owner's own artwork for one side of the printable card (Admin → Themes → Printable card design):
+ * a full-page background image without text, and how the platform writes the invitation's text on it.
+ */
+export type CardSideDesign = {
+  assetId: string;
+  /** Main text colour and the colour of the names / big title. */
+  ink: string;
+  accent: string;
+  /** Font of the names / big title, and of the rest of the text. */
+  headingFont: CardFont;
+  bodyFont: CardFont;
+  /** Where the text block sits on the artwork. */
+  align: 'top' | 'center' | 'bottom';
+  /** Empty space kept from the page edges (mm), so the text stays inside the artwork's frame. */
+  insetMm: number;
+  /** Text size, 100 = normal. */
+  scale: number;
+};
+export type CardFont = 'ruqaa' | 'sans' | 'vazir';
+/** Null side = the theme's own design (or the platform's simple back). */
+export type CardDesign = { front?: CardSideDesign | null; back?: CardSideDesign | null };
+
 export const themes = pgTable(
   'themes',
   {
@@ -155,6 +178,8 @@ export const themes = pgTable(
     borderAssetId: uuid('border_asset_id').references(() => assets.id, { onDelete: 'restrict' }),
     /** How the replacement border is laid out (`strips` or `corners`, size in px on a phone). */
     borderStyle: jsonb('border_style').$type<{ kind: 'strips' | 'corners'; size: number }>(),
+    /** The owner's artwork for the front and/or back of the printable card; null = the theme's own. */
+    cardDesign: jsonb('card_design').$type<CardDesign>(),
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     ...timestamps,
   },

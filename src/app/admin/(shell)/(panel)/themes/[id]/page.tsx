@@ -12,6 +12,9 @@ import { MAX_ACTIVE_PACKAGES } from '@/server/catalog/packages';
 import { themeBorder } from '@/server/catalog/border';
 import { listPalettes } from '@/server/catalog/palettes';
 import { listSubsections } from '@/server/catalog/subsections';
+import { themeNumber } from '@/theme-registry';
+import { ThemeNumber } from '@/components/admin/ThemeNumber';
+import { CardDesignSection } from './CardDesignSection';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -123,10 +126,11 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
       </Link>
       <header className="space-y-1">
         <h1 className="flex flex-wrap items-center gap-3 text-2xl font-semibold">
+          <ThemeNumber n={themeNumber(d.theme.key)} label={t('themes.number')} />
           {localized(d.theme.name, locale)} <Badge status={d.theme.status}>{t(`themes.status.${d.theme.status}`)}</Badge>
         </h1>
         <p className="font-mono text-sm text-muted" dir="ltr">
-          {d.theme.key}
+          {d.theme.key} · themes/{d.theme.key}/
         </p>
         {manifest?.internal ? <p className="text-sm text-danger">{t('themes.internal')}</p> : null}
       </header>
@@ -278,6 +282,21 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
           ) : null}
         </Card>
       ) : null}
+
+      {(() => {
+        const current = d.versions.find((v) => v.id === d.theme.currentVersionId);
+        return (
+          <CardDesignSection
+            themeId={d.theme.id}
+            themeKey={d.theme.key}
+            codeRef={current?.inBuild ? current.codeRef : null}
+            version={current?.version ?? null}
+            design={d.theme.cardDesign}
+            updatedAt={d.theme.updatedAt}
+            canManage={canManage}
+          />
+        );
+      })()}
 
       {canManage && colorSlots.length ? (
         <Card className="space-y-4">

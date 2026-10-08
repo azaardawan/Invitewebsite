@@ -437,7 +437,9 @@
         "paletteArchived": "Not offered",
         "palettePreview": "Preview",
         "paletteArchive": "Stop offering",
-        "paletteRestore": "Offer again"
+        "paletteRestore": "Offer again",
+        "number": "Theme number: use it to ask for changes to this theme",
+        "searchHint": "Name, key or number (e.g. 7)"
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -500,6 +502,41 @@
         "themeSubsection": "Subsection",
         "none": "None (listed with the section)",
         "themeHint": "Subsections are managed under Admin → Sections."
+      },
+      "cardDesign": {
+        "heading": "Printable card design",
+        "intro": "The front (portrait) and back (landscape) of this theme’s printable card. Each side uses the theme’s own design until you upload your own artwork for it; the invitation’s text is then written on your artwork with the colours, fonts and placement you choose here. Changes apply to every card downloaded from now on.",
+        "front": "Front",
+        "back": "Back",
+        "editFront": "Edit the front",
+        "editBack": "Edit the back",
+        "usingArtwork": "your artwork",
+        "usingTheme": "the theme’s own design",
+        "usingSimpleBack": "the simple back",
+        "usingNone": "no printable front yet",
+        "noFront": "This theme has no printable front of its own. Upload artwork for the front to give it a printable card.",
+        "sizeFront": "Artwork for the front: portrait, 154 × 216 mm including 3 mm bleed on every side (at least 1800 × 2520 px). Leave out the text; keep important artwork away from the edges.",
+        "sizeBack": "Artwork for the back: landscape, 216 × 154 mm including 3 mm bleed on every side (at least 2520 × 1800 px). Leave out the text: the customer’s big title, message and signatures are written on it.",
+        "artwork": "Artwork (JPG, PNG or WebP)",
+        "accent": "Names and big title colour",
+        "ink": "Text colour",
+        "headingFont": "Names and big title font",
+        "bodyFont": "Text font",
+        "fonts": {
+          "ruqaa": "Aref Ruqaa (calligraphy)",
+          "sans": "Noto Sans Arabic (clean)",
+          "vazir": "Vazirmatn (modern)"
+        },
+        "align": "Text position",
+        "alignTop": "Top",
+        "alignCenter": "Middle",
+        "alignBottom": "Bottom",
+        "inset": "Space from the edges (mm)",
+        "scale": "Text size (%)",
+        "save": "Save this side",
+        "restore": "Remove my artwork (use the theme’s own design)",
+        "restoreSimple": "Remove my artwork (use the simple back)",
+        "perInvitation": "Wording for one customer only (card message, extra line, back text) and uploading a finished PDF are on that invitation’s page."
       }
     },
     "settings": {
@@ -637,7 +674,7 @@
       "cardExtraLine": "Extra line (optional), e.g. “Family invitation”",
       "cardShowQr": "Show the QR code to the online invitation",
       "cardSaveOptions": "Save card changes",
-      "cardUploadHelp": "Or upload your own design: a PDF with A5 pages (148 × 210 mm, portrait). It replaces the automatic card for this customer.",
+      "cardUploadHelp": "Or upload your own finished design: a PDF with A5 pages, usually the front (148 × 210 mm, portrait) then the back (210 × 148 mm, landscape). It replaces the automatic card for this customer.",
       "cardUploadLabel": "Card PDF",
       "cardUpload": "Upload design",
       "cardUploading": "Uploading…",
@@ -647,7 +684,7 @@
       "keepsakeCustomerLater": "The customer gets it on their receipt automatically once the event has started.",
       "cardErrors": {
         "notPdf": "That file is not a valid PDF.",
-        "notA5": "Every page must be A5 portrait (148 × 210 mm). Export the design at A5 without bleed.",
+        "notA5": "Every page must be A5 (148 × 210 mm portrait, or 210 × 148 mm landscape for the back). Export the design at A5 without bleed.",
         "tooLarge": "The PDF is larger than 15 MB.",
         "tooLong": "The message or extra line is too long.",
         "notIncluded": "This package does not include a printable card.",

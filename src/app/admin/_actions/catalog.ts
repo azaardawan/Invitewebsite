@@ -25,6 +25,7 @@ import {
   type ThemeStatus,
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
+import { CARD_SIDE_DEFAULTS, updateThemeCardSide } from '@/server/catalog/card-design';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
 import { catalogFailure, readI18n, readString } from './form-helpers';
@@ -190,6 +191,33 @@ export async function themeBorderAction(_: ActionState, form: FormData): Promise
         actor,
       ),
     ['/admin/themes', `/admin/themes/${themeId}`],
+  );
+}
+
+export async function themeCardSideAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form);
+  const side = form.get('side') === 'back' ? 'back' : 'front';
+  const restore = form.get('restore') === '1';
+  return run(
+    () =>
+      updateThemeCardSide(
+        db(),
+        themeId,
+        side,
+        {
+          assetId: restore ? null : (readString(form, 'assetId') ?? null),
+          ink: String(form.get('ink') ?? CARD_SIDE_DEFAULTS.ink),
+          accent: String(form.get('accent') ?? CARD_SIDE_DEFAULTS.accent),
+          headingFont: String(form.get('headingFont') ?? CARD_SIDE_DEFAULTS.headingFont) as never,
+          bodyFont: String(form.get('bodyFont') ?? CARD_SIDE_DEFAULTS.bodyFont) as never,
+          align: String(form.get('align') ?? CARD_SIDE_DEFAULTS.align) as never,
+          insetMm: Number(form.get('insetMm') ?? CARD_SIDE_DEFAULTS.insetMm),
+          scale: Number(form.get('scale') ?? CARD_SIDE_DEFAULTS.scale),
+        },
+        actor,
+      ),
+    [`/admin/themes/${themeId}`],
   );
 }
 
