@@ -14,6 +14,7 @@ import {
   themeFields,
   themeVersions,
   themes,
+  subsections,
 } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { env } from '@/server/env';
@@ -276,6 +277,8 @@ export const themeSettingsInput = z.object({
   name: i18nContent(60),
   description: optionalI18nContent(500),
   sectionId: z.uuid().nullish(),
+  /** A subsection of the same section; omitted keeps the current one (cleared if the section changes). */
+  subsectionId: z.uuid().nullish(),
   coverAssetId: z.uuid().nullish(),
   musicTrackId: z.uuid().nullish(),
 });
@@ -297,10 +300,22 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
       const [s] = await tx.select({ id: sections.id }).from(sections).where(eq(sections.id, data.sectionId));
       if (!s) throw new CatalogError('notFound');
     }
+    const sectionId = data.sectionId ?? null;
+    let subsectionId = data.subsectionId === undefined ? before.subsectionId : data.subsectionId;
+    if (subsectionId) {
+      const [sub] = await tx.select({ sectionId: subsections.sectionId }).from(subsections).where(eq(subsections.id, subsectionId));
+      if (!sub) throw new CatalogError('notFound');
+      // A subsection from another section: dropped when the section changed, an error when chosen now.
+      if (sub.sectionId !== sectionId) {
+        if (data.subsectionId === undefined) subsectionId = null;
+        else throw new CatalogError('subsectionMismatch');
+      }
+    }
     const next = {
       name: data.name,
       description: data.description,
-      sectionId: data.sectionId ?? null,
+      sectionId,
+      subsectionId: subsectionId ?? null,
       coverAssetId: data.coverAssetId ?? null,
       musicTrackId: data.musicTrackId ?? null,
     };
@@ -311,7 +326,7 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
       action: 'theme.settings_updated',
       objectType: 'theme',
       objectId: themeId,
-      before: { name: before.name, description: before.description, sectionId: before.sectionId, coverAssetId: before.coverAssetId, musicTrackId: before.musicTrackId },
+      before: { name: before.name, description: before.description, sectionId: before.sectionId, subsectionId: before.subsectionId, coverAssetId: before.coverAssetId, musicTrackId: before.musicTrackId },
       after: next,
     });
   });

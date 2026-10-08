@@ -185,7 +185,8 @@
         "field": "Field label",
         "contact": "Contact details (address or hours)",
         "payment": "Payment instructions",
-        "uiTexts": "Website texts ({count})"
+        "uiTexts": "Website texts ({count})",
+        "subsection": "Subsection"
       }
     },
     "users": {
@@ -469,7 +470,8 @@
         "uploadFailed": "Upload failed. Please try again.",
         "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty.",
         "invalidInput": "Check the name (Arabic and English) and the colours.",
-        "noColorSlots": "This design's current version has no colour slots."
+        "noColorSlots": "This design's current version has no colour slots.",
+        "subsectionMismatch": "That subsection belongs to another section."
       },
       "preview": {
         "contents": "Preview contents",
@@ -482,6 +484,22 @@
         "width": "Screen width",
         "desktop": "Desktop",
         "openNewTab": "Open in new tab"
+      },
+      "subsections": {
+        "title": "Subsections",
+        "hint": "Groups inside this section (for example Classic, Modern, Kurdish style). On the website, this occasion's designs are shown under these headings with a filter. Put each design in one from its settings (Admin → Themes).",
+        "empty": "No subsections yet: all designs are shown together.",
+        "name": "Subsection name",
+        "key": "Key (for links)",
+        "keyHint": "Lowercase English letters, numbers and dashes, e.g. classic. It cannot change later.",
+        "add": "Add subsection",
+        "themeCount": "{count, plural, =0 {no designs} one {# design} other {# designs}}",
+        "hidden": "Hidden",
+        "hide": "Hide on the website",
+        "show": "Show on the website",
+        "themeSubsection": "Subsection",
+        "none": "None (listed with the section)",
+        "themeHint": "Subsections are managed under Admin → Sections."
       }
     },
     "settings": {
@@ -1147,7 +1165,9 @@
       "heading": "Invitation colours",
       "help": "Choose a colour set for your design.",
       "original": "Original colours"
-    }
+    },
+    "moreDesigns": "More designs",
+    "seeAll": "See all"
   },
   "contact": {
     "title": "Contact us",

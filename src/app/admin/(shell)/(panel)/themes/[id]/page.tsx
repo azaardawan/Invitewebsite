@@ -11,6 +11,7 @@ import { CatalogError, localized } from '@/server/catalog/common';
 import { MAX_ACTIVE_PACKAGES } from '@/server/catalog/packages';
 import { themeBorder } from '@/server/catalog/border';
 import { listPalettes } from '@/server/catalog/palettes';
+import { listSubsections } from '@/server/catalog/subsections';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -106,6 +107,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const manifest = d.currentManifest;
   const border = await themeBorder(db(), d.theme.id);
   const colorSlots = manifest?.colors?.slots ?? [];
+  const themeSubs = d.theme.sectionId ? await listSubsections(db(), d.theme.sectionId) : [];
   const palettes = colorSlots.length ? await listPalettes(db(), d.theme.id) : [];
   const required = d.section?.requiredFeatures ?? [];
   const labels = new Map(d.fields.map((f) => [f.fieldKey, localized(f.effectiveLabel as I18nContent, locale)]));
@@ -212,6 +214,21 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 ))}
               </select>
             </label>
+            {themeSubs.length ? (
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium">{t('subsections.themeSubsection')}</span>
+                <select name="subsectionId" defaultValue={d.theme.subsectionId ?? ''} className="w-full rounded-md border border-line bg-surface px-3 py-2">
+                  <option value="">{t('subsections.none')}</option>
+                  {themeSubs.map(({ subsection: sub }) => (
+                    <option key={sub.id} value={sub.id}>
+                      {localized(sub.name, locale)}
+                      {sub.status === 'ARCHIVED' ? ` (${t('subsections.hidden')})` : ''}
+                    </option>
+                  ))}
+                </select>
+                <span className="mt-1 block text-xs text-muted">{t('subsections.themeHint')}</span>
+              </label>
+            ) : null}
             <ImageUpload name="coverAssetId" label={t('themes.cover')} initial={d.cover ? { id: d.cover.id, url: publicMediaUrl(d.cover.storageKey) } : null} />
             <label className="block">
               <span className="mb-1 block text-sm font-medium">{t('themes.musicSelect')}</span>

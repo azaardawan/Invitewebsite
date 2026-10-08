@@ -455,7 +455,7 @@ through this file first.
 | 7 | `receipt.attendancePrivate` | أنا فقط (هنا في إيصالي) | Only me (here on my receipt) | تەنها من (لێرە لە پسوولەکەم) | بتنێ ئەز (ل ڤێرە د پسوولا من دا) | ◐ |
 | 8 | `receipt.attendancePublic` | كل من لديه رابط الدعوة (يظهر فوق نموذج الرد) | Everyone with the invitation link (shown above the reply form) | هەرکەسێک بەستەری بانگهێشتنامەکەی هەبێت (لە سەرووی فۆرمی وەڵامدانەوە دەردەکەوێت) | هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت) | ◐ |
 
-## Batch 19 — card back, signature and colour choice (PENDING)
+## Batch 19 — card back, signature, colour choice and subsections (PENDING)
 
 Until approved, these show in Arabic to Kurdish visitors.
 
@@ -482,3 +482,5 @@ Until approved, these show in Arabic to Kurdish visitors.
 | 19 | `store.colors.heading` | ألوان الدعوة | Invitation colours | ڕەنگەکانی بانگهێشتنامە | ڕەنگێن داخوازنامێ | ● |
 | 20 | `store.colors.help` | اختاروا مجموعة ألوان لتصميمكم. | Choose a colour set for your design. | کۆمەڵە ڕەنگێک بۆ دیزاینەکەتان هەڵبژێرن. | کۆمەکا ڕەنگان بۆ دیزاینێ خۆ هەلبژێرن. | ◐ |
 | 21 | `store.colors.original` | الألوان الأصلية | Original colours | ڕەنگە ڕەسەنەکان | ڕەنگێن ڕەسەن | ◐ |
+| 22 | `store.moreDesigns` | تصاميم أخرى | More designs | دیزاینی تر | دیزاینێن دی | ● |
+| 23 | `store.seeAll` | عرض الكل | See all | هەمووی ببینە | هەمیان ببینە | ◐ |
