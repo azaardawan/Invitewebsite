@@ -18,7 +18,10 @@ const base64Key32 = z
  */
 function normalizePhone(v: unknown) {
   if (typeof v !== 'string') return v;
-  const digits = v.replace(/[\s\-().+\u200e\u200f]/g, '').replace(/^00/, '');
+  // Arabic-Indic (٠–٩) and Persian (۰–۹) digits become 0–9; quotes, spaces, dashes, brackets, + and hidden
+  // direction marks are dropped.
+  const western = v.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660)).replace(/[\u06f0-\u06f9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
+  const digits = western.replace(/\D/g, '').replace(/^00/, '');
   // An Iraqi number typed without the country code (07701234567) gets +964.
   return (/^07\d{9}$/.test(digits) ? `964${digits.slice(1)}` : digits) || undefined;
 }
