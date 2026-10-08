@@ -9,6 +9,8 @@ test('visits are counted anonymously and shown in Admin → Analytics', async ({
     if (r.url().endsWith('/api/e')) beacons++;
   });
   await visitor.goto('/');
+  // Let the home page hydrate and report its view before navigating away.
+  await expect.poll(() => beacons, { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
   await visitor.goto('/themes');
   await visitor.waitForLoadState('networkidle');
   await expect.poll(() => beacons, { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
