@@ -14,14 +14,15 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
 /**
  * Optional choices on the order form, each only for packages that include it:
  * - `cardBack` (print_card): big title and smaller message for the back of the card;
- * - `signature` (signature): a PNG data URL from the drawing pad, `keep` (unchanged) or `none`;
+ * - `signature` / `signature2` (signature): each a PNG data URL from a drawing pad, `keep` (unchanged) or
+ *   `none`; the customer chooses one signature or two (the second is then `none`);
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours.
  */
-export type OrderExtras = { cardBack?: { title: string; message: string }; signature?: string; paletteId?: string };
+export type OrderExtras = { cardBack?: { title: string; message: string }; signature?: string; signature2?: string; paletteId?: string };
 
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
-export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'colors'>, extras: OrderExtras) {
-  const set: Partial<Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'colors'>> = {};
+export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'>, extras: OrderExtras) {
+  const set: Partial<Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'>> = {};
   const errors: Record<string, string> = {};
 
   if (extras.cardBack && inv.featureKeys.includes('print_card')) {
@@ -37,16 +38,27 @@ export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId
     set.cardOptions = next;
   }
 
-  if (extras.signature !== undefined && extras.signature !== 'keep' && inv.featureKeys.includes('signature')) {
-    if (extras.signature === 'none' || extras.signature === '') set.signatureAssetId = null;
+  for (const [input, column] of [
+    [extras.signature, 'signatureAssetId'],
+    [extras.signature2, 'signature2AssetId'],
+  ] as const) {
+    if (input === undefined || input === 'keep' || !inv.featureKeys.includes('signature')) continue;
+    if (input === 'none' || input === '') set[column] = null;
     else {
       try {
-        set.signatureAssetId = (await storeSignature(db, extras.signature))?.id ?? null;
+        set[column] = (await storeSignature(db, input))?.id ?? null;
       } catch (e) {
         if (!(e instanceof MediaError)) throw e;
         errors.signature = 'invalid';
       }
     }
+  }
+  // Only a second signature (the first pad left empty): it becomes the first.
+  const first = set.signatureAssetId !== undefined ? set.signatureAssetId : inv.signatureAssetId;
+  const second = set.signature2AssetId !== undefined ? set.signature2AssetId : inv.signature2AssetId;
+  if (!first && second) {
+    set.signatureAssetId = second;
+    set.signature2AssetId = null;
   }
 
   if (extras.paletteId !== undefined && inv.featureKeys.includes('color_choice')) {

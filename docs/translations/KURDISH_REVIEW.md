@@ -472,10 +472,10 @@ Until approved, these show in Arabic to Kurdish visitors.
 | 9 | `store.cardBack.message` | رسالتكم | Your message | نامەکەتان | نامەیا هەوە | ● |
 | 10 | `store.cardBack.messagePlaceholder` | شكراً لأنكم معنا في أجمل أيامنا… | Thank you for being part of our happiest day… | سوپاس کە لە خۆشترین ڕۆژمان لەگەڵمان بوون… | سوپاس کو د خۆشترین ڕۆژا مە دا دگەل مە بوون… | ◐ |
 | 11 | `store.signature.heading` | توقيعكم | Your signature | واژووەکەتان | ئیمزایا هەوە | ◐ |
-| 12 | `store.signature.help` | وقّعوا بإصبعكم أو بالفأرة. يمكنكم المسح والمحاولة من جديد كما تشاؤون. | Sign with your finger or mouse… | بە پەنجە یان ماوس واژوو بکەن. دەتوانن بیسڕنەوە و چەند جار بتانەوێت دووبارە هەوڵ بدەنەوە. | ب تبلا خۆ یان ماوسێ ئیمزا بکەن. دشێن ژێببەن و هەر چەند جاران هوین بڤێن دووبارە هەول بدەن. | ◐ |
+| 12 | `store.signature.help` | اختاروا توقيعاً واحداً أو توقيعين (مثلاً لكليكما). وقّعوا بإصبعكم أو بالفأرة، ويمكنكم المسح والمحاولة من جديد كما تشاؤون. | Choose one signature or two (for example both of you)… | یەک واژوو یان دوو واژوو هەڵبژێرن (بۆ نموونە بۆ هەردووکتان). بە پەنجە یان ماوس واژوو بکەن؛ دەتوانن بیسڕنەوە و چەند جار بتانەوێت دووبارە هەوڵ بدەنەوە. | ئیمزایەکێ یان دوو ئیمزایان هەلبژێرن (بۆ نموونە بۆ هەردووکان). ب تبلا خۆ یان ماوسێ ئیمزا بکەن؛ دشێن ژێببەن و هەر چەند جاران هوین بڤێن دووبارە هەول بدەن. | ◐ |
 | 13 | `store.signature.pad` | مكان التوقيع | Signature area | شوێنی واژوو | جهێ ئیمزایێ | ◐ |
 | 14 | `store.signature.clear` | مسح والمحاولة من جديد | Clear and try again | سڕینەوە و دووبارە هەوڵدانەوە | ژێبرن و دووبارە هەولدان | ◐ |
-| 15 | `store.signature.include` | أضف توقيعي إلى الدعوة | Add my signature to the invitation | واژووەکەم بخەرە سەر بانگهێشتنامەکە | ئیمزایا من بێخە سەر داخوازنامێ | ◐ |
+| 15 | `store.signature.include` | أضف توقيعي (أو توقيعينا) إلى الدعوة | Add my signature(s) to the invitation | واژووەکەم (یان واژووەکانمان) بخەرە سەر بانگهێشتنامەکە | ئیمزایا من (یان ئیمزایێن مە) بێخە سەر داخوازنامێ | ◐ |
 | 16 | `store.signature.current` | توقيعكم | Your signature | واژووەکەتان | ئیمزایا هەوە | ◐ |
 | 17 | `store.signature.redraw` | ارسموا توقيعاً جديداً | Draw a new signature | واژوویەکی نوێ بکێشن | ئیمزایەکا نوو بکێشن | ◐ |
 | 18 | `store.signature.invalid` | لم نتمكن من قراءة التوقيع. امسحوه وحاولوا من جديد. | We couldn't read the signature… | نەمانتوانی واژووەکە بخوێنینەوە. بیسڕنەوە و دووبارە هەوڵ بدەنەوە. | مە نەشیا ئیمزایێ بخوینین. ژێببەن و دووبارە هەول بدەن. | ◐ |
@@ -484,3 +484,8 @@ Until approved, these show in Arabic to Kurdish visitors.
 | 21 | `store.colors.original` | الألوان الأصلية | Original colours | ڕەنگە ڕەسەنەکان | ڕەنگێن ڕەسەن | ◐ |
 | 22 | `store.moreDesigns` | تصاميم أخرى | More designs | دیزاینی تر | دیزاینێن دی | ● |
 | 23 | `store.seeAll` | عرض الكل | See all | هەمووی ببینە | هەمیان ببینە | ◐ |
+| 24 | `store.signature.count` | كم توقيعاً؟ | How many signatures? | چەند واژوو؟ | چەند ئیمزا؟ | ● |
+| 25 | `store.signature.one` | توقيع واحد | One signature | یەک واژوو | ئیمزایەک | ● |
+| 26 | `store.signature.two` | توقيعان | Two signatures | دوو واژوو | دوو ئیمزا | ● |
+| 27 | `store.signature.first` | التوقيع الأول | First signature | واژووی یەکەم | ئیمزایا ئێکێ | ● |
+| 28 | `store.signature.second` | التوقيع الثاني | Second signature | واژووی دووەم | ئیمزایا دووێ | ● |

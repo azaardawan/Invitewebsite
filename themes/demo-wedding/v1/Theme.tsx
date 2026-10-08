@@ -70,7 +70,7 @@ export default function DemoWeddingTheme(props: ThemeProps) {
 
           {fields.invitation_message ? <p className={styles.message}>{fields.invitation_message}</p> : null}
 
-          <Signature signature={props.signature} className={styles.signature} />
+          <Signature signatures={props.signatures} className={styles.signature} />
 
           <dl className={styles.details}>
             {event.date ? (

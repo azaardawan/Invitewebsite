@@ -26,19 +26,21 @@ test('the customer signs, picks colours and writes the back of the card when ord
   // Colours: the owner's set instead of the original colours.
   await page.getByText('وردي').click();
 
-  // Signature: a first try, cleared, then signed again.
-  const pad = page.getByRole('img', { name: 'مكان التوقيع' });
-  await pad.scrollIntoViewIfNeeded();
-  const box = (await pad.boundingBox())!;
-  const sign = async () => {
-    await page.mouse.move(box.x + 30, box.y + box.height * 0.7);
+  // Signatures: two (both of the couple); the first is cleared and signed again.
+  await page.getByText('توقيعان', { exact: true }).click();
+  const sign = async (name: string) => {
+    const pad = page.getByRole('img', { name });
+    await pad.scrollIntoViewIfNeeded();
+    const box = (await pad.boundingBox())!;
+    await page.mouse.move(box.x + 20, box.y + box.height * 0.7);
     await page.mouse.down();
-    for (let i = 1; i <= 12; i++) await page.mouse.move(box.x + 30 + i * 20, box.y + box.height * (0.7 - 0.4 * Math.sin(i / 2)));
+    for (let i = 1; i <= 12; i++) await page.mouse.move(box.x + 20 + i * (box.width - 40) / 12, box.y + box.height * (0.6 - 0.3 * Math.sin(i / 2)));
     await page.mouse.up();
   };
-  await sign();
-  await page.getByRole('button', { name: 'مسح والمحاولة من جديد' }).click();
-  await sign();
+  await sign('التوقيع الأول');
+  await page.getByRole('button', { name: 'مسح والمحاولة من جديد' }).first().click();
+  await sign('التوقيع الأول');
+  await sign('التوقيع الثاني');
 
   // Back of the printed card.
   await page.getByLabel('العنوان الكبير').fill('شكراً لكم');
@@ -50,13 +52,13 @@ test('the customer signs, picks colours and writes the back of the card when ord
   // The preview shows the signature and the chosen colours.
   const frame = page.frameLocator('iframe');
   await frame.getByRole('button', { name: 'افتح الدعوة' }).click().catch(() => {});
-  await expect(frame.locator('[data-bahja-signature]')).toBeVisible();
+  await expect(frame.locator('[data-bahja-signature] img')).toHaveCount(2);
   const bg = await frame.locator('[data-bahja-theme]').evaluate((el) => getComputedStyle(el).getPropertyValue('--bahja-color-background').trim());
   expect(bg).toBe('#6e1f33');
 
   // Editing keeps everything: current signature, colour set and card back.
   await page.getByRole('link', { name: 'تعديل التفاصيل' }).click();
-  await expect(page.getByRole('img', { name: 'توقيعكم' })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'توقيعكم' })).toHaveCount(2);
   await expect(page.getByLabel('العنوان الكبير')).toHaveValue('شكراً لكم');
   await expect(page.locator('input[name=palette]:checked')).not.toHaveValue('');
   await testInfo.attach('order-form.png', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });

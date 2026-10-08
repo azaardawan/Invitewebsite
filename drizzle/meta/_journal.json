@@ -169,6 +169,13 @@
       "when": 1791471619480,
       "tag": "0023_subsections",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791472792000,
+      "tag": "0024_second_signature",
+      "breakpoints": true
     }
   ]
 }

@@ -48,7 +48,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `music` | `{ src }` or null |
 | `guestbook` | Guest messages to show **under the invitation**, newest first (`{ guestName, message }[]`, possibly empty) when the customer made them public; `null` when they stay private (keepsake only) or the package has no messages. Render nothing when null; show `labels.guestbookEmpty` when empty. Samples are filled in previews. |
 | `attendance` | How many guests replied coming / not coming (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
-| `signature` | The customer's drawn signature (`{ src }`, dark ink on transparent) for packages with `signature` when they chose to include it, else `null`. Place it where your design has its signature spot with `<Signature signature={props.signature} className={…} />` (renders nothing when null; on a dark design invert it with CSS). Samples show an example signature. Only list `signature` in the manifest when the design has that spot. |
+| `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
 
 ## 4. What the theme may use: `@/theme-sdk`
@@ -106,7 +106,7 @@ Performance budgets (JS/image size) are reported during M11 hardening.
 Every printable card is **two pages**: the front (`print/Card.tsx`) and the back (`print/CardBack.tsx`,
 `PrintCardBackProps`): the same theme, its own layout. The back gets the customer's big `title` (or a
 default such as "With love"), their smaller `message` (or null), and `signature`/`fields` for a closing
-(the signature, or the names). Same size and bleed as the front. The border drawn with `<ThemeBorder>` on the
+(the signatures, or the names). Same size and bleed as the front. The border drawn with `<ThemeBorder>` on the
 front repeats on the back by itself. Without a `CardBack.tsx` the platform prints a simple back (title,
 message, names or signature, in the theme's colours). See `themes/demo-wedding/v1/print/CardBack.tsx`.
 

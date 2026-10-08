@@ -65,12 +65,19 @@ export function ThemeBorder({ border, fallback, medium }: { border: ThemeBorderS
 }
 
 /**
- * The customer's signature, where the theme's design places it. Renders nothing without one (or when
- * the package has no signature). The image is dark ink on transparent; on a dark design use CSS
- * (e.g. `filter: invert(1)`) through `className`. Works in the invitation and in print companions.
+ * The customer's signature(s), where the theme's design places them: one, or two side by side. Renders
+ * nothing without any (or when the package has no signature). Each image is dark ink on transparent;
+ * `className` styles each image (size; on a dark design e.g. `filter: invert(1)`). Works in the
+ * invitation and in print companions.
  */
-export function Signature({ signature, className, alt = '' }: { signature: { src: string } | null; className?: string; alt?: string }) {
-  if (!signature) return null;
-  // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
-  return <img src={signature.src} alt={alt} className={className} data-bahja-signature="" />;
+export function Signature({ signatures, className, alt = '' }: { signatures: readonly { src: string }[]; className?: string; alt?: string }) {
+  if (!signatures.length) return null;
+  return (
+    <span data-bahja-signature={signatures.length} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5em' }}>
+      {signatures.map((s, i) => (
+        // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
+        <img key={i} src={s.src} alt={alt} className={className} style={{ maxWidth: signatures.length > 1 ? 'calc(50% - 0.75em)' : undefined }} />
+      ))}
+    </span>
+  );
 }

@@ -5,7 +5,7 @@ import { db } from '@/server/db/client';
 import { packages, themes, type CardOptions } from '@/server/db/schema';
 import type { Locale } from '@/i18n/config';
 import { localized } from '@/lib/localized';
-import { signatureUrl } from '@/server/invitation/load';
+import { signatureUrls } from '@/server/invitation/load';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { listPalettes, themeColorSlots } from '@/server/catalog/palettes';
 import type { OrderFormExtras } from '@/components/storefront/order/OrderForm';
@@ -30,7 +30,7 @@ export async function draftByToken(token: string) {
     featureKeys: inv.featureKeys,
     fields: await orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
     themeId: inv.themeId,
-    current: { cardOptions: inv.cardOptions, signatureSrc: await signatureUrl(db(), inv.signatureAssetId), colors: inv.colors },
+    current: { cardOptions: inv.cardOptions, signatureSrcs: await signatureUrls(db(), inv), colors: inv.colors },
     theme: { key: row.theme.key, name: row.theme.name },
     pkg: { id: row.pkg.id, name: row.pkg.name, priceIqd: row.pkg.priceIqd },
   };
@@ -44,13 +44,13 @@ export async function orderFormExtras(
   locale: Locale,
   themeId: string,
   featureKeys: readonly string[],
-  current: { cardOptions?: CardOptions | null; signatureSrc?: string | null; colors?: Record<string, string> | null } = {},
+  current: { cardOptions?: CardOptions | null; signatureSrcs?: string[]; colors?: Record<string, string> | null } = {},
 ): Promise<OrderFormExtras> {
   const extras: OrderFormExtras = {};
   if (featureKeys.includes('print_card')) {
     extras.cardBack = { title: current.cardOptions?.backTitle ?? '', message: current.cardOptions?.backMessage ?? '', limits: CARD_BACK_LIMITS };
   }
-  if (featureKeys.includes('signature')) extras.signature = { current: current.signatureSrc ?? null };
+  if (featureKeys.includes('signature')) extras.signature = { current: current.signatureSrcs ?? [] };
   if (featureKeys.includes('color_choice')) {
     const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
     if (slots.length && palettes.length) {

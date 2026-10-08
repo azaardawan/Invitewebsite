@@ -82,12 +82,13 @@ describe('order extras', () => {
     expect(inv.colors).toEqual({ background: '#dde8f3', accent: '#2b4c7e' });
 
     const { props } = await invitationRenderData(db(), inv, 'preview');
-    expect(props.signature?.src).toMatch(/\.webp$/);
+    expect(props.signatures).toHaveLength(1);
+    expect(props.signatures[0]!.src).toMatch(/\.webp$/);
     expect(props.colors).toEqual({ background: '#dde8f3', accent: '#2b4c7e' });
 
     const card = await printData(db(), inv, 'card');
     expect(card.kind === 'card' && card.back).toMatchObject({ title: 'شكراً لكم', message: 'سعدنا بوجودكم', colors: { accent: '#2b4c7e' } });
-    expect(card.kind === 'card' && card.back.signature?.src).toBeTruthy();
+    expect(card.kind === 'card' && card.back.signatures).toHaveLength(1);
 
     // Admin card tweaks keep the customer's back.
     await updateCardOptions(db(), inv.id, { extraLine: 'دعوة عائلية' }, { adminId: shop.adminId, ipHash: null });
@@ -101,6 +102,26 @@ describe('order extras', () => {
     const card2 = await printData(db(), after, 'card');
     expect(card2.kind === 'card' && card2.back.title).toBe('بكل الحب');
     expect((await invitationRenderData(db(), after, 'preview')).props.colors).toEqual({ background: '#173b2f', accent: '#c9a45c' });
+  });
+
+  it('takes two signatures side by side, and a lone second one becomes the first', async () => {
+    const SECOND = STROKE.replace('M20 150', 'M40 120');
+    const d = await draft({ signature: await pngDataUrl(STROKE), signature2: await pngDataUrl(SECOND) });
+    const inv = await row(d.invitationId);
+    expect(inv.signatureAssetId).not.toBeNull();
+    expect(inv.signature2AssetId).not.toBeNull();
+    expect((await invitationRenderData(db(), inv, 'preview')).props.signatures).toHaveLength(2);
+    const card = await printData(db(), inv, 'card');
+    expect(card.kind === 'card' && card.back.signatures).toHaveLength(2);
+
+    // Back to one: the second is removed.
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: 'keep', signature2: 'none' } });
+    expect((await row(inv.id)).signature2AssetId).toBeNull();
+
+    const lone = await draft({ signature: 'none', signature2: await pngDataUrl(SECOND) });
+    const l = await row(lone.invitationId);
+    expect(l.signatureAssetId).not.toBeNull();
+    expect(l.signature2AssetId).toBeNull();
   });
 
   it('refuses a too-long back, ignores an empty signature pad, and rejects unknown colour sets', async () => {

@@ -56,8 +56,8 @@ export function buildThemeProps(input: {
   border?: ThemeBorderSpec | null;
   /** Reply counts (live, customer opted in); omitted = private. */
   attendance?: { attending: number; notAttending: number } | null;
-  /** URL of the customer's signature image, when they included one. */
-  signatureSrc?: string | null;
+  /** URLs of the customer's signature images (none, one or two), when they included them. */
+  signatureSrcs?: readonly string[];
   /** The theme's colour slots (manifest) and the customer's chosen colours (or none = defaults). */
   colorSlots?: readonly { key: string; default: string }[];
   colors?: Record<string, string> | null;
@@ -93,13 +93,7 @@ export function buildThemeProps(input: {
         ? sampleGuestbook(input.locale)
         : (input.guestbook ?? null),
     attendance: features.includes('rsvp') ? (input.attendance ?? null) : null,
-    signature: !features.includes('signature')
-      ? null
-      : input.mode === 'sample'
-        ? { src: SAMPLE_SIGNATURE }
-        : input.signatureSrc
-          ? { src: input.signatureSrc }
-          : null,
+    signatures: !features.includes('signature') ? [] : input.mode === 'sample' ? [{ src: SAMPLE_SIGNATURE }] : (input.signatureSrcs ?? []).map((src) => ({ src })),
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
   };

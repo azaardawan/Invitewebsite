@@ -21,7 +21,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
   const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now);
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
   // Card back, signature and colour set (only what the package includes).
-  const extra = await extrasUpdate(db, { themeId: p.theme.id, featureKeys: p.pkg.featureKeys, cardOptions: {}, signatureAssetId: null, colors: null }, input.extras ?? {});
+  const extra = await extrasUpdate(db, { themeId: p.theme.id, featureKeys: p.pkg.featureKeys, cardOptions: {}, signatureAssetId: null, signature2AssetId: null, colors: null }, input.extras ?? {});
 
   const token = newPreviewToken();
   for (let attempt = 0; attempt < 5; attempt++) {

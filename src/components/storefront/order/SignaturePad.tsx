@@ -2,19 +2,66 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-type Labels = { heading: string; help: string; pad: string; clear: string; include: string; current: string; redraw: string };
+type Labels = {
+  heading: string;
+  help: string;
+  pad: string;
+  clear: string;
+  include: string;
+  current: string;
+  redraw: string;
+  count: string;
+  one: string;
+  two: string;
+  first: string;
+  second: string;
+};
 
 /**
- * The customer draws their signature with a finger or mouse, can clear and try again as often as they
- * like, and chooses whether to include it. Sends `signature` = a PNG data URL, `keep` (unchanged) or `none`.
+ * The customer chooses one signature or two (e.g. both of the couple), draws each with a finger or mouse,
+ * can clear and try again as often as they like, and chooses whether to include them. Sends `signature`
+ * and `signature2`, each a PNG data URL, `keep` (unchanged) or `none`.
  */
-export function SignaturePad({ current, labels, error }: { current: string | null; labels: Labels; error?: string }) {
+export function SignaturePad({ current, labels, error }: { current: string[]; labels: Labels; error?: string }) {
+  const [count, setCount] = useState<1 | 2>(current.length === 2 ? 2 : 1);
+  const [include, setInclude] = useState(true);
+
+  return (
+    <fieldset className="flex flex-col gap-3 rounded-[22px] border border-line bg-paper px-5 py-4">
+      <legend className="px-1 text-[15px] font-medium text-heading">{labels.heading}</legend>
+      <p className="text-sm text-muted">{labels.help}</p>
+      <div role="radiogroup" aria-label={labels.count} className="flex gap-2">
+        {([1, 2] as const).map((n) => (
+          <label key={n} className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-surface px-3 py-2 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-accent-ink">
+            <input type="radio" name="signatureCount" value={n} checked={count === n} onChange={() => setCount(n)} className="sr-only" />
+            {n === 1 ? labels.one : labels.two}
+          </label>
+        ))}
+      </div>
+      <div className={`grid gap-4 ${count === 2 ? 'sm:grid-cols-2' : ''}`}>
+        <Pad name="signature" current={current[0] ?? null} include={include} label={count === 2 ? labels.first : labels.pad} labels={labels} />
+        {count === 2 ? (
+          <Pad name="signature2" current={current[1] ?? null} include={include} label={labels.second} labels={labels} />
+        ) : (
+          <input type="hidden" name="signature2" value="none" />
+        )}
+      </div>
+      <label className="flex items-center gap-3 text-sm">
+        <input type="checkbox" checked={include} onChange={(e) => setInclude(e.target.checked)} className="size-5 accent-[#6e1f33]" />
+        <span>{labels.include}</span>
+      </label>
+      {error ? <p className="text-sm text-danger">{error}</p> : null}
+    </fieldset>
+  );
+}
+
+/** One drawing pad (or the saved signature with "draw a new one"). */
+function Pad({ name, current, include, label, labels }: { name: string; current: string | null; include: boolean; label: string; labels: Labels }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
   const [drawn, setDrawn] = useState<string | null>(null);
   const [redraw, setRedraw] = useState(!current);
-  const [include, setInclude] = useState(true);
 
   const setup = useCallback(() => {
     const c = canvas.current;
@@ -70,16 +117,14 @@ export function SignaturePad({ current, labels, error }: { current: string | nul
   const value = !include ? 'none' : redraw ? (drawn ?? (current ? 'keep' : 'none')) : 'keep';
 
   return (
-    <fieldset className="flex flex-col gap-3 rounded-[22px] border border-line bg-paper px-5 py-4">
-      <legend className="px-1 text-[15px] font-medium text-heading">{labels.heading}</legend>
-      <p className="text-sm text-muted">{labels.help}</p>
-      <input type="hidden" name="signature" value={value} />
+    <div className="flex flex-col gap-2">
+      <input type="hidden" name={name} value={value} />
       {redraw ? (
         <>
           <canvas
             ref={canvas}
             role="img"
-            aria-label={labels.pad}
+            aria-label={label}
             onPointerDown={start}
             onPointerMove={move}
             onPointerUp={end}
@@ -92,20 +137,15 @@ export function SignaturePad({ current, labels, error }: { current: string | nul
           </button>
         </>
       ) : (
-        <div className="flex flex-col gap-2">
-          <span className="text-sm text-muted">{labels.current}</span>
+        <>
+          <span className="text-sm text-muted">{label}</span>
           {/* eslint-disable-next-line @next/next/no-img-element -- the customer's own signature */}
           <img src={current!} alt={labels.current} className="h-24 w-auto self-start rounded-xl bg-surface object-contain p-2" />
           <button type="button" onClick={() => setRedraw(true)} className="self-start text-sm font-medium text-accent underline underline-offset-4">
             {labels.redraw}
           </button>
-        </div>
+        </>
       )}
-      <label className="flex items-center gap-3 text-sm">
-        <input type="checkbox" checked={include} onChange={(e) => setInclude(e.target.checked)} className="size-5 accent-[#6e1f33]" />
-        <span>{labels.include}</span>
-      </label>
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
-    </fieldset>
+    </div>
   );
 }

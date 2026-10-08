@@ -40,6 +40,7 @@ function orderExtras(form: FormData): OrderExtras {
   const extras: OrderExtras = {};
   if (form.has('cb.title') || form.has('cb.message')) extras.cardBack = { title: str(form, 'cb.title'), message: str(form, 'cb.message') };
   if (form.has('signature')) extras.signature = str(form, 'signature');
+  if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
   if (form.has('palette')) extras.paletteId = str(form, 'palette');
   return extras;
 }

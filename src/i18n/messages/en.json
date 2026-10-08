@@ -1153,13 +1153,18 @@
     },
     "signature": {
       "heading": "Your signature",
-      "help": "Sign with your finger or mouse. You can clear it and try again as often as you like.",
+      "help": "Choose one signature or two (for example both of you). Sign with your finger or mouse; you can clear and try again as often as you like.",
       "pad": "Signature area",
       "clear": "Clear and try again",
-      "include": "Add my signature to the invitation",
+      "include": "Add my signature(s) to the invitation",
       "current": "Your signature",
       "redraw": "Draw a new signature",
-      "invalid": "We couldn't read the signature. Please clear it and try again."
+      "invalid": "We couldn't read the signature. Please clear it and try again.",
+      "count": "How many signatures?",
+      "one": "One signature",
+      "two": "Two signatures",
+      "first": "First signature",
+      "second": "Second signature"
     },
     "colors": {
       "heading": "Invitation colours",

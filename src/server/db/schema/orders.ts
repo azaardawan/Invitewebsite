@@ -97,6 +97,8 @@ export const invitations = pgTable(
     publicAttendance: boolean('public_attendance').notNull().default(false),
     /** The customer's drawn signature (packages with `signature`); null = none or not included. */
     signatureAssetId: uuid('signature_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /** A second signature, when the customer chose two (e.g. both of the couple). */
+    signature2AssetId: uuid('signature2_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */

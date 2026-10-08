@@ -10,7 +10,7 @@ import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
-import { signatureUrl } from '@/server/invitation/load';
+import { signatureUrls } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -49,7 +49,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     values: inv.fieldValues,
     musicSrc: null,
     border: await themeBorder(db, inv.themeId),
-    signatureSrc: await signatureUrl(db, inv.signatureAssetId),
+    signatureSrcs: await signatureUrls(db, inv),
     colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
     colors: inv.colors,
   });
@@ -63,7 +63,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     event: { date: theme.event.date, time: theme.event.time },
     labels,
     border: theme.border,
-    signature: theme.signature,
+    signatures: theme.signatures,
     colors: theme.colors,
   };
 

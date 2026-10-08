@@ -37,8 +37,8 @@ type PrintBase = {
   labels: PrintLabels;
   /** The owner's replacement border, or null for the theme's own: the same one as on the invitation. */
   border: ThemeBorderSpec | null;
-  /** The customer's signature image (packages with `signature`, when included), or null. */
-  signature: { src: string } | null;
+  /** The customer's signatures (packages with `signature`, when included): none, one or two. */
+  signatures: { src: string }[];
   /** The theme's colour slots with the customer's chosen colours (also set as `--bahja-color-<key>`). */
   colors: Record<string, string>;
 };

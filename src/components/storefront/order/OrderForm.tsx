@@ -11,8 +11,8 @@ export type OrderFormField = { key: string; type: string; maxLength: number | nu
 export type OrderFormExtras = {
   /** Back of the printable card (print_card): current text. */
   cardBack?: { title: string; message: string; limits: { title: number; message: number } };
-  /** Signature pad (signature): the current signature image, if any. */
-  signature?: { current: string | null };
+  /** Signature pads (signature): the current signature images (none, one or two). */
+  signature?: { current: string[] };
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -131,6 +131,11 @@ export function OrderForm({
             pad: t('signature.pad'),
             clear: t('signature.clear'),
             include: t('signature.include'),
+            count: t('signature.count'),
+            one: t('signature.one'),
+            two: t('signature.two'),
+            first: t('signature.first'),
+            second: t('signature.second'),
             current: t('signature.current'),
             redraw: t('signature.redraw'),
           }}

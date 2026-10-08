@@ -57,7 +57,7 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 22. **Back of the printable card.** Every printed card has two sides. Design the **back** too (same size and bleed as the front): the same theme but its own layout, with a **big title** and a **smaller message** written by the customer, then their names or their signature at the bottom (like a thank-you card). Make it work with a short title only, a long message (300 characters), and with or without a signature. The border appears on both sides.
 
 **Optional features (only if the owner asks for them in this theme)**
-23. **Signature spot.** Mark where the customer's own signature goes on the invitation (and, if wanted, the card back). It arrives as dark ink on a transparent background; say if it should be shown light on a dark design.
+23. **Signature spot.** Mark where the customer's own signature goes on the invitation (and, if wanted, the card back). The customer chooses **one or two signatures** (e.g. both of the couple), so leave room for two side by side. It arrives as dark ink on a transparent background; say if it should be shown light on a dark design.
 24. **Colour sets.** If customers may choose the colours, list the colours that can change (e.g. background, accent, text) with the default for each, and make sure the design stays readable with the owner's sets. The owner makes the sets in Admin.
 
 **Delivery**
