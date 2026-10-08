@@ -8,6 +8,7 @@ import { OrderError } from '@/server/orders/common';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { startPayment } from '@/server/payments/service';
 import { setPublicGuestbook } from '@/server/guests/guestbook';
+import { setPublicAttendance } from '@/server/guests/attendance';
 import { customerEditInvitation } from '@/server/invitation/customer-edit';
 
 /** "Pay now" on the private receipt: sends the customer to WAYL (reusing an open link). */
@@ -35,6 +36,15 @@ export async function guestbookAction(token: string, isPublic: boolean): Promise
   const { ipHash } = await requestContext();
   if (ipHash && !(await consumeRateLimit(db(), `guestbook:${ipHash}`, 30, 3600))) return { ok: false };
   return { ok: await setPublicGuestbook(db(), r.invitation.id, isPublic === true, { type: 'CUSTOMER', ipHash }) };
+}
+
+/** The customer's choice from their receipt: reply counts shown on the invitation, or seen only by them. Saved on tap. */
+export async function attendanceAction(token: string, isPublic: boolean): Promise<{ ok: boolean }> {
+  const r = await getReceipt(db(), token);
+  if (!r || r.status !== 'PAID' || !r.invitation.hasRsvp) return { ok: false };
+  const { ipHash } = await requestContext();
+  if (ipHash && !(await consumeRateLimit(db(), `attendance:${ipHash}`, 30, 3600))) return { ok: false };
+  return { ok: await setPublicAttendance(db(), r.invitation.id, isPublic === true, { type: 'CUSTOMER', ipHash }) };
 }
 
 type EditState = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };

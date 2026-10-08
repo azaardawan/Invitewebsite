@@ -6,6 +6,7 @@ import { publicMediaUrl } from '@/server/storage';
 import type { InvitationMode } from '@/theme-sdk/types';
 import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps } from './theme-props';
+import { attendanceCounts } from '@/server/guests/attendance';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -30,6 +31,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       musicSrc: music ? publicMediaUrl(music.key) : null,
       border: await themeBorder(db, inv.themeId),
       guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
+      attendance: mode === 'live' && inv.publicAttendance && inv.featureKeys.includes('rsvp') ? await attendanceCounts(db, inv.id) : null,
     }),
   };
 }

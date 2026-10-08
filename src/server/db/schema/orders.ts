@@ -86,6 +86,8 @@ export const invitations = pgTable(
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
+    /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */
+    publicAttendance: boolean('public_attendance').notNull().default(false),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */
     selfEdits: integer('self_edits').notNull().default(0),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */

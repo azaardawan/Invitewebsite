@@ -19,6 +19,7 @@ const LABEL_KEYS = [
   'countdownSeconds', 'eventStarted', 'openMap', 'date', 'time', 'venue', 'guestFormTitle', 'guestName',
   'attendanceQuestion', 'attending', 'notAttending', 'message', 'submit', 'sending', 'sent', 'sentPreview',
   'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
+  'attendanceTitle', 'attendingCount', 'notAttendingCount',
 ] as const satisfies readonly (keyof ThemeLabels)[];
 
 /**
@@ -53,6 +54,8 @@ export function buildThemeProps(input: {
   guestbook?: { guestName: string; message: string }[] | null;
   /** The owner's replacement border (Admin); omitted/null = the theme's own. */
   border?: ThemeBorderSpec | null;
+  /** Reply counts (live, customer opted in); omitted = private. */
+  attendance?: { attending: number; notAttending: number } | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -84,6 +87,7 @@ export function buildThemeProps(input: {
       : input.mode === 'sample'
         ? sampleGuestbook(input.locale)
         : (input.guestbook ?? null),
+    attendance: features.includes('rsvp') ? (input.attendance ?? null) : null,
     border: input.border ?? null,
   };
 }

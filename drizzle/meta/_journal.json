@@ -148,6 +148,13 @@
       "when": 1791450363046,
       "tag": "0020_ui_translations",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791467392092,
+      "tag": "0021_public_attendance",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationMode, type ThemeLabels } from './types';
+import { formatNumber, GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationLocale, type InvitationMode, type ThemeLabels } from './types';
 
 type RuntimeValue = {
   mode: InvitationMode;
@@ -14,6 +14,9 @@ type RuntimeValue = {
     submit?: (input: GuestResponseInput, captchaToken?: string) => Promise<GuestSubmitResult>;
     /** Cloudflare Turnstile site key; when set, live submissions carry a bot-check token. */
     turnstileSiteKey?: string | null;
+    /** Public reply counts (customer's choice), or null. */
+    attendance?: { attending: number; notAttending: number } | null;
+    locale?: InvitationLocale;
   };
 };
 
@@ -273,7 +276,30 @@ function TurnstileBox({ handle, siteKey }: { handle: TurnstileHandle; siteKey: s
  * submits, protects against spam and stores responses. Renders nothing when
  * the package has no guest form.
  */
-export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => ReactNode }) {
+/**
+ * How many guests are coming / not coming, when the customer shows it to everyone. Drawn with the
+ * theme's own font and colours (everything inherits), so it fits any design.
+ */
+function AttendanceSummary({ counts, labels, locale }: { counts: { attending: number; notAttending: number }; labels: ThemeLabels; locale: InvitationLocale }) {
+  const box = { flex: 1, padding: '0.75em 0.5em', border: '1px solid currentColor', borderRadius: '0.75em', textAlign: 'center' as const };
+  return (
+    <section aria-label={labels.attendanceTitle} data-bahja-attendance="" style={{ margin: '0 auto 1.25em', maxWidth: '24em', width: '100%' }}>
+      <p style={{ margin: '0 0 0.5em', textAlign: 'center', fontWeight: 600 }}>{labels.attendanceTitle}</p>
+      <div style={{ display: 'flex', gap: '0.75em' }}>
+        <p style={box}>
+          <span style={{ display: 'block', fontSize: '1.75em', lineHeight: 1.1, fontWeight: 700 }}>{formatNumber(counts.attending, locale)}</span>
+          <span style={{ opacity: 0.85 }}>{labels.attendingCount}</span>
+        </p>
+        <p style={{ ...box, opacity: 0.8 }}>
+          <span style={{ display: 'block', fontSize: '1.75em', lineHeight: 1.1, fontWeight: 700 }}>{formatNumber(counts.notAttending, locale)}</span>
+          <span style={{ opacity: 0.85 }}>{labels.notAttendingCount}</span>
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export function GuestFormSlot({ render, summary = true }: { render: (form: GuestFormApi) => ReactNode; summary?: boolean }) {
   const { guest, labels, mode } = useRuntime();
   const [status, setStatus] = useState<GuestFormApi['status']>('idle');
   const [fieldErrors, setFieldErrors] = useState<GuestFormApi['fieldErrors']>({});
@@ -326,6 +352,7 @@ export function GuestFormSlot({ render }: { render: (form: GuestFormApi) => Reac
   if (!guest.enabled) return null;
   return (
     <>
+      {summary && guest.attendance ? <AttendanceSummary counts={guest.attendance} labels={labels} locale={guest.locale ?? 'ar'} /> : null}
       {render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}
       {botKey ? <TurnstileBox handle={bot} siteKey={botKey} /> : null}
     </>

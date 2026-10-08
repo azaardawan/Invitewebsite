@@ -650,7 +650,11 @@
       "guestbookPublicOff": "رسائل الضيوف خاصة (في ملف الذكرى فقط).",
       "guestbookMakePublic": "إظهار الرسائل تحت الدعوة",
       "guestbookMakePrivate": "جعل الرسائل خاصة",
-      "accessCode": "رقم الدعوة (لصفحة «دعوتي»)"
+      "accessCode": "رقم الدعوة (لصفحة «دعوتي»)",
+      "attendancePublicOn": "عدد الضيوف الذين سيحضرون / لن يحضروا ظاهر في الدعوة (اختيار الزبون).",
+      "attendancePublicOff": "عدد الضيوف الذين سيحضرون / لن يحضروا خاص (يراه الزبون فقط).",
+      "attendanceMakePublic": "إظهار عدد الردود في الدعوة",
+      "attendanceMakePrivate": "جعل عدد الردود خاصاً"
     },
     "legal": {
       "heading": "السياسات القانونية",
@@ -883,7 +887,10 @@
       "keepsakeEmpty": "لم تصل رسائل بعد."
     },
     "guestbookTitle": "رسائل الضيوف",
-    "guestbookEmpty": "كن أول من يكتب تهنئة."
+    "guestbookEmpty": "كن أول من يكتب تهنئة.",
+    "attendanceTitle": "ردود الضيوف",
+    "attendingCount": "سيحضرون",
+    "notAttendingCount": "لن يحضروا"
   },
   "invitationSamples": {
     "short": {
@@ -987,7 +994,13 @@
     "keepsakeGrowing": "يتحدّث الملف كلما كتب ضيوفكم، فحمّلوه مرة أخرى بعد المناسبة ليضمّ كل الرسائل.",
     "guestbookSaving": "جارٍ الحفظ…",
     "guestbookError": "تعذّر حفظ اختياركم. حاولوا مرة أخرى.",
-    "receiptLinkLine": "الإيصال والبطاقة وملف الذكرى (في أي وقت): {url}"
+    "receiptLinkLine": "الإيصال والبطاقة وملف الذكرى (في أي وقت): {url}",
+    "attendanceTitle": "من سيحضر",
+    "attendanceHelp": "اختر من يرى عدد الضيوف الذين سيحضرون والذين لن يحضروا.",
+    "attendancePrivate": "أنا فقط (هنا في إيصالي)",
+    "attendancePublic": "كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)",
+    "attendanceComing": "سيحضر: {count}",
+    "attendanceNotComing": "لن يحضر: {count}"
   },
   "nav": {
     "home": "الرئيسية",

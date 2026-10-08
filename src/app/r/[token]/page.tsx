@@ -14,7 +14,8 @@ import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/servic
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
-import { guestbookAction, payAction } from './actions';
+import { attendanceAction, guestbookAction, payAction } from './actions';
+import { attendanceCounts } from '@/server/guests/attendance';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 
 /**
@@ -72,6 +73,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
+  const replies = paid && r.invitation.hasRsvp ? await attendanceCounts(db(), r.invitation.id) : null;
+  const num = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ar-IQ');
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
   const files = paid
     ? [
@@ -203,6 +206,30 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               title: t('guestbookTitle'),
               private: t('guestbookPrivate'),
               public: t('guestbookPublic'),
+              saving: t('guestbookSaving'),
+              saved: t('guestbookSaved'),
+              error: t('guestbookError'),
+            }}
+          />
+        </section>
+      ) : null}
+
+      {replies ? (
+        <section id="attendance" className="mt-8 space-y-3 print:hidden">
+          <h2 className="font-semibold">{t('attendanceTitle')}</h2>
+          <ul className="flex flex-wrap gap-x-6 gap-y-1 text-lg font-semibold">
+            <li>{t('attendanceComing', { count: num.format(replies.attending) })}</li>
+            <li className="text-muted">{t('attendanceNotComing', { count: num.format(replies.notAttending) })}</li>
+          </ul>
+          <p className="text-sm text-muted">{t('attendanceHelp')}</p>
+          <GuestbookChoice
+            name="attendanceVisibility"
+            initialPublic={r.invitation.publicAttendance}
+            save={attendanceAction.bind(null, token)}
+            labels={{
+              title: t('attendanceTitle'),
+              private: t('attendancePrivate'),
+              public: t('attendancePublic'),
               saving: t('guestbookSaving'),
               saved: t('guestbookSaved'),
               error: t('guestbookError'),

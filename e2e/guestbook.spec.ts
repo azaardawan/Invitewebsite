@@ -32,7 +32,7 @@ test('guest messages stay private until the customer shows them under the invita
   // The customer makes messages public from their private receipt: one tap saves it, no button to miss.
   await page.goto(`/r/${receiptToken}`);
   await page.getByLabel('كل من لديه رابط الدعوة (تظهر تحت الدعوة)').check();
-  await expect(page.getByText('✓ تم الحفظ.')).toBeVisible();
+  await expect(page.locator('#guestbook').getByText('✓ تم الحفظ.')).toBeVisible();
   // The choice survives a reload.
   await page.reload();
   await expect(page.getByLabel('كل من لديه رابط الدعوة (تظهر تحت الدعوة)')).toBeChecked();
@@ -48,9 +48,19 @@ test('guest messages stay private until the customer shows them under the invita
   expect(keepsake.headers()['content-disposition']).toMatch(/^inline;/);
   await testInfo.attach('receipt-files.png', { body: await files.screenshot(), contentType: 'image/png' });
 
-  // The next person who opens the link sees the message under the invitation.
+  // The reply count is on the receipt; the customer shows it to everyone too.
+  await expect(page.locator('#attendance').getByText('سيحضر: ١')).toBeVisible();
+  await expect(page.locator('#attendance').getByText('لن يحضر: ٠')).toBeVisible();
+  await page.getByLabel('كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)').check();
+  await expect(page.locator('#attendance').getByText('✓ تم الحفظ.')).toBeVisible();
+
+  // The next person who opens the link sees the message under the invitation, and how many are coming.
   const next = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await openInvitation(next);
+  const replies = next.getByRole('region', { name: 'ردود الضيوف' });
+  await expect(replies).toContainText('١');
+  await expect(replies).toContainText('سيحضرون');
+  await expect(replies).toContainText('لن يحضروا');
   await expect(next.getByRole('heading', { name: 'رسائل الضيوف' })).toBeVisible();
   await expect(next.getByText('ألف مبروك يا أحلى عروسين')).toBeVisible();
   await expect(next.getByText('— سارة')).toBeVisible();

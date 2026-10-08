@@ -440,3 +440,19 @@ Those edits are saved in the database (`ui_translations`) on top of the files in
 website within a minute, and are recorded in the audit log. Sorani and Badini can only be changed there by
 the owner, so a Kurdish edit made in Admin is already owner-approved. Suggestions made by Claude still go
 through this file first.
+
+## Batch 18 — showing how many guests are coming (PENDING)
+
+Until approved, these show in Arabic to Kurdish visitors.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `invitation.attendanceTitle` | ردود الضيوف | Guest replies | وەڵامی میوانەکان | بەرسڤێن مێڤانان | ● |
+| 2 | `invitation.attendingCount` | سيحضرون | Coming | ئامادە دەبن | دێ ئامادە بن | ◐ |
+| 3 | `invitation.notAttendingCount` | لن يحضروا | Not coming | ئامادە نابن | ئامادە نابن | ◐ |
+| 4 | `receipt.attendanceTitle` | من سيحضر | Who is coming | کێ ئامادە دەبێت | کی دێ ئامادە بیت | ◐ |
+| 5 | `receipt.attendanceComing` | سيحضر: {count} | Coming: {count} | ئامادە دەبن: {count} | دێ ئامادە بن: {count} | ◐ |
+| 5b | `receipt.attendanceNotComing` | لن يحضر: {count} | Not coming: {count} | ئامادە نابن: {count} | ئامادە نابن: {count} | ◐ |
+| 6 | `receipt.attendanceHelp` | اختر من يرى عدد الضيوف الذين سيحضرون والذين لن يحضروا. | Choose who sees how many guests are coming and how many are not. | هەڵبژێرە کێ ژمارەی ئەو میوانانە دەبینێت کە ئامادە دەبن و ئەوانەی ئامادە نابن. | هەلبژێرە کی ژمارا وان مێڤانان دبینیت یێن دێ ئامادە بن و یێن ئامادە نابن. | ◐ |
+| 7 | `receipt.attendancePrivate` | أنا فقط (هنا في إيصالي) | Only me (here on my receipt) | تەنها من (لێرە لە پسوولەکەم) | بتنێ ئەز (ل ڤێرە د پسوولا من دا) | ◐ |
+| 8 | `receipt.attendancePublic` | كل من لديه رابط الدعوة (يظهر فوق نموذج الرد) | Everyone with the invitation link (shown above the reply form) | هەرکەسێک بەستەری بانگهێشتنامەکەی هەبێت (لە سەرووی فۆرمی وەڵامدانەوە دەردەکەوێت) | هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت) | ◐ |

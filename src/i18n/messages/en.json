@@ -650,7 +650,11 @@
       "guestbookPublicOff": "Guest messages are private (keepsake only).",
       "guestbookMakePublic": "Show messages under the invitation",
       "guestbookMakePrivate": "Make messages private",
-      "accessCode": "invitation number (for \"My invitation\")"
+      "accessCode": "invitation number (for \"My invitation\")",
+      "attendancePublicOn": "The number of guests coming / not coming is shown on the invitation (the customer's choice).",
+      "attendancePublicOff": "The number of guests coming / not coming is private (only the customer sees it).",
+      "attendanceMakePublic": "Show the reply count on the invitation",
+      "attendanceMakePrivate": "Make the reply count private"
     },
     "legal": {
       "heading": "Legal policies",
@@ -883,7 +887,10 @@
       "keepsakeEmpty": "No messages yet."
     },
     "guestbookTitle": "Messages from our guests",
-    "guestbookEmpty": "Be the first to write a congratulation."
+    "guestbookEmpty": "Be the first to write a congratulation.",
+    "attendanceTitle": "Guest replies",
+    "attendingCount": "Coming",
+    "notAttendingCount": "Not coming"
   },
   "invitationSamples": {
     "short": {
@@ -987,7 +994,13 @@
     "keepsakeGrowing": "It updates as your guests write, so download it again after the celebration to have every message.",
     "guestbookSaving": "Saving…",
     "guestbookError": "Couldn't save your choice. Please try again.",
-    "receiptLinkLine": "Your receipt, card and keepsake (any time): {url}"
+    "receiptLinkLine": "Your receipt, card and keepsake (any time): {url}",
+    "attendanceTitle": "Who is coming",
+    "attendanceHelp": "Choose who sees how many guests are coming and how many are not.",
+    "attendancePrivate": "Only me (here on my receipt)",
+    "attendancePublic": "Everyone with the invitation link (shown above the reply form)",
+    "attendanceComing": "Coming: {count}",
+    "attendanceNotComing": "Not coming: {count}"
   },
   "nav": {
     "home": "Home",
