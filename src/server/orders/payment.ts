@@ -5,6 +5,7 @@ import type { DbOrTx } from '@/server/db/client';
 import { invitations, invoiceCounters, orderStatusHistory, orders } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { notifyOwner, paidOrderMessage } from '@/server/notify/owner';
+import { themeNumber } from '@/theme-registry';
 import { INVITATION_LIFETIME_DAYS, OrderError } from './common';
 import type { OrderSnapshot } from './receipt';
 
@@ -81,7 +82,7 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
     const [inv] = await tx.select({ themeId: invitations.themeId, packageId: invitations.packageId, locale: invitations.locale }).from(invitations).where(eq(invitations.id, order.invitationId));
     await trackEvent(tx, { name: 'order_paid', locale: inv?.locale, themeId: inv?.themeId, packageId: inv?.packageId, invitationId: order.invitationId, orderId, occurredAt: now });
     const snap = order.snapshot as OrderSnapshot;
-    notice = paidOrderMessage({ orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: snap.theme.name.ar, pkg: snap.package.name.ar, via: source.kind });
+    notice = paidOrderMessage({ orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: `${themeNumber(snap.theme.key) ? `#${themeNumber(snap.theme.key)} ` : ''}${snap.theme.name.ar}`, pkg: snap.package.name.ar, via: source.kind });
     return { alreadyPaid: false, invoiceNumber };
   });
   // The owner's WhatsApp notice, sent after the payment is saved; it never holds up or breaks the order.

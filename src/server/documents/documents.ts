@@ -23,6 +23,11 @@ const KIND = { card: 'PRINT_CARD', keepsake: 'KEEPSAKE_PDF' } as const;
 const PREVIEW_KIND = { card: 'PRINT_CARD_PREVIEW', cardBack: 'PRINT_CARD_BACK_PREVIEW', keepsake: 'KEEPSAKE_PREVIEW', og: 'OG_IMAGE' } as const;
 const FEATURE = { card: 'print_card', keepsake: 'keepsake_pdf' } as const;
 
+/** The owner's card artwork, when a side uses it (left out otherwise, so older files keep their hash). */
+function artwork(data: Awaited<ReturnType<typeof printData>>) {
+  return data.kind === 'card' && (data.design.front || data.design.back) ? data.design : undefined;
+}
+
 export class DocumentError extends Error {
   constructor(public readonly code: 'notFound' | 'notIncluded' | 'notPaid' | 'notPdf' | 'notA5' | 'tooLarge' | 'tooLong') {
     super(code);
@@ -60,7 +65,7 @@ export async function ensureDocument(
   }
 
   const data = await printData(db, inv, kind);
-  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null }));
+  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null, design: artwork(data) }));
   const fileName = `${kind === 'card' ? 'invitation-card' : 'keepsake'}-${inv.publicId}.pdf`;
 
   const [existing] = await db
@@ -126,7 +131,8 @@ export async function ensurePreview(db: DbOrTx, invitationId: string, kind: Prev
     if (doc === 'card' && inv.cardCustomKey) return null;
     const data = await printData(db, inv, doc);
     const shown = kind === 'cardBack' && data.kind === 'card' ? data.back : data.props;
-    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown }));
+    const design = data.kind === 'card' ? (kind === 'cardBack' ? data.design.back : data.design.front) ?? undefined : undefined;
+    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown, design }));
   }
   const [existing] = await db
     .select()
@@ -191,14 +197,15 @@ export async function updateCardOptions(db: DbOrTx, invitationId: string, input:
   });
 }
 
-/** A5 portrait: 148 × 210 mm = 419.5 × 595.3 pt. Allow 2 pt for rounding in design tools. */
+/** A5, portrait (the front) or landscape (the back): 148 × 210 mm = 419.5 × 595.3 pt. Allow 2 pt for rounding in design tools. */
 function isA5(width: number, height: number) {
-  return Math.abs(width - 419.53) <= 2 && Math.abs(height - 595.28) <= 2;
+  const portrait = (w: number, h: number) => Math.abs(w - 419.53) <= 2 && Math.abs(h - 595.28) <= 2;
+  return portrait(width, height) || portrait(height, width);
 }
 
 /**
  * Replaces the automatic card with a PDF the team designed (Canva, Photoshop…). Every page must be
- * A5 portrait. Returns the page count.
+ * A5: usually the front in portrait, then the back in landscape. Returns the page count.
  */
 export async function uploadCustomCard(db: DbOrTx, invitationId: string, file: Buffer, actor: Actor) {
   if (file.length > CARD_LIMITS.uploadBytes) throw new DocumentError('tooLarge');

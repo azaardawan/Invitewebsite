@@ -12,6 +12,17 @@ const base64Key32 = z
   .min(1, 'is required')
   .refine((v) => Buffer.from(v, 'base64').length === 32 || v.length >= 32, 'must be 32 bytes base64, or a random string of 32+ characters');
 
+/**
+ * The owner's WhatsApp number as typed in Railway: "+964 770 123 4567", "00964-770…", "(964) 770…" all become
+ * digits only. An unusable value (or a missing key) only turns the owner notice off; it never stops the site.
+ */
+function normalizePhone(v: unknown) {
+  if (typeof v !== 'string') return v;
+  const digits = v.replace(/[\s\-().+\u200e\u200f]/g, '').replace(/^00/, '');
+  // An Iraqi number typed without the country code (07701234567) gets +964.
+  return (/^07\d{9}$/.test(digits) ? `964${digits.slice(1)}` : digits) || undefined;
+}
+
 const schema = z.object({
   APP_ENV: z.enum(['development', 'staging', 'production']).default('development'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -41,10 +52,10 @@ const schema = z.object({
   TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
   /**
    * WhatsApp message to the owner for every paid order (CallMeBot: the owner sends their bot one
-   * message to get the key). Both set = on; both unset = off.
+   * message to get the key). Both set and usable = on; anything else = off (with a warning at start-up).
    */
-  OWNER_WHATSAPP_PHONE: z.string().regex(/^\+?\d{8,15}$/).optional(),
-  CALLMEBOT_API_KEY: z.string().min(3).optional(),
+  OWNER_WHATSAPP_PHONE: z.preprocess(normalizePhone, z.string().regex(/^\d{8,15}$/).optional()).catch(undefined),
+  CALLMEBOT_API_KEY: z.preprocess((v) => (typeof v === 'string' ? v.trim() || undefined : v), z.string().min(3).optional()).catch(undefined),
   /** Chromium used to render PDFs; defaults to Playwright's bundled browser (the Docker image sets /usr/bin/chromium). */
   CHROMIUM_PATH: z.string().optional(),
   /** Where the PDF renderer reaches this app's print pages; defaults to http://127.0.0.1:$PORT. */
@@ -57,9 +68,6 @@ const schema = z.object({
   }
   if (Boolean(e.TURNSTILE_SITE_KEY) !== Boolean(e.TURNSTILE_SECRET_KEY)) {
     ctx.addIssue({ code: 'custom', path: ['TURNSTILE_SECRET_KEY'], message: 'set both TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY, or neither' });
-  }
-  if (Boolean(e.OWNER_WHATSAPP_PHONE) !== Boolean(e.CALLMEBOT_API_KEY)) {
-    ctx.addIssue({ code: 'custom', path: ['CALLMEBOT_API_KEY'], message: 'set both OWNER_WHATSAPP_PHONE and CALLMEBOT_API_KEY, or neither' });
   }
   if (e.STORAGE_DRIVER === 's3') {
     for (const k of ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'MEDIA_PUBLIC_BASE_URL'] as const) {

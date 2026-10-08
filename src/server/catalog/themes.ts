@@ -21,6 +21,7 @@ import { env } from '@/server/env';
 import { sha256 } from '@/lib/crypto';
 import { codeRef, packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
 import { CatalogError, auditActor, i18nContent, localized, moveInList, optionalI18nContent, type Actor } from './common';
+import { themeKeyByNumber } from '@/theme-registry';
 
 export type ThemeStatus = (typeof themes.$inferSelect)['status'];
 
@@ -150,7 +151,9 @@ export async function listThemes(
   if (filters.status) where.push(eq(themes.status, filters.status));
   if (filters.search) {
     const q = `%${filters.search.replace(/[%_\\]/g, '\\$&')}%`;
-    where.push(or(ilike(themes.key, q), sql`${themes.name}->>'ar' ilike ${q}`, sql`${themes.name}->>'en' ilike ${q}`)!);
+    // "7" or "#7" also finds theme number 7.
+    const byNumber = /^#?\d{1,5}$/.test(filters.search.trim()) ? themeKeyByNumber(Number(filters.search.trim().replace('#', ''))) : undefined;
+    where.push(or(ilike(themes.key, q), sql`${themes.name}->>'ar' ilike ${q}`, sql`${themes.name}->>'en' ilike ${q}`, byNumber ? eq(themes.key, byNumber) : undefined)!);
   }
   return db
     .select({

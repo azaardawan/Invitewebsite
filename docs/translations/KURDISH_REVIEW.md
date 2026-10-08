@@ -236,7 +236,7 @@ Once you have settled the wording in batch 5, I'll suggest the longer sentences 
 | `store.placeOrder` | تأكيد الطلب | Confirm order | پشتڕاستکردنەوەی داواکاری | پشتڕاستکرنا داخوازیێ | ◐ | APPROVED (owner, 2026-09-30) |
 | `store.features.*` | (feature names shown on packages) | | I'll suggest these with the batch 6 sentences. | | | PENDING |
 
-## Batch 7 — online payment (PENDING)
+## Batch 7 — online payment — ✅ APPROVED (applied with the full list, see `KURDISH_FULL_LIST.md`)
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
@@ -261,7 +261,7 @@ Still to suggest (after you've settled the wording above): FAQ answers (`home.fa
 | `invitation.endedBody` | شكراً لمشاركتكم فرحتنا. هذه الدعوة لم تعد متاحة. | Thank you for celebrating with us. This invitation is no longer available. | سوپاس بۆ بەشداریکردنتان لە خۆشیمان. ئەم بانگهێشتنامەیە چیتر بەردەست نییە. | سوپاس بۆ پشکداریا هەوە د شاهیا مە دا. ئەڤ داخوازنامە ئێدی بەردەست نینە. | ○ | APPROVED (owner, 2026-10-01) |
 | `invitation.brand` | بهجه | Bahja | بەهجە | بەهجە | ● | APPROVED (owner, 2026-10-01) |
 
-## Batch 9 — paying while online payment is off (PENDING)
+## Batch 9 — paying while online payment is off — ✅ APPROVED (applied with the full list)
 
 | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
 |---|---|---|---|---|---|---|
@@ -269,7 +269,7 @@ Still to suggest (after you've settled the wording above): FAQ answers (`home.fa
 | `receipt.waMessage` | مرحباً بهجه، قمت بالطلب {order} بمبلغ {amount}. كيف أُكمل الدفع؟ | Hello Bahja, I placed order {order} for {amount}. How do I complete payment? | سڵاو بەهجە، داواکاری {order} م کرد بە بڕی {amount}. چۆن پارەدان تەواو بکەم؟ | سلاڤ بەهجە، من داخوازیا {order} کر ب بڕێ {amount}. چاوا پارەدانێ تەمام بکەم؟ | ○ | PENDING |
 | `store.paymentSoon` | بعد التأكيد ستحصلون على إيصال خاص فيه طريقة الدفع… | After confirming, you'll get a private receipt with how to pay… | دوای پشتڕاستکردنەوە پسوولەیەکی تایبەتتان پێدەگات کە ڕێگای پارەدانی تێدایە. بانگهێشتنامەکەتان هەر کە پارەدانمان پشتڕاست کردەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ دێ پسوولەکا تایبەت گەهیتە هەوە کو ڕێکا پارەدانێ تێدایە. داخوازناما هەوە هەر کو مە پارەدان پشتڕاست کر دێ هێتە بەلاڤکرن. | ○ | PENDING |
 
-## Batch 10 — Olive Ring Box theme wording (AWAITING WORDING)
+## Batch 10 — Olive Ring Box theme wording — ✅ APPROVED (applied with the full list, see `KURDISH_FULL_LIST.md`)
 
 These fixed lines live in `themes/olive-ring-box/v1/copy.ts`, not in the site message files. Every
 other text in the theme (buttons, guest form, countdown units, errors) uses the already-translated
@@ -287,7 +287,7 @@ Arabic. The basmala always stays in Arabic.
 | `keepsakeSubtitle` | تهاني الأهل والأحبة | Wishes from family and friends | | | AWAITING |
 | `keepsakeClosing` | مع خالص الشكر لكل من شاركنا الفرح | With heartfelt thanks to everyone who shared our joy | | | AWAITING |
 
-## Batch 11 — printable card and keepsake (AWAITING WORDING)
+## Batch 11 — printable card and keepsake — ✅ APPROVED (applied with the full list, see `KURDISH_FULL_LIST.md`)
 
 Shown on the customer's receipt page and printed on the card / keepsake PDF. Until approved, Kurdish
 invitations show the Arabic.
@@ -306,7 +306,7 @@ invitations show the Arabic.
 | `receipt.waCardMessage` | مرحباً {name}، هذه بطاقة دعوتكم للطباعة من بهجه (PDF): {url} | Hello {name}, here is your printable invitation card from Bahja (PDF): {url} | | | AWAITING |
 | `receipt.waKeepsakeMessage` | مرحباً {name}، ألف مبروك! هذا ملف الذكرى بكل تهاني ضيوفكم من بهجه (PDF): {url} | Hello {name}, congratulations! Here is your keepsake with all your guests' wishes from Bahja (PDF): {url} | | | AWAITING |
 
-## Batch 12 — footer, contact page, legal pages, checkout terms (AWAITING WORDING)
+## Batch 12 — footer, contact page, legal pages, checkout terms — ✅ APPROVED (applied with the full list, see `KURDISH_FULL_LIST.md`)
 
 Customer-facing labels added in M10. Policy texts themselves are written per language in
 Admin → Legal policies (Kurdish fields are optional there and fall back to Arabic). `<terms>` and
@@ -338,7 +338,7 @@ Admin → Legal policies (Kurdish fields are optional there and fall back to Ara
 | `store.askThemeLink` | اسألنا على واتساب | Ask us on WhatsApp | | | AWAITING |
 | `store.askThemeText` | مرحباً بهجه، لدي سؤال عن دعوة «{theme}»: {url} | Hello Bahja, I have a question about the “{theme}” invitation: {url} | | | AWAITING |
 
-## Batch 13 — public guest messages (AWAITING WORDING)
+## Batch 13 — public guest messages — ✅ APPROVED (applied with the full list, see `KURDISH_FULL_LIST.md`)
 
 Shown under the invitation when the customer makes messages public, the sample messages in theme
 previews, and the choice on the customer's receipt.
@@ -455,9 +455,9 @@ through this file first.
 | 7 | `receipt.attendancePrivate` | أنا فقط (هنا في إيصالي) | Only me (here on my receipt) | تەنها من (لێرە لە پسوولەکەم) | بتنێ ئەز (ل ڤێرە د پسوولا من دا) | ◐ |
 | 8 | `receipt.attendancePublic` | كل من لديه رابط الدعوة (يظهر فوق نموذج الرد) | Everyone with the invitation link (shown above the reply form) | هەرکەسێک بەستەری بانگهێشتنامەکەی هەبێت (لە سەرووی فۆرمی وەڵامدانەوە دەردەکەوێت) | هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت) | ◐ |
 
-## Batch 19 — card back, signature, colour choice and subsections (PENDING)
+## Batch 19 — card back, signature, colour choice and subsections — ✅ APPROVED (owner, 2026-10-08)
 
-Until approved, these show in Arabic to Kurdish visitors.
+Applied to `ckb.json` and `bdn.json`.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|

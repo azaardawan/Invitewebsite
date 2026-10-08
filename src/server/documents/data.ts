@@ -12,6 +12,9 @@ import { invitationPath } from '@/lib/ids';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
 import { signatureUrls } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
+import type { CardOptions } from '@/server/db/schema';
+import type { ThemeProps } from '@/theme-sdk/types';
+import { themeCardDesign, type ResolvedCardDesign } from '@/server/catalog/card-design';
 
 type InvitationRow = typeof invitations.$inferSelect;
 type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string };
@@ -53,7 +56,20 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
     colors: inv.colors,
   });
-  const { cardBackTitle, ...printMsgs } = (invitationMessages(inv.locale) as unknown as { print: PrintMessages }).print;
+
+  if (kind === 'card' || kind === 'cardBleed') {
+    const opts = inv.cardOptions ?? {};
+    const qrUrl = opts.showQr !== false ? invitationUrl(inv) : null;
+    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, await themeCardDesign(db, inv.themeId))) };
+  }
+  const { base } = printBase(theme);
+  const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
+  return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };
+}
+
+/** The props every print design shares, from the invitation's theme props. */
+function printBase(theme: ThemeProps) {
+  const { cardBackTitle, ...printMsgs } = (invitationMessages(theme.locale) as unknown as { print: PrintMessages }).print;
   const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...printMsgs };
   const base = {
     locale: theme.locale,
@@ -66,30 +82,40 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     signatures: theme.signatures,
     colors: theme.colors,
   };
+  return { base, cardBackTitle };
+}
 
-  if (kind === 'card' || kind === 'cardBleed') {
-    const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
-    const [w, h] = CARD_SIZES[spec.size];
-    const opts = inv.cardOptions ?? {};
-    const showQr = spec.qr && opts.showQr !== false;
-    const qrDataUrl = showQr ? await QRCode.toDataURL(invitationUrl(inv), { margin: 0, width: 384, errorCorrectionLevel: 'M' }) : null;
-    // Card-only wording from Admin: replace (or remove) the message, add one extra line.
-    const fields = { ...base.fields };
-    if (opts.message !== undefined) {
-      if (opts.message.trim()) fields.invitation_message = opts.message.trim();
-      else delete fields.invitation_message;
-    }
-    const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
-    // The back: the customer's big title (or a default) and smaller message.
-    const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
-    const page: PageSpec =
-      kind === 'card'
-        ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
-        : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
-    // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
-    const backPage: PageSpec = { ...page, width: page.height, height: page.width };
-    return { codeRef, kind: 'card' as const, props, back, page, backPage };
+/**
+ * Both sides of the printable card: page sizes, the front's and back's props, and the owner's artwork for
+ * either side (Admin → Themes → Printable card design), which replaces the theme's own design for that side.
+ */
+export async function cardData(
+  theme: ThemeProps,
+  manifest: ThemeManifest | undefined,
+  kind: 'card' | 'cardBleed',
+  opts: CardOptions,
+  qrUrl: string | null,
+  design: ResolvedCardDesign,
+) {
+  const { base, cardBackTitle } = printBase(theme);
+  const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
+  const [w, h] = CARD_SIZES[spec.size];
+  const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M' }) : null;
+  // Card-only wording from Admin: replace (or remove) the message, add one extra line.
+  const fields = { ...base.fields };
+  if (opts.message !== undefined) {
+    if (opts.message.trim()) fields.invitation_message = opts.message.trim();
+    else delete fields.invitation_message;
   }
-  const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
-  return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };
+  const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
+  // The back: the customer's big title (or a default) and smaller message.
+  const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
+  const page: PageSpec =
+    kind === 'card'
+      ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
+      : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
+  // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
+  const backPage: PageSpec = { ...page, width: page.height, height: page.width };
+  const sheet = { bleedMm: spec.bleedMm, pageHasBleed: kind === 'cardBleed' };
+  return { kind: 'card' as const, props, back, page, backPage, design, sheet };
 }

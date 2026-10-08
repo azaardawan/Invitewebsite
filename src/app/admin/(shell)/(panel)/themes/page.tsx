@@ -11,6 +11,8 @@ import { publicMediaUrl } from '@/server/storage';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
 import { moveThemeAction, syncThemesAction } from '@/app/admin/_actions/catalog';
+import { themeNumber } from '@/theme-registry';
+import { ThemeNumber } from '@/components/admin/ThemeNumber';
 
 const STATUSES = ['DEVELOPMENT', 'READY_FOR_REVIEW', 'ACTIVE', 'ARCHIVED'] as const;
 
@@ -45,7 +47,7 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
       <form method="get" className="flex flex-wrap items-end gap-2">
         <label className="block">
           <span className="mb-1 block text-sm">{t('themes.search')}</span>
-          <input name="q" defaultValue={search} className="rounded-md border border-line bg-surface px-3 py-2" />
+          <input name="q" defaultValue={search} placeholder={t('themes.searchHint')} className="rounded-md border border-line bg-surface px-3 py-2" />
         </label>
         <select name="section" defaultValue={sectionId ?? ''} aria-label={t('themes.section')} className="rounded-md border border-line bg-surface px-3 py-2">
           <option value="">{t('themes.allSections')}</option>
@@ -81,6 +83,7 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
               )}
               <div className="min-w-0 flex-1 space-y-1">
                 <p className="flex flex-wrap items-center gap-2">
+                  <ThemeNumber n={themeNumber(r.theme.key)} label={t('themes.number')} />
                   <Link href={`/admin/themes/${r.theme.id}`} className="font-medium underline-offset-4 hover:underline">
                     {localized(r.theme.name, locale)}
                   </Link>
