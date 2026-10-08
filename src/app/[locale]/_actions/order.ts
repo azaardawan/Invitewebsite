@@ -7,6 +7,7 @@ import { db } from '@/server/db/client';
 import { requestContext } from '@/server/auth/request-context';
 import { OrderError } from '@/server/orders/common';
 import { createDraft, updateDraft } from '@/server/orders/drafts';
+import type { OrderExtras } from '@/server/orders/extras';
 import { createOrder } from '@/server/orders/checkout';
 import { startPayment } from '@/server/payments/service';
 
@@ -27,6 +28,21 @@ function fieldValues(form: FormData): Record<string, string> {
   const values: Record<string, string> = {};
   for (const [k, v] of form.entries()) if (k.startsWith('f.') && typeof v === 'string') values[k.slice(2)] = v;
   return values;
+}
+
+/** Everything typed, so a failed submit puts it all back (fields plus the card back). */
+function typedValues(form: FormData): Record<string, string> {
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message') };
+}
+
+/** The optional order-form sections (card back, signature, colour set); absent sections are left alone. */
+function orderExtras(form: FormData): OrderExtras {
+  const extras: OrderExtras = {};
+  if (form.has('cb.title') || form.has('cb.message')) extras.cardBack = { title: str(form, 'cb.title'), message: str(form, 'cb.message') };
+  if (form.has('signature')) extras.signature = str(form, 'signature');
+  if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
+  if (form.has('palette')) extras.paletteId = str(form, 'palette');
+  return extras;
 }
 
 function siteLocale(form: FormData): Locale {
@@ -54,11 +70,11 @@ export async function startOrderAction(_prev: OrderFormState, form: FormData): P
   try {
     ({ previewToken: token } = await createDraft(
       db(),
-      { themeKey: str(form, 'themeKey'), packageId: str(form, 'packageId'), locale: invitationLocale(form, locale), values },
+      { themeKey: str(form, 'themeKey'), packageId: str(form, 'packageId'), locale: invitationLocale(form, locale), values, extras: orderExtras(form) },
       await requestContext(),
     ));
   } catch (e) {
-    return failure(e, values);
+    return failure(e, typedValues(form));
   }
   redirect(reviewPath(locale, token));
 }
@@ -69,9 +85,9 @@ export async function editDraftAction(_prev: OrderFormState, form: FormData): Pr
   const token = str(form, 'token');
   const values = fieldValues(form);
   try {
-    await updateDraft(db(), token, { values, locale: invitationLocale(form, locale) });
+    await updateDraft(db(), token, { values, locale: invitationLocale(form, locale), extras: orderExtras(form) });
   } catch (e) {
-    return failure(e, values);
+    return failure(e, typedValues(form));
   }
   redirect(reviewPath(locale, token));
 }

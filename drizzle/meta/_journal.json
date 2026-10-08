@@ -155,6 +155,34 @@
       "when": 1791467392092,
       "tag": "0021_public_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791469855392,
+      "tag": "0022_signature_colors",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791471619480,
+      "tag": "0023_subsections",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791472792000,
+      "tag": "0024_second_signature",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791474230558,
+      "tag": "0025_card_back_and_og_pictures",
+      "breakpoints": true
     }
   ]
 }

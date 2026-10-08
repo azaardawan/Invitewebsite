@@ -4,8 +4,11 @@ import { secretKey } from '@/server/env';
 import { safeEqual } from '@/lib/crypto';
 
 export type DocumentKind = 'card' | 'keepsake';
-/** What the print page renders: the stored documents, plus the card with its bleed for print shops. */
-export type RenderKind = DocumentKind | 'cardBleed';
+/**
+ * What the print page renders: the stored documents, the card with its bleed for print shops, and
+ * `og`: the live invitation's cover, pictured for link previews (WhatsApp).
+ */
+export type RenderKind = DocumentKind | 'cardBleed' | 'og';
 
 const sign = (payload: string) => createHmac('sha256', secretKey('TOKEN_SECRET')).update(`print:${payload}`).digest('base64url');
 
@@ -22,7 +25,7 @@ export function verifyPrintToken(token: string, now = Date.now()): { kind: Rende
   const parts = token.split('.');
   if (parts.length !== 4) return null;
   const [kind, invitationId, exp, sig] = parts as [string, string, string, string];
-  if ((kind !== 'card' && kind !== 'cardBleed' && kind !== 'keepsake') || !/^\d+$/.test(exp)) return null;
+  if ((kind !== 'card' && kind !== 'cardBleed' && kind !== 'keepsake' && kind !== 'og') || !/^\d+$/.test(exp)) return null;
   if (!safeEqual(sig, sign(`${kind}.${invitationId}.${exp}`))) return null;
   if (Number(exp) * 1000 < now) return null;
   return { kind, invitationId };

@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { ThemeProps, GuestResponseInput, GuestSubmitResult } from '@/theme-sdk/types';
 import { ThemeHost } from '@/theme-registry/loaders.generated';
 import { InvitationRuntime } from '@/theme-sdk/runtime';
@@ -34,7 +35,13 @@ export function InvitationView({
   };
   return (
     <InvitationRuntime mode={props.mode} labels={props.labels} musicSrc={props.music?.src ?? null} guest={guest}>
-      <div data-bahja-theme={codeRef} lang={props.lang} dir={props.dir}>
+      <div
+        data-bahja-theme={codeRef}
+        lang={props.lang}
+        dir={props.dir}
+        // The theme's colour slots as CSS variables (customer's colour set, or the theme's defaults).
+        style={Object.fromEntries(Object.entries(props.colors).map(([k, v]) => [`--bahja-color-${k}`, v])) as React.CSSProperties}
+      >
         <ThemeErrorBoundary codeRef={codeRef} message={errorText.message} retry={errorText.retry}>
           <ThemeHost codeRef={codeRef} {...props} />
         </ThemeErrorBoundary>

@@ -34,6 +34,12 @@ export type ThemeManifest = {
     card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean };
     keepsake?: { size: 'A4' };
   };
+  /**
+   * Colours the theme takes from the platform (CSS variables `--bahja-color-<key>`), each with the
+   * theme's own default. Required for `color_choice`: the owner makes colour sets for these slots in
+   * Admin and the customer picks one. Without it the theme keeps its fixed colours.
+   */
+  colors?: { slots: { key: string; label: { ar: string; en: string }; default: string }[] };
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
@@ -64,6 +70,20 @@ export const manifestSchema = z
         keepsake: z.object({ size: z.literal('A4') }).optional(),
       })
       .optional(),
+    colors: z
+      .object({
+        slots: z
+          .array(
+            z.object({
+              key: z.string().regex(/^[a-z][a-z0-9-]*$/),
+              label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+              default: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+            }),
+          )
+          .min(1)
+          .max(8),
+      })
+      .optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {
@@ -83,6 +103,8 @@ export const manifestSchema = z
     }
     if (m.features.includes('print_card') && !m.print?.card) issue('print_card requires print.card');
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
+    if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
+    if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
   });
 
 /**

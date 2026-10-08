@@ -39,6 +39,12 @@ const schema = z.object({
   /** Cloudflare Turnstile (bot check on the guest form). Both set = on; both unset = off. */
   TURNSTILE_SITE_KEY: z.string().min(1).optional(),
   TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+  /**
+   * WhatsApp message to the owner for every paid order (CallMeBot: the owner sends their bot one
+   * message to get the key). Both set = on; both unset = off.
+   */
+  OWNER_WHATSAPP_PHONE: z.string().regex(/^\+?\d{8,15}$/).optional(),
+  CALLMEBOT_API_KEY: z.string().min(3).optional(),
   /** Chromium used to render PDFs; defaults to Playwright's bundled browser (the Docker image sets /usr/bin/chromium). */
   CHROMIUM_PATH: z.string().optional(),
   /** Where the PDF renderer reaches this app's print pages; defaults to http://127.0.0.1:$PORT. */
@@ -51,6 +57,9 @@ const schema = z.object({
   }
   if (Boolean(e.TURNSTILE_SITE_KEY) !== Boolean(e.TURNSTILE_SECRET_KEY)) {
     ctx.addIssue({ code: 'custom', path: ['TURNSTILE_SECRET_KEY'], message: 'set both TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY, or neither' });
+  }
+  if (Boolean(e.OWNER_WHATSAPP_PHONE) !== Boolean(e.CALLMEBOT_API_KEY)) {
+    ctx.addIssue({ code: 'custom', path: ['CALLMEBOT_API_KEY'], message: 'set both OWNER_WHATSAPP_PHONE and CALLMEBOT_API_KEY, or neither' });
   }
   if (e.STORAGE_DRIVER === 's3') {
     for (const k of ['S3_ENDPOINT', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'MEDIA_PUBLIC_BASE_URL'] as const) {

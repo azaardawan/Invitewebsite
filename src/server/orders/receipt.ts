@@ -56,6 +56,7 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       keepsakeReady: keepsakeReady(row.invitation, now),
       /** The team uploaded its own card: no automatic picture to show. */
       customCard: row.invitation.cardCustomKey !== null,
+      cardBack: { title: row.invitation.cardOptions.backTitle ?? '', message: row.invitation.cardOptions.backMessage ?? '' },
       hasMessages: row.invitation.featureKeys.includes('congratulations'),
       publicGuestbook: row.invitation.publicGuestbook,
       hasRsvp: row.invitation.featureKeys.includes('rsvp'),

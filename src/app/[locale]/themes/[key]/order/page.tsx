@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
 import { storefrontTheme } from '@/server/storefront/catalog';
+import { orderFormExtras } from '@/server/storefront/order';
 import { baghdadToday } from '@/server/orders/validation';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { Price } from '@/components/storefront/currency';
@@ -53,6 +54,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           invitationLocale={locale}
           minDate={baghdadToday()}
           submitLabel={t('continue')}
+          extras={await orderFormExtras(locale, th.id, pkg.featureKeys)}
         />
       </div>
     </div>

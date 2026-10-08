@@ -441,9 +441,7 @@ website within a minute, and are recorded in the audit log. Sorani and Badini ca
 the owner, so a Kurdish edit made in Admin is already owner-approved. Suggestions made by Claude still go
 through this file first.
 
-## Batch 18 — showing how many guests are coming (PENDING)
-
-Until approved, these show in Arabic to Kurdish visitors.
+## Batch 18 — showing how many guests are coming — ✅ APPROVED (owner, 2026-10-08)
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -456,3 +454,39 @@ Until approved, these show in Arabic to Kurdish visitors.
 | 6 | `receipt.attendanceHelp` | اختر من يرى عدد الضيوف الذين سيحضرون والذين لن يحضروا. | Choose who sees how many guests are coming and how many are not. | هەڵبژێرە کێ ژمارەی ئەو میوانانە دەبینێت کە ئامادە دەبن و ئەوانەی ئامادە نابن. | هەلبژێرە کی ژمارا وان مێڤانان دبینیت یێن دێ ئامادە بن و یێن ئامادە نابن. | ◐ |
 | 7 | `receipt.attendancePrivate` | أنا فقط (هنا في إيصالي) | Only me (here on my receipt) | تەنها من (لێرە لە پسوولەکەم) | بتنێ ئەز (ل ڤێرە د پسوولا من دا) | ◐ |
 | 8 | `receipt.attendancePublic` | كل من لديه رابط الدعوة (يظهر فوق نموذج الرد) | Everyone with the invitation link (shown above the reply form) | هەرکەسێک بەستەری بانگهێشتنامەکەی هەبێت (لە سەرووی فۆرمی وەڵامدانەوە دەردەکەوێت) | هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت) | ◐ |
+
+## Batch 19 — card back, signature, colour choice and subsections (PENDING)
+
+Until approved, these show in Arabic to Kurdish visitors.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `invitation.print.cardBackTitle` | بكل الحب | With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ | ◐ |
+| 2 | `store.cardBack.titlePlaceholder` | بكل الحب | With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ | ◐ |
+| 3 | `receipt.cardBackSave` | حفظ ظهر البطاقة | Save the back of the card | پاشەکەوتکردنی پشتی کارتەکە | پاراستنا پشتا کارتێ | ◐ |
+| 4 | `store.features.signature` | توقيعكم الخاص على الدعوة | Your own signature on the invitation | واژووی خۆتان لەسەر بانگهێشتنامەکە | ئیمزایا هەوە ب خۆ ل سەر داخوازنامێ | ◐ |
+| 5 | `store.features.color_choice` | اختيار ألوان الدعوة | Choose the invitation colours | هەڵبژاردنی ڕەنگەکانی بانگهێشتنامە | هەلبژارتنا ڕەنگێن داخوازنامێ | ◐ |
+| 6 | `store.cardBack.heading` | ظهر بطاقتكم المطبوعة | Back of your printed card | پشتی کارتە چاپکراوەکەتان | پشتا کارتا هەوە یا چاپکری | ◐ |
+| 7 | `store.cardBack.help` | بطاقتكم المطبوعة لها وجهان. اكتبوا ما يظهر على ظهرها: عنواناً كبيراً ورسالة أصغر. | Your printed card has two sides… | کارتە چاپکراوەکەتان دوو ڕووی هەیە. ئەوەی لە پشتەوەی دەردەکەوێت بنووسن: ناونیشانێکی گەورە و نامەیەکی بچووکتر. | کارتا هەوە یا چاپکری دوو ڕوو هەنە. ئەوا ل پشتێ دیار دبیت بنڤیسن: ناڤونیشانەکێ مەزن و نامەیەکا بچووکتر. | ◐ |
+| 8 | `store.cardBack.title` | العنوان الكبير | Big title | ناونیشانی گەورە | ناڤونیشانێ مەزن | ◐ |
+| 9 | `store.cardBack.message` | رسالتكم | Your message | نامەکەتان | نامەیا هەوە | ● |
+| 10 | `store.cardBack.messagePlaceholder` | شكراً لأنكم معنا في أجمل أيامنا… | Thank you for being part of our happiest day… | سوپاس کە لە خۆشترین ڕۆژمان لەگەڵمان بوون… | سوپاس کو د خۆشترین ڕۆژا مە دا دگەل مە بوون… | ◐ |
+| 11 | `store.signature.heading` | توقيعكم | Your signature | واژووەکەتان | ئیمزایا هەوە | ◐ |
+| 12 | `store.signature.help` | اختاروا توقيعاً واحداً أو توقيعين (مثلاً لكليكما). وقّعوا بإصبعكم أو بالفأرة، ويمكنكم المسح والمحاولة من جديد كما تشاؤون. | Choose one signature or two (for example both of you)… | یەک واژوو یان دوو واژوو هەڵبژێرن (بۆ نموونە بۆ هەردووکتان). بە پەنجە یان ماوس واژوو بکەن؛ دەتوانن بیسڕنەوە و چەند جار بتانەوێت دووبارە هەوڵ بدەنەوە. | ئیمزایەکێ یان دوو ئیمزایان هەلبژێرن (بۆ نموونە بۆ هەردووکان). ب تبلا خۆ یان ماوسێ ئیمزا بکەن؛ دشێن ژێببەن و هەر چەند جاران هوین بڤێن دووبارە هەول بدەن. | ◐ |
+| 13 | `store.signature.pad` | مكان التوقيع | Signature area | شوێنی واژوو | جهێ ئیمزایێ | ◐ |
+| 14 | `store.signature.clear` | مسح والمحاولة من جديد | Clear and try again | سڕینەوە و دووبارە هەوڵدانەوە | ژێبرن و دووبارە هەولدان | ◐ |
+| 15 | `store.signature.include` | أضف توقيعي (أو توقيعينا) إلى الدعوة | Add my signature(s) to the invitation | واژووەکەم (یان واژووەکانمان) بخەرە سەر بانگهێشتنامەکە | ئیمزایا من (یان ئیمزایێن مە) بێخە سەر داخوازنامێ | ◐ |
+| 16 | `store.signature.current` | توقيعكم | Your signature | واژووەکەتان | ئیمزایا هەوە | ◐ |
+| 17 | `store.signature.redraw` | ارسموا توقيعاً جديداً | Draw a new signature | واژوویەکی نوێ بکێشن | ئیمزایەکا نوو بکێشن | ◐ |
+| 18 | `store.signature.invalid` | لم نتمكن من قراءة التوقيع. امسحوه وحاولوا من جديد. | We couldn't read the signature… | نەمانتوانی واژووەکە بخوێنینەوە. بیسڕنەوە و دووبارە هەوڵ بدەنەوە. | مە نەشیا ئیمزایێ بخوینین. ژێببەن و دووبارە هەول بدەن. | ◐ |
+| 19 | `store.colors.heading` | ألوان الدعوة | Invitation colours | ڕەنگەکانی بانگهێشتنامە | ڕەنگێن داخوازنامێ | ● |
+| 20 | `store.colors.help` | اختاروا مجموعة ألوان لتصميمكم. | Choose a colour set for your design. | کۆمەڵە ڕەنگێک بۆ دیزاینەکەتان هەڵبژێرن. | کۆمەکا ڕەنگان بۆ دیزاینێ خۆ هەلبژێرن. | ◐ |
+| 21 | `store.colors.original` | الألوان الأصلية | Original colours | ڕەنگە ڕەسەنەکان | ڕەنگێن ڕەسەن | ◐ |
+| 22 | `store.moreDesigns` | تصاميم أخرى | More designs | دیزاینی تر | دیزاینێن دی | ● |
+| 23 | `store.seeAll` | عرض الكل | See all | هەمووی ببینە | هەمیان ببینە | ◐ |
+| 24 | `store.signature.count` | كم توقيعاً؟ | How many signatures? | چەند واژوو؟ | چەند ئیمزا؟ | ● |
+| 25 | `store.signature.one` | توقيع واحد | One signature | یەک واژوو | ئیمزایەک | ● |
+| 26 | `store.signature.two` | توقيعان | Two signatures | دوو واژوو | دوو ئیمزا | ● |
+| 27 | `store.signature.first` | التوقيع الأول | First signature | واژووی یەکەم | ئیمزایا ئێکێ | ● |
+| 28 | `store.signature.second` | التوقيع الثاني | Second signature | واژووی دووەم | ئیمزایا دووێ | ● |
+| 29 | `receipt.flipCard` | اقلب البطاقة | Turn the card over | کارتەکە وەربگێڕە | کارتێ وەرگێڕە | ◐ |

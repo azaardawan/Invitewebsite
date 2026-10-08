@@ -7,12 +7,13 @@ import type { InvitationMode } from '@/theme-sdk/types';
 import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps } from './theme-props';
 import { attendanceCounts } from '@/server/guests/attendance';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
 /** What the renderer needs for a stored invitation: its exact theme version and contract props. */
 export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode: InvitationMode) {
-  const [version] = await db.select({ codeRef: themeVersions.codeRef }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
+  const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const [music] = inv.musicTrackId
     ? await db
         .select({ key: assets.storageKey })
@@ -32,6 +33,9 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       border: await themeBorder(db, inv.themeId),
       guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
       attendance: mode === 'live' && inv.publicAttendance && inv.featureKeys.includes('rsvp') ? await attendanceCounts(db, inv.id) : null,
+      signatureSrcs: await signatureUrls(db, inv),
+      colorSlots: (version!.manifest as ThemeManifest).colors?.slots ?? [],
+      colors: inv.colors,
     }),
   };
 }
@@ -47,3 +51,16 @@ export async function publicGuestbook(db: DbOrTx, invitationId: string) {
   return rows.map((r) => ({ guestName: r.guestName, message: r.message! }));
 }
 
+
+/** Public URLs of an invitation's signature images, first then second (missing ones left out). */
+export async function signatureUrls(db: DbOrTx, inv: Pick<InvitationRow, 'signatureAssetId' | 'signature2AssetId'>) {
+  const urls = [await signatureUrl(db, inv.signatureAssetId), await signatureUrl(db, inv.signature2AssetId)];
+  return urls.filter((u): u is string => Boolean(u));
+}
+
+/** Public URL of a customer's signature image, or null. */
+export async function signatureUrl(db: DbOrTx, assetId: string | null) {
+  if (!assetId) return null;
+  const [a] = await db.select({ key: assets.storageKey }).from(assets).where(eq(assets.id, assetId));
+  return a ? publicMediaUrl(a.key) : null;
+}

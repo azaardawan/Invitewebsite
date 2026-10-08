@@ -185,7 +185,8 @@
         "field": "Field label",
         "contact": "Contact details (address or hours)",
         "payment": "Payment instructions",
-        "uiTexts": "Website texts ({count})"
+        "uiTexts": "Website texts ({count})",
+        "subsection": "Subsection"
       }
     },
     "users": {
@@ -287,7 +288,9 @@
         "congratulations": "Guest congratulation message",
         "keepsake_pdf": "Keepsake PDF of messages",
         "print_card": "Printable invitation card",
-        "self_edit": "Customer edits after publishing (up to 3)"
+        "self_edit": "Customer edits after publishing (up to 3)",
+        "signature": "Customer signature (drawn when ordering)",
+        "color_choice": "Customer chooses a colour set"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -426,7 +429,15 @@
         "borderStrips": "Strips down the left and right edges (the image repeats downwards)",
         "borderCorners": "Corner ornaments (image for the top-right corner; also turned into the bottom-left)",
         "borderSize": "Size on a phone (px; print uses 0.25 mm per px)",
-        "borderRestore": "Use the design's own border again"
+        "borderRestore": "Use the design's own border again",
+        "palettes": "Colour sets",
+        "palettesHint": "This design lets customers choose its colours. Make the colour sets they can pick from (their package must include \"Customer chooses a colour set\"). Invitations keep the colours they were made with.",
+        "paletteNew": "Add a colour set",
+        "paletteName": "Colour set name",
+        "paletteArchived": "Not offered",
+        "palettePreview": "Preview",
+        "paletteArchive": "Stop offering",
+        "paletteRestore": "Offer again"
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -457,7 +468,10 @@
         "forbidden": "You don't have permission.",
         "unauthorized": "Your session ended; please sign in again.",
         "uploadFailed": "Upload failed. Please try again.",
-        "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty."
+        "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty.",
+        "invalidInput": "Check the name (Arabic and English) and the colours.",
+        "noColorSlots": "This design's current version has no colour slots.",
+        "subsectionMismatch": "That subsection belongs to another section."
       },
       "preview": {
         "contents": "Preview contents",
@@ -470,6 +484,22 @@
         "width": "Screen width",
         "desktop": "Desktop",
         "openNewTab": "Open in new tab"
+      },
+      "subsections": {
+        "title": "Subsections",
+        "hint": "Groups inside this section (for example Classic, Modern, Kurdish style). On the website, this occasion's designs are shown under these headings with a filter. Put each design in one from its settings (Admin → Themes).",
+        "empty": "No subsections yet: all designs are shown together.",
+        "name": "Subsection name",
+        "key": "Key (for links)",
+        "keyHint": "Lowercase English letters, numbers and dashes, e.g. classic. It cannot change later.",
+        "add": "Add subsection",
+        "themeCount": "{count, plural, =0 {no designs} one {# design} other {# designs}}",
+        "hidden": "Hidden",
+        "hide": "Hide on the website",
+        "show": "Show on the website",
+        "themeSubsection": "Subsection",
+        "none": "None (listed with the section)",
+        "themeHint": "Subsections are managed under Admin → Sections."
       }
     },
     "settings": {
@@ -654,7 +684,9 @@
       "attendancePublicOn": "The number of guests coming / not coming is shown on the invitation (the customer's choice).",
       "attendancePublicOff": "The number of guests coming / not coming is private (only the customer sees it).",
       "attendanceMakePublic": "Show the reply count on the invitation",
-      "attendanceMakePrivate": "Make the reply count private"
+      "attendanceMakePrivate": "Make the reply count private",
+      "cardBackTitle": "Back of the card: big title (the customer's; empty = default)",
+      "cardBackMessage": "Back of the card: message"
     },
     "legal": {
       "heading": "Legal policies",
@@ -884,7 +916,8 @@
     "print": {
       "scanToOpen": "Scan to open the invitation",
       "keepsakeTitle": "Messages of love",
-      "keepsakeEmpty": "No messages yet."
+      "keepsakeEmpty": "No messages yet.",
+      "cardBackTitle": "With love"
     },
     "guestbookTitle": "Messages from our guests",
     "guestbookEmpty": "Be the first to write a congratulation.",
@@ -1000,7 +1033,9 @@
     "attendancePrivate": "Only me (here on my receipt)",
     "attendancePublic": "Everyone with the invitation link (shown above the reply form)",
     "attendanceComing": "Coming: {count}",
-    "attendanceNotComing": "Not coming: {count}"
+    "attendanceNotComing": "Not coming: {count}",
+    "cardBackSave": "Save the back of the card",
+    "flipCard": "Turn the card over"
   },
   "nav": {
     "home": "Home",
@@ -1035,7 +1070,9 @@
       "congratulations": "Congratulation messages from guests",
       "keepsake_pdf": "A keepsake PDF of all messages",
       "print_card": "Printable invitation card",
-      "self_edit": "Edit your invitation yourself after publishing"
+      "self_edit": "Edit your invitation yourself after publishing",
+      "signature": "Your own signature on the invitation",
+      "color_choice": "Choose the invitation colours"
     },
     "fieldsCount": "{count} details to fill in",
     "orderTitle": "Your invitation details",
@@ -1106,7 +1143,37 @@
     "askThemeLink": "Ask us on WhatsApp",
     "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}",
     "couponLabel": "Coupon code (optional)",
-    "couponHint": "If you have a discount code, type it here. The discount is applied when you confirm."
+    "couponHint": "If you have a discount code, type it here. The discount is applied when you confirm.",
+    "cardBack": {
+      "heading": "Back of your printed card",
+      "help": "Your printed card has two sides. Write what goes on the back: a big title and a smaller message.",
+      "title": "Big title",
+      "titlePlaceholder": "With love",
+      "message": "Your message",
+      "messagePlaceholder": "Thank you for being part of our happiest day…"
+    },
+    "signature": {
+      "heading": "Your signature",
+      "help": "Choose one signature or two (for example both of you). Sign with your finger or mouse; you can clear and try again as often as you like.",
+      "pad": "Signature area",
+      "clear": "Clear and try again",
+      "include": "Add my signature(s) to the invitation",
+      "current": "Your signature",
+      "redraw": "Draw a new signature",
+      "invalid": "We couldn't read the signature. Please clear it and try again.",
+      "count": "How many signatures?",
+      "one": "One signature",
+      "two": "Two signatures",
+      "first": "First signature",
+      "second": "Second signature"
+    },
+    "colors": {
+      "heading": "Invitation colours",
+      "help": "Choose a colour set for your design.",
+      "original": "Original colours"
+    },
+    "moreDesigns": "More designs",
+    "seeAll": "See all"
   },
   "contact": {
     "title": "Contact us",

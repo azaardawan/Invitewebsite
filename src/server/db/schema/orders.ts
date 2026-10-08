@@ -16,13 +16,20 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { adminUsers } from './admin';
-import { musicTracks, packages, sections, themeVersions, themes } from './catalog';
+import { assets, musicTracks, packages, sections, themeVersions, themes } from './catalog';
 
 /**
  * Admin tweaks to the automatic printable card. `message`: undefined = the invitation's own message,
  * '' = no message, any other text replaces it on the card only. `showQr: false` hides the QR code.
  */
-export type CardOptions = { message?: string; extraLine?: string; showQr?: boolean };
+export type CardOptions = {
+  message?: string;
+  extraLine?: string;
+  showQr?: boolean;
+  /** The customer's text for the back of the card: a big title and a smaller message. */
+  backTitle?: string;
+  backMessage?: string;
+};
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -88,6 +95,12 @@ export const invitations = pgTable(
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */
     publicAttendance: boolean('public_attendance').notNull().default(false),
+    /** The customer's drawn signature (packages with `signature`); null = none or not included. */
+    signatureAssetId: uuid('signature_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /** A second signature, when the customer chose two (e.g. both of the couple). */
+    signature2AssetId: uuid('signature2_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
+    colors: jsonb('colors').$type<Record<string, string>>(),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */
     selfEdits: integer('self_edits').notNull().default(0),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */

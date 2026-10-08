@@ -63,3 +63,21 @@ export function ThemeBorder({ border, fallback, medium }: { border: ThemeBorderS
     </div>
   );
 }
+
+/**
+ * The customer's signature(s), where the theme's design places them: one, or two side by side. Renders
+ * nothing without any (or when the package has no signature). Each image is dark ink on transparent;
+ * `className` styles each image (size; on a dark design e.g. `filter: invert(1)`). Works in the
+ * invitation and in print companions.
+ */
+export function Signature({ signatures, className, alt = '' }: { signatures: readonly { src: string }[]; className?: string; alt?: string }) {
+  if (!signatures.length) return null;
+  return (
+    <span data-bahja-signature={signatures.length} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5em' }}>
+      {signatures.map((s, i) => (
+        // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
+        <img key={i} src={s.src} alt={alt} className={className} style={{ maxWidth: signatures.length > 1 ? 'calc(50% - 0.75em)' : undefined }} />
+      ))}
+    </span>
+  );
+}

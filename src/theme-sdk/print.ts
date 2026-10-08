@@ -37,6 +37,10 @@ type PrintBase = {
   labels: PrintLabels;
   /** The owner's replacement border, or null for the theme's own: the same one as on the invitation. */
   border: ThemeBorderSpec | null;
+  /** The customer's signatures (packages with `signature`, when included): none, one or two. */
+  signatures: { src: string }[];
+  /** The theme's colour slots with the customer's chosen colours (also set as `--bahja-color-<key>`). */
+  colors: Record<string, string>;
 };
 
 export type PrintCardProps = PrintBase & {
@@ -44,6 +48,18 @@ export type PrintCardProps = PrintBase & {
   qrDataUrl: string | null;
   /** One extra line the team added for this card only (e.g. "Family invitation"); null when none. Print it near the details. */
   extraLine: string | null;
+};
+
+/**
+ * The back of the printable card (`print/CardBack.tsx`, optional): the same theme as the front but its
+ * own layout. A big title and a smaller message, both written by the customer, then the couple's names
+ * (or their signature). Without a CardBack the platform prints a simple back with the theme's border.
+ */
+export type PrintCardBackProps = PrintBase & {
+  /** Big text, e.g. "Thank you". The customer's own, or a default in the invitation's language. */
+  title: string;
+  /** Smaller text under it; null when the customer left it empty. */
+  message: string | null;
 };
 
 export type KeepsakeMessage = { guestName: string; message: string };

@@ -4,7 +4,9 @@ import { eq, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, invoiceCounters, orderStatusHistory, orders } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
+import { notifyOwner, paidOrderMessage } from '@/server/notify/owner';
 import { INVITATION_LIFETIME_DAYS, OrderError } from './common';
+import type { OrderSnapshot } from './receipt';
 
 /** Next gap-free invoice number for the (Baghdad) year: INV-2026-00001. Must run inside the PAID transaction. */
 async function nextInvoiceNumber(tx: DbOrTx, now: Date) {
@@ -40,7 +42,8 @@ export type PaymentSource = { kind: 'WAYL' } | { kind: 'MANUAL'; adminId: string
  * one invoice number and one publication.
  */
 export async function markOrderPaid(db: DbOrTx, orderId: string, source: PaymentSource, now = new Date()) {
-  return db.transaction(async (tx) => {
+  let notice = null as string | null;
+  const result = await db.transaction(async (tx) => {
     const [order] = await tx.select().from(orders).where(eq(orders.id, orderId)).for('update');
     if (!order) throw new OrderError('notFound');
     if (order.status === 'PAID') return { alreadyPaid: true, invoiceNumber: order.invoiceNumber! };
@@ -77,8 +80,13 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
     }
     const [inv] = await tx.select({ themeId: invitations.themeId, packageId: invitations.packageId, locale: invitations.locale }).from(invitations).where(eq(invitations.id, order.invitationId));
     await trackEvent(tx, { name: 'order_paid', locale: inv?.locale, themeId: inv?.themeId, packageId: inv?.packageId, invitationId: order.invitationId, orderId, occurredAt: now });
+    const snap = order.snapshot as OrderSnapshot;
+    notice = paidOrderMessage({ orderNumber: order.orderNumber, amountIqd: order.amountIqd, theme: snap.theme.name.ar, pkg: snap.package.name.ar, via: source.kind });
     return { alreadyPaid: false, invoiceNumber };
   });
+  // The owner's WhatsApp notice, sent after the payment is saved; it never holds up or breaks the order.
+  if (notice) void notifyOwner(notice);
+  return result;
 }
 
 /** Whether a published invitation is currently visible to guests (expiry is derived, never a stored flag). */

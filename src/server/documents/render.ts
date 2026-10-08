@@ -1,5 +1,6 @@
 import 'server-only';
-import { chromium } from 'playwright-core';
+import { chromium, type Browser } from 'playwright-core';
+import { PDFDocument } from 'pdf-lib';
 import { env } from '@/server/env';
 import { printToken, type RenderKind } from './tokens';
 
@@ -13,7 +14,8 @@ function printOrigin() {
  * Opens this app's internal print page in headless Chromium and saves it as
  * a PDF at the page size the print page declares (`@page`). Arabic and
  * Kurdish shaping, RTL and the theme's embedded fonts come out right because
- * it is a real browser.
+ * it is a real browser. Cards are printed one side at a time (portrait front, landscape back) and joined,
+ * so each side's border is laid out for its own page shape.
  */
 export const renderPdf: PdfRenderer = async (kind, invitationId) => {
   const browser = await chromium.launch({
@@ -21,25 +23,44 @@ export const renderPdf: PdfRenderer = async (kind, invitationId) => {
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
   });
   try {
-    const page = await browser.newPage();
-    const res = await page.goto(`${printOrigin()}/print/${printToken(kind, invitationId)}`, { waitUntil: 'networkidle', timeout: 60_000 });
-    if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
-    await page.evaluate(() => document.fonts.ready);
-    return await page.pdf({ preferCSSPageSize: true, printBackground: true, tagged: true });
+    const url = `/print/${printToken(kind, invitationId)}`;
+    if (kind !== 'card' && kind !== 'cardBleed') return await pdfOf(browser, url);
+    const merged = await PDFDocument.create();
+    for (const side of ['front', 'back']) {
+      const part = await PDFDocument.load(await pdfOf(browser, `${url}?view=${side}`));
+      for (const p of await merged.copyPages(part, part.getPageIndices())) merged.addPage(p);
+    }
+    return Buffer.from(await merged.save());
   } finally {
     await browser.close();
   }
 };
 
-export type PreviewRenderer = (kind: 'card' | 'keepsake', invitationId: string) => Promise<Buffer>;
+async function pdfOf(browser: Browser, path: string) {
+  const page = await browser.newPage();
+  const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
+  if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
+  await page.evaluate(() => document.fonts.ready);
+  const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true, tagged: true });
+  await page.close();
+  return pdf;
+}
 
-/** Page sizes in mm of what the customer gets: the A5 card (bleed cropped) and the keepsake's A4 cover. */
-const PREVIEW_PAGE_MM = { card: [148, 210], keepsake: [210, 297] } as const;
+export type PreviewKind = 'card' | 'cardBack' | 'keepsake' | 'og';
+export type PreviewRenderer = (kind: PreviewKind, invitationId: string) => Promise<Buffer>;
+
 const PX_PER_MM = 96 / 25.4;
+/** Viewport in px: page sizes of what the customer gets (A5 card portrait, back landscape, A4 cover), and 1200 × 630 for link previews. */
+const PREVIEW_VIEWPORT: Record<PreviewKind, { width: number; height: number; scale: number }> = {
+  card: { width: Math.round(148 * PX_PER_MM), height: Math.round(210 * PX_PER_MM), scale: 1.2 },
+  cardBack: { width: Math.round(210 * PX_PER_MM), height: Math.round(148 * PX_PER_MM), scale: 1.2 },
+  keepsake: { width: Math.round(210 * PX_PER_MM), height: Math.round(297 * PX_PER_MM), scale: 1 },
+  og: { width: 1200, height: 630, scale: 1 },
+};
 
 /**
- * A picture of the document's first page (the card, or the keepsake cover) for the customer's receipt:
- * the same print page rendered in the same browser, captured as a JPEG instead of a PDF.
+ * A picture rendered in the same browser as the PDFs: a document page (print page, captured as a JPEG
+ * instead of a PDF) or, for `og`, the invitation's cover as a guest first sees it.
  */
 export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
   const browser = await chromium.launch({
@@ -47,12 +68,20 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
   });
   try {
-    const [w, h] = PREVIEW_PAGE_MM[kind];
-    const page = await browser.newPage({ viewport: { width: Math.round(w * PX_PER_MM), height: Math.round(h * PX_PER_MM) }, deviceScaleFactor: kind === 'card' ? 1.2 : 1 });
-    await page.emulateMedia({ media: 'print' });
-    const res = await page.goto(`${printOrigin()}/print/${printToken(kind, invitationId)}`, { waitUntil: 'networkidle', timeout: 60_000 });
+    const v = PREVIEW_VIEWPORT[kind];
+    const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.scale, reducedMotion: 'reduce' });
+    if (kind !== 'og') await page.emulateMedia({ media: 'print' });
+    const url =
+      kind === 'og'
+        ? `/print/${printToken('og', invitationId)}`
+        : kind === 'cardBack'
+          ? `/print/${printToken('card', invitationId)}?view=back`
+          : `/print/${printToken(kind, invitationId)}`;
+    const res = await page.goto(`${printOrigin()}${url}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
+    // The cover's images and entrance settle.
+    if (kind === 'og') await page.waitForTimeout(800);
     return await page.screenshot({ type: 'jpeg', quality: 82 });
   } finally {
     await browser.close();

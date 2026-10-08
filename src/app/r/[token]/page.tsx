@@ -1,4 +1,6 @@
+import { after } from 'next/server';
 import { getTranslations } from 'next-intl/server';
+import { ensurePreview } from '@/server/documents/documents';
 import { isLocale, type Locale } from '@/i18n/config';
 import { localized } from '@/server/catalog/common';
 import { env } from '@/server/env';
@@ -14,7 +16,8 @@ import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/servic
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
 import { receiptFor } from './data';
-import { attendanceAction, guestbookAction, payAction } from './actions';
+import { attendanceAction, cardBackAction, guestbookAction, payAction } from './actions';
+import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 
@@ -33,6 +36,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   if (check === 'PAID') r = await getReceipt(db(), token);
   const locale: Locale = r && isLocale(r.snapshot.invitation.locale) ? r.snapshot.invitation.locale : 'ar';
   const t = await getTranslations({ locale, namespace: 'receipt' });
+  const tStore = await getTranslations({ locale, namespace: 'store' });
   const brand = (await getTranslations({ locale, namespace: 'common' }))('brand');
   if (!r) {
     return (
@@ -73,6 +77,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
+  // Have the WhatsApp link-preview picture ready before the customer shares the invitation.
+  if (paid && r.invitation.live) after(() => ensurePreview(db(), r!.invitation.id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
   const replies = paid && r.invitation.hasRsvp ? await attendanceCounts(db(), r.invitation.id) : null;
   const num = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ar-IQ');
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
@@ -250,13 +256,45 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 key={f.kind}
                 title={f.title}
                 imageSrc={f.preview ? `${base}/preview/${f.kind}` : null}
+                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack`, title: tStore('cardBack.heading') } : undefined}
                 openHref={`${base}/${f.kind}?inline=1`}
                 downloadHref={`${base}/${f.kind}`}
-                labels={{ download: f.download, pdf: t('pdfFile') }}
+                labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
               />
             ))}
           </div>
           {r.invitation.hasPrintCard ? <p className="text-xs text-muted">{t('printCardHelp')}</p> : null}
+          {r.invitation.hasPrintCard && !r.invitation.customCard ? (
+            <details id="card-back" open={sp.cardBack !== undefined} className="rounded-2xl border border-line bg-surface px-4 py-3">
+              <summary className="cursor-pointer text-sm font-semibold">{tStore('cardBack.heading')}</summary>
+              <form action={cardBackAction} className="mt-3 flex flex-col gap-3">
+                <input type="hidden" name="token" value={token} />
+                <p className="text-xs text-muted">{tStore('cardBack.help')}</p>
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="font-medium">{tStore('cardBack.title')}</span>
+                  <input name="title" dir="auto" defaultValue={r.invitation.cardBack.title} maxLength={CARD_BACK_LIMITS.title} placeholder={tStore('cardBack.titlePlaceholder')} className="rounded-xl border border-line bg-canvas px-3 py-2" />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="font-medium">{tStore('cardBack.message')}</span>
+                  <textarea name="message" dir="auto" rows={4} defaultValue={r.invitation.cardBack.message} maxLength={CARD_BACK_LIMITS.message} placeholder={tStore('cardBack.messagePlaceholder')} className="rounded-xl border border-line bg-canvas px-3 py-2" />
+                </label>
+                <div className="flex items-center gap-3">
+                  <button type="submit" className="inline-flex h-10 items-center justify-center rounded-full border border-accent px-5 text-sm font-semibold text-accent">
+                    {t('cardBackSave')}
+                  </button>
+                  {sp.cardBack === 'saved' ? (
+                    <span role="status" className="text-sm font-semibold text-accent">
+                      ✓ {t('guestbookSaved')}
+                    </span>
+                  ) : sp.cardBack === 'error' ? (
+                    <span role="alert" className="text-sm text-danger">
+                      {t('guestbookError')}
+                    </span>
+                  ) : null}
+                </div>
+              </form>
+            </details>
+          ) : null}
           {r.invitation.hasKeepsake ? (
             <p className="text-xs text-muted">
               {t('keepsakeHelp')} {r.invitation.keepsakeReady ? null : t('keepsakeGrowing')}

@@ -63,3 +63,34 @@ export async function processAudio(input: Buffer) {
   if (duration > MEDIA_LIMITS.audioMaxSeconds) throw new MediaError('audioTooLong');
   return { data: input, mime: 'audio/mpeg', durationSeconds: Math.round(duration), ext: 'mp3' as const };
 }
+
+/**
+ * A signature drawn on the order page: a PNG data URL from the drawing pad. Cropped to the ink,
+ * scaled to at most 1200 × 480 and kept transparent (WebP). Null when nothing was drawn.
+ */
+export async function processSignature(dataUrl: string): Promise<{ data: Buffer; width: number; height: number } | null> {
+  const prefix = 'data:image/png;base64,';
+  if (!dataUrl.startsWith(prefix) || dataUrl.length > 1_200_000) throw new MediaError('unsupportedImage');
+  const input = Buffer.from(dataUrl.slice(prefix.length), 'base64');
+  let meta: Metadata;
+  try {
+    meta = await sharp(input, { limitInputPixels: 8_000_000 }).metadata();
+  } catch {
+    throw new MediaError('unsupportedImage');
+  }
+  if (meta.format !== 'png') throw new MediaError('unsupportedImage');
+  // Nothing drawn: every pixel is transparent.
+  const stats = await sharp(input).ensureAlpha().stats();
+  if ((stats.channels[3]?.max ?? 0) === 0) return null;
+  const trimmed = await sharp(input)
+    .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .toBuffer({ resolveWithObject: true })
+    .catch(() => null);
+  // Nothing drawn (an empty canvas can't be trimmed) or only a speck.
+  if (!trimmed || trimmed.info.width < 12 || trimmed.info.height < 6) return null;
+  const { data, info } = await sharp(trimmed.data)
+    .resize({ width: 1200, height: 480, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 90, alphaQuality: 100 })
+    .toBuffer({ resolveWithObject: true });
+  return { data, width: info.width, height: info.height };
+}

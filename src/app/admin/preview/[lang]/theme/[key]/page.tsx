@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
+import { themePalettes } from '@/server/db/schema';
 import { requireAdmin } from '@/server/auth/guard';
 import { resolveSample } from '@/server/invitation/preview';
 import { invitationMessages } from '@/server/invitation/theme-props';
@@ -16,6 +18,8 @@ const query = z.object({
   /** Comma-separated custom combination (used by the automatic theme checks). */
   features: z.string().max(500).optional(),
   fields: z.string().max(500).optional(),
+  /** A colour set to try on the theme. */
+  palette: z.uuid().optional(),
 });
 
 const list = (v: string | undefined) => (v === undefined ? undefined : v.split(',').filter(Boolean));
@@ -37,6 +41,7 @@ export default async function ThemeSamplePreview({ params, searchParams }: PageP
     stateIndex: q.data?.state,
     custom: q.data?.features !== undefined || q.data?.fields !== undefined ? { features: list(q.data?.features) ?? [], fields: list(q.data?.fields) ?? [] } : undefined,
     names: q.data?.names,
+    colors: q.data?.palette ? (await db().select({ colors: themePalettes.colors }).from(themePalettes).where(eq(themePalettes.id, q.data.palette)))[0]?.colors : undefined,
   });
   if (!sample) notFound();
   // Code for this version must be in the deployed build.

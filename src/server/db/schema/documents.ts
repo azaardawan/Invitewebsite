@@ -3,8 +3,8 @@ import { adminUsers } from './admin';
 import { themeVersions } from './catalog';
 import { invitations } from './orders';
 
-/** PDFs, plus a first-page picture of each for the customer's receipt (stored the same way, same freshness rule). */
-export const documentKind = pgEnum('document_kind', ['PRINT_CARD', 'KEEPSAKE_PDF', 'PRINT_CARD_PREVIEW', 'KEEPSAKE_PREVIEW']);
+/** PDFs, pictures of their pages for the customer's receipt, and the link-preview picture (stored the same way, same freshness rule). */
+export const documentKind = pgEnum('document_kind', ['PRINT_CARD', 'KEEPSAKE_PDF', 'PRINT_CARD_PREVIEW', 'KEEPSAKE_PREVIEW', 'PRINT_CARD_BACK_PREVIEW', 'OG_IMAGE']);
 
 /**
  * The latest generated PDF per invitation and kind. `source_hash` covers

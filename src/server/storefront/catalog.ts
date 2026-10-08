@@ -2,7 +2,7 @@ import 'server-only';
 import { connection } from 'next/server';
 import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, themeFields, themeVersions, themes, type I18nContent } from '@/server/db/schema';
+import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, subsections, themeFields, themeVersions, themes, type I18nContent } from '@/server/db/schema';
 import { packagesWithShape } from '@/server/catalog/themes';
 import { publicMediaUrl } from '@/server/storage';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -36,19 +36,50 @@ export async function storefrontSections() {
 
 export type StorefrontTheme = Awaited<ReturnType<typeof storefrontThemes>>[number];
 
-export async function storefrontThemes(opts: { sectionKey?: string; limit?: number } = {}) {
+/**
+ * A section's visible subsections that hold at least one theme on sale, in the owner's order
+ * (for the occasion page headings and the catalog filters).
+ */
+export async function storefrontSubsections(sectionKey: string) {
+  await connection();
+  const rows = await db()
+    .select({ sub: subsections })
+    .from(subsections)
+    .innerJoin(sections, eq(sections.id, subsections.sectionId))
+    .where(
+      and(
+        eq(sections.key, sectionKey),
+        eq(subsections.status, 'ACTIVE'),
+        sql`exists (select 1 from "themes" t where t."subsection_id" = "subsections"."id" and t."status" = 'ACTIVE')`,
+      ),
+    )
+    .orderBy(asc(subsections.sortOrder), asc(subsections.createdAt));
+  return rows.map((r) => ({ key: r.sub.key, name: r.sub.name, description: r.sub.description }));
+}
+
+export async function storefrontThemes(opts: { sectionKey?: string; subsectionKey?: string; limit?: number } = {}) {
   await connection();
   const rows = await db()
     .select({
       theme: themes,
       section: sections,
+      sub: subsections,
       coverKey: assets.storageKey,
       minPrice: sql<number | null>`(select min(${packages.priceIqd})::bigint from ${packages} where ${packages.themeId} = ${themes.id} and ${packages.status} = 'ACTIVE')`,
     })
     .from(themes)
     .innerJoin(sections, eq(sections.id, themes.sectionId))
     .leftJoin(assets, eq(assets.id, themes.coverAssetId))
-    .where(and(eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE'), opts.sectionKey ? eq(sections.key, opts.sectionKey) : undefined))
+    // Hidden subsections don't group anything: their themes are listed with the section.
+    .leftJoin(subsections, and(eq(subsections.id, themes.subsectionId), eq(subsections.status, 'ACTIVE')))
+    .where(
+      and(
+        eq(themes.status, 'ACTIVE'),
+        eq(sections.status, 'ACTIVE'),
+        opts.sectionKey ? eq(sections.key, opts.sectionKey) : undefined,
+        opts.subsectionKey ? eq(subsections.key, opts.subsectionKey) : undefined,
+      ),
+    )
     .orderBy(asc(sections.sortOrder), asc(themes.sortOrder), asc(themes.createdAt))
     .limit(opts.limit ?? 100);
   return rows.map((r) => ({
@@ -57,6 +88,7 @@ export async function storefrontThemes(opts: { sectionKey?: string; limit?: numb
     description: r.theme.description,
     sectionKey: r.section.key,
     sectionName: r.section.name,
+    subsection: r.sub ? { key: r.sub.key, name: r.sub.name } : null,
     coverUrl: r.coverKey ? publicMediaUrl(r.coverKey) : null,
     minPriceIqd: r.minPrice === null ? null : Number(r.minPrice),
   }));
@@ -79,6 +111,7 @@ export async function storefrontTheme(key: string) {
   const pkgs = (await packagesWithShape(db(), row.theme.id)).filter((p) => p.status === 'ACTIVE').sort((a, b) => a.sortOrder - b.sortOrder);
   const fields = await orderFields(row.theme.id, row.section.id, [...new Set(pkgs.flatMap((p) => p.fieldKeys))]);
   return {
+    id: row.theme.id,
     key: row.theme.key,
     name: row.theme.name,
     description: row.theme.description,

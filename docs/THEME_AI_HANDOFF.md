@@ -52,7 +52,7 @@ should be there, or features that should not be.
 >    hard-coded words, in any language); **an opening animation** after the "open" tap (1.5–3.5 s,
 >    done within 4 s) that also starts music with `useMusic().start()`; honor `useReducedMotion()`; use `GuestFormSlot` for the guest form; render `guestbook`
 >    under the invitation when it is not null (`labels.guestbookTitle`, `labels.guestbookEmpty`);
->    add `print/Card.tsx` (A5 + 3 mm bleed) and `print/Keepsake.tsx` (A4) when the manifest lists
+>    add `print/Card.tsx` (A5 + 3 mm bleed), `print/CardBack.tsx` (the back of the card) and `print/Keepsake.tsx` (A4) when the manifest lists
 >    `print_card` / `keepsake_pdf`.
 > 5. Run `pnpm lint && pnpm typecheck && pnpm build && pnpm exec playwright test e2e/themes.spec.ts`
 >    and fix everything until they pass. Look at the saved screenshots for each state and compare them

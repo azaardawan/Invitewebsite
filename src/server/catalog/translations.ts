@@ -1,10 +1,10 @@
 import 'server-only';
 import { asc, ne } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { fieldDefinitions, packages, sectionDefaultFields, sections, themeFields, themes, type I18nContent } from '@/server/db/schema';
+import { fieldDefinitions, packages, sectionDefaultFields, sections, subsections, themeFields, themes, type I18nContent } from '@/server/db/schema';
 import { getSettings } from '@/server/settings/service';
 
-export type MissingTranslation = { kind: 'theme' | 'package' | 'section' | 'field' | 'contact' | 'payment'; name: string; href: string };
+export type MissingTranslation = { kind: 'theme' | 'package' | 'section' | 'subsection' | 'field' | 'contact' | 'payment'; name: string; href: string };
 
 /** True when a written text lacks Sorani or Badini (an empty optional text needs nothing). */
 function lacksKurdish(v: I18nContent | null | undefined) {
@@ -17,7 +17,7 @@ function lacksKurdish(v: I18nContent | null | undefined) {
  * details. Shown on the dashboard until every one has both Kurdish dialects.
  */
 export async function missingKurdish(db: DbOrTx): Promise<MissingTranslation[]> {
-  const [themeRows, packageRows, sectionRows, fieldRows, sectionFieldRows, themeFieldRows, settings] = await Promise.all([
+  const [themeRows, packageRows, sectionRows, fieldRows, sectionFieldRows, themeFieldRows, settings, subRows] = await Promise.all([
     db.select().from(themes).where(ne(themes.status, 'ARCHIVED')).orderBy(asc(themes.sortOrder)),
     db.select().from(packages).where(ne(packages.status, 'ARCHIVED')).orderBy(asc(packages.sortOrder)),
     db.select().from(sections).where(ne(sections.status, 'ARCHIVED')).orderBy(asc(sections.sortOrder)),
@@ -25,6 +25,7 @@ export async function missingKurdish(db: DbOrTx): Promise<MissingTranslation[]> 
     db.select().from(sectionDefaultFields),
     db.select().from(themeFields),
     getSettings(db),
+    db.select().from(subsections).where(ne(subsections.status, 'ARCHIVED')).orderBy(asc(subsections.sortOrder)),
   ]);
   const out: MissingTranslation[] = [];
   const themeById = new Map(themeRows.map((t) => [t.id, t]));
@@ -39,6 +40,11 @@ export async function missingKurdish(db: DbOrTx): Promise<MissingTranslation[]> 
   for (const s of sectionRows) {
     const fieldsLack = sectionFieldRows.some((f) => f.sectionId === s.id && lacksKurdish(f.label));
     if (lacksKurdish(s.name) || lacksKurdish(s.description) || fieldsLack) out.push({ kind: 'section', name: s.name.en, href: `/admin/sections/${s.id}` });
+  }
+  const sectionById = new Map(sectionRows.map((x) => [x.id, x]));
+  for (const sub of subRows) {
+    const parent = sectionById.get(sub.sectionId);
+    if (parent && (lacksKurdish(sub.name) || lacksKurdish(sub.description))) out.push({ kind: 'subsection', name: `${parent.name.en} · ${sub.name.en}`, href: `/admin/sections/${parent.id}` });
   }
   for (const f of fieldRows) if (lacksKurdish(f.label)) out.push({ kind: 'field', name: f.label.en, href: '/admin/fields' });
   if (lacksKurdish(settings.contact.address) || lacksKurdish(settings.contact.hours)) out.push({ kind: 'contact', name: '', href: '/admin/settings' });

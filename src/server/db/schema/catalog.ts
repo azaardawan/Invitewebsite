@@ -74,6 +74,32 @@ export const sections = pgTable(
   ],
 );
 
+/**
+ * Groups inside a section (e.g. Wedding → Classic, Modern, Kurdish style) so the catalog stays organized
+ * as themes grow. Owner-managed in Admin; a theme can belong to one subsection of its own section.
+ */
+export const subsections = pgTable(
+  'subsections',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sectionId: uuid('section_id')
+      .notNull()
+      .references(() => sections.id, { onDelete: 'cascade' }),
+    /** URL-safe identifier within its section (e.g. `classic`), used in storefront filters. */
+    key: text('key').notNull(),
+    name: jsonb('name_i18n').$type<I18nContent>().notNull(),
+    description: jsonb('description_i18n').$type<I18nContent>(),
+    status: sectionStatus('status').notNull().default('ACTIVE'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [
+    unique('subsections_section_key').on(t.sectionId, t.key),
+    index('subsections_order_idx').on(t.sectionId, t.status, t.sortOrder),
+    check('subsections_key_format', sql`${t.key} ~ '^[a-z][a-z0-9-]{1,39}$'`),
+  ],
+);
+
 /** Admin-editable settings for the code-defined Field Library (src/catalog/fields.ts). */
 export const fieldDefinitions = pgTable('field_definitions', {
   key: text('key').primaryKey(),
@@ -115,6 +141,8 @@ export const themes = pgTable(
     /** Matches the code folder `themes/<key>/`. */
     key: text('key').notNull().unique(),
     sectionId: uuid('section_id').references(() => sections.id, { onDelete: 'restrict' }),
+    /** Optional group inside the theme's section (Admin → Sections). */
+    subsectionId: uuid('subsection_id').references((): AnyPgColumn => subsections.id, { onDelete: 'set null' }),
     name: jsonb('name_i18n').$type<I18nContent>().notNull(),
     description: jsonb('description_i18n').$type<I18nContent>(),
     status: themeStatus('status').notNull().default('DEVELOPMENT'),
@@ -212,4 +240,25 @@ export const packageFeatures = pgTable(
     featureKey: text('feature_key').notNull(),
   },
   (t) => [primaryKey({ columns: [t.packageId, t.featureKey] })],
+);
+
+/**
+ * Colour sets the owner makes for a theme that declares colour slots (manifest `colors`). Customers whose
+ * package includes `color_choice` pick one; the invitation keeps a copy, so later edits never change it.
+ */
+export const themePalettes = pgTable(
+  'theme_palettes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    themeId: uuid('theme_id')
+      .notNull()
+      .references(() => themes.id, { onDelete: 'cascade' }),
+    name: jsonb('name_i18n').$type<I18nContent>().notNull(),
+    /** Slot key → `#rrggbb`. Slots left out use the theme's default. */
+    colors: jsonb('colors').$type<Record<string, string>>().notNull(),
+    status: packageStatus('status').notNull().default('ACTIVE'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('theme_palettes_theme_idx').on(t.themeId, t.status, t.sortOrder)],
 );

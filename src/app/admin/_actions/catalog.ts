@@ -28,6 +28,8 @@ import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/s
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
 import { catalogFailure, readI18n, readString } from './form-helpers';
+import { savePalette, setPaletteStatus } from '@/server/catalog/palettes';
+import { createSubsection, moveSubsection, setSubsectionStatus, updateSubsection } from '@/server/catalog/subsections';
 import type { ActionState } from './state';
 
 async function actorWith(permission: Permission): Promise<Actor> {
@@ -96,6 +98,34 @@ export async function sectionStatusAction(_: ActionState, form: FormData): Promi
 export async function moveSectionAction(_: ActionState, form: FormData): Promise<ActionState> {
   const actor = await actorWith('sections.manage');
   return run(() => moveSection(db(), id(form), direction(form), actor), ['/admin/sections']);
+}
+
+// ---------- Subsections ----------
+
+export async function createSubsectionAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('sections.manage');
+  const sectionId = id(form, 'sectionId');
+  return run(async () => {
+    await createSubsection(db(), sectionId, { key: String(form.get('key') ?? ''), name: readI18n(form, 'name') }, actor);
+  }, [`/admin/sections/${sectionId}`]);
+}
+
+export async function updateSubsectionAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('sections.manage');
+  const sectionId = id(form, 'sectionId');
+  return run(() => updateSubsection(db(), id(form), { name: readI18n(form, 'name'), description: readI18n(form, 'description') }, actor), [`/admin/sections/${sectionId}`]);
+}
+
+export async function subsectionStatusAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('sections.manage');
+  const sectionId = id(form, 'sectionId');
+  return run(() => setSubsectionStatus(db(), id(form), status(form), actor), [`/admin/sections/${sectionId}`]);
+}
+
+export async function moveSubsectionAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('sections.manage');
+  const sectionId = id(form, 'sectionId');
+  return run(() => moveSubsection(db(), id(form), direction(form), actor), [`/admin/sections/${sectionId}`]);
 }
 
 // ---------- Field library ----------
@@ -175,6 +205,7 @@ export async function themeSettingsAction(_: ActionState, form: FormData): Promi
           name: readI18n(form, 'name'),
           description: readI18n(form, 'description'),
           sectionId: readString(form, 'sectionId') ?? null,
+          subsectionId: form.has('subsectionId') ? (readString(form, 'subsectionId') ?? null) : undefined,
           coverAssetId: readString(form, 'coverAssetId') ?? null,
           musicTrackId: readString(form, 'musicTrackId') ?? null,
         },
@@ -276,4 +307,28 @@ export async function movePackageAction(_: ActionState, form: FormData): Promise
   const actor = await actorWith('themes.manage');
   const themeId = id(form, 'themeId');
   return run(() => movePackage(db(), id(form), direction(form), actor), [`/admin/themes/${themeId}`]);
+}
+
+// ---------- Colour sets ----------
+
+/** Reads `color.<slot>` inputs. */
+function readColors(form: FormData): Record<string, string> {
+  const colors: Record<string, string> = {};
+  for (const [k, v] of form.entries()) if (k.startsWith('color.') && typeof v === 'string') colors[k.slice(6)] = v;
+  return colors;
+}
+
+export async function savePaletteAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form, 'themeId');
+  const paletteId = readString(form, 'paletteId') ?? undefined;
+  return run(async () => {
+    await savePalette(db(), themeId, { name: readI18n(form, 'name'), colors: readColors(form) }, actor, paletteId ? z.uuid().parse(paletteId) : undefined);
+  }, [`/admin/themes/${themeId}`]);
+}
+
+export async function paletteStatusAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form, 'themeId');
+  return run(() => setPaletteStatus(db(), themeId, id(form), status(form), actor), [`/admin/themes/${themeId}`]);
 }
