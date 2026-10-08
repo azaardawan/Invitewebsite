@@ -48,7 +48,8 @@ export async function Occasions({ sections }: { sections: { key: string; name: I
             )}
             <span className="relative flex flex-col items-center gap-0.5">
               <span className="font-display text-[28px] lg:text-[40px]">{localized(s.name, locale)}</span>
-              {locale !== 'en' ? <span className="text-xs opacity-85 lg:text-sm">{s.name.en}</span> : null}
+              {/* The small English name is an Arabic-design accent; Kurdish pages stay fully Kurdish (owner rule). */}
+              {locale === 'ar' ? <span className="text-xs opacity-85 lg:text-sm">{s.name.en}</span> : null}
             </span>
           </Link>
         ))}

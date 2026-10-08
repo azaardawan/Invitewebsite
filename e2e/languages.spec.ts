@@ -51,6 +51,12 @@ async function expectOnlyLanguage(page: Page, locale: 'en' | 'ckb' | 'bdn') {
     expect(leftovers.map((s) => s.trim()).filter((s) => s !== 'ب'), url).toEqual([]);
   } else {
     expect(arabicTexts[locale].filter((a) => text.includes(a)), url).toEqual([]);
+    // No English words either, apart from names that stay as they are (PDF, QR, WhatsApp…) and web addresses.
+    const english = text
+      .replace(/\S*\/\S*/g, '')
+      .match(/[A-Za-z]{3,}/g)
+      ?.filter((w) => !['PDF', 'QR', 'WhatsApp', 'Instagram', 'Facebook', 'TikTok', 'Google', 'Apple', 'IQD'].includes(w));
+    expect(english ?? [], url).toEqual([]);
   }
   await expect(page.locator('html')).toHaveAttribute('lang', locale === 'en' ? 'en' : locale === 'ckb' ? 'ckb-IQ' : 'kmr-Arab-IQ');
 }

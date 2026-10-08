@@ -400,9 +400,7 @@ Same glossary as before (بانگهێشتنامە / داخوازنامە, پسو
 | 4 | `receipt.listPrice` | سعر الباقة | Package price | نرخی پاکێج | بهایێ پاکێجێ | ● |
 | 5 | `receipt.discount` | الخصم ({code}) | Discount ({code}) | داشکاندن ({code}) | داشکاندن ({code}) | ● |
 
-## Batch 16 — receipt previews, saving the guest-message choice, receipt link on WhatsApp (PENDING)
-
-Until approved, these show in Arabic to Kurdish customers.
+## Batch 16 — receipt previews, saving the guest-message choice, receipt link on WhatsApp — ✅ APPROVED (owner, 2026-10-08)
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -415,3 +413,22 @@ Until approved, these show in Arabic to Kurdish customers.
 | 7 | `receipt.receiptLinkLine` | الإيصال والبطاقة وملف الذكرى (في أي وقت): {url} | Your receipt, card and keepsake (any time): {url} | پسوولە و کارت و فایلی یادگاری (هەر کاتێک): {url} | پسوولە و کارت و فایلا بیرهاتنێ (هەر دەمەکێ): {url} | ◐ |
 
 `receipt.guestbookSave` ("Save choice") was removed: the choice now saves the moment it is tapped.
+
+## Batch 17 — design and package names typed in Admin (PENDING)
+
+These names live in the database, not in the message files. Once approved, `pnpm db:seed` (every deploy)
+adds them wherever the name's Sorani or Badini is still empty; Kurdish typed in Admin is never replaced.
+Source: `src/server/catalog/kurdish-names.ts` (`approved: true` per line after approval). Anything else still
+missing is listed on the Admin home page under "Missing Kurdish".
+
+| # | Name (Arabic / English) | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|
+| 1 | علبة الخاتم الزيتونية / Olive Ring Box | سندوقی ئەڵقەی زەیتوونی | سندوقا ئەنگوستیلا زەیتوونی | ◐ |
+| 2 | زاخو بالألوان المائية / Zaxo Watercolor | زاخۆ بە ڕەنگی ئاوی | زاخۆ ب ڕەنگێن ئاڤی | ◐ |
+| 3 | عادي / Normal | ئاسایی | ئاسایی | ● |
+| 4 | مميز / VIP | تایبەت | تایبەت | ◐ |
+| 5 | مميز جداً / VVIP | زۆر تایبەت | گەلەک تایبەت | ◐ |
+| 6 | VIP, VVIP (when the Arabic name is the Latin letters) | VIP | VIP / VVIP | ● |
+
+Kept in Arabic on purpose (not a translation gap): «بسم الله الرحمن الرحيم» at the top of invitations and cards,
+the language names «العربية» and «English» in language pickers, and whatever the customer types (names, venue, message).
