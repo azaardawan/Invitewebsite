@@ -17,8 +17,15 @@ export default getRequestConfig(async ({ requestLocale, locale: explicit }) => {
     const adminLocale = (await cookies()).get(ADMIN_LOCALE_COOKIE)?.value;
     locale = isAdminLocale(adminLocale) ? adminLocale : routing.defaultLocale;
   }
-  // Texts changed in Admin → Translations (re-read at most every 30 s).
-  await refreshTranslations(db());
+  // Texts changed in Admin → Translations (re-read at most every 30 s). Not while building the site
+  // (there is no database then), and never a reason for a page to fail: the shipped texts still work.
+  if (process.env.NEXT_PHASE !== 'phase-production-build') {
+    try {
+      await refreshTranslations(db());
+    } catch (e) {
+      console.error('[translations] edits not loaded; using shipped texts', e);
+    }
+  }
   return {
     locale,
     messages: messagesFor(locale),
