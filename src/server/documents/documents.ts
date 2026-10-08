@@ -9,11 +9,13 @@ import { auditActor, type Actor } from '@/server/catalog/common';
 import { storage } from '@/server/storage';
 import { sha256 } from '@/lib/crypto';
 import { printData } from './data';
+import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { renderPdf, renderPreview, type PdfRenderer, type PreviewRenderer } from './render';
 import type { DocumentKind } from './tokens';
 
 /** Bump when the print pipeline changes in a way that should regenerate every stored PDF. */
-const PIPELINE_VERSION = 2;
+// 3: printable cards have a back page.
+const PIPELINE_VERSION = 3;
 
 const KIND = { card: 'PRINT_CARD', keepsake: 'KEEPSAKE_PDF' } as const;
 const PREVIEW_KIND = { card: 'PRINT_CARD_PREVIEW', keepsake: 'KEEPSAKE_PREVIEW' } as const;
@@ -56,7 +58,7 @@ export async function ensureDocument(
   }
 
   const data = await printData(db, inv, kind);
-  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props }));
+  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null }));
   const fileName = `${kind === 'card' ? 'invitation-card' : 'keepsake'}-${inv.publicId}.pdf`;
 
   const [existing] = await db
@@ -157,10 +159,21 @@ export async function updateCardOptions(db: DbOrTx, invitationId: string, input:
   if (input.message !== undefined) next.message = input.message.trim();
   if (input.extraLine?.trim()) next.extraLine = input.extraLine.trim();
   if (input.showQr === false) next.showQr = false;
-  if ((next.message?.length ?? 0) > CARD_LIMITS.message || (next.extraLine?.length ?? 0) > CARD_LIMITS.extraLine) throw new DocumentError('tooLong');
+  if (input.backTitle?.trim()) next.backTitle = input.backTitle.trim();
+  if (input.backMessage?.trim()) next.backMessage = input.backMessage.replace(/\r\n/g, '\n').trim();
+  if (
+    (next.message?.length ?? 0) > CARD_LIMITS.message ||
+    (next.extraLine?.length ?? 0) > CARD_LIMITS.extraLine ||
+    (next.backTitle?.length ?? 0) > CARD_BACK_LIMITS.title ||
+    (next.backMessage?.length ?? 0) > CARD_BACK_LIMITS.message
+  )
+    throw new DocumentError('tooLong');
   await db.transaction(async (tx) => {
     const [inv] = await tx.select().from(invitations).where(eq(invitations.id, invitationId)).for('update');
     if (!inv) throw new DocumentError('notFound');
+    // The back is the customer's text: kept unless this form sends it.
+    if (input.backTitle === undefined && inv.cardOptions.backTitle) next.backTitle = inv.cardOptions.backTitle;
+    if (input.backMessage === undefined && inv.cardOptions.backMessage) next.backMessage = inv.cardOptions.backMessage;
     await tx.update(invitations).set({ cardOptions: next }).where(eq(invitations.id, inv.id));
     await recordAudit(tx, { ...auditActor(actor), action: 'card.options_updated', objectType: 'invitation', objectId: inv.id, before: inv.cardOptions, after: next });
   });

@@ -6,13 +6,15 @@ import type { DbOrTx } from '@/server/db/client';
 import { guestResponses, invitations, themeVersions } from '@/server/db/schema';
 import { buildThemeProps, invitationMessages } from '@/server/invitation/theme-props';
 import { manifestByCodeRef } from '@/theme-registry';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
-import type { KeepsakeProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
+import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
+import { signatureUrl } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
 
 type InvitationRow = typeof invitations.$inferSelect;
-type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string };
+type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string };
 
 /**
  * Page size for Chromium. The card page is exactly the trim size (A5 = 148 × 210 mm) and the theme's
@@ -36,13 +38,34 @@ export async function visibleMessages(db: DbOrTx, invitationId: string) {
 
 /** Everything a theme's print component and the PDF page need for one invitation. */
 export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind) {
-  const [version] = await db.select({ codeRef: themeVersions.codeRef }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
+  const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const codeRef = version!.codeRef;
   const manifest = manifestByCodeRef(codeRef);
-  const theme = buildThemeProps({ mode: 'live', locale: inv.locale, fieldKeys: inv.fieldKeys, features: inv.featureKeys, values: inv.fieldValues, musicSrc: null, border: await themeBorder(db, inv.themeId) });
-  const msgs = invitationMessages(inv.locale) as unknown as { print: PrintMessages };
-  const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...msgs.print };
-  const base = { locale: theme.locale, dir: theme.dir, lang: theme.lang, fields: theme.fields, event: { date: theme.event.date, time: theme.event.time }, labels, border: theme.border };
+  const theme = buildThemeProps({
+    mode: 'live',
+    locale: inv.locale,
+    fieldKeys: inv.fieldKeys,
+    features: inv.featureKeys,
+    values: inv.fieldValues,
+    musicSrc: null,
+    border: await themeBorder(db, inv.themeId),
+    signatureSrc: await signatureUrl(db, inv.signatureAssetId),
+    colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
+    colors: inv.colors,
+  });
+  const { cardBackTitle, ...printMsgs } = (invitationMessages(inv.locale) as unknown as { print: PrintMessages }).print;
+  const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...printMsgs };
+  const base = {
+    locale: theme.locale,
+    dir: theme.dir,
+    lang: theme.lang,
+    fields: theme.fields,
+    event: { date: theme.event.date, time: theme.event.time },
+    labels,
+    border: theme.border,
+    signature: theme.signature,
+    colors: theme.colors,
+  };
 
   if (kind === 'card' || kind === 'cardBleed') {
     const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
@@ -57,11 +80,13 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
       else delete fields.invitation_message;
     }
     const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
+    // The back: the customer's big title (or a default) and smaller message.
+    const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
     const page: PageSpec =
       kind === 'card'
         ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
         : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
-    return { codeRef, kind: 'card' as const, props, page };
+    return { codeRef, kind: 'card' as const, props, back, page };
   }
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
   return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };

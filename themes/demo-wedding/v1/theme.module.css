@@ -1,9 +1,10 @@
 /* Demo theme styles. Scoped by CSS Modules; no global selectors allowed. */
 .root {
-  --green: #173b2f;
-  --green-2: #1f4d3d;
-  --gold: #c9a45c;
-  --ivory: #f7f1e3;
+  /* Colour slots (manifest `colors`): the customer's colour set, or these defaults. */
+  --green: var(--bahja-color-background, #173b2f);
+  --green-2: color-mix(in srgb, var(--green) 82%, white);
+  --gold: var(--bahja-color-accent, #c9a45c);
+  --ivory: var(--bahja-color-text, #f7f1e3);
   min-height: 100dvh;
   background: radial-gradient(120% 80% at 50% 0%, var(--green-2), var(--green));
   color: var(--ivory);
@@ -292,3 +293,12 @@
   opacity: 0.8;
 }
 
+
+/* The customer's signature (dark ink) shown light on the dark card. */
+.signature {
+  display: block;
+  margin: 0 auto;
+  max-width: 220px;
+  max-height: 90px;
+  filter: invert(1) brightness(1.1);
+}

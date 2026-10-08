@@ -10,8 +10,9 @@ import { OrderError, PREVIEW_TTL_MS, fieldDefs, loadPurchasable } from './common
 import { newPreviewToken, previewTokenHash } from './tokens';
 import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
+import { extrasUpdate, type OrderExtras } from './extras';
 
-export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown> };
+export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown>; extras?: OrderExtras };
 
 /** Step 1 of buying: the customer's details become a private draft with a preview link. */
 export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestContext, now = new Date()) {
@@ -19,6 +20,8 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
   const p = await loadPurchasable(db, input.themeKey, input.packageId);
   const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now);
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
+  // Card back, signature and colour set (only what the package includes).
+  const extra = await extrasUpdate(db, { themeId: p.theme.id, featureKeys: p.pkg.featureKeys, cardOptions: {}, signatureAssetId: null, colors: null }, input.extras ?? {});
 
   const token = newPreviewToken();
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -36,6 +39,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
         fieldKeys: p.pkg.fieldKeys,
         featureKeys: p.pkg.featureKeys,
         musicTrackId: p.theme.musicTrackId,
+        ...extra,
         previewTokenHash: previewTokenHash(token),
         previewExpiresAt: new Date(now.getTime() + PREVIEW_TTL_MS),
       })
@@ -69,7 +73,7 @@ export async function findByPreviewToken(db: DbOrTx, token: string, now = new Da
 export async function updateDraft(
   db: DbOrTx,
   token: string,
-  input: { values: Record<string, unknown>; locale?: Locale },
+  input: { values: Record<string, unknown>; locale?: Locale; extras?: OrderExtras },
   now = new Date(),
 ) {
   return db.transaction(async (tx) => {
@@ -79,9 +83,11 @@ export async function updateDraft(
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
     const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now);
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
+    const extra = await extrasUpdate(tx, locked!, input.extras ?? {});
     await tx
       .update(invitations)
       .set({
+        ...extra,
         fieldValues: result.values,
         slug: slugFromNames([result.values.person_1_name, result.values.person_2_name]),
         locale: input.locale ?? locked!.locale,

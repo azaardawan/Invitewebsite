@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
-import { draftByToken } from '@/server/storefront/order';
+import { draftByToken, orderFormExtras } from '@/server/storefront/order';
 import { baghdadToday } from '@/server/orders/validation';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
@@ -44,6 +44,7 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
           invitationLocale={draft.locale}
           minDate={baghdadToday()}
           submitLabel={t('saveChanges')}
+          extras={await orderFormExtras(locale, draft.themeId, draft.featureKeys, draft.current)}
         />
       </div>
       <div className="mt-4 flex justify-center">

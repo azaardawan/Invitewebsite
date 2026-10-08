@@ -99,6 +99,18 @@ export type ThemeProps = {
    * above the form; a theme that draws its own passes `summary={false}` to the slot.
    */
   attendance: { attending: number; notAttending: number } | null;
+  /**
+   * The customer's drawn signature (packages with `signature`, when they chose to include it), or null.
+   * Show it where the design has its signature spot, as an `<img>` (transparent background, dark ink).
+   * Samples and previews show an example signature.
+   */
+  signature: { src: string } | null;
+  /**
+   * The theme's colour slots (manifest `colors`) with the customer's chosen colour set, or the
+   * defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme,
+   * so CSS can use `var(--bahja-color-accent)`. Empty when the theme declares no slots.
+   */
+  colors: Record<string, string>;
   /** The owner's replacement border from Admin, or null to use the theme's own. Render it with `<ThemeBorder>`. */
   border: ThemeBorderSpec | null;
 };

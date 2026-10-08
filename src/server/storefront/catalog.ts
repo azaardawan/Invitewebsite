@@ -79,6 +79,7 @@ export async function storefrontTheme(key: string) {
   const pkgs = (await packagesWithShape(db(), row.theme.id)).filter((p) => p.status === 'ACTIVE').sort((a, b) => a.sortOrder - b.sortOrder);
   const fields = await orderFields(row.theme.id, row.section.id, [...new Set(pkgs.flatMap((p) => p.fieldKeys))]);
   return {
+    id: row.theme.id,
     key: row.theme.key,
     name: row.theme.name,
     description: row.theme.description,

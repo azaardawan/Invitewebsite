@@ -119,6 +119,8 @@ export async function cardOptionsAction(_: ActionState, form: FormData): Promise
         message: useOwnMessage ? String(form.get('message') ?? '') : undefined,
         extraLine: String(form.get('extraLine') ?? ''),
         showQr: form.get('showQr') === 'on',
+        backTitle: String(form.get('backTitle') ?? ''),
+        backMessage: String(form.get('backMessage') ?? ''),
       },
       { adminId: user.id, ipHash: (await requestContext()).ipHash },
     );

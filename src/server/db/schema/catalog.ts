@@ -213,3 +213,24 @@ export const packageFeatures = pgTable(
   },
   (t) => [primaryKey({ columns: [t.packageId, t.featureKey] })],
 );
+
+/**
+ * Colour sets the owner makes for a theme that declares colour slots (manifest `colors`). Customers whose
+ * package includes `color_choice` pick one; the invitation keeps a copy, so later edits never change it.
+ */
+export const themePalettes = pgTable(
+  'theme_palettes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    themeId: uuid('theme_id')
+      .notNull()
+      .references(() => themes.id, { onDelete: 'cascade' }),
+    name: jsonb('name_i18n').$type<I18nContent>().notNull(),
+    /** Slot key → `#rrggbb`. Slots left out use the theme's default. */
+    colors: jsonb('colors').$type<Record<string, string>>().notNull(),
+    status: packageStatus('status').notNull().default('ACTIVE'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('theme_palettes_theme_idx').on(t.themeId, t.status, t.sortOrder)],
+);

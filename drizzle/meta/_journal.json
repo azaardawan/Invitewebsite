@@ -155,6 +155,13 @@
       "when": 1791467392092,
       "tag": "0021_public_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791469855392,
+      "tag": "0022_signature_colors",
+      "breakpoints": true
     }
   ]
 }

@@ -5,7 +5,7 @@ import type { DbOrTx } from '@/server/db/client';
 import { assets } from '@/server/db/schema';
 import { storage, publicMediaUrl } from '@/server/storage';
 import { sha256Buffer } from '@/lib/crypto';
-import { processAudio, processImage } from './process';
+import { processAudio, processImage, processSignature } from './process';
 
 export type AssetRecord = typeof assets.$inferSelect;
 
@@ -64,4 +64,20 @@ export async function storeAudio(db: DbOrTx, input: Buffer, opts: { filename?: s
 
 export function assetUrl(asset: Pick<AssetRecord, 'storageKey'> | null | undefined) {
   return asset ? publicMediaUrl(asset.storageKey) : null;
+}
+
+/** Stores a customer's drawn signature (see processSignature). Null when the pad was empty. */
+export async function storeSignature(db: DbOrTx, dataUrl: string) {
+  const img = await processSignature(dataUrl);
+  if (!img) return null;
+  const hash = sha256Buffer(img.data);
+  const [existing] = await db.select().from(assets).where(and(eq(assets.kind, 'IMAGE'), eq(assets.sha256, hash)));
+  if (existing) return existing;
+  const key = `images/${randomUUID()}.webp`;
+  await storage().put(key, img.data, 'image/webp');
+  const [row] = await db
+    .insert(assets)
+    .values({ kind: 'IMAGE', storageKey: key, mime: 'image/webp', bytes: img.data.byteLength, width: img.width, height: img.height, sha256: hash, originalFilename: 'signature', uploadedBy: null })
+    .returning();
+  return row!;
 }

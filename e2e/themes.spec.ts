@@ -85,6 +85,8 @@ test('every theme renders every designed state correctly', async ({ page }, test
       const has = (f: string) => (state.features as string[]).includes(f);
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${ref} state ${i + 1}: map`).toHaveCount(has('map') ? 1 : 0);
       await expect(page.getByRole('button', { name: ar.invitation.submit }), `${ref} state ${i + 1}: guest form`).toHaveCount(has('rsvp') ? 1 : 0);
+      // A theme with the signature feature shows the (sample) signature with <Signature>, and only then.
+      await expect(page.locator('[data-bahja-signature]'), `${ref} state ${i + 1}: signature`).toHaveCount(has('signature') ? 1 : 0);
       if (has('rsvp')) {
         // Empty submit shows validation; nothing is saved in sample mode.
         await page.getByRole('button', { name: ar.invitation.submit }).click();
@@ -123,6 +125,7 @@ test('every sellable theme looks right with any single feature switched off', as
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${m.key} without ${off}: map`).toHaveCount(features.includes('map') ? 1 : 0);
       await expect(page.getByRole('button', { name: ar.invitation.submit }), `${m.key} without ${off}: guest form`).toHaveCount(features.includes('rsvp') ? 1 : 0);
       await expect(page.getByRole('timer'), `${m.key} without ${off}: countdown`).toHaveCount(features.includes('countdown') ? 1 : 0);
+      await expect(page.locator('[data-bahja-signature]'), `${m.key} without ${off}: signature`).toHaveCount(features.includes('signature') ? 1 : 0);
       await page.screenshot({ path: testInfo.outputPath(`theme-screenshots/${m.key}@${m.version}/without-${off}-opened.png`), fullPage: true });
     }
   }

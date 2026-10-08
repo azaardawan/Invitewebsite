@@ -62,3 +62,33 @@
   font-size: 9pt;
   opacity: 0.75;
 }
+
+/* Back of the card: big title, smaller message, then the signature (or the names). */
+.back {
+  background: var(--bahja-color-text, #fff8f1);
+  color: var(--bahja-color-background, #173b2f);
+}
+.backTitle {
+  margin: 0;
+  font-size: 40pt;
+  letter-spacing: 0.04em;
+  color: var(--bahja-color-accent, #c9a45c);
+}
+.backMessage {
+  margin: 0 auto;
+  max-width: 100mm;
+  font-size: 11pt;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+.backSignature {
+  display: block;
+  margin: 0 auto;
+  max-width: 60mm;
+  max-height: 22mm;
+}
+.backNames {
+  margin: 0;
+  font-size: 14pt;
+  color: var(--bahja-color-accent, #c9a45c);
+}

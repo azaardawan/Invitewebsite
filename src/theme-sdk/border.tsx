@@ -63,3 +63,14 @@ export function ThemeBorder({ border, fallback, medium }: { border: ThemeBorderS
     </div>
   );
 }
+
+/**
+ * The customer's signature, where the theme's design places it. Renders nothing without one (or when
+ * the package has no signature). The image is dark ink on transparent; on a dark design use CSS
+ * (e.g. `filter: invert(1)`) through `className`. Works in the invitation and in print companions.
+ */
+export function Signature({ signature, className, alt = '' }: { signature: { src: string } | null; className?: string; alt?: string }) {
+  if (!signature) return null;
+  // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
+  return <img src={signature.src} alt={alt} className={className} data-bahja-signature="" />;
+}

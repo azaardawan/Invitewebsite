@@ -1,3 +1,4 @@
+import type React from 'react';
 import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
@@ -6,6 +7,7 @@ import { verifyPrintToken } from '@/server/documents/tokens';
 import { printData } from '@/server/documents/data';
 import { printComponents } from '@/theme-registry/print.generated';
 import type { KeepsakeProps, PrintCardProps } from '@/theme-sdk/print';
+import { DefaultCardBack } from '@/components/print/DefaultCardBack';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,14 +35,30 @@ export default async function PrintPage({ params }: PageProps<'/print/[token]'>)
   if (data.kind === 'card') {
     if (!loaders?.card) notFound();
     const Card = (await loaders.card()).default;
+    const Back = loaders.cardBack ? (await loaders.cardBack()).default : null;
     const crop = data.page.cropMm;
-    // The theme draws trim + bleed; for the exact-A5 page the bleed is cropped evenly on every side.
+    // Two pages: the front, then the back. The theme draws trim + bleed; for the exact-A5 page the bleed
+    // is cropped evenly on every side. The platform's default back simply fills the page.
+    const sheet = { width: data.page.width, height: data.page.height, overflow: 'hidden', position: 'relative' } as const;
     return (
       <>
         <style>{pageCss}</style>
-        <div style={{ width: data.page.width, height: data.page.height, overflow: 'hidden' }}>
-          <div style={{ margin: crop ? `-${crop}mm` : undefined }}>
-            <Card {...(data.props as PrintCardProps)} />
+        <div style={{ ...colorVars(data.props.colors), breakAfter: 'page' }}>
+          <div style={sheet}>
+            <div style={{ margin: crop ? `-${crop}mm` : undefined }}>
+              <Card {...(data.props as PrintCardProps)} />
+            </div>
+          </div>
+        </div>
+        <div style={colorVars(data.props.colors)}>
+          <div style={sheet}>
+            {Back ? (
+              <div style={{ margin: crop ? `-${crop}mm` : undefined }}>
+                <Back {...data.back} />
+              </div>
+            ) : (
+              <DefaultCardBack {...data.back} />
+            )}
           </div>
         </div>
       </>
@@ -51,7 +69,14 @@ export default async function PrintPage({ params }: PageProps<'/print/[token]'>)
   return (
     <>
       <style>{pageCss}</style>
-      <Keepsake {...(data.props as KeepsakeProps)} />
+      <div style={colorVars(data.props.colors)}>
+        <Keepsake {...(data.props as KeepsakeProps)} />
+      </div>
     </>
   );
+}
+
+/** The theme's colour slots as CSS variables (`--bahja-color-<key>`), as around the online invitation. */
+function colorVars(colors: Record<string, string>) {
+  return Object.fromEntries(Object.entries(colors).map(([k, v]) => [`--bahja-color-${k}`, v])) as React.CSSProperties;
 }

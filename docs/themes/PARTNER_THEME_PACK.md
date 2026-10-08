@@ -54,8 +54,14 @@ A theme is accepted when **all** of these hold. The automatic checks test most o
 20. **Keepsake PDF** (packages with messages): A4, **the same look as the invitation**. Every page is printed **edge to edge with no page margin**: design the cover as the full 210 × 297 mm, and give message pages their own space inside the page (about 20 mm top and bottom, and clear of the border at the sides). Each message shows the guest's name + text (up to 500 characters) and is never split across pages. It must look good with **0, 3 and 200 messages**.
 21. **One border for the whole set.** Each theme has **one border** (strips down both edges, or corner ornaments) that appears **identically on the invitation, the printable card and every keepsake page**, so the three look like one set. Deliver it as its own transparent layer: a strip that can repeat downwards, or a top-right corner ornament (it is also turned for the bottom-left). The owner can replace it in Admin with other artwork at any time, so nothing else in the design may depend on its exact shape.
 
+22. **Back of the printable card.** Every printed card has two sides. Design the **back** too (same size and bleed as the front): the same theme but its own layout, with a **big title** and a **smaller message** written by the customer, then their names or their signature at the bottom (like a thank-you card). Make it work with a short title only, a long message (300 characters), and with or without a signature. The border appears on both sides.
+
+**Optional features (only if the owner asks for them in this theme)**
+23. **Signature spot.** Mark where the customer's own signature goes on the invitation (and, if wanted, the card back). It arrives as dark ink on a transparent background; say if it should be shown light on a dark design.
+24. **Colour sets.** If customers may choose the colours, list the colours that can change (e.g. background, accent, text) with the default for each, and make sure the design stays readable with the owner's sets. The owner makes the sets in Admin.
+
 **Delivery**
-22. One folder in the structure of `docs/THEME_GUIDE.md` Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
+25. One folder in the structure of `docs/THEME_GUIDE.md` Step 12, with the filled-in brief (`docs/themes/THEME_BRIEF_TEMPLATE.md`).
 
 
 ## 3. The opening animation (required for every theme)
@@ -160,7 +166,8 @@ draft that a person must then fix; if you use one, give it every file listed in 
 >    - **one border** in `border.ts` (strips or corners, artwork from the hand-off), rendered with `<ThemeBorder>` on the
 >      invitation (`medium="screen"`), the card and the keepsake (`medium="print"`), always passing `props.border`;
 >    - `GuestFormSlot` for the guest form (all states), and the `guestbook` list under the invitation when it is not null;
->    - `print/Card.tsx` (A5 + 3 mm bleed, 5 mm safe area, QR and extra line) and `print/Keepsake.tsx` (A4,
+>    - `print/Card.tsx` (A5 + 3 mm bleed, 5 mm safe area, QR and extra line), `print/CardBack.tsx` (the back:
+>      big `title`, smaller `message`, then the signature or the names; same size) and `print/Keepsake.tsx` (A4,
 >      full-page cover, messages that never split) when the manifest lists `print_card` / `keepsake_pdf`;
 >    - size budget: about 1.5 MB total, first screen under 500 KB; fonts that show Kurdish letters.
 > 5. Run `pnpm lint && pnpm typecheck && pnpm build && pnpm exec playwright test e2e/themes.spec.ts` and fix

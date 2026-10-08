@@ -169,7 +169,10 @@
       "keepsakeEmpty": "هێشتا چ نامە نەگەهشتینە."
     },
     "guestbookTitle": "نامێن مێڤانان",
-    "guestbookEmpty": "ببە ئێکەم کەس یێ پیرۆزباهیێ دنڤیسیت."
+    "guestbookEmpty": "ببە ئێکەم کەس یێ پیرۆزباهیێ دنڤیسیت.",
+    "attendanceTitle": "بەرسڤێن مێڤانان",
+    "attendingCount": "دێ ئامادە بن",
+    "notAttendingCount": "ئامادە نابن"
   },
   "invitationSamples": {
     "short": {
@@ -273,7 +276,13 @@
     "keepsakeGrowing": "فایل هەر دەمێ مێڤانێن هەوە بنڤیسن نوو دبیت، لەوما پشتی بۆنێ دووبارە داگرن دا هەمی نامە تێدا بن.",
     "guestbookSaving": "دهێتە پاراستن…",
     "guestbookError": "هەلبژارتنا هەوە نەهاتە پاراستن. هیڤییە دووبارە هەول بدەن.",
-    "receiptLinkLine": "پسوولە و کارت و فایلا بیرهاتنێ (هەر دەمەکێ): {url}"
+    "receiptLinkLine": "پسوولە و کارت و فایلا بیرهاتنێ (هەر دەمەکێ): {url}",
+    "attendanceTitle": "کی دێ ئامادە بیت",
+    "attendanceComing": "دێ ئامادە بن: {count}",
+    "attendanceNotComing": "ئامادە نابن: {count}",
+    "attendanceHelp": "هەلبژێرە کی ژمارا وان مێڤانان دبینیت یێن دێ ئامادە بن و یێن ئامادە نابن.",
+    "attendancePrivate": "بتنێ ئەز (ل ڤێرە د پسوولا من دا)",
+    "attendancePublic": "هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت)"
   },
   "nav": {
     "home": "سەرەکی",

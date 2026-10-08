@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
+import { PDFDocument } from 'pdf-lib';
 import { E2E_DATABASE_URL, signInAsNewOwner } from './helpers';
 
 function paidCardOrder(): { receiptToken: string } {
@@ -28,6 +29,10 @@ test('the customer downloads a real printable card PDF from their receipt', asyn
   expect(Math.abs(Number(box?.[1]) - 419.5)).toBeLessThan(1);
   expect(Math.abs(Number(box?.[2]) - 595.3)).toBeLessThan(1);
   await testInfo.attach('card.pdf', { body: pdf, contentType: 'application/pdf' });
+  // Two sides: the front and the back, both A5.
+  const doc = await PDFDocument.load(pdf);
+  expect(doc.getPageCount()).toBe(2);
+  for (const p of doc.getPages()) expect(Math.abs(p.getWidth() - 419.5)).toBeLessThan(1);
 
   // The print page itself is not reachable without a valid signed token.
   expect((await request.get('/print/card.00000000-0000-0000-0000-000000000000.9999999999.bad')).status()).toBe(404);

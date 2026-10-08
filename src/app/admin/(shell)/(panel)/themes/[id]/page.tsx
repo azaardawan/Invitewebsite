@@ -10,6 +10,7 @@ import { listMusic } from '@/server/catalog/music';
 import { CatalogError, localized } from '@/server/catalog/common';
 import { MAX_ACTIVE_PACKAGES } from '@/server/catalog/packages';
 import { themeBorder } from '@/server/catalog/border';
+import { listPalettes } from '@/server/catalog/palettes';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -29,6 +30,8 @@ import {
   themeFieldsAction,
   themeSettingsAction,
   themeBorderAction,
+  savePaletteAction,
+  paletteStatusAction,
   themeTransitionAction,
   updatePackageAction,
 } from '@/app/admin/_actions/catalog';
@@ -102,6 +105,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const canManage = can(authz, 'themes.manage');
   const manifest = d.currentManifest;
   const border = await themeBorder(db(), d.theme.id);
+  const colorSlots = manifest?.colors?.slots ?? [];
+  const palettes = colorSlots.length ? await listPalettes(db(), d.theme.id) : [];
   const required = d.section?.requiredFeatures ?? [];
   const labels = new Map(d.fields.map((f) => [f.fieldKey, localized(f.effectiveLabel as I18nContent, locale)]));
   const fieldLabel = (k: string) => labels.get(k) ?? k;
@@ -254,6 +259,59 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
               <SubmitButton tone="danger">{t('themes.borderRestore')}</SubmitButton>
             </ActionForm>
           ) : null}
+        </Card>
+      ) : null}
+
+      {canManage && colorSlots.length ? (
+        <Card className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold">{t('themes.palettes')}</h2>
+            <p className="text-sm text-muted">{t('themes.palettesHint')}</p>
+          </div>
+          {[...palettes, null].map((p) => (
+            <details key={p?.id ?? 'new'} open={!p && !palettes.length} className="rounded-md border border-line p-3">
+              <summary className="flex cursor-pointer flex-wrap items-center gap-3">
+                {p ? (
+                  <>
+                    <span className="flex" aria-hidden>
+                      {colorSlots.map((c) => (
+                        <span key={c.key} className="-ms-1 size-6 rounded-full border-2 border-surface first:ms-0" style={{ background: p.colors[c.key] ?? c.default }} />
+                      ))}
+                    </span>
+                    <span className="font-medium">{localized(p.name, locale)}</span>
+                    {p.status === 'ARCHIVED' ? <Badge status="ARCHIVED">{t('themes.paletteArchived')}</Badge> : null}
+                    <a href={`/admin/preview/ar/theme/${d.theme.key}?palette=${p.id}`} target="_blank" className="text-sm text-accent underline">
+                      {t('themes.palettePreview')}
+                    </a>
+                  </>
+                ) : (
+                  <span className="font-medium text-accent">{t('themes.paletteNew')}</span>
+                )}
+              </summary>
+              <ActionForm action={savePaletteAction} className="mt-3 space-y-4">
+                <input type="hidden" name="themeId" value={d.theme.id} />
+                {p ? <input type="hidden" name="paletteId" value={p.id} /> : null}
+                <I18nInputs name="name" label={t('themes.paletteName')} defaultValue={p?.name} maxLength={40} />
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {colorSlots.map((c) => (
+                    <label key={c.key} className="flex flex-col gap-1 text-sm">
+                      <span>{locale === 'ar' ? c.label.ar : c.label.en}</span>
+                      <input type="color" name={`color.${c.key}`} defaultValue={p?.colors[c.key] ?? c.default} className="h-10 w-full cursor-pointer rounded-md border border-line bg-surface" />
+                    </label>
+                  ))}
+                </div>
+                <SubmitButton>{t('common.save')}</SubmitButton>
+              </ActionForm>
+              {p ? (
+                <ActionForm action={paletteStatusAction} className="mt-3">
+                  <input type="hidden" name="themeId" value={d.theme.id} />
+                  <input type="hidden" name="id" value={p.id} />
+                  <input type="hidden" name="status" value={p.status === 'ACTIVE' ? 'ARCHIVED' : 'ACTIVE'} />
+                  <SubmitButton tone={p.status === 'ACTIVE' ? 'danger' : 'secondary'}>{p.status === 'ACTIVE' ? t('themes.paletteArchive') : t('themes.paletteRestore')}</SubmitButton>
+                </ActionForm>
+              ) : null}
+            </details>
+          ))}
         </Card>
       ) : null}
 

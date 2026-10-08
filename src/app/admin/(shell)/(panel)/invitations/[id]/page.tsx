@@ -204,6 +204,14 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                       <span className="mb-1 block text-sm">{t('cardExtraLine')}</span>
                       <input name="extraLine" maxLength={120} defaultValue={inv.cardOptions.extraLine ?? ''} dir="auto" className={input} />
                     </label>
+                    <label className="block">
+                      <span className="mb-1 block text-sm">{t('cardBackTitle')}</span>
+                      <input name="backTitle" maxLength={40} defaultValue={inv.cardOptions.backTitle ?? ''} dir="auto" className={input} />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1 block text-sm">{t('cardBackMessage')}</span>
+                      <textarea name="backMessage" rows={3} maxLength={300} defaultValue={inv.cardOptions.backMessage ?? ''} dir="auto" className={input} />
+                    </label>
                     <label className="flex items-center gap-2 text-sm">
                       <input type="checkbox" name="showQr" defaultChecked={inv.cardOptions.showQr !== false} />
                       {t('cardShowQr')}

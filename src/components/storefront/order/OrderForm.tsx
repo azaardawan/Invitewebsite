@@ -3,8 +3,19 @@
 import { useActionState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
+import { SignaturePad } from './SignaturePad';
 
 export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
+
+/** Optional sections, each present only when the package includes it. */
+export type OrderFormExtras = {
+  /** Back of the printable card (print_card): current text. */
+  cardBack?: { title: string; message: string; limits: { title: number; message: number } };
+  /** Signature pad (signature): the current signature image, if any. */
+  signature?: { current: string | null };
+  /** Colour sets (color_choice): '' = the theme's own colours. */
+  palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
+};
 type State = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };
 
 const inputCls =
@@ -19,6 +30,7 @@ export function OrderForm({
   invitationLocale,
   minDate,
   submitLabel,
+  extras = {},
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   hidden: Record<string, string>;
@@ -27,6 +39,7 @@ export function OrderForm({
   invitationLocale: Locale;
   minDate: string;
   submitLabel: string;
+  extras?: OrderFormExtras;
 }) {
   const t = useTranslations('store');
   const [state, formAction, pending] = useActionState(action, {});
@@ -86,6 +99,83 @@ export function OrderForm({
           </div>
         );
       })}
+
+      {extras.palettes ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-[15px] font-medium text-heading">{t('colors.heading')}</legend>
+          <p className="text-sm text-muted">{t('colors.help')}</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {[{ id: '', name: t('colors.original'), swatches: extras.palettes.original }, ...extras.palettes.options].map((p) => (
+              <label key={p.id || 'original'} className="flex cursor-pointer flex-col gap-2 rounded-2xl border border-line bg-surface p-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20">
+                <input type="radio" name="palette" value={p.id} defaultChecked={extras.palettes!.current === p.id} className="sr-only" />
+                <span className="flex" aria-hidden>
+                  {p.swatches.map((c, i) => (
+                    <span key={i} className="-ms-1.5 size-7 rounded-full border-2 border-surface first:ms-0" style={{ background: c }} />
+                  ))}
+                </span>
+                <span className="text-sm font-medium">{p.name}</span>
+              </label>
+            ))}
+          </div>
+          {errors.palette ? <p className="text-sm text-danger">{t('fieldErrors.invalidText')}</p> : null}
+        </fieldset>
+      ) : null}
+
+      {extras.signature ? (
+        <SignaturePad
+          current={extras.signature.current}
+          error={errors.signature ? t('signature.invalid') : undefined}
+          labels={{
+            heading: t('signature.heading'),
+            help: t('signature.help'),
+            pad: t('signature.pad'),
+            clear: t('signature.clear'),
+            include: t('signature.include'),
+            current: t('signature.current'),
+            redraw: t('signature.redraw'),
+          }}
+        />
+      ) : null}
+
+      {extras.cardBack ? (
+        <fieldset className="flex flex-col gap-4 rounded-[22px] border border-line bg-paper px-5 py-4">
+          <legend className="px-1 text-[15px] font-medium text-heading">{t('cardBack.heading')}</legend>
+          <p className="text-sm text-muted">{t('cardBack.help')}</p>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="cb-title" className="text-sm font-medium text-heading">
+              {t('cardBack.title')}
+            </label>
+            <input
+              id="cb-title"
+              name="cb.title"
+              dir="auto"
+              defaultValue={values['cb.title'] ?? extras.cardBack.title}
+              maxLength={extras.cardBack.limits.title}
+              placeholder={t('cardBack.titlePlaceholder')}
+              aria-invalid={errors.cardBackTitle ? true : undefined}
+              className={inputCls}
+            />
+            {errors.cardBackTitle ? <p className="text-sm text-danger">{t(`fieldErrors.${errors.cardBackTitle}` as 'fieldErrors.tooLong')}</p> : null}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="cb-message" className="text-sm font-medium text-heading">
+              {t('cardBack.message')}
+            </label>
+            <textarea
+              id="cb-message"
+              name="cb.message"
+              dir="auto"
+              rows={4}
+              defaultValue={values['cb.message'] ?? extras.cardBack.message}
+              maxLength={extras.cardBack.limits.message}
+              placeholder={t('cardBack.messagePlaceholder')}
+              aria-invalid={errors.cardBackMessage ? true : undefined}
+              className={inputCls}
+            />
+            {errors.cardBackMessage ? <p className="text-sm text-danger">{t(`fieldErrors.${errors.cardBackMessage}` as 'fieldErrors.tooLong')}</p> : null}
+          </div>
+        </fieldset>
+      ) : null}
 
       <div className="flex flex-col gap-2">
         <label htmlFor="invitationLocale" className="text-[15px] font-medium text-heading">

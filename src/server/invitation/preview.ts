@@ -18,6 +18,8 @@ export type SampleRequest = {
   /** Any combination of the theme's features/fields (admin checks), instead of a package or designed state. */
   custom?: { features: string[]; fields: string[] };
   names?: 'short' | 'long';
+  /** A colour set to try (Admin palette preview); omitted = the theme's defaults. */
+  colors?: Record<string, string>;
 };
 
 /**
@@ -70,6 +72,8 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     values: sampleValues(req.locale, req.names ?? 'short'),
     musicSrc: music ? publicMediaUrl(music.key) : null,
     border: await themeBorder(db, theme.id),
+    colorSlots: manifest.colors?.slots ?? [],
+    colors: req.colors ?? null,
   });
   return { theme, version, manifest, props };
 }

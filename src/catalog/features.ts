@@ -19,6 +19,10 @@ export const FEATURES = {
   print_card: { requires: [], requiresFields: [] },
   /** The customer can change their invitation's details themselves after publishing (a few times). */
   self_edit: { requires: [], requiresFields: [] },
+  /** The customer draws their own signature when ordering; the theme shows it where its designer placed it. */
+  signature: { requires: [], requiresFields: [] },
+  /** The customer picks one of the colour sets the owner made for the theme (themes declare colour slots). */
+  color_choice: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 /**

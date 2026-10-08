@@ -56,6 +56,11 @@ export function buildThemeProps(input: {
   border?: ThemeBorderSpec | null;
   /** Reply counts (live, customer opted in); omitted = private. */
   attendance?: { attending: number; notAttending: number } | null;
+  /** URL of the customer's signature image, when they included one. */
+  signatureSrc?: string | null;
+  /** The theme's colour slots (manifest) and the customer's chosen colours (or none = defaults). */
+  colorSlots?: readonly { key: string; default: string }[];
+  colors?: Record<string, string> | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -88,9 +93,33 @@ export function buildThemeProps(input: {
         ? sampleGuestbook(input.locale)
         : (input.guestbook ?? null),
     attendance: features.includes('rsvp') ? (input.attendance ?? null) : null,
+    signature: !features.includes('signature')
+      ? null
+      : input.mode === 'sample'
+        ? { src: SAMPLE_SIGNATURE }
+        : input.signatureSrc
+          ? { src: input.signatureSrc }
+          : null,
+    colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
   };
 }
+
+/** The theme's colours: each slot's chosen colour (when valid) or its default. */
+export function resolveColors(slots: readonly { key: string; default: string }[], chosen: Record<string, string> | null): Record<string, string> {
+  const hex = /^#[0-9a-fA-F]{6}$/;
+  return Object.fromEntries(slots.map((s) => [s.key, chosen?.[s.key] && hex.test(chosen[s.key]!) ? chosen[s.key]! : s.default]));
+}
+
+/** CSS variables for a theme's colours (`--bahja-color-<key>`), set by the platform around the theme. */
+export function colorVariables(colors: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(colors).map(([k, v]) => [`--bahja-color-${k}`, v]));
+}
+
+/** An example signature (dark ink, transparent) for samples and theme previews. */
+const SAMPLE_SIGNATURE = `data:image/svg+xml;utf8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 90"><path d="M12 62c18-30 34-46 42-40s-14 44-6 46 26-40 34-38-8 34 0 34 22-26 30-24-4 22 4 22 18-14 26-14 10 10 22 8 30-10 40-12" fill="none" stroke="#1d1d1f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+)}`;
 
 /** Example messages so theme samples and Admin previews show the public messages section. */
 function sampleGuestbook(locale: Locale) {

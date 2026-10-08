@@ -9,6 +9,7 @@ import { consumeRateLimit } from '@/server/rate-limit';
 import { startPayment } from '@/server/payments/service';
 import { setPublicGuestbook } from '@/server/guests/guestbook';
 import { setPublicAttendance } from '@/server/guests/attendance';
+import { saveCustomerCardBack } from '@/server/documents/card-back';
 import { customerEditInvitation } from '@/server/invitation/customer-edit';
 
 /** "Pay now" on the private receipt: sends the customer to WAYL (reusing an open link). */
@@ -45,6 +46,18 @@ export async function attendanceAction(token: string, isPublic: boolean): Promis
   const { ipHash } = await requestContext();
   if (ipHash && !(await consumeRateLimit(db(), `attendance:${ipHash}`, 30, 3600))) return { ok: false };
   return { ok: await setPublicAttendance(db(), r.invitation.id, isPublic === true, { type: 'CUSTOMER', ipHash }) };
+}
+
+/** The customer changes the back of their printable card from the receipt. */
+export async function cardBackAction(form: FormData) {
+  const token = String(form.get('token') ?? '');
+  const r = await getReceipt(db(), token);
+  const back = `/r/${encodeURIComponent(token)}`;
+  if (!r || r.status !== 'PAID' || !r.invitation.hasPrintCard) redirect(back);
+  const { ipHash } = await requestContext();
+  if (ipHash && !(await consumeRateLimit(db(), `cardback:${ipHash}`, 30, 3600))) redirect(`${back}?cardBack=error#card-back`);
+  const ok = await saveCustomerCardBack(db(), r.invitation.id, { title: String(form.get('title') ?? ''), message: String(form.get('message') ?? '') }, ipHash);
+  redirect(`${back}?cardBack=${ok ? 'saved' : 'error'}#card-back`);
 }
 
 type EditState = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };

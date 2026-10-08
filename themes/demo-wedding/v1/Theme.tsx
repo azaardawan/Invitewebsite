@@ -4,6 +4,7 @@ import '@fontsource-variable/noto-sans-arabic';
 import { useState } from 'react';
 import {
   GuestFormSlot,
+  Signature,
   formatNumber,
   hasFeature,
   useCountdown,
@@ -68,6 +69,8 @@ export default function DemoWeddingTheme(props: ThemeProps) {
           </header>
 
           {fields.invitation_message ? <p className={styles.message}>{fields.invitation_message}</p> : null}
+
+          <Signature signature={props.signature} className={styles.signature} />
 
           <dl className={styles.details}>
             {event.date ? (

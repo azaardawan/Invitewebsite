@@ -28,6 +28,7 @@ import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/s
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
 import { catalogFailure, readI18n, readString } from './form-helpers';
+import { savePalette, setPaletteStatus } from '@/server/catalog/palettes';
 import type { ActionState } from './state';
 
 async function actorWith(permission: Permission): Promise<Actor> {
@@ -276,4 +277,28 @@ export async function movePackageAction(_: ActionState, form: FormData): Promise
   const actor = await actorWith('themes.manage');
   const themeId = id(form, 'themeId');
   return run(() => movePackage(db(), id(form), direction(form), actor), [`/admin/themes/${themeId}`]);
+}
+
+// ---------- Colour sets ----------
+
+/** Reads `color.<slot>` inputs. */
+function readColors(form: FormData): Record<string, string> {
+  const colors: Record<string, string> = {};
+  for (const [k, v] of form.entries()) if (k.startsWith('color.') && typeof v === 'string') colors[k.slice(6)] = v;
+  return colors;
+}
+
+export async function savePaletteAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form, 'themeId');
+  const paletteId = readString(form, 'paletteId') ?? undefined;
+  return run(async () => {
+    await savePalette(db(), themeId, { name: readI18n(form, 'name'), colors: readColors(form) }, actor, paletteId ? z.uuid().parse(paletteId) : undefined);
+  }, [`/admin/themes/${themeId}`]);
+}
+
+export async function paletteStatusAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form, 'themeId');
+  return run(() => setPaletteStatus(db(), themeId, id(form), status(form), actor), [`/admin/themes/${themeId}`]);
 }
