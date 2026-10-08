@@ -432,3 +432,11 @@ missing is listed on the Admin home page under "Missing Kurdish".
 
 Kept in Arabic on purpose (not a translation gap): «بسم الله الرحمن الرحيم» at the top of invitations and cards,
 the language names «العربية» and «English» in language pickers, and whatever the customer types (names, venue, message).
+
+## Editing in Admin → Translations
+
+Since 2026-10-08 the owner can change any customer text in Admin → Translations, in all four languages.
+Those edits are saved in the database (`ui_translations`) on top of the files in `src/i18n/messages`, show on the
+website within a minute, and are recorded in the audit log. Sorani and Badini can only be changed there by
+the owner, so a Kurdish edit made in Admin is already owner-approved. Suggestions made by Claude still go
+through this file first.

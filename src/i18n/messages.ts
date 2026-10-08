@@ -21,19 +21,28 @@ export function mergeMessages(base: Messages, override: Messages): Messages {
   return out;
 }
 
+/** The texts shipped with the code, per language (Kurdish only where approved). */
+export const SHIPPED: Record<Locale, Messages> = { ar, en, ckb, bdn };
+
+/** Texts changed in Admin → Translations, per language, as nested messages. Set by the server's loader. */
+let overrides: Partial<Record<Locale, Messages>> = {};
+const cache = new Map<Locale, Messages>();
+
+export function setMessageOverrides(next: Partial<Record<Locale, Messages>>) {
+  overrides = next;
+  cache.clear();
+}
+
 /**
  * Kurdish files contain only owner-approved translations. Any key not yet
- * approved falls back to Arabic (never to a machine guess).
+ * approved falls back to Arabic (never to a machine guess). Admin edits win
+ * over the shipped texts; Arabic edits also reach Kurdish keys that fall back.
  */
 export function messagesFor(locale: Locale): Messages {
-  switch (locale) {
-    case 'ar':
-      return ar;
-    case 'en':
-      return en;
-    case 'ckb':
-      return mergeMessages(ar, ckb);
-    case 'bdn':
-      return mergeMessages(ar, bdn);
-  }
+  const hit = cache.get(locale);
+  if (hit) return hit;
+  const withEdits = (l: Locale) => (overrides[l] ? mergeMessages(SHIPPED[l], overrides[l]) : SHIPPED[l]);
+  const out = locale === 'ar' || locale === 'en' ? withEdits(locale) : mergeMessages(withEdits('ar'), withEdits(locale));
+  cache.set(locale, out);
+  return out;
 }

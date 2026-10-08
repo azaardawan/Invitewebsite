@@ -8,3 +8,4 @@ export * from './guests';
 export * from './documents';
 export * from './legal';
 export * from './analytics';
+export * from './translations';
