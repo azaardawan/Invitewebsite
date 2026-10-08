@@ -9,7 +9,7 @@ function vvipOrder(): { receiptToken: string; path: string } {
   return JSON.parse(out.trim().split('\n').at(-1)!);
 }
 
-test('guest messages stay private until the customer shows them under the invitation', async ({ page, browser }, testInfo) => {
+test('guest messages stay private until the customer shows them under the invitation; card and keepsake previews on the receipt', async ({ page, browser }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-390', 'stateful flow runs once');
   test.setTimeout(120_000);
   const { receiptToken, path } = vvipOrder();
@@ -29,11 +29,24 @@ test('guest messages stay private until the customer shows them under the invita
   await expect(guest.getByRole('status')).toBeVisible();
   await expect(guest.getByRole('heading', { name: 'رسائل الضيوف' })).toHaveCount(0);
 
-  // The customer makes messages public from their private receipt.
+  // The customer makes messages public from their private receipt: one tap saves it, no button to miss.
   await page.goto(`/r/${receiptToken}`);
   await page.getByLabel('كل من لديه رابط الدعوة (تظهر تحت الدعوة)').check();
-  await page.getByRole('button', { name: 'حفظ الاختيار' }).click();
-  await expect(page.getByText('تم الحفظ.')).toBeVisible();
+  await expect(page.getByText('✓ تم الحفظ.')).toBeVisible();
+  // The choice survives a reload.
+  await page.reload();
+  await expect(page.getByLabel('كل من لديه رابط الدعوة (تظهر تحت الدعوة)')).toBeChecked();
+
+  // The keepsake is on the receipt from publication (before the celebration), side by side with the card.
+  const files = page.locator('#files');
+  for (const name of ['بطاقة الدعوة للطباعة', 'ذكرى التهاني']) {
+    const img = files.getByRole('img', { name });
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth), { timeout: 60_000 }).toBeGreaterThan(0);
+  }
+  const keepsake = await page.request.get(`/r/${receiptToken}/keepsake?inline=1`);
+  expect(keepsake.status()).toBe(200);
+  expect(keepsake.headers()['content-disposition']).toMatch(/^inline;/);
+  await testInfo.attach('receipt-files.png', { body: await files.screenshot(), contentType: 'image/png' });
 
   // The next person who opens the link sees the message under the invitation.
   const next = await browser.newPage({ viewport: { width: 390, height: 844 } });

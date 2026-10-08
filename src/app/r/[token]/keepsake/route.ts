@@ -9,11 +9,11 @@ import { trackEvent } from '@/server/analytics/events';
 /** Rendering a PDF costs a few seconds of Chromium; cap it per visitor. */
 const DOWNLOADS_PER_HOUR = 20;
 
-/** The customer's keepsake of guest messages, through their private receipt token, once the celebration is over. */
-export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/keepsake'>) {
+/** The customer's keepsake of guest messages, through their private receipt token, from publication (it grows as guests write). */
+export async function GET(req: Request, { params }: RouteContext<'/r/[token]/keepsake'>) {
   const { token } = await params;
   const r = await getReceipt(db(), token);
-  if (!r || r.status !== 'PAID' || !r.invitation.keepsakeReady) return new Response('Not found', { status: 404 });
+  if (!r || r.status !== 'PAID' || !r.invitation.hasKeepsake) return new Response('Not found', { status: 404 });
   const ipHash = hashIp(clientIpFrom(await headers()));
   if (ipHash && !(await consumeRateLimit(db(), `keepsake:ip:${ipHash}`, DOWNLOADS_PER_HOUR, 3600))) {
     return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '3600' } });
@@ -24,7 +24,8 @@ export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/ke
     return new Response(new Uint8Array(pdf), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        // ?inline=1 opens it in the browser's PDF viewer (the receipt previews); otherwise it downloads.
+        'Content-Disposition': `${new URL(req.url).searchParams.get('inline') === '1' ? 'inline' : 'attachment'}; filename="${fileName}"`,
         'Cache-Control': 'private, no-store',
         'X-Robots-Tag': 'noindex',
       },

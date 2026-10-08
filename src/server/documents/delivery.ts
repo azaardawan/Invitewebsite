@@ -2,7 +2,7 @@ import 'server-only';
 import { and, desc, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { customers, invitations, orders } from '@/server/db/schema';
-import { receiptTokenFor } from '@/server/orders/tokens';
+import { accessCodeFor, formatAccessCode, receiptTokenFor } from '@/server/orders/tokens';
 import { eventStartIso } from '@/lib/invitation-format';
 import { env } from '@/server/env';
 import { documentAvailable } from './documents';
@@ -20,7 +20,7 @@ export function keepsakeReady(inv: Pick<InvitationRow, 'status' | 'featureKeys' 
   return inv.expiresAt !== null && inv.expiresAt <= now;
 }
 
-/** The paying customer's phone and private receipt links, for "Send on WhatsApp" in Admin. */
+/** The paying customer's phone, private receipt links and invitation number, for "Send on WhatsApp" in Admin. */
 export async function customerDelivery(db: DbOrTx, invitationId: string) {
   const [row] = await db
     .select({ orderId: orders.id, phone: customers.phoneE164, name: customers.name })
@@ -31,7 +31,14 @@ export async function customerDelivery(db: DbOrTx, invitationId: string) {
     .limit(1);
   if (!row) return null;
   const base = `${env().APP_URL.replace(/\/$/, '')}/r/${receiptTokenFor(row.orderId)}`;
-  return { phone: row.phone, name: row.name, receiptUrl: base, cardUrl: `${base}/card`, keepsakeUrl: `${base}/keepsake` };
+  return {
+    phone: row.phone,
+    name: row.name,
+    receiptUrl: base,
+    cardUrl: `${base}/card`,
+    keepsakeUrl: `${base}/keepsake`,
+    accessCode: formatAccessCode(accessCodeFor(row.orderId)),
+  };
 }
 
 /** wa.me link that opens WhatsApp to the customer with a prepared message. */

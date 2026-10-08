@@ -1,6 +1,7 @@
 import 'server-only';
 import { selfEditState } from '@/server/invitation/customer-edit';
 import { keepsakeReady } from '@/server/documents/delivery';
+import { documentAvailable } from '@/server/documents/documents';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, orders } from '@/server/db/schema';
@@ -49,7 +50,12 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       /** Internal id, for the card download; never rendered. */
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
+      /** The keepsake can be downloaded as soon as the invitation is live; it grows as guests write. */
+      hasKeepsake: documentAvailable(row.invitation, 'keepsake'),
+      /** The celebration has started, so the keepsake is (nearly) complete. */
       keepsakeReady: keepsakeReady(row.invitation, now),
+      /** The team uploaded its own card: no automatic picture to show. */
+      customCard: row.invitation.cardCustomKey !== null,
       hasMessages: row.invitation.featureKeys.includes('congratulations'),
       publicGuestbook: row.invitation.publicGuestbook,
       selfEdit: selfEditState(row.invitation, now),

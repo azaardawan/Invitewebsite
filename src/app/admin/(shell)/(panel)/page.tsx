@@ -9,6 +9,7 @@ import { Card } from '@/components/admin/bits';
 import { analyticsReport } from '@/server/analytics/report';
 import { formatIqd } from '@/lib/currency';
 import { missingKurdish } from '@/server/catalog/translations';
+import { missingKurdishTexts } from '@/server/i18n/translations';
 
 async function counts(now = new Date()) {
   const [[awaiting], [live]] = await Promise.all([
@@ -26,6 +27,7 @@ export default async function DashboardPage({ searchParams }: PageProps<'/admin'
   const week = can(authz, 'analytics.view') ? await analyticsReport(db(), 7) : null;
   const intl = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-GB';
   const untranslated = can(authz, 'themes.manage') ? await missingKurdish(db()) : [];
+  const uiMissing = can(authz, 'translations.manage') ? await missingKurdishTexts(db()) : 0;
   const roleNames = authz.roleKeys.map((k) => (['OWNER', 'MANAGER', 'DESIGNER', 'SUPPORT'].includes(k) ? t(`roles.${k}` as never) : k));
 
   return (
@@ -53,11 +55,18 @@ export default async function DashboardPage({ searchParams }: PageProps<'/admin'
           </Card>
         ) : null}
       </div>
-      {untranslated.length > 0 ? (
+      {untranslated.length + uiMissing > 0 ? (
         <Card className="space-y-2 border-accent">
-          <h2 className="font-semibold">{t('dashboard.missingKurdishTitle', { count: untranslated.length })}</h2>
+          <h2 className="font-semibold">{t('dashboard.missingKurdishTitle', { count: untranslated.length + uiMissing })}</h2>
           <p className="text-sm text-muted">{t('dashboard.missingKurdishBody')}</p>
           <ul className="space-y-1 text-sm">
+            {uiMissing > 0 ? (
+              <li>
+                <Link href="/admin/translations?filter=missing" className="text-accent underline">
+                  {t('dashboard.missingKurdishKind.uiTexts', { count: uiMissing })}
+                </Link>
+              </li>
+            ) : null}
             {untranslated.map((m, i) => (
               <li key={i}>
                 <Link href={m.href} className="text-accent underline">

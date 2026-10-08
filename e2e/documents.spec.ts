@@ -32,8 +32,14 @@ test('the customer downloads a real printable card PDF from their receipt', asyn
   // The print page itself is not reachable without a valid signed token.
   expect((await request.get('/print/card.00000000-0000-0000-0000-000000000000.9999999999.bad')).status()).toBe(404);
   expect((await request.get('/r/not-a-real-token/card')).status()).toBe(404);
-  // The keepsake isn't offered before the celebration.
+  // This package has no keepsake.
   expect((await request.get(`/r/${receiptToken}/keepsake`)).status()).toBe(404);
+  expect((await request.get(`/r/${receiptToken}/preview/keepsake`)).status()).toBe(404);
+  // The receipt shows a picture of the card's first page.
+  const preview = await request.get(`/r/${receiptToken}/preview/card`);
+  expect(preview.status()).toBe(200);
+  expect(preview.headers()['content-type']).toBe('image/jpeg');
+  expect((await request.get(`/r/${receiptToken}/card?inline=1`)).headers()['content-disposition']).toMatch(/^inline;/);
 
   // Admin: the print-shop version keeps the 3 mm bleed (154 × 216 mm ≈ 436.5 × 612.3 pt).
   await signInAsNewOwner(page);

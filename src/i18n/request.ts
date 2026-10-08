@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { ADMIN_LOCALE_COOKIE, isAdminLocale, isLocale, localeMeta, type Locale } from './config';
 import { messagesFor } from './messages';
 import { routing } from './routing';
+import { db } from '@/server/db/client';
+import { refreshTranslations } from '@/server/i18n/translations';
 
 export default getRequestConfig(async ({ requestLocale, locale: explicit }) => {
   // An explicitly passed locale (e.g. `getTranslations({ locale })` on receipt pages) wins.
@@ -15,6 +17,8 @@ export default getRequestConfig(async ({ requestLocale, locale: explicit }) => {
     const adminLocale = (await cookies()).get(ADMIN_LOCALE_COOKIE)?.value;
     locale = isAdminLocale(adminLocale) ? adminLocale : routing.defaultLocale;
   }
+  // Texts changed in Admin → Translations (re-read at most every 30 s).
+  await refreshTranslations(db());
   return {
     locale,
     messages: messagesFor(locale),

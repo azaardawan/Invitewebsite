@@ -30,3 +30,31 @@ export const renderPdf: PdfRenderer = async (kind, invitationId) => {
     await browser.close();
   }
 };
+
+export type PreviewRenderer = (kind: 'card' | 'keepsake', invitationId: string) => Promise<Buffer>;
+
+/** Page sizes in mm of what the customer gets: the A5 card (bleed cropped) and the keepsake's A4 cover. */
+const PREVIEW_PAGE_MM = { card: [148, 210], keepsake: [210, 297] } as const;
+const PX_PER_MM = 96 / 25.4;
+
+/**
+ * A picture of the document's first page (the card, or the keepsake cover) for the customer's receipt:
+ * the same print page rendered in the same browser, captured as a JPEG instead of a PDF.
+ */
+export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
+  const browser = await chromium.launch({
+    executablePath: env().CHROMIUM_PATH || undefined,
+    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+  });
+  try {
+    const [w, h] = PREVIEW_PAGE_MM[kind];
+    const page = await browser.newPage({ viewport: { width: Math.round(w * PX_PER_MM), height: Math.round(h * PX_PER_MM) }, deviceScaleFactor: kind === 'card' ? 1.2 : 1 });
+    await page.emulateMedia({ media: 'print' });
+    const res = await page.goto(`${printOrigin()}/print/${printToken(kind, invitationId)}`, { waitUntil: 'networkidle', timeout: 60_000 });
+    if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
+    await page.evaluate(() => document.fonts.ready);
+    return await page.screenshot({ type: 'jpeg', quality: 82 });
+  } finally {
+    await browser.close();
+  }
+};

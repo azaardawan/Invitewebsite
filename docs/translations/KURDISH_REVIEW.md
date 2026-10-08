@@ -399,3 +399,44 @@ Same glossary as before (بانگهێشتنامە / داخوازنامە, پسو
 | 3 | `store.errors.invalidCoupon` | رمز الخصم هذا غير صالح أو انتهت صلاحيته أو استُخدم بالكامل. | This coupon code isn't valid, has expired or has been used up. | ئەم کۆدی داشکاندنە دروست نییە، یان ماوەی بەسەرچووە، یان بە تەواوی بەکارهاتووە. | ئەڤ کۆدێ داشکاندنێ نە دروستە، یان دەمێ وی ب دوماهی هاتیە، یان هەمی هاتیە بکارئینان. | ◐ |
 | 4 | `receipt.listPrice` | سعر الباقة | Package price | نرخی پاکێج | بهایێ پاکێجێ | ● |
 | 5 | `receipt.discount` | الخصم ({code}) | Discount ({code}) | داشکاندن ({code}) | داشکاندن ({code}) | ● |
+
+## Batch 16 — receipt previews, saving the guest-message choice, receipt link on WhatsApp — ✅ APPROVED (owner, 2026-10-08)
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `receipt.filesTitle` | بطاقتكم وذكرى التهاني | Your card and keepsake | کارتەکەتان و یادگاری پیرۆزباییەکان | کارتا هەوە و بیرهاتنا پیرۆزباهیان | ◐ |
+| 2 | `receipt.filesHelp` | اضغطوا على الصورة لفتح ملف PDF، أو حمّلوه للاحتفاظ به. | Tap a picture to open the PDF, or download it to keep. | کرتە لە وێنەکە بکەن بۆ کردنەوەی فایلی PDF، یان دایبگرن بۆ پاراستنی. | کلیک ل سەر وێنەی بکەن دا فایلا PDF ڤەبیت، یان داگرن دا بپارێزن. | ◐ |
+| 3 | `receipt.pdfFile` | ملف PDF | PDF file | فایلی PDF | فایلا PDF | ● |
+| 4 | `receipt.keepsakeGrowing` | يتحدّث الملف كلما كتب ضيوفكم، فحمّلوه مرة أخرى بعد المناسبة ليضمّ كل الرسائل. | It updates as your guests write, so download it again after the celebration to have every message. | فایلەکە هەر کاتێک میوانەکانتان بنووسن نوێ دەبێتەوە، بۆیە دوای بۆنەکە دووبارە دایبگرن بۆ ئەوەی هەموو نامەکانی تێدا بێت. | فایل هەر دەمێ مێڤانێن هەوە بنڤیسن نوو دبیت، لەوما پشتی بۆنێ دووبارە داگرن دا هەمی نامە تێدا بن. | ◐ |
+| 5 | `receipt.guestbookSaving` | جارٍ الحفظ… | Saving… | پاشەکەوت دەکرێت… | دهێتە پاراستن… | ● |
+| 6 | `receipt.guestbookError` | تعذّر حفظ اختياركم. حاولوا مرة أخرى. | Couldn't save your choice. Please try again. | هەڵبژاردنەکەتان پاشەکەوت نەکرا. تکایە دووبارە هەوڵ بدەنەوە. | هەلبژارتنا هەوە نەهاتە پاراستن. هیڤییە دووبارە هەول بدەن. | ◐ |
+| 7 | `receipt.receiptLinkLine` | الإيصال والبطاقة وملف الذكرى (في أي وقت): {url} | Your receipt, card and keepsake (any time): {url} | پسوولە و کارت و فایلی یادگاری (هەر کاتێک): {url} | پسوولە و کارت و فایلا بیرهاتنێ (هەر دەمەکێ): {url} | ◐ |
+
+`receipt.guestbookSave` ("Save choice") was removed: the choice now saves the moment it is tapped.
+
+## Batch 17 — design and package names typed in Admin (PENDING)
+
+These names live in the database, not in the message files. Once approved, `pnpm db:seed` (every deploy)
+adds them wherever the name's Sorani or Badini is still empty; Kurdish typed in Admin is never replaced.
+Source: `src/server/catalog/kurdish-names.ts` (`approved: true` per line after approval). Anything else still
+missing is listed on the Admin home page under "Missing Kurdish".
+
+| # | Name (Arabic / English) | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|
+| 1 | علبة الخاتم الزيتونية / Olive Ring Box | سندوقی ئەڵقەی زەیتوونی | سندوقا ئەنگوستیلا زەیتوونی | ◐ |
+| 2 | زاخو بالألوان المائية / Zaxo Watercolor | زاخۆ بە ڕەنگی ئاوی | زاخۆ ب ڕەنگێن ئاڤی | ◐ |
+| 3 | عادي / Normal | ئاسایی | ئاسایی | ● |
+| 4 | مميز / VIP | تایبەت | تایبەت | ◐ |
+| 5 | مميز جداً / VVIP | زۆر تایبەت | گەلەک تایبەت | ◐ |
+| 6 | VIP, VVIP (when the Arabic name is the Latin letters) | VIP | VIP / VVIP | ● |
+
+Kept in Arabic on purpose (not a translation gap): «بسم الله الرحمن الرحيم» at the top of invitations and cards,
+the language names «العربية» and «English» in language pickers, and whatever the customer types (names, venue, message).
+
+## Editing in Admin → Translations
+
+Since 2026-10-08 the owner can change any customer text in Admin → Translations, in all four languages.
+Those edits are saved in the database (`ui_translations`) on top of the files in `src/i18n/messages`, show on the
+website within a minute, and are recorded in the audit log. Sorani and Badini can only be changed there by
+the owner, so a Kurdish edit made in Admin is already owner-approved. Suggestions made by Claude still go
+through this file first.

@@ -30,12 +30,13 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   let repliesDeleted = 0;
   if (oldIds.length) {
     const docs = await db
-      .select({ id: generatedDocuments.id, key: generatedDocuments.storageKey })
+      .select({ id: generatedDocuments.id, key: generatedDocuments.storageKey, kind: generatedDocuments.kind })
       .from(generatedDocuments)
-      .where(and(inArray(generatedDocuments.invitationId, oldIds), eq(generatedDocuments.kind, 'KEEPSAKE_PDF')));
+      // The keepsake and its receipt picture go together.
+      .where(and(inArray(generatedDocuments.invitationId, oldIds), inArray(generatedDocuments.kind, ['KEEPSAKE_PDF', 'KEEPSAKE_PREVIEW'])));
     for (const d of docs) await storage().delete(d.key).catch(() => {});
     if (docs.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, docs.map((d) => d.id)));
-    keepsakesDeleted = docs.length;
+    keepsakesDeleted = docs.filter((d) => d.kind === 'KEEPSAKE_PDF').length;
     const gone = await db.delete(guestResponses).where(inArray(guestResponses.invitationId, oldIds)).returning({ id: guestResponses.id });
     repliesDeleted = gone.length;
   }

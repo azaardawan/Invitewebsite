@@ -54,6 +54,9 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const delivery = canDocs && (hasCard || hasKeepsake) ? await customerDelivery(db(), inv.id) : null;
   // WhatsApp messages go to the customer in their invitation's language.
   const tr = await getTranslations({ locale: inv.locale, namespace: 'receipt' });
+  // Every message also carries the private receipt link and the invitation number, so the customer can come back any time.
+  const withReceiptLines = (text: string) =>
+    delivery ? `${text}\n${tr('receiptLinkLine', { url: delivery.receiptUrl })}\n${tr('accessCodeLine', { code: delivery.accessCode })}` : text;
   const canModerate = can(authz, 'guests.moderate');
   const [fields, tracks, guests, counts] = await Promise.all([
     orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
@@ -158,7 +161,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                   ) : null}
                   {delivery ? (
                     <a
-                      href={whatsappLink(delivery.phone, tr('waCardMessage', { name: delivery.name, url: delivery.cardUrl }))}
+                      href={whatsappLink(delivery.phone, withReceiptLines(tr('waCardMessage', { name: delivery.name, url: delivery.cardUrl })))}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-accent underline"
@@ -230,7 +233,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                   </a>
                   {delivery ? (
                     <a
-                      href={whatsappLink(delivery.phone, tr('waKeepsakeMessage', { name: delivery.name, url: delivery.keepsakeUrl }))}
+                      href={whatsappLink(delivery.phone, withReceiptLines(tr('waKeepsakeMessage', { name: delivery.name, url: delivery.keepsakeUrl })))}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-accent underline"

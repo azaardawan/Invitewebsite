@@ -28,15 +28,13 @@ export async function payAction(form: FormData) {
   redirect(`/r/${token}${result.kind === 'error' || result.kind === 'busy' ? '?pay=error' : ''}`);
 }
 
-/** The customer's choice from their receipt: guest messages public under the invitation, or keepsake only. */
-export async function guestbookAction(form: FormData) {
-  const token = String(form.get('token') ?? '');
+/** The customer's choice from their receipt: guest messages public under the invitation, or keepsake only. Saved on tap. */
+export async function guestbookAction(token: string, isPublic: boolean): Promise<{ ok: boolean }> {
   const r = await getReceipt(db(), token);
-  if (!r || r.status !== 'PAID') redirect(`/r/${encodeURIComponent(token)}`);
+  if (!r || r.status !== 'PAID' || !r.invitation.hasMessages) return { ok: false };
   const { ipHash } = await requestContext();
-  if (ipHash && !(await consumeRateLimit(db(), `guestbook:${ipHash}`, 30, 3600))) redirect(`/r/${encodeURIComponent(token)}`);
-  await setPublicGuestbook(db(), r.invitation.id, form.get('visibility') === 'public', { type: 'CUSTOMER', ipHash });
-  redirect(`/r/${encodeURIComponent(token)}?guestbook=saved#guestbook`);
+  if (ipHash && !(await consumeRateLimit(db(), `guestbook:${ipHash}`, 30, 3600))) return { ok: false };
+  return { ok: await setPublicGuestbook(db(), r.invitation.id, isPublic === true, { type: 'CUSTOMER', ipHash }) };
 }
 
 type EditState = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };

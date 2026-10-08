@@ -134,6 +134,20 @@
       "when": 1791365936538,
       "tag": "0018_coupons",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791444527429,
+      "tag": "0019_document_previews",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1791450363046,
+      "tag": "0020_ui_translations",
+      "breakpoints": true
     }
   ]
 }
