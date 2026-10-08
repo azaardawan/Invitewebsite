@@ -79,7 +79,11 @@
         "date": "Saturday, 20 December"
       }
     },
-    "and": "&"
+    "and": "&",
+    "topTitle": "Our top picks",
+    "topSubtitle": "The designs our customers love most.",
+    "bestSeller": "Best seller",
+    "topPick": "Top pick"
   },
   "footer": {
     "rights": "© {year} Bahja. All rights reserved.",
@@ -439,7 +443,16 @@
         "paletteArchive": "Stop offering",
         "paletteRestore": "Offer again",
         "number": "Theme number: use it to ask for changes to this theme",
-        "searchHint": "Name, key or number (e.g. 7)"
+        "searchHint": "Name, key or number (e.g. 7)",
+        "topHeading": "Top 3 on the website",
+        "topIntro": "Choose your three top designs. They appear together near the top of the homepage; the first is marked “Best seller” and the other two “Top pick”, and they come first wherever designs are listed. Only designs on sale can be chosen.",
+        "topPlace1": "1st: Best seller",
+        "topPlace2": "2nd: Top pick",
+        "topPlace3": "3rd: Top pick",
+        "topNone": "— None —",
+        "topSave": "Save the top 3",
+        "topBadge1": "Best seller",
+        "topBadge": "Top {n}"
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -473,7 +486,9 @@
         "allLanguages": "Fill in all four languages (Arabic, English, Sorani and Badini), or leave them all empty.",
         "invalidInput": "Check the name (Arabic and English) and the colours.",
         "noColorSlots": "This design's current version has no colour slots.",
-        "subsectionMismatch": "That subsection belongs to another section."
+        "subsectionMismatch": "That subsection belongs to another section.",
+        "duplicateFeatured": "Each design can be chosen only once in the top 3.",
+        "featuredNotActive": "Only designs on sale can be in the top 3."
       },
       "preview": {
         "contents": "Preview contents",

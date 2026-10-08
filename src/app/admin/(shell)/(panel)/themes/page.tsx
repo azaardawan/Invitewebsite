@@ -10,7 +10,8 @@ import { localized } from '@/server/catalog/common';
 import { publicMediaUrl } from '@/server/storage';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
-import { moveThemeAction, syncThemesAction } from '@/app/admin/_actions/catalog';
+import { featuredThemesAction, moveThemeAction, syncThemesAction } from '@/app/admin/_actions/catalog';
+import { getSettings } from '@/server/settings/service';
 import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
 
@@ -24,10 +25,14 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
   const search = typeof params.q === 'string' ? params.q.slice(0, 80) : '';
   const sectionId = z.uuid().safeParse(params.section).data;
   const status = z.enum(STATUSES).safeParse(params.status).data;
-  const [rows, sections] = await Promise.all([
+  const [rows, sections, onSale, settings] = await Promise.all([
     listThemes(db(), { search: search || undefined, sectionId, status }),
     listSections(db(), { includeArchived: true }),
+    listThemes(db(), { status: 'ACTIVE' }),
+    getSettings(db()),
   ]);
+  const top = settings.featured.themeIds;
+  const rankOf = (id: string) => top.indexOf(id) + 1 || null;
   const canManage = can(authz, 'themes.manage');
 
   return (
@@ -43,6 +48,33 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
           </ActionForm>
         ) : null}
       </header>
+
+      <Card className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">{t('themes.topHeading')}</h2>
+          <p className="mt-1 text-sm text-muted">{t('themes.topIntro')}</p>
+        </div>
+        {canManage ? (
+          <ActionForm action={featuredThemesAction} className="grid gap-3 sm:grid-cols-3">
+            {(['first', 'second', 'third'] as const).map((place, i) => (
+              <label key={place} className="block">
+                <span className="mb-1 block text-sm font-medium">{t(`themes.topPlace${i + 1}` as never)}</span>
+                <select name={place} defaultValue={top[i] ?? ''} className="w-full rounded-md border border-line bg-surface px-3 py-2">
+                  <option value="">{t('themes.topNone')}</option>
+                  {onSale.map((r) => (
+                    <option key={r.theme.id} value={r.theme.id}>
+                      #{themeNumber(r.theme.key) ?? '—'} {localized(r.theme.name, locale)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+            <div className="sm:col-span-3">
+              <SubmitButton>{t('themes.topSave')}</SubmitButton>
+            </div>
+          </ActionForm>
+        ) : null}
+      </Card>
 
       <form method="get" className="flex flex-wrap items-end gap-2">
         <label className="block">
@@ -88,6 +120,11 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
                     {localized(r.theme.name, locale)}
                   </Link>
                   <Badge status={r.theme.status}>{t(`themes.status.${r.theme.status}`)}</Badge>
+                  {rankOf(r.theme.id) ? (
+                    <span className="rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-heading">
+                      {rankOf(r.theme.id) === 1 ? t('themes.topBadge1') : t('themes.topBadge', { n: rankOf(r.theme.id)! })}
+                    </span>
+                  ) : null}
                 </p>
                 <p className="text-sm text-muted">
                   {r.sectionName ? localized(r.sectionName, locale) : t('themes.noSection')} ·{' '}

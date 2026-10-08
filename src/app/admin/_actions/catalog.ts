@@ -26,6 +26,7 @@ import {
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
 import { CARD_SIDE_DEFAULTS, updateThemeCardSide } from '@/server/catalog/card-design';
+import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
 import { catalogFailure, readI18n, readString } from './form-helpers';
@@ -192,6 +193,15 @@ export async function themeBorderAction(_: ActionState, form: FormData): Promise
       ),
     ['/admin/themes', `/admin/themes/${themeId}`],
   );
+}
+
+export async function featuredThemesAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  // Places 1–3 in order; an empty place is skipped (the rest move up).
+  const themeIds = ['first', 'second', 'third'].map((k) => readString(form, k)).filter((v): v is string => !!v);
+  return run(async () => {
+    await updateFeaturedThemes(db(), { themeIds }, actor);
+  }, ['/admin/themes']);
 }
 
 export async function themeCardSideAction(_: ActionState, form: FormData): Promise<ActionState> {

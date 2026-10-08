@@ -53,7 +53,7 @@ export default async function ThemesPage({ params, searchParams }: PageProps<'/[
       <div className="mx-auto mt-10 max-w-[1440px] lg:mt-14">
         {themes.length ? (
           <ThemeGrid
-            themes={themes.map((th) => ({ key: th.key, name: localized(th.name, locale), section: th.subsection ? `${localized(th.sectionName, locale)} · ${localized(th.subsection.name, locale)}` : localized(th.sectionName, locale), coverUrl: th.coverUrl, minPriceIqd: th.minPriceIqd }))}
+            themes={themes.map((th) => ({ key: th.key, name: localized(th.name, locale), section: th.subsection ? `${localized(th.sectionName, locale)} · ${localized(th.subsection.name, locale)}` : localized(th.sectionName, locale), coverUrl: th.coverUrl, minPriceIqd: th.minPriceIqd, rank: th.rank }))}
           />
         ) : (
           <p className="px-6 py-16 text-center text-muted">{t('empty')}</p>

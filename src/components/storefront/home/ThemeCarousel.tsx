@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { Price } from '../currency';
+import { RankBadge } from '../RankBadge';
 
 export type CarouselTheme = {
   key: string;
@@ -10,6 +11,7 @@ export type CarouselTheme = {
   section: string;
   coverUrl: string | null;
   minPriceIqd: number | null;
+  rank?: number | null;
 };
 
 const TINTS = ['bg-[#efe2ea]', 'bg-blush', 'bg-paper', 'bg-sand', 'bg-[#efd0c8]'];
@@ -24,7 +26,7 @@ export function ThemeCarousel({
   labels,
 }: {
   themes: CarouselTheme[];
-  labels: { prev: string; next: string; preview: string; choose: string; from: string };
+  labels: { prev: string; next: string; preview: string; choose: string; from: string; bestSeller: string; topPick: string };
 }) {
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -100,8 +102,9 @@ export function ThemeCarousel({
             <Link
               href={`/themes/${t.key}`}
               aria-label={t.name}
-              className={`block h-[340px] overflow-hidden rounded-t-[128px] rounded-b-[18px] lg:h-[400px] lg:rounded-t-[150px] ${TINTS[i % TINTS.length]}`}
+              className={`relative block h-[340px] overflow-hidden rounded-t-[128px] rounded-b-[18px] lg:h-[400px] lg:rounded-t-[150px] ${TINTS[i % TINTS.length]}`}
             >
+              <RankBadge rank={t.rank} labels={labels} className="absolute bottom-3 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2" />
               {t.coverUrl ? (
                 // Covers are already optimized WebP from the upload pipeline.
                 // eslint-disable-next-line @next/next/no-img-element

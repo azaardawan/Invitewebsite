@@ -42,13 +42,23 @@ export const contactSettings = z.object({
   hours: i18nText.nullable(),
 });
 
+/**
+ * The owner's top 3 themes, best first: shown together on the homepage, the first marked "Best seller" and the
+ * other two "Top pick" wherever themes are listed.
+ */
+export const featuredSettings = z.object({
+  themeIds: z.array(z.uuid()).max(3),
+});
+
 export const settingsData = z.object({
   currency: currencySettings.default({ usdRateIqd: null }),
   payment: paymentSettings.default({ whatsapp: null, manualInstructions: null }),
   contact: contactSettings.default({ phone: null, email: null, instagram: null, facebook: null, tiktok: null, address: null, hours: null }),
+  featured: featuredSettings.default({ themeIds: [] }),
 });
 
 export type SettingsData = z.infer<typeof settingsData>;
 export type CurrencySettings = z.infer<typeof currencySettings>;
 export type PaymentSettings = z.infer<typeof paymentSettings>;
 export type ContactSettings = z.infer<typeof contactSettings>;
+export type FeaturedSettings = z.infer<typeof featuredSettings>;
