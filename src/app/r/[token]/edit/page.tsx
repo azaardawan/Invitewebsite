@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { NextIntlClientProvider } from 'next-intl';
+import { signatureUrls } from '@/server/invitation/load';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { isLocale, type Locale } from '@/i18n/config';
 import { db } from '@/server/db/client';
@@ -55,6 +56,7 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
             invitationLocale={inv!.locale}
             minDate={minDate}
             submitLabel={t('editSave')}
+            extras={inv!.featureKeys.includes('signature') ? { signature: { current: await signatureUrls(db(), inv!) } } : {}}
           />
         </NextIntlClientProvider>
       </div>

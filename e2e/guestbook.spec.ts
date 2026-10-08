@@ -46,7 +46,19 @@ test('guest messages stay private until the customer shows them under the invita
   const keepsake = await page.request.get(`/r/${receiptToken}/keepsake?inline=1`);
   expect(keepsake.status()).toBe(200);
   expect(keepsake.headers()['content-disposition']).toMatch(/^inline;/);
+  // The card turns over to its landscape back.
+  await files.getByRole('button', { name: 'اقلب البطاقة' }).click();
+  const back = files.getByRole('img', { name: 'ظهر بطاقتكم المطبوعة' });
+  await expect.poll(() => back.evaluate((el: HTMLImageElement) => el.naturalWidth > el.naturalHeight), { timeout: 60_000 }).toBe(true);
   await testInfo.attach('receipt-files.png', { body: await files.screenshot(), contentType: 'image/png' });
+
+  // Sharing the link shows the invitation's own cover (WhatsApp preview).
+  const html = await (await page.request.get(path)).text();
+  const og = /property="og:image" content="([^"]+)"/.exec(html)?.[1];
+  expect(og).toMatch(/\/og$/);
+  const ogImage = await page.request.get(new URL(og!).pathname);
+  expect(ogImage.status()).toBe(200);
+  expect(ogImage.headers()['content-type']).toBe('image/jpeg');
 
   // The reply count is on the receipt; the customer shows it to everyone too.
   await expect(page.locator('#attendance').getByText('سيحضر: ١')).toBeVisible();

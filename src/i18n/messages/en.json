@@ -1034,7 +1034,8 @@
     "attendancePublic": "Everyone with the invitation link (shown above the reply form)",
     "attendanceComing": "Coming: {count}",
     "attendanceNotComing": "Not coming: {count}",
-    "cardBackSave": "Save the back of the card"
+    "cardBackSave": "Save the back of the card",
+    "flipCard": "Turn the card over"
   },
   "nav": {
     "home": "Home",

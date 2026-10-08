@@ -1034,7 +1034,8 @@
     "attendancePublic": "كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)",
     "attendanceComing": "سيحضر: {count}",
     "attendanceNotComing": "لن يحضر: {count}",
-    "cardBackSave": "حفظ ظهر البطاقة"
+    "cardBackSave": "حفظ ظهر البطاقة",
+    "flipCard": "اقلب البطاقة"
   },
   "nav": {
     "home": "الرئيسية",

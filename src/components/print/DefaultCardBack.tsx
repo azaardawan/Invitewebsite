@@ -5,7 +5,7 @@ import type { PrintCardBackProps } from '@/theme-sdk/print';
 
 /**
  * The back of the printable card for themes without their own `print/CardBack.tsx`: the customer's big
- * title, their message, then the couple's names or the signature, in the theme's colours. The theme's
+ * title, their message, then the couple's names or the signatures, in the theme's colours. Landscape. The theme's
  * border (drawn with <ThemeBorder> on the front) repeats on this page by itself. Fills the page it is given.
  */
 export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message }: PrintCardBackProps) {
@@ -21,7 +21,7 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         boxSizing: 'border-box',
         width: '100%',
         height: '100%',
-        padding: '24mm 20mm',
+        padding: '16mm 28mm',
         background: colors.paper ?? colors.background ?? '#fbf7f0',
         color: ink,
         fontFamily: "'Noto Sans Arabic Variable', 'Noto Sans Arabic', sans-serif",
@@ -30,12 +30,12 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        gap: '7mm',
+        gap: '5mm',
         overflow: 'hidden',
       }}
     >
-      <h1 style={{ margin: 0, fontFamily: "'Aref Ruqaa', serif", fontWeight: 700, fontSize: '19mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
-      {message ? <p style={{ margin: 0, maxWidth: '100mm', fontSize: '4.6mm', lineHeight: 1.8, whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{message}</p> : null}
+      <h1 style={{ margin: 0, fontFamily: "'Aref Ruqaa', serif", fontWeight: 700, fontSize: '16mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
+      {message ? <p style={{ margin: 0, maxWidth: '140mm', fontSize: '4.4mm', lineHeight: 1.8, whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{message}</p> : null}
       {signatures.length ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '8mm' }}>
           {signatures.map((sig, i) => (

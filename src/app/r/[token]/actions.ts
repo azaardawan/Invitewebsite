@@ -71,6 +71,8 @@ export async function customerEditAction(token: string, _prev: EditState, form: 
     values,
     locale: String(form.get('invitationLocale') ?? ''),
     ipHash: (await requestContext()).ipHash,
+    signature: form.has('signature') ? String(form.get('signature')) : undefined,
+    signature2: form.has('signature2') ? String(form.get('signature2')) : undefined,
   });
   if (result.ok) redirect(`/r/${encodeURIComponent(token)}?edited=1#edit`);
   if (result.error === 'invalidFields') return { error: 'errors.invalidFields', fieldErrors: result.fieldErrors, values };

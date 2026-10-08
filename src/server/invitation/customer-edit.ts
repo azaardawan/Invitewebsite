@@ -10,6 +10,8 @@ import { receiptTokenHash } from '@/server/orders/tokens';
 import { validateFieldValues } from '@/server/orders/validation';
 import { isLocale, type Locale } from '@/i18n/config';
 import { slugFromNames } from '@/lib/ids';
+import { extrasUpdate } from '@/server/orders/extras';
+import { OrderError } from '@/server/orders/common';
 
 /** How many times a customer can change their published invitation themselves (packages with `self_edit`). */
 export const SELF_EDIT_LIMIT = 3;
@@ -35,7 +37,7 @@ export type CustomerEditResult =
  */
 export async function customerEditInvitation(
   db: DbOrTx,
-  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null },
+  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null; signature?: string; signature2?: string },
   now = new Date(),
 ): Promise<CustomerEditResult> {
   if (input.ipHash && !(await consumeRateLimit(db, `self-edit:${input.ipHash}`, 20, 3600, now))) return { ok: false, error: 'rateLimited' };
@@ -57,19 +59,34 @@ export async function customerEditInvitation(
     const result = validateFieldValues(input.values, inv!.fieldKeys, await fieldDefs(tx, inv!.fieldKeys), validateAt);
     if (!result.ok) return { ok: false, error: 'invalidFields', fieldErrors: result.errors } as const;
 
+    // Signatures can be redrawn too (packages with `signature`): same pads as the order form.
+    let signatures;
+    try {
+      signatures = await extrasUpdate(tx, inv!, { signature: input.signature, signature2: input.signature2 });
+    } catch (e) {
+      if (e instanceof OrderError) return { ok: false, error: 'invalidFields', fieldErrors: e.fieldErrors } as const;
+      throw e;
+    }
+
     const locale: Locale = input.locale && isLocale(input.locale) ? input.locale : inv!.locale;
     const slug = slugFromNames([result.values.person_1_name, result.values.person_2_name]);
     await tx
       .update(invitations)
-      .set({ fieldValues: result.values, slug, locale, selfEdits: inv!.selfEdits + 1, version: inv!.version + 1 })
+      .set({ ...signatures, fieldValues: result.values, slug, locale, selfEdits: inv!.selfEdits + 1, version: inv!.version + 1 })
       .where(eq(invitations.id, inv!.id));
     await recordAudit(tx, {
       actorType: 'CUSTOMER',
       action: 'invitation.customer_edited',
       objectType: 'invitation',
       objectId: inv!.id,
-      before: { values: inv!.fieldValues, locale: inv!.locale, slug: inv!.slug },
-      after: { values: result.values, locale, slug, selfEdits: inv!.selfEdits + 1 },
+      before: { values: inv!.fieldValues, locale: inv!.locale, slug: inv!.slug, signatures: [inv!.signatureAssetId, inv!.signature2AssetId] },
+      after: {
+        values: result.values,
+        locale,
+        slug,
+        selfEdits: inv!.selfEdits + 1,
+        signatures: [signatures.signatureAssetId ?? inv!.signatureAssetId, signatures.signature2AssetId ?? inv!.signature2AssetId],
+      },
       ipHash: input.ipHash,
     });
     return { ok: true, left: state.left - 1 } as const;

@@ -1,4 +1,6 @@
+import { after } from 'next/server';
 import { getTranslations } from 'next-intl/server';
+import { ensurePreview } from '@/server/documents/documents';
 import { isLocale, type Locale } from '@/i18n/config';
 import { localized } from '@/server/catalog/common';
 import { env } from '@/server/env';
@@ -75,6 +77,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
+  // Have the WhatsApp link-preview picture ready before the customer shares the invitation.
+  if (paid && r.invitation.live) after(() => ensurePreview(db(), r!.invitation.id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
   const replies = paid && r.invitation.hasRsvp ? await attendanceCounts(db(), r.invitation.id) : null;
   const num = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ar-IQ');
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
@@ -252,9 +256,10 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 key={f.kind}
                 title={f.title}
                 imageSrc={f.preview ? `${base}/preview/${f.kind}` : null}
+                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack`, title: tStore('cardBack.heading') } : undefined}
                 openHref={`${base}/${f.kind}?inline=1`}
                 downloadHref={`${base}/${f.kind}`}
-                labels={{ download: f.download, pdf: t('pdfFile') }}
+                labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
               />
             ))}
           </div>

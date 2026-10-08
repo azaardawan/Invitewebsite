@@ -103,12 +103,14 @@ Performance budgets (JS/image size) are reported during M11 hardening.
 
 ## 6. Print companions
 
-Every printable card is **two pages**: the front (`print/Card.tsx`) and the back (`print/CardBack.tsx`,
-`PrintCardBackProps`): the same theme, its own layout. The back gets the customer's big `title` (or a
-default such as "With love"), their smaller `message` (or null), and `signature`/`fields` for a closing
-(the signatures, or the names). Same size and bleed as the front. The border drawn with `<ThemeBorder>` on the
-front repeats on the back by itself. Without a `CardBack.tsx` the platform prints a simple back (title,
-message, names or signature, in the theme's colours). See `themes/demo-wedding/v1/print/CardBack.tsx`.
+Every printable card is **two pages**: the front (`print/Card.tsx`, **portrait**) and the back
+(`print/CardBack.tsx`, `PrintCardBackProps`, **landscape**: A5 turned sideways, 210 × 148 mm, drawn at
+216 × 154 mm with the 3 mm bleed): the same theme, its own layout. The back gets the customer's big `title`
+(or a default such as "With love"), their smaller `message` (or null), and `signatures`/`fields` for a closing
+(the signatures, or the names). Each side is printed on its own and the two are joined, so the `<ThemeBorder>`
+you draw on the front also frames the landscape back, laid out for its shape. Without a `CardBack.tsx` the
+platform prints a simple landscape back (title, message, names or signatures, in the theme's colours). The
+customer sees both sides on their receipt and can turn the card over. See `themes/demo-wedding/v1/print/CardBack.tsx`.
 
 `print/Card.tsx` and `print/Keepsake.tsx` default-export **server components** (no hooks, no
 animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/theme-sdk`:

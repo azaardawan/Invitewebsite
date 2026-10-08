@@ -176,6 +176,13 @@
       "when": 1791472792000,
       "tag": "0024_second_signature",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791474230558,
+      "tag": "0025_card_back_and_og_pictures",
+      "breakpoints": true
     }
   ]
 }

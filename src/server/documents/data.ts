@@ -86,7 +86,9 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
       kind === 'card'
         ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
         : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
-    return { codeRef, kind: 'card' as const, props, back, page };
+    // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
+    const backPage: PageSpec = { ...page, width: page.height, height: page.width };
+    return { codeRef, kind: 'card' as const, props, back, page, backPage };
   }
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
   return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };

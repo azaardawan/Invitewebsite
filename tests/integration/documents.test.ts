@@ -110,7 +110,7 @@ describe('receipt previews', () => {
   it('stores a picture of the first page and redraws it only when something it shows changes', async () => {
     const inv = await order(true);
     const calls: string[] = [];
-    const render = async (kind: 'card' | 'keepsake') => {
+    const render = async (kind: string) => {
       calls.push(kind);
       return Buffer.from(`jpeg-${calls.length}`);
     };

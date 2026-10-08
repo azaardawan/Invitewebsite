@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: PageProps<'/i/[path]'>): Prom
     title,
     description: msgs.youreInvited,
     alternates: { canonical: url },
-    openGraph: { title, description: msgs.youreInvited, url, type: 'website', images: r.coverUrl ? [{ url: r.coverUrl }] : undefined },
-    twitter: { card: r.coverUrl ? 'summary_large_image' : 'summary', title },
+    // The invitation's own cover with the names (see ./og), so WhatsApp shows the real invitation.
+    openGraph: { title, description: msgs.youreInvited, url, type: 'website', images: [{ url: `${url}/og`, width: 1200, height: 630, alt: title }] },
+    twitter: { card: 'summary_large_image', title, images: [`${url}/og`] },
   };
 }
 

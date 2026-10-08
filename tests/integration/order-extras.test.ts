@@ -13,6 +13,9 @@ import { updateCardOptions } from '@/server/documents/documents';
 import { manifestSchema } from '@/theme-sdk/manifest';
 import { storeImage } from '@/server/media/assets';
 import { randomToken } from '@/lib/crypto';
+import { createOrder } from '@/server/orders/checkout';
+import { markOrderPaid } from '@/server/orders/payment';
+import { customerEditInvitation } from '@/server/invitation/customer-edit';
 import { activeTheme, BASIC_FIELDS, testManifest, weddingValues } from '../fixtures';
 import { ctx, uniqueKey } from '../helpers';
 
@@ -122,6 +125,25 @@ describe('order extras', () => {
     const l = await row(lone.invitationId);
     expect(l.signatureAssetId).not.toBeNull();
     expect(l.signature2AssetId).toBeNull();
+  });
+
+  it('after publishing, the customer can redraw or add signatures as one of their edits', async () => {
+    const d = await draft({ signature: await pngDataUrl(STROKE) });
+    const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'c@example.com' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, { ...ctx, ipHash: randomToken(8) });
+    await markOrderPaid(db(), o.orderId, { kind: 'WAYL' });
+    const inv = await row(d.invitationId);
+    await db().update(invitations).set({ featureKeys: [...inv.featureKeys, 'self_edit'] }).where(eq(invitations.id, inv.id));
+    const result = await customerEditInvitation(db(), {
+      receiptToken: o.receiptToken,
+      values: inv.fieldValues,
+      ipHash: null,
+      signature: 'keep',
+      signature2: await pngDataUrl(STROKE.replace('M20 150', 'M60 100')),
+    });
+    expect(result).toMatchObject({ ok: true, left: 2 });
+    const after = await row(inv.id);
+    expect(after.signatureAssetId).toBe(inv.signatureAssetId);
+    expect(after.signature2AssetId).not.toBeNull();
   });
 
   it('refuses a too-long back, ignores an empty signature pad, and rejects unknown colour sets', async () => {

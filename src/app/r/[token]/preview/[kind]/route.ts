@@ -8,12 +8,12 @@ import { DocumentError, ensurePreview } from '@/server/documents/documents';
 /** A stored picture is cheap, but a fresh one costs Chromium; cap it per visitor. */
 const PREVIEWS_PER_HOUR = 60;
 
-/** The first page of the card or the keepsake as a picture, for the receipt's side-by-side previews. */
+/** The card's front or back, or the keepsake cover, as a picture for the receipt's previews. */
 export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/preview/[kind]'>) {
   const { token, kind } = await params;
-  if (kind !== 'card' && kind !== 'keepsake') return new Response('Not found', { status: 404 });
+  if (kind !== 'card' && kind !== 'cardBack' && kind !== 'keepsake') return new Response('Not found', { status: 404 });
   const r = await getReceipt(db(), token);
-  const offered = kind === 'card' ? r?.invitation.hasPrintCard : r?.invitation.hasKeepsake;
+  const offered = kind === 'keepsake' ? r?.invitation.hasKeepsake : r?.invitation.hasPrintCard;
   if (!r || r.status !== 'PAID' || !offered) return new Response('Not found', { status: 404 });
   const ipHash = hashIp(clientIpFrom(await headers()));
   if (ipHash && !(await consumeRateLimit(db(), `preview:ip:${ipHash}`, PREVIEWS_PER_HOUR, 3600))) {

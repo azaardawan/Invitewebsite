@@ -489,3 +489,4 @@ Until approved, these show in Arabic to Kurdish visitors.
 | 26 | `store.signature.two` | توقيعان | Two signatures | دوو واژوو | دوو ئیمزا | ● |
 | 27 | `store.signature.first` | التوقيع الأول | First signature | واژووی یەکەم | ئیمزایا ئێکێ | ● |
 | 28 | `store.signature.second` | التوقيع الثاني | Second signature | واژووی دووەم | ئیمزایا دووێ | ● |
+| 29 | `receipt.flipCard` | اقلب البطاقة | Turn the card over | کارتەکە وەربگێڕە | کارتێ وەرگێڕە | ◐ |
