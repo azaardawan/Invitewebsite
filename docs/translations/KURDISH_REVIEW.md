@@ -491,9 +491,9 @@ Applied to `ckb.json` and `bdn.json`.
 | 28 | `store.signature.second` | التوقيع الثاني | Second signature | واژووی دووەم | ئیمزایا دووێ | ● |
 | 29 | `receipt.flipCard` | اقلب البطاقة | Turn the card over | کارتەکە وەربگێڕە | کارتێ وەرگێڕە | ◐ |
 
-## Batch 20 — top 3 designs on the homepage (PENDING)
+## Batch 20 — top 3 designs on the homepage — ✅ APPROVED (owner, 2026-10-08)
 
-Until approved, these show in Arabic to Kurdish visitors.
+Applied to `ckb.json` and `bdn.json`.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
