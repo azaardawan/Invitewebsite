@@ -12,14 +12,14 @@ type Name = { ckb: string; bdn: string; approved: boolean };
  */
 export const KURDISH_NAMES: Record<string, Name> = {
   // Batch 17 — design names
-  'علبة الخاتم الزيتونية': { ckb: 'سندوقی ئەڵقەی زەیتوونی', bdn: 'سندوقا ئەنگوستیلا زەیتوونی', approved: false },
-  'زاخو بالألوان المائية': { ckb: 'زاخۆ بە ڕەنگی ئاوی', bdn: 'زاخۆ ب ڕەنگێن ئاڤی', approved: false },
+  'علبة الخاتم الزيتونية': { ckb: 'سندوقی ئەڵقەی زەیتوونی', bdn: 'سندوقا ئەنگوستیلا زەیتوونی', approved: true },
+  'زاخو بالألوان المائية': { ckb: 'زاخۆ بە ڕەنگی ئاوی', bdn: 'زاخۆ ب ڕەنگێن ئاڤی', approved: true },
   // Batch 17 — package names
-  عادي: { ckb: 'ئاسایی', bdn: 'ئاسایی', approved: false },
-  مميز: { ckb: 'تایبەت', bdn: 'تایبەت', approved: false },
-  'مميز جداً': { ckb: 'زۆر تایبەت', bdn: 'گەلەک تایبەت', approved: false },
-  VIP: { ckb: 'VIP', bdn: 'VIP', approved: false },
-  VVIP: { ckb: 'VVIP', bdn: 'VVIP', approved: false },
+  عادي: { ckb: 'ئاسایی', bdn: 'ئاسایی', approved: true },
+  مميز: { ckb: 'تایبەت', bdn: 'تایبەت', approved: true },
+  'مميز جداً': { ckb: 'زۆر تایبەت', bdn: 'گەلەک تایبەت', approved: true },
+  VIP: { ckb: 'VIP', bdn: 'VIP', approved: true },
+  VVIP: { ckb: 'VVIP', bdn: 'VVIP', approved: true },
 };
 
 /** The name with any missing Kurdish filled from the approved list, or null when nothing changes. */

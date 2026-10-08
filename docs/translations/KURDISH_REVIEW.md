@@ -414,7 +414,7 @@ Same glossary as before (بانگهێشتنامە / داخوازنامە, پسو
 
 `receipt.guestbookSave` ("Save choice") was removed: the choice now saves the moment it is tapped.
 
-## Batch 17 — design and package names typed in Admin (PENDING)
+## Batch 17 — design and package names typed in Admin — ✅ APPROVED (owner, 2026-10-08)
 
 These names live in the database, not in the message files. Once approved, `pnpm db:seed` (every deploy)
 adds them wherever the name's Sorani or Badini is still empty; Kurdish typed in Admin is never replaced.
