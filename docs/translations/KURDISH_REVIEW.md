@@ -399,3 +399,19 @@ Same glossary as before (بانگهێشتنامە / داخوازنامە, پسو
 | 3 | `store.errors.invalidCoupon` | رمز الخصم هذا غير صالح أو انتهت صلاحيته أو استُخدم بالكامل. | This coupon code isn't valid, has expired or has been used up. | ئەم کۆدی داشکاندنە دروست نییە، یان ماوەی بەسەرچووە، یان بە تەواوی بەکارهاتووە. | ئەڤ کۆدێ داشکاندنێ نە دروستە، یان دەمێ وی ب دوماهی هاتیە، یان هەمی هاتیە بکارئینان. | ◐ |
 | 4 | `receipt.listPrice` | سعر الباقة | Package price | نرخی پاکێج | بهایێ پاکێجێ | ● |
 | 5 | `receipt.discount` | الخصم ({code}) | Discount ({code}) | داشکاندن ({code}) | داشکاندن ({code}) | ● |
+
+## Batch 16 — receipt previews, saving the guest-message choice, receipt link on WhatsApp (PENDING)
+
+Until approved, these show in Arabic to Kurdish customers.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `receipt.filesTitle` | بطاقتكم وذكرى التهاني | Your card and keepsake | کارتەکەتان و یادگاری پیرۆزباییەکان | کارتا هەوە و بیرهاتنا پیرۆزباهیان | ◐ |
+| 2 | `receipt.filesHelp` | اضغطوا على الصورة لفتح ملف PDF، أو حمّلوه للاحتفاظ به. | Tap a picture to open the PDF, or download it to keep. | کرتە لە وێنەکە بکەن بۆ کردنەوەی فایلی PDF، یان دایبگرن بۆ پاراستنی. | کلیک ل سەر وێنەی بکەن دا فایلا PDF ڤەبیت، یان داگرن دا بپارێزن. | ◐ |
+| 3 | `receipt.pdfFile` | ملف PDF | PDF file | فایلی PDF | فایلا PDF | ● |
+| 4 | `receipt.keepsakeGrowing` | يتحدّث الملف كلما كتب ضيوفكم، فحمّلوه مرة أخرى بعد المناسبة ليضمّ كل الرسائل. | It updates as your guests write, so download it again after the celebration to have every message. | فایلەکە هەر کاتێک میوانەکانتان بنووسن نوێ دەبێتەوە، بۆیە دوای بۆنەکە دووبارە دایبگرن بۆ ئەوەی هەموو نامەکانی تێدا بێت. | فایل هەر دەمێ مێڤانێن هەوە بنڤیسن نوو دبیت، لەوما پشتی بۆنێ دووبارە داگرن دا هەمی نامە تێدا بن. | ◐ |
+| 5 | `receipt.guestbookSaving` | جارٍ الحفظ… | Saving… | پاشەکەوت دەکرێت… | دهێتە پاراستن… | ● |
+| 6 | `receipt.guestbookError` | تعذّر حفظ اختياركم. حاولوا مرة أخرى. | Couldn't save your choice. Please try again. | هەڵبژاردنەکەتان پاشەکەوت نەکرا. تکایە دووبارە هەوڵ بدەنەوە. | هەلبژارتنا هەوە نەهاتە پاراستن. هیڤییە دووبارە هەول بدەن. | ◐ |
+| 7 | `receipt.receiptLinkLine` | الإيصال والبطاقة وملف الذكرى (في أي وقت): {url} | Your receipt, card and keepsake (any time): {url} | پسوولە و کارت و فایلی یادگاری (هەر کاتێک): {url} | پسوولە و کارت و فایلا بیرهاتنێ (هەر دەمەکێ): {url} | ◐ |
+
+`receipt.guestbookSave` ("Save choice") was removed: the choice now saves the moment it is tapped.

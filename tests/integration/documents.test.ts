@@ -7,7 +7,7 @@ import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
 import { updateInvitationValues } from '@/server/invitation/admin';
 import { submitGuestResponse } from '@/server/guests/responses';
-import { DocumentError, ensureDocument, printShopCard, removeCustomCard, updateCardOptions, uploadCustomCard } from '@/server/documents/documents';
+import { DocumentError, ensureDocument, ensurePreview, printShopCard, removeCustomCard, updateCardOptions, uploadCustomCard } from '@/server/documents/documents';
 import { customerDelivery, keepsakeReady } from '@/server/documents/delivery';
 import { receiptTokenHash } from '@/server/orders/tokens';
 import { orders } from '@/server/db/schema';
@@ -103,6 +103,32 @@ describe('printable card', () => {
     expect(r.calls).toHaveLength(2);
     const logs = await db().select().from(auditLogs).where(eq(auditLogs.objectId, inv.id));
     expect(logs.some((l) => l.action === 'document.generate')).toBe(true);
+  });
+});
+
+describe('receipt previews', () => {
+  it('stores a picture of the first page and redraws it only when something it shows changes', async () => {
+    const inv = await order(true);
+    const calls: string[] = [];
+    const render = async (kind: 'card' | 'keepsake') => {
+      calls.push(kind);
+      return Buffer.from(`jpeg-${calls.length}`);
+    };
+    expect((await ensurePreview(db(), inv.id, 'card', render))?.toString()).toBe('jpeg-1');
+    expect((await ensurePreview(db(), inv.id, 'card', render))?.toString()).toBe('jpeg-1');
+    expect(calls).toHaveLength(1);
+    const kinds = (await db().select().from(generatedDocuments).where(eq(generatedDocuments.invitationId, inv.id))).map((d) => d.kind);
+    expect(kinds).toContain('PRINT_CARD_PREVIEW');
+
+    await updateCardOptions(db(), inv.id, { message: 'أهلاً بكم' }, { adminId: shop.admin.id, ipHash: null });
+    expect((await ensurePreview(db(), inv.id, 'card', render))?.toString()).toBe('jpeg-2');
+    // Not in this package: no keepsake picture.
+    await expect(ensurePreview(db(), inv.id, 'keepsake', render)).rejects.toMatchObject({ code: 'notIncluded' });
+  });
+
+  it('is not offered before payment', async () => {
+    const inv = await order(false);
+    await expect(ensurePreview(db(), inv.id, 'card', async () => Buffer.from('x'))).rejects.toBeInstanceOf(DocumentError);
   });
 });
 

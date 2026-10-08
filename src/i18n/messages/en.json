@@ -927,7 +927,6 @@
     "guestbookHelp": "Choose who sees the congratulation messages your guests write. Either way, they are all collected in your keepsake PDF.",
     "guestbookPrivate": "Only me (in the keepsake PDF)",
     "guestbookPublic": "Everyone with the invitation link (shown under the invitation)",
-    "guestbookSave": "Save choice",
     "guestbookSaved": "Saved.",
     "accessCodeTitle": "Your invitation number",
     "accessCodeHelp": "Keep it. Type it on {site}/access (My invitation) any time to come back here: your invitation, card, keepsake and edits.",
@@ -941,7 +940,14 @@
     "editClosed": "Editing is closed because the invitation is no longer online.",
     "editBack": "Back to my receipt",
     "listPrice": "Package price",
-    "discount": "Discount ({code})"
+    "discount": "Discount ({code})",
+    "filesTitle": "Your card and keepsake",
+    "filesHelp": "Tap a picture to open the PDF, or download it to keep.",
+    "pdfFile": "PDF file",
+    "keepsakeGrowing": "It updates as your guests write, so download it again after the celebration to have every message.",
+    "guestbookSaving": "Saving…",
+    "guestbookError": "Couldn't save your choice. Please try again.",
+    "receiptLinkLine": "Your receipt, card and keepsake (any time): {url}"
   },
   "nav": {
     "home": "Home",

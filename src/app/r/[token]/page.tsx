@@ -6,6 +6,8 @@ import { formatIqdIn } from '@/lib/currency';
 import { formatLongDate } from '@/server/invitation/theme-props';
 import { ReceiptActions } from '@/components/receipt/ReceiptActions';
 import { ConfirmingPayment, PayButton } from '@/components/receipt/PaymentStatus';
+import { DocumentPreview } from '@/components/receipt/DocumentPreview';
+import { GuestbookChoice } from '@/components/receipt/GuestbookChoice';
 import { db } from '@/server/db/client';
 import { getReceipt } from '@/server/orders/receipt';
 import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/service';
@@ -68,6 +70,17 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
     ...(r.invitation.publishedAt ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
   ];
+
+  const base = `/r/${encodeURIComponent(token)}`;
+  // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
+  const files = paid
+    ? [
+        ...(r.invitation.hasPrintCard
+          ? [{ kind: 'card' as const, title: t('printCardTitle'), download: t('printCardDownload'), preview: !r.invitation.customCard }]
+          : []),
+        ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
+      ]
+    : [];
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">
@@ -143,7 +156,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         <ReceiptActions
           url={url}
           shareText={t('shareText', { url: url ?? '' })}
-          confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('accessCodeLine', { code: r.accessCode })}`}
+          confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
           labels={{
             copyLink: t('copyLink'),
             copied: t('copied'),
@@ -154,19 +167,6 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           }}
         />
       </section>
-
-      {paid && r.invitation.hasPrintCard ? (
-        <section className="mt-8 space-y-2 print:hidden">
-          <h2 className="font-semibold">{t('printCardTitle')}</h2>
-          <p className="text-sm text-muted">{t('printCardHelp')}</p>
-          <a
-            href={`/r/${encodeURIComponent(token)}/card`}
-            className="inline-flex h-12 items-center justify-center rounded-full border border-accent px-6 font-semibold text-accent"
-          >
-            {t('printCardDownload')}
-          </a>
-        </section>
-      ) : null}
 
       {paid && r.invitation.selfEdit.included ? (
         <section id="edit" className="mt-8 space-y-2 print:hidden">
@@ -196,43 +196,45 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         <section id="guestbook" className="mt-8 space-y-3 print:hidden">
           <h2 className="font-semibold">{t('guestbookTitle')}</h2>
           <p className="text-sm text-muted">{t('guestbookHelp')}</p>
-          <form action={guestbookAction} className="flex flex-col gap-3">
-            <input type="hidden" name="token" value={token} />
-            <fieldset className="flex flex-col gap-2 text-sm">
-              <legend className="sr-only">{t('guestbookTitle')}</legend>
-              <label className="flex items-start gap-3">
-                <input type="radio" name="visibility" value="private" defaultChecked={!r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
-                <span>{t('guestbookPrivate')}</span>
-              </label>
-              <label className="flex items-start gap-3">
-                <input type="radio" name="visibility" value="public" defaultChecked={r.invitation.publicGuestbook} className="mt-1 size-5 accent-[#6e1f33]" />
-                <span>{t('guestbookPublic')}</span>
-              </label>
-            </fieldset>
-            <div className="flex items-center gap-3">
-              <button type="submit" className="inline-flex h-11 items-center justify-center rounded-full border border-accent px-6 text-sm font-semibold text-accent">
-                {t('guestbookSave')}
-              </button>
-              {sp.guestbook === 'saved' ? (
-                <span role="status" className="text-sm text-muted">
-                  {t('guestbookSaved')}
-                </span>
-              ) : null}
-            </div>
-          </form>
+          <GuestbookChoice
+            initialPublic={r.invitation.publicGuestbook}
+            save={guestbookAction.bind(null, token)}
+            labels={{
+              title: t('guestbookTitle'),
+              private: t('guestbookPrivate'),
+              public: t('guestbookPublic'),
+              saving: t('guestbookSaving'),
+              saved: t('guestbookSaved'),
+              error: t('guestbookError'),
+            }}
+          />
         </section>
       ) : null}
 
-      {paid && r.invitation.keepsakeReady ? (
-        <section className="mt-8 space-y-2 print:hidden">
-          <h2 className="font-semibold">{t('keepsakeTitle')}</h2>
-          <p className="text-sm text-muted">{t('keepsakeHelp')}</p>
-          <a
-            href={`/r/${encodeURIComponent(token)}/keepsake`}
-            className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-6 font-semibold text-accent-ink"
-          >
-            {t('keepsakeDownload')}
-          </a>
+      {files.length ? (
+        <section id="files" className="mt-8 space-y-3 print:hidden" aria-labelledby="files-title">
+          <h2 id="files-title" className="font-semibold">
+            {t('filesTitle')}
+          </h2>
+          <p className="text-sm text-muted">{t('filesHelp')}</p>
+          <div className={`grid gap-4 ${files.length > 1 ? 'grid-cols-2' : 'mx-auto max-w-[220px] grid-cols-1'}`}>
+            {files.map((f) => (
+              <DocumentPreview
+                key={f.kind}
+                title={f.title}
+                imageSrc={f.preview ? `${base}/preview/${f.kind}` : null}
+                openHref={`${base}/${f.kind}?inline=1`}
+                downloadHref={`${base}/${f.kind}`}
+                labels={{ download: f.download, pdf: t('pdfFile') }}
+              />
+            ))}
+          </div>
+          {r.invitation.hasPrintCard ? <p className="text-xs text-muted">{t('printCardHelp')}</p> : null}
+          {r.invitation.hasKeepsake ? (
+            <p className="text-xs text-muted">
+              {t('keepsakeHelp')} {r.invitation.keepsakeReady ? null : t('keepsakeGrowing')}
+            </p>
+          ) : null}
         </section>
       ) : null}
 

@@ -9,13 +9,14 @@ import { auditActor, type Actor } from '@/server/catalog/common';
 import { storage } from '@/server/storage';
 import { sha256 } from '@/lib/crypto';
 import { printData } from './data';
-import { renderPdf, type PdfRenderer } from './render';
+import { renderPdf, renderPreview, type PdfRenderer, type PreviewRenderer } from './render';
 import type { DocumentKind } from './tokens';
 
 /** Bump when the print pipeline changes in a way that should regenerate every stored PDF. */
 const PIPELINE_VERSION = 2;
 
 const KIND = { card: 'PRINT_CARD', keepsake: 'KEEPSAKE_PDF' } as const;
+const PREVIEW_KIND = { card: 'PRINT_CARD_PREVIEW', keepsake: 'KEEPSAKE_PREVIEW' } as const;
 const FEATURE = { card: 'print_card', keepsake: 'keepsake_pdf' } as const;
 
 export class DocumentError extends Error {
@@ -97,6 +98,40 @@ export async function ensureDocument(
   }
   if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
   return { pdf, fileName };
+}
+
+/**
+ * A JPEG of the document's first page for the receipt (the card, or the keepsake cover). Stored and reused
+ * like the PDF while nothing it shows has changed. Null when the team uploaded its own card (no automatic
+ * page to picture): the receipt then shows a plain PDF tile.
+ */
+export async function ensurePreview(db: DbOrTx, invitationId: string, kind: DocumentKind, render: PreviewRenderer = renderPreview): Promise<Buffer | null> {
+  const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
+  if (!inv) throw new DocumentError('notFound');
+  if (!inv.featureKeys.includes(FEATURE[kind])) throw new DocumentError('notIncluded');
+  if (!documentAvailable(inv, kind)) throw new DocumentError('notPaid');
+  if (kind === 'card' && inv.cardCustomKey) return null;
+
+  const data = await printData(db, inv, kind);
+  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: true, codeRef: data.codeRef, props: data.props }));
+  const [existing] = await db
+    .select()
+    .from(generatedDocuments)
+    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, PREVIEW_KIND[kind])));
+  if (existing && existing.sourceHash === sourceHash) {
+    const stored = await storage().get(existing.storageKey);
+    if (stored) return stored;
+  }
+  const image = await render(kind, inv.id);
+  const storageKey = `documents/${randomUUID()}.jpg`;
+  await storage().put(storageKey, image, 'image/jpeg');
+  const values = { invitationId: inv.id, kind: PREVIEW_KIND[kind], storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: image.length, generatedBy: null, generatedAt: new Date() };
+  await db
+    .insert(generatedDocuments)
+    .values(values)
+    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind], set: values });
+  if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
+  return image;
 }
 
 /**

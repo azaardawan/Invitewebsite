@@ -10,7 +10,7 @@ import { trackEvent } from '@/server/analytics/events';
 const DOWNLOADS_PER_HOUR = 20;
 
 /** The customer's printable card, reachable only through their private receipt token, after payment. */
-export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/card'>) {
+export async function GET(req: Request, { params }: RouteContext<'/r/[token]/card'>) {
   const { token } = await params;
   const r = await getReceipt(db(), token);
   if (!r || r.status !== 'PAID' || !r.invitation.hasPrintCard) return new Response('Not found', { status: 404 });
@@ -24,7 +24,8 @@ export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/ca
     return new Response(new Uint8Array(pdf), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        // ?inline=1 opens it in the browser's PDF viewer (the receipt previews); otherwise it downloads.
+        'Content-Disposition': `${new URL(req.url).searchParams.get('inline') === '1' ? 'inline' : 'attachment'}; filename="${fileName}"`,
         'Cache-Control': 'private, no-store',
         'X-Robots-Tag': 'noindex',
       },
