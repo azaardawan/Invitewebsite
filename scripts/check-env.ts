@@ -6,8 +6,14 @@
 import { env } from '../src/server/env';
 
 try {
-  env();
+  const e = env();
   console.log('[check-env] Settings OK.');
+  // Optional extras that are typed but unusable are switched off rather than stopping the site; say so.
+  if ((process.env.OWNER_WHATSAPP_PHONE || process.env.CALLMEBOT_API_KEY) && !(e.OWNER_WHATSAPP_PHONE && e.CALLMEBOT_API_KEY)) {
+    console.warn(
+      '[check-env] WhatsApp notices to the owner are OFF: set both OWNER_WHATSAPP_PHONE (with country code, e.g. +9647701234567) and CALLMEBOT_API_KEY.',
+    );
+  }
 } catch (e) {
   console.error('\n================ Bahja cannot start yet ================');
   console.error((e as Error).message);

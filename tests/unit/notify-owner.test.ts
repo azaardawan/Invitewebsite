@@ -33,3 +33,32 @@ describe('owner WhatsApp notice', () => {
     expect(await fresh.notifyOwner('x', broken as never)).toBe(false);
   });
 });
+
+describe('owner WhatsApp settings', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('accept the number as people type it, and never stop the site when unusable', async () => {
+    for (const [typed, stored] of [
+      ['+964 770 123 4567', '9647701234567'],
+      ['00964-770-123-4567', '9647701234567'],
+      ['0770 123 4567', '9647701234567'],
+      ['(964) 7701234567', '9647701234567'],
+    ] as const) {
+      vi.resetModules();
+      vi.stubEnv('OWNER_WHATSAPP_PHONE', typed);
+      vi.stubEnv('CALLMEBOT_API_KEY', 'key123');
+      const { env } = await import('@/server/env');
+      expect(env().OWNER_WHATSAPP_PHONE).toBe(stored);
+    }
+    vi.resetModules();
+    vi.stubEnv('OWNER_WHATSAPP_PHONE', 'my phone');
+    vi.stubEnv('CALLMEBOT_API_KEY', '');
+    const { env } = await import('@/server/env');
+    expect(env().OWNER_WHATSAPP_PHONE).toBeUndefined();
+    const { notifyOwner } = await import('@/server/notify/owner');
+    expect(await notifyOwner('x', vi.fn() as never)).toBe(false);
+  });
+});
