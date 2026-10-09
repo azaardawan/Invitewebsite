@@ -53,9 +53,6 @@ export function MobileMenu({ links, labels }: { links: { href: string; label: st
           <div className="mt-8">
             <CurrencySwitcher />
           </div>
-          <span aria-hidden className="font-display mt-auto self-center text-5xl text-accent">
-            ب
-          </span>
         </div>
       ) : null}
     </>
