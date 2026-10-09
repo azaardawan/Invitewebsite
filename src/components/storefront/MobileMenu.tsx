@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { CurrencySwitcher } from './currency';
 
 /** Full-screen menu for phones. Closes on Escape and after choosing a link. */
-export function MobileMenu({ links, labels }: { links: { href: string; label: string }[]; labels: { menu: string; close: string } }) {
+export function MobileMenu({ links, labels }: { links: { href: string; label: string }[]; labels: { menu: string; close: string; brand: string } }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!open) return;
@@ -53,9 +53,10 @@ export function MobileMenu({ links, labels }: { links: { href: string; label: st
           <div className="mt-8">
             <CurrencySwitcher />
           </div>
-          <span aria-hidden className="font-display mt-auto self-center text-5xl text-accent">
-            ب
-          </span>
+          {/* The brand name, as in the header. */}
+          <Link href="/" onClick={() => setOpen(false)} className="font-display mt-auto self-center pb-4 text-[44px] leading-none font-bold text-accent">
+            {labels.brand}
+          </Link>
         </div>
       ) : null}
     </>

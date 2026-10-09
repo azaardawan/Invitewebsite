@@ -10,10 +10,14 @@ test('the owner picks a top 3; the homepage shows them with the best seller firs
       env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL, THEME_KEY: theme },
     });
   }
+  execFileSync('pnpm', ['exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-extras-theme.ts'], {
+    env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL },
+  });
   await signInAsNewOwner(page);
   await page.goto('/admin/themes');
   await page.getByLabel('الأول: الأكثر مبيعاً').selectOption({ label: '#2 زاخو بالألوان المائية' });
   await page.getByLabel('الثاني: اختيار مميز').selectOption({ label: '#1 علبة الخاتم الزيتونية' });
+  await page.getByLabel('الثالث: اختيار مميز').selectOption({ index: 1 });
   await page.getByRole('button', { name: 'حفظ أفضل 3' }).click();
   await expect(page.getByText('الأكثر مبيعاً', { exact: true }).first()).toBeVisible();
 
@@ -26,6 +30,10 @@ test('the owner picks a top 3; the homepage shows them with the best seller firs
   await top.scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
   await top.screenshot({ path: testInfo.outputPath('top-desktop.png') });
+  // A side design lifts and brightens under the mouse.
+  await top.locator('[data-top-pick="2"] a').first().hover();
+  await page.waitForTimeout(700);
+  await top.screenshot({ path: testInfo.outputPath('top-hover.png') });
   await page.setViewportSize({ width: 390, height: 844 });
   await top.scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
@@ -40,6 +48,7 @@ test('the owner picks a top 3; the homepage shows them with the best seller firs
   await page.goto('/admin/themes');
   await page.getByLabel('الأول: الأكثر مبيعاً').selectOption('');
   await page.getByLabel('الثاني: اختيار مميز').selectOption('');
+  await page.getByLabel('الثالث: اختيار مميز').selectOption('');
   await page.getByRole('button', { name: 'حفظ أفضل 3' }).click();
   await expect(page.getByLabel('الأول: الأكثر مبيعاً')).toHaveValue('');
   await page.goto('/');
