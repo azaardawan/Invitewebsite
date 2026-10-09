@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
-import { THEME_TRANSITIONS, getThemeDetail, type ThemeStatus } from '@/server/catalog/themes';
+import { THEME_TRANSITIONS, getThemeDetail, themeExtraSectionIds, type ThemeStatus } from '@/server/catalog/themes';
 import { listSections } from '@/server/catalog/sections';
 import { listMusic } from '@/server/catalog/music';
 import { CatalogError, localized } from '@/server/catalog/common';
@@ -100,6 +100,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const canManage = can(authz, 'themes.manage');
   const manifest = d.currentManifest;
   const border = await themeBorder(db(), d.theme.id);
+  const extraSections = await themeExtraSectionIds(db(), d.theme.id);
   const colorSlots = manifest?.colors?.slots ?? [];
   const themeSubs = d.theme.sectionId ? await listSubsections(db(), d.theme.sectionId) : [];
   const palettes = colorSlots.length ? await listPalettes(db(), d.theme.id) : [];
@@ -224,6 +225,19 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <span className="mt-1 block text-xs text-muted">{t('subsections.themeHint')}</span>
               </label>
             ) : null}
+            <fieldset className="space-y-1.5">
+              <legend className="text-sm font-medium">{t('themes.alsoIn')}</legend>
+              <p className="text-xs text-muted">{t('themes.alsoInHint')}</p>
+              <input type="hidden" name="extraSectionsShown" value="1" />
+              {sections
+                .filter(({ section }) => section.id !== d.theme.sectionId && section.status === 'ACTIVE')
+                .map(({ section }) => (
+                  <label key={section.id} className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="extraSectionIds" value={section.id} defaultChecked={extraSections.includes(section.id)} />
+                    {localized(section.name, locale)}
+                  </label>
+                ))}
+            </fieldset>
             <ImageUpload name="coverAssetId" label={t('themes.cover')} initial={d.cover ? { id: d.cover.id, url: publicMediaUrl(d.cover.storageKey) } : null} />
             <label className="block">
               <span className="mb-1 block text-sm font-medium">{t('themes.musicSelect')}</span>

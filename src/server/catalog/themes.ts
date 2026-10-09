@@ -10,12 +10,14 @@ import {
   packageFields,
   packages,
   sectionDefaultFields,
+  themeExtraSections,
   sections,
   themeFields,
   themeVersions,
   themes,
   subsections,
 } from '@/server/db/schema';
+import type { I18nContent } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { env } from '@/server/env';
 import { sha256 } from '@/lib/crypto';
@@ -163,6 +165,7 @@ export async function listThemes(
       versionRef: themeVersions.codeRef,
       musicTitle: musicTracks.title,
       coverKey: assets.storageKey,
+      extraSectionNames: sql<I18nContent[]>`(select coalesce(json_agg(s."name_i18n" order by s."sort_order"), '[]'::json) from "theme_extra_sections" x join "sections" s on s."id" = x."section_id" where x."theme_id" = "themes"."id")`,
       activePackages: sql<number>`(select count(*)::int from ${packages} where ${packages.themeId} = ${themes.id} and ${packages.status} = 'ACTIVE')`,
       minPrice: sql<number | null>`(select min(${packages.priceIqd})::bigint from ${packages} where ${packages.themeId} = ${themes.id} and ${packages.status} = 'ACTIVE')`,
     })
@@ -282,6 +285,8 @@ export const themeSettingsInput = z.object({
   subsectionId: z.uuid().nullish(),
   coverAssetId: z.uuid().nullish(),
   musicTrackId: z.uuid().nullish(),
+  /** Other occasions the design is also sold in; omitted keeps the current ones. */
+  extraSectionIds: z.array(z.uuid()).max(20).optional(),
 });
 
 export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.input<typeof themeSettingsInput>, actor: Actor) {
@@ -321,14 +326,28 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
       musicTrackId: data.musicTrackId ?? null,
     };
     await tx.update(themes).set(next).where(eq(themes.id, themeId));
+    // Extra occasions: never the main one; kept as they are when the form doesn't send them.
+    const extraBefore = (await tx.select({ id: themeExtraSections.sectionId }).from(themeExtraSections).where(eq(themeExtraSections.themeId, themeId))).map((r) => r.id).sort();
+    let extraAfter = extraBefore.filter((id) => id !== sectionId);
+    if (data.extraSectionIds !== undefined) {
+      extraAfter = [...new Set(data.extraSectionIds)].filter((id) => id !== sectionId).sort();
+      if (extraAfter.length) {
+        const found = await tx.select({ id: sections.id }).from(sections).where(inArray(sections.id, extraAfter));
+        if (found.length !== extraAfter.length) throw new CatalogError('notFound');
+      }
+    }
+    if (extraAfter.join() !== extraBefore.join()) {
+      await tx.delete(themeExtraSections).where(eq(themeExtraSections.themeId, themeId));
+      if (extraAfter.length) await tx.insert(themeExtraSections).values(extraAfter.map((id) => ({ themeId, sectionId: id })));
+    }
     await assertStillReady(tx, themeId);
     await recordAudit(tx, {
       ...auditActor(actor),
       action: 'theme.settings_updated',
       objectType: 'theme',
       objectId: themeId,
-      before: { name: before.name, description: before.description, sectionId: before.sectionId, subsectionId: before.subsectionId, coverAssetId: before.coverAssetId, musicTrackId: before.musicTrackId },
-      after: next,
+      before: { name: before.name, description: before.description, sectionId: before.sectionId, subsectionId: before.subsectionId, coverAssetId: before.coverAssetId, musicTrackId: before.musicTrackId, extraSectionIds: extraBefore },
+      after: { ...next, extraSectionIds: extraAfter },
     });
   });
 }
@@ -449,4 +468,9 @@ export async function getThemeDetail(db: DbOrTx, themeId: string) {
     packages: await packagesWithShape(db, themeId),
     readiness: await themeReadiness(db, themeId),
   };
+}
+
+/** The other occasions a design is also sold in (ids), besides its main one. */
+export async function themeExtraSectionIds(db: DbOrTx, themeId: string) {
+  return (await db.select({ id: themeExtraSections.sectionId }).from(themeExtraSections).where(eq(themeExtraSections.themeId, themeId))).map((r) => r.id);
 }

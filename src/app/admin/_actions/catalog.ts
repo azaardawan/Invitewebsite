@@ -246,6 +246,8 @@ export async function themeSettingsAction(_: ActionState, form: FormData): Promi
           subsectionId: form.has('subsectionId') ? (readString(form, 'subsectionId') ?? null) : undefined,
           coverAssetId: readString(form, 'coverAssetId') ?? null,
           musicTrackId: readString(form, 'musicTrackId') ?? null,
+          // The form marks that it carries the tick boxes, so unticking all of them clears the list.
+          extraSectionIds: form.has('extraSectionsShown') ? form.getAll('extraSectionIds').filter((v): v is string => typeof v === 'string') : undefined,
         },
         actor,
       ),

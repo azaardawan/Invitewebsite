@@ -501,3 +501,13 @@ Applied to `ckb.json` and `bdn.json`.
 | 2 | `home.topSubtitle` | التصاميم التي يحبها زبائننا أكثر. | The designs our customers love most. | ئەو دیزاینانەی کڕیارەکانمان زیاتر حەزیان لێیە. | ئەو دیزاینێن کڕیارێن مە پتر حەز ژێ دکەن. | ◐ |
 | 3 | `home.bestSeller` | الأكثر مبيعاً | Best seller | پڕفرۆشترین | پڕفرۆشترین | ◐ |
 | 4 | `home.topPick` | اختيار مميز | Top pick | هەڵبژاردەی تایبەت | هەلبژارتنا تایبەت | ◐ |
+
+## Batch 21 — choosing the occasion for a design sold in several (PENDING)
+
+Shown on the order form only for a design that is in more than one occasion (e.g. wedding and engagement).
+Until approved, these show in Arabic to Kurdish visitors.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.occasionQuestion` | لأي مناسبة هذه الدعوة؟ | Which occasion is this invitation for? | ئەم بانگهێشتنامەیە بۆ چ بۆنەیەکە؟ | ئەڤ داخوازنامە بۆ چ بۆنەیێ یە؟ | ◐ |
+| 2 | `store.occasionRequired` | يرجى اختيار المناسبة. | Please choose the occasion. | تکایە بۆنەکە هەڵبژێرە. | هیڤییە بۆنێ هەلبژێرە. | ◐ |

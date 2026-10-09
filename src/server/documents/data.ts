@@ -10,7 +10,7 @@ import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
-import { signatureUrls } from '@/server/invitation/load';
+import { occasionKey, signatureUrls } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
 import type { CardOptions } from '@/server/db/schema';
 import type { ThemeProps } from '@/theme-sdk/types';
@@ -55,6 +55,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     signatureSrcs: await signatureUrls(db, inv),
     colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
     colors: inv.colors,
+    occasion: await occasionKey(db, inv.sectionId),
   });
 
   if (kind === 'card' || kind === 'cardBleed') {

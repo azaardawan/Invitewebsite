@@ -11,14 +11,24 @@ import { newPreviewToken, previewTokenHash } from './tokens';
 import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
 import { extrasUpdate, type OrderExtras } from './extras';
+import { occasionSectionId, themeOccasions } from '@/server/catalog/occasions';
 
-export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown>; extras?: OrderExtras };
+/** `occasion`: which occasion (section key) the invitation is for, for a design sold in several. */
+export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown>; extras?: OrderExtras; occasion?: string };
 
 /** Step 1 of buying: the customer's details become a private draft with a preview link. */
 export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestContext, now = new Date()) {
   if (ctx.ipHash && !(await consumeRateLimit(db, `draft:${ctx.ipHash}`, 30, 3600, now))) throw new OrderError('rateLimited');
   const p = await loadPurchasable(db, input.themeKey, input.packageId);
   const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now);
+  // A design sold in several occasions needs to know which one this is; one occasion needs nothing.
+  const occasions = await themeOccasions(db, p.theme.id, p.theme.sectionId);
+  let sectionId = p.theme.sectionId;
+  if (occasions.length > 1) {
+    const chosen = input.occasion && occasions.includes(input.occasion) ? await occasionSectionId(db, p.theme.id, p.theme.sectionId, input.occasion) : null;
+    if (!chosen) throw new OrderError('invalidFields', { ...(result.ok ? {} : result.errors), occasion: 'required' });
+    sectionId = chosen;
+  }
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
   // Card back, signature and colour set (only what the package includes).
   const extra = await extrasUpdate(db, { themeId: p.theme.id, featureKeys: p.pkg.featureKeys, cardOptions: {}, signatureAssetId: null, signature2AssetId: null, colors: null }, input.extras ?? {});
@@ -33,7 +43,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
         themeId: p.theme.id,
         themeVersionId: p.version.id,
         packageId: p.pkg.id,
-        sectionId: p.theme.sectionId,
+        sectionId,
         locale: input.locale,
         fieldValues: result.values,
         fieldKeys: p.pkg.fieldKeys,

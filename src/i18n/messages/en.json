@@ -450,7 +450,9 @@
         "topNone": "— None —",
         "topSave": "Save the top 3",
         "topBadge1": "Best seller",
-        "topBadge": "Top {n}"
+        "topBadge": "Top {n}",
+        "alsoIn": "Also sold in",
+        "alsoInHint": "Tick other occasions to show this design there too. It appears once in combined lists (\"Wedding · Engagement\"), and the customer's invitation records which occasion it is for (the design picks its wording from it)."
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -735,7 +737,8 @@
       "attendanceMakePublic": "Show the reply count on the invitation",
       "attendanceMakePrivate": "Make the reply count private",
       "cardBackTitle": "Back of the card: big title (the customer's; empty = default)",
-      "cardBackMessage": "Back of the card: message"
+      "cardBackMessage": "Back of the card: message",
+      "occasion": "Occasion"
     },
     "legal": {
       "heading": "Legal policies",
@@ -1222,7 +1225,9 @@
       "original": "Original colours"
     },
     "moreDesigns": "More designs",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "occasionQuestion": "Which occasion is this invitation for?",
+    "occasionRequired": "Please choose the occasion."
   },
   "contact": {
     "title": "Contact us",

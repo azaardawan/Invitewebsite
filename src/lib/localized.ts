@@ -4,3 +4,8 @@ export function localized(content: { ar: string; en: string; ckb?: string | null
   const value = (content as Record<string, string | null | undefined>)[locale];
   return value || content.ar;
 }
+
+/** "Wedding · Engagement" for a design sold in several occasions; its one occasion otherwise. */
+export function occasionsLabel(occasions: readonly { name: Parameters<typeof localized>[0] }[], locale: Parameters<typeof localized>[1]) {
+  return occasions.map((o) => localized(o.name, locale)).join(' · ');
+}

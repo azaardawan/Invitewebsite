@@ -114,6 +114,12 @@ export type ThemeProps = {
   colors: Record<string, string>;
   /** The owner's replacement border from Admin, or null to use the theme's own. Render it with `<ThemeBorder>`. */
   border: ThemeBorderSpec | null;
+  /**
+   * Which occasion this invitation is for, as the section key (e.g. `wedding`, `engagement`). A design sold
+   * in several occasions (manifest `sections`) uses it to pick its wording ("حفل الخطوبة" or "حفل الزفاف");
+   * a design for one occasion can ignore it. Null only when unknown.
+   */
+  occasion: string | null;
 };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;

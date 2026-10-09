@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { localized } from '@/lib/localized';
+import { localized, occasionsLabel } from '@/lib/localized';
 import { storefrontSections, storefrontThemes, storefrontTopPicks } from '@/server/storefront/catalog';
 import { TopPicks } from '@/components/storefront/home/TopPicks';
 import { Hero } from '@/components/storefront/home/Hero';
@@ -21,7 +21,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
         picks={top.map((th) => ({
           key: th.key,
           name: localized(th.name, locale),
-          section: localized(th.sectionName, locale),
+          section: occasionsLabel(th.occasions, locale),
           coverUrl: th.coverUrl,
           minPriceIqd: th.minPriceIqd,
           rank: th.rank!,
@@ -35,7 +35,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
               themes={themes.map((th) => ({
                 key: th.key,
                 name: localized(th.name, locale),
-                section: localized(th.sectionName, locale),
+                section: occasionsLabel(th.occasions, locale),
                 coverUrl: th.coverUrl,
                 minPriceIqd: th.minPriceIqd,
                 rank: th.rank,

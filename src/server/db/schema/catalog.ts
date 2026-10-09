@@ -186,6 +186,24 @@ export const themes = pgTable(
   (t) => [index('themes_section_order_idx').on(t.sectionId, t.status, t.sortOrder)],
 );
 
+/**
+ * Other occasions a design is also sold in (besides its main one, `themes.section_id`), e.g. a design for both
+ * weddings and engagements. It shows on each occasion's page and once in combined lists; the customer's
+ * invitation records which occasion it is for.
+ */
+export const themeExtraSections = pgTable(
+  'theme_extra_sections',
+  {
+    themeId: uuid('theme_id')
+      .notNull()
+      .references(() => themes.id, { onDelete: 'cascade' }),
+    sectionId: uuid('section_id')
+      .notNull()
+      .references(() => sections.id, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.themeId, t.sectionId] }), index('theme_extra_sections_section_idx').on(t.sectionId)],
+);
+
 export const themeVersions = pgTable(
   'theme_versions',
   {

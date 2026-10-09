@@ -1,8 +1,8 @@
 import 'server-only';
 import { connection } from 'next/server';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, or, sql } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, subsections, themeFields, themeVersions, themes, type I18nContent } from '@/server/db/schema';
+import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, subsections, themeExtraSections, themeFields, themeVersions, themes, type I18nContent } from '@/server/db/schema';
 import { packagesWithShape } from '@/server/catalog/themes';
 import { publicMediaUrl } from '@/server/storage';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -20,7 +20,8 @@ export async function storefrontSections() {
     .select({
       section: sections,
       imageKey: assets.storageKey,
-      themeCount: sql<number>`(select count(*)::int from ${themes} where ${themes.sectionId} = ${sections.id} and ${themes.status} = 'ACTIVE')`,
+      // Designs whose main occasion this is, plus designs also sold in it.
+      themeCount: sql<number>`(select count(*)::int from ${themes} where ${themes.status} = 'ACTIVE' and (${themes.sectionId} = ${sections.id} or exists (select 1 from "theme_extra_sections" x where x."theme_id" = "themes"."id" and x."section_id" = ${sections.id})))`,
     })
     .from(sections)
     .leftJoin(assets, eq(assets.id, sections.imageAssetId))
@@ -81,6 +82,8 @@ export async function storefrontThemes(opts: { sectionKey?: string; subsectionKe
       sub: subsections,
       coverKey: assets.storageKey,
       minPrice: sql<number | null>`(select min(${packages.priceIqd})::bigint from ${packages} where ${packages.themeId} = ${themes.id} and ${packages.status} = 'ACTIVE')`,
+      // Other occasions the design is also sold in (shown on the website only), in the owner's order.
+      alsoIn: sql<{ key: string; name: I18nContent }[]>`(select coalesce(json_agg(json_build_object('key', s."key", 'name', s."name_i18n") order by s."sort_order"), '[]'::json) from "theme_extra_sections" x join "sections" s on s."id" = x."section_id" where x."theme_id" = "themes"."id" and s."status" = 'ACTIVE')`,
     })
     .from(themes)
     .innerJoin(sections, eq(sections.id, themes.sectionId))
@@ -91,24 +94,37 @@ export async function storefrontThemes(opts: { sectionKey?: string; subsectionKe
       and(
         eq(themes.status, 'ACTIVE'),
         eq(sections.status, 'ACTIVE'),
-        opts.sectionKey ? eq(sections.key, opts.sectionKey) : undefined,
+        opts.sectionKey
+          ? or(
+              eq(sections.key, opts.sectionKey),
+              sql`exists (select 1 from "theme_extra_sections" x join "sections" s on s."id" = x."section_id" where x."theme_id" = "themes"."id" and s."key" = ${opts.sectionKey} and s."status" = 'ACTIVE')`,
+            )
+          : undefined,
         opts.subsectionKey ? eq(subsections.key, opts.subsectionKey) : undefined,
         opts.onlyFeatured ? inArray(themes.id, [...ranks.keys()]) : undefined,
       ),
     )
     .orderBy(asc(sections.sortOrder), asc(themes.sortOrder), asc(themes.createdAt))
     .limit(opts.limit ?? 100);
-  return rows.map((r) => ({
-    key: r.theme.key,
-    name: r.theme.name,
-    description: r.theme.description,
-    sectionKey: r.section.key,
-    sectionName: r.section.name,
-    subsection: r.sub ? { key: r.sub.key, name: r.sub.name } : null,
-    coverUrl: r.coverKey ? publicMediaUrl(r.coverKey) : null,
-    minPriceIqd: r.minPrice === null ? null : Number(r.minPrice),
-    rank: ranks.get(r.theme.id) ?? null,
-  }));
+  return rows.map((r) => {
+    // Every occasion the design is sold in, its main one first ("Wedding · Engagement" in combined lists).
+    const occasions = [{ key: r.section.key, name: r.section.name }, ...r.alsoIn];
+    // On an occasion's own page, a design listed there through "also sold in" shows that occasion.
+    const shown = (opts.sectionKey && occasions.find((o) => o.key === opts.sectionKey)) || occasions[0]!;
+    return {
+      key: r.theme.key,
+      name: r.theme.name,
+      description: r.theme.description,
+      sectionKey: shown.key,
+      sectionName: shown.name,
+      occasions,
+      // Its subsection belongs to the main occasion only.
+      subsection: r.sub && shown.key === r.section.key ? { key: r.sub.key, name: r.sub.name } : null,
+      coverUrl: r.coverKey ? publicMediaUrl(r.coverKey) : null,
+      minPriceIqd: r.minPrice === null ? null : Number(r.minPrice),
+      rank: ranks.get(r.theme.id) ?? null,
+    };
+  });
 }
 
 export type StorefrontThemeDetail = NonNullable<Awaited<ReturnType<typeof storefrontTheme>>>;
@@ -133,6 +149,8 @@ export async function storefrontTheme(key: string) {
     name: row.theme.name,
     description: row.theme.description,
     section: { key: row.section.key, name: row.section.name },
+    /** Every occasion it is sold in, the main one first (one entry for most designs). */
+    occasions: [{ key: row.section.key, name: row.section.name }, ...(await alsoSoldIn(row.theme.id))],
     coverUrl: row.coverKey ? publicMediaUrl(row.coverKey) : null,
     rank: (await featuredRanks()).get(row.theme.id) ?? null,
     codeRef: row.version.codeRef,
@@ -150,6 +168,16 @@ export async function storefrontTheme(key: string) {
     })),
     fields,
   };
+}
+
+/** The other occasions (shown on the website) a design is also sold in, in the owner's order. */
+async function alsoSoldIn(themeId: string) {
+  return db()
+    .select({ key: sections.key, name: sections.name })
+    .from(themeExtraSections)
+    .innerJoin(sections, eq(sections.id, themeExtraSections.sectionId))
+    .where(and(eq(themeExtraSections.themeId, themeId), eq(sections.status, 'ACTIVE')))
+    .orderBy(asc(sections.sortOrder));
 }
 
 export type OrderField = Awaited<ReturnType<typeof orderFields>>[number];

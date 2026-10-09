@@ -25,11 +25,14 @@ export async function generateMetadata({ params }: PageProps<'/[locale]/themes/[
   };
 }
 
-export default async function ThemePage({ params }: PageProps<'/[locale]/themes/[key]'>) {
+export default async function ThemePage({ params, searchParams }: PageProps<'/[locale]/themes/[key]'>) {
   const { locale, key } = (await params) as { locale: Locale; key: string };
   setRequestLocale(locale);
   const th = await storefrontTheme(key);
   if (!th) notFound();
+  // A design sold in several occasions keeps the one the customer came from (wording, order).
+  const { occasion: occasionParam } = await searchParams;
+  const occasion = th.occasions.length > 1 ? th.occasions.find((o) => o.key === occasionParam) : undefined;
   const t = await getTranslations('store');
   const home = await getTranslations('home');
   const { whatsapp } = await publicContact();
@@ -38,9 +41,16 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
   return (
     <div className="mx-auto max-w-[1440px] px-6 pt-10 lg:px-[110px] lg:pt-16">
       <div className="flex flex-col items-center gap-2 text-center lg:items-start lg:text-start">
-        <Link href={`/occasions/${th.section.key}`} className="text-sm font-medium text-gold hover:underline">
-          {localized(th.section.name, locale)}
-        </Link>
+        <p className="flex flex-wrap justify-center gap-x-2 text-sm font-medium text-gold lg:justify-start">
+          {(occasion ? [occasion, ...th.occasions.filter((o) => o.key !== occasion.key)] : th.occasions).map((o, i) => (
+            <span key={o.key}>
+              {i > 0 ? <span aria-hidden>· </span> : null}
+              <Link href={`/occasions/${o.key}`} className="hover:underline">
+                {localized(o.name, locale)}
+              </Link>
+            </span>
+          ))}
+        </p>
         <RankBadge rank={th.rank} labels={{ bestSeller: home('bestSeller'), topPick: home('topPick') }} />
         <h1 className="bh-rise font-display text-[42px] leading-[1.3] font-bold text-heading lg:text-[64px]">{localized(th.name, locale)}</h1>
         {th.description ? <p className="bh-rise-2 max-w-2xl text-[15px] leading-relaxed text-muted lg:text-lg">{localized(th.description, locale)}</p> : null}
@@ -49,6 +59,7 @@ export default async function ThemePage({ params }: PageProps<'/[locale]/themes/
         <ThemeShowcase
           themeKey={th.key}
           lang={locale}
+          occasion={occasion?.key}
           packages={th.packages.map((p) => ({
             id: p.id,
             name: localized(p.name, locale),

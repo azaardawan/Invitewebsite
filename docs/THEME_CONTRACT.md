@@ -24,7 +24,7 @@ themes/<key>/v<N>/
 ## 2. Manifest (`defineTheme`)
 
 - `key` and `version` must match the folder.
-- `sections`: where it belongs. `fields` and `features`: what the complete theme renders.
+- `sections`: where it belongs (the first is its main occasion; a design whose wording fits several lists them all and reads `props.occasion`). `fields` and `features`: what the complete theme renders.
 - **`validStates`**: example package combinations the designer drew (previewed and tested). The complete
   theme must be one of them. Admin builds packages from **any** combination of the theme's `features`
   and `fields` (dependencies checked), so the theme must render correctly with any subset.
@@ -50,6 +50,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `attendance` | How many guests replied coming / not coming (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
 | `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
+| `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. |
 
 ## 4. What the theme may use: `@/theme-sdk`
 

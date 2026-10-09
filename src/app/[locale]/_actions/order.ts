@@ -32,7 +32,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message') };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion') };
 }
 
 /** The optional order-form sections (card back, signature, colour set); absent sections are left alone. */
@@ -70,7 +70,7 @@ export async function startOrderAction(_prev: OrderFormState, form: FormData): P
   try {
     ({ previewToken: token } = await createDraft(
       db(),
-      { themeKey: str(form, 'themeKey'), packageId: str(form, 'packageId'), locale: invitationLocale(form, locale), values, extras: orderExtras(form) },
+      { themeKey: str(form, 'themeKey'), packageId: str(form, 'packageId'), locale: invitationLocale(form, locale), values, extras: orderExtras(form), occasion: str(form, 'occasion') || undefined },
       await requestContext(),
     ));
   } catch (e) {

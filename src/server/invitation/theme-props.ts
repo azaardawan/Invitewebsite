@@ -61,6 +61,8 @@ export function buildThemeProps(input: {
   /** The theme's colour slots (manifest) and the customer's chosen colours (or none = defaults). */
   colorSlots?: readonly { key: string; default: string }[];
   colors?: Record<string, string> | null;
+  /** The occasion (section key) the invitation is for. */
+  occasion?: string | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -96,6 +98,7 @@ export function buildThemeProps(input: {
     signatures: !features.includes('signature') ? [] : input.mode === 'sample' ? [{ src: SAMPLE_SIGNATURE }] : (input.signatureSrcs ?? []).map((src) => ({ src })),
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
+    occasion: input.occasion ?? null,
   };
 }
 

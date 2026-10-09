@@ -112,6 +112,12 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           <span className="font-mono font-semibold" dir="ltr">#{themeNumber(row.themeKey) ?? '—'}</span> {localized(row.themeName, locale)}{' '}
           <span className="font-mono text-xs text-muted">({row.themeKey})</span>
         </p>
+        {row.occasionName ? (
+          <p>
+            <span className="text-muted">{t('occasion')}: </span>
+            {localized(row.occasionName, locale)}
+          </p>
+        ) : null}
         <p>
           <span className="text-muted">{t('package')}: </span>
           {localized(row.packageName, locale)}

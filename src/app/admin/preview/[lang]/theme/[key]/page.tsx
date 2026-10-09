@@ -20,6 +20,8 @@ const query = z.object({
   fields: z.string().max(500).optional(),
   /** A colour set to try on the theme. */
   palette: z.uuid().optional(),
+  /** Which occasion's wording, for a design sold in several. */
+  occasion: z.string().max(40).optional(),
 });
 
 const list = (v: string | undefined) => (v === undefined ? undefined : v.split(',').filter(Boolean));
@@ -41,6 +43,7 @@ export default async function ThemeSamplePreview({ params, searchParams }: PageP
     stateIndex: q.data?.state,
     custom: q.data?.features !== undefined || q.data?.fields !== undefined ? { features: list(q.data?.features) ?? [], fields: list(q.data?.fields) ?? [] } : undefined,
     names: q.data?.names,
+    occasion: q.data?.occasion,
     colors: q.data?.palette ? (await db().select({ colors: themePalettes.colors }).from(themePalettes).where(eq(themePalettes.id, q.data.palette)))[0]?.colors : undefined,
   });
   if (!sample) notFound();

@@ -31,6 +31,7 @@ export function OrderForm({
   minDate,
   submitLabel,
   extras = {},
+  occasions,
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   hidden: Record<string, string>;
@@ -40,6 +41,8 @@ export function OrderForm({
   minDate: string;
   submitLabel: string;
   extras?: OrderFormExtras;
+  /** For a design sold in several occasions when the customer hasn't picked one yet: which one is it? */
+  occasions?: { key: string; label: string }[];
 }) {
   const t = useTranslations('store');
   const [state, formAction, pending] = useActionState(action, {});
@@ -55,6 +58,28 @@ export function OrderForm({
         <p role="alert" className="rounded-2xl bg-danger/10 px-4 py-3 text-sm text-danger">
           {t(state.error as 'errors.generic')}
         </p>
+      ) : null}
+
+      {occasions?.length ? (
+        <fieldset className="flex flex-col gap-3" aria-describedby={errors.occasion ? 'occasion-err' : undefined}>
+          <legend className="text-[15px] font-medium text-heading">{t('occasionQuestion')}</legend>
+          <div className="flex flex-wrap gap-2">
+            {occasions.map((o) => (
+              <label
+                key={o.key}
+                className="inline-flex h-11 cursor-pointer items-center rounded-full border border-line bg-surface px-5 text-sm font-medium transition has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-accent-ink"
+              >
+                <input type="radio" name="occasion" value={o.key} defaultChecked={values.occasion === o.key} className="sr-only" />
+                {o.label}
+              </label>
+            ))}
+          </div>
+          {errors.occasion ? (
+            <p id="occasion-err" className="text-sm text-danger">
+              {t('occasionRequired')}
+            </p>
+          ) : null}
+        </fieldset>
       ) : null}
 
       {fields.map((f) => {
