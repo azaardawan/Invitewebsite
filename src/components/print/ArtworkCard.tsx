@@ -8,6 +8,7 @@ import { invitationNames } from '@/catalog/fields';
 
 /** One side of the owner's own card artwork (Admin → Themes → Printable card design), ready to print. */
 export type ArtworkSide = {
+  /** '' = no picture (an extra drawn on its look only). */
   src: string;
   ink: string;
   accent: string;
@@ -16,7 +17,15 @@ export type ArtworkSide = {
   align: 'top' | 'center' | 'bottom';
   insetMm: number;
   scale: number;
+  /** Extras only (see ExtrasDesign): layout, details shown, own colours, paper. */
+  layout?: string;
+  show?: { gender?: boolean; date?: boolean; parents?: boolean; quote?: boolean };
+  ownLook?: boolean;
+  paper?: string;
 };
+
+/** The shared look of a design's extras, resolved for printing (see ExtrasLook in the schema). */
+export type PrintLook = { paper: string; ink: string; accent: string; headingFont: 'ruqaa' | 'sans' | 'vazir'; bodyFont: 'ruqaa' | 'sans' | 'vazir'; babyColours: boolean };
 
 /** How the page relates to the artwork: the picture is designed with `bleedMm` on every side. */
 type Sheet = { bleedMm: number; pageHasBleed: boolean };
@@ -34,7 +43,7 @@ function Frame({ design, sheet, dir, lang, children }: { design: ArtworkSide; sh
   const out = sheet.pageHasBleed ? 0 : sheet.bleedMm;
   const inset = design.insetMm + (sheet.pageHasBleed ? sheet.bleedMm : 0);
   return (
-    <div dir={dir} lang={lang} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', color: design.ink, fontFamily: FONTS[design.bodyFont], background: design.src ? undefined : DEFAULT_PAPER }}>
+    <div dir={dir} lang={lang} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', color: design.ink, fontFamily: FONTS[design.bodyFont], background: design.src ? undefined : (design.paper ?? DEFAULT_PAPER) }}>
       {design.src ? (
         // eslint-disable-next-line @next/next/no-img-element -- print document
         <img src={design.src} alt="" style={{ position: 'absolute', inset: `-${out}mm`, width: `calc(100% + ${2 * out}mm)`, height: `calc(100% + ${2 * out}mm)`, objectFit: 'cover' }} />
@@ -70,13 +79,14 @@ const DEFAULT_PAPER = '#fbf7f0';
  * The platform's simple card front for a design without its own printable card and without the owner's
  * artwork (e.g. a newborn design): the same layout on plain paper with a thin frame, in the theme's colours.
  */
-export function DefaultCardFront(p: PrintCardProps & { sheet: Sheet }) {
+export function DefaultCardFront({ look, ...p }: PrintCardProps & { sheet: Sheet; look?: PrintLook }) {
   const design: ArtworkSide = {
     src: '',
-    ink: p.colors.ink ?? p.colors.text ?? '#3b2f2a',
-    accent: p.colors.accent ?? p.colors.primary ?? '#8a6a3b',
-    headingFont: 'ruqaa',
-    bodyFont: 'sans',
+    ink: look?.ink ?? p.colors.ink ?? p.colors.text ?? '#3b2f2a',
+    accent: look?.accent ?? p.colors.accent ?? p.colors.primary ?? '#8a6a3b',
+    headingFont: look?.headingFont ?? 'ruqaa',
+    bodyFont: look?.bodyFont ?? 'sans',
+    paper: look?.paper,
     align: 'center',
     insetMm: 18,
     scale: 100,

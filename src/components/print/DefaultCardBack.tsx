@@ -3,15 +3,16 @@ import '@fontsource/aref-ruqaa/700.css';
 import '@fontsource-variable/noto-sans-arabic';
 import type { PrintCardBackProps } from '@/theme-sdk/print';
 import { invitationNames } from '@/catalog/fields';
+import { FONTS, type PrintLook } from './ArtworkCard';
 
 /**
  * The back of the printable card for themes without their own `print/CardBack.tsx`: the customer's big
  * title, their message, then the couple's names or the signatures, in the theme's colours. Landscape. The theme's
  * border (drawn with <ThemeBorder> on the front) repeats on this page by itself. Fills the page it is given.
  */
-export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message }: PrintCardBackProps) {
-  const ink = colors.ink ?? colors.text ?? '#3b2f2a';
-  const accent = colors.accent ?? colors.primary ?? '#8a6a3b';
+export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message, look }: PrintCardBackProps & { look?: PrintLook }) {
+  const ink = look?.ink ?? colors.ink ?? colors.text ?? '#3b2f2a';
+  const accent = look?.accent ?? colors.accent ?? colors.primary ?? '#8a6a3b';
   const names = invitationNames(fields).join(` ${labels.and} `);
   return (
     <div
@@ -23,9 +24,9 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         width: '100%',
         height: '100%',
         padding: '16mm 28mm',
-        background: colors.paper ?? colors.background ?? '#fbf7f0',
+        background: look?.paper ?? colors.paper ?? colors.background ?? '#fbf7f0',
         color: ink,
-        fontFamily: "'Noto Sans Arabic Variable', 'Noto Sans Arabic', sans-serif",
+        fontFamily: look ? FONTS[look.bodyFont] : "'Noto Sans Arabic Variable', 'Noto Sans Arabic', sans-serif",
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -35,7 +36,7 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         overflow: 'hidden',
       }}
     >
-      <h1 style={{ margin: 0, fontFamily: "'Aref Ruqaa', serif", fontWeight: 700, fontSize: '16mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
+      <h1 style={{ margin: 0, fontFamily: look ? FONTS[look.headingFont] : "'Aref Ruqaa', serif", fontWeight: 700, fontSize: '16mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
       {message ? <p style={{ margin: 0, maxWidth: '140mm', fontSize: '4.4mm', lineHeight: 1.8, whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{message}</p> : null}
       {signatures.length ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '8mm' }}>
@@ -45,7 +46,7 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
           ))}
         </div>
       ) : names ? (
-        <p style={{ margin: 0, fontFamily: "'Aref Ruqaa', serif", fontSize: '7mm', color: accent }}>{names}</p>
+        <p style={{ margin: 0, fontFamily: look ? FONTS[look.headingFont] : "'Aref Ruqaa', serif", fontSize: '7mm', color: accent }}>{names}</p>
       ) : null}
     </div>
   );

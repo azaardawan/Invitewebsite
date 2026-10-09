@@ -42,10 +42,10 @@ export async function CardPages({
       </div>
     ) : (
       // No printable front of its own and no artwork: the platform's simple front.
-      <DefaultCardFront {...data.props} sheet={data.sheet} />
+      <DefaultCardFront {...data.props} sheet={data.sheet} look={data.look} />
     )
   );
-  const mark = watermark ? <Watermark labels={{ ...watermark, itsABoy: '', itsAGirl: '', bornOn: '' }} /> : null;
+  const mark = watermark ? <Watermark labels={watermark} /> : null;
   const front = { width: data.page.width, height: data.page.height, overflow: 'hidden', position: 'relative' } as const;
   const backSheet = { width: data.backPage.width, height: data.backPage.height, overflow: 'hidden', position: 'relative' } as const;
   const backSide = (
@@ -58,7 +58,7 @@ export async function CardPages({
             <Back {...data.back} />
           </div>
         ) : (
-          <DefaultCardBack {...data.back} />
+          <DefaultCardBack {...data.back} look={data.look} />
         )}
         {mark}
       </div>

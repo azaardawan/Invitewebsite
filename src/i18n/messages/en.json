@@ -557,11 +557,20 @@
         "restoreSimple": "Remove my artwork (use the simple back)",
         "perInvitation": "Wording for one customer only (card message, extra line, back text) and uploading a finished PDF are on that invitation’s page.",
         "usingSimpleFront": "the simple front",
-        "restoreSimpleFront": "Remove my artwork (use the simple front)"
+        "restoreSimpleFront": "Remove my artwork (use the simple front)",
+        "artworkOptional": "Artwork (optional: without it the item is drawn on its colours)",
+        "layout": "Layout",
+        "showLegend": "Details to show (the name always shows)",
+        "showGender": "\"It's a boy / girl\"",
+        "showDate": "Date of birth",
+        "showParents": "Parents' names",
+        "showQuote": "The quote",
+        "ownLook": "Use this item's own colours and fonts below (otherwise the shared look)",
+        "paper": "Paper (background)"
       },
       "productDesign": {
         "heading": "Newborn extras design",
-        "intro": "The Instagram story, chocolate sticker and water bottle label for packages that include them. Each uses a soft design in the baby's colours until you upload your own artwork; the customer's details are then written on it with the colours, fonts and placement you choose. Customers see watermarked previews before paying and download clean files after.",
+        "intro": "The story, chocolate stickers and water bottle label share one look with this design's card, so the set matches: the same colours and fonts (taken from the design, and the customer's colour set, until you set your own), each with its own layout. Change the shared look below, then any single item: its layout, which details it shows, its own colours, or your own artwork. Customers see watermarked previews before paying and download clean files after.",
         "story": "Story",
         "stickerRound": "Sticker (round)",
         "stickerSquare": "Sticker (square)",
@@ -572,11 +581,44 @@
           "bottle": "Edit the bottle label"
         },
         "usingSoft": "the soft default design",
-        "restore": "Remove my artwork (use the soft default)",
+        "restore": "Reset this item (shared look, first layout)",
         "size": {
-          "story": "Artwork for the story: 1080 × 1920 px (portrait, 9:16). Leave out the text; keep the top and bottom 250 px calm (Instagram covers them).",
-          "sticker": "Artwork for the sticker: square, at least 1200 × 1200 px, for a 4 cm sticker. Round stickers are cut from the middle circle, so keep important artwork inside it.",
-          "bottle": "Artwork for the bottle label: 215 × 55 mm (at least 2540 × 650 px). It wraps a 0.5 L bottle; the text sits in the middle third, which faces out."
+          "story": "Optional artwork for the story: 1080 × 1920 px (portrait, 9:16), without text; keep the top and bottom 250 px calm (Instagram covers them).",
+          "sticker": "Optional artwork for the sticker: square, at least 1200 × 1200 px, for a 4 cm sticker. Round stickers are cut from the middle circle.",
+          "bottle": "Optional artwork for the bottle label: 215 × 55 mm (at least 2540 × 650 px). It wraps a 0.5 L bottle; the text sits in the middle part, which faces out."
+        },
+        "boy": "boy",
+        "girl": "girl",
+        "customised": "customised",
+        "usingLook": "the shared look, first layout",
+        "look": {
+          "heading": "Shared look (all items and the simple card)",
+          "own": "your colours",
+          "fromDesign": "from the design's colours",
+          "help": "Used by every item that doesn't have its own colours, and by the platform's simple card front and back. Pink and blue tints can follow the baby (girl or boy).",
+          "paper": "Paper (background)",
+          "ink": "Text",
+          "accent": "Names and decoration",
+          "babyColours": "Tint pink for a girl and blue for a boy",
+          "save": "Save the shared look",
+          "reset": "Back to the design's colours"
+        },
+        "layouts": {
+          "story": {
+            "classic": "Centred with soft circles",
+            "top": "Name at the top, details at the bottom",
+            "framed": "Everything in a framed card"
+          },
+          "sticker": {
+            "classic": "Name and date",
+            "name": "Name only, double ring",
+            "badge": "Badge: boy/girl, name, date"
+          },
+          "bottle": {
+            "classic": "Centred",
+            "split": "Name | quote and details",
+            "band": "Coloured band with the name"
+          }
         }
       }
     },

@@ -303,7 +303,14 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             updatedAt={d.theme.updatedAt}
             canManage={canManage}
           />
-          {extras ? <ProductDesignSection themeId={d.theme.id} themeKey={d.theme.key} design={d.theme.cardDesign} updatedAt={d.theme.updatedAt} canManage={canManage} /> : null}
+          {extras ? <ProductDesignSection
+              themeId={d.theme.id}
+              themeKey={d.theme.key}
+              design={d.theme.cardDesign}
+              themeColors={Object.fromEntries((manifest?.colors?.slots ?? []).map((c) => [c.key, c.default]))}
+              updatedAt={d.theme.updatedAt}
+              canManage={canManage}
+            /> : null}
           </>
         );
       })()}

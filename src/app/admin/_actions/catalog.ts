@@ -25,7 +25,7 @@ import {
   type ThemeStatus,
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
-import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, updateThemeCardSide, type ArtworkSlot } from '@/server/catalog/card-design';
+import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, EXTRA_SLOTS, updateThemeCardSide, updateThemeExtrasLook, type ArtworkSlot } from '@/server/catalog/card-design';
 import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
@@ -209,6 +209,8 @@ export async function themeCardSideAction(_: ActionState, form: FormData): Promi
   const themeId = id(form);
   const side = (ARTWORK_SLOTS as readonly string[]).includes(String(form.get('side'))) ? (String(form.get('side')) as ArtworkSlot) : 'front';
   const restore = form.get('restore') === '1';
+  const extra = (EXTRA_SLOTS as readonly string[]).includes(side);
+  const on = (name: string) => form.get(name) === 'on';
   return run(
     () =>
       updateThemeCardSide(
@@ -224,7 +226,41 @@ export async function themeCardSideAction(_: ActionState, form: FormData): Promi
           align: String(form.get('align') ?? CARD_SIDE_DEFAULTS.align) as never,
           insetMm: Number(form.get('insetMm') ?? CARD_SIDE_DEFAULTS.insetMm),
           scale: Number(form.get('scale') ?? CARD_SIDE_DEFAULTS.scale),
+          ...(extra && !restore
+            ? {
+                layout: readString(form, 'layout') ?? undefined,
+                show: { gender: on('showGender'), date: on('showDate'), parents: on('showParents'), quote: on('showQuote') },
+                ownLook: on('ownLook'),
+                paper: readString(form, 'paper') ?? undefined,
+              }
+            : {}),
         },
+        actor,
+        { remove: restore },
+      ),
+    [`/admin/themes/${themeId}`],
+  );
+}
+
+/** The look all of a design's newborn extras share; `reset` goes back to the design's colours. */
+export async function themeExtrasLookAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form);
+  return run(
+    () =>
+      updateThemeExtrasLook(
+        db(),
+        themeId,
+        form.get('reset') === '1'
+          ? null
+          : {
+              paper: String(form.get('paper') ?? ''),
+              ink: String(form.get('ink') ?? ''),
+              accent: String(form.get('accent') ?? ''),
+              headingFont: String(form.get('headingFont') ?? '') as never,
+              bodyFont: String(form.get('bodyFont') ?? '') as never,
+              babyColours: form.get('babyColours') === 'on',
+            },
         actor,
       ),
     [`/admin/themes/${themeId}`],

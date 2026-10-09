@@ -98,7 +98,10 @@ export async function SideForm({
   using,
   sizeHint,
   restoreLabel,
+  extra,
 }: {
+  /** Newborn extras: their layouts, the details to show, and own colours or the shared look. */
+  extra?: { layouts: { value: string; label: string }[]; look: { paper: string; ink: string; accent: string; headingFont: string; bodyFont: string } };
   side: ArtworkSlot;
   themeId: string;
   current: CardSideDesign | null;
@@ -109,7 +112,14 @@ export async function SideForm({
   restoreLabel: string;
 }) {
   const t = await getTranslations('admin.catalog.cardDesign');
-  const values = current ?? { ...CARD_SIDE_DEFAULTS, assetId: '' };
+  const values = current ?? { ...CARD_SIDE_DEFAULTS, ...(extra ? { ink: extra.look.ink, accent: extra.look.accent, headingFont: extra.look.headingFont as never, bodyFont: extra.look.bodyFont as never } : {}), assetId: '' };
+  const show = { gender: true, date: true, parents: true, quote: true, ...(current?.show ?? {}) };
+  const check = (name: string, label: string, on: boolean) => (
+    <label key={name} className="flex items-center gap-2 text-sm">
+      <input type="checkbox" name={name} defaultChecked={on} />
+      {label}
+    </label>
+  );
   return (
     <details className="rounded-md border border-line p-3" data-card-side={side}>
       <summary className="cursor-pointer font-medium">
@@ -120,8 +130,37 @@ export async function SideForm({
         <input type="hidden" name="id" value={themeId} />
         <input type="hidden" name="side" value={side} />
         <div className="sm:col-span-2">
-          <ImageUpload name="assetId" label={t('artwork')} initial={current && resolvedSrc ? { id: current.assetId, url: resolvedSrc } : null} />
+          <ImageUpload name="assetId" label={extra ? t('artworkOptional') : t('artwork')} initial={current?.assetId && resolvedSrc ? { id: current.assetId, url: resolvedSrc } : null} />
         </div>
+        {extra ? (
+          <>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">{t('layout')}</span>
+              <select name="layout" defaultValue={current?.layout ?? extra.layouts[0]!.value} className={input}>
+                {extra.layouts.map((l) => (
+                  <option key={l.value} value={l.value}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <fieldset className="space-y-1">
+              <legend className="mb-1 text-sm font-medium">{t('showLegend')}</legend>
+              {check('showGender', t('showGender'), show.gender)}
+              {check('showDate', t('showDate'), show.date)}
+              {check('showParents', t('showParents'), show.parents)}
+              {check('showQuote', t('showQuote'), show.quote)}
+            </fieldset>
+            <label className="flex items-center gap-2 text-sm font-medium sm:col-span-2">
+              <input type="checkbox" name="ownLook" defaultChecked={current?.ownLook ?? false} />
+              {t('ownLook')}
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">{t('paper')}</span>
+              <input type="color" name="paper" defaultValue={current?.paper ?? extra.look.paper} className="h-10 w-20 rounded-md border border-line" />
+            </label>
+          </>
+        ) : null}
         <label className="block">
           <span className="mb-1 block text-sm font-medium">{t('accent')}</span>
           <input type="color" name="accent" defaultValue={values.accent} className="h-10 w-20 rounded-md border border-line" />

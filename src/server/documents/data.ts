@@ -14,7 +14,9 @@ import { occasionKey, signatureUrls } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
 import type { CardOptions } from '@/server/db/schema';
 import type { ThemeProps } from '@/theme-sdk/types';
-import { themeCardDesign, type ResolvedCardDesign } from '@/server/catalog/card-design';
+import { defaultLook, themeArtwork, type ResolvedCardDesign } from '@/server/catalog/card-design';
+import type { ExtrasLook } from '@/server/db/schema';
+import { tintedLook } from '@/components/print/look';
 
 type InvitationRow = typeof invitations.$inferSelect;
 type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string; watermark: string; watermarkNote: string };
@@ -61,7 +63,8 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
   if (kind === 'card' || kind === 'cardBleed') {
     const opts = inv.cardOptions ?? {};
     const qrUrl = opts.showQr !== false ? invitationUrl(inv) : null;
-    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, await themeCardDesign(db, inv.themeId))) };
+    const artwork = await themeArtwork(db, inv.themeId);
+    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look)) };
   }
   const { base } = printBase(theme);
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
@@ -109,6 +112,8 @@ export async function cardData(
   opts: CardOptions,
   qrUrl: string | null,
   design: ResolvedCardDesign,
+  /** The owner's look for this design's extras; the platform's simple card front and back follow it too. */
+  ownerLook: ExtrasLook | null = null,
 ) {
   const { base, cardBackTitle } = printBase(theme);
   const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
@@ -130,5 +135,7 @@ export async function cardData(
   // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
   const backPage: PageSpec = { ...page, width: page.height, height: page.width };
   const sheet = { bleedMm: spec.bleedMm, pageHasBleed: kind === 'cardBleed' };
-  return { kind: 'card' as const, props, back, page, backPage, design, sheet };
+  const gender = base.fields.baby_gender === 'boy' || base.fields.baby_gender === 'girl' ? base.fields.baby_gender : null;
+  const look = tintedLook(ownerLook ?? defaultLook(base.colors), gender);
+  return { kind: 'card' as const, props, back, page, backPage, design, sheet, look };
 }

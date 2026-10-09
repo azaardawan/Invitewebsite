@@ -3,7 +3,7 @@ import type { DbOrTx } from '@/server/db/client';
 import type { invitations } from '@/server/db/schema';
 import type { ThemeProps } from '@/theme-sdk/types';
 import type { ProductData } from '@/components/print/Products';
-import { themeArtwork, type ResolvedArtwork } from '@/server/catalog/card-design';
+import { defaultLook, themeArtwork, type ResolvedArtwork } from '@/server/catalog/card-design';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { invitationRenderData } from '@/server/invitation/load';
 
@@ -21,7 +21,7 @@ export function isPaid(inv: Pick<InvitationRow, 'status' | 'publishedAt'>) {
 /** What the story, sticker and bottle label show, from an invitation's (or a sample's) theme props. */
 export function productDataFrom(
   props: ThemeProps,
-  design: Pick<ResolvedArtwork, 'story' | 'sticker' | 'bottle'>,
+  design: Pick<ResolvedArtwork, 'story' | 'sticker' | 'bottle' | 'look'>,
   opts: { stickerShape: 'round' | 'square'; watermark: boolean },
 ): ProductData {
   const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string } };
@@ -36,6 +36,8 @@ export function productDataFrom(
     birthDate: props.birthDate?.full ?? props.event.date?.full ?? null,
     quote: f.baby_quote ?? null,
     labels: { itsABoy: props.labels.itsABoy, itsAGirl: props.labels.itsAGirl, bornOn: props.labels.bornOn, watermark: msgs.print.watermark, watermarkNote: msgs.print.watermarkNote },
+    // One look for the whole set: the owner's, or the design's colours (with the customer's colour set).
+    look: design.look ?? defaultLook(props.colors),
     design: { story: design.story, sticker: design.sticker, bottle: design.bottle },
     stickerShape: opts.stickerShape,
     watermark: opts.watermark,

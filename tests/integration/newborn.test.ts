@@ -91,3 +91,29 @@ describe('newborn extras', () => {
     expect(r.calls).toEqual(['sticker.pdf', 'story.png']);
   });
 });
+
+describe('the extras design in Admin', () => {
+  it('shares one look across the set, and lets each item have its own layout, details and colours', async () => {
+    const { updateThemeCardSide, updateThemeExtrasLook, themeArtwork } = await import('@/server/catalog/card-design');
+    const actor = { adminId: shop.admin.id, ipHash: null };
+    await updateThemeExtrasLook(db(), shop.theme.id, { paper: '#fff8f0', ink: '#222222', accent: '#7a1f3d', headingFont: 'vazir', bodyFont: 'sans', babyColours: false }, actor);
+    const style = { ink: '#111111', accent: '#004466', headingFont: 'ruqaa', bodyFont: 'sans', align: 'center', insetMm: 6, scale: 100 } as const;
+    // Settings only, no artwork: kept for an extra.
+    await updateThemeCardSide(db(), shop.theme.id, 'sticker', { ...style, assetId: null, layout: 'badge', show: { gender: true, date: false, parents: false, quote: false }, ownLook: true, paper: '#eeeeee' }, actor);
+    await expect(updateThemeCardSide(db(), shop.theme.id, 'story', { ...style, assetId: null, layout: 'nope' }, actor)).rejects.toMatchObject({ code: 'invalid' });
+    const art = await themeArtwork(db(), shop.theme.id);
+    expect(art.look).toMatchObject({ accent: '#7a1f3d', headingFont: 'vazir' });
+    expect(art.sticker).toMatchObject({ src: '', layout: 'badge', ownLook: true, paper: '#eeeeee', show: { date: false } });
+    expect(art.story).toBeNull();
+
+    const id = (await createDraft(db(), { themeKey: shop.theme.key, packageId: shop.full.id, locale: 'ar', values: weddingValues() }, { ...ctx, ipHash: randomToken(8) })).invitationId;
+    const [inv] = await db().select().from(invitations).where(eq(invitations.id, id));
+    const data = await productData(db(), inv!);
+    expect(data.look).toMatchObject({ paper: '#fff8f0', accent: '#7a1f3d' });
+    expect(data.design.sticker?.layout).toBe('badge');
+
+    await updateThemeCardSide(db(), shop.theme.id, 'sticker', { ...style, assetId: null }, actor, { remove: true });
+    await updateThemeExtrasLook(db(), shop.theme.id, null, actor);
+    expect(await themeArtwork(db(), shop.theme.id)).toMatchObject({ sticker: null, look: null });
+  });
+});
