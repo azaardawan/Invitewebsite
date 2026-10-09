@@ -37,7 +37,7 @@ export async function SiteHeader() {
             <LanguageSwitcher label={t('language')} />
             <CurrencySwitcher />
           </div>
-          <MobileMenu links={links} labels={{ menu: n('menu'), close: n('close') }} />
+          <MobileMenu links={links} labels={{ menu: n('menu'), close: n('close'), brand: t('brand') }} />
         </div>
       </div>
     </header>
