@@ -169,7 +169,7 @@ describe('theme registry sync', () => {
 });
 
 describe('packages', () => {
-  it('accept any combination the theme supports, checking dependencies and section-required features', async () => {
+  it('accept any combination the theme supports, checking dependencies; the occasion forces nothing', async () => {
     const t = await registeredTheme();
     // Not one of the designed states, but consistent: allowed (the owner builds packages feature by feature).
     const custom = await createPackage(db(), t.id, { ...full(), featureKeys: ['rsvp', 'print_card'] }, actor);
@@ -183,15 +183,14 @@ describe('packages', () => {
       createPackage(db(), t.id, { ...full(), featureKeys: ['music', 'countdown', 'print_card'] }, actor),
     ).rejects.toMatchObject({ code: 'notValidState', details: ['theme does not support feature countdown'] });
 
-    // A theme designed without the printable card can't have wedding packages at all.
+    // The occasion forces nothing: each package chooses (here, a wedding package without the printable card).
     const noPrint = await registeredTheme({
       features: ['music'],
       validStates: [{ features: ['music'], fields: [...FULL_FIELDS] }],
       print: undefined,
     });
-    await expect(
-      createPackage(db(), noPrint.id, { ...full(), featureKeys: ['music'] }, actor),
-    ).rejects.toMatchObject({ code: 'missingRequiredFeature', details: ['print_card'] });
+    const plain = await createPackage(db(), noPrint.id, { ...full(), featureKeys: ['music'] }, actor);
+    expect(plain.id).toBeTruthy();
   });
 
   it('allow at most 3 active packages per theme (service and database)', async () => {

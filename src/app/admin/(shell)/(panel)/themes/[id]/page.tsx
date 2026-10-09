@@ -42,17 +42,15 @@ import {
 
 type Translate = Awaited<ReturnType<typeof getTranslations<'admin.catalog'>>>;
 
-/** What a package includes: each feature and field the theme supports, ticked one by one. The section's required features stay on. */
+/** What a package includes: each feature and field the theme supports, ticked one by one; nothing is locked on. */
 function PackageContents({
   manifest,
-  required,
   features,
   fields,
   fieldLabel,
   t,
 }: {
   manifest: ThemeManifest;
-  required: string[];
   features: readonly string[];
   fields: readonly string[];
   fieldLabel: (key: string) => string;
@@ -63,19 +61,12 @@ function PackageContents({
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium">{t('themes.packageFeatures')}</legend>
         <p className="text-xs text-muted">{t('themes.packageFeaturesHint')}</p>
-        {[...manifest.features, ...PLATFORM_FEATURES].map((f) => {
-          const forced = required.includes(f);
-          return (
-            <label key={f} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="features" value={f} defaultChecked={forced || features.includes(f)} disabled={forced} />
-              {forced ? <input type="hidden" name="features" value={f} /> : null}
-              <span>
-                {t(`features.${f}` as never)}
-                {forced ? <span className="text-xs text-muted"> · {t('themes.requiredInSection')}</span> : null}
-              </span>
-            </label>
-          );
-        })}
+        {[...manifest.features, ...PLATFORM_FEATURES].map((f) => (
+          <label key={f} className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="features" value={f} defaultChecked={features.includes(f)} />
+            <span>{t(`features.${f}` as never)}</span>
+          </label>
+        ))}
       </fieldset>
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium">{t('themes.packageFields')}</legend>
@@ -383,7 +374,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <div className="w-48">
                     <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
                   </div>
-                  <PackageContents manifest={manifest} required={required} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
+                  <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
                 <ActionForm action={packageStatusAction} confirmMessage={t('common.confirm')} className="mt-3">
@@ -408,7 +399,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <div className="w-48">
                   <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
                 </div>
-                <PackageContents manifest={manifest} required={required} features={manifest.features} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
+                <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
             </details>
