@@ -22,7 +22,7 @@ export const packageInput = z.object({
 });
 export type PackageInput = z.input<typeof packageInput>;
 
-/** Locks the theme row and checks the package shape against its current version and section rules. */
+/** Locks the theme row and checks the package shape against its current version. The occasion forces nothing. */
 async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], features: string[]) {
   const [row] = await tx
     .select({ theme: themes, version: themeVersions, section: sections })
@@ -35,8 +35,6 @@ async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], fe
   if (!row.version) throw new CatalogError('noVersion');
   const problems = packageShapeProblems(row.version.manifest as ThemeManifest, features, fields);
   if (problems.length) throw new CatalogError('notValidState', problems);
-  const missing = (row.section?.requiredFeatures ?? []).filter((r) => !features.includes(r));
-  if (missing.length) throw new CatalogError('missingRequiredFeature', missing);
   return row;
 }
 

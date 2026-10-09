@@ -292,8 +292,8 @@ export async function moveThemeAction(_: ActionState, form: FormData): Promise<A
 // ---------- Packages ----------
 
 /**
- * The package's contents, chosen feature by feature and field by field. The
- * section's required features are always included, a feature's required field
+ * The package's contents, chosen feature by feature and field by field (nothing is forced by the
+ * occasion; its suggested features only start ticked on a new package). A feature's required field
  * is added for it (map → map link, countdown → date), and the map link is only
  * asked for when the map is included. Other rules are checked by the service.
  */
@@ -303,7 +303,6 @@ async function packageShape(themeId: string, form: FormData) {
   if (!manifest) throw new z.ZodError([]);
   const picked = (name: string) => new Set(form.getAll(name).filter((v): v is string => typeof v === 'string'));
   const features = picked('features');
-  for (const r of detail.section?.requiredFeatures ?? []) features.add(r);
   const featureKeys = [...manifest.features, ...PLATFORM_FEATURES].filter((f) => features.has(f) && (FEATURE_KEYS as string[]).includes(f));
   const fields = picked('fields');
   for (const f of featureKeys) for (const k of FEATURES[f].requiresFields as readonly string[]) fields.add(k);

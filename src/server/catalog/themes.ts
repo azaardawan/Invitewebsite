@@ -212,11 +212,9 @@ export async function themeReadiness(db: DbOrTx, themeId: string): Promise<Readi
   const active = (await packagesWithShape(db, themeId)).filter((p) => p.status === 'ACTIVE');
   if (!active.length) problems.push({ code: 'noPackages' });
   const manifest = row.version?.manifest as ThemeManifest | undefined;
-  const required = row.section?.requiredFeatures ?? [];
   for (const p of active) {
     const name = localized(p.name, 'en');
     if (manifest && packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0) problems.push({ code: 'packageInvalid', subject: name });
-    for (const r of required) if (!p.featureKeys.includes(r)) problems.push({ code: 'packageMissingRequired', subject: `${name}: ${r}` });
   }
   if (active.some((p) => p.featureKeys.includes('music'))) {
     if (!row.music) problems.push({ code: 'noMusic' });
