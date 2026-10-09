@@ -154,8 +154,17 @@ export type CardSideDesign = {
   scale: number;
 };
 export type CardFont = 'ruqaa' | 'sans' | 'vazir';
-/** Null side = the theme's own design (or the platform's simple back). */
-export type CardDesign = { front?: CardSideDesign | null; back?: CardSideDesign | null };
+/**
+ * The owner's artwork per printed/shared item. Card sides: null = the theme's own design (or the platform's
+ * simple one). Story, sticker, bottle label (newborn extras): null = the platform's simple design.
+ */
+export type CardDesign = {
+  front?: CardSideDesign | null;
+  back?: CardSideDesign | null;
+  story?: CardSideDesign | null;
+  sticker?: CardSideDesign | null;
+  bottle?: CardSideDesign | null;
+};
 
 export const themes = pgTable(
   'themes',

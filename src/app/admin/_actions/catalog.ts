@@ -25,7 +25,7 @@ import {
   type ThemeStatus,
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
-import { CARD_SIDE_DEFAULTS, updateThemeCardSide } from '@/server/catalog/card-design';
+import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, updateThemeCardSide, type ArtworkSlot } from '@/server/catalog/card-design';
 import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
@@ -207,7 +207,7 @@ export async function featuredThemesAction(_: ActionState, form: FormData): Prom
 export async function themeCardSideAction(_: ActionState, form: FormData): Promise<ActionState> {
   const actor = await actorWith('themes.manage');
   const themeId = id(form);
-  const side = form.get('side') === 'back' ? 'back' : 'front';
+  const side = (ARTWORK_SLOTS as readonly string[]).includes(String(form.get('side'))) ? (String(form.get('side')) as ArtworkSlot) : 'front';
   const restore = form.get('restore') === '1';
   return run(
     () =>

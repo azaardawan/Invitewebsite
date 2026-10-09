@@ -15,6 +15,7 @@ import { listSubsections } from '@/server/catalog/subsections';
 import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
 import { CardDesignSection } from './CardDesignSection';
+import { ProductDesignSection } from './ProductDesignSection';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -290,7 +291,9 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
 
       {(() => {
         const current = d.versions.find((v) => v.id === d.theme.currentVersionId);
+        const extras = d.section?.key === 'newborn' || d.packages.some((p) => p.featureKeys.some((f) => f === 'story' || f === 'sticker' || f === 'bottle_label'));
         return (
+          <>
           <CardDesignSection
             themeId={d.theme.id}
             themeKey={d.theme.key}
@@ -300,6 +303,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             updatedAt={d.theme.updatedAt}
             canManage={canManage}
           />
+          {extras ? <ProductDesignSection themeId={d.theme.id} themeKey={d.theme.key} design={d.theme.cardDesign} updatedAt={d.theme.updatedAt} canManage={canManage} /> : null}
+          </>
         );
       })()}
 

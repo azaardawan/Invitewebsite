@@ -1,4 +1,5 @@
 import 'server-only';
+import { invitationNames } from '@/catalog/fields';
 import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
@@ -90,7 +91,7 @@ export async function updateInvitationValues(
     const validateAt = unchangedPastDate ? new Date(`${existingDate}T00:00:00Z`) : now;
     const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys), validateAt < now ? validateAt : now);
     if (!result.ok) throw new InvitationAdminError('invalidFields', result.errors);
-    const slug = slugFromNames([result.values.person_1_name, result.values.person_2_name]);
+    const slug = slugFromNames(invitationNames(result.values));
     await tx.update(invitations).set({ fieldValues: result.values, slug, version: inv.version + 1 }).where(eq(invitations.id, id));
     await recordAudit(tx, {
       ...auditActor(actor),

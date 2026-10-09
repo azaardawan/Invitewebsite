@@ -1,0 +1,100 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+.boy {
+  background: #eaf2fb;
+  color: #29435f;
+  --accent: #3d6fa3;
+}
+
+.girl {
+  background: #fbecf2;
+  color: #5a2d40;
+  --accent: #b04a73;
+}
+
+.card {
+  width: 100%;
+  max-width: 24rem;
+  display: grid;
+  gap: 0.8rem;
+  text-align: center;
+  padding: 2.2rem 1.25rem;
+  border-radius: 2rem;
+  background: #fff;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.07);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.name {
+  margin: 0;
+  font-size: clamp(2rem, 11vw, 3rem);
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.line,
+.parents,
+.quote {
+  margin: 0;
+}
+
+.parents {
+  font-weight: 600;
+}
+
+.quote {
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.form {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.form h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.form input,
+.form textarea {
+  font: inherit;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.8rem;
+  border: 1px solid #d8d2cc;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.button {
+  font: inherit;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+}
+
+.button[aria-pressed='true'] {
+  background: var(--accent);
+  color: #fff;
+}

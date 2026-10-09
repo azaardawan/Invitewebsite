@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { invitations } from '@/server/db/schema';
-import { verifyPrintToken } from '@/server/documents/tokens';
+import { PRODUCT_VIEWS, verifyPrintToken, type ProductView } from '@/server/documents/tokens';
+import { ProductPages } from '../ProductPages';
+import { isPaid, productData } from '@/server/products/data';
 import { printData } from '@/server/documents/data';
 import { printComponents } from '@/theme-registry/print.generated';
 import type { KeepsakeProps } from '@/theme-sdk/print';
@@ -33,8 +35,11 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     const msgs = invitationMessages(inv.locale);
     return <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
   }
+  if ((PRODUCT_VIEWS as readonly string[]).includes(claim.kind)) {
+    return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv)} />;
+  }
   const data = await printData(db(), inv, claim.kind);
-  if (data.kind === 'card') return <CardPages codeRef={data.codeRef} data={data} view={view === 'front' || view === 'back' ? view : undefined} />;
+  if (data.kind === 'card') return <CardPages codeRef={data.codeRef} data={data} view={view === 'front' || view === 'back' ? view : undefined} watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)} />;
   const loaders = printComponents[data.codeRef];
   // Keepsake: every A4 page edge to edge (no page margins), so the theme's border sits in the same place on
   // the cover and every message page; the theme spaces its messages with padding (box-decoration-break: clone).
@@ -51,3 +56,9 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
   );
 }
 
+
+/** The watermark wording (before payment) in the invitation's language. */
+async function watermarkLabels(locale: Parameters<typeof invitationMessages>[0]) {
+  const { print } = invitationMessages(locale) as unknown as { print: { watermark: string; watermarkNote: string } };
+  return { watermark: print.watermark, watermarkNote: print.watermarkNote };
+}

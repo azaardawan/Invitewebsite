@@ -1,3 +1,4 @@
+import { invitationNames } from '@/catalog/fields';
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { headers } from 'next/headers';
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<'/i/[path]'>): Prom
   if (r.state !== 'live') return {};
   const v = r.invitation.fieldValues;
   const msgs = invitationMessages(r.invitation.locale);
-  const names = [v.person_1_name, v.person_2_name].filter(Boolean).join(` ${msgs.and} `);
+  const names = invitationNames(v).join(` ${msgs.and} `);
   const title = names || msgs.youreInvited;
   const url = `${env().APP_URL.replace(/\/$/, '')}${r.canonicalPath}`;
   return {

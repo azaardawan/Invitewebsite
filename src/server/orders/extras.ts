@@ -16,13 +16,14 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `cardBack` (print_card): big title and smaller message for the back of the card;
  * - `signature` / `signature2` (signature): each a PNG data URL from a drawing pad, `keep` (unchanged) or
  *   `none`; the customer chooses one signature or two (the second is then `none`);
- * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours.
+ * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
+ * - `stickerShape` (sticker): round or square chocolate stickers.
  */
-export type OrderExtras = { cardBack?: { title: string; message: string }; signature?: string; signature2?: string; paletteId?: string };
+export type OrderExtras = { cardBack?: { title: string; message: string }; signature?: string; signature2?: string; paletteId?: string; stickerShape?: string };
 
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
 export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'>, extras: OrderExtras) {
-  const set: Partial<Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'>> = {};
+  const set: Partial<Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape'>> = {};
   const errors: Record<string, string> = {};
 
   if (extras.cardBack && inv.featureKeys.includes('print_card')) {
@@ -72,6 +73,11 @@ export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId
       if (!p) errors.palette = 'invalid';
       else set.colors = p.colors;
     }
+  }
+
+  if (extras.stickerShape !== undefined && inv.featureKeys.includes('sticker')) {
+    if (extras.stickerShape === 'round' || extras.stickerShape === 'square') set.stickerShape = extras.stickerShape;
+    else errors.stickerShape = 'invalid';
   }
 
   if (Object.keys(errors).length) throw new OrderError('invalidFields', errors);

@@ -24,6 +24,10 @@ export type PrintLabels = {
   keepsakeTitle: string;
   /** Shown when a keepsake has no messages. */
   keepsakeEmpty: string;
+  /** Newborn: "It's a boy" / "It's a girl", and the caption before the date of birth. */
+  itsABoy: string;
+  itsAGirl: string;
+  bornOn: string;
 };
 
 type PrintBase = {
@@ -41,6 +45,8 @@ type PrintBase = {
   signatures: { src: string }[];
   /** The theme's colour slots with the customer's chosen colours (also set as `--bahja-color-<key>`). */
   colors: Record<string, string>;
+  /** Newborn: the date of birth in the invitation's language, or null. */
+  birthDate: EventDateParts | null;
 };
 
 export type PrintCardProps = PrintBase & {

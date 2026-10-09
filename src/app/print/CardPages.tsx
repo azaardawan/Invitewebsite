@@ -1,9 +1,9 @@
 import type React from 'react';
-import { notFound } from 'next/navigation';
 import type { cardData } from '@/server/documents/data';
 import { printComponents } from '@/theme-registry/print.generated';
 import { DefaultCardBack } from '@/components/print/DefaultCardBack';
-import { ArtworkCardBack, ArtworkCardFront } from '@/components/print/ArtworkCard';
+import { ArtworkCardBack, ArtworkCardFront, DefaultCardFront } from '@/components/print/ArtworkCard';
+import { Watermark } from '@/components/print/Products';
 
 type CardData = Awaited<ReturnType<typeof cardData>>;
 
@@ -15,10 +15,20 @@ const BASE = 'html,body{margin:0;padding:0;background:#fff}';
  * (the back falls back to the platform's simple back). `view` prints one side only (the PDF joins them; each
  * side is also a picture on the receipt). The Admin card preview uses the same component with sample data.
  */
-export async function CardPages({ codeRef, data, view }: { codeRef: string; data: CardData; view?: 'front' | 'back' }) {
+export async function CardPages({
+  codeRef,
+  data,
+  view,
+  watermark = null,
+}: {
+  codeRef: string;
+  data: CardData;
+  view?: 'front' | 'back';
+  /** Before payment the card is only previewed, with a watermark on each side. */
+  watermark?: { watermark: string; watermarkNote: string } | null;
+}) {
   const loaders = printComponents[codeRef];
   const Card = !data.design.front && loaders?.card ? (await loaders.card()).default : null;
-  if (!data.design.front && !Card) notFound();
   const Back = !data.design.back && loaders?.cardBack ? (await loaders.cardBack()).default : null;
   const crop = data.page.cropMm;
   const vars = colorVars(data.props.colors);
@@ -26,8 +36,16 @@ export async function CardPages({ codeRef, data, view }: { codeRef: string; data
   const frontSide = data.design.front ? (
     <ArtworkCardFront {...data.props} design={data.design.front} sheet={data.sheet} />
   ) : (
-    <div style={{ margin: crop ? `-${crop}mm` : undefined }}>{Card ? <Card {...data.props} /> : null}</div>
+    Card ? (
+      <div style={{ margin: crop ? `-${crop}mm` : undefined }}>
+        <Card {...data.props} />
+      </div>
+    ) : (
+      // No printable front of its own and no artwork: the platform's simple front.
+      <DefaultCardFront {...data.props} sheet={data.sheet} />
+    )
   );
+  const mark = watermark ? <Watermark labels={{ ...watermark, itsABoy: '', itsAGirl: '', bornOn: '' }} /> : null;
   const front = { width: data.page.width, height: data.page.height, overflow: 'hidden', position: 'relative' } as const;
   const backSheet = { width: data.backPage.width, height: data.backPage.height, overflow: 'hidden', position: 'relative' } as const;
   const backSide = (
@@ -42,6 +60,7 @@ export async function CardPages({ codeRef, data, view }: { codeRef: string; data
         ) : (
           <DefaultCardBack {...data.back} />
         )}
+        {mark}
       </div>
     </div>
   );
@@ -51,7 +70,10 @@ export async function CardPages({ codeRef, data, view }: { codeRef: string; data
       <>
         <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}${BASE}`}</style>
         <div style={vars}>
-          <div style={front}>{frontSide}</div>
+          <div style={front}>
+            {frontSide}
+            {mark}
+          </div>
         </div>
       </>
     );
@@ -75,7 +97,10 @@ export async function CardPages({ codeRef, data, view }: { codeRef: string; data
     <>
       <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}@page back{size:${data.backPage.width} ${data.backPage.height};margin:0}${BASE}`}</style>
       <div style={{ ...vars, breakAfter: 'page' }}>
-        <div style={front}>{frontSide}</div>
+        <div style={front}>
+            {frontSide}
+            {mark}
+          </div>
       </div>
       {backSide}
     </>

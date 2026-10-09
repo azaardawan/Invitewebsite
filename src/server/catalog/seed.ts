@@ -75,6 +75,14 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'invitation_message' },
     ],
   },
+  {
+    key: 'newborn',
+    // Kurdish awaits the owner's approval (docs/translations/KURDISH_REVIEW.md).
+    name: { ar: 'مولود جديد', en: 'Newborn baby' },
+    // Ticked by default on new packages (the owner chooses per package).
+    requiredFeatures: ['story', 'print_card', 'sticker', 'bottle_label'],
+    fields: [{ key: 'baby_name' }, { key: 'baby_gender' }, { key: 'mother_name' }, { key: 'father_name' }, { key: 'birth_date' }, { key: 'baby_quote' }],
+  },
 ];
 
 export async function seedCatalog(db: DbOrTx) {

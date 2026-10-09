@@ -32,7 +32,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion') };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape') };
 }
 
 /** The optional order-form sections (card back, signature, colour set); absent sections are left alone. */
@@ -42,6 +42,7 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('signature')) extras.signature = str(form, 'signature');
   if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
   if (form.has('palette')) extras.paletteId = str(form, 'palette');
+  if (form.has('stickerShape')) extras.stickerShape = str(form, 'stickerShape');
   return extras;
 }
 

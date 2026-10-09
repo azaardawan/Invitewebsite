@@ -19,7 +19,7 @@ const LABEL_KEYS = [
   'countdownSeconds', 'eventStarted', 'openMap', 'date', 'time', 'venue', 'guestFormTitle', 'guestName',
   'attendanceQuestion', 'attending', 'notAttending', 'message', 'submit', 'sending', 'sent', 'sentPreview',
   'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
-  'attendanceTitle', 'attendingCount', 'notAttendingCount',
+  'attendanceTitle', 'attendingCount', 'notAttendingCount', 'itsABoy', 'itsAGirl', 'bornOn',
 ] as const satisfies readonly (keyof ThemeLabels)[];
 
 /**
@@ -99,6 +99,7 @@ export function buildThemeProps(input: {
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
     occasion: input.occasion ?? null,
+    birthDate: fields.birth_date ? formatEventDate(fields.birth_date, cal, msgs) : null,
   };
 }
 
@@ -129,5 +130,6 @@ export function sampleValues(locale: Locale, variant: 'short' | 'long', now = ne
   const samples = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> })
     .invitationSamples[variant];
   const date = new Date(now.getTime() + 45 * 86400000).toISOString().slice(0, 10);
-  return { ...samples, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad' };
+  const born = new Date(now.getTime() - 5 * 86400000).toISOString().slice(0, 10);
+  return { ...samples, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad', baby_gender: 'boy', birth_date: born };
 }

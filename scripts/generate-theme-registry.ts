@@ -75,7 +75,7 @@ for (const key of existsSync(themesDir) ? readdirSync(themesDir).sort() : []) {
     const keepsake = existsSync(path.join(themeDir, dirent.name, 'print/Keepsake.tsx'));
     // Optional: the back of the printable card. Without it the platform prints a simple back.
     const cardBack = card && existsSync(path.join(themeDir, dirent.name, 'print/CardBack.tsx'));
-    if (parsed.data.print?.card && !card) errors.push(`themes/${key}/${dirent.name}: manifest declares print.card but print/Card.tsx is missing`);
+    // A card without print/Card.tsx is fine: the platform prints its simple front (or the owner's artwork).
     if (parsed.data.print?.keepsake && !keepsake) errors.push(`themes/${key}/${dirent.name}: manifest declares print.keepsake but print/Keepsake.tsx is missing`);
     entries.push({ key, version: parsed.data.version, importPath: `../../themes/${key}/${dirent.name}/manifest`, card, cardBack, keepsake });
   }

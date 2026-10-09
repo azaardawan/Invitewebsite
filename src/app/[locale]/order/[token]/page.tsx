@@ -8,6 +8,7 @@ import { draftByToken } from '@/server/storefront/order';
 import { Price } from '@/components/storefront/currency';
 import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
+import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
@@ -74,6 +75,22 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               </span>
             </div>
           </div>
+          <ExtrasPreview
+            base={`/p/${token}/extra`}
+            featureKeys={draft.featureKeys}
+            stickerShape={draft.current.stickerShape}
+            watermarked
+            labels={{
+              title: t('extras.title'),
+              note: t('extras.watermarkNote'),
+              card: t('extras.card'),
+              story: t('extras.story'),
+              sticker: t('extras.sticker'),
+              bottle: t('extras.bottle'),
+              downloadPng: t('extras.downloadPng'),
+              downloadSheet: t('extras.downloadSheet'),
+            }}
+          />
           <section aria-labelledby="contact-title" className="flex flex-col gap-4">
             <div>
               <h2 id="contact-title" className="text-xl font-semibold text-heading">

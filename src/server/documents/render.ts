@@ -2,7 +2,7 @@ import 'server-only';
 import { chromium, type Browser } from 'playwright-core';
 import { PDFDocument } from 'pdf-lib';
 import { env } from '@/server/env';
-import { printToken, type RenderKind } from './tokens';
+import { printToken, type ProductView, type RenderKind } from './tokens';
 
 export type PdfRenderer = (kind: RenderKind, invitationId: string) => Promise<Buffer>;
 
@@ -83,6 +83,54 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
     // The cover's images and entrance settle.
     if (kind === 'og') await page.waitForTimeout(800);
     return await page.screenshot({ type: 'jpeg', quality: 82 });
+  } finally {
+    await browser.close();
+  }
+};
+
+/**
+ * Newborn extras and their previews. Files: the story PNG (1080 × 1920), one sticker PNG (≈1200 px, transparent
+ * outside its shape), one bottle label PNG (300 dpi) and the print-ready A4 sheets (PDF). Previews: smaller
+ * JPEGs (the sticker a PNG). The print page draws the watermark itself until the invitation is paid.
+ */
+export type ProductItem =
+  | 'story.png'
+  | 'sticker.png'
+  | 'sticker.pdf'
+  | 'bottle.png'
+  | 'bottle.pdf'
+  | 'story.preview'
+  | 'sticker.preview'
+  | 'bottle.preview'
+  | 'card.preview';
+export type ProductRenderer = (item: ProductItem, invitationId: string) => Promise<Buffer>;
+
+const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
+const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'bottle.pdf'>, { view: string; width: number; height: number; scale: number; type: 'png' | 'jpeg'; transparent?: boolean }> = {
+  'story.png': { view: 'story', width: 1080, height: 1920, scale: 1, type: 'png' },
+  'sticker.png': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 8, type: 'png', transparent: true },
+  'bottle.png': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 3.125, type: 'png' },
+  'story.preview': { view: 'story', width: 1080, height: 1920, scale: 0.5, type: 'jpeg' },
+  'sticker.preview': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 4, type: 'png', transparent: true },
+  'bottle.preview': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 1.6, type: 'jpeg' },
+  'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
+};
+
+export const renderProduct: ProductRenderer = async (item, invitationId) => {
+  const browser = await chromium.launch({
+    executablePath: env().CHROMIUM_PATH || undefined,
+    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+  });
+  try {
+    if (item === 'sticker.pdf' || item === 'bottle.pdf') return await pdfOf(browser, `/print/${printToken(item === 'sticker.pdf' ? 'stickerSheet' : 'bottleSheet', invitationId)}`);
+    const shot = PRODUCT_SHOTS[item];
+    const page = await browser.newPage({ viewport: { width: shot.width, height: shot.height }, deviceScaleFactor: shot.scale, reducedMotion: 'reduce' });
+    await page.emulateMedia({ media: 'print' });
+    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}`;
+    const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
+    if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
+    await page.evaluate(() => document.fonts.ready);
+    return await page.screenshot({ type: shot.type, ...(shot.type === 'jpeg' ? { quality: 84 } : {}), omitBackground: shot.transparent ?? false });
   } finally {
     await browser.close();
   }

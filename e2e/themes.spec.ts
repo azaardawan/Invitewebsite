@@ -77,7 +77,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
         null,
         { timeout: m.internal ? 30_000 : 4_000 },
       );
-      await expect(page.getByText(ar.invitationSamples.short.person_1_name).first()).toBeVisible();
+      await expect(page.getByText(ar.invitationSamples.short[m.fields.includes('person_1_name') ? 'person_1_name' : 'baby_name']).first()).toBeVisible();
       if (!m.internal) {
         // Owner rule: one border per theme, drawn with <ThemeBorder> on the invitation, the card and the keepsake.
         await expect(page.locator('[data-bahja-border]'), `${ref}: theme border`).toHaveCount(1);

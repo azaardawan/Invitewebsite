@@ -1,4 +1,5 @@
 import 'server-only';
+import { invitationNames } from '@/catalog/fields';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, orders } from '@/server/db/schema';
@@ -69,7 +70,7 @@ export async function customerEditInvitation(
     }
 
     const locale: Locale = input.locale && isLocale(input.locale) ? input.locale : inv!.locale;
-    const slug = slugFromNames([result.values.person_1_name, result.values.person_2_name]);
+    const slug = slugFromNames(invitationNames(result.values));
     await tx
       .update(invitations)
       .set({ ...signatures, fieldValues: result.values, slug, locale, selfEdits: inv!.selfEdits + 1, version: inv!.version + 1 })

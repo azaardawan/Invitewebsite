@@ -36,23 +36,33 @@ export const CARD_SIDE_DEFAULTS: Omit<CardSideDesign, 'assetId'> = {
 };
 
 export type ResolvedCardDesign = { front: ArtworkSide | null; back: ArtworkSide | null };
+/** Every artwork slot: the card's sides and the newborn extras. */
+export const ARTWORK_SLOTS = ['front', 'back', 'story', 'sticker', 'bottle'] as const;
+export type ArtworkSlot = (typeof ARTWORK_SLOTS)[number];
+export type ResolvedArtwork = Record<ArtworkSlot, ArtworkSide | null>;
 
 /** The owner's card artwork for a theme, with picture URLs; a side is null when the theme's own design is used. */
 export async function themeCardDesign(db: DbOrTx, themeId: string): Promise<ResolvedCardDesign> {
+  const all = await themeArtwork(db, themeId);
+  return { front: all.front, back: all.back };
+}
+
+/** All of a theme's artwork (card sides and newborn extras), with picture URLs; null where none is set. */
+export async function themeArtwork(db: DbOrTx, themeId: string): Promise<ResolvedArtwork> {
   const [row] = await db.select({ design: themes.cardDesign }).from(themes).where(eq(themes.id, themeId));
   const design = row?.design ?? {};
-  const ids = [design.front?.assetId, design.back?.assetId].filter((id): id is string => !!id);
+  const ids = ARTWORK_SLOTS.map((k) => design[k]?.assetId).filter((id): id is string => !!id);
   const keys = ids.length ? new Map((await db.select({ id: assets.id, key: assets.storageKey }).from(assets).where(inArray(assets.id, ids))).map((a) => [a.id, a.key])) : new Map<string, string>();
   const resolve = (side: CardSideDesign | null | undefined): ArtworkSide | null => {
     const key = side ? keys.get(side.assetId) : undefined;
     if (!side || !key) return null;
     return { ink: side.ink, accent: side.accent, headingFont: side.headingFont, bodyFont: side.bodyFont, align: side.align, insetMm: side.insetMm, scale: side.scale, src: publicMediaUrl(key) };
   };
-  return { front: resolve(design.front), back: resolve(design.back) };
+  return Object.fromEntries(ARTWORK_SLOTS.map((k) => [k, resolve(design[k])])) as ResolvedArtwork;
 }
 
 /** Sets (or removes) the owner's artwork for one side of a theme's printable card. Audited. */
-export async function updateThemeCardSide(db: DbOrTx, themeId: string, side: 'front' | 'back', input: z.input<typeof cardSideInput>, actor: Actor) {
+export async function updateThemeCardSide(db: DbOrTx, themeId: string, side: ArtworkSlot, input: z.input<typeof cardSideInput>, actor: Actor) {
   const data = cardSideInput.parse(input);
   await db.transaction(async (tx) => {
     const [before] = await tx.select({ design: themes.cardDesign }).from(themes).where(eq(themes.id, themeId)).for('update');
@@ -63,7 +73,7 @@ export async function updateThemeCardSide(db: DbOrTx, themeId: string, side: 'fr
     }
     const { assetId, ...style } = data;
     const next: CardDesign = { ...(before.design ?? {}), [side]: assetId ? { assetId, ...style } : null };
-    const empty = !next.front && !next.back;
+    const empty = ARTWORK_SLOTS.every((k) => !next[k]);
     await tx.update(themes).set({ cardDesign: empty ? null : next }).where(eq(themes.id, themeId));
     await recordAudit(tx, {
       ...auditActor(actor),

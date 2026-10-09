@@ -1,4 +1,5 @@
 import 'server-only';
+import { invitationNames } from '@/catalog/fields';
 import { and, eq, gt, inArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations } from '@/server/db/schema';
@@ -39,7 +40,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
       .insert(invitations)
       .values({
         publicId: invitationPublicId(),
-        slug: slugFromNames([result.values.person_1_name, result.values.person_2_name]),
+        slug: slugFromNames(invitationNames(result.values)),
         themeId: p.theme.id,
         themeVersionId: p.version.id,
         packageId: p.pkg.id,
@@ -99,7 +100,7 @@ export async function updateDraft(
       .set({
         ...extra,
         fieldValues: result.values,
-        slug: slugFromNames([result.values.person_1_name, result.values.person_2_name]),
+        slug: slugFromNames(invitationNames(result.values)),
         locale: input.locale ?? locked!.locale,
         previewExpiresAt: new Date(now.getTime() + 24 * 3600_000),
       })

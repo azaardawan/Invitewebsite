@@ -2,6 +2,7 @@ import '@fontsource/aref-ruqaa/400.css';
 import '@fontsource/aref-ruqaa/700.css';
 import '@fontsource-variable/noto-sans-arabic';
 import type { PrintCardBackProps } from '@/theme-sdk/print';
+import { invitationNames } from '@/catalog/fields';
 
 /**
  * The back of the printable card for themes without their own `print/CardBack.tsx`: the customer's big
@@ -11,7 +12,7 @@ import type { PrintCardBackProps } from '@/theme-sdk/print';
 export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message }: PrintCardBackProps) {
   const ink = colors.ink ?? colors.text ?? '#3b2f2a';
   const accent = colors.accent ?? colors.primary ?? '#8a6a3b';
-  const names = [fields.person_1_name, fields.person_2_name].filter(Boolean).join(` ${labels.and} `);
+  const names = invitationNames(fields).join(` ${labels.and} `);
   return (
     <div
       dir={dir}

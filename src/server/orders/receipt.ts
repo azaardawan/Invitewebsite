@@ -50,6 +50,9 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       /** Internal id, for the card download; never rendered. */
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
+      /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */
+      featureKeys: row.invitation.featureKeys,
+      stickerShape: row.invitation.stickerShape,
       /** The keepsake can be downloaded as soon as the invitation is live; it grows as guests write. */
       hasKeepsake: documentAvailable(row.invitation, 'keepsake'),
       /** The celebration has started, so the keepsake is (nearly) complete. */

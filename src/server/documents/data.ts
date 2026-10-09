@@ -17,7 +17,7 @@ import type { ThemeProps } from '@/theme-sdk/types';
 import { themeCardDesign, type ResolvedCardDesign } from '@/server/catalog/card-design';
 
 type InvitationRow = typeof invitations.$inferSelect;
-type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string };
+type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string; watermark: string; watermarkNote: string };
 
 /**
  * Page size for Chromium. The card page is exactly the trim size (A5 = 148 × 210 mm) and the theme's
@@ -70,8 +70,19 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
 
 /** The props every print design shares, from the invitation's theme props. */
 function printBase(theme: ThemeProps) {
-  const { cardBackTitle, ...printMsgs } = (invitationMessages(theme.locale) as unknown as { print: PrintMessages }).print;
-  const labels: PrintLabels = { date: theme.labels.date, time: theme.labels.time, venue: theme.labels.venue, and: theme.labels.and, ...printMsgs };
+  const { cardBackTitle, scanToOpen, keepsakeTitle, keepsakeEmpty } = (invitationMessages(theme.locale) as unknown as { print: PrintMessages }).print;
+  const labels: PrintLabels = {
+    date: theme.labels.date,
+    time: theme.labels.time,
+    venue: theme.labels.venue,
+    and: theme.labels.and,
+    scanToOpen,
+    keepsakeTitle,
+    keepsakeEmpty,
+    itsABoy: theme.labels.itsABoy,
+    itsAGirl: theme.labels.itsAGirl,
+    bornOn: theme.labels.bornOn,
+  };
   const base = {
     locale: theme.locale,
     dir: theme.dir,
@@ -82,6 +93,7 @@ function printBase(theme: ThemeProps) {
     border: theme.border,
     signatures: theme.signatures,
     colors: theme.colors,
+    birthDate: theme.birthDate,
   };
   return { base, cardBackTitle };
 }
