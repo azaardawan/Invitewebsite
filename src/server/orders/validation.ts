@@ -9,6 +9,8 @@ export type FieldError =
   | 'invalidDate'
   | 'pastDate'
   | 'tooFar'
+  | 'futureDate'
+  | 'tooOld'
   | 'invalidTime'
   | 'invalidMapUrl'
   | 'invalidPhone'
@@ -18,6 +20,8 @@ export type FieldDef = { type: string; maxLength: number | null };
 
 const DEFAULT_MAX = { text: 80, longtext: 500 } as const;
 const MAX_DAYS_AHEAD = 730;
+/** A past date (e.g. a birth date) may be at most this old. */
+const MAX_YEARS_BACK = 5;
 
 /** Today's date in Baghdad as YYYY-MM-DD. */
 export function baghdadToday(now = new Date()): string {
@@ -69,6 +73,16 @@ export function validateFieldValues(
         if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) errors[key] = 'invalidDate';
         else if (v < today) errors[key] = 'pastDate';
         else if (v > latest) errors[key] = 'tooFar';
+        else values[key] = v;
+        break;
+      }
+      case 'past_date': {
+        const v = toAsciiDigits(raw.trim());
+        const d = /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00Z`) : null;
+        const earliest = `${Number(today.slice(0, 4)) - MAX_YEARS_BACK}${today.slice(4)}`;
+        if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) errors[key] = 'invalidDate';
+        else if (v > today) errors[key] = 'futureDate';
+        else if (v < earliest) errors[key] = 'tooOld';
         else values[key] = v;
         break;
       }

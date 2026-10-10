@@ -65,6 +65,9 @@ export function OrderForm({
               <textarea {...common} dir="auto" rows={3} maxLength={f.maxLength ?? 500} />
             ) : f.type === 'date' ? (
               <input {...common} type="date" min={minDate} />
+            ) : f.type === 'past_date' ? (
+              // `minDate` is today: a date that already happened can't be later.
+              <input {...common} type="date" max={minDate} />
             ) : f.type === 'time' ? (
               <input {...common} type="time" />
             ) : f.type === 'url' ? (

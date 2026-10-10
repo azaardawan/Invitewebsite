@@ -11,6 +11,8 @@ export type {
   EventDateParts,
   GuestAttendance,
   GuestResponseInput,
+  KitProps,
+  KitComponent,
 } from './types';
 export { hasFeature, formatNumber } from './types';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';

@@ -1,0 +1,100 @@
+/* Platform-owned frame around kit units: sizing, clipping, sheets, crop marks, previews. */
+.unit {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* Round stickers: on a sheet the art keeps its bleed; a PNG is cut exactly on the trim circle. */
+.circleBleed {
+  clip-path: circle(50%);
+}
+
+.circleTrim {
+  clip-path: circle(calc(50% - var(--kit-bleed)));
+}
+
+.page {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+
+.item {
+  position: absolute;
+}
+
+.marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Preview gallery (storefront sample, customer preview, admin preview). */
+.gallery {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 3.5rem 1rem 2.5rem;
+  background: #f3f0ea;
+  color: #3d3a32;
+  font: 500 0.95rem/1.5 system-ui, sans-serif;
+}
+
+.group {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.group h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.note {
+  margin: -0.4rem 0 0;
+  font-size: 0.8rem;
+  color: #77736a;
+  text-align: center;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.scaled {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.scaledInner {
+  position: absolute;
+  inset-block-start: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.shadow {
+  box-shadow: 0 10px 30px rgb(40 35 25 / 0.18);
+}
+
+.watermark {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-repeat: repeat;
+}

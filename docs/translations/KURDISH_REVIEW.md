@@ -264,3 +264,28 @@ Still to suggest (after you've settled the wording above): FAQ answers (`home.fa
 | `receipt.payWhatsApp` | إرسال طلبي على واتساب | Send my order on WhatsApp | ناردنی داواکارییەکەم لە واتسئاپ | هنارتنا داخوازیا من ل واتسئاپێ | ◐ | PENDING |
 | `receipt.waMessage` | مرحباً بهجه، قمت بالطلب {order} بمبلغ {amount}. كيف أُكمل الدفع؟ | Hello Bahja, I placed order {order} for {amount}. How do I complete payment? | سڵاو بەهجە، داواکاری {order} م کرد بە بڕی {amount}. چۆن پارەدان تەواو بکەم؟ | سلاڤ بەهجە، من داخوازیا {order} کر ب بڕێ {amount}. چاوا پارەدانێ تەمام بکەم؟ | ○ | PENDING |
 | `store.paymentSoon` | بعد التأكيد ستحصلون على إيصال خاص فيه طريقة الدفع… | After confirming, you'll get a private receipt with how to pay… | دوای پشتڕاستکردنەوە پسوولەیەکی تایبەتتان پێدەگات کە ڕێگای پارەدانی تێدایە. بانگهێشتنامەکەتان هەر کە پارەدانمان پشتڕاست کردەوە بڵاو دەکرێتەوە. | پشتی پشتڕاستکرنێ دێ پسوولەکا تایبەت گەهیتە هەوە کو ڕێکا پارەدانێ تێدایە. داخوازناما هەوە هەر کو مە پارەدان پشتڕاست کر دێ هێتە بەلاڤکرن. | ○ | PENDING |
+
+## Batch 10 — baby design kits (PENDING)
+
+New for the Baby welcoming section (files to download instead of an online invitation). The Quran
+and du'a wording on the designs always stays Arabic (owner decision); only these lines change with
+the kit language. Until approved, Kurdish kits and pages show the Arabic text.
+
+| Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Status |
+|---|---|---|---|---|---|---|
+| `kitCopy.embroidered-garden.blessed` | رزقنا الله بأجمل العطايا | God has blessed us with the most beautiful of gifts | خودا جوانترین بەخششی پێبەخشین | خودێ جوانترین دیاری دا مە | ○ | PENDING |
+| `kitCopy.embroidered-garden.sonOf` | بن | son of | کوڕی | کوڕێ | ◐ | PENDING |
+| `kit.units.story` | ستوري انستغرام | Instagram story | ستۆری ئینستاگرام | ستۆریا ئینستاگرامێ | ◐ | PENDING |
+| `kit.units.card` | بطاقة A5 للطباعة | A5 printable card | کارتی A5 بۆ چاپکردن | کارتا A5 بۆ چاپکرنێ | ◐ | PENDING |
+| `kit.units.sticker-round` / `sticker-square` | ملصقات الشوكولاتة | Chocolate stickers | ستیکەری شوکولاتە | ستیکەرێن شوکولاتەیێ | ◐ | PENDING |
+| `kit.units.bottle` | ملصق قناني الماء | Water bottle wrap | ستیکەری بوتڵی ئاو | ستیکەرێ بوتلێن ئاڤێ | ○ | PENDING |
+| `kit.downloads.title` | ملفاتكم | Your files | فایلەکانتان | فایلێن هەوە | ◐ | PENDING |
+| `kit.downloads.dateStyle` | طريقة كتابة تاريخ الولادة | How the date of birth is written | شێوازی نووسینی بەرواری لەدایکبوون | شێوازێ نڤیسینا رۆژا ژدایکبوونێ | ○ | PENDING |
+| `kit.downloads.afterPayment` | ستظهر ملفاتكم هنا بعد تأكيد الدفع. | Your files will appear here once payment is confirmed. | فایلەکانتان دوای پشتڕاستکردنەوەی پارەدان لێرە دەردەکەون. | فایلێن هەوە پشتی پشتڕاستکرنا پارەدانێ دێ ل ڤێرە دیار بن. | ○ | PENDING |
+| `store.features.kit_*` | ستوري انستغرام (PNG)… | Instagram story (PNG)… | (same wording as `kit.units.*`, with the file types) | | | PENDING |
+| `store.fieldErrors.futureDate` | لا يمكن أن يكون التاريخ في المستقبل. | The date can't be in the future. | بەروار ناتوانێت لە داهاتوودا بێت. | رۆژ نەشێت د پاشەڕۆژێ دا بیت. | ○ | PENDING |
+| `store.fieldErrors.tooOld` | التاريخ قديم جدًا. | The date is too far in the past. | بەروارەکە زۆر کۆنە. | رۆژ گەلەک کەڤنە. | ○ | PENDING |
+
+The rest of `kit.downloads.*` (button labels and hints) and the Kurdish sample names (`kitSamples`)
+follow once the wording above is settled. Section and field names (`baby` section, `baby_name`,
+`father_name`, `birth_date`) are entered in Admin like the other sections and fields.

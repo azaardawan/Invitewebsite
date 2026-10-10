@@ -1,7 +1,35 @@
 # Architecture Proposal — Bahja (بهجه) Digital Invitation Platform (V1)
 
-Status: **APPROVED — revision 8. M1–M3 implemented; M5 (orders and invoices) backend implemented.**
-Date: 2026-09-30
+Status: **APPROVED — revision 9. M1–M7 implemented; design kits added (owner request, 2026-10-10).**
+Date: 2026-10-10
+
+**Revision 9 changes (design kits — owner decision, 2026-10-10):**
+- **New experience type `DESIGN_KIT`** (§13 anticipated new formats). A kit sells **files**, not an online
+  invitation: an Instagram story (PNG 1080×1920), an A5 card (print PDF with 3 mm bleed and crop marks,
+  plus PNG at 300 dpi), chocolate stickers (round or square, 5 cm: an A4 sheet of 15 with cut guides,
+  or a 2000 px PNG to resize) and a water-bottle wrap (250/330/500/600 ml: an A4 sheet with crop marks,
+  or a PNG at 300 dpi).
+  - Orders, payments, invoices, receipts, packages, audit and admin are shared with invitations. A kit
+    has no public page (`/i/…` answers 404) and no expiry on the receipt.
+  - Package features `kit_story`, `kit_card`, `kit_sticker`, `kit_bottle`; any non-empty mix is a
+    designed state (`kitStates()`), so the owner sets packages freely in Admin.
+  - First section: **Baby welcoming** (`baby`), fields `baby_name`, `father_name`, `birth_date`
+    (new field type `past_date`: not in the future, at most 5 years back).
+- **Choices at download time** (on the private receipt): how the birth date is written (Gregorian
+  long / numeric / Hijri / both; Arabic-Indic or Western digits), sticker shape, bottle size, PDF or PNG.
+- **File generation.** Headless Chromium (`playwright-core`) opens the app's own `/k/<signed token>`
+  page (5-minute HMAC token minted only for an authorized download), waits for fonts and images, then
+  prints the PDF or takes the PNG; PNGs are set to their exact pixel size and DPI. Files are stored
+  (`generated_documents`, `documents/<uuid>.png|pdf`) keyed by a hash of everything that shapes them,
+  so repeat downloads are instant and a change makes a new file. At most two renders run at once;
+  downloads are rate-limited per receipt (60/hour). Admin can download any kit file (`documents.generate`).
+  The Docker image now installs Chromium.
+- **Kit theme contract** (`docs/THEME_CONTRACT.md` §7): `Kit.tsx` draws one unit at a time inside a
+  size container; the platform owns sizes, sheets, crop marks, watermarks and previews. Theme wording
+  that may change lives in `kitCopy.<theme key>` messages (outside the frozen folder).
+- **Previews.** Storefront sample, customer preview and admin preview show every file of the package
+  in a gallery with a watermark and the PREVIEW/SAMPLE ribbon; full-resolution files exist only after payment.
+- The theme registry also records a content hash per theme version (part of the file cache key).
 
 **Revision 8 changes (M5 implementation notes):**
 - **Drafts.**
@@ -100,6 +128,8 @@ Customer-facing routes:
 | `/[locale]/themes/[theme]/order` | Package → fields → preview → checkout | no |
 | `/p/[previewToken]` | Personalized pre-payment preview (short-lived) | no |
 | `/r/[receiptToken]` | Private receipt/confirmation page | no |
+| `/r/[receiptToken]/kit` | Design-kit file download (paid orders only) | no |
+| `/k/[renderToken]` | Internal page the file generator prints (signed, 5 minutes) | no |
 | `/i/[slug]-[publicId]` | Public invitation | **no** (noindex header + meta, excluded from sitemap) |
 | `/api/webhooks/wayl` | WAYL webhook | n/a |
 | `/admin/**` | Admin | no, auth-gated |
@@ -605,7 +635,7 @@ Tests are written inside each milestone. Coverage focuses on payment verificatio
 
 The owner plans a section where people **add pictures and messages**, for example a shared memory book or guestbook. It is **not built in V1**, and V1 still has no customer uploads. These choices keep it addable later without a redesign:
 
-1. **Experience type per section.** `sections.experience_type` is `INVITATION` for everything in V1. A new type (working name `CONTRIBUTION_BOOK`) will have:
+1. **Experience type per section.** `sections.experience_type` is `INVITATION` for invitations and `DESIGN_KIT` for design kits (revision 9). A new type (working name `CONTRIBUTION_BOOK`) will have:
    - its own customer flow and public page renderer, selected by this type at `/i/...`;
    - its own theme contract, extending the same theme SDK.
 

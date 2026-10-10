@@ -9,6 +9,8 @@ type StarterSection = {
   key: string;
   name: I18nContent;
   requiredFeatures: string[];
+  /** Defaults to an online invitation. */
+  experienceType?: 'INVITATION' | 'DESIGN_KIT';
   fields: { key: FieldKey; label?: I18nContent }[];
 };
 
@@ -75,6 +77,14 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'invitation_message' },
     ],
   },
+  {
+    // Design kits (files to download, no online invitation): story, card, stickers, bottle wrap.
+    key: 'baby',
+    name: { ar: 'استقبال مولود', en: 'Baby welcoming' },
+    requiredFeatures: [],
+    experienceType: 'DESIGN_KIT',
+    fields: [{ key: 'baby_name' }, { key: 'father_name' }, { key: 'birth_date' }],
+  },
 ];
 
 export async function seedCatalog(db: DbOrTx) {
@@ -82,7 +92,13 @@ export async function seedCatalog(db: DbOrTx) {
   for (const [i, s] of STARTER_SECTIONS.entries()) {
     const inserted = await db
       .insert(sections)
-      .values({ key: s.key, name: { ...s.name, ckb: null, bdn: null }, requiredFeatures: s.requiredFeatures, sortOrder: i })
+      .values({
+        key: s.key,
+        name: { ...s.name, ckb: null, bdn: null },
+        requiredFeatures: s.requiredFeatures,
+        experienceType: s.experienceType ?? 'INVITATION',
+        sortOrder: i,
+      })
       .onConflictDoNothing({ target: sections.key })
       .returning({ id: sections.id });
     const id = inserted[0]?.id;

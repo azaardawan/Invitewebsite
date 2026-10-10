@@ -204,6 +204,8 @@ export async function themeReadiness(db: DbOrTx, themeId: string): Promise<Readi
   if (!row.version) problems.push({ code: 'noVersion' });
   else if (!row.version.inBuild) problems.push({ code: 'versionNotInBuild', subject: row.version.codeRef });
   if (!row.theme.coverAssetId) problems.push({ code: 'noCover' });
+  const experience = (row.version?.manifest as ThemeManifest | undefined)?.experience;
+  if (row.section && experience && row.section.experienceType !== experience) problems.push({ code: 'experienceMismatch' });
 
   const active = (await packagesWithShape(db, themeId)).filter((p) => p.status === 'ACTIVE');
   if (!active.length) problems.push({ code: 'noPackages' });

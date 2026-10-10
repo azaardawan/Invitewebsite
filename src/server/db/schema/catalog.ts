@@ -21,7 +21,7 @@ import { adminUsers } from './admin';
 export type I18nContent = { ar: string; en: string; ckb?: string | null; bdn?: string | null };
 
 export const sectionStatus = pgEnum('section_status', ['ACTIVE', 'ARCHIVED']);
-export const experienceType = pgEnum('experience_type', ['INVITATION']);
+export const experienceType = pgEnum('experience_type', ['INVITATION', 'DESIGN_KIT']);
 export const themeStatus = pgEnum('theme_status', ['DEVELOPMENT', 'READY_FOR_REVIEW', 'ACTIVE', 'ARCHIVED']);
 export const packageStatus = pgEnum('package_status', ['ACTIVE', 'ARCHIVED']);
 export const musicStatus = pgEnum('music_status', ['ACTIVE', 'ARCHIVED']);

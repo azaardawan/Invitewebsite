@@ -12,8 +12,10 @@ COPY . .
 RUN pnpm build
 
 FROM base AS run
-ENV NODE_ENV=production
+ENV NODE_ENV=production PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 COPY --from=build /app /app
+# Headless Chromium (and its system libraries) for design-kit PNG/PDF files.
+RUN pnpm exec playwright-core install --with-deps chromium-headless-shell && rm -rf /var/lib/apt/lists/*
 RUN chmod +x scripts/start.sh
 EXPOSE 3000
 CMD ["scripts/start.sh"]

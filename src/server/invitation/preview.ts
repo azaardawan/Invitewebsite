@@ -64,5 +64,5 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     values: sampleValues(req.locale, req.names ?? 'short'),
     musicSrc: music ? publicMediaUrl(music.key) : null,
   });
-  return { theme, version, manifest, props };
+  return { theme, version, manifest, props, features, fieldKeys };
 }

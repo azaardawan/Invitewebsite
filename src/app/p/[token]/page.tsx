@@ -2,6 +2,9 @@ import { db } from '@/server/db/client';
 import { invitationRenderData } from '@/server/invitation/load';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { InvitationView } from '@/components/invitation/InvitationView';
+import { KitGallery } from '@/components/kit/KitGallery';
+import { kitGalleryData } from '@/server/kit/preview';
+import { isDesignKit } from '@/theme-registry';
 import { previewInvitation } from './data';
 
 /**
@@ -22,5 +25,9 @@ export default async function PersonalPreviewPage({ params }: PageProps<'/p/[tok
     );
   }
   const { codeRef, props } = await invitationRenderData(db(), inv, 'preview');
+  if (isDesignKit(codeRef)) {
+    const kit = kitGalleryData({ mode: 'preview', locale: inv.locale, codeRef, features: inv.featureKeys, fieldKeys: inv.fieldKeys, values: inv.fieldValues });
+    return <KitGallery codeRef={codeRef} {...kit} ribbon={msgs.previewRibbon} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
+  }
   return <InvitationView codeRef={codeRef} props={props} ribbon={msgs.previewRibbon} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
 }

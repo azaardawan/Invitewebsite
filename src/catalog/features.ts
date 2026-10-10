@@ -17,10 +17,23 @@ export const FEATURES = {
   keepsake_pdf: { requires: ['congratulations'], requiresFields: [] },
   /** Printable invitation card PDF for the customer. */
   print_card: { requires: [], requiresFields: [] },
+  /** Design kits (src/catalog/kit.ts): downloadable files instead of an online invitation. */
+  kit_story: { requires: [], requiresFields: [] },
+  kit_card: { requires: [], requiresFields: [] },
+  kit_sticker: { requires: [], requiresFields: [] },
+  kit_bottle: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 export type FeatureKey = keyof typeof FEATURES;
 export const FEATURE_KEYS = Object.keys(FEATURES) as FeatureKey[];
+
+/** Features that belong to design kits; invitation themes can't use them and kits can use only these. */
+export const KIT_FEATURE_KEYS = ['kit_story', 'kit_card', 'kit_sticker', 'kit_bottle'] as const satisfies readonly FeatureKey[];
+export type KitFeatureKey = (typeof KIT_FEATURE_KEYS)[number];
+
+export function isKitFeature(value: string): value is KitFeatureKey {
+  return (KIT_FEATURE_KEYS as readonly string[]).includes(value);
+}
 
 export function isFeatureKey(value: string): value is FeatureKey {
   return Object.hasOwn(FEATURES, value);

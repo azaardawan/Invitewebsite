@@ -10,6 +10,10 @@ import { getReceipt } from '@/server/orders/receipt';
 import { paymentWindowOpen, refreshOrderPayment } from '@/server/payments/service';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { getSettings } from '@/server/settings/service';
+import { isDesignKit } from '@/theme-registry';
+import { kitUnits } from '@/catalog/kit';
+import { kitDateExamples, kitDownloadLabels } from '@/server/kit/props';
+import { KitDownloads } from '@/components/kit/KitDownloads';
 import { receiptFor } from './data';
 import { payAction } from './actions';
 
@@ -46,6 +50,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // Manual collection has no time limit: the team confirms whenever the customer pays.
   const waitingManual = (r.status === 'PENDING' || r.status === 'AWAITING_PAYMENT') && !online;
   const { payment } = waitingManual ? await getSettings(db()) : { payment: null };
+  // Design kits are files to download: no public link and no expiry.
+  const kit = isDesignKit(r.snapshot.themeVersion.codeRef);
   const waText = t('waMessage', { order: r.orderNumber, amount: formatIqd(r.amountIqd, intl) });
   const rows: [string, string][] = [
     [t('orderNumber'), r.orderNumber],
@@ -59,7 +65,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('amount'), formatIqd(r.amountIqd, intl)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
-    ...(r.invitation.publishedAt ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
+    ...(r.invitation.publishedAt && !kit ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
   ];
 
   return (
@@ -114,29 +120,45 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       </dl>
       <p className="mt-2 text-xs text-muted">{t('amountNote')}</p>
 
-      <section className="mt-8 space-y-3">
-        <h2 className="font-semibold">{t('invitationLink')}</h2>
-        {url ? (
-          <p className="break-all rounded-md bg-canvas px-3 py-2 text-sm" dir="ltr">
-            {url}
-          </p>
-        ) : (
-          <p className="text-sm text-muted">{t('notPublishedYet')}</p>
-        )}
-        <ReceiptActions
-          url={url}
-          shareText={t('shareText', { url: url ?? '' })}
-          confirmText={t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}
-          labels={{
-            copyLink: t('copyLink'),
-            copied: t('copied'),
-            shareWhatsApp: t('shareWhatsApp'),
-            saveWhatsApp: t('saveWhatsApp'),
-            openInvitation: t('openInvitation'),
-            print: t('print'),
-          }}
-        />
-      </section>
+      {kit ? (
+        <div className="mt-8 print:hidden">
+          {paid ? (
+            <KitDownloads
+              baseHref={`/r/${token}/kit`}
+              units={kitUnits(r.snapshot.package.featureKeys)}
+              dateExamples={kitDateExamples(r.snapshot.invitation.fieldValues.birth_date, locale)}
+              showDigits={locale !== 'en'}
+              labels={kitDownloadLabels(locale)}
+            />
+          ) : (
+            <p className="text-sm text-muted">{kitDownloadLabels(locale).afterPayment}</p>
+          )}
+        </div>
+      ) : (
+        <section className="mt-8 space-y-3">
+          <h2 className="font-semibold">{t('invitationLink')}</h2>
+          {url ? (
+            <p className="break-all rounded-md bg-canvas px-3 py-2 text-sm" dir="ltr">
+              {url}
+            </p>
+          ) : (
+            <p className="text-sm text-muted">{t('notPublishedYet')}</p>
+          )}
+          <ReceiptActions
+            url={url}
+            shareText={t('shareText', { url: url ?? '' })}
+            confirmText={t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}
+            labels={{
+              copyLink: t('copyLink'),
+              copied: t('copied'),
+              shareWhatsApp: t('shareWhatsApp'),
+              saveWhatsApp: t('saveWhatsApp'),
+              openInvitation: t('openInvitation'),
+              print: t('print'),
+            }}
+          />
+        </section>
+      )}
 
       <p className="mt-8 text-sm">{t('corrections')}</p>
       <p className="mt-2 text-xs text-muted print:hidden">{t('keepLink')}</p>

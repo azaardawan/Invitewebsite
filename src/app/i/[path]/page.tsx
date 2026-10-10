@@ -13,6 +13,7 @@ import { env } from '@/server/env';
 import { isLocale } from '@/i18n/config';
 import { InvitationView } from '@/components/invitation/InvitationView';
 import { InvitationEnded } from '@/components/invitation/InvitationEnded';
+import { isDesignKit } from '@/theme-registry';
 
 export async function generateMetadata({ params }: PageProps<'/i/[path]'>): Promise<Metadata> {
   const { path } = await params;
@@ -55,6 +56,8 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
     return <InvitationEnded title={msgs.endedTitle} body={msgs.endedBody} brand={msgs.brand} />;
   }
   const { codeRef, props } = await invitationRenderData(db(), r.invitation, 'live');
+  // Design kits are files to download; they have no public page.
+  if (isDesignKit(codeRef)) notFound();
   const msgs = invitationMessages(r.invitation.locale);
   return <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
 }

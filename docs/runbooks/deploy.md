@@ -78,6 +78,13 @@ Staging is never indexed by search engines (`robots.txt` blocks everything unles
    - `/robots.txt` allows indexing and lists the sitemap.
    - A test invitation link opens on a phone and shows a preview when shared on WhatsApp.
 
+## Design-kit files (Chromium)
+
+Design kits (e.g. the baby welcoming kits) are made into PNG/PDF files by a headless Chromium inside
+the same container; the Dockerfile installs it. Nothing to configure: it reaches the app at
+`http://127.0.0.1:$PORT`. Give the service at least **1 GB of memory** (two files are made at once at
+most). The first download of each file takes a few seconds; later downloads come from storage.
+
 ## Backups
 
 On the Hobby plan, check that Railway Postgres **backups** are enabled for the database. A tested

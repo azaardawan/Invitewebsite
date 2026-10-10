@@ -38,6 +38,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
   await signInAsNewOwner(page);
 
   for (const m of generatedManifests) {
+    if (m.experience === 'DESIGN_KIT') continue; // checked by e2e/kits.spec.ts
     const ref = `${m.key}@${m.version}`;
     for (const [i, state] of m.validStates.entries()) {
       for (const lang of LANGS) {

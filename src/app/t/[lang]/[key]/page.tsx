@@ -9,6 +9,9 @@ import { invitationMessages } from '@/server/invitation/theme-props';
 import { isLocale } from '@/i18n/config';
 import { manifestByCodeRef } from '@/theme-registry';
 import { InvitationView } from '@/components/invitation/InvitationView';
+import { KitGallery } from '@/components/kit/KitGallery';
+import { kitGalleryData } from '@/server/kit/preview';
+import { kitSampleValues } from '@/server/kit/props';
 
 const query = z.object({
   pkg: z.uuid().optional(),
@@ -34,6 +37,17 @@ export default async function PublicThemeSample({ params, searchParams }: PagePr
   const sample = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names });
   if (!sample || !manifestByCodeRef(sample.version.codeRef)) notFound();
   const msgs = invitationMessages(lang);
+  if (sample.manifest.experience === 'DESIGN_KIT') {
+    const kit = kitGalleryData({
+      mode: 'sample',
+      locale: lang,
+      codeRef: sample.version.codeRef,
+      features: sample.features,
+      fieldKeys: sample.fieldKeys,
+      values: kitSampleValues(lang, q.data?.names ?? 'short'),
+    });
+    return <KitGallery codeRef={sample.version.codeRef} {...kit} ribbon={msgs.sampleRibbon} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
+  }
   return (
     <InvitationView
       codeRef={sample.version.codeRef}

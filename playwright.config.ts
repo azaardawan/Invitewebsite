@@ -42,6 +42,9 @@ export default defineConfig({
         WAYL_API_KEY: 'mock-key',
         WAYL_API_BASE_URL: `http://localhost:${WAYL_MOCK_PORT}`,
         WAYL_ENV: 'test',
+        // The design-kit file generator opens this server (and the preinstalled Chromium, if given).
+        KIT_RENDER_ORIGIN: `http://localhost:${PORT}`,
+        ...(process.env.PW_CHROMIUM_PATH ? { KIT_CHROMIUM_PATH: process.env.PW_CHROMIUM_PATH } : {}),
       },
     },
   ],

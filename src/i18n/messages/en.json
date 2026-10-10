@@ -274,7 +274,11 @@
         "rsvp": "Guest form (name + attendance)",
         "congratulations": "Guest congratulation message",
         "keepsake_pdf": "Keepsake PDF of messages",
-        "print_card": "Printable invitation card"
+        "print_card": "Printable invitation card",
+        "kit_story": "Instagram story",
+        "kit_card": "A5 printable card",
+        "kit_sticker": "Chocolate stickers",
+        "kit_bottle": "Water bottle wrap"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -282,7 +286,8 @@
         "date": "Date",
         "time": "Time",
         "url": "Link",
-        "phone": "Phone number"
+        "phone": "Phone number",
+        "past_date": "Past date (e.g. date of birth)"
       },
       "sections": {
         "heading": "Sections",
@@ -399,7 +404,8 @@
           "packageInvalid": "A package doesn't match any designed state",
           "packageMissingRequired": "A package is missing a feature required by the section",
           "noMusic": "A package includes music but no song is chosen.",
-          "musicArchived": "The chosen song is archived."
+          "musicArchived": "The chosen song is archived.",
+          "experienceMismatch": "The theme type (invitation or design kit) does not match the section type."
         },
         "priceUsd": "Price (US dollars)",
         "priceUsdHint": "You set both prices. The USD price is optional for now and will be used once card payments (Mastercard) are enabled."
@@ -723,7 +729,11 @@
       "rsvp": "Guest attendance replies",
       "congratulations": "Congratulation messages from guests",
       "keepsake_pdf": "A keepsake PDF of all messages",
-      "print_card": "Printable invitation card"
+      "print_card": "Printable invitation card",
+      "kit_story": "Instagram story (PNG)",
+      "kit_card": "Print-ready A5 card (PDF and PNG)",
+      "kit_sticker": "Round or square chocolate stickers (PDF and PNG)",
+      "kit_bottle": "Water bottle wrap label (PDF and PNG)"
     },
     "fieldsCount": "{count} details to fill in",
     "orderTitle": "Your invitation details",
@@ -751,7 +761,9 @@
       "invalidPhone": "Please enter a valid phone number.",
       "invalidUrl": "Please enter a valid https link.",
       "invalidEmail": "Please enter a valid email address.",
-      "invalidName": "Please enter your name (2–80 characters)."
+      "invalidName": "Please enter your name (2–80 characters).",
+      "futureDate": "The date can’t be in the future.",
+      "tooOld": "The date is too far in the past."
     },
     "errors": {
       "notAvailable": "This design or package is no longer available.",
@@ -787,5 +799,62 @@
     "metaThemes": "Invitation designs",
     "metaHome": "Digital invitations for your occasions",
     "paymentNext": "After confirming, you'll pay securely on WAYL's payment page. Your invitation goes live as soon as payment is confirmed."
+  },
+  "kit": {
+    "units": {
+      "story": "Instagram story",
+      "card": "A5 printable card",
+      "sticker-round": "Chocolate stickers",
+      "sticker-square": "Chocolate stickers",
+      "bottle": "Water bottle wrap"
+    },
+    "notes": {
+      "sticker-round": "Round or square, 5 cm",
+      "bottle": "Wraps around the bottle; choose the size when downloading"
+    },
+    "downloads": {
+      "title": "Your files",
+      "intro": "Choose how the date of birth is written, then download your files. You can download them as often as you like.",
+      "dateStyle": "How the date of birth is written",
+      "digits": "Digits",
+      "digitsArab": "٠١٢٣",
+      "digitsLatn": "0123",
+      "units": {
+        "story": "Instagram story",
+        "card": "A5 printable card",
+        "sticker-round": "Round chocolate sticker",
+        "sticker-square": "Square chocolate sticker",
+        "bottle": "Water bottle wrap",
+        "stickers": "Chocolate stickers (5 cm)"
+      },
+      "shape": "Shape",
+      "round": "Round",
+      "square": "Square",
+      "bottleSize": "Bottle size",
+      "bottleHint": "Check the size by wrapping a paper strip around your bottle. The PNG can be resized for any bottle.",
+      "ml": "ml",
+      "pdf": "Print PDF",
+      "pdfSheet": "A4 print sheet (PDF)",
+      "png": "PNG image",
+      "pngHint": "A high-resolution PNG you can resize to any size.",
+      "slowHint": "The first download of each file can take a few seconds.",
+      "afterPayment": "Your files will appear here once payment is confirmed."
+    }
+  },
+  "kitSamples": {
+    "short": {
+      "baby_name": "Omar",
+      "father_name": "Abdulaziz"
+    },
+    "long": {
+      "baby_name": "Abdulrahman",
+      "father_name": "Mohammed Abdulkareem"
+    }
+  },
+  "kitCopy": {
+    "embroidered-garden": {
+      "blessed": "God has blessed us with the most beautiful of gifts",
+      "sonOf": "son of"
+    }
   }
 }

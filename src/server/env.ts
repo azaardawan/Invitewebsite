@@ -38,6 +38,11 @@ const schema = z.object({
   WAYL_ENV: z.enum(['live', 'test']).default('test'),
   /** Shared secret for the scheduled reconciliation call (`POST /api/cron/reconcile-payments`). */
   CRON_SECRET: z.string().min(32).optional(),
+  /** Where the file generator's headless Chromium reaches this app (default: http://127.0.0.1:$PORT). */
+  KIT_RENDER_ORIGIN: z.url().optional(),
+  /** Chromium binary for file generation; by default Playwright's installed browser is used. */
+  KIT_CHROMIUM_PATH: z.string().min(1).optional(),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
 }).superRefine((e, ctx) => {
   if (e.APP_ENV === 'production' && e.WAYL_API_KEY && e.WAYL_ENV !== 'live') {
     ctx.addIssue({ code: 'custom', path: ['WAYL_ENV'], message: 'must be live in production' });

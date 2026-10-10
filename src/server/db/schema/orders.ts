@@ -143,6 +143,33 @@ export const orderStatusHistory = pgTable(
   (t) => [index('order_status_history_order_idx').on(t.orderId, t.at)],
 );
 
+/**
+ * Files made for a customer (design-kit PNG/PDF downloads; later the printable
+ * card and keepsake PDF). Generated on first download and kept, so a repeat
+ * download is instant; `source_hash` covers everything that shapes the file,
+ * so an admin edit or a different option makes a new one.
+ */
+export const generatedDocuments = pgTable(
+  'generated_documents',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    invitationId: uuid('invitation_id')
+      .notNull()
+      .references(() => invitations.id, { onDelete: 'restrict' }),
+    themeVersionId: uuid('theme_version_id')
+      .notNull()
+      .references(() => themeVersions.id, { onDelete: 'restrict' }),
+    /** e.g. `kit:sticker-round:pdf`. */
+    variant: text('variant').notNull(),
+    sourceHash: text('source_hash').notNull(),
+    storageKey: text('storage_key').notNull().unique(),
+    contentType: text('content_type').notNull(),
+    bytes: integer('bytes').notNull(),
+    generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('generated_documents_source_uq').on(t.invitationId, t.sourceHash)],
+);
+
 /** Gap-free yearly invoice sequence; incremented in the same transaction that marks an order PAID. */
 export const invoiceCounters = pgTable('invoice_counters', {
   year: integer('year').primaryKey(),

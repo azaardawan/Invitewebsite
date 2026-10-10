@@ -6,7 +6,8 @@
  * the values here are the seeded defaults. Adding a field: add it here, then
  * `pnpm db:seed`. Every future theme can then use it.
  */
-export const FIELD_TYPES = ['text', 'longtext', 'date', 'time', 'url', 'phone'] as const;
+/** `date` is an upcoming event date; `past_date` is a date that already happened (e.g. a birth date). */
+export const FIELD_TYPES = ['text', 'longtext', 'date', 'past_date', 'time', 'url', 'phone'] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 
 export type I18nText = { ar: string; en: string; ckb?: string | null; bdn?: string | null };
@@ -27,6 +28,9 @@ export const STANDARD_FIELDS = {
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message' } },
+  baby_name: { type: 'text', maxLength: 25, label: { ar: 'اسم المولود', en: "Baby's name" } },
+  father_name: { type: 'text', maxLength: 30, label: { ar: 'اسم الأب', en: "Father's name" } },
+  birth_date: { type: 'past_date', label: { ar: 'تاريخ الولادة', en: 'Date of birth' } },
 } as const satisfies Record<string, FieldSpec>;
 
 export type FieldKey = keyof typeof STANDARD_FIELDS;

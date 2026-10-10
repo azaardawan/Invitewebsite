@@ -25,7 +25,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
       .insert(invitations)
       .values({
         publicId: invitationPublicId(),
-        slug: slugFromNames([result.values.person_1_name, result.values.person_2_name]),
+        slug: slugFromNames([result.values.person_1_name ?? result.values.baby_name, result.values.person_2_name]),
         themeId: p.theme.id,
         themeVersionId: p.version.id,
         packageId: p.pkg.id,
@@ -79,7 +79,7 @@ export async function updateDraft(
       .update(invitations)
       .set({
         fieldValues: result.values,
-        slug: slugFromNames([result.values.person_1_name, result.values.person_2_name]),
+        slug: slugFromNames([result.values.person_1_name ?? result.values.baby_name, result.values.person_2_name]),
         locale: input.locale ?? locked!.locale,
         previewExpiresAt: new Date(now.getTime() + 24 * 3600_000),
       })

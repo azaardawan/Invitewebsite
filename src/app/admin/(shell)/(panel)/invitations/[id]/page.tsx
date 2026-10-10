@@ -13,6 +13,10 @@ import { localeMeta } from '@/i18n/config';
 import { invitationPath } from '@/lib/ids';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
+import { isDesignKit } from '@/theme-registry';
+import { kitUnits } from '@/catalog/kit';
+import { kitDateExamples, kitDownloadLabels } from '@/server/kit/props';
+import { KitDownloads } from '@/components/kit/KitDownloads';
 import { editInvitationAction, extendInvitationAction, invitationMusicAction, publishInvitationAction } from '../../../../_actions/invitations';
 
 const BADGE = { live: 'ACTIVE', expired: 'ARCHIVED', unpublished: 'ARCHIVED', awaiting: 'READY_FOR_REVIEW', paid: 'READY_FOR_REVIEW', draft: 'DEVELOPMENT' } as const;
@@ -48,7 +52,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           {t('heading')}
         </Link>
         <h1 className="text-2xl font-semibold" dir="auto">
-          {[inv.fieldValues.person_1_name, inv.fieldValues.person_2_name].filter(Boolean).join(' · ') || inv.publicId}
+          {[inv.fieldValues.person_1_name ?? inv.fieldValues.baby_name, inv.fieldValues.person_2_name].filter(Boolean).join(' · ') || inv.publicId}
         </h1>
         <Badge status={BADGE[state]}>{t(`states.${state}`)}</Badge>
       </header>
@@ -101,6 +105,18 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           </p>
         ))}
       </Card>
+
+      {row.codeRef && isDesignKit(row.codeRef) && can(authz, 'documents.generate') ? (
+        <Card>
+          <KitDownloads
+            baseHref={`/admin/api/invitations/${inv.id}/kit`}
+            units={kitUnits(inv.featureKeys)}
+            dateExamples={kitDateExamples(inv.fieldValues.birth_date, inv.locale)}
+            showDigits={inv.locale !== 'en'}
+            labels={kitDownloadLabels(locale === 'en' ? 'en' : 'ar')}
+          />
+        </Card>
+      ) : null}
 
       {published && can(authz, 'invitations.extend') ? (
         <Card>
@@ -157,7 +173,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                     <input
                       name={`f.${f.key}`}
                       defaultValue={inv.fieldValues[f.key] ?? ''}
-                      type={f.type === 'date' ? 'date' : f.type === 'time' ? 'time' : f.type === 'url' ? 'url' : 'text'}
+                      type={f.type === 'date' || f.type === 'past_date' ? 'date' : f.type === 'time' ? 'time' : f.type === 'url' ? 'url' : 'text'}
                       dir={f.type === 'url' ? 'ltr' : 'auto'}
                       className={input}
                     />
