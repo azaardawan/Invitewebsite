@@ -79,16 +79,15 @@ const STARTER_SECTIONS: StarterSection[] = [
   },
   {
     key: 'newborn',
-    // Kurdish awaits the owner's approval (docs/translations/KURDISH_REVIEW.md).
-    name: { ar: 'مولود جديد', en: 'Newborn baby' },
+    name: { ar: 'مولود جديد', en: 'Newborn baby', ckb: 'لەدایکبوونی منداڵ', bdn: 'زاروکێ نوو' },
     // Ticked by default on new packages (the owner chooses per package).
     requiredFeatures: ['story', 'print_card', 'sticker', 'bottle_label'],
     fields: [{ key: 'baby_name' }, { key: 'baby_gender' }, { key: 'mother_name' }, { key: 'father_name' }, { key: 'birth_date' }, { key: 'baby_quote' }],
     // Designs for a boy or a girl, so parents who know can go straight to them. A design in one of these
     // starts the order form with that gender chosen.
     subsections: [
-      { key: 'boy', name: { ar: 'ولد', en: 'Boy' } },
-      { key: 'girl', name: { ar: 'بنت', en: 'Girl' } },
+      { key: 'boy', name: { ar: 'ولد', en: 'Boy', ckb: 'کوڕ', bdn: 'کوڕ' } },
+      { key: 'girl', name: { ar: 'بنت', en: 'Girl', ckb: 'کچ', bdn: 'کچ' } },
     ],
   },
 ];
@@ -149,6 +148,11 @@ async function addMissingKurdish(db: DbOrTx) {
     if (!row) continue;
     const name = fill(row.name, s.name);
     if (name) await db.update(sections).set({ name }).where(eq(sections.id, row.id));
+    for (const sub of s.subsections ?? []) {
+      const [existing] = await db.select().from(subsections).where(and(eq(subsections.sectionId, row.id), eq(subsections.key, sub.key)));
+      const subName = existing ? fill(existing.name, sub.name) : null;
+      if (subName) await db.update(subsections).set({ name: subName }).where(eq(subsections.id, existing!.id));
+    }
     const defaults = await db.select().from(sectionDefaultFields).where(eq(sectionDefaultFields.sectionId, row.id));
     for (const d of defaults) {
       const label = fill(d.label, s.fields.find((f) => f.key === d.fieldKey)?.label);

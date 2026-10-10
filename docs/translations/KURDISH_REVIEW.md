@@ -502,20 +502,21 @@ Applied to `ckb.json` and `bdn.json`.
 | 3 | `home.bestSeller` | الأكثر مبيعاً | Best seller | پڕفرۆشترین | پڕفرۆشترین | ◐ |
 | 4 | `home.topPick` | اختيار مميز | Top pick | هەڵبژاردەی تایبەت | هەلبژارتنا تایبەت | ◐ |
 
-## Batch 21 — choosing the occasion for a design sold in several (PENDING)
+## Batch 21 — choosing the occasion for a design sold in several — ✅ APPROVED (owner, 2026-10-10)
 
 Shown on the order form only for a design that is in more than one occasion (e.g. wedding and engagement).
-Until approved, these show in Arabic to Kurdish visitors.
+Applied to `ckb.json` and `bdn.json`.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
 | 1 | `store.occasionQuestion` | لأي مناسبة هذه الدعوة؟ | Which occasion is this invitation for? | ئەم بانگهێشتنامەیە بۆ چ بۆنەیەکە؟ | ئەڤ داخوازنامە بۆ چ بۆنەیێ یە؟ | ◐ |
 | 2 | `store.occasionRequired` | يرجى اختيار المناسبة. | Please choose the occasion. | تکایە بۆنەکە هەڵبژێرە. | هیڤییە بۆنێ هەلبژێرە. | ◐ |
 
-## Batch 22 — newborn baby occasion and its extras (PENDING)
+## Batch 22 — newborn baby occasion and its extras — ✅ APPROVED (owner, 2026-10-10)
 
 The new "مولود جديد" occasion: its details, the extras (Instagram story, chocolate stickers, bottle label), the
-watermarked previews and the sticker shape. Until approved, these show in Arabic to Kurdish visitors.
+watermarked previews and the sticker shape. Applied to `ckb.json` and `bdn.json`; the names below are added by the
+seed wherever the Arabic is unchanged and the Kurdish is empty.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|

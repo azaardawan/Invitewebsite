@@ -33,13 +33,13 @@ export const STANDARD_FIELDS = {
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link', ckb: 'بەستەری شوێن لەسەر نەخشە', bdn: 'لینکا جهی ل سەر نەخشەی' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
-  // Newborn baby (Kurdish labels await the owner's approval: docs/translations/KURDISH_REVIEW.md).
-  baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name" } },
-  baby_gender: { type: 'choice', options: ['boy', 'girl'], label: { ar: 'ولد أم بنت', en: 'Boy or girl' } },
-  mother_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأم', en: "Mother's name" } },
-  father_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأب', en: "Father's name" } },
-  birth_date: { type: 'birthdate', label: { ar: 'تاريخ الولادة', en: 'Date of birth' } },
-  baby_quote: { type: 'text', maxLength: 120, label: { ar: 'عبارة قصيرة', en: 'A short quote' } },
+  // Newborn baby.
+  baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },
+  baby_gender: { type: 'choice', options: ['boy', 'girl'], label: { ar: 'ولد أم بنت', en: 'Boy or girl', ckb: 'کوڕ یان کچ', bdn: 'کوڕ یان کچ' } },
+  mother_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأم', en: "Mother's name", ckb: 'ناوی دایک', bdn: 'ناڤێ دەیکێ' } },
+  father_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأب', en: "Father's name", ckb: 'ناوی باوک', bdn: 'ناڤێ بابی' } },
+  birth_date: { type: 'birthdate', label: { ar: 'تاريخ الولادة', en: 'Date of birth', ckb: 'بەرواری لەدایکبوون', bdn: 'دیرۆکا ژدایکبوونێ' } },
+  baby_quote: { type: 'text', maxLength: 120, label: { ar: 'عبارة قصيرة', en: 'A short quote', ckb: 'ڕستەیەکی کورت', bdn: 'ڕستەیەکا کورت' } },
 } as const satisfies Record<string, FieldSpec>;
 
 export type FieldKey = keyof typeof STANDARD_FIELDS;
