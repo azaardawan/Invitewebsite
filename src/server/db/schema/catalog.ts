@@ -139,7 +139,8 @@ export const musicTracks = pgTable('music_tracks', {
  * a full-page background image without text, and how the platform writes the invitation's text on it.
  */
 export type CardSideDesign = {
-  assetId: string;
+  /** The background artwork; null (extras only) = drawn on the design's shared look without a picture. */
+  assetId: string | null;
   /** Main text colour and the colour of the names / big title. */
   ink: string;
   accent: string;
@@ -152,10 +153,42 @@ export type CardSideDesign = {
   insetMm: number;
   /** Text size, 100 = normal. */
   scale: number;
+  /** Extras only: which of the item's layouts (see PRODUCT_LAYOUTS). */
+  layout?: string;
+  /** Extras only: which details to print (the name is always shown). */
+  show?: { gender?: boolean; date?: boolean; parents?: boolean; quote?: boolean };
+  /** Extras only: true = use the colours and fonts set here; otherwise the design's shared look. */
+  ownLook?: boolean;
+  /** Extras only, with `ownLook`: the paper colour behind the text (when there is no artwork). */
+  paper?: string;
+};
+/**
+ * The look every newborn extra (and the platform's simple card) shares for one design, so the story,
+ * stickers, bottle label and card read as one set. Null = taken from the design's colours (and the
+ * customer's chosen colour set).
+ */
+export type ExtrasLook = {
+  paper: string;
+  ink: string;
+  accent: string;
+  headingFont: CardFont;
+  bodyFont: CardFont;
+  /** Tint the paper and accent pink for a girl and blue for a boy. */
+  babyColours: boolean;
 };
 export type CardFont = 'ruqaa' | 'sans' | 'vazir';
-/** Null side = the theme's own design (or the platform's simple back). */
-export type CardDesign = { front?: CardSideDesign | null; back?: CardSideDesign | null };
+/**
+ * The owner's artwork per printed/shared item. Card sides: null = the theme's own design (or the platform's
+ * simple one). Story, sticker, bottle label (newborn extras): null = the platform's simple design.
+ */
+export type CardDesign = {
+  front?: CardSideDesign | null;
+  back?: CardSideDesign | null;
+  story?: CardSideDesign | null;
+  sticker?: CardSideDesign | null;
+  bottle?: CardSideDesign | null;
+  look?: ExtrasLook | null;
+};
 
 export const themes = pgTable(
   'themes',
@@ -184,6 +217,24 @@ export const themes = pgTable(
     ...timestamps,
   },
   (t) => [index('themes_section_order_idx').on(t.sectionId, t.status, t.sortOrder)],
+);
+
+/**
+ * Other occasions a design is also sold in (besides its main one, `themes.section_id`), e.g. a design for both
+ * weddings and engagements. It shows on each occasion's page and once in combined lists; the customer's
+ * invitation records which occasion it is for.
+ */
+export const themeExtraSections = pgTable(
+  'theme_extra_sections',
+  {
+    themeId: uuid('theme_id')
+      .notNull()
+      .references(() => themes.id, { onDelete: 'cascade' }),
+    sectionId: uuid('section_id')
+      .notNull()
+      .references(() => sections.id, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.themeId, t.sectionId] }), index('theme_extra_sections_section_idx').on(t.sectionId)],
 );
 
 export const themeVersions = pgTable(

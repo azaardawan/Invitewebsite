@@ -13,6 +13,8 @@ import { InvitationView } from '@/components/invitation/InvitationView';
 const query = z.object({
   pkg: z.uuid().optional(),
   names: z.enum(['short', 'long']).optional(),
+  /** Which occasion's wording, for a design sold in several. */
+  occasion: z.string().max(40).optional(),
 });
 
 /**
@@ -31,7 +33,7 @@ export default async function PublicThemeSample({ params, searchParams }: PagePr
     .where(and(eq(themes.key, key), eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE')));
   if (!live) notFound();
   const q = query.safeParse(await searchParams);
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names });
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names, occasion: q.data?.occasion });
   if (!sample || !manifestByCodeRef(sample.version.codeRef)) notFound();
   const msgs = invitationMessages(lang);
   return (

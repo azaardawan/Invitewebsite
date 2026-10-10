@@ -24,16 +24,19 @@ export function ThemeShowcase({
   lang,
   packages,
   defaultPackageId,
+  occasion,
 }: {
   themeKey: string;
   lang: string;
   packages: ShowcasePackage[];
   defaultPackageId?: string;
+  /** The occasion the customer came from, for a design sold in several (wording and order). */
+  occasion?: string;
 }) {
   const t = useTranslations('store');
   const [pkg, setPkg] = useState(defaultPackageId ?? packages[0]?.id);
   const [names, setNames] = useState<'short' | 'long'>('short');
-  const src = `/t/${lang}/${themeKey}?${new URLSearchParams({ ...(pkg ? { pkg } : {}), names })}`;
+  const src = `/t/${lang}/${themeKey}?${new URLSearchParams({ ...(pkg ? { pkg } : {}), names, ...(occasion ? { occasion } : {}) })}`;
 
   return (
     <div className="grid gap-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start lg:gap-20">
@@ -104,7 +107,7 @@ export function ThemeShowcase({
                     </ul>
                   </div>
                   <Link
-                    href={`/themes/${themeKey}/order?pkg=${p.id}`}
+                    href={`/themes/${themeKey}/order?pkg=${p.id}${occasion ? `&occasion=${occasion}` : ''}`}
                     className="inline-flex h-12 items-center justify-center self-start rounded-full bg-accent px-7 text-sm font-semibold text-accent-ink transition hover:bg-accent-deep"
                   >
                     {t('choose')}

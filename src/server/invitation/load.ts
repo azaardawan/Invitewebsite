@@ -1,7 +1,7 @@
 import 'server-only';
 import { and, desc, eq, isNotNull } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { assets, guestResponses, invitations, musicTracks, themeVersions } from '@/server/db/schema';
+import { assets, guestResponses, invitations, musicTracks, sections, themeVersions } from '@/server/db/schema';
 import { publicMediaUrl } from '@/server/storage';
 import type { InvitationMode } from '@/theme-sdk/types';
 import { themeBorder } from '@/server/catalog/border';
@@ -36,8 +36,16 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       signatureSrcs: await signatureUrls(db, inv),
       colorSlots: (version!.manifest as ThemeManifest).colors?.slots ?? [],
       colors: inv.colors,
+      occasion: await occasionKey(db, inv.sectionId),
     }),
   };
+}
+
+/** The section key of the occasion an invitation is for (e.g. `wedding`), or null. */
+export async function occasionKey(db: DbOrTx, sectionId: string | null) {
+  if (!sectionId) return null;
+  const [s] = await db.select({ key: sections.key }).from(sections).where(eq(sections.id, sectionId));
+  return s?.key ?? null;
 }
 
 /** Visible guest messages for the public list under the invitation, newest first (hidden ones never appear). */

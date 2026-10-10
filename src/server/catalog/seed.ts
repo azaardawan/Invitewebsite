@@ -1,7 +1,7 @@
 import 'server-only';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { fieldDefinitions, sectionDefaultFields, sections, type I18nContent } from '@/server/db/schema';
+import { fieldDefinitions, sectionDefaultFields, sections, subsections, type I18nContent } from '@/server/db/schema';
 import { FIELD_KEYS, STANDARD_FIELDS, type FieldKey } from '@/catalog/fields';
 import { syncFieldLibrary } from './fields';
 
@@ -10,6 +10,8 @@ type StarterSection = {
   name: I18nContent;
   requiredFeatures: string[];
   fields: { key: FieldKey; label?: I18nContent }[];
+  /** Starter groups inside the section, e.g. newborn Boy / Girl. */
+  subsections?: { key: string; name: I18nContent }[];
 };
 
 /**
@@ -75,6 +77,19 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'invitation_message' },
     ],
   },
+  {
+    key: 'newborn',
+    name: { ar: 'مولود جديد', en: 'Newborn baby', ckb: 'لەدایکبوونی منداڵ', bdn: 'زاروکێ نوو' },
+    // Ticked by default on new packages (the owner chooses per package).
+    requiredFeatures: ['story', 'print_card', 'sticker', 'bottle_label'],
+    fields: [{ key: 'baby_name' }, { key: 'baby_gender' }, { key: 'mother_name' }, { key: 'father_name' }, { key: 'birth_date' }, { key: 'baby_quote' }],
+    // Designs for a boy or a girl, so parents who know can go straight to them. A design in one of these
+    // starts the order form with that gender chosen.
+    subsections: [
+      { key: 'boy', name: { ar: 'ولد', en: 'Boy', ckb: 'کوڕ', bdn: 'کوڕ' } },
+      { key: 'girl', name: { ar: 'بنت', en: 'Girl', ckb: 'کچ', bdn: 'کچ' } },
+    ],
+  },
 ];
 
 export async function seedCatalog(db: DbOrTx) {
@@ -86,12 +101,34 @@ export async function seedCatalog(db: DbOrTx) {
       .onConflictDoNothing({ target: sections.key })
       .returning({ id: sections.id });
     const id = inserted[0]?.id;
-    if (!id) continue;
-    await db.insert(sectionDefaultFields).values(
-      s.fields.map((f, order) => ({ sectionId: id, fieldKey: f.key, sortOrder: order, label: f.label ?? null })),
-    );
+    if (id) {
+      await db.insert(sectionDefaultFields).values(
+        s.fields.map((f, order) => ({ sectionId: id, fieldKey: f.key, sortOrder: order, label: f.label ?? null })),
+      );
+    }
+    await seedSubsections(db, s);
   }
   await addMissingKurdish(db);
+}
+
+/**
+ * Adds a section's starter subsections that don't exist yet (also for a section seeded before they were
+ * added). An existing one, archived or renamed by the owner, is left as it is; subsections are never deleted.
+ */
+async function seedSubsections(db: DbOrTx, s: StarterSection) {
+  if (!s.subsections?.length) return;
+  const sectionId = await sectionIdByKey(db, s.key);
+  if (!sectionId) return;
+  const existing = await db.select({ sortOrder: subsections.sortOrder }).from(subsections).where(eq(subsections.sectionId, sectionId));
+  let next = existing.reduce((m, r) => Math.max(m, r.sortOrder + 1), 0);
+  for (const sub of s.subsections) {
+    const inserted = await db
+      .insert(subsections)
+      .values({ sectionId, key: sub.key, name: sub.name, sortOrder: next })
+      .onConflictDoNothing({ target: [subsections.sectionId, subsections.key] })
+      .returning({ id: subsections.id });
+    if (inserted.length) next++;
+  }
 }
 
 export async function sectionIdByKey(db: DbOrTx, key: string) {
@@ -111,6 +148,11 @@ async function addMissingKurdish(db: DbOrTx) {
     if (!row) continue;
     const name = fill(row.name, s.name);
     if (name) await db.update(sections).set({ name }).where(eq(sections.id, row.id));
+    for (const sub of s.subsections ?? []) {
+      const [existing] = await db.select().from(subsections).where(and(eq(subsections.sectionId, row.id), eq(subsections.key, sub.key)));
+      const subName = existing ? fill(existing.name, sub.name) : null;
+      if (subName) await db.update(subsections).set({ name: subName }).where(eq(subsections.id, existing!.id));
+    }
     const defaults = await db.select().from(sectionDefaultFields).where(eq(sectionDefaultFields.sectionId, row.id));
     for (const d of defaults) {
       const label = fill(d.label, s.fields.find((f) => f.key === d.fieldKey)?.label);

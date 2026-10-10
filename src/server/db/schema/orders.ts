@@ -90,6 +90,8 @@ export const invitations = pgTable(
     publishedAt: timestamp('published_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
+    /** Chocolate stickers (`sticker` feature): the shape the customer chose. */
+    stickerShape: text('sticker_shape', { enum: ['round', 'square'] }).notNull().default('round'),
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),

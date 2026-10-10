@@ -294,7 +294,10 @@
         "print_card": "Printable invitation card",
         "self_edit": "Customer edits after publishing (up to 3)",
         "signature": "Customer signature (drawn when ordering)",
-        "color_choice": "Customer chooses a colour set"
+        "color_choice": "Customer chooses a colour set",
+        "story": "Instagram story picture",
+        "sticker": "Chocolate stickers (round or square)",
+        "bottle_label": "Water bottle label"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -302,7 +305,9 @@
         "date": "Date",
         "time": "Time",
         "url": "Link",
-        "phone": "Phone number"
+        "phone": "Phone number",
+        "birthdate": "Date of birth",
+        "choice": "Choice"
       },
       "sections": {
         "heading": "Sections",
@@ -450,7 +455,9 @@
         "topNone": "— None —",
         "topSave": "Save the top 3",
         "topBadge1": "Best seller",
-        "topBadge": "Top {n}"
+        "topBadge": "Top {n}",
+        "alsoIn": "Also sold in",
+        "alsoInHint": "Tick other occasions to show this design there too. It appears once in combined lists (\"Wedding · Engagement\"), and the customer's invitation records which occasion it is for (the design picks its wording from it)."
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -526,7 +533,7 @@
         "usingTheme": "the theme’s own design",
         "usingSimpleBack": "the simple back",
         "usingNone": "no printable front yet",
-        "noFront": "This theme has no printable front of its own. Upload artwork for the front to give it a printable card.",
+        "noFront": "This design has no printable front of its own, so a simple front with the customer's details is printed until you upload artwork.",
         "sizeFront": "Artwork for the front: portrait, 154 × 216 mm including 3 mm bleed on every side (at least 1800 × 2520 px). Leave out the text; keep important artwork away from the edges.",
         "sizeBack": "Artwork for the back: landscape, 216 × 154 mm including 3 mm bleed on every side (at least 2520 × 1800 px). Leave out the text: the customer’s big title, message and signatures are written on it.",
         "artwork": "Artwork (JPG, PNG or WebP)",
@@ -548,7 +555,71 @@
         "save": "Save this side",
         "restore": "Remove my artwork (use the theme’s own design)",
         "restoreSimple": "Remove my artwork (use the simple back)",
-        "perInvitation": "Wording for one customer only (card message, extra line, back text) and uploading a finished PDF are on that invitation’s page."
+        "perInvitation": "Wording for one customer only (card message, extra line, back text) and uploading a finished PDF are on that invitation’s page.",
+        "usingSimpleFront": "the simple front",
+        "restoreSimpleFront": "Remove my artwork (use the simple front)",
+        "artworkOptional": "Artwork (optional: without it the item is drawn on its colours)",
+        "layout": "Layout",
+        "showLegend": "Details to show (the name always shows)",
+        "showGender": "\"It's a boy / girl\"",
+        "showDate": "Date of birth",
+        "showParents": "Parents' names",
+        "showQuote": "The quote",
+        "ownLook": "Use this item's own colours and fonts below (otherwise the shared look)",
+        "paper": "Paper (background)"
+      },
+      "productDesign": {
+        "heading": "Newborn extras design",
+        "intro": "The story, chocolate stickers and water bottle label share one look with this design's card, so the set matches: the same colours and fonts (taken from the design, and the customer's colour set, until you set your own), each with its own layout. Change the shared look below, then any single item: its layout, which details it shows, its own colours, or your own artwork. Customers see watermarked previews before paying and download clean files after.",
+        "story": "Story",
+        "stickerRound": "Sticker (round)",
+        "stickerSquare": "Sticker (square)",
+        "bottle": "Bottle label",
+        "edit": {
+          "story": "Edit the story",
+          "sticker": "Edit the sticker",
+          "bottle": "Edit the bottle label"
+        },
+        "usingSoft": "the soft default design",
+        "restore": "Reset this item (shared look, first layout)",
+        "size": {
+          "story": "Optional artwork for the story: 1080 × 1920 px (portrait, 9:16), without text; keep the top and bottom 250 px calm (Instagram covers them).",
+          "sticker": "Optional artwork for the sticker: square, at least 1200 × 1200 px, for a 4 cm sticker. Round stickers are cut from the middle circle.",
+          "bottle": "Optional artwork for the bottle label: 215 × 55 mm (at least 2540 × 650 px). It wraps a 0.5 L bottle; the text sits in the middle part, which faces out."
+        },
+        "boy": "boy",
+        "girl": "girl",
+        "customised": "customised",
+        "usingLook": "the shared look, first layout",
+        "look": {
+          "heading": "Shared look (all items and the simple card)",
+          "own": "your colours",
+          "fromDesign": "from the design's colours",
+          "help": "Used by every item that doesn't have its own colours, and by the platform's simple card front and back. Pink and blue tints can follow the baby (girl or boy).",
+          "paper": "Paper (background)",
+          "ink": "Text",
+          "accent": "Names and decoration",
+          "babyColours": "Tint pink for a girl and blue for a boy",
+          "save": "Save the shared look",
+          "reset": "Back to the design's colours"
+        },
+        "layouts": {
+          "story": {
+            "classic": "Centred with soft circles",
+            "top": "Name at the top, details at the bottom",
+            "framed": "Everything in a framed card"
+          },
+          "sticker": {
+            "classic": "Name and date",
+            "name": "Name only, double ring",
+            "badge": "Badge: boy/girl, name, date"
+          },
+          "bottle": {
+            "classic": "Centred",
+            "split": "Name | quote and details",
+            "band": "Coloured band with the name"
+          }
+        }
       }
     },
     "settings": {
@@ -735,7 +806,8 @@
       "attendanceMakePublic": "Show the reply count on the invitation",
       "attendanceMakePrivate": "Make the reply count private",
       "cardBackTitle": "Back of the card: big title (the customer's; empty = default)",
-      "cardBackMessage": "Back of the card: message"
+      "cardBackMessage": "Back of the card: message",
+      "occasion": "Occasion"
     },
     "legal": {
       "heading": "Legal policies",
@@ -966,13 +1038,18 @@
       "scanToOpen": "Scan to open the invitation",
       "keepsakeTitle": "Messages of love",
       "keepsakeEmpty": "No messages yet.",
-      "cardBackTitle": "With love"
+      "cardBackTitle": "With love",
+      "watermark": "Bahja · PREVIEW",
+      "watermarkNote": "Preview: this watermark is removed after purchase"
     },
     "guestbookTitle": "Messages from our guests",
     "guestbookEmpty": "Be the first to write a congratulation.",
     "attendanceTitle": "Guest replies",
     "attendingCount": "Coming",
-    "notAttendingCount": "Not coming"
+    "notAttendingCount": "Not coming",
+    "itsABoy": "It's a boy",
+    "itsAGirl": "It's a girl",
+    "bornOn": "Born on"
   },
   "invitationSamples": {
     "short": {
@@ -980,14 +1057,22 @@
       "person_2_name": "Noor",
       "family_names": "The Al-Husseini and Al-Karkhi families",
       "venue_name": "Jasmine Hall",
-      "invitation_message": "We would love you to celebrate with us."
+      "invitation_message": "We would love you to celebrate with us.",
+      "baby_name": "Adam",
+      "mother_name": "Noor",
+      "father_name": "Ali",
+      "baby_quote": "Our little star has arrived"
     },
     "long": {
       "person_1_name": "Abdulrahman",
       "person_2_name": "Fatima Al-Zahraa",
       "family_names": "The families of Abdulrahman Al-Husseini and Mohammed Al-Karkhi",
       "venue_name": "The Princesses' Palace Grand Events Hall",
-      "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times."
+      "invitation_message": "With hearts full of joy and love, we are honoured to invite you to share the most beautiful moments of our lives at our wedding celebration. Your presence completes our happiness and fills our day with delight; may we always gather in good times.",
+      "baby_name": "Abdul Rahman",
+      "mother_name": "Fatima Al-Zahraa",
+      "father_name": "Mohammed Al-Hasani",
+      "baby_quote": "A new heart has joined our family, and our home is full of joy"
     },
     "m1Name": "Sara",
     "m1Text": "Congratulations! Wishing you a lifetime of love and happiness.",
@@ -1121,7 +1206,10 @@
       "print_card": "Printable invitation card",
       "self_edit": "Edit your invitation yourself after publishing",
       "signature": "Your own signature on the invitation",
-      "color_choice": "Choose the invitation colours"
+      "color_choice": "Choose the invitation colours",
+      "story": "An Instagram story picture to share",
+      "sticker": "Chocolate stickers, round or square, ready to print",
+      "bottle_label": "A label that wraps around water bottles, ready to print"
     },
     "fieldsCount": "{count} details to fill in",
     "orderTitle": "Your invitation details",
@@ -1149,7 +1237,9 @@
       "invalidPhone": "Please enter a valid phone number.",
       "invalidUrl": "Please enter a valid https link.",
       "invalidEmail": "Please enter a valid email address.",
-      "invalidName": "Please enter your name (2–80 characters)."
+      "invalidName": "Please enter your name (2–80 characters).",
+      "invalidChoice": "Please choose one.",
+      "birthTooFar": "Please check the date of birth."
     },
     "errors": {
       "notAvailable": "This design or package is no longer available.",
@@ -1222,7 +1312,31 @@
       "original": "Original colours"
     },
     "moreDesigns": "More designs",
-    "seeAll": "See all"
+    "seeAll": "See all",
+    "occasionQuestion": "Which occasion is this invitation for?",
+    "occasionRequired": "Please choose the occasion.",
+    "fieldOptions": {
+      "baby_gender": {
+        "boy": "Boy",
+        "girl": "Girl"
+      }
+    },
+    "extras": {
+      "title": "Your extras",
+      "watermarkNote": "These previews carry a watermark to protect the design. The watermark is removed after purchase, and you download the clean files from your receipt.",
+      "card": "Printable card",
+      "story": "Instagram story",
+      "sticker": "Chocolate sticker",
+      "bottle": "Water bottle label",
+      "downloadPng": "Picture (PNG)",
+      "downloadSheet": "Print sheet (PDF)"
+    },
+    "stickerShape": {
+      "heading": "Sticker shape",
+      "help": "Round suits most chocolates; square suits square pieces and boxes. You get a print-ready A4 sheet (PDF) and a single sticker picture (PNG).",
+      "round": "Round",
+      "square": "Square"
+    }
   },
   "contact": {
     "title": "Contact us",

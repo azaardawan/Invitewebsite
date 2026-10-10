@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
+import { fieldOptions } from '@/catalog/fields';
 
 export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
 
@@ -13,6 +14,8 @@ export type OrderFormExtras = {
   cardBack?: { title: string; message: string; limits: { title: number; message: number } };
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
+  /** Chocolate stickers (sticker): round or square. */
+  sticker?: { current: 'round' | 'square' };
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -31,6 +34,7 @@ export function OrderForm({
   minDate,
   submitLabel,
   extras = {},
+  occasions,
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   hidden: Record<string, string>;
@@ -40,6 +44,8 @@ export function OrderForm({
   minDate: string;
   submitLabel: string;
   extras?: OrderFormExtras;
+  /** For a design sold in several occasions when the customer hasn't picked one yet: which one is it? */
+  occasions?: { key: string; label: string }[];
 }) {
   const t = useTranslations('store');
   const [state, formAction, pending] = useActionState(action, {});
@@ -57,6 +63,28 @@ export function OrderForm({
         </p>
       ) : null}
 
+      {occasions?.length ? (
+        <fieldset className="flex flex-col gap-3" aria-describedby={errors.occasion ? 'occasion-err' : undefined}>
+          <legend className="text-[15px] font-medium text-heading">{t('occasionQuestion')}</legend>
+          <div className="flex flex-wrap gap-2">
+            {occasions.map((o) => (
+              <label
+                key={o.key}
+                className="inline-flex h-11 cursor-pointer items-center rounded-full border border-line bg-surface px-5 text-sm font-medium transition has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-accent-ink"
+              >
+                <input type="radio" name="occasion" value={o.key} defaultChecked={values.occasion === o.key} className="sr-only" />
+                {o.label}
+              </label>
+            ))}
+          </div>
+          {errors.occasion ? (
+            <p id="occasion-err" className="text-sm text-danger">
+              {t('occasionRequired')}
+            </p>
+          ) : null}
+        </fieldset>
+      ) : null}
+
       {fields.map((f) => {
         const id = `f-${f.key}`;
         const err = errors[f.key];
@@ -71,11 +99,25 @@ export function OrderForm({
         } as const;
         return (
           <div key={f.key} className="flex flex-col gap-2">
-            <label htmlFor={id} className="text-[15px] font-medium text-heading">
+            <label htmlFor={id} id={`${id}-label`} className="text-[15px] font-medium text-heading">
               {f.label}
             </label>
-            {f.type === 'longtext' ? (
+            {f.type === 'choice' ? (
+              <div role="radiogroup" aria-labelledby={`${id}-label`} className="flex flex-wrap gap-2">
+                {fieldOptions(f.key).map((o) => (
+                  <label
+                    key={o}
+                    className="inline-flex h-11 cursor-pointer items-center rounded-full border border-line bg-surface px-5 text-sm font-medium transition has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-accent-ink"
+                  >
+                    <input type="radio" name={`f.${f.key}`} value={o} defaultChecked={values[f.key] === o} className="sr-only" />
+                    {t(`fieldOptions.${f.key}.${o}` as 'fieldOptions.baby_gender.boy')}
+                  </label>
+                ))}
+              </div>
+            ) : f.type === 'longtext' ? (
               <textarea {...common} dir="auto" rows={3} maxLength={f.maxLength ?? 500} />
+            ) : f.type === 'birthdate' ? (
+              <input {...common} type="date" />
             ) : f.type === 'date' ? (
               <input {...common} type="date" min={minDate} />
             ) : f.type === 'time' ? (
@@ -99,6 +141,25 @@ export function OrderForm({
           </div>
         );
       })}
+
+      {extras.sticker ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-[15px] font-medium text-heading">{t('stickerShape.heading')}</legend>
+          <p className="text-sm text-muted">{t('stickerShape.help')}</p>
+          <div className="flex gap-3">
+            {(['round', 'square'] as const).map((shape) => (
+              <label
+                key={shape}
+                className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+              >
+                <input type="radio" name="stickerShape" value={shape} defaultChecked={(values.stickerShape || extras.sticker!.current) === shape} className="sr-only" />
+                <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                <span className="text-sm font-medium">{t(`stickerShape.${shape}`)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
 
       {extras.palettes ? (
         <fieldset className="flex flex-col gap-3">

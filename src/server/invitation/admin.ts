@@ -1,7 +1,8 @@
 import 'server-only';
+import { invitationNames } from '@/catalog/fields';
 import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, musicTracks, orders, packages, themes } from '@/server/db/schema';
+import { invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { fieldDefs } from '@/server/orders/common';
@@ -45,11 +46,12 @@ export async function listInvitations(db: DbOrTx, f: { q?: string; filter?: Invi
 
 export async function getInvitation(db: DbOrTx, id: string) {
   const [row] = await db
-    .select({ invitation: invitations, themeName: themes.name, themeKey: themes.key, packageName: packages.name, music: musicTracks })
+    .select({ invitation: invitations, themeName: themes.name, themeKey: themes.key, packageName: packages.name, music: musicTracks, occasionName: sections.name })
     .from(invitations)
     .innerJoin(themes, eq(themes.id, invitations.themeId))
     .innerJoin(packages, eq(packages.id, invitations.packageId))
     .leftJoin(musicTracks, eq(musicTracks.id, invitations.musicTrackId))
+    .leftJoin(sections, eq(sections.id, invitations.sectionId))
     .where(eq(invitations.id, id));
   if (!row) return null;
   const orderRows = await db.select().from(orders).where(eq(orders.invitationId, id)).orderBy(desc(orders.createdAt));
@@ -89,7 +91,7 @@ export async function updateInvitationValues(
     const validateAt = unchangedPastDate ? new Date(`${existingDate}T00:00:00Z`) : now;
     const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys), validateAt < now ? validateAt : now);
     if (!result.ok) throw new InvitationAdminError('invalidFields', result.errors);
-    const slug = slugFromNames([result.values.person_1_name, result.values.person_2_name]);
+    const slug = slugFromNames(invitationNames(result.values));
     await tx.update(invitations).set({ fieldValues: result.values, slug, version: inv.version + 1 }).where(eq(invitations.id, id));
     await recordAudit(tx, {
       ...auditActor(actor),

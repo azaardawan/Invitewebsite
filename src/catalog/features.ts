@@ -23,13 +23,19 @@ export const FEATURES = {
   signature: { requires: [], requiresFields: [] },
   /** The customer picks one of the colour sets the owner made for the theme (themes declare colour slots). */
   color_choice: { requires: [], requiresFields: [] },
+  /** An Instagram story picture (1080 × 1920 PNG) on the owner's story artwork. */
+  story: { requires: [], requiresFields: [] },
+  /** Chocolate stickers, round or square (the customer chooses): a print-ready A4 sheet (PDF) and one sticker (PNG). */
+  sticker: { requires: [], requiresFields: [] },
+  /** A label that wraps around a water bottle: a print-ready A4 sheet (PDF) and one label (PNG). */
+  bottle_label: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 /**
  * Features handled entirely by the platform: any theme can be sold with them,
  * so they are never listed in a theme's manifest.
  */
-export const PLATFORM_FEATURES = ['self_edit'] as const satisfies readonly (keyof typeof FEATURES)[];
+export const PLATFORM_FEATURES = ['self_edit', 'story', 'sticker', 'bottle_label'] as const satisfies readonly (keyof typeof FEATURES)[];
 export function isPlatformFeature(key: string) {
   return (PLATFORM_FEATURES as readonly string[]).includes(key);
 }

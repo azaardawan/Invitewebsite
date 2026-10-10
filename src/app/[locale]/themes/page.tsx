@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { localized } from '@/lib/localized';
+import { localized, occasionsLabel } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
 import { storefrontSections, storefrontSubsections, storefrontThemes } from '@/server/storefront/catalog';
 import { PageHeading, ThemeGrid } from '@/components/storefront/ThemeGrid';
@@ -53,7 +53,7 @@ export default async function ThemesPage({ params, searchParams }: PageProps<'/[
       <div className="mx-auto mt-10 max-w-[1440px] lg:mt-14">
         {themes.length ? (
           <ThemeGrid
-            themes={themes.map((th) => ({ key: th.key, name: localized(th.name, locale), section: th.subsection ? `${localized(th.sectionName, locale)} · ${localized(th.subsection.name, locale)}` : localized(th.sectionName, locale), coverUrl: th.coverUrl, minPriceIqd: th.minPriceIqd, rank: th.rank }))}
+            themes={themes.map((th) => ({ key: th.key, name: localized(th.name, locale), section: active ? (th.subsection ? `${localized(th.sectionName, locale)} · ${localized(th.subsection.name, locale)}` : localized(th.sectionName, locale)) : occasionsLabel(th.occasions, locale), coverUrl: th.coverUrl, minPriceIqd: th.minPriceIqd, rank: th.rank, occasion: active && th.occasions.length > 1 ? active : undefined }))}
           />
         ) : (
           <p className="px-6 py-16 text-center text-muted">{t('empty')}</p>

@@ -21,7 +21,7 @@ test('the owner finds a theme by its number and gives its printable card their o
   await expect(page.locator('main li').getByText('#4')).toBeVisible();
   await page.getByRole('link', { name: 'تصميم بسيط تجريبي' }).click();
   await expect(page.getByRole('heading', { name: 'تصميم البطاقة المطبوعة' })).toBeVisible();
-  await expect(page.getByText('هذا القالب ليس له وجه بطاقة للطباعة')).toBeVisible();
+  await expect(page.getByText('هذا القالب ليس له وجه بطاقة خاص به')).toBeVisible();
 
   for (const [side, w, h, paper] of [
     ['front', 600, 840, '#f4ead8'],
@@ -53,5 +53,5 @@ test('the owner finds a theme by its number and gives its printable card their o
     await box.getByRole('button', { name: /إزالة تصميمي/ }).click();
     await expect(page.locator(`details[data-card-side=${side}] summary`)).not.toContainText('تصميمك');
   }
-  await expect(page.getByText('هذا القالب ليس له وجه بطاقة للطباعة')).toBeVisible();
+  await expect(page.getByText('هذا القالب ليس له وجه بطاقة خاص به')).toBeVisible();
 });

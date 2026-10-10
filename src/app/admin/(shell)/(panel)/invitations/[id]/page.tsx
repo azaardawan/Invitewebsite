@@ -1,4 +1,5 @@
 import { themeNumber } from '@/theme-registry';
+import { invitationNames } from '@/catalog/fields';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -80,7 +81,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           {t('heading')}
         </Link>
         <h1 className="text-2xl font-semibold" dir="auto">
-          {[inv.fieldValues.person_1_name, inv.fieldValues.person_2_name].filter(Boolean).join(' · ') || inv.publicId}
+          {invitationNames(inv.fieldValues).join(' · ') || inv.publicId}
         </h1>
         <Badge status={BADGE[state]}>{t(`states.${state}`)}</Badge>
       </header>
@@ -112,6 +113,12 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           <span className="font-mono font-semibold" dir="ltr">#{themeNumber(row.themeKey) ?? '—'}</span> {localized(row.themeName, locale)}{' '}
           <span className="font-mono text-xs text-muted">({row.themeKey})</span>
         </p>
+        {row.occasionName ? (
+          <p>
+            <span className="text-muted">{t('occasion')}: </span>
+            {localized(row.occasionName, locale)}
+          </p>
+        ) : null}
         <p>
           <span className="text-muted">{t('package')}: </span>
           {localized(row.packageName, locale)}

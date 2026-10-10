@@ -43,6 +43,7 @@ export default async function OccasionPage({ params, searchParams }: PageProps<'
         coverUrl: th.coverUrl,
         minPriceIqd: th.minPriceIqd,
         rank: th.rank,
+        occasion: th.occasions.length > 1 ? key : undefined,
       }))}
     />
   );

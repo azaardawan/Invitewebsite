@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { invitationNames } from '@/catalog/fields';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
@@ -48,7 +49,7 @@ export default async function InvitationsPage({ searchParams }: PageProps<'/admi
       <ul className="space-y-3">
         {rows.map(({ invitation: inv, themeName, packageName, orderNumber }) => {
           const state = invitationState(inv);
-          const names = [inv.fieldValues.person_1_name, inv.fieldValues.person_2_name].filter(Boolean).join(' · ');
+          const names = invitationNames(inv.fieldValues).join(' · ');
           return (
             <li key={inv.id}>
               <Card className="grid gap-3 sm:grid-cols-4 sm:items-center">

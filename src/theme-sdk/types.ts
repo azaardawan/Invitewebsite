@@ -46,6 +46,11 @@ export type ThemeLabels = {
   notAttendingCount: string;
   /** Word between two names ("و" / "&"), in the invitation's language. */
   and: string;
+  /** Newborn: "It's a boy" / "It's a girl" (for `fields.baby_gender` = `boy` / `girl`). */
+  itsABoy: string;
+  itsAGirl: string;
+  /** Newborn: caption before the date of birth, e.g. "Born on". */
+  bornOn: string;
 };
 
 /** One guest message shown under the invitation (only when the customer made them public). */
@@ -114,6 +119,14 @@ export type ThemeProps = {
   colors: Record<string, string>;
   /** The owner's replacement border from Admin, or null to use the theme's own. Render it with `<ThemeBorder>`. */
   border: ThemeBorderSpec | null;
+  /**
+   * Which occasion this invitation is for, as the section key (e.g. `wedding`, `engagement`). A design sold
+   * in several occasions (manifest `sections`) uses it to pick its wording ("حفل الخطوبة" or "حفل الزفاف");
+   * a design for one occasion can ignore it. Null only when unknown.
+   */
+  occasion: string | null;
+  /** Newborn: the date of birth (`fields.birth_date`) in the invitation's language, or null. */
+  birthDate: EventDateParts | null;
 };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;

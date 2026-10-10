@@ -171,13 +171,18 @@
       "scanToOpen": "کۆدی سکان بکە بۆ ڤەکرنا داخوازنامێ",
       "keepsakeTitle": "نامێن ڤیانێ",
       "keepsakeEmpty": "هێشتا چ نامە نەگەهشتینە.",
-      "cardBackTitle": "ب هەمی ڤیانێ"
+      "cardBackTitle": "ب هەمی ڤیانێ",
+      "watermark": "◐",
+      "watermarkNote": "◐"
     },
     "guestbookTitle": "نامێن مێڤانان",
     "guestbookEmpty": "ببە ئێکەم کەس یێ پیرۆزباهیێ دنڤیسیت.",
     "attendanceTitle": "بەرسڤێن مێڤانان",
     "attendingCount": "دێ ئامادە بن",
-    "notAttendingCount": "ئامادە نابن"
+    "notAttendingCount": "ئامادە نابن",
+    "itsABoy": "◐",
+    "itsAGirl": "◐",
+    "bornOn": "●"
   },
   "invitationSamples": {
     "short": {
@@ -185,14 +190,22 @@
       "person_2_name": "ژیلا",
       "family_names": "بنەمالا ئەحمەد و بنەمالا کەریم",
       "venue_name": "هۆلا یاسەمینێ",
-      "invitation_message": "دێ دلخۆش بین ب ئامادەبوونا هەوە بۆ پشکداریێ د شاهیا مە دا."
+      "invitation_message": "دێ دلخۆش بین ب ئامادەبوونا هەوە بۆ پشکداریێ د شاهیا مە دا.",
+      "baby_name": "●",
+      "mother_name": "●",
+      "father_name": "●",
+      "baby_quote": "◐"
     },
     "long": {
       "person_1_name": "عەبدولرەحمان",
       "person_2_name": "فاتیمە زەهرا",
       "family_names": "بنەمالا بەڕێز عەبدولرەحمان ئەحمەد و بنەمالا بەڕێز محەمەد کەریم",
       "venue_name": "هۆلا کۆشکا شاژنان بۆ ئاهەنگێن مەزن",
-      "invitation_message": "ب دلەکێ تژی شاهی و ڤیان، شانازیێ ب داخوازکرنا هەوە دکەین بۆ پشکداریێ د جوانترین دەمێن ژیانا مە دا د ئاهەنگا داوەتا مە دا. ئامادەبوونا هەوە شاهیا مە تەمام دکەت و ڕۆژا مە تژی خۆشی دکەت، و ژ خودێ دخوازین هەردەم مە ل سەر خێر و خۆشیێ کۆم بکەت."
+      "invitation_message": "ب دلەکێ تژی شاهی و ڤیان، شانازیێ ب داخوازکرنا هەوە دکەین بۆ پشکداریێ د جوانترین دەمێن ژیانا مە دا د ئاهەنگا داوەتا مە دا. ئامادەبوونا هەوە شاهیا مە تەمام دکەت و ڕۆژا مە تژی خۆشی دکەت، و ژ خودێ دخوازین هەردەم مە ل سەر خێر و خۆشیێ کۆم بکەت.",
+      "baby_name": "●",
+      "mother_name": "◐",
+      "father_name": "◐",
+      "baby_quote": "◐"
     },
     "m1Name": "شیلان",
     "m1Text": "پیرۆز بیت! ژیانەکا تژی ڤیان و بەختەوەری بۆ هەوە دخوازین.",
@@ -326,7 +339,10 @@
       "print_card": "کارتا داخوازیێ یا ئامادە بۆ چاپێ",
       "self_edit": "گوهۆڕینا داخوازنامێ ب خۆ پشتی بەلاڤکرنێ",
       "signature": "ئیمزایا هەوە ب خۆ ل سەر داخوازنامێ",
-      "color_choice": "هەلبژارتنا ڕەنگێن داخوازنامێ"
+      "color_choice": "هەلبژارتنا ڕەنگێن داخوازنامێ",
+      "story": "◐",
+      "sticker": "◐",
+      "bottle_label": "◐"
     },
     "fieldsCount": "{count, plural, one {ئێک زانیاری بۆ تژیکرنێ} other {# زانیاری بۆ تژیکرنێ}}",
     "orderTitle": "هوورگیێن داخوازناما تە",
@@ -354,7 +370,9 @@
       "invalidPhone": "هیڤییە ژمارەکا تەلەفۆنێ یا دروست بنڤیسە.",
       "invalidUrl": "هیڤییە لینکەکا https یا دروست بنڤیسە.",
       "invalidEmail": "هیڤییە ئیمەیلەکێ دروست بنڤیسە.",
-      "invalidName": "هیڤییە ناڤێ خۆ بنڤیسە (ژ 2 بۆ 80 پیتان)."
+      "invalidName": "هیڤییە ناڤێ خۆ بنڤیسە (ژ 2 بۆ 80 پیتان).",
+      "invalidChoice": "●",
+      "birthTooFar": "◐"
     },
     "errors": {
       "notAvailable": "ئەڤ دیزاینە یان ئەڤ پاکێجە ئێدی بەردەست نینە.",
@@ -427,7 +445,31 @@
       "original": "ڕەنگێن ڕەسەن"
     },
     "moreDesigns": "دیزاینێن دی",
-    "seeAll": "هەمیان ببینە"
+    "seeAll": "هەمیان ببینە",
+    "occasionQuestion": "◐",
+    "occasionRequired": "◐",
+    "fieldOptions": {
+      "baby_gender": {
+        "boy": "●",
+        "girl": "●"
+      }
+    },
+    "extras": {
+      "title": "◐",
+      "watermarkNote": "◐",
+      "card": "◐",
+      "story": "●",
+      "sticker": "◐",
+      "bottle": "◐",
+      "downloadPng": "●",
+      "downloadSheet": "◐"
+    },
+    "stickerShape": {
+      "heading": "◐",
+      "help": "◐",
+      "round": "◐",
+      "square": "●"
+    }
   },
   "contact": {
     "title": "پەیوەندیێ ب مە بکە",

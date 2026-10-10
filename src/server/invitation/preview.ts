@@ -8,6 +8,8 @@ import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { publicMediaUrl } from '@/server/storage';
 import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps, sampleValues } from './theme-props';
+import { occasionKey } from './load';
+import { themeOccasions } from '@/server/catalog/occasions';
 
 export type SampleRequest = {
   themeKey: string;
@@ -20,6 +22,8 @@ export type SampleRequest = {
   names?: 'short' | 'long';
   /** A colour set to try (Admin palette preview); omitted = the theme's defaults. */
   colors?: Record<string, string>;
+  /** Which occasion to show (a design sold in several); omitted = its main one. */
+  occasion?: string;
 };
 
 /**
@@ -74,6 +78,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     border: await themeBorder(db, theme.id),
     colorSlots: manifest.colors?.slots ?? [],
     colors: req.colors ?? null,
+    occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
   });
   return { theme, version, manifest, props };
 }

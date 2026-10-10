@@ -501,3 +501,59 @@ Applied to `ckb.json` and `bdn.json`.
 | 2 | `home.topSubtitle` | التصاميم التي يحبها زبائننا أكثر. | The designs our customers love most. | ئەو دیزاینانەی کڕیارەکانمان زیاتر حەزیان لێیە. | ئەو دیزاینێن کڕیارێن مە پتر حەز ژێ دکەن. | ◐ |
 | 3 | `home.bestSeller` | الأكثر مبيعاً | Best seller | پڕفرۆشترین | پڕفرۆشترین | ◐ |
 | 4 | `home.topPick` | اختيار مميز | Top pick | هەڵبژاردەی تایبەت | هەلبژارتنا تایبەت | ◐ |
+
+## Batch 21 — choosing the occasion for a design sold in several — ✅ APPROVED (owner, 2026-10-10)
+
+Shown on the order form only for a design that is in more than one occasion (e.g. wedding and engagement).
+Applied to `ckb.json` and `bdn.json`.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.occasionQuestion` | لأي مناسبة هذه الدعوة؟ | Which occasion is this invitation for? | ئەم بانگهێشتنامەیە بۆ چ بۆنەیەکە؟ | ئەڤ داخوازنامە بۆ چ بۆنەیێ یە؟ | ◐ |
+| 2 | `store.occasionRequired` | يرجى اختيار المناسبة. | Please choose the occasion. | تکایە بۆنەکە هەڵبژێرە. | هیڤییە بۆنێ هەلبژێرە. | ◐ |
+
+## Batch 22 — newborn baby occasion and its extras — ✅ APPROVED (owner, 2026-10-10)
+
+The new "مولود جديد" occasion: its details, the extras (Instagram story, chocolate stickers, bottle label), the
+watermarked previews and the sticker shape. Applied to `ckb.json` and `bdn.json`; the names below are added by the
+seed wherever the Arabic is unchanged and the Kurdish is empty.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `invitation.print.watermark` | بهجه · معاينة | Bahja · PREVIEW | بەهجە · پێشبینین | بەهجە · پێشدیتن | ◐ |
+| 2 | `invitation.print.watermarkNote` | معاينة: تُزال هذه العلامة بعد الشراء | Preview: this watermark is removed after purchase | پێشبینین: ئەم نیشانەیە دوای کڕین لادەبرێت | پێشدیتن: ئەڤ نیشانە پشتی کڕینێ دێ هێتە لابرن | ◐ |
+| 3 | `invitation.itsABoy` | إنه ولد | It's a boy | کوڕە | کوڕە | ◐ |
+| 4 | `invitation.itsAGirl` | إنها بنت | It's a girl | کچە | کچە | ◐ |
+| 5 | `invitation.bornOn` | تاريخ الولادة | Born on | بەرواری لەدایکبوون | دیرۆکا ژدایکبوونێ | ● |
+| 6 | `invitationSamples.short.baby_name` | آدم | Adam | ئادەم | ئادەم | ● |
+| 7 | `invitationSamples.short.mother_name` | نور | Noor | نوور | نوور | ● |
+| 8 | `invitationSamples.short.father_name` | علي | Ali | عەلی | عەلی | ● |
+| 9 | `invitationSamples.short.baby_quote` | وصلت نجمتنا الصغيرة | Our little star has arrived | ئەستێرە بچووکەکەمان گەیشت | ستێرکا مە یا بچووک گەهشت | ◐ |
+| 10 | `invitationSamples.long.baby_name` | عبد الرحمن | Abdul Rahman | عەبدولڕەحمان | عەبدولڕەحمان | ● |
+| 11 | `invitationSamples.long.mother_name` | فاطمة الزهراء | Fatima Al-Zahraa | فاتیمە زەهرا | فاتمە زەهرا | ◐ |
+| 12 | `invitationSamples.long.father_name` | محمد الحسني | Mohammed Al-Hasani | محەمەد حەسەنی | محەمەد حەسەنی | ◐ |
+| 13 | `invitationSamples.long.baby_quote` | انضم قلب جديد إلى عائلتنا، وامتلأ بيتنا فرحاً وسروراً | A new heart has joined our family… | دڵێکی نوێ هاتە ناو خێزانەکەمان و ماڵەکەمان پڕ بوو لە خۆشی | دلەکێ نوو هاتە د ناڤ مالباتا مە دا و مالا مە تژی شاهی بوو | ◐ |
+| 14 | `store.features.story` | صورة ستوري لإنستغرام لمشاركتها | An Instagram story picture to share | وێنەی ستۆری ئینستاگرام بۆ هاوبەشکردن | وێنەیەکێ ستۆریا ئینستاگرامێ بۆ پارڤەکرنێ | ◐ |
+| 15 | `store.features.sticker` | ملصقات للشوكولاتة، دائرية أو مربعة، جاهزة للطباعة | Chocolate stickers, round or square, ready to print | لکێنەری چوکلێت، بازنەیی یان چوارگۆشە، ئامادەی چاپ | لکێنەرێن چوکلێتێ، خڕ یان چارگوشە، ئامادەی چاپێ | ◐ |
+| 16 | `store.features.bottle_label` | ملصق يلتف حول قناني الماء، جاهز للطباعة | A label that wraps around water bottles, ready to print | لکێنەرێک کە بە دەوری بوتڵی ئاودا دەپێچرێت، ئامادەی چاپ | لکێنەرەک کو ل دۆر بوتلێن ئاڤێ دهێتە پێچان، ئامادەی چاپێ | ◐ |
+| 17 | `store.fieldErrors.invalidChoice` | يرجى الاختيار. | Please choose one. | تکایە یەکێک هەڵبژێرە. | هیڤییە ئێکێ هەلبژێرە. | ● |
+| 18 | `store.fieldErrors.birthTooFar` | يرجى التأكد من تاريخ الولادة. | Please check the date of birth. | تکایە بەرواری لەدایکبوون بپشکنە. | هیڤییە دیرۆکا ژدایکبوونێ بپشکنە. | ◐ |
+| 19 | `store.fieldOptions.baby_gender.boy` | ولد | Boy | کوڕ | کوڕ | ● |
+| 20 | `store.fieldOptions.baby_gender.girl` | بنت | Girl | کچ | کچ | ● |
+| 21 | `store.extras.title` | إضافاتكم | Your extras | زیادەکانتان | زێدەکرنێن هەوە | ◐ |
+| 22 | `store.extras.watermarkNote` | هذه معاينات عليها علامة مائية لحماية التصميم… | These previews carry a watermark… | ئەمانە پێشبینینن کە نیشانەی ئاویان لەسەرە بۆ پاراستنی دیزاینەکە. نیشانەکە دوای کڕین لادەبرێت و فایلەکان بەبێ نیشانە لە پەڕەی پسوولەکە دادەگرن. | ئەڤە پێشدیتنن کو نیشانا ئاڤێ ل سەرە بۆ پاراستنا دیزاینێ. نیشان پشتی کڕینێ دێ هێتە لابرن و هوین فایلان بێ نیشان ژ لاپەرێ پسوولێ دادگرن. | ◐ |
+| 23 | `store.extras.card` | بطاقة للطباعة | Printable card | کارتی چاپ | کارتا چاپێ | ◐ |
+| 24 | `store.extras.story` | ستوري إنستغرام | Instagram story | ستۆری ئینستاگرام | ستۆریا ئینستاگرامێ | ● |
+| 25 | `store.extras.sticker` | ملصق الشوكولاتة | Chocolate sticker | لکێنەری چوکلێت | لکێنەرێ چوکلێتێ | ◐ |
+| 26 | `store.extras.bottle` | ملصق قناني الماء | Water bottle label | لکێنەری بوتڵی ئاو | لکێنەرێ بوتلێن ئاڤێ | ◐ |
+| 27 | `store.extras.downloadPng` | صورة (PNG) | Picture (PNG) | وێنە (PNG) | وێنە (PNG) | ● |
+| 28 | `store.extras.downloadSheet` | ورقة طباعة (PDF) | Print sheet (PDF) | پەڕەی چاپ (PDF) | لاپەرێ چاپێ (PDF) | ◐ |
+| 29 | `store.stickerShape.heading` | شكل الملصق | Sticker shape | شێوەی لکێنەر | شێوێ لکێنەری | ◐ |
+| 30 | `store.stickerShape.help` | الدائري يناسب أغلب قطع الشوكولاتة… | Round suits most chocolates… | بازنەیی بۆ زۆربەی چوکلێتەکان دەگونجێت و چوارگۆشە بۆ پارچە و قوتووە چوارگۆشەکان. پەڕەیەکی A4ی ئامادەی چاپ (PDF) و وێنەی یەک لکێنەر (PNG) وەردەگرن. | خڕ بۆ پترییا چوکلێتان دگونجیت و چارگوشە بۆ پارچە و قوتیێن چارگوشە. هوین لاپەرەکێ A4 یێ ئامادەی چاپێ (PDF) و وێنەیێ ئێک لکێنەری (PNG) وەردگرن. | ◐ |
+| 31 | `store.stickerShape.round` | دائري | Round | بازنەیی | خڕ | ◐ |
+| 32 | `store.stickerShape.square` | مربع | Square | چوارگۆشە | چارگوشە | ● |
+
+Names typed in Admin (seeded, editable there): the occasion «مولود جديد» (Sorani: لەدایکبوونی منداڵ / Badini: زاروکێ نوو)
+and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ زاروکی), «ولد أم بنت» (کوڕ یان کچ / کوڕ یان کچ), «اسم الأم» (ناوی دایک / ناڤێ دەیکێ),
+«اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
+And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).

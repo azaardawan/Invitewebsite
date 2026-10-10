@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
-import { THEME_TRANSITIONS, getThemeDetail, type ThemeStatus } from '@/server/catalog/themes';
+import { THEME_TRANSITIONS, getThemeDetail, themeExtraSectionIds, type ThemeStatus } from '@/server/catalog/themes';
 import { listSections } from '@/server/catalog/sections';
 import { listMusic } from '@/server/catalog/music';
 import { CatalogError, localized } from '@/server/catalog/common';
@@ -15,6 +15,7 @@ import { listSubsections } from '@/server/catalog/subsections';
 import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
 import { CardDesignSection } from './CardDesignSection';
+import { ProductDesignSection } from './ProductDesignSection';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -100,6 +101,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const canManage = can(authz, 'themes.manage');
   const manifest = d.currentManifest;
   const border = await themeBorder(db(), d.theme.id);
+  const extraSections = await themeExtraSectionIds(db(), d.theme.id);
   const colorSlots = manifest?.colors?.slots ?? [];
   const themeSubs = d.theme.sectionId ? await listSubsections(db(), d.theme.sectionId) : [];
   const palettes = colorSlots.length ? await listPalettes(db(), d.theme.id) : [];
@@ -224,6 +226,19 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <span className="mt-1 block text-xs text-muted">{t('subsections.themeHint')}</span>
               </label>
             ) : null}
+            <fieldset className="space-y-1.5">
+              <legend className="text-sm font-medium">{t('themes.alsoIn')}</legend>
+              <p className="text-xs text-muted">{t('themes.alsoInHint')}</p>
+              <input type="hidden" name="extraSectionsShown" value="1" />
+              {sections
+                .filter(({ section }) => section.id !== d.theme.sectionId && section.status === 'ACTIVE')
+                .map(({ section }) => (
+                  <label key={section.id} className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="extraSectionIds" value={section.id} defaultChecked={extraSections.includes(section.id)} />
+                    {localized(section.name, locale)}
+                  </label>
+                ))}
+            </fieldset>
             <ImageUpload name="coverAssetId" label={t('themes.cover')} initial={d.cover ? { id: d.cover.id, url: publicMediaUrl(d.cover.storageKey) } : null} />
             <label className="block">
               <span className="mb-1 block text-sm font-medium">{t('themes.musicSelect')}</span>
@@ -276,7 +291,9 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
 
       {(() => {
         const current = d.versions.find((v) => v.id === d.theme.currentVersionId);
+        const extras = d.section?.key === 'newborn' || d.packages.some((p) => p.featureKeys.some((f) => f === 'story' || f === 'sticker' || f === 'bottle_label'));
         return (
+          <>
           <CardDesignSection
             themeId={d.theme.id}
             themeKey={d.theme.key}
@@ -286,6 +303,15 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             updatedAt={d.theme.updatedAt}
             canManage={canManage}
           />
+          {extras ? <ProductDesignSection
+              themeId={d.theme.id}
+              themeKey={d.theme.key}
+              design={d.theme.cardDesign}
+              themeColors={Object.fromEntries((manifest?.colors?.slots ?? []).map((c) => [c.key, c.default]))}
+              updatedAt={d.theme.updatedAt}
+              canManage={canManage}
+            /> : null}
+          </>
         );
       })()}
 

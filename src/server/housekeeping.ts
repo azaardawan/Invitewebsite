@@ -15,6 +15,7 @@ const DAY = 86_400_000;
  * - prepares the keepsake of invitations that ended in the last 7 days (so it is ready to download);
  * - deletes guest replies and keepsake PDFs 12 months after an invitation ended;
  * - deletes raw analytics events older than 13 months;
+ * - deletes the watermarked previews of orders left unpaid for a week;
  * - drops old rate-limit counters.
  */
 export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prepareKeepsakes?: boolean } = {}) {
@@ -71,6 +72,21 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
     .where(lt(analyticsEvents.occurredAt, new Date(now.getTime() - 396 * DAY)))
     .returning({ id: analyticsEvents.id });
 
+  // Watermarked preview pictures of orders never paid, a week after their last change.
+  const stale = await db
+    .select({ id: generatedDocuments.id, key: generatedDocuments.storageKey })
+    .from(generatedDocuments)
+    .innerJoin(invitations, eq(invitations.id, generatedDocuments.invitationId))
+    .where(
+      and(
+        inArray(invitations.status, ['DRAFT', 'AWAITING_PAYMENT']),
+        lt(invitations.updatedAt, new Date(now.getTime() - 7 * DAY)),
+        inArray(generatedDocuments.kind, ['STORY_PREVIEW', 'STICKER_PREVIEW', 'BOTTLE_PREVIEW', 'CARD_DRAFT_PREVIEW']),
+      ),
+    );
+  for (const d of stale) await storage().delete(d.key).catch(() => {});
+  if (stale.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, stale.map((d) => d.id)));
+
   await pruneRateLimits(db, now);
-  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length };
+  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length };
 }

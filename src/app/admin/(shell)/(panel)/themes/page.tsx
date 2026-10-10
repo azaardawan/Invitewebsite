@@ -127,7 +127,8 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
                   ) : null}
                 </p>
                 <p className="text-sm text-muted">
-                  {r.sectionName ? localized(r.sectionName, locale) : t('themes.noSection')} ·{' '}
+                  {r.sectionName ? localized(r.sectionName, locale) : t('themes.noSection')}
+                  {r.extraSectionNames.map((n) => ` + ${localized(n, locale)}`).join('')} ·{' '}
                   <span dir="ltr" className="font-mono text-xs">
                     {r.versionRef ?? '—'}
                   </span>

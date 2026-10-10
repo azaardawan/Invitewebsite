@@ -21,8 +21,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   setRequestLocale(locale);
   const th = await storefrontTheme(key);
   if (!th || !th.packages.length) notFound();
-  const { pkg: pkgParam } = await searchParams;
+  const { pkg: pkgParam, occasion: occasionParam } = await searchParams;
+  // A design sold in several occasions: the one the customer came from, or they choose on the form.
+  const occasion = th.occasions.length > 1 ? th.occasions.find((o) => o.key === occasionParam) : undefined;
   const pkg = th.packages.find((p) => p.id === pkgParam) ?? th.packages[0]!;
+  // A newborn design from the Boy or Girl group starts with that gender chosen (the customer can change it).
+  const gender = th.section.key === 'newborn' && (th.subsectionKey === 'boy' || th.subsectionKey === 'girl') ? th.subsectionKey : undefined;
   const t = await getTranslations('store');
 
   return (
@@ -36,6 +40,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           <span className="text-xs text-muted">{t('packageLabel')}</span>
           <span className="font-semibold text-heading">
             {localized(th.name, locale)} · {localized(pkg.name, locale)}
+            {occasion ? ` · ${localized(occasion.name, locale)}` : ''}
           </span>
           <span className="text-sm text-accent">
             <Price iqd={pkg.priceIqd} />
@@ -49,8 +54,10 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
       <div className="mt-8">
         <OrderForm
           action={startOrderAction}
-          hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale }}
+          hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale, ...(occasion ? { occasion: occasion.key } : {}) }}
+          occasions={th.occasions.length > 1 && !occasion ? th.occasions.map((o) => ({ key: o.key, label: localized(o.name, locale) })) : undefined}
           fields={th.fields.filter((f) => pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale) }))}
+          initialValues={gender ? { baby_gender: gender } : undefined}
           invitationLocale={locale}
           minDate={baghdadToday()}
           submitLabel={t('continue')}

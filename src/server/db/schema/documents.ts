@@ -4,7 +4,24 @@ import { themeVersions } from './catalog';
 import { invitations } from './orders';
 
 /** PDFs, pictures of their pages for the customer's receipt, and the link-preview picture (stored the same way, same freshness rule). */
-export const documentKind = pgEnum('document_kind', ['PRINT_CARD', 'KEEPSAKE_PDF', 'PRINT_CARD_PREVIEW', 'KEEPSAKE_PREVIEW', 'PRINT_CARD_BACK_PREVIEW', 'OG_IMAGE']);
+export const documentKind = pgEnum('document_kind', [
+  'PRINT_CARD',
+  'KEEPSAKE_PDF',
+  'PRINT_CARD_PREVIEW',
+  'KEEPSAKE_PREVIEW',
+  'PRINT_CARD_BACK_PREVIEW',
+  'OG_IMAGE',
+  // Newborn extras: the files the customer downloads, and the pictures they preview (watermarked until paid).
+  'STORY_PNG',
+  'STICKER_PDF',
+  'STICKER_PNG',
+  'BOTTLE_PDF',
+  'BOTTLE_PNG',
+  'STORY_PREVIEW',
+  'STICKER_PREVIEW',
+  'BOTTLE_PREVIEW',
+  'CARD_DRAFT_PREVIEW',
+]);
 
 /**
  * The latest generated PDF per invitation and kind. `source_hash` covers

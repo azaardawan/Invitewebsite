@@ -9,6 +9,7 @@ import { formatLongDate } from '@/server/invitation/theme-props';
 import { ReceiptActions } from '@/components/receipt/ReceiptActions';
 import { ConfirmingPayment, PayButton } from '@/components/receipt/PaymentStatus';
 import { DocumentPreview } from '@/components/receipt/DocumentPreview';
+import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { GuestbookChoice } from '@/components/receipt/GuestbookChoice';
 import { db } from '@/server/db/client';
 import { getReceipt } from '@/server/orders/receipt';
@@ -242,6 +243,28 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
             }}
           />
         </section>
+      ) : null}
+
+ {r.status === 'PAID' ? (
+        <div className="mt-8 print:hidden">
+          <ExtrasPreview
+            base={`${base}/extra`}
+            featureKeys={r.invitation.featureKeys}
+            stickerShape={r.invitation.stickerShape}
+            watermarked={false}
+            downloads
+            labels={{
+              title: tStore('extras.title'),
+              note: tStore('extras.watermarkNote'),
+              card: tStore('extras.card'),
+              story: tStore('extras.story'),
+              sticker: tStore('extras.sticker'),
+              bottle: tStore('extras.bottle'),
+              downloadPng: tStore('extras.downloadPng'),
+              downloadSheet: tStore('extras.downloadSheet'),
+            }}
+          />
+        </div>
       ) : null}
 
       {files.length ? (

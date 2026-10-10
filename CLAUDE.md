@@ -25,6 +25,9 @@ product spec's §74 business rules override assumptions.
   commit the file. Numbers are never reused.
 - The owner can replace either side of a theme's printable card with their own artwork in Admin
   (`themes.card_design`, `src/server/catalog/card-design.ts`); the platform writes the text on it.
+- Newborn extras (`story`, `sticker`, `bottle_label`) are platform features drawn by `src/components/print/Products.tsx`
+  on the owner's artwork (`src/server/products/*`). Anything shown before payment is watermarked by the server's
+  render (`isPaid`); files (PNG/PDF) are only served once paid.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
 - `pnpm db:seed` is idempotent and runs on every deploy: permissions/roles, field library, starter
   sections, theme registration. It never overwrites owner edits.

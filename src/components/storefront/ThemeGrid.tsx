@@ -3,7 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { Price } from './currency';
 import { RankBadge } from './RankBadge';
 
-export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null; rank?: number | null };
+export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null; rank?: number | null; occasion?: string };
 
 const TINTS = ['bg-[#efe2ea]', 'bg-blush', 'bg-paper', 'bg-sand', 'bg-[#efd0c8]'];
 
@@ -15,7 +15,7 @@ export async function ThemeGrid({ themes: list }: { themes: GridTheme[] }) {
     <ul className="grid grid-cols-2 gap-x-4 gap-y-10 px-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14 lg:px-[110px]">
       {themes.map((th, i) => (
         <li key={th.key} data-reveal>
-          <Link href={`/themes/${th.key}`} className="group flex flex-col gap-3">
+          <Link href={th.occasion ? `/themes/${th.key}?occasion=${th.occasion}` : `/themes/${th.key}`} className="group flex flex-col gap-3">
             <span
               className={`relative block aspect-[3/4.4] overflow-hidden rounded-t-[999px] rounded-b-[16px] transition duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_18px_34px_rgb(74_19_34/0.14)] ${TINTS[i % TINTS.length]}`}
             >

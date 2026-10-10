@@ -1,6 +1,7 @@
 import 'server-only';
 import { safeMapUrl } from '@/lib/invitation-format';
 import { normalizePhone, toAsciiDigits } from '@/lib/phone';
+import { fieldOptions } from '@/catalog/fields';
 
 export type FieldError =
   | 'required'
@@ -12,7 +13,9 @@ export type FieldError =
   | 'invalidTime'
   | 'invalidMapUrl'
   | 'invalidPhone'
-  | 'invalidUrl';
+  | 'invalidUrl'
+  | 'invalidChoice'
+  | 'birthTooFar';
 
 export type FieldDef = { type: string; maxLength: number | null };
 
@@ -69,6 +72,21 @@ export function validateFieldValues(
         if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) errors[key] = 'invalidDate';
         else if (v < today) errors[key] = 'pastDate';
         else if (v > latest) errors[key] = 'tooFar';
+        else values[key] = v;
+        break;
+      }
+      case 'birthdate': {
+        // A date of birth: up to three years back, or up to a year ahead (an expected birth).
+        const v = toAsciiDigits(raw.trim());
+        const d = /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00Z`) : null;
+        if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) errors[key] = 'invalidDate';
+        else if (v < baghdadToday(new Date(now.getTime() - 3 * 365 * 86400_000)) || v > baghdadToday(new Date(now.getTime() + 365 * 86400_000))) errors[key] = 'birthTooFar';
+        else values[key] = v;
+        break;
+      }
+      case 'choice': {
+        const v = raw.trim();
+        if (!fieldOptions(key).includes(v)) errors[key] = 'invalidChoice';
         else values[key] = v;
         break;
       }

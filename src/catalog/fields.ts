@@ -6,7 +6,11 @@
  * the values here are the seeded defaults. Adding a field: add it here, then
  * `pnpm db:seed`. Every future theme can then use it.
  */
-export const FIELD_TYPES = ['text', 'longtext', 'date', 'time', 'url', 'phone'] as const;
+/**
+ * `date`: an upcoming event (today up to two years ahead). `birthdate`: a date of birth (up to three years back,
+ * or up to a year ahead for an expected birth). `choice`: one of the field's fixed `options`.
+ */
+export const FIELD_TYPES = ['text', 'longtext', 'date', 'birthdate', 'time', 'url', 'phone', 'choice'] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 
 export type I18nText = { ar: string; en: string; ckb?: string | null; bdn?: string | null };
@@ -16,6 +20,8 @@ export type FieldSpec = {
   /** Default and upper bound for the admin-editable max length (text types). */
   maxLength?: number;
   label: I18nText;
+  /** `choice` fields: the stored values (labels live in the message files under `fieldOptions`). */
+  options?: readonly string[];
 };
 
 export const STANDARD_FIELDS = {
@@ -27,6 +33,13 @@ export const STANDARD_FIELDS = {
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link', ckb: 'بەستەری شوێن لەسەر نەخشە', bdn: 'لینکا جهی ل سەر نەخشەی' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
+  // Newborn baby.
+  baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },
+  baby_gender: { type: 'choice', options: ['boy', 'girl'], label: { ar: 'ولد أم بنت', en: 'Boy or girl', ckb: 'کوڕ یان کچ', bdn: 'کوڕ یان کچ' } },
+  mother_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأم', en: "Mother's name", ckb: 'ناوی دایک', bdn: 'ناڤێ دەیکێ' } },
+  father_name: { type: 'text', maxLength: 40, label: { ar: 'اسم الأب', en: "Father's name", ckb: 'ناوی باوک', bdn: 'ناڤێ بابی' } },
+  birth_date: { type: 'birthdate', label: { ar: 'تاريخ الولادة', en: 'Date of birth', ckb: 'بەرواری لەدایکبوون', bdn: 'دیرۆکا ژدایکبوونێ' } },
+  baby_quote: { type: 'text', maxLength: 120, label: { ar: 'عبارة قصيرة', en: 'A short quote', ckb: 'ڕستەیەکی کورت', bdn: 'ڕستەیەکا کورت' } },
 } as const satisfies Record<string, FieldSpec>;
 
 export type FieldKey = keyof typeof STANDARD_FIELDS;
@@ -38,3 +51,14 @@ export function isFieldKey(value: string): value is FieldKey {
 
 /** Absolute upper bound for any admin-configured text length. */
 export const MAX_TEXT_LENGTH = 1000;
+
+/** The fixed options of a `choice` field (empty for other fields). */
+export function fieldOptions(key: string): readonly string[] {
+  return isFieldKey(key) ? ((STANDARD_FIELDS[key] as FieldSpec).options ?? []) : [];
+}
+
+/** The names an invitation is "for": the couple, or else the baby (for slugs, lists and titles). */
+export function invitationNames(values: Readonly<Partial<Record<string, string | undefined>>>): string[] {
+  const couple = [values.person_1_name, values.person_2_name].filter((n): n is string => Boolean(n));
+  return couple.length ? couple : [values.baby_name].filter((n): n is string => Boolean(n));
+}
