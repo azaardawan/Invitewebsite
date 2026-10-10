@@ -30,8 +30,13 @@ test('newborn extras: watermarked previews before paying, clean files to downloa
   // The files themselves are not given out before payment.
   expect((await request.get(`/p/${draft.previewToken}/extra/story.png`)).status()).toBe(404);
 
-  // The order form: the baby's details, boy or girl, and the sticker shape.
+  // The occasion lists its designs under Boy and Girl; one from the Girl group starts with "girl" chosen.
+  await page.goto('/occasions/newborn');
+  await expect(page.getByRole('heading', { name: 'بنت', exact: true })).toBeVisible();
   await page.goto('/themes/demo-newborn/order');
+  await expect(page.getByRole('radiogroup', { name: 'ولد أم بنت' }).getByRole('radio', { name: 'بنت' })).toBeChecked();
+
+  // The order form: the baby's details, boy or girl (changed to boy), and the sticker shape.
   await page.getByLabel('اسم المولود').fill('يوسف');
   await page.getByRole('radiogroup', { name: 'ولد أم بنت' }).getByText('ولد').click();
   await page.getByLabel('اسم الأم').fill('سارة');

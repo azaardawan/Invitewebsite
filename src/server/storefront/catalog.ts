@@ -133,11 +133,12 @@ export type StorefrontThemeDetail = NonNullable<Awaited<ReturnType<typeof storef
 export async function storefrontTheme(key: string) {
   await connection();
   const [row] = await db()
-    .select({ theme: themes, section: sections, version: themeVersions, coverKey: assets.storageKey })
+    .select({ theme: themes, section: sections, version: themeVersions, coverKey: assets.storageKey, subKey: subsections.key })
     .from(themes)
     .innerJoin(sections, eq(sections.id, themes.sectionId))
     .innerJoin(themeVersions, eq(themeVersions.id, themes.currentVersionId))
     .leftJoin(assets, eq(assets.id, themes.coverAssetId))
+    .leftJoin(subsections, and(eq(subsections.id, themes.subsectionId), eq(subsections.status, 'ACTIVE')))
     .where(and(eq(themes.key, key), eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE')));
   if (!row) return null;
   const manifest = row.version.manifest as ThemeManifest;
@@ -149,6 +150,8 @@ export async function storefrontTheme(key: string) {
     name: row.theme.name,
     description: row.theme.description,
     section: { key: row.section.key, name: row.section.name },
+    /** Its visible subsection's key within the main occasion (e.g. newborn `boy` / `girl`), if any. */
+    subsectionKey: row.subKey ?? null,
     /** Every occasion it is sold in, the main one first (one entry for most designs). */
     occasions: [{ key: row.section.key, name: row.section.name }, ...(await alsoSoldIn(row.theme.id))],
     coverUrl: row.coverKey ? publicMediaUrl(row.coverKey) : null,

@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { invitations, sections } from '@/server/db/schema';
+import { invitations, sections, subsections } from '@/server/db/schema';
+import { setSubsectionStatus, updateSubsection } from '@/server/catalog/subsections';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
@@ -43,6 +44,25 @@ describe('newborn details', () => {
     const [s] = await db().select().from(sections).where(eq(sections.key, 'newborn'));
     expect(s!.name).toMatchObject({ ar: 'مولود جديد', en: 'Newborn baby' });
     expect(s!.requiredFeatures).toEqual(expect.arrayContaining(['story', 'sticker', 'bottle_label', 'print_card']));
+  });
+
+  it('come with Boy and Girl groups, added once and never overwriting the owner', async () => {
+    await seedCatalog(db());
+    const [s] = await db().select().from(sections).where(eq(sections.key, 'newborn'));
+    const subs = async () => (await db().select().from(subsections).where(eq(subsections.sectionId, s!.id))).sort((a, b) => a.sortOrder - b.sortOrder);
+    const first = await subs();
+    expect(first.filter((x) => x.key === 'boy' || x.key === 'girl').map((x) => [x.key, x.name.ar])).toEqual([
+      ['boy', 'ولد'],
+      ['girl', 'بنت'],
+    ]);
+    const girl = first.find((x) => x.key === 'girl')!;
+    await updateSubsection(db(), girl.id, { name: { ar: 'بنات', en: 'Girls' } }, shop.actor);
+    await setSubsectionStatus(db(), girl.id, 'ARCHIVED', shop.actor);
+    await seedCatalog(db());
+    const again = await subs();
+    expect(again).toHaveLength(first.length);
+    expect(again.find((x) => x.key === 'girl')).toMatchObject({ status: 'ARCHIVED', name: { ar: 'بنات', en: 'Girls' } });
+    await setSubsectionStatus(db(), girl.id, 'ACTIVE', shop.actor);
   });
 });
 

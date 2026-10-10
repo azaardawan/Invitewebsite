@@ -555,3 +555,4 @@ watermarked previews and the sticker shape. Until approved, these show in Arabic
 Names typed in Admin (seeded, editable there): the occasion «مولود جديد» (Sorani: لەدایکبوونی منداڵ / Badini: زاروکێ نوو)
 and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ زاروکی), «ولد أم بنت» (کوڕ یان کچ / کوڕ یان کچ), «اسم الأم» (ناوی دایک / ناڤێ دەیکێ),
 «اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
+And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).

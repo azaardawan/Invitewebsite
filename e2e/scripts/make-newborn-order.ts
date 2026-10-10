@@ -1,13 +1,13 @@
 /**
  * E2E fixture: puts the internal demo-newborn theme on sale (allowed in development) with a package that has
- * every newborn extra (card, story, sticker, bottle label), then creates an order for a baby girl with square
+ * every newborn extra (card, story, sticker, bottle label), in the Girl group, then creates an order for a baby girl with square
  * stickers: left unpaid (review page, watermarked previews). Prints { previewToken, receiptToken, invitationId }.
  * PAID=1 pays it (receipt with clean files).
  */
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import sharp from 'sharp';
 import { closeDb, db } from '../../src/server/db/client';
-import { themes } from '../../src/server/db/schema';
+import { subsections, themes } from '../../src/server/db/schema';
 import { createPackage } from '../../src/server/catalog/packages';
 import { transitionTheme, updateThemeSettings, packagesWithShape } from '../../src/server/catalog/themes';
 import { storeImage } from '../../src/server/media/assets';
@@ -24,7 +24,8 @@ try {
   const [t] = await db().select().from(themes).where(eq(themes.key, 'demo-newborn'));
   if (!t) throw new Error('demo-newborn not registered (run db:seed)');
   const cover = await storeImage(db(), await sharp({ create: { width: 420, height: 600, channels: 3, background: '#eaf2fb' } }).png().toBuffer(), { uploadedBy: null });
-  await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, coverAssetId: t.coverAssetId ?? cover.id, musicTrackId: t.musicTrackId }, actor);
+  const [girl] = await db().select({ id: subsections.id }).from(subsections).where(and(eq(subsections.sectionId, t.sectionId ?? ''), eq(subsections.key, 'girl')));
+  await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, subsectionId: girl?.id ?? null, coverAssetId: t.coverAssetId ?? cover.id, musicTrackId: t.musicTrackId }, actor);
   const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.featureKeys.includes('bottle_label'));
   const packageId = existing?.id ?? (await createPackage(db(), t.id, { name: { ar: 'باقة المولود', en: 'Newborn' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: [...FEATURES] }, actor)).id;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
