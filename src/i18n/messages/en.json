@@ -97,7 +97,8 @@
     "terms": "Terms of service",
     "privacy": "Privacy policy",
     "refund": "Refund policy",
-    "access": "My invitation"
+    "access": "My invitation",
+    "termsNewborn": "Newborn invitation terms"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -813,9 +814,10 @@
       "heading": "Legal policies",
       "intro": "Terms of service, privacy and refund policies shown on the website. Edit a draft, preview it, then publish. A published version can never be changed: customers' orders record exactly which version they accepted. Have a lawyer review the texts before going live.",
       "types": {
-        "TERMS": "Terms of service",
+        "TERMS": "Terms of service (weddings and other occasions)",
         "PRIVACY": "Privacy policy",
-        "REFUND": "Refund policy"
+        "REFUND": "Refund policy",
+        "TERMS_NEWBORN": "Terms for newborn invitations"
       },
       "liveVersion": "Live: version {version}, published {date}.",
       "notPublished": "Not published yet: the website says it is being prepared.",

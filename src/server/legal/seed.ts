@@ -125,6 +125,84 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - لەوانەیە ئەم مەرجانە نوێ بکەینەوە، و لەسەر هەر داواکارییەک ئەو وەشانە جێبەجێ دەکرێت کە لە کاتی داواکاریدا ڕازی بوویت پێی.
 - بۆ پەیوەندی: لە ڕێگەی واتسئاپ یان ڕێگاکانی پەیوەندی لە پەرەی «پەیوەندیمان پێوە بکە».`,
   },
+  // Newborn invitations have their own terms. Kurdish awaits the owner's approval (docs/translations/KURDISH_REVIEW.md);
+  // a policy can only be published with all four languages.
+  TERMS_NEWBORN: {
+    ar: `هذه الشروط تنظّم شراء دعوات المولود الجديد وإضافاتها من موقع بهجه. بإتمام الطلب فإنك توافق عليها.
+
+## الخدمة
+- بهجه تصمّم دعوة رقمية للإعلان عن مولودكم تُفتح برابط خاص، مع إضافات بحسب الباقة التي تختارها: صورة ستوري لإنستغرام، ملصقات للشوكولاتة، ملصق لقناني الماء، وبطاقة للطباعة.
+- تكتب أنت بيانات المولود (الاسم، ولد أم بنت، اسم الأم والأب، تاريخ الولادة، العبارة) وتراجعها في المعاينة قبل تأكيد الطلب.
+
+## الطلب والدفع
+- الأسعار بالدينار العراقي، وأي سعر بالدولار للعرض فقط.
+- يُنشأ الطلب عند تأكيدك له، ويُدفع بالطريقة المذكورة في صفحة الإيصال. تُنشر الدعوة بعد تأكيد الدفع.
+
+## المعاينات والملفات
+- تظهر المعاينات قبل الدفع بعلامة مائية لحماية التصميم.
+- بعد تأكيد الدفع تُزال العلامة، وتحمّل الملفات (صور PNG وأوراق طباعة PDF) من صفحة الإيصال.
+
+## الطباعة
+- ملفات الطباعة جاهزة بالمقاسات المذكورة، والطباعة على مسؤوليتك أو مسؤولية المطبعة التي تختارها.
+- قد تختلف الألوان قليلاً بين الشاشة والورق وبين مطبعة وأخرى، وهذا ليس عيباً في التصميم.
+- الملصقات للتزيين، وتوضع على الغلاف لا على الطعام مباشرة.
+
+## بيانات المولود والخصوصية
+- رابط الدعوة خاص ولا يظهر في الموقع، لكن كل من يصله الرابط يستطيع فتحها، فشاركه مع من تثق بهم فقط.
+- اكتب فقط ما ترغب في مشاركته من بيانات المولود. لا نستخدم هذه البيانات لأي غرض غير دعوتك.
+
+## مدة النشر
+- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
+
+## محتوى الدعوة
+- أنت مسؤول عن صحة المعلومات التي تكتبها وعن حقك في نشرها.
+- لا يُسمح بمحتوى مسيء أو مخالف للقانون، ويحق لنا إيقاف أي دعوة تخالف ذلك.
+- يمكن تصحيح الأخطاء في بيانات الدعوة بالتواصل معنا خلال مدة النشر، وتُحدَّث الملفات بعد التصحيح.
+
+## الملكية
+- التصاميم والموسيقى والبرمجيات ملك لبهجه أو مرخّصة لها. يحق لك استخدام دعوتك وطباعة ملفاتها ومشاركتها لمناسبتك فقط، ولا يجوز بيعها أو استخدام التصميم لغيرك.
+
+## التعديلات والتواصل
+- قد نحدّث هذه الشروط، ويُطبّق على كل طلب الإصدار الذي وافقت عليه عند الطلب.
+- للتواصل: عبر واتساب أو وسائل التواصل في صفحة «تواصل معنا».`,
+    en: `These terms govern the purchase of newborn baby invitations and their extras from the Bahja website. By placing an order you accept them.
+
+## The service
+- Bahja designs a digital invitation announcing your baby, opened through a private link, with extras depending on the package you choose: an Instagram story picture, chocolate stickers, a water bottle label and a printable card.
+- You write the baby's details (name, boy or girl, mother's and father's names, date of birth, a short quote) and review them in the preview before confirming your order.
+
+## Ordering and payment
+- Prices are in Iraqi dinars; any US dollar price is shown for reference only.
+- Your order is created when you confirm it and is paid as described on your receipt page. The invitation is published once payment is confirmed.
+
+## Previews and files
+- Previews shown before payment carry a watermark to protect the design.
+- Once payment is confirmed the watermark is removed and you download the files (PNG pictures and PDF print sheets) from your receipt page.
+
+## Printing
+- The print files are ready at the sizes stated; printing is your responsibility or that of the print shop you choose.
+- Colours may differ slightly between screen and paper and from one printer to another; this is not a fault in the design.
+- The stickers are decorative and go on the wrapping, not directly on food.
+
+## Your baby's details and privacy
+- The invitation link is private and not listed on the website, but anyone who has the link can open it, so share it only with people you trust.
+- Only write the details about your baby that you are happy to share. We use them for your invitation only.
+
+## Publication period
+- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.
+
+## Invitation content
+- You are responsible for the accuracy of the information you enter and for your right to publish it.
+- Offensive or unlawful content is not allowed, and we may take down any invitation that breaks this rule.
+- Mistakes in the invitation details can be corrected by contacting us during the publication period; the files are updated after the correction.
+
+## Ownership
+- Designs, music and software belong to Bahja or are licensed to it. You may use your invitation and print and share its files for your occasion only; you may not sell them or use the design for anyone else.
+
+## Changes and contact
+- We may update these terms; each order is governed by the version accepted when it was placed.
+- Contact us on WhatsApp or through the details on the Contact page.`,
+  },
   PRIVACY: {
     ar: `توضّح هذه السياسة ما نجمعه من معلومات وكيف نستخدمه.
 
@@ -288,7 +366,7 @@ export async function seedLegalDrafts(db: DbOrTx) {
     }
     // Adds the approved Kurdish to a draft that still has the untouched seeded Arabic and no Kurdish yet.
     for (const row of rows) {
-      if (row.status !== 'DRAFT' || row.content.ar !== content.ar || (row.content.ckb && row.content.bdn)) continue;
+      if (!content.ckb || row.status !== 'DRAFT' || row.content.ar !== content.ar || (row.content.ckb && row.content.bdn)) continue;
       await db
         .update(legalPolicyVersions)
         .set({ content: { ...row.content, ckb: row.content.ckb || content.ckb, bdn: row.content.bdn || content.bdn } })

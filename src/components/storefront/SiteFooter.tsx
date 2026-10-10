@@ -3,8 +3,11 @@ import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import { socialLinks, whatsappHref, type ContactInfo } from '@/lib/contact-links';
 
-/** Footer; contact details come from Admin → Website settings (loaded by the layout). */
-export async function SiteFooter({ contact }: { contact: ContactInfo }) {
+/**
+ * Footer; contact details come from Admin → Website settings (loaded by the layout). The newborn
+ * terms are linked once the owner has published them.
+ */
+export async function SiteFooter({ contact, newbornTerms = false }: { contact: ContactInfo; newbornTerms?: boolean }) {
   const t = await getTranslations('footer');
   const nav = await getTranslations('nav');
   const common = await getTranslations('common');
@@ -55,6 +58,7 @@ export async function SiteFooter({ contact }: { contact: ContactInfo }) {
       <div className="border-t border-[#ffffff1f] px-6 py-5 text-center text-xs opacity-80">
         <nav aria-label={t('legal')} className="mb-2 flex flex-wrap justify-center gap-x-5 gap-y-1">
           <Link href="/legal/terms" className="hover:underline">{t('terms')}</Link>
+          {newbornTerms ? <Link href="/legal/terms-newborn" className="hover:underline">{t('termsNewborn')}</Link> : null}
           <Link href="/legal/privacy" className="hover:underline">{t('privacy')}</Link>
           <Link href="/legal/refund" className="hover:underline">{t('refund')}</Link>
         </nav>

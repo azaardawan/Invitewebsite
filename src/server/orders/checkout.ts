@@ -2,7 +2,7 @@ import 'server-only';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
-import { customers, invitations, orderStatusHistory, orders, themes } from '@/server/db/schema';
+import { customers, invitations, orderStatusHistory, orders, sections, themes } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import type { RequestContext } from '@/server/auth/request-context';
 import { consumeRateLimit } from '@/server/rate-limit';
@@ -117,7 +117,9 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     const amountIqd = p.pkg.priceIqd - (coupon?.discountIqd ?? 0);
     snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: p.pkg.priceIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null };
 
-    const legal = await acceptedVersions(tx);
+    // Newborn invitations accept their own terms (once the owner has published them).
+    const [section] = inv!.sectionId ? await tx.select({ key: sections.key }).from(sections).where(eq(sections.id, inv!.sectionId)) : [];
+    const legal = await acceptedVersions(tx, section?.key);
     let order: typeof orders.$inferSelect | undefined;
     for (let attempt = 0; attempt < 5 && !order; attempt++) {
       [order] = await tx

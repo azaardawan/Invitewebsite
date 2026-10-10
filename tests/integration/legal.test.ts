@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { eq, sql } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { legalPolicyVersions, orders } from '@/server/db/schema';
+import { invitations, legalPolicyVersions, orders } from '@/server/db/schema';
 import { acceptedVersions, currentPolicy, discardDraft, policyAdminView, publishDraft, saveDraft } from '@/server/legal/policies';
 import { seedLegalDrafts } from '@/server/legal/seed';
+import { seedCatalog, sectionIdByKey } from '@/server/catalog/seed';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { getSettings, updateContactSettings } from '@/server/settings/service';
@@ -28,7 +29,7 @@ describe('legal policies', () => {
     expect(terms.draft?.version).toBe(1);
     expect(terms.published).toEqual([]);
     expect(await currentPolicy(db(), 'TERMS')).toBeNull();
-    expect(await acceptedVersions(db())).toEqual({ terms: 'none', refund: 'none', privacy: 'none' });
+    expect(await acceptedVersions(db())).toEqual({ terms: 'none', termsPolicy: 'TERMS', refund: 'none', privacy: 'none' });
   });
 
   it('edits a draft, publishes it, and freezes the published version', async () => {
@@ -62,7 +63,34 @@ describe('legal policies', () => {
     const d = await createDraft(db(), { themeKey: shop.theme.key, packageId: shop.basic.id, locale: 'ar', values: weddingValues() }, visitor);
     const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'c@example.com' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, visitor);
     const [row] = await db().select().from(orders).where(eq(orders.id, o.orderId));
-    expect(row!.legalAcceptance).toMatchObject({ terms: 'v1', refund: 'v1', privacy: 'none' });
+    expect(row!.legalAcceptance).toMatchObject({ terms: 'v1', termsPolicy: 'TERMS', refund: 'v1', privacy: 'none' });
+  });
+
+  it('gives newborn invitations their own terms once published; weddings keep the main terms', async () => {
+    // Seeded as a draft (Arabic and English); it can't go live until all four languages are written.
+    expect((await policyAdminView(db(), 'TERMS_NEWBORN')).draft?.content.en).toMatch(/newborn/);
+    await expect(publishDraft(db(), 'TERMS_NEWBORN', actor)).rejects.toMatchObject({ code: 'allLanguages' });
+
+    await seedCatalog(db());
+    const newbornId = (await sectionIdByKey(db(), 'newborn'))!;
+    const shop = await activeTheme();
+    async function order(newborn: boolean) {
+      const visitor = { ...ctx, ipHash: randomToken(8) };
+      const d = await createDraft(db(), { themeKey: shop.theme.key, packageId: shop.basic.id, locale: 'ar', values: weddingValues() }, visitor);
+      if (newborn) await db().update(invitations).set({ sectionId: newbornId }).where(eq(invitations.id, d.invitationId));
+      const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'c@example.com' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, visitor);
+      const [row] = await db().select().from(orders).where(eq(orders.id, o.orderId));
+      return row!.legalAcceptance;
+    }
+
+    // Not published yet: a newborn order falls back to the main terms.
+    expect(await acceptedVersions(db(), 'newborn')).toMatchObject({ termsPolicy: 'TERMS', terms: 'v1' });
+    expect(await order(true)).toMatchObject({ termsPolicy: 'TERMS', terms: 'v1' });
+
+    await saveDraft(db(), 'TERMS_NEWBORN', { ar: 'شروط المولود', en: 'Newborn terms', ckb: 'مەرجەکانی منداڵ', bdn: 'مەرجێن زاروکی' }, actor);
+    expect(await publishDraft(db(), 'TERMS_NEWBORN', actor)).toBe(1);
+    expect(await order(true)).toMatchObject({ termsPolicy: 'TERMS_NEWBORN', terms: 'v1' });
+    expect(await order(false)).toMatchObject({ termsPolicy: 'TERMS', terms: 'v1' });
   });
 });
 

@@ -103,6 +103,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               token={token}
               idempotencyKey={randomBytes(18).toString('base64url')}
               paymentNote={onlinePaymentsEnabled() ? t('paymentNext') : t('paymentSoon')}
+              termsSlug={draft.termsSlug}
             />
           </section>
         </div>

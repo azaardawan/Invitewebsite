@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgEnum, pgTable, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { adminUsers } from './admin';
 
-export const legalPolicyType = pgEnum('legal_policy_type', ['TERMS', 'PRIVACY', 'REFUND']);
+export const legalPolicyType = pgEnum('legal_policy_type', ['TERMS', 'PRIVACY', 'REFUND', 'TERMS_NEWBORN']);
 export const legalPolicyStatus = pgEnum('legal_policy_status', ['DRAFT', 'PUBLISHED']);
 
 export type LegalContent = { ar: string; en: string; ckb?: string | null; bdn?: string | null };

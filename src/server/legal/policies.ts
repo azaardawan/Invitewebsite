@@ -6,10 +6,19 @@ import { legalPolicyVersions, type LegalContent } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 
-export const POLICY_TYPES = ['TERMS', 'PRIVACY', 'REFUND'] as const;
+export const POLICY_TYPES = ['TERMS', 'TERMS_NEWBORN', 'PRIVACY', 'REFUND'] as const;
 export type PolicyType = (typeof POLICY_TYPES)[number];
-/** URL segment per policy: /legal/terms, /legal/privacy, /legal/refund. */
-export const POLICY_SLUGS: Record<PolicyType, string> = { TERMS: 'terms', PRIVACY: 'privacy', REFUND: 'refund' };
+/** URL segment per policy: /legal/terms, /legal/terms-newborn, /legal/privacy, /legal/refund. */
+export const POLICY_SLUGS: Record<PolicyType, string> = { TERMS: 'terms', TERMS_NEWBORN: 'terms-newborn', PRIVACY: 'privacy', REFUND: 'refund' };
+
+/**
+ * Which terms an order accepts: newborn invitations have their own (once published); weddings and every
+ * other occasion use the main terms of service.
+ */
+export async function termsPolicyFor(db: DbOrTx, sectionKey: string | null | undefined): Promise<'TERMS' | 'TERMS_NEWBORN'> {
+  if (sectionKey === 'newborn' && (await currentPolicy(db, 'TERMS_NEWBORN'))) return 'TERMS_NEWBORN';
+  return 'TERMS';
+}
 export function policyTypeFromSlug(slug: string): PolicyType | null {
   return (Object.entries(POLICY_SLUGS).find(([, s]) => s === slug)?.[0] as PolicyType | undefined) ?? null;
 }
@@ -39,11 +48,15 @@ export async function currentPolicy(db: DbOrTx, type: PolicyType) {
   return row ?? null;
 }
 
-/** What a customer accepts at checkout: the current published version of each policy ('none' if unpublished). */
-export async function acceptedVersions(db: DbOrTx) {
-  const [terms, refund, privacy] = await Promise.all([currentPolicy(db, 'TERMS'), currentPolicy(db, 'REFUND'), currentPolicy(db, 'PRIVACY')]);
+/**
+ * What a customer accepts at checkout: the current published version of each policy ('none' if unpublished),
+ * with which terms they were (`termsPolicy`: the main terms, or the newborn terms for a newborn invitation).
+ */
+export async function acceptedVersions(db: DbOrTx, sectionKey?: string | null) {
+  const termsPolicy = await termsPolicyFor(db, sectionKey);
+  const [terms, refund, privacy] = await Promise.all([currentPolicy(db, termsPolicy), currentPolicy(db, 'REFUND'), currentPolicy(db, 'PRIVACY')]);
   const v = (p: Awaited<ReturnType<typeof currentPolicy>>) => (p ? `v${p.version}` : 'none');
-  return { terms: v(terms), refund: v(refund), privacy: v(privacy) };
+  return { terms: v(terms), termsPolicy, refund: v(refund), privacy: v(privacy) };
 }
 
 export async function policyAdminView(db: DbOrTx, type: PolicyType) {
