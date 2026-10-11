@@ -53,6 +53,13 @@ Date: 2026-09-30
 - **Kurdish translations are owner-approved only.** New strings get suggested Sorani/Badini wording in `docs/translations/KURDISH_REVIEW.md`; nothing Kurdish ships until the owner approves it.
 - The **admin panel is Arabic/English only** (staff tool); Kurdish applies to all customer-facing pages.
 
+**Revision 4 changes (newborn, 2026-10-11):**
+- Designs can be **files only** (manifest `onlineInvitation: false`): story, A5 card, chocolate stickers and
+  bottle label, with no online invitation, link or QR.
+- A newborn design may draw its own extras (`print/Story|Sticker|Bottle.tsx`); otherwise the platform draws them.
+- On the order form the customer chooses how the date of birth is written (Gregorian, numeric, Hijri or both;
+  Arabic-Indic or Western digits) and the water-bottle size (250 / 330 / 500 / 600 ml).
+
 **Revision 3 changes:**
 - A: no go-live date; publish immediately for 30 days; extensions by Admin on request.
 - C: separate order and invoice numbers, as recommended.

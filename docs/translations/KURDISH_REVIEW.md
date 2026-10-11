@@ -557,3 +557,25 @@ Names typed in Admin (seeded, editable there): the occasion «مولود جدي�
 and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ زاروکی), «ولد أم بنت» (کوڕ یان کچ / کوڕ یان کچ), «اسم الأم» (ناوی دایک / ناڤێ دەیکێ),
 «اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
 And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).
+
+## Batch 23 — date-of-birth format, bottle size, files-only designs — ⏳ PENDING owner approval
+
+Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Arabic until approved).
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.birthDateFormat.heading` | طريقة كتابة تاريخ الولادة | How the date of birth is written | شێوازی نووسینی بەرواری لەدایکبوون | شێوازێ نڤیسینا دیرۆکا ژدایکبوونێ | ◐ |
+| 2 | `store.birthDateFormat.help` | هكذا سيظهر التاريخ على الستوري والبطاقة والملصقات. | This is how the date appears on the story, card and stickers. | بەروارەکە بەم شێوەیە لەسەر ستۆری و کارت و لکێنەرەکان دەردەکەوێت. | دیرۆک ب ڤی شێوەی ل سەر ستۆری و کارت و لکێنەران دێ دیار بیت. | ◐ |
+| 3 | `store.birthDateFormat.digits` | الأرقام | Digits | ژمارەکان | ژمارە | ● |
+| 4 | `store.birthDateFormat.arab` | ٠١٢٣ | ٠١٢٣ | ٠١٢٣ | ٠١٢٣ | ● |
+| 5 | `store.birthDateFormat.latn` | 0123 | 0123 | 0123 | 0123 | ● |
+| 6 | `store.bottleSize.heading` | حجم قنينة الماء | Water bottle size | قەبارەی بوتڵی ئاو | قەبارێ بوتلا ئاڤێ | ◐ |
+| 7 | `store.bottleSize.help` | الملصق يلتف حول القنينة… | The label wraps around the bottle… | لکێنەرەکە بە دەوری بوتڵەکەدا دەپێچرێت. قەبارەکە بە پارچە کاغەزێک بپشکنن؛ وێنەی PNG دەتوانرێت بۆ هەر بوتڵێک گەورە یان بچووک بکرێت. | لکێنەر ل دۆر بوتلێ دهێتە پێچان. قەبارێ ب پارچەکا کاغەزێ بپشکنن؛ وێنەیێ PNG دشێت بۆ هەر بوتلەکێ بهێتە مەزنکرن یان بچووککرن. | ◐ |
+| 8 | `store.bottleSize.option` | {ml} مل | {ml} ml | {ml} مل | {ml} مل | ● |
+| 9 | `store.filesPreview` | عرض الملفات | Files preview | پیشاندانی فایلەکان | نیشاندانا فایلان | ◐ |
+| 10 | `store.filesOnlyHint` | هذا تصميم ملفات فقط للتحميل والطباعة (ستوري، بطاقة، ملصقات)، وليس دعوة إلكترونية. | This design comes as files to download and print… | ئەم دیزاینە تەنها فایلە بۆ داگرتن و چاپکردن (ستۆری، کارت، لکێنەر)، بانگهێشتی ئۆنلاین نییە. | ئەڤ دیزاینە بتنێ فایلن بۆ داگرتن و چاپکرنێ (ستۆری، کارت، لکێنەر)، ڤەخواندنا ئۆنلاین نینە. | ◐ |
+
+Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts`; Kurdish uses the Arabic until approved;
+the Quran verse and du'a always stay Arabic):
+«رزقنا الله بأجمل العطايا» → Sorani: خودا جوانترین بەخششی پێ بەخشین / Badini: خودێ جوانترین دیاری دا مە (◐);
+«بن» (son of) → Sorani: کوڕی / Badini: کوڕێ (●).

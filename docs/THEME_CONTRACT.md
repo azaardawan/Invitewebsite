@@ -31,6 +31,9 @@ themes/<key>/v<N>/
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
+- `onlineInvitation: false` marks a **files-only** design (e.g. a newborn set: story, card, stickers,
+  bottle label). It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
+  and the storefront shows it as a picture, not in a phone frame. `Theme.tsx` is then only the preview.
 
 ## 3. What the theme receives: `ThemeProps`
 
@@ -51,7 +54,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
 | `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. |
-| `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts), or null. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), not theme code. |
+| `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`
 
@@ -132,6 +135,18 @@ in the same place on every page): give the messages section its own padding (abo
 clear of the border at the sides) with `box-decoration-break: clone` so it repeats on each page. No page
 numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
+
+### Newborn extras drawn by the design
+
+A newborn design may ship its own `print/Story.tsx`, `print/Sticker.tsx` and/or `print/Bottle.tsx`
+(server components, default export, `PrintExtraProps` from `@/theme-sdk`). The registry picks them up
+automatically; the package still decides which extras are sold (`story`, `sticker`, `bottle_label`), and
+owner artwork uploaded in Admin for an extra takes precedence. Each is drawn inside an exact-size box that is
+a CSS size container (story 1080 × 1920 px, sticker 40 mm, bottle label in the customer's bottle size from
+`src/catalog/products.ts`), so size everything in `cqw`/`cqh`. They receive `fields`, `birthDate`
+(use `lines`), `labels`, `shape` (`round`/`square`; the platform clips the round one) and `size`.
+The platform adds the watermark before payment, the cut lines and the A4 sheets.
+See `themes/embroidered-garden/v1/`.
 
 ## 7. Preview and review
 

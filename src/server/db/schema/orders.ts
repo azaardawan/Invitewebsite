@@ -92,6 +92,11 @@ export const invitations = pgTable(
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     /** Chocolate stickers (`sticker` feature): the shape the customer chose. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square'] }).notNull().default('round'),
+    /** Bottle labels (`bottle_label` feature): the bottle size the customer chose (src/catalog/products.ts). */
+    bottleSize: text('bottle_size', { enum: ['250', '330', '500', '600'] }).notNull().default('500'),
+    /** Newborn: how the customer wants the date of birth written (src/lib/birth-date-format.ts). */
+    birthDateStyle: text('birth_date_style', { enum: ['long', 'numeric', 'hijri', 'both'] }).notNull().default('long'),
+    birthDateDigits: text('birth_date_digits', { enum: ['arab', 'latn'] }).notNull().default('arab'),
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),

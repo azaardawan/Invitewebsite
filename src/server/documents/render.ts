@@ -3,6 +3,7 @@ import { chromium, type Browser } from 'playwright-core';
 import { PDFDocument } from 'pdf-lib';
 import { env } from '@/server/env';
 import { printToken, type ProductView, type RenderKind } from './tokens';
+import { BOTTLE_SIZES, DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
 
 export type PdfRenderer = (kind: RenderKind, invitationId: string) => Promise<Buffer>;
 
@@ -103,7 +104,7 @@ export type ProductItem =
   | 'sticker.preview'
   | 'bottle.preview'
   | 'card.preview';
-export type ProductRenderer = (item: ProductItem, invitationId: string) => Promise<Buffer>;
+export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize }) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
 const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'bottle.pdf'>, { view: string; width: number; height: number; scale: number; type: 'png' | 'jpeg'; transparent?: boolean }> = {
@@ -116,14 +117,17 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'bottle.pdf'>, 
   'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
 };
 
-export const renderProduct: ProductRenderer = async (item, invitationId) => {
+export const renderProduct: ProductRenderer = async (item, invitationId, opts = {}) => {
   const browser = await chromium.launch({
     executablePath: env().CHROMIUM_PATH || undefined,
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
   });
   try {
     if (item === 'sticker.pdf' || item === 'bottle.pdf') return await pdfOf(browser, `/print/${printToken(item === 'sticker.pdf' ? 'stickerSheet' : 'bottleSheet', invitationId)}`);
-    const shot = PRODUCT_SHOTS[item];
+    const base = PRODUCT_SHOTS[item];
+    // Bottle labels come in several sizes: the picture is the size the customer chose.
+    const dims = BOTTLE_SIZES[opts.bottleSize ?? DEFAULT_BOTTLE_SIZE];
+    const shot = base.view === 'bottle' ? { ...base, width: mmPx(dims.width), height: mmPx(dims.height) } : base;
     const page = await browser.newPage({ viewport: { width: shot.width, height: shot.height }, deviceScaleFactor: shot.scale, reducedMotion: 'reduce' });
     await page.emulateMedia({ media: 'print' });
     const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}`;

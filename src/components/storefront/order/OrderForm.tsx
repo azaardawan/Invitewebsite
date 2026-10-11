@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
@@ -16,6 +16,10 @@ export type OrderFormExtras = {
   signature?: { current: string[] };
   /** Chocolate stickers (sticker): round or square. */
   sticker?: { current: 'round' | 'square' };
+  /** Bottle labels (bottle_label): which bottle size. */
+  bottle?: { current: string; sizes: readonly string[] };
+  /** Date of birth: how it is written; `examples` is `${style}:${digits}` → the date written that way. */
+  birthDate?: { style: string; digits: string; examples: Record<string, string>; showDigits: boolean };
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -161,6 +165,24 @@ export function OrderForm({
         </fieldset>
       ) : null}
 
+      {extras.birthDate ? <BirthDateFormat extra={extras.birthDate} values={values} label={(k) => t(`birthDateFormat.${k}` as 'birthDateFormat.heading')} /> : null}
+
+      {extras.bottle ? (
+        <div className="flex flex-col gap-2">
+          <label htmlFor="bottleSize" className="text-[15px] font-medium text-heading">
+            {t('bottleSize.heading')}
+          </label>
+          <p className="text-sm text-muted">{t('bottleSize.help')}</p>
+          <select id="bottleSize" name="bottleSize" defaultValue={values.bottleSize || extras.bottle.current} className={inputCls}>
+            {extras.bottle.sizes.map((size) => (
+              <option key={size} value={size}>
+                {t('bottleSize.option', { ml: size })}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
       {extras.palettes ? (
         <fieldset className="flex flex-col gap-3">
           <legend className="text-[15px] font-medium text-heading">{t('colors.heading')}</legend>
@@ -264,5 +286,51 @@ export function OrderForm({
         {pending ? t('saving') : submitLabel}
       </button>
     </form>
+  );
+}
+
+/** How the date of birth is written on the designs: four styles (shown on the customer's date) and the digits. */
+function BirthDateFormat({
+  extra,
+  values,
+  label,
+}: {
+  extra: NonNullable<OrderFormExtras['birthDate']>;
+  values: Record<string, string>;
+  label: (key: 'heading' | 'help' | 'digits' | 'arab' | 'latn') => string;
+}) {
+  const [digits, setDigits] = useState(values.birthDateDigits || extra.digits);
+  const initialStyle = values.birthDateStyle || extra.style;
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-[15px] font-medium text-heading">{label('heading')}</legend>
+      <p className="text-sm text-muted">{label('help')}</p>
+      <div className="flex flex-col gap-2">
+        {(['long', 'numeric', 'hijri', 'both'] as const).map((style) => (
+          <label
+            key={style}
+            className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+          >
+            <input type="radio" name="birthDateStyle" value={style} defaultChecked={initialStyle === style} className="mt-1" />
+            <span className="whitespace-pre-line text-sm" dir="auto">
+              {extra.examples[`${style}:${extra.showDigits ? digits : 'latn'}`]}
+            </span>
+          </label>
+        ))}
+      </div>
+      {extra.showDigits ? (
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <span className="font-medium">{label('digits')}</span>
+          {(['arab', 'latn'] as const).map((d) => (
+            <label key={d} className="flex items-center gap-2">
+              <input type="radio" name="birthDateDigits" value={d} checked={digits === d} onChange={() => setDigits(d)} />
+              {label(d)}
+            </label>
+          ))}
+        </div>
+      ) : (
+        <input type="hidden" name="birthDateDigits" value="latn" />
+      )}
+    </fieldset>
   );
 }

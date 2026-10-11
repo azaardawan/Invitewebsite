@@ -86,7 +86,7 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
     const stored = await storage().get(existing.storageKey);
     if (stored) return { data: stored, type: contentType(item), fileName: productFileName(item, inv.publicId) };
   }
-  const data = await render(item, inv.id);
+  const data = await render(item, inv.id, { bottleSize: inv.bottleSize });
   const ext = contentType(item) === 'application/pdf' ? 'pdf' : contentType(item) === 'image/png' ? 'png' : 'jpg';
   const storageKey = `documents/${randomUUID()}.${ext}`;
   await storage().put(storageKey, data, contentType(item));

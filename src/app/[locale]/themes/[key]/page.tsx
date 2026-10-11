@@ -11,6 +11,7 @@ import { publicContact } from '@/server/settings/public';
 import { whatsappHref } from '@/lib/contact-links';
 import { env } from '@/server/env';
 import { RankBadge } from '@/components/storefront/RankBadge';
+import { manifestByCodeRef } from '@/theme-registry';
 
 export const dynamicParams = true;
 
@@ -60,6 +61,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
           themeKey={th.key}
           lang={locale}
           occasion={occasion?.key}
+          filesOnly={manifestByCodeRef(th.codeRef)?.onlineInvitation === false}
           packages={th.packages.map((p) => ({
             id: p.id,
             name: localized(p.name, locale),

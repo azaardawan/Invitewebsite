@@ -44,7 +44,7 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
           invitationLocale={draft.locale}
           minDate={baghdadToday()}
           submitLabel={t('saveChanges')}
-          extras={await orderFormExtras(locale, draft.themeId, draft.featureKeys, draft.current)}
+          extras={await orderFormExtras(locale, draft.themeId, draft.featureKeys, draft.current, draft.fieldKeys)}
         />
       </div>
       <div className="mt-4 flex justify-center">
