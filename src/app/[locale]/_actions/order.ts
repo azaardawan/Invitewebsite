@@ -32,7 +32,14 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits') };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
+}
+
+/** The changeable-line choices as typed (`w.<key>`, `w.<key>.text`), so a failed submit keeps them. */
+function wordingValues(form: FormData): Record<string, string> {
+  const values: Record<string, string> = {};
+  for (const [k, v] of form.entries()) if (/^w\.[a-zA-Z0-9]+(\.text)?$/.test(k) && typeof v === 'string') values[k] = v;
+  return values;
 }
 
 /** The optional order-form sections (card back, signature, colour set); absent sections are left alone. */
@@ -46,6 +53,11 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
   if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
   if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');
+  // The design's changeable lines: radio `w.<key>` (ar | lang | custom) and the text `w.<key>.text`.
+  for (const [k, v] of form.entries()) {
+    const key = /^w\.([a-zA-Z0-9]+)$/.exec(k)?.[1];
+    if (key && typeof v === 'string') (extras.wording ??= {})[key] = { choice: v, text: str(form, `w.${key}.text`) };
+  }
   return extras;
 }
 

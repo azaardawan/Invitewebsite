@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "wording" jsonb DEFAULT '{}'::jsonb NOT NULL;

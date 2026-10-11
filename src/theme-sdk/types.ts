@@ -127,6 +127,11 @@ export type ThemeProps = {
   occasion: string | null;
   /** Newborn: the date of birth (`fields.birth_date`) in the invitation's language, or null. */
   birthDate: BirthDateParts | null;
+  /**
+   * The design's changeable lines (manifest `wording`), by key: the customer's choice, or the Arabic default.
+   * Always has every declared key.
+   */
+  wording: Readonly<Record<string, string>>;
 };
 
 /**

@@ -38,6 +38,8 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       colors: inv.colors,
       occasion: await occasionKey(db, inv.sectionId),
       birthDateFormat: { style: inv.birthDateStyle, digits: inv.birthDateDigits },
+      wordingLines: (version!.manifest as ThemeManifest).wording ?? [],
+      wording: inv.wording,
     }),
   };
 }

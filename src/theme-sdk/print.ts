@@ -47,6 +47,8 @@ type PrintBase = {
   colors: Record<string, string>;
   /** Newborn: the date of birth in the invitation's language, or null. */
   birthDate: BirthDateParts | null;
+  /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
+  wording: Readonly<Record<string, string>>;
 };
 
 export type PrintCardProps = PrintBase & {
@@ -91,6 +93,8 @@ export type PrintExtraProps = {
   fields: Readonly<Partial<Record<FieldKey, string>>>;
   /** The date of birth; print `birthDate.lines` (the style the customer chose). */
   birthDate: BirthDateParts | null;
+  /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
+  wording: Readonly<Record<string, string>>;
   labels: Pick<PrintLabels, 'itsABoy' | 'itsAGirl' | 'bornOn' | 'and'>;
   /** Stickers: the shape the customer chose. */
   shape: 'round' | 'square';

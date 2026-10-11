@@ -577,8 +577,17 @@ Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Ara
 | 8 | `store.bottleSize.option` | {ml} مل | {ml} ml | {ml} مل | {ml} مل | ● |
 | 9 | `store.filesPreview` | عرض الملفات | Files preview | پیشاندانی فایلەکان | نیشاندانا فایلان | ◐ |
 | 10 | `store.filesOnlyHint` | هذا تصميم ملفات فقط للتحميل والطباعة (ستوري، بطاقة، ملصقات)، وليس دعوة إلكترونية. | This design comes as files to download and print… | ئەم دیزاینە تەنها فایلە بۆ داگرتن و چاپکردن (ستۆری، کارت، لکێنەر)، بانگهێشتی ئۆنلاین نییە. | ئەڤ دیزاینە بتنێ فایلن بۆ داگرتن و چاپکرنێ (ستۆری، کارت، لکێنەر)، ڤەخواندنا ئۆنلاین نینە. | ◐ |
+| 11 | `store.wording.heading` | نص التصميم | Wording on the design | دەقی دیزاین | نڤیسینا دیزاینێ | ◐ |
+| 12 | `store.wording.help` | يمكنكم تغيير هذه الأسطر. الآية والدعاء يبقيان كما هما. | You can change these lines. The Quran verse and the du'a always stay as they are. | دەتوانن ئەم دێڕانە بگۆڕن. ئایەت و دوعاکە وەک خۆیان دەمێننەوە. | هوین دشێن ئەڤان دێڕان بگوهۆڕن. ئایەت و دوعا وەک خۆ دمینن. | ◐ |
+| 13 | `store.wording.arabic` | العربية (كما في التصميم) | Arabic (as in the design) | عەرەبی (وەک لە دیزاینەکەدا) | عەرەبی (وەک د دیزاینێ دا) | ◐ |
+| 14 | `store.wording.inLanguage` | بلغة الدعوة ({language}) | In the invitation's language ({language}) | بە زمانی بانگهێشتنامەکە ({language}) | ب زمانێ داخوازنامێ ({language}) | ◐ |
+| 15 | `store.wording.custom` | اكتبوا نصكم | Write your own | دەقی خۆتان بنووسن | نڤیسینا خۆ بنڤیسن | ◐ |
+
+Order-form labels in the Embroidered Garden manifest (Kurdish shows the Arabic until approved):
+«سطر التهنئة» (Blessing line) → Sorani: دێڕی پیرۆزبایی / Badini: دێڕا پیرۆزباهیێ (◐);
+«كلمة «بن»» → Sorani: وشەی «کوڕی» / Badini: پەیڤا «کوڕێ» (◐).
 
 Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts`; Kurdish uses the Arabic until approved;
 the Quran verse and du'a always stay Arabic):
 «رزقنا الله بأجمل العطايا» → Sorani: خودا جوانترین بەخششی پێ بەخشین / Badini: خودێ جوانترین دیاری دا مە (◐);
-«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوری», Badini «کورێ» (in the design).
+«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوڕی», Badini «کوڕێ» (offered on the order form; Arabic stays the default).

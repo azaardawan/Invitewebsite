@@ -1,7 +1,7 @@
 /**
  * E2E/dev fixture: puts the Embroidered Garden design (files only) on sale in the newborn Boy group with a
  * package of every file (card, story, sticker, bottle label), then creates an order. Env: NAME, FATHER, INV_LANG,
- * DATE_STYLE, DIGITS, SHAPE, BOTTLE; PAID=1 pays it. Prints { previewToken, receiptToken, invitationId, path }.
+ * DATE_STYLE, DIGITS, SHAPE, BOTTLE, W_BLESSED, W_SONOF; PAID=1 pays it. Prints { previewToken, receiptToken, invitationId, path }.
  */
 import { and, eq } from 'drizzle-orm';
 import sharp from 'sharp';
@@ -37,7 +37,12 @@ try {
   const born = new Date(Date.now() - 6 * 86400_000).toISOString().slice(0, 10);
   const values = { baby_name: e.NAME ?? 'عمر', father_name: e.FATHER ?? 'عبدالعزيز', birth_date: e.BORN ?? born };
   const ctx = { ipHash: randomToken(8), userAgent: 'e2e' };
-  const extras = { stickerShape: e.SHAPE ?? 'round', bottleSize: e.BOTTLE ?? '330', birthDateStyle: e.DATE_STYLE ?? 'long', birthDateDigits: e.DIGITS ?? 'arab' };
+  // W_BLESSED / W_SONOF: `ar` (default), `lang`, or `custom:<text>`.
+  const pick = (v?: string) => (v ? { choice: v.split(':')[0]!, text: v.split(':').slice(1).join(':') } : undefined);
+  const wording = Object.fromEntries(
+    Object.entries({ blessed: pick(e.W_BLESSED), sonOf: pick(e.W_SONOF) }).filter((x): x is [string, { choice: string; text: string }] => !!x[1]),
+  );
+  const extras = { stickerShape: e.SHAPE ?? 'round', bottleSize: e.BOTTLE ?? '330', birthDateStyle: e.DATE_STYLE ?? 'long', birthDateDigits: e.DIGITS ?? 'arab', wording };
   const d = await createDraft(db(), { themeKey: 'embroidered-garden', packageId, locale: (['en', 'ckb', 'bdn'] as const).find((l) => l === e.INV_LANG) ?? 'ar', values, extras }, ctx);
   let receiptToken: string | null = null;
   if (e.PAID === '1') {

@@ -306,7 +306,7 @@
 
 /* English wording is longer than the Arabic: smaller and narrower on the small sticker, so every line
    stays inside the clear centre of the wreath (it narrows towards the top and bottom). */
-.sticker:lang(en) .stBlessed {
+.sticker .stBlessed:lang(en) {
   --y: 32%;
   font-size: 3.7cqw;
   max-inline-size: 44cqw;

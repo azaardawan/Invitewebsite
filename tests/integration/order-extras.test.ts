@@ -153,3 +153,61 @@ describe('order extras', () => {
     expect((await row(d.invitationId)).signatureAssetId).toBeNull();
   });
 });
+
+describe('changeable lines of a design (manifest wording)', () => {
+  const WORDING = [
+    { key: 'blessed', label: { ar: 'سطر التهنئة', en: 'Blessing line' }, ar: 'رزقنا الله بأجمل العطايا', versions: { en: 'Blessed with a son' }, maxLength: 30 },
+    { key: 'sonOf', label: { ar: 'بن', en: 'Son of' }, ar: 'بن', versions: { en: 'Son of', ckb: 'کوڕی' }, defaultIn: ['en' as const], maxLength: 12 },
+  ];
+  let wshop: { themeKey: string; packageId: string };
+
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('wording');
+    await syncThemesFromRegistry(db(), [testManifest(key, 1, { wording: WORDING })], base.actor, { complete: false });
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 320, height: 420, channels: 3, background: '#bb8' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: base.song.id }, base.actor);
+    const pkg = await createPackage(db(), t!.id, { name: { ar: 'أساسي', en: 'Basic' }, priceIqd: 20000, fieldKeys: [...BASIC_FIELDS], featureKeys: ['print_card'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    wshop = { themeKey: key, packageId: pkg.id };
+  });
+
+  const order = (locale: 'ar' | 'en', wording?: Record<string, { choice: string; text: string }>) =>
+    createDraft(db(), { themeKey: wshop.themeKey, packageId: wshop.packageId, locale, values: weddingValues(), extras: { wording } }, { ...ctx, ipHash: randomToken(8) });
+  const shown = async (id: string) => (await invitationRenderData(db(), await row(id), 'preview')).props.wording;
+
+  it('is Arabic by default in every language; the language version and the customer’s own words are choices', async () => {
+    expect(await shown((await order('ar')).invitationId)).toEqual({ blessed: 'رزقنا الله بأجمل العطايا', sonOf: 'بن' });
+    // `defaultIn`: English orders default to the line's English version.
+    expect(await shown((await order('en')).invitationId)).toEqual({ blessed: 'رزقنا الله بأجمل العطايا', sonOf: 'Son of' });
+
+    const d = await order('en', { blessed: { choice: 'lang', text: '' }, sonOf: { choice: 'ar', text: '' } });
+    expect((await row(d.invitationId)).wording).toEqual({ blessed: 'Blessed with a son', sonOf: 'بن' });
+    expect(await shown(d.invitationId)).toEqual({ blessed: 'Blessed with a son', sonOf: 'بن' });
+
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { wording: { blessed: { choice: 'custom', text: '  Our  little joy ' }, sonOf: { choice: 'lang', text: '' } } } });
+    expect(await shown(d.invitationId)).toEqual({ blessed: 'Our little joy', sonOf: 'Son of' });
+
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { wording: { blessed: { choice: 'ar', text: 'ignored' } } } });
+    expect((await row(d.invitationId)).wording).toEqual({});
+  });
+
+  it('refuses an empty or too-long own text, markup, and a language version that does not exist', async () => {
+    const fails = async (locale: 'ar' | 'en', choice: string, text: string) =>
+      (await order(locale, { blessed: { choice, text } }).catch((e: { fieldErrors?: Record<string, string> }) => e.fieldErrors))?.['w.blessed' as never];
+    expect(await fails('en', 'custom', '   ')).toBe('required');
+    expect(await fails('en', 'custom', 'x'.repeat(31))).toBe('tooLong');
+    expect(await fails('en', 'custom', '<b>hi</b>')).toBe('invalidText');
+    expect(await fails('ar', 'lang', '')).toBe('invalidChoice');
+  });
+
+  it('the manifest keeps keys unique and every text within its length', () => {
+    const base = testManifest('wording-check', 1);
+    expect(manifestSchema.safeParse({ ...base, wording: [...WORDING, ...WORDING] }).success).toBe(false);
+    expect(manifestSchema.safeParse({ ...base, wording: [{ ...WORDING[0]!, maxLength: 5 }] }).success).toBe(false);
+    expect(manifestSchema.safeParse({ ...base, wording: [{ ...WORDING[1]!, defaultIn: ['bdn'] }] }).success).toBe(false);
+    expect(manifestSchema.safeParse({ ...base, wording: WORDING }).success).toBe(true);
+  });
+});
