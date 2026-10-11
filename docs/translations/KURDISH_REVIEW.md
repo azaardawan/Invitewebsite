@@ -514,6 +514,9 @@ Applied to `ckb.json` and `bdn.json`.
 
 ## Batch 22 — newborn baby occasion and its extras — ✅ APPROVED (owner, 2026-10-10)
 
+Note (2026-10-11): Batches 21 and 22 were first imported one column off (Sorani got the Badini text,
+Badini got the confidence marks). Both files were restored from the tables below.
+
 The new "مولود جديد" occasion: its details, the extras (Instagram story, chocolate stickers, bottle label), the
 watermarked previews and the sticker shape. Applied to `ckb.json` and `bdn.json`; the names below are added by the
 seed wherever the Arabic is unchanged and the Kurdish is empty.
@@ -578,4 +581,4 @@ Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Ara
 Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts`; Kurdish uses the Arabic until approved;
 the Quran verse and du'a always stay Arabic):
 «رزقنا الله بأجمل العطايا» → Sorani: خودا جوانترین بەخششی پێ بەخشین / Badini: خودێ جوانترین دیاری دا مە (◐);
-«بن» (son of) → Sorani: کوڕی / Badini: کوڕێ (●).
+«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوری», Badini «کورێ» (in the design).
