@@ -1,4 +1,4 @@
-/** Owner-supplied artwork (transparent WebP in `public/occasion-art/`), keyed by occasion. */
+/** Owner-supplied artwork (transparent WebP, 320 px: sharp at 2× for the 140 px tile, in `public/occasion-art/`), keyed by occasion. */
 const ART = ['wedding', 'engagement', 'graduation', 'birthday', 'newborn'] as const;
 type ArtKey = (typeof ART)[number];
 
@@ -14,7 +14,7 @@ export function OccasionArt({ sectionKey, className }: { sectionKey: string; cla
   const key = artKey(sectionKey);
   if (key) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={`/occasion-art/${key}.webp`} alt="" width={512} height={512} loading="lazy" decoding="async" className={`object-contain ${className ?? ''}`} />;
+    return <img src={`/occasion-art/${key}.webp`} alt="" width={320} height={320} loading="lazy" decoding="async" className={`object-contain ${className ?? ''}`} />;
   }
   return (
     <svg className={className} viewBox="0 0 120 120" fill="none" aria-hidden stroke="#a8834f" strokeWidth="2">

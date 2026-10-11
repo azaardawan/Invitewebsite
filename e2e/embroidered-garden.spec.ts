@@ -38,7 +38,7 @@ test('Embroidered Garden is files only: story, card, stickers and bottle label, 
   expect((await request.get(`/i/${draft.path.slice(3)}`)).status()).toBe(404);
 
   // Paid: every file downloads, and the receipt has no invitation link.
-  const paid = order({ NAME: 'Omar', FATHER: 'Abdulaziz', LANG: 'en', SHAPE: 'round', BOTTLE: '330', PAID: '1' });
+  const paid = order({ NAME: 'Omar', FATHER: 'Abdulaziz', INV_LANG: 'en', SHAPE: 'round', BOTTLE: '330', PAID: '1' });
   await page.goto(`/r/${paid.receiptToken}`);
   await expect(page.locator(`a[href*="/i/"]`)).toHaveCount(0);
   for (const [item, type] of [

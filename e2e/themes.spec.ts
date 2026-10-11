@@ -40,6 +40,8 @@ test('every theme renders every designed state correctly', async ({ page }, test
 
   for (const m of generatedManifests) {
     const ref = `${m.key}@${m.version}`;
+    // A files-only design (story, card, stickers…) has no online invitation: no opening, no guest page.
+    const invitation = !m.internal && m.onlineInvitation !== false;
     for (const [i, state] of m.validStates.entries()) {
       for (const lang of LANGS) {
         for (const names of ['short', 'long'] as const) {
@@ -55,7 +57,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&state=${i}&names=short`);
       const open = page.getByRole('button', { name: ar.invitation.openInvitation });
-      if (!m.internal) {
+      if (invitation) {
         // Owner rule: every invitation starts closed and opens with an animation on the guest's tap.
         await expect(open, `${ref} state ${i + 1}: opening screen with the Open button`).toBeVisible();
         await page.evaluate(() => {
@@ -65,7 +67,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
         });
       }
       if (await open.count()) await open.click();
-      if (!m.internal) {
+      if (invitation) {
         const animated = await page
           .waitForFunction(() => (window as unknown as { __bahjaAnimated: number }).__bahjaAnimated > 0 || document.getAnimations().length > 0, null, { timeout: 1500 })
           .then(() => true, () => false);
@@ -75,10 +77,10 @@ test('every theme renders every designed state correctly', async ({ page }, test
       await page.waitForFunction(
         () => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity),
         null,
-        { timeout: m.internal ? 30_000 : 4_000 },
+        { timeout: invitation ? 4_000 : 30_000 },
       );
       await expect(page.getByText(ar.invitationSamples.short[m.fields.includes('person_1_name') ? 'person_1_name' : 'baby_name']).first()).toBeVisible();
-      if (!m.internal) {
+      if (invitation) {
         // Owner rule: one border per theme, drawn with <ThemeBorder> on the invitation, the card and the keepsake.
         await expect(page.locator('[data-bahja-border]'), `${ref}: theme border`).toHaveCount(1);
       }
@@ -102,7 +104,7 @@ test('every sellable theme looks right with any single feature switched off', as
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(5 * 60_000);
   await signInAsNewOwner(page);
-  for (const m of generatedManifests.filter((x) => !x.internal)) {
+  for (const m of generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
     for (const off of m.features) {
       // Switching a feature off also switches off what depends on it (no messages without the guest form…).
       const dropped = new Set<string>([off]);
@@ -136,7 +138,7 @@ test('with reduced motion the opening is skipped and the invitation shows at onc
   await signInAsNewOwner(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const m of generatedManifests.filter((x) => !x.internal)) {
+  for (const m of generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
     await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&names=short`);
     await page.getByRole('button', { name: ar.invitation.openInvitation }).click();
     await expect(page.getByText(ar.invitationSamples.short.person_1_name).first(), `${m.key}@${m.version}`).toBeVisible({ timeout: 1_000 });
