@@ -21,7 +21,7 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `signature` / `signature2` (signature): each a PNG data URL from a drawing pad, `keep` (unchanged) or
  *   `none`; the customer chooses one signature or two (the second is then `none`);
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
- * - `stickerShape` (sticker): round or square chocolate stickers;
+ * - `stickerShape` (sticker): round or square chocolate stickers, or both (a set of each);
  * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
  * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
  * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the Arabic), `lang` (the
@@ -112,7 +112,7 @@ export async function extrasUpdate(
   }
 
   if (extras.stickerShape !== undefined && inv.featureKeys.includes('sticker')) {
-    if (extras.stickerShape === 'round' || extras.stickerShape === 'square') set.stickerShape = extras.stickerShape;
+    if (extras.stickerShape === 'round' || extras.stickerShape === 'square' || extras.stickerShape === 'both') set.stickerShape = extras.stickerShape;
     else errors.stickerShape = 'invalid';
   }
 

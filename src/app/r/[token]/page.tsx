@@ -262,6 +262,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               card: tStore('extras.card'),
               story: tStore('extras.story'),
               sticker: tStore('extras.sticker'),
+              round: tStore('stickerShape.round'),
+              square: tStore('stickerShape.square'),
               bottle: tStore('extras.bottle'),
               downloadPng: tStore('extras.downloadPng'),
               downloadSheet: tStore('extras.downloadSheet'),

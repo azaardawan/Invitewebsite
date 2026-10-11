@@ -93,11 +93,15 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
  * Newborn extras and their previews. Files: the story PNG (1080 × 1920), one sticker PNG (≈1200 px, transparent
  * outside its shape), one bottle label PNG (300 dpi) and the print-ready A4 sheets (PDF). Previews: smaller
  * JPEGs (the sticker a PNG). The print page draws the watermark itself until the invitation is paid.
+ * `sticker-square.*`: the square set when the customer chose both shapes (`sticker.*` is then the round one).
  */
 export type ProductItem =
   | 'story.png'
   | 'sticker.png'
   | 'sticker.pdf'
+  | 'sticker-square.png'
+  | 'sticker-square.pdf'
+  | 'sticker-square.preview'
   | 'bottle.png'
   | 'bottle.pdf'
   | 'story.preview'
@@ -107,12 +111,14 @@ export type ProductItem =
 export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize }) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
-const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'bottle.pdf'>, { view: string; width: number; height: number; scale: number; type: 'png' | 'jpeg'; transparent?: boolean }> = {
+const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square.pdf' | 'bottle.pdf'>, { view: string; width: number; height: number; scale: number; type: 'png' | 'jpeg'; transparent?: boolean }> = {
   'story.png': { view: 'story', width: 1080, height: 1920, scale: 1, type: 'png' },
   'sticker.png': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 8, type: 'png', transparent: true },
   'bottle.png': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 3.125, type: 'png' },
   'story.preview': { view: 'story', width: 1080, height: 1920, scale: 0.5, type: 'jpeg' },
   'sticker.preview': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 4, type: 'png', transparent: true },
+  'sticker-square.png': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 8, type: 'png', transparent: true },
+  'sticker-square.preview': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 4, type: 'png', transparent: true },
   'bottle.preview': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 1.6, type: 'jpeg' },
   'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
 };
@@ -123,14 +129,18 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
   });
   try {
-    if (item === 'sticker.pdf' || item === 'bottle.pdf') return await pdfOf(browser, `/print/${printToken(item === 'sticker.pdf' ? 'stickerSheet' : 'bottleSheet', invitationId)}`);
+    // The square set (both shapes chosen): the same print pages, drawn square.
+    const square = item.startsWith('sticker-square.') ? '?shape=square' : '';
+    if (item === 'sticker.pdf' || item === 'sticker-square.pdf' || item === 'bottle.pdf') {
+      return await pdfOf(browser, `/print/${printToken(item === 'bottle.pdf' ? 'bottleSheet' : 'stickerSheet', invitationId)}${square}`);
+    }
     const base = PRODUCT_SHOTS[item];
     // Bottle labels come in several sizes: the picture is the size the customer chose.
     const dims = BOTTLE_SIZES[opts.bottleSize ?? DEFAULT_BOTTLE_SIZE];
     const shot = base.view === 'bottle' ? { ...base, width: mmPx(dims.width), height: mmPx(dims.height) } : base;
     const page = await browser.newPage({ viewport: { width: shot.width, height: shot.height }, deviceScaleFactor: shot.scale, reducedMotion: 'reduce' });
     await page.emulateMedia({ media: 'print' });
-    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}`;
+    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}${square}`;
     const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);

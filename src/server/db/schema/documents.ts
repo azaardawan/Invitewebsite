@@ -21,6 +21,10 @@ export const documentKind = pgEnum('document_kind', [
   'STICKER_PREVIEW',
   'BOTTLE_PREVIEW',
   'CARD_DRAFT_PREVIEW',
+  // The square set when the customer chose both sticker shapes (the round set uses the kinds above).
+  'STICKER_SQUARE_PNG',
+  'STICKER_SQUARE_PDF',
+  'STICKER_SQUARE_PREVIEW',
 ]);
 
 /**

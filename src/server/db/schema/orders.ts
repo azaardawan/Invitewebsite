@@ -90,8 +90,8 @@ export const invitations = pgTable(
     publishedAt: timestamp('published_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
-    /** Chocolate stickers (`sticker` feature): the shape the customer chose. */
-    stickerShape: text('sticker_shape', { enum: ['round', 'square'] }).notNull().default('round'),
+    /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
+    stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
     /** Bottle labels (`bottle_label` feature): the bottle size the customer chose (src/catalog/products.ts). */
     bottleSize: text('bottle_size', { enum: ['250', '330', '500', '600'] }).notNull().default('500'),
     /** Newborn: how the customer wants the date of birth written (src/lib/birth-date-format.ts). */

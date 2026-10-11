@@ -95,6 +95,8 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               card: t('extras.card'),
               story: t('extras.story'),
               sticker: t('extras.sticker'),
+              round: t('stickerShape.round'),
+              square: t('stickerShape.square'),
               bottle: t('extras.bottle'),
               downloadPng: t('extras.downloadPng'),
               downloadSheet: t('extras.downloadSheet'),

@@ -582,6 +582,7 @@ Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Ara
 | 13 | `store.wording.arabic` | العربية (كما في التصميم) | Arabic (as in the design) | عەرەبی (وەک لە دیزاینەکەدا) | عەرەبی (وەک د دیزاینێ دا) | ◐ |
 | 14 | `store.wording.inLanguage` | بلغة الدعوة ({language}) | In the invitation's language ({language}) | بە زمانی بانگهێشتنامەکە ({language}) | ب زمانێ داخوازنامێ ({language}) | ◐ |
 | 15 | `store.wording.custom` | اكتبوا نصكم | Write your own | دەقی خۆتان بنووسن | نڤیسینا خۆ بنڤیسن | ◐ |
+| 16 | `store.stickerShape.both` | الاثنان | Both | هەردووکیان | هەردوو | ◐ |
 
 Order-form labels in the Embroidered Garden manifest (Kurdish shows the Arabic until approved):
 «كلمة «بن»» → Sorani: وشەی «کوڕی» / Badini: پەیڤا «کوڕێ» (◐).
