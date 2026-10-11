@@ -3,7 +3,8 @@ import type React from 'react';
 /**
  * The "preview" watermark on everything shown before payment: the extras and the card (print renders) and the
  * customer's live preview of a files-only design. Dense, large diagonal marks over the whole picture, and the
- * note that they go away after purchase across the middle, so cropping cannot remove it. No fonts imported:
+ * note that they go away after purchase well inside the picture (off the name, see-through so the design stays
+ * readable), so cropping cannot remove it without cutting the design. No fonts imported:
  * it uses whatever Arabic font the page already has (system fallback otherwise).
  */
 export type WatermarkText = { watermark: string; watermarkNote: string };
@@ -40,15 +41,17 @@ export function WatermarkLayer({
         style={{
           position: 'absolute',
           insetInline: 0,
-          // Across the middle (over the name), so no crop can keep the picture and lose the note.
-          top: '50%',
-          transform: compact ? 'translateY(-50%) rotate(-4deg) scale(1.1)' : 'translateY(-50%) rotate(-8deg) scale(1.15)',
-          background: 'rgba(43,26,30,0.66)',
+          // Inside the picture but below the name: no crop keeps the design and loses it.
+          top: compact ? '71%' : '68%',
+          transform: compact ? 'translateY(-50%) rotate(-4deg)' : 'translateY(-50%) rotate(-8deg) scale(1.15)',
+          // See-through, so the design's own text reads through it.
+          background: 'rgba(43,26,30,0.36)',
           color: '#fff',
+          textShadow: '0 1px 3px rgba(43,26,30,0.7)',
           textAlign: 'center',
           fontFamily: 'Noto Sans Arabic, Vazirmatn, Tahoma, sans-serif',
           fontWeight: 700,
-          fontSize: noteSize ?? (compact ? 'min(6cqw, 7.5cqh)' : fixed ? '17px' : 'min(3.6cqw, 2.4cqh)'),
+          fontSize: noteSize ?? (compact ? 'min(4.8cqw, 7cqh)' : fixed ? '17px' : 'min(3.6cqw, 2.4cqh)'),
           padding: compact ? '2% 6%' : '0.7em 1.2em',
           lineHeight: 1.4,
         }}
