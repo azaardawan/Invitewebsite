@@ -1,5 +1,5 @@
 import { defineTheme } from '@/theme-sdk/manifest';
-import { BLESSED, SON_OF } from './copy';
+import { SON_OF } from './copy';
 
 /**
  * Embroidered Garden (newborn boy): white embroidered flowers, sage leaves and stitched doves on cream
@@ -19,9 +19,8 @@ export default defineTheme({
   validStates: [{ features: ['print_card'], fields: ['baby_name', 'father_name', 'birth_date'] }],
   print: { card: { size: 'A5', bleedMm: 3, qr: false } },
   onlineInvitation: false,
-  // Arabic in every language unless the customer picks their language's version or writes their own.
+  // Only the connector is the customer's; the verse, the du'a and the Arabic blessing never change.
   wording: [
-    { key: 'blessed', label: { ar: 'سطر التهنئة', en: 'Blessing line' }, ...BLESSED, maxLength: 60 },
     { key: 'sonOf', label: { ar: 'كلمة «بن»', en: 'The word "son of"' }, ...SON_OF, maxLength: 12 },
   ],
 });

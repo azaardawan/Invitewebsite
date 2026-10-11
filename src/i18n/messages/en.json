@@ -1353,7 +1353,7 @@
     },
     "wording": {
       "heading": "Wording on the design",
-      "help": "You can change these lines. The Quran verse and the du'a always stay as they are.",
+      "help": "You can choose the word that joins the two names. The Quran verses and the Arabic text of the design stay as they are.",
       "arabic": "Arabic (as in the design)",
       "inLanguage": "In the invitation's language ({language})",
       "custom": "Write your own"
