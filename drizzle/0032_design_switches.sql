@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "switches" jsonb DEFAULT '{}'::jsonb NOT NULL;

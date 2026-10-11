@@ -49,6 +49,8 @@ type PrintBase = {
   birthDate: BirthDateParts | null;
   /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
   wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`): the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
 };
 
 export type PrintCardProps = PrintBase & {
@@ -95,6 +97,8 @@ export type PrintExtraProps = {
   birthDate: BirthDateParts | null;
   /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
   wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`): the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
   labels: Pick<PrintLabels, 'itsABoy' | 'itsAGirl' | 'bornOn' | 'and'>;
   /** Stickers: the shape the customer chose. */
   shape: 'round' | 'square';

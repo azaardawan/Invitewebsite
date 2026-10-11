@@ -100,6 +100,8 @@ export const invitations = pgTable(
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
     /** The design's changeable lines (manifest `wording`) the customer changed, by key; absent = the Arabic default. */
     wording: jsonb('wording').$type<Record<string, string>>().notNull().default({}),
+    /** The design's yes/no choices (manifest `switches`) the customer answered, by key; absent = the default. */
+    switches: jsonb('switches').$type<Record<string, boolean>>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */

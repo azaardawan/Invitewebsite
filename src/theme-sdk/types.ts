@@ -132,6 +132,8 @@ export type ThemeProps = {
    * Always has every declared key.
    */
   wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`), by key: the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
 };
 
 /**

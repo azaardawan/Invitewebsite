@@ -211,3 +211,46 @@ describe('changeable lines of a design (manifest wording)', () => {
     expect(manifestSchema.safeParse({ ...base, wording: WORDING }).success).toBe(true);
   });
 });
+
+describe('fixed choices and yes/no switches of a design', () => {
+  const ORDER = { key: 'order', label: { ar: 'ترتيب المولود', en: 'Birth order' }, ar: 'أوّل أفراحنا', options: ['ثاني أفراحنا', 'ثالث أفراحنا'], custom: false, maxLength: 20 };
+  const SWITCH = { key: 'fatherOnExtras', label: { ar: 'اسم الأب على الملصقات', en: "Father's name on the stickers" }, default: false };
+  let shop2: { themeKey: string; packageId: string };
+
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('choices');
+    await syncThemesFromRegistry(db(), [testManifest(key, 1, { wording: [ORDER], switches: [SWITCH] })], base.actor, { complete: false });
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 320, height: 420, channels: 3, background: '#bb8' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: base.song.id }, base.actor);
+    const pkg = await createPackage(db(), t!.id, { name: { ar: 'أساسي', en: 'Basic' }, priceIqd: 20000, fieldKeys: [...BASIC_FIELDS], featureKeys: ['print_card'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    shop2 = { themeKey: key, packageId: pkg.id };
+  });
+
+  const order = (extras: Parameters<typeof createDraft>[1]['extras']) =>
+    createDraft(db(), { themeKey: shop2.themeKey, packageId: shop2.packageId, locale: 'ar', values: weddingValues(), extras }, { ...ctx, ipHash: randomToken(8) });
+  const props = async (id: string) => (await invitationRenderData(db(), await row(id), 'preview')).props;
+
+  it('defaults to the first choice and the switch default; stores only what differs', async () => {
+    const plain = await order({});
+    expect((await props(plain.invitationId)).wording).toEqual({ order: 'أوّل أفراحنا' });
+    expect((await props(plain.invitationId)).switches).toEqual({ fatherOnExtras: false });
+
+    const d = await order({ wording: { order: { choice: 'opt:1', text: '' } }, switches: { fatherOnExtras: true } });
+    expect(await row(d.invitationId)).toMatchObject({ wording: { order: 'ثالث أفراحنا' }, switches: { fatherOnExtras: true } });
+    expect((await props(d.invitationId)).switches).toEqual({ fatherOnExtras: true });
+
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { switches: { fatherOnExtras: false }, wording: { order: { choice: 'ar', text: '' } } } });
+    expect(await row(d.invitationId)).toMatchObject({ wording: {}, switches: {} });
+  });
+
+  it('refuses own text where the design allows only its choices, and unknown options', async () => {
+    const fails = async (choice: string) =>
+      (await order({ wording: { order: { choice, text: 'my own' } } }).catch((e: { fieldErrors?: Record<string, string> }) => e.fieldErrors))?.['w.order' as never];
+    expect(await fails('custom')).toBe('invalidChoice');
+    expect(await fails('opt:7')).toBe('invalidChoice');
+  });
+});

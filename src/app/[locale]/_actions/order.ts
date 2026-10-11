@@ -38,7 +38,7 @@ function typedValues(form: FormData): Record<string, string> {
 /** The changeable-line choices as typed (`w.<key>`, `w.<key>.text`), so a failed submit keeps them. */
 function wordingValues(form: FormData): Record<string, string> {
   const values: Record<string, string> = {};
-  for (const [k, v] of form.entries()) if (/^w\.[a-zA-Z0-9]+(\.text)?$/.test(k) && typeof v === 'string') values[k] = v;
+  for (const [k, v] of form.entries()) if (/^(w\.[a-zA-Z0-9]+(\.text)?|s\.[a-zA-Z0-9]+|sw\.[a-zA-Z0-9]+)$/.test(k) && typeof v === 'string') values[k] = v;
   return values;
 }
 
@@ -57,6 +57,11 @@ function orderExtras(form: FormData): OrderExtras {
   for (const [k, v] of form.entries()) {
     const key = /^w\.([a-zA-Z0-9]+)$/.exec(k)?.[1];
     if (key && typeof v === 'string') (extras.wording ??= {})[key] = { choice: v, text: str(form, `w.${key}.text`) };
+  }
+  // The design's yes/no choices: a hidden `sw.<key>` marks each one shown, the tick box `s.<key>` is on.
+  for (const [k] of form.entries()) {
+    const key = /^sw\.([a-zA-Z0-9]+)$/.exec(k)?.[1];
+    if (key) (extras.switches ??= {})[key] = form.get(`s.${key}`) === '1';
   }
   return extras;
 }

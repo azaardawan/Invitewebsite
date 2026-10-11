@@ -45,6 +45,8 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
       colors: null,
       wordingLines: (p.version.manifest as ThemeManifest).wording,
       wording: {},
+      switchDefs: (p.version.manifest as ThemeManifest).switches,
+      switches: {},
       locale: input.locale,
     },
     input.extras ?? {},
@@ -113,7 +115,12 @@ export async function updateDraft(
     const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
     const extra = await extrasUpdate(
       tx,
-      { ...locked!, wordingLines: (version?.manifest as ThemeManifest | undefined)?.wording, locale: input.locale ?? locked!.locale },
+      {
+        ...locked!,
+        wordingLines: (version?.manifest as ThemeManifest | undefined)?.wording,
+        switchDefs: (version?.manifest as ThemeManifest | undefined)?.switches,
+        locale: input.locale ?? locked!.locale,
+      },
       input.extras ?? {},
     );
     await tx

@@ -5,7 +5,7 @@ import { E2E_DATABASE_URL } from './helpers';
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
 function order(env: Record<string, string>): Made {
-  const out = execFileSync('pnpm', ['-s', 'exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-embroidered-order.ts'], {
+  const out = execFileSync('pnpm', ['-s', 'exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-files-order.ts'], {
     env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL, ...env },
   }).toString();
   return JSON.parse(out.trim().split('\n').at(-1)!);
