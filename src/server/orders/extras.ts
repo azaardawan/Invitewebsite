@@ -6,6 +6,8 @@ import { storeSignature } from '@/server/media/assets';
 import { MediaError } from '@/server/media/process';
 import { isBottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES } from '@/lib/birth-date-format';
+import type { Locale } from '@/i18n/config';
+import type { WordingLine } from '@/theme-sdk/manifest';
 import { OrderError } from './common';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -21,7 +23,9 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
  * - `stickerShape` (sticker): round or square chocolate stickers;
  * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
- * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written.
+ * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
+ * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the default), `lang` (the
+ *   design's version in the invitation's language) or `custom` with the customer's own text.
  */
 export type OrderExtras = {
   cardBack?: { title: string; message: string };
@@ -32,16 +36,28 @@ export type OrderExtras = {
   bottleSize?: string;
   birthDateStyle?: string;
   birthDateDigits?: string;
+  wording?: Record<string, { choice: string; text: string }>;
 };
+
+/** One changeable line: at most this many characters, on one line, no markup characters. */
+function cleanLine(text: string) {
+  return text.replace(/\s+/g, ' ').trim();
+}
 
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
 export async function extrasUpdate(
   db: DbOrTx,
-  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> & { fieldKeys?: readonly string[] },
+  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> & {
+    fieldKeys?: readonly string[];
+    /** For `wording`: the design's changeable lines, what is stored now, and the invitation's language. */
+    wordingLines?: readonly WordingLine[];
+    wording?: Record<string, string>;
+    locale?: Locale;
+  },
   extras: OrderExtras,
 ) {
   const set: Partial<
-    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits'>
+    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording'>
   > = {};
   const errors: Record<string, string> = {};
 
@@ -115,6 +131,24 @@ export async function extrasUpdate(
       if ((BIRTH_DATE_DIGITS as readonly string[]).includes(digits)) set.birthDateDigits = digits as InvitationRow['birthDateDigits'];
       else errors.birthDateStyle = 'invalid';
     }
+  }
+
+  if (extras.wording && inv.wordingLines?.length) {
+    const next: Record<string, string> = { ...(inv.wording ?? {}) };
+    for (const line of inv.wordingLines) {
+      const pick = extras.wording[line.key];
+      if (!pick) continue;
+      const version = inv.locale && inv.locale !== 'ar' ? line.versions?.[inv.locale] : undefined;
+      const text = cleanLine(pick.text);
+      if (pick.choice === 'ar') delete next[line.key];
+      else if (pick.choice === 'lang' && version) next[line.key] = version;
+      else if (pick.choice === 'custom' && !text) errors[`w.${line.key}`] = 'required';
+      else if (pick.choice === 'custom' && text.length > line.maxLength) errors[`w.${line.key}`] = 'tooLong';
+      else if (pick.choice === 'custom' && /[<>]/.test(text)) errors[`w.${line.key}`] = 'invalidText';
+      else if (pick.choice === 'custom') next[line.key] = text;
+      else errors[`w.${line.key}`] = 'invalidChoice';
+    }
+    set.wording = next;
   }
 
   if (Object.keys(errors).length) throw new OrderError('invalidFields', errors);

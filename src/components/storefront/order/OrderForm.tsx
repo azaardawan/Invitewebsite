@@ -20,6 +20,14 @@ export type OrderFormExtras = {
   bottle?: { current: string; sizes: readonly string[] };
   /** Date of birth: how it is written; `examples` is `${style}:${digits}` → the date written that way. */
   birthDate?: { style: string; digits: string; examples: Record<string, string>; showDigits: boolean };
+  /**
+   * The design's changeable lines (manifest `wording`): Arabic by default, the design's version in the
+   * invitation's language when it has one, or the customer's own words. `current` = what is stored (absent = Arabic).
+   */
+  wording?: {
+    lines: { key: string; label: string; ar: string; versions: Partial<Record<string, string>>; maxLength: number }[];
+    current: Record<string, string>;
+  };
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -55,6 +63,8 @@ export function OrderForm({
   const [state, formAction, pending] = useActionState(action, {});
   const values = state.values ?? initialValues;
   const errors = state.fieldErrors ?? {};
+  // The invitation's language, as chosen below: the wording section offers the design's version in it.
+  const [lang, setLang] = useState<Locale>(invitationLocale);
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
@@ -165,6 +175,8 @@ export function OrderForm({
         </fieldset>
       ) : null}
 
+      {extras.wording ? <DesignWording extra={extras.wording} lang={lang} values={state.values} errors={errors} /> : null}
+
       {extras.birthDate ? <BirthDateFormat extra={extras.birthDate} values={values} label={(k) => t(`birthDateFormat.${k}` as 'birthDateFormat.heading')} /> : null}
 
       {extras.bottle ? (
@@ -269,7 +281,7 @@ export function OrderForm({
         <label htmlFor="invitationLocale" className="text-[15px] font-medium text-heading">
           {t('languageLabel')}
         </label>
-        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} className={inputCls}>
+        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} onChange={(e) => setLang(e.target.value as Locale)} className={inputCls}>
           {locales.map((l) => (
             <option key={l} value={l}>
               {localeMeta[l].autonym}
@@ -332,5 +344,92 @@ function BirthDateFormat({
         <input type="hidden" name="birthDateDigits" value="latn" />
       )}
     </fieldset>
+  );
+}
+
+/** The design's changeable lines: Arabic (the default), the design's version in the invitation's language, or the customer's own. */
+function DesignWording({
+  extra,
+  lang,
+  values,
+  errors,
+}: {
+  extra: NonNullable<OrderFormExtras['wording']>;
+  lang: Locale;
+  values?: Record<string, string>;
+  errors: Record<string, string>;
+}) {
+  const t = useTranslations('store');
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-[15px] font-medium text-heading">{t('wording.heading')}</legend>
+      <p className="text-sm text-muted">{t('wording.help')}</p>
+      {extra.lines.map((line) => (
+        <WordingLine key={line.key} line={line} lang={lang} stored={extra.current[line.key]} values={values} error={errors[`w.${line.key}`]} />
+      ))}
+    </fieldset>
+  );
+}
+
+function WordingLine({
+  line,
+  lang,
+  stored,
+  values,
+  error,
+}: {
+  line: NonNullable<OrderFormExtras['wording']>['lines'][number];
+  lang: Locale;
+  stored?: string;
+  values?: Record<string, string>;
+  error?: string;
+}) {
+  const t = useTranslations('store');
+  const name = `w.${line.key}`;
+  const version = lang !== 'ar' ? line.versions[lang] : undefined;
+  // What to show checked: what was just submitted, else what is stored (a known version or the customer's own).
+  const fromStored = !stored ? 'ar' : Object.values(line.versions).includes(stored) ? 'lang' : 'custom';
+  const [choice, setChoice] = useState(values?.[name] || fromStored);
+  const shown = choice === 'lang' && !version ? 'ar' : choice;
+  const option = 'flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20';
+  return (
+    <div className="flex flex-col gap-2" role="radiogroup" aria-label={line.label}>
+      <span className="text-sm font-medium">{line.label}</span>
+      <label className={option}>
+        <input type="radio" name={name} value="ar" checked={shown === 'ar'} onChange={() => setChoice('ar')} className="mt-1" />
+        <span className="flex flex-col text-sm">
+          <span lang="ar" dir="rtl">
+            {line.ar}
+          </span>
+          <span className="text-xs text-muted">{t('wording.arabic')}</span>
+        </span>
+      </label>
+      {version ? (
+        <label className={option}>
+          <input type="radio" name={name} value="lang" checked={shown === 'lang'} onChange={() => setChoice('lang')} className="mt-1" />
+          <span className="flex flex-col text-sm">
+            <span dir="auto">{version}</span>
+            <span className="text-xs text-muted">{t('wording.inLanguage', { language: localeMeta[lang].autonym })}</span>
+          </span>
+        </label>
+      ) : null}
+      <label className={option}>
+        <input type="radio" name={name} value="custom" checked={shown === 'custom'} onChange={() => setChoice('custom')} className="mt-1" />
+        <span className="text-sm">{t('wording.custom')}</span>
+      </label>
+      {shown === 'custom' ? (
+        <input
+          type="text"
+          name={`${name}.text`}
+          dir="auto"
+          maxLength={line.maxLength}
+          defaultValue={values?.[`${name}.text`] ?? (fromStored === 'custom' ? stored : '')}
+          aria-label={`${line.label}: ${t('wording.custom')}`}
+          aria-invalid={error ? true : undefined}
+          className={inputCls}
+        />
+      ) : null}
+      {error ? <p className="text-sm text-danger">{t(`fieldErrors.${error}` as 'fieldErrors.required')}</p> : null}
+    </div>
   );
 }

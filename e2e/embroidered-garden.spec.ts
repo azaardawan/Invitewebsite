@@ -55,6 +55,16 @@ test('Embroidered Garden is files only: story, card, stickers and bottle label, 
   expect((await request.get(`/r/${paid.receiptToken}/card`)).status()).toBe(200);
   expect((await request.get(paid.path)).status()).toBe(404);
 
+  // The order form: the design's own lines are Arabic by default; Kurdish orders are offered «کوڕی».
+  await page.goto('/themes/embroidered-garden/order');
+  const sonOf = page.getByRole('radiogroup', { name: 'كلمة «بن»' });
+  await expect(sonOf.getByRole('radio').first()).toBeChecked();
+  await expect(sonOf.getByText('کوڕی')).toHaveCount(0);
+  await page.locator('#invitationLocale').selectOption('ckb');
+  await expect(sonOf.getByText('کوڕی')).toBeVisible();
+  await sonOf.getByRole('radio').last().check();
+  await expect(page.getByRole('textbox', { name: /كلمة «بن»/ })).toBeVisible();
+
   // The theme page sells it as files, not as a phone invitation.
   await page.goto('/themes/embroidered-garden');
   await expect(page.getByText('وليس دعوة إلكترونية')).toBeVisible();

@@ -31,6 +31,10 @@ themes/<key>/v<N>/
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
+- `wording`: lines of the design's own text the customer may change on the order form (never Quran or du'a),
+  each `{ key, label: {ar, en}, ar, versions?: {en?, ckb?, bdn?}, maxLength }`. The Arabic is the default in
+  every language; a version is offered as a choice for orders in that language; or the customer writes their
+  own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
 - `onlineInvitation: false` marks a **files-only** design (e.g. a newborn set: story, card, stickers,
   bottle label). It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
   and the storefront shows it as a picture, not in a phone frame. `Theme.tsx` is then only the preview.
@@ -54,6 +58,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
 | `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. |
+| `wording` | The design's changeable lines (manifest `wording`) by key: the customer's choice, or the Arabic default. Every declared key is present. Also given to print companions and newborn extras. A line in another script than the invitation (Arabic on an English order) should get its own `lang`/`dir`. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`

@@ -59,6 +59,8 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     colors: inv.colors,
     occasion: await occasionKey(db, inv.sectionId),
     birthDateFormat: { style: inv.birthDateStyle, digits: inv.birthDateDigits },
+    wordingLines: (version!.manifest as ThemeManifest | null)?.wording ?? manifest?.wording ?? [],
+    wording: inv.wording,
   });
 
   if (kind === 'card' || kind === 'cardBleed') {
@@ -99,6 +101,7 @@ function printBase(theme: ThemeProps) {
     signatures: theme.signatures,
     colors: theme.colors,
     birthDate: theme.birthDate,
+    wording: theme.wording,
   };
   return { base, cardBackTitle };
 }

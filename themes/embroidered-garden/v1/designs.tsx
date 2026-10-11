@@ -1,6 +1,6 @@
 import Image, { type StaticImageData } from 'next/image';
 import type { BirthDateParts, InvitationLocale } from '@/theme-sdk';
-import { DUA, DUA_PLAIN, HAMD, HAMD_PLAIN, copyFor } from './copy';
+import { BLESSED, DUA, DUA_PLAIN, HAMD, HAMD_PLAIN, SON_OF } from './copy';
 import styles from './design.module.css';
 import storyArt from './assets/story.webp';
 import cardArt from './assets/card.webp';
@@ -21,18 +21,41 @@ export type DesignData = {
   father: string | null;
   /** The date of birth in the customer's chosen style (one or two lines). */
   birthLines: string[] | null;
+  /** The blessing line, as the customer chose it (Arabic by default). */
+  blessed: string;
+  /** The father's line runs in the direction of its «son of» word (Arabic «بن» on an English order: right to left). */
+  fatherAttrs: { lang?: string; dir?: 'rtl' | 'ltr' };
 };
 
-export function designData(p: { locale: InvitationLocale; dir: 'rtl' | 'ltr'; lang: string; fields: Partial<Record<string, string>>; birthDate: BirthDateParts | null }): DesignData {
-  const copy = copyFor(p.locale);
+export function designData(p: {
+  locale: InvitationLocale;
+  dir: 'rtl' | 'ltr';
+  lang: string;
+  fields: Partial<Record<string, string>>;
+  birthDate: BirthDateParts | null;
+  wording: Readonly<Record<string, string>>;
+}): DesignData {
+  const sonOf = p.wording.sonOf ?? SON_OF.ar;
+  const base = { dir: p.dir };
   return {
     locale: p.locale,
     dir: p.dir,
     lang: p.lang,
     name: p.fields.baby_name ?? '',
-    father: p.fields.father_name ? `${copy.sonOf} ${p.fields.father_name}` : null,
+    father: p.fields.father_name ? `${sonOf} ${p.fields.father_name}` : null,
     birthLines: p.birthDate?.lines ?? null,
+    blessed: p.wording.blessed ?? BLESSED.ar,
+    fatherAttrs: ownLang(sonOf, base),
   };
+}
+
+/** A line whose script differs from the design's language (Arabic wording on an English order, or the
+ * reverse) gets its own `lang`/`dir`, so it is shaped and styled for its own script. */
+function ownLang(text: string, d: { dir: 'rtl' | 'ltr' }) {
+  const arabicScript = /[\u0600-\u06FF]/.test(text);
+  if (arabicScript && d.dir === 'ltr') return { lang: 'ar', dir: 'rtl' as const };
+  if (!arabicScript && /[A-Za-z]/.test(text) && d.dir === 'rtl') return { lang: 'en', dir: 'ltr' as const };
+  return {};
 }
 
 /** Name size: `max`, but never wider than `budget` cqw (long names shrink). */
@@ -104,11 +127,13 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
     <div className={`${styles.root} ${story ? styles.story : styles.card}`} dir={d.dir} lang={d.lang}>
       <Art src={story ? storyArt : cardArt} />
       <Lines lines={HAMD} className={`${styles.at} ${styles.hamd}`} arabic />
-      <p className={`${styles.at} ${styles.blessed}`}>{copyFor(d.locale).blessed}</p>
+      <p className={`${styles.at} ${styles.blessed}`} {...ownLang(d.blessed, d)}>
+        {d.blessed}
+      </p>
       <div className={`${styles.at} ${styles.nameAt}`}>
         <Name name={d.name} size={fit(d.name, 64, story ? '23cqw' : '21cqw')} />
       </div>
-      {d.father ? <p className={`${styles.at} ${styles.father}`}>{d.father}</p> : null}
+      {d.father ? <p className={`${styles.at} ${styles.father}`} {...d.fatherAttrs}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines} className={styles.cardDate} />
       <Lines lines={DUA} className={`${styles.at} ${styles.dua}`} arabic />
     </div>
@@ -120,12 +145,14 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
   return (
     <div className={`${styles.root} ${styles.sticker} ${round ? styles.round : styles.square}`} dir={d.dir} lang={d.lang}>
       <Art src={round ? roundArt : squareArt} />
-      <p className={`${styles.at} ${styles.stBlessed}`}>{copyFor(d.locale).blessed}</p>
+      <p className={`${styles.at} ${styles.stBlessed}`} {...ownLang(d.blessed, d)}>
+        {d.blessed}
+      </p>
       <div className={`${styles.at} ${styles.stName}`}>
         {/* English has two lines of wording above the name: a smaller largest size keeps them apart. */}
         <Name name={d.name} size={fit(d.name, 46, d.locale === 'en' ? '10.5cqw' : '13cqw')} />
       </div>
-      {d.father ? <p className={`${styles.at} ${styles.stFather}`}>{d.father}</p> : null}
+      {d.father ? <p className={`${styles.at} ${styles.stFather}`} {...d.fatherAttrs}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines} className={styles.stDate} />
     </div>
   );
@@ -138,12 +165,14 @@ export function BottleDesign({ d }: { d: DesignData }) {
       <Art src={bottleArt} stretch />
       <div className={`${styles.at} ${styles.btRight}`}>
         <Lines lines={HAMD_PLAIN} className={styles.btVerse} arabic />
-        <p className={`${styles.btVerse} ${styles.btBlessed}`}>{copyFor(d.locale).blessed}</p>
+        <p className={`${styles.btVerse} ${styles.btBlessed}`} {...ownLang(d.blessed, d)}>
+          {d.blessed}
+        </p>
       </div>
       <div className={`${styles.at} ${styles.btName}`}>
         <Name name={d.name} size={fit(d.name, 24, '26cqh')} />
       </div>
-      {d.father ? <p className={`${styles.at} ${styles.btFather}`}>{d.father}</p> : null}
+      {d.father ? <p className={`${styles.at} ${styles.btFather}`} {...d.fatherAttrs}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines ? [d.birthLines.join(' · ')] : null} className={styles.btDate} />
       <Lines lines={DUA_PLAIN} className={`${styles.at} ${styles.btLeft} ${styles.btVerse}`} arabic />
     </div>

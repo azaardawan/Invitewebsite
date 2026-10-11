@@ -46,8 +46,25 @@ export type ThemeManifest = {
    * to share; `Theme.tsx` is used only for previews. Default `true`.
    */
   onlineInvitation?: boolean;
+  /**
+   * Lines of the design's own wording the customer may change on the order form (never Quran or du'a):
+   * the Arabic is the default in every language; `versions` are offered as a choice for orders in that
+   * language; or the customer writes their own (up to `maxLength`). The theme reads `props.wording[key]`.
+   */
+  wording?: WordingLine[];
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
+};
+
+export type WordingLine = {
+  key: string;
+  /** What the line is, shown on the order form. */
+  label: { ar: string; en: string };
+  /** The default text, in every language. */
+  ar: string;
+  /** The same line in other languages, offered as a choice (never the default). */
+  versions?: Partial<Record<'en' | 'ckb' | 'bdn', string>>;
+  maxLength: number;
 };
 
 export function defineTheme<const T extends ThemeManifest>(manifest: T): T {
@@ -91,6 +108,18 @@ export const manifestSchema = z
       })
       .optional(),
     onlineInvitation: z.boolean().optional(),
+    wording: z
+      .array(
+        z.object({
+          key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
+          label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+          ar: z.string().min(1),
+          versions: z.object({ en: z.string().min(1), ckb: z.string().min(1), bdn: z.string().min(1) }).partial().optional(),
+          maxLength: z.number().int().min(1).max(120),
+        }),
+      )
+      .max(6)
+      .optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {
@@ -112,6 +141,10 @@ export const manifestSchema = z
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
+    if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');
+    for (const w of m.wording ?? []) {
+      for (const text of [w.ar, ...Object.values(w.versions ?? {})]) if (text.length > w.maxLength) issue(`wording.${w.key}: "${text}" is longer than maxLength`);
+    }
   });
 
 /**

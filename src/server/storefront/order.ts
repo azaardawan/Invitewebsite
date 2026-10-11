@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { packages, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { manifestByCodeRef } from '@/theme-registry';
+import type { ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
 import { localized } from '@/lib/localized';
 import { signatureUrls } from '@/server/invitation/load';
@@ -24,7 +25,7 @@ export async function draftByToken(token: string) {
   const inv = await findByPreviewToken(db(), token);
   if (!inv) return null;
   const [row] = await db()
-    .select({ theme: themes, pkg: packages, codeRef: themeVersions.codeRef })
+    .select({ theme: themes, pkg: packages, codeRef: themeVersions.codeRef, manifest: themeVersions.manifest })
     .from(themes)
     .innerJoin(packages, eq(packages.id, inv.packageId))
     .innerJoin(themeVersions, eq(themeVersions.id, inv.themeVersionId))
@@ -44,6 +45,8 @@ export async function draftByToken(token: string) {
       stickerShape: inv.stickerShape,
       bottleSize: inv.bottleSize,
       birthDate: { style: inv.birthDateStyle, digits: inv.birthDateDigits, value: inv.fieldValues.birth_date ?? null },
+      wordingLines: (row.manifest as ThemeManifest).wording ?? [],
+      wording: inv.wording,
     },
     fieldKeys: inv.fieldKeys,
     theme: { key: row.theme.key, name: row.theme.name },
@@ -68,6 +71,9 @@ export async function orderFormExtras(
     stickerShape?: 'round' | 'square';
     bottleSize?: BottleSize;
     birthDate?: { style: DateStyle; digits: DigitStyle; value: string | null };
+    /** The design's changeable lines (manifest `wording`) and what the customer chose so far. */
+    wordingLines?: readonly WordingLine[];
+    wording?: Record<string, string>;
   } = {},
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
@@ -89,6 +95,12 @@ export async function orderFormExtras(
       }
     }
     extras.birthDate = { style: current.birthDate?.style ?? 'long', digits: current.birthDate?.digits ?? 'arab', examples, showDigits: locale !== 'en' };
+  }
+  if (current.wordingLines?.length) {
+    extras.wording = {
+      lines: current.wordingLines.map((l) => ({ key: l.key, label: localized(l.label, locale), ar: l.ar, versions: l.versions ?? {}, maxLength: l.maxLength })),
+      current: current.wording ?? {},
+    };
   }
   if (featureKeys.includes('color_choice')) {
     const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);

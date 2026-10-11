@@ -1350,6 +1350,13 @@
       "heading": "Water bottle size",
       "help": "The label wraps around the bottle. Check the size with a paper strip; the PNG can be resized for any bottle.",
       "option": "{ml} ml"
+    },
+    "wording": {
+      "heading": "Wording on the design",
+      "help": "The design keeps its Arabic wording; you can change these lines. The Quran verse and the du'a always stay as they are.",
+      "arabic": "Arabic (as in the design)",
+      "inLanguage": "In the invitation's language ({language})",
+      "custom": "Write your own"
     }
   },
   "contact": {
