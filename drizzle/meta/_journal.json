@@ -218,6 +218,13 @@
       "when": 1791728139163,
       "tag": "0030_design_wording",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1791739588236,
+      "tag": "0031_sticker_both_shapes",
+      "breakpoints": true
     }
   ]
 }

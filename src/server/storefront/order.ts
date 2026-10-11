@@ -68,7 +68,7 @@ export async function orderFormExtras(
     cardOptions?: CardOptions | null;
     signatureSrcs?: string[];
     colors?: Record<string, string> | null;
-    stickerShape?: 'round' | 'square';
+    stickerShape?: 'round' | 'square' | 'both';
     bottleSize?: BottleSize;
     birthDate?: { style: DateStyle; digits: DigitStyle; value: string | null };
     /** The design's changeable lines (manifest `wording`) and what the customer chose so far. */

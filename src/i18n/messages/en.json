@@ -1337,7 +1337,8 @@
       "heading": "Sticker shape",
       "help": "Round suits most chocolates; square suits square pieces and boxes. You get a print-ready A4 sheet (PDF) and a single sticker picture (PNG).",
       "round": "Round",
-      "square": "Square"
+      "square": "Square",
+      "both": "Both"
     },
     "birthDateFormat": {
       "heading": "How the date of birth is written",

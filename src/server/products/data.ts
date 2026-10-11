@@ -60,8 +60,12 @@ export function productDataFrom(
   };
 }
 
-/** A customer's extras: watermarked until the invitation is paid (decided here, on the server). */
-export async function productData(db: DbOrTx, inv: InvitationRow): Promise<ProductData> {
+/**
+ * A customer's extras: watermarked until the invitation is paid (decided here, on the server). Stickers are
+ * drawn in the chosen shape; with both shapes chosen, round unless `stickerShape` asks for the square set.
+ */
+export async function productData(db: DbOrTx, inv: InvitationRow, opts: { stickerShape?: 'round' | 'square' } = {}): Promise<ProductData> {
   const { codeRef, props } = await invitationRenderData(db, inv, 'live');
-  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape: inv.stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef });
+  const stickerShape = opts.stickerShape ?? (inv.stickerShape === 'both' ? 'round' : inv.stickerShape);
+  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef });
 }

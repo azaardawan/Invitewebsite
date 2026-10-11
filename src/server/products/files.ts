@@ -9,8 +9,8 @@ import { printData } from '@/server/documents/data';
 import { renderProduct, type ProductItem, type ProductRenderer } from '@/server/documents/render';
 import { isPaid, productData } from './data';
 
-/** Bump to regenerate every stored extra after a design change in the platform's components. */
-const PRODUCT_PIPELINE_VERSION = 1;
+/** Bump to regenerate every stored extra after a design change in the platform's components (2: denser watermark, note across the middle). */
+const PRODUCT_PIPELINE_VERSION = 2;
 
 const KIND = {
   'story.png': 'STORY_PNG',
@@ -22,6 +22,9 @@ const KIND = {
   'sticker.preview': 'STICKER_PREVIEW',
   'bottle.preview': 'BOTTLE_PREVIEW',
   'card.preview': 'CARD_DRAFT_PREVIEW',
+  'sticker-square.png': 'STICKER_SQUARE_PNG',
+  'sticker-square.pdf': 'STICKER_SQUARE_PDF',
+  'sticker-square.preview': 'STICKER_SQUARE_PREVIEW',
 } as const satisfies Record<ProductItem, string>;
 
 const FEATURE: Record<ProductItem, string> = {
@@ -34,7 +37,13 @@ const FEATURE: Record<ProductItem, string> = {
   'bottle.pdf': 'bottle_label',
   'bottle.preview': 'bottle_label',
   'card.preview': 'print_card',
+  'sticker-square.png': 'sticker',
+  'sticker-square.pdf': 'sticker',
+  'sticker-square.preview': 'sticker',
 };
+
+/** The square sticker set exists only when the customer chose both shapes. */
+export const isSquareSet = (item: ProductItem) => item.startsWith('sticker-square.');
 
 export const PRODUCT_ITEMS = Object.keys(KIND) as ProductItem[];
 export const isPreview = (item: ProductItem) => item.endsWith('.preview');
@@ -47,13 +56,20 @@ export class ProductError extends Error {
 
 export function contentType(item: ProductItem) {
   if (item.endsWith('.pdf')) return 'application/pdf';
-  return item === 'sticker.preview' || item.endsWith('.png') ? 'image/png' : 'image/jpeg';
+  return item === 'sticker.preview' || item === 'sticker-square.preview' || item.endsWith('.png') ? 'image/png' : 'image/jpeg';
 }
 
 /** The download name, e.g. `story-ABC123.png`, `stickers-ABC123.pdf`. */
 export function productFileName(item: ProductItem, publicId: string) {
   const [what, ext] = item.split('.') as [string, string];
-  const base = { story: 'story', sticker: what === 'sticker' && ext === 'pdf' ? 'stickers-sheet' : 'sticker', bottle: ext === 'pdf' ? 'bottle-labels-sheet' : 'bottle-label', card: 'card' }[what] ?? what;
+  const base =
+    {
+      story: 'story',
+      sticker: ext === 'pdf' ? 'stickers-sheet' : 'sticker',
+      'sticker-square': ext === 'pdf' ? 'square-stickers-sheet' : 'square-sticker',
+      bottle: ext === 'pdf' ? 'bottle-labels-sheet' : 'bottle-label',
+      card: 'card',
+    }[what] ?? what;
   return `${base}-${publicId}.${ext === 'preview' ? (contentType(item) === 'image/png' ? 'png' : 'jpg') : ext}`;
 }
 
@@ -66,6 +82,7 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new ProductError('notFound');
   if (!inv.featureKeys.includes(FEATURE[item])) throw new ProductError('notIncluded');
+  if (isSquareSet(item) && inv.stickerShape !== 'both') throw new ProductError('notIncluded');
   const paid = isPaid(inv);
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
 
@@ -75,7 +92,7 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
           const d = await printData(db, inv, 'card');
           return d.kind === 'card' ? { props: d.props, design: d.design.front } : null;
         })()
-      : await productData(db, inv);
+      : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
   const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid }));
 
   const [existing] = await db

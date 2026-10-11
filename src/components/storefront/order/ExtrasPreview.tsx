@@ -14,8 +14,21 @@ export function ExtrasPreview({
   /** Where the pictures come from, e.g. `/p/<token>/extra` (draft) or `/r/<token>/extra` (receipt). */
   base: string;
   featureKeys: readonly string[];
-  stickerShape: 'round' | 'square';
-  labels: { title: string; note: string; card: string; story: string; sticker: string; bottle: string; downloadPng: string; downloadSheet: string };
+  /** `both`: a round set (sticker.*) and a square set (sticker-square.*), each shown and downloadable. */
+  stickerShape: 'round' | 'square' | 'both';
+  labels: {
+    title: string;
+    note: string;
+    card: string;
+    story: string;
+    sticker: string;
+    bottle: string;
+    downloadPng: string;
+    downloadSheet: string;
+    /** The two shapes' names, to tell the sets apart when both were chosen. */
+    round?: string;
+    square?: string;
+  };
   watermarked: boolean;
   /** Receipt only: download links per item. */
   downloads?: boolean;
@@ -24,7 +37,24 @@ export function ExtrasPreview({
     featureKeys.includes('print_card') && !downloads ? { key: 'card', label: labels.card, src: `${base}/card.preview`, box: 'aspect-[148/210] w-40' } : null,
     featureKeys.includes('story') ? { key: 'story', label: labels.story, src: `${base}/story.preview`, box: 'aspect-[9/16] w-40', png: `${base}/story.png` } : null,
     featureKeys.includes('sticker')
-      ? { key: 'sticker', label: labels.sticker, src: `${base}/sticker.preview`, box: `aspect-square w-32 ${stickerShape === 'round' ? 'rounded-full' : 'rounded-xl'}`, png: `${base}/sticker.png`, sheet: `${base}/sticker.pdf` }
+      ? {
+          key: 'sticker',
+          label: stickerShape === 'both' ? `${labels.sticker} · ${labels.round}` : labels.sticker,
+          src: `${base}/sticker.preview`,
+          box: `aspect-square w-32 ${stickerShape === 'square' ? 'rounded-xl' : 'rounded-full'}`,
+          png: `${base}/sticker.png`,
+          sheet: `${base}/sticker.pdf`,
+        }
+      : null,
+    featureKeys.includes('sticker') && stickerShape === 'both'
+      ? {
+          key: 'sticker-square',
+          label: `${labels.sticker} · ${labels.square}`,
+          src: `${base}/sticker-square.preview`,
+          box: 'aspect-square w-32 rounded-xl',
+          png: `${base}/sticker-square.png`,
+          sheet: `${base}/sticker-square.pdf`,
+        }
       : null,
     featureKeys.includes('bottle_label') ? { key: 'bottle', label: labels.bottle, src: `${base}/bottle.preview`, box: 'aspect-[215/55] w-72', png: `${base}/bottle.png`, sheet: `${base}/bottle.pdf` } : null,
   ].filter((i): i is NonNullable<typeof i> => i !== null);

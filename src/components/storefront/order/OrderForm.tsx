@@ -15,7 +15,7 @@ export type OrderFormExtras = {
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
   /** Chocolate stickers (sticker): round or square. */
-  sticker?: { current: 'round' | 'square' };
+  sticker?: { current: 'round' | 'square' | 'both' };
   /** Bottle labels (bottle_label): which bottle size. */
   bottle?: { current: string; sizes: readonly string[] };
   /** Date of birth: how it is written; `examples` is `${style}:${digits}` → the date written that way. */
@@ -160,14 +160,21 @@ export function OrderForm({
         <fieldset className="flex flex-col gap-3">
           <legend className="text-[15px] font-medium text-heading">{t('stickerShape.heading')}</legend>
           <p className="text-sm text-muted">{t('stickerShape.help')}</p>
-          <div className="flex gap-3">
-            {(['round', 'square'] as const).map((shape) => (
+          <div className="flex flex-wrap gap-3">
+            {(['round', 'square', 'both'] as const).map((shape) => (
               <label
                 key={shape}
                 className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
               >
                 <input type="radio" name="stickerShape" value={shape} defaultChecked={(values.stickerShape || extras.sticker!.current) === shape} className="sr-only" />
-                <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                {shape === 'both' ? (
+                  <span aria-hidden className="flex gap-1">
+                    <span className="block size-10 rounded-full border-2 border-accent bg-blush" />
+                    <span className="block size-10 rounded-md border-2 border-accent bg-blush" />
+                  </span>
+                ) : (
+                  <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                )}
                 <span className="text-sm font-medium">{t(`stickerShape.${shape}`)}</span>
               </label>
             ))}

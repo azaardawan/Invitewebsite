@@ -78,7 +78,7 @@ describe('newborn extras', () => {
     const [inv] = await db().select().from(invitations).where(eq(invitations.id, d.invitationId));
     await db()
       .update(invitations)
-      .set({ featureKeys: [...inv!.featureKeys, 'story', 'sticker'], ...(stickerShape ? { stickerShape: stickerShape as 'square' } : {}) })
+      .set({ featureKeys: [...inv!.featureKeys, 'story', 'sticker'], ...(stickerShape ? { stickerShape: stickerShape as 'round' | 'square' | 'both' } : {}) })
       .where(eq(invitations.id, d.invitationId));
     return d.invitationId;
   }
@@ -109,6 +109,21 @@ describe('newborn extras', () => {
     expect(sheet).toMatchObject({ type: 'application/pdf', fileName: expect.stringMatching(/^stickers-sheet-.+\.pdf$/) });
     expect((await ensureProductFile(db(), id, 'story.png', r.render)).type).toBe('image/png');
     expect(r.calls).toEqual(['sticker.pdf', 'story.png']);
+  });
+
+  it('with both sticker shapes: a round set and a square set, each its own file', async () => {
+    const one = await order(true, 'round');
+    await expect(ensureProductFile(db(), one, 'sticker-square.png', fake().render)).rejects.toMatchObject({ code: 'notIncluded' });
+
+    const id = await order(true, 'both');
+    const [inv] = await db().select().from(invitations).where(eq(invitations.id, id));
+    expect((await productData(db(), inv!)).stickerShape).toBe('round');
+    expect((await productData(db(), inv!, { stickerShape: 'square' })).stickerShape).toBe('square');
+    const r = fake();
+    expect((await ensureProductFile(db(), id, 'sticker.png', r.render)).fileName).toMatch(/^sticker-.+\.png$/);
+    expect((await ensureProductFile(db(), id, 'sticker-square.png', r.render)).fileName).toMatch(/^square-sticker-.+\.png$/);
+    expect((await ensureProductFile(db(), id, 'sticker-square.pdf', r.render)).fileName).toMatch(/^square-stickers-sheet-.+\.pdf$/);
+    expect(r.calls).toEqual(['sticker.png', 'sticker-square.png', 'sticker-square.pdf']);
   });
 });
 

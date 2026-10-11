@@ -36,7 +36,9 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     return <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
   }
   if ((PRODUCT_VIEWS as readonly string[]).includes(claim.kind)) {
-    return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv)} />;
+    // `shape=square`: the square sticker set of a customer who chose both shapes.
+    const shape = (await searchParams).shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
+    return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />;
   }
   const data = await printData(db(), inv, claim.kind);
   if (data.kind === 'card') return <CardPages codeRef={data.codeRef} data={data} view={view === 'front' || view === 'back' ? view : undefined} watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)} />;
