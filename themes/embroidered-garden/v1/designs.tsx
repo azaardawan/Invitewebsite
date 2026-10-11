@@ -122,7 +122,8 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
       <Art src={round ? roundArt : squareArt} />
       <p className={`${styles.at} ${styles.stBlessed}`}>{copyFor(d.locale).blessed}</p>
       <div className={`${styles.at} ${styles.stName}`}>
-        <Name name={d.name} size={fit(d.name, 46, '13cqw')} />
+        {/* English has two lines of wording above the name: a smaller largest size keeps them apart. */}
+        <Name name={d.name} size={fit(d.name, 46, d.locale === 'en' ? '10.5cqw' : '13cqw')} />
       </div>
       {d.father ? <p className={`${styles.at} ${styles.stFather}`}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines} className={styles.stDate} />
