@@ -38,7 +38,7 @@ try {
   const values = { baby_name: e.NAME ?? 'عمر', father_name: e.FATHER ?? 'عبدالعزيز', birth_date: e.BORN ?? born };
   const ctx = { ipHash: randomToken(8), userAgent: 'e2e' };
   const extras = { stickerShape: e.SHAPE ?? 'round', bottleSize: e.BOTTLE ?? '330', birthDateStyle: e.DATE_STYLE ?? 'long', birthDateDigits: e.DIGITS ?? 'arab' };
-  const d = await createDraft(db(), { themeKey: 'embroidered-garden', packageId, locale: e.INV_LANG === 'en' ? 'en' : 'ar', values, extras }, ctx);
+  const d = await createDraft(db(), { themeKey: 'embroidered-garden', packageId, locale: (['en', 'ckb', 'bdn'] as const).find((l) => l === e.INV_LANG) ?? 'ar', values, extras }, ctx);
   let receiptToken: string | null = null;
   if (e.PAID === '1') {
     const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'e2e@bahja.test' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, ctx);
