@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { packages, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { manifestByCodeRef } from '@/theme-registry';
-import type { ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
+import type { DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
 import { localized } from '@/lib/localized';
 import { signatureUrls } from '@/server/invitation/load';
@@ -47,6 +47,8 @@ export async function draftByToken(token: string) {
       birthDate: { style: inv.birthDateStyle, digits: inv.birthDateDigits, value: inv.fieldValues.birth_date ?? null },
       wordingLines: (row.manifest as ThemeManifest).wording ?? [],
       wording: inv.wording,
+      switchDefs: (row.manifest as ThemeManifest).switches ?? [],
+      switches: inv.switches,
     },
     fieldKeys: inv.fieldKeys,
     theme: { key: row.theme.key, name: row.theme.name },
@@ -74,6 +76,9 @@ export async function orderFormExtras(
     /** The design's changeable lines (manifest `wording`) and what the customer chose so far. */
     wordingLines?: readonly WordingLine[];
     wording?: Record<string, string>;
+    /** The design's yes/no choices (manifest `switches`) and the customer's answers so far. */
+    switchDefs?: readonly DesignSwitch[];
+    switches?: Record<string, boolean>;
   } = {},
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
@@ -98,9 +103,21 @@ export async function orderFormExtras(
   }
   if (current.wordingLines?.length) {
     extras.wording = {
-      lines: current.wordingLines.map((l) => ({ key: l.key, label: localized(l.label, locale), ar: l.ar, versions: l.versions ?? {}, defaultIn: [...(l.defaultIn ?? [])], maxLength: l.maxLength })),
+      lines: current.wordingLines.map((l) => ({
+        key: l.key,
+        label: localized(l.label, locale),
+        ar: l.ar,
+        versions: l.versions ?? {},
+        defaultIn: [...(l.defaultIn ?? [])],
+        options: [...(l.options ?? [])],
+        custom: l.custom !== false,
+        maxLength: l.maxLength,
+      })),
       current: current.wording ?? {},
     };
+  }
+  if (current.switchDefs?.length) {
+    extras.switches = current.switchDefs.map((d) => ({ key: d.key, label: localized(d.label, locale), on: current.switches?.[d.key] ?? d.default }));
   }
   if (featureKeys.includes('color_choice')) {
     const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);

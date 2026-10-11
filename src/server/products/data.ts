@@ -53,6 +53,7 @@ export function productDataFrom(
             fields: props.fields,
             birthDate: props.birthDate,
             wording: props.wording,
+            switches: props.switches,
             labels: { itsABoy: props.labels.itsABoy, itsAGirl: props.labels.itsAGirl, bornOn: props.labels.bornOn, and: props.labels.and },
           },
         }

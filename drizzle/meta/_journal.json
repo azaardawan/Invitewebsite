@@ -225,6 +225,13 @@
       "when": 1791739588236,
       "tag": "0031_sticker_both_shapes",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791751272973,
+      "tag": "0032_design_switches",
+      "breakpoints": true
     }
   ]
 }

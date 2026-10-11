@@ -591,3 +591,11 @@ Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts
 the Quran verse and du'a always stay Arabic):
 «رزقنا الله بأجمل العطايا» → stays Arabic in every language (owner, 2026-10-11): no Kurdish needed.
 «بن» (son of) → ✅ owner (2026-10-11): Sorani «کوڕی», Badini «کوڕێ» (the default on Kurdish orders; «بن» stays a choice).
+
+Order-form labels in the Bluebird Garden manifest (`themes/bluebird-garden/v1/manifest.ts`; Kurdish shows the Arabic until approved):
+- «ترتيب المولود» / Birth order → Sorani: ڕیزبەندی منداڵ / Badini: ڕیزبەندیا زاروکی (◐).
+- «كلمة «بن»» → Sorani: وشەی «کوڕی» / Badini: پەیڤا «کوڕێ» (◐).
+- «إظهار اسم الأب على ملصقات الشوكولاتة وملصق القنينة» / Show the father's name on the chocolate stickers and bottle label →
+  Sorani: ناوی باوک لەسەر لکێنەری چوکلێت و لکێنەری بوتڵ پیشان بدرێت / Badini: ناڤێ بابی ل سەر لکێنەرێن چوکلێتێ و لکێنەرا بوتلێ بهێتە نیشاندان (◐).
+
+Text inside the Bluebird Garden design (praise lines, birth-order line, du'a) stays Arabic in every language (owner, 2026-10-11).

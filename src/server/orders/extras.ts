@@ -7,7 +7,7 @@ import { MediaError } from '@/server/media/process';
 import { isBottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES } from '@/lib/birth-date-format';
 import type { Locale } from '@/i18n/config';
-import { wordingDefault, type WordingLine } from '@/theme-sdk/manifest';
+import { wordingDefault, type DesignSwitch, type WordingLine } from '@/theme-sdk/manifest';
 import { OrderError } from './common';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -26,7 +26,9 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
  * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the Arabic), `lang` (the
  *   design's version in the invitation's language) or `custom` with the customer's own text. What equals the
- *   language's default is not stored, so the default follows a later change of language.
+ *   language's default is not stored, so the default follows a later change of language. A line with
+ *   fixed `options` also takes `opt:<n>`; one with `custom: false` refuses the customer's own text;
+ * - `switches` (designs with yes/no choices, manifest `switches`): each answer by key.
  */
 export type OrderExtras = {
   cardBack?: { title: string; message: string };
@@ -38,6 +40,7 @@ export type OrderExtras = {
   birthDateStyle?: string;
   birthDateDigits?: string;
   wording?: Record<string, { choice: string; text: string }>;
+  switches?: Record<string, boolean>;
 };
 
 /** One changeable line: at most this many characters, on one line, no markup characters. */
@@ -54,11 +57,14 @@ export async function extrasUpdate(
     wordingLines?: readonly WordingLine[];
     wording?: Record<string, string>;
     locale?: Locale;
+    /** For `switches`: the design's yes/no choices and what is stored now. */
+    switchDefs?: readonly DesignSwitch[];
+    switches?: Record<string, boolean>;
   },
   extras: OrderExtras,
 ) {
   const set: Partial<
-    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording'>
+    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording' | 'switches'>
   > = {};
   const errors: Record<string, string> = {};
 
@@ -143,8 +149,11 @@ export async function extrasUpdate(
       const text = cleanLine(pick.text);
       const fallback = wordingDefault(line, inv.locale ?? 'ar');
       const keep = (value: string) => (value === fallback ? delete next[line.key] : (next[line.key] = value));
+      const option = /^opt:(\d+)$/.exec(pick.choice);
       if (pick.choice === 'ar') keep(line.ar);
+      else if (option && line.options?.[Number(option[1])] !== undefined) keep(line.options[Number(option[1])]!);
       else if (pick.choice === 'lang' && version) keep(version);
+      else if (pick.choice === 'custom' && line.custom === false) errors[`w.${line.key}`] = 'invalidChoice';
       else if (pick.choice === 'custom' && !text) errors[`w.${line.key}`] = 'required';
       else if (pick.choice === 'custom' && text.length > line.maxLength) errors[`w.${line.key}`] = 'tooLong';
       else if (pick.choice === 'custom' && /[<>]/.test(text)) errors[`w.${line.key}`] = 'invalidText';
@@ -152,6 +161,17 @@ export async function extrasUpdate(
       else errors[`w.${line.key}`] = 'invalidChoice';
     }
     set.wording = next;
+  }
+
+  if (extras.switches && inv.switchDefs?.length) {
+    const next: Record<string, boolean> = { ...(inv.switches ?? {}) };
+    for (const def of inv.switchDefs) {
+      const on = extras.switches[def.key];
+      if (on === undefined) continue;
+      if (on === def.default) delete next[def.key];
+      else next[def.key] = on;
+    }
+    set.switches = next;
   }
 
   if (Object.keys(errors).length) throw new OrderError('invalidFields', errors);

@@ -7,7 +7,7 @@ import { messagesFor } from '@/i18n/messages';
 import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type CalendarNames } from '@/lib/invitation-format';
 import { DEFAULT_BIRTH_DATE_FORMAT, formatBirthDate, type BirthDateFormat } from '@/lib/birth-date-format';
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
-import { wordingDefault, type WordingLine } from '@/theme-sdk/manifest';
+import { wordingDefault, type DesignSwitch, type WordingLine } from '@/theme-sdk/manifest';
 
 type InvitationMessages = ThemeLabels &
   CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string; and: string; youreInvited: string; endedTitle: string; endedBody: string; brand: string };
@@ -70,6 +70,9 @@ export function buildThemeProps(input: {
   /** The design's changeable lines (manifest) and the customer's choices (absent = the Arabic default). */
   wordingLines?: readonly WordingLine[];
   wording?: Record<string, string> | null;
+  /** The design's yes/no choices (manifest) and the customer's answers (absent = the default). */
+  switchDefs?: readonly DesignSwitch[];
+  switches?: Record<string, boolean> | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -108,7 +111,13 @@ export function buildThemeProps(input: {
     occasion: input.occasion ?? null,
     birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
     wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
+    switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),
   };
+}
+
+/** Each yes/no choice: the customer's answer, else the design's default. */
+export function resolveSwitches(defs: readonly DesignSwitch[], chosen: Record<string, boolean> | null): Record<string, boolean> {
+  return Object.fromEntries(defs.map((d) => [d.key, typeof chosen?.[d.key] === 'boolean' ? chosen[d.key]! : d.default]));
 }
 
 /** Each changeable line: the customer's text when they chose one, else the default for the language. */

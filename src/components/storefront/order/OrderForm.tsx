@@ -25,9 +25,22 @@ export type OrderFormExtras = {
    * invitation's language when it has one, or the customer's own words. `current` = what is stored (absent = Arabic).
    */
   wording?: {
-    lines: { key: string; label: string; ar: string; versions: Partial<Record<string, string>>; defaultIn: string[]; maxLength: number }[];
+    lines: {
+      key: string;
+      label: string;
+      ar: string;
+      versions: Partial<Record<string, string>>;
+      defaultIn: string[];
+      /** Fixed alternatives besides `ar` (value `opt:<n>`). */
+      options: string[];
+      /** Whether the customer may write their own text. */
+      custom: boolean;
+      maxLength: number;
+    }[];
     current: Record<string, string>;
   };
+  /** The design's yes/no choices (manifest `switches`) and the current answers. */
+  switches?: { key: string; label: string; on: boolean }[];
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -183,6 +196,24 @@ export function OrderForm({
       ) : null}
 
       {extras.wording ? <DesignWording extra={extras.wording} lang={lang} values={state.values} errors={errors} /> : null}
+
+      {extras.switches?.length ? (
+        <div className="flex flex-col gap-2">
+          {extras.switches.map((s) => (
+            <label key={s.key} className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3">
+              <input type="hidden" name={`sw.${s.key}`} value="" />
+              <input
+                type="checkbox"
+                name={`s.${s.key}`}
+                value="1"
+                defaultChecked={state.values?.[`sw.${s.key}`] !== undefined ? state.values[`s.${s.key}`] === '1' : s.on}
+                className="mt-1"
+              />
+              <span className="text-sm">{s.label}</span>
+            </label>
+          ))}
+        </div>
+      ) : null}
 
       {extras.birthDate ? <BirthDateFormat extra={extras.birthDate} values={values} label={(k) => t(`birthDateFormat.${k}` as 'birthDateFormat.heading')} /> : null}
 
@@ -396,7 +427,18 @@ function WordingLine({
   const version = lang !== 'ar' ? line.versions[lang] : undefined;
   // Nothing stored = the language's default (Arabic, or the version where the design makes it the default).
   const defaultChoice = version && line.defaultIn.includes(lang) ? 'lang' : 'ar';
-  const fromStored = !stored ? null : stored === line.ar ? 'ar' : Object.values(line.versions).includes(stored) ? 'lang' : 'custom';
+  const optionIndex = stored ? line.options.indexOf(stored) : -1;
+  const fromStored = !stored
+    ? null
+    : stored === line.ar
+      ? 'ar'
+      : optionIndex >= 0
+        ? `opt:${optionIndex}`
+        : Object.values(line.versions).includes(stored)
+          ? 'lang'
+          : line.custom
+            ? 'custom'
+            : null;
   // What the customer picked (or just submitted); until then the default follows the language chosen above.
   const [picked, setChoice] = useState<string | null>(values?.[name] || fromStored);
   const choice = picked ?? defaultChoice;
@@ -411,9 +453,17 @@ function WordingLine({
           <span lang="ar" dir="rtl">
             {line.ar}
           </span>
-          <span className="text-xs text-muted">{t('wording.arabic')}</span>
+          {line.options.length ? null : <span className="text-xs text-muted">{t('wording.arabic')}</span>}
         </span>
       </label>
+      {line.options.map((text, i) => (
+        <label key={i} className={option}>
+          <input type="radio" name={name} value={`opt:${i}`} checked={shown === `opt:${i}`} onChange={() => setChoice(`opt:${i}`)} className="mt-1" />
+          <span className="text-sm" lang="ar" dir="rtl">
+            {text}
+          </span>
+        </label>
+      ))}
       {version ? (
         <label className={option}>
           <input type="radio" name={name} value="lang" checked={shown === 'lang'} onChange={() => setChoice('lang')} className="mt-1" />
@@ -423,11 +473,13 @@ function WordingLine({
           </span>
         </label>
       ) : null}
-      <label className={option}>
-        <input type="radio" name={name} value="custom" checked={shown === 'custom'} onChange={() => setChoice('custom')} className="mt-1" />
-        <span className="text-sm">{t('wording.custom')}</span>
-      </label>
-      {shown === 'custom' ? (
+      {line.custom ? (
+        <label className={option}>
+          <input type="radio" name={name} value="custom" checked={shown === 'custom'} onChange={() => setChoice('custom')} className="mt-1" />
+          <span className="text-sm">{t('wording.custom')}</span>
+        </label>
+      ) : null}
+      {shown === 'custom' && line.custom ? (
         <input
           type="text"
           name={`${name}.text`}

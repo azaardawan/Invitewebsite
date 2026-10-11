@@ -79,6 +79,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     colorSlots: manifest.colors?.slots ?? [],
     colors: req.colors ?? null,
     wordingLines: manifest.wording ?? [],
+    switchDefs: manifest.switches ?? [],
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
   });
   return { theme, version, manifest, props };
