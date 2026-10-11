@@ -33,6 +33,9 @@ test('Embroidered Garden is files only: story, card, stickers and bottle label, 
   await expect(page.getByRole('link', { name: /فتح المعاينة/ })).toHaveCount(0);
   await page.goto(`/p/${draft.previewToken}`);
   await expect(page.getByText('عبد الرحمن')).toBeVisible();
+  // The preview of a files-only design is the product itself: watermarked all over, note in the middle.
+  await expect(page.locator('[data-bahja-watermark]')).toHaveCount(1);
+  await expect(page.getByText('تُزال هذه العلامة بعد الشراء')).toBeVisible();
   expect(await textInside(page)).toBe(true);
   expect((await request.get(`/p/${draft.previewToken}/extra/sticker.preview`)).status()).toBe(200);
   expect((await request.get(`/i/${draft.path.slice(3)}`)).status()).toBe(404);

@@ -3,12 +3,14 @@ import { invitationRenderData } from '@/server/invitation/load';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { InvitationView } from '@/components/invitation/InvitationView';
 import { previewInvitation } from './data';
+import { manifestByCodeRef } from '@/theme-registry';
 
 /**
  * The customer's personalized preview before payment (decision J): their real
  * content in the real theme, with a PREVIEW label the theme can't remove. The
  * link expires 24h after the last edit, guest responses are never stored, and
- * it stops working once the invitation is published.
+ * it stops working once the invitation is published. A design sold only as files
+ * (no online invitation) is the product itself, so it is watermarked all over.
  */
 export default async function PersonalPreviewPage({ params }: PageProps<'/p/[token]'>) {
   const { token } = await params;
@@ -22,5 +24,15 @@ export default async function PersonalPreviewPage({ params }: PageProps<'/p/[tok
     );
   }
   const { codeRef, props } = await invitationRenderData(db(), inv, 'preview');
-  return <InvitationView codeRef={codeRef} props={props} ribbon={msgs.previewRibbon} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
+  const filesOnly = manifestByCodeRef(codeRef)?.onlineInvitation === false;
+  const { print } = msgs as unknown as { print: { watermark: string; watermarkNote: string } };
+  return (
+    <InvitationView
+      codeRef={codeRef}
+      props={props}
+      ribbon={msgs.previewRibbon}
+      errorText={{ message: msgs.renderError, retry: msgs.retry }}
+      watermark={filesOnly ? print : null}
+    />
+  );
 }

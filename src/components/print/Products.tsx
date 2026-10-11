@@ -7,6 +7,7 @@ import { FONTS, JUSTIFY, type ArtworkSide, type PrintLook } from './ArtworkCard'
 import { TINT, mix } from './look';
 import { BOTTLE_GAP_MM, BOTTLE_SIZES, bottlesPerSheet, type BottleSize } from '@/catalog/products';
 import type { PrintExtraProps } from '@/theme-sdk/print';
+import { WatermarkLayer } from './watermark';
 export { tintedLook } from './look';
 
 /**
@@ -85,33 +86,9 @@ function styleOf(design: ArtworkSide | null, d: ProductData, defaults: { inset: 
   };
 }
 
-/** Repeated diagonal "preview" marks and a ribbon saying they go away after purchase. */
+/** Repeated diagonal "preview" marks and, across the middle, the note that they go away after purchase. */
 export function Watermark({ labels, compact = false }: { labels: Pick<ProductData['labels'], 'watermark' | 'watermarkNote'>; compact?: boolean }) {
-  const text = labels.watermark.replace(/[<&>]/g, '');
-  const tile = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="160"><text x="130" y="85" text-anchor="middle" font-family="Noto Sans Arabic, sans-serif" font-size="26" font-weight="700" fill="rgba(80,40,50,0.22)" transform="rotate(-28 130 80)">${text}</text></svg>`;
-  return (
-    <div aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 50, pointerEvents: 'none', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(tile)}")`, backgroundSize: compact ? '34% auto' : '260px auto' }} />
-      <div
-        style={{
-          position: 'absolute',
-          insetInline: 0,
-          // Low on the picture, so the name stays readable in the preview.
-          bottom: compact ? '9%' : '7%',
-          background: 'rgba(43,26,30,0.72)',
-          color: '#fff',
-          textAlign: 'center',
-          fontFamily: FONTS.sans,
-          fontWeight: 700,
-          fontSize: compact ? '7%' : undefined,
-          padding: compact ? '1.5% 3%' : '0.6em 1em',
-          lineHeight: 1.4,
-        }}
-      >
-        {labels.watermarkNote}
-      </div>
-    </div>
-  );
+  return <WatermarkLayer text={labels} compact={compact} />;
 }
 
 function Paper({ s }: { s: Style }) {

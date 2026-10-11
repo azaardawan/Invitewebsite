@@ -4,11 +4,13 @@ import { ThemeHost } from '@/theme-registry/loaders.generated';
 import { InvitationRuntime } from '@/theme-sdk/runtime';
 import { ThemeErrorBoundary } from './ThemeErrorBoundary';
 import styles from './platform.module.css';
+import { WatermarkLayer, type WatermarkText } from '@/components/print/watermark';
 
 /**
  * Renders one theme with the platform around it: runtime (music, guest form),
  * error boundary and — outside `live` mode — a PREVIEW/SAMPLE ribbon the theme
- * cannot remove or restyle.
+ * cannot remove or restyle. `watermark`: the full preview watermark over the whole page (designs sold
+ * only as files, whose preview is the product itself).
  */
 export function InvitationView({
   codeRef,
@@ -17,6 +19,7 @@ export function InvitationView({
   errorText,
   submitGuestResponse,
   turnstileSiteKey,
+  watermark,
 }: {
   codeRef: string;
   props: ThemeProps;
@@ -24,6 +27,7 @@ export function InvitationView({
   errorText: { message: string; retry: string };
   submitGuestResponse?: (input: GuestResponseInput, captchaToken?: string) => Promise<GuestSubmitResult>;
   turnstileSiteKey?: string | null;
+  watermark?: WatermarkText | null;
 }) {
   const guest = {
     enabled: props.features.includes('rsvp'),
@@ -51,6 +55,7 @@ export function InvitationView({
           {ribbon}
         </div>
       ) : null}
+      {watermark ? <WatermarkLayer text={watermark} fixed /> : null}
     </InvitationRuntime>
   );
 }
