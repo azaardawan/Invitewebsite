@@ -16,8 +16,8 @@ import { isLive } from '@/server/orders/payment';
 import type { DocumentKind } from './tokens';
 
 /** Bump when the print pipeline changes in a way that should regenerate every stored PDF. */
-// 3: printable cards have a back page. 4: the back is landscape. 5: denser watermark, note across the middle.
-const PIPELINE_VERSION = 5;
+// 3: printable cards have a back page. 4: the back is landscape. 5: denser watermark. 6: the preview note only.
+const PIPELINE_VERSION = 6;
 
 const KIND = { card: 'PRINT_CARD', keepsake: 'KEEPSAKE_PDF' } as const;
 const PREVIEW_KIND = { card: 'PRINT_CARD_PREVIEW', cardBack: 'PRINT_CARD_BACK_PREVIEW', keepsake: 'KEEPSAKE_PREVIEW', og: 'OG_IMAGE' } as const;
