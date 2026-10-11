@@ -98,7 +98,7 @@ export async function orderFormExtras(
   }
   if (current.wordingLines?.length) {
     extras.wording = {
-      lines: current.wordingLines.map((l) => ({ key: l.key, label: localized(l.label, locale), ar: l.ar, versions: l.versions ?? {}, maxLength: l.maxLength })),
+      lines: current.wordingLines.map((l) => ({ key: l.key, label: localized(l.label, locale), ar: l.ar, versions: l.versions ?? {}, defaultIn: [...(l.defaultIn ?? [])], maxLength: l.maxLength })),
       current: current.wording ?? {},
     };
   }

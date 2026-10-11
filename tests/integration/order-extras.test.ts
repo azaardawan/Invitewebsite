@@ -155,7 +155,10 @@ describe('order extras', () => {
 });
 
 describe('changeable lines of a design (manifest wording)', () => {
-  const WORDING = [{ key: 'blessed', label: { ar: 'سطر التهنئة', en: 'Blessing line' }, ar: 'رزقنا الله بأجمل العطايا', versions: { en: 'Blessed with a son' }, maxLength: 30 }];
+  const WORDING = [
+    { key: 'blessed', label: { ar: 'سطر التهنئة', en: 'Blessing line' }, ar: 'رزقنا الله بأجمل العطايا', versions: { en: 'Blessed with a son' }, maxLength: 30 },
+    { key: 'sonOf', label: { ar: 'بن', en: 'Son of' }, ar: 'بن', versions: { en: 'Son of', ckb: 'کوڕی' }, defaultIn: ['en' as const], maxLength: 12 },
+  ];
   let wshop: { themeKey: string; packageId: string };
 
   beforeAll(async () => {
@@ -176,14 +179,16 @@ describe('changeable lines of a design (manifest wording)', () => {
   const shown = async (id: string) => (await invitationRenderData(db(), await row(id), 'preview')).props.wording;
 
   it('is Arabic by default in every language; the language version and the customer’s own words are choices', async () => {
-    expect(await shown((await order('en')).invitationId)).toEqual({ blessed: 'رزقنا الله بأجمل العطايا' });
+    expect(await shown((await order('ar')).invitationId)).toEqual({ blessed: 'رزقنا الله بأجمل العطايا', sonOf: 'بن' });
+    // `defaultIn`: English orders default to the line's English version.
+    expect(await shown((await order('en')).invitationId)).toEqual({ blessed: 'رزقنا الله بأجمل العطايا', sonOf: 'Son of' });
 
-    const d = await order('en', { blessed: { choice: 'lang', text: '' } });
-    expect((await row(d.invitationId)).wording).toEqual({ blessed: 'Blessed with a son' });
-    expect(await shown(d.invitationId)).toEqual({ blessed: 'Blessed with a son' });
+    const d = await order('en', { blessed: { choice: 'lang', text: '' }, sonOf: { choice: 'ar', text: '' } });
+    expect((await row(d.invitationId)).wording).toEqual({ blessed: 'Blessed with a son', sonOf: 'بن' });
+    expect(await shown(d.invitationId)).toEqual({ blessed: 'Blessed with a son', sonOf: 'بن' });
 
-    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { wording: { blessed: { choice: 'custom', text: '  Our  little joy ' } } } });
-    expect(await shown(d.invitationId)).toEqual({ blessed: 'Our little joy' });
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { wording: { blessed: { choice: 'custom', text: '  Our  little joy ' }, sonOf: { choice: 'lang', text: '' } } } });
+    expect(await shown(d.invitationId)).toEqual({ blessed: 'Our little joy', sonOf: 'Son of' });
 
     await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { wording: { blessed: { choice: 'ar', text: 'ignored' } } } });
     expect((await row(d.invitationId)).wording).toEqual({});
@@ -202,6 +207,7 @@ describe('changeable lines of a design (manifest wording)', () => {
     const base = testManifest('wording-check', 1);
     expect(manifestSchema.safeParse({ ...base, wording: [...WORDING, ...WORDING] }).success).toBe(false);
     expect(manifestSchema.safeParse({ ...base, wording: [{ ...WORDING[0]!, maxLength: 5 }] }).success).toBe(false);
+    expect(manifestSchema.safeParse({ ...base, wording: [{ ...WORDING[1]!, defaultIn: ['bdn'] }] }).success).toBe(false);
     expect(manifestSchema.safeParse({ ...base, wording: WORDING }).success).toBe(true);
   });
 });

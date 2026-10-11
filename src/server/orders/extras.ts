@@ -7,7 +7,7 @@ import { MediaError } from '@/server/media/process';
 import { isBottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES } from '@/lib/birth-date-format';
 import type { Locale } from '@/i18n/config';
-import type { WordingLine } from '@/theme-sdk/manifest';
+import { wordingDefault, type WordingLine } from '@/theme-sdk/manifest';
 import { OrderError } from './common';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -24,8 +24,9 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `stickerShape` (sticker): round or square chocolate stickers;
  * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
  * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
- * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the default), `lang` (the
- *   design's version in the invitation's language) or `custom` with the customer's own text.
+ * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the Arabic), `lang` (the
+ *   design's version in the invitation's language) or `custom` with the customer's own text. What equals the
+ *   language's default is not stored, so the default follows a later change of language.
  */
 export type OrderExtras = {
   cardBack?: { title: string; message: string };
@@ -140,8 +141,10 @@ export async function extrasUpdate(
       if (!pick) continue;
       const version = inv.locale && inv.locale !== 'ar' ? line.versions?.[inv.locale] : undefined;
       const text = cleanLine(pick.text);
-      if (pick.choice === 'ar') delete next[line.key];
-      else if (pick.choice === 'lang' && version) next[line.key] = version;
+      const fallback = wordingDefault(line, inv.locale ?? 'ar');
+      const keep = (value: string) => (value === fallback ? delete next[line.key] : (next[line.key] = value));
+      if (pick.choice === 'ar') keep(line.ar);
+      else if (pick.choice === 'lang' && version) keep(version);
       else if (pick.choice === 'custom' && !text) errors[`w.${line.key}`] = 'required';
       else if (pick.choice === 'custom' && text.length > line.maxLength) errors[`w.${line.key}`] = 'tooLong';
       else if (pick.choice === 'custom' && /[<>]/.test(text)) errors[`w.${line.key}`] = 'invalidText';

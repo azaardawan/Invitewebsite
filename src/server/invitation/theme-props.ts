@@ -7,7 +7,7 @@ import { messagesFor } from '@/i18n/messages';
 import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type CalendarNames } from '@/lib/invitation-format';
 import { DEFAULT_BIRTH_DATE_FORMAT, formatBirthDate, type BirthDateFormat } from '@/lib/birth-date-format';
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
-import type { WordingLine } from '@/theme-sdk/manifest';
+import { wordingDefault, type WordingLine } from '@/theme-sdk/manifest';
 
 type InvitationMessages = ThemeLabels &
   CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string; and: string; youreInvited: string; endedTitle: string; endedBody: string; brand: string };
@@ -107,13 +107,13 @@ export function buildThemeProps(input: {
     border: input.border ?? null,
     occasion: input.occasion ?? null,
     birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
-    wording: resolveWording(input.wordingLines ?? [], input.wording ?? null),
+    wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
   };
 }
 
-/** Each changeable line: the customer's text when they chose one, else the Arabic default. */
-export function resolveWording(lines: readonly WordingLine[], chosen: Record<string, string> | null): Record<string, string> {
-  return Object.fromEntries(lines.map((l) => [l.key, chosen?.[l.key]?.trim() || l.ar]));
+/** Each changeable line: the customer's text when they chose one, else the default for the language. */
+export function resolveWording(lines: readonly WordingLine[], chosen: Record<string, string> | null, locale: Locale): Record<string, string> {
+  return Object.fromEntries(lines.map((l) => [l.key, chosen?.[l.key]?.trim() || wordingDefault(l, locale)]));
 }
 
 /** The date of birth's parts plus its lines in the customer's chosen style. */

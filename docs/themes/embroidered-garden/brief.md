@@ -28,9 +28,9 @@ Fixed text (not editable by the customer):
 - Always Arabic, in every language (owner decision): «الحمد لله الذي جعل لنا من زينة الحياة نصيبًا ومن الذكور حظًّا وسندًا»
   and the du'a «اللّهُمَّ أنبِتهُ نباتًا حسنًا واجعلهُ قُرّةَ عينٍ لنا، واجعَلهُ صغيرًا بارًّا وكبيرًا بارًّا».
 - Changeable by the customer on the order form (manifest `wording`): «رزقنا الله بأجمل العطايا» and «بن».
-  Arabic is the default in every language; the customer may pick their language's version (English "God has
-  blessed us with the most beautiful of gifts" / "son of"; Sorani «کوڕی», Badini «کوڕێ», owner's wording) or
-  write their own. No Kurdish blessing yet (owner to approve).
+  Arabic is the default, except «بن» on English orders, which defaults to "Son of" (owner). The customer may
+  pick their language's version (English "God has blessed us with the most beautiful of gifts" / "Son of";
+  Sorani «کوڕی», Badini «کوڕێ», owner's wording), the Arabic, or write their own. No Kurdish blessing yet (owner to approve).
 
 ## 3. Products and the customer's choices
 | Product | Text on it | Files | Chosen on the order form |

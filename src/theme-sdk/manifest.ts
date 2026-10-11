@@ -48,8 +48,9 @@ export type ThemeManifest = {
   onlineInvitation?: boolean;
   /**
    * Lines of the design's own wording the customer may change on the order form (never Quran or du'a):
-   * the Arabic is the default in every language; `versions` are offered as a choice for orders in that
-   * language; or the customer writes their own (up to `maxLength`). The theme reads `props.wording[key]`.
+   * the Arabic is the default (except in the languages listed in `defaultIn`, which default to their
+   * version); `versions` are offered as a choice for orders in that language; or the customer writes their
+   * own (up to `maxLength`). The theme reads `props.wording[key]`.
    */
   wording?: WordingLine[];
   /** Internal/demo themes can never be activated for sale. */
@@ -62,10 +63,18 @@ export type WordingLine = {
   label: { ar: string; en: string };
   /** The default text, in every language. */
   ar: string;
-  /** The same line in other languages, offered as a choice (never the default). */
+  /** The same line in other languages, offered as a choice. */
   versions?: Partial<Record<'en' | 'ckb' | 'bdn', string>>;
+  /** Languages whose version is the default instead of the Arabic. */
+  defaultIn?: readonly ('en' | 'ckb' | 'bdn')[];
   maxLength: number;
 };
+
+/** A line's default text for an invitation language: its version where `defaultIn` lists the language, else the Arabic. */
+export function wordingDefault(line: Pick<WordingLine, 'ar' | 'versions' | 'defaultIn'>, locale: string): string {
+  const l = locale as 'en' | 'ckb' | 'bdn';
+  return (line.defaultIn?.includes(l) && line.versions?.[l]) || line.ar;
+}
 
 export function defineTheme<const T extends ThemeManifest>(manifest: T): T {
   return manifest;
@@ -115,6 +124,7 @@ export const manifestSchema = z
           label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
           ar: z.string().min(1),
           versions: z.object({ en: z.string().min(1), ckb: z.string().min(1), bdn: z.string().min(1) }).partial().optional(),
+          defaultIn: z.array(z.enum(['en', 'ckb', 'bdn'])).optional(),
           maxLength: z.number().int().min(1).max(120),
         }),
       )
@@ -143,6 +153,7 @@ export const manifestSchema = z
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');
     for (const w of m.wording ?? []) {
+      for (const l of w.defaultIn ?? []) if (!w.versions?.[l]) issue(`wording.${w.key}: defaultIn ${l} has no version`);
       for (const text of [w.ar, ...Object.values(w.versions ?? {})]) if (text.length > w.maxLength) issue(`wording.${w.key}: "${text}" is longer than maxLength`);
     }
   });

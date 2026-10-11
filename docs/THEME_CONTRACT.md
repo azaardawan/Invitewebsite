@@ -32,9 +32,9 @@ themes/<key>/v<N>/
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
 - `wording`: lines of the design's own text the customer may change on the order form (never Quran or du'a),
-  each `{ key, label: {ar, en}, ar, versions?: {en?, ckb?, bdn?}, maxLength }`. The Arabic is the default in
-  every language; a version is offered as a choice for orders in that language; or the customer writes their
-  own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
+  each `{ key, label: {ar, en}, ar, versions?: {en?, ckb?, bdn?}, defaultIn?, maxLength }`. The Arabic is the
+  default, except in the languages listed in `defaultIn` (their version is); a version is offered as a choice
+  for orders in that language; or the customer writes their own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
 - `onlineInvitation: false` marks a **files-only** design (e.g. a newborn set: story, card, stickers,
   bottle label). It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
   and the storefront shows it as a picture, not in a phone frame. `Theme.tsx` is then only the preview.

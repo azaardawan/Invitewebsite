@@ -25,7 +25,7 @@ export type OrderFormExtras = {
    * invitation's language when it has one, or the customer's own words. `current` = what is stored (absent = Arabic).
    */
   wording?: {
-    lines: { key: string; label: string; ar: string; versions: Partial<Record<string, string>>; maxLength: number }[];
+    lines: { key: string; label: string; ar: string; versions: Partial<Record<string, string>>; defaultIn: string[]; maxLength: number }[];
     current: Record<string, string>;
   };
   /** Colour sets (color_choice): '' = the theme's own colours. */
@@ -387,9 +387,12 @@ function WordingLine({
   const t = useTranslations('store');
   const name = `w.${line.key}`;
   const version = lang !== 'ar' ? line.versions[lang] : undefined;
-  // What to show checked: what was just submitted, else what is stored (a known version or the customer's own).
-  const fromStored = !stored ? 'ar' : Object.values(line.versions).includes(stored) ? 'lang' : 'custom';
-  const [choice, setChoice] = useState(values?.[name] || fromStored);
+  // Nothing stored = the language's default (Arabic, or the version where the design makes it the default).
+  const defaultChoice = version && line.defaultIn.includes(lang) ? 'lang' : 'ar';
+  const fromStored = !stored ? null : stored === line.ar ? 'ar' : Object.values(line.versions).includes(stored) ? 'lang' : 'custom';
+  // What the customer picked (or just submitted); until then the default follows the language chosen above.
+  const [picked, setChoice] = useState<string | null>(values?.[name] || fromStored);
+  const choice = picked ?? defaultChoice;
   const shown = choice === 'lang' && !version ? 'ar' : choice;
   const option = 'flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20';
   return (
