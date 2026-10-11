@@ -21,8 +21,6 @@ export type DesignData = {
   father: string | null;
   /** The date of birth in the customer's chosen style (one or two lines). */
   birthLines: string[] | null;
-  /** The blessing line, as the customer chose it (Arabic by default). */
-  blessed: string;
   /** The father's line runs in the direction of its «son of» word (Arabic «بن» on an English order: right to left). */
   fatherAttrs: { lang?: string; dir?: 'rtl' | 'ltr' };
 };
@@ -44,13 +42,13 @@ export function designData(p: {
     name: p.fields.baby_name ?? '',
     father: p.fields.father_name ? `${sonOf} ${p.fields.father_name}` : null,
     birthLines: p.birthDate?.lines ?? null,
-    blessed: p.wording.blessed ?? BLESSED.ar,
     fatherAttrs: ownLang(sonOf, base),
   };
 }
 
 /** A line whose script differs from the design's language (Arabic wording on an English order, or the
  * reverse) gets its own `lang`/`dir`, so it is shaped and styled for its own script. */
+const BLESSED_LINE = { lang: 'ar', dir: 'rtl' } as const;
 function ownLang(text: string, d: { dir: 'rtl' | 'ltr' }) {
   const arabicScript = /[\u0600-\u06FF]/.test(text);
   if (arabicScript && d.dir === 'ltr') return { lang: 'ar', dir: 'rtl' as const };
@@ -127,8 +125,8 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
     <div className={`${styles.root} ${story ? styles.story : styles.card}`} dir={d.dir} lang={d.lang}>
       <Art src={story ? storyArt : cardArt} />
       <Lines lines={HAMD} className={`${styles.at} ${styles.hamd}`} arabic />
-      <p className={`${styles.at} ${styles.blessed}`} {...ownLang(d.blessed, d)}>
-        {d.blessed}
+      <p className={`${styles.at} ${styles.blessed}`} {...BLESSED_LINE}>
+        {BLESSED}
       </p>
       <div className={`${styles.at} ${styles.nameAt}`}>
         <Name name={d.name} size={fit(d.name, 64, story ? '23cqw' : '21cqw')} />
@@ -145,8 +143,8 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
   return (
     <div className={`${styles.root} ${styles.sticker} ${round ? styles.round : styles.square}`} dir={d.dir} lang={d.lang}>
       <Art src={round ? roundArt : squareArt} />
-      <p className={`${styles.at} ${styles.stBlessed}`} {...ownLang(d.blessed, d)}>
-        {d.blessed}
+      <p className={`${styles.at} ${styles.stBlessed}`} {...BLESSED_LINE}>
+        {BLESSED}
       </p>
       <div className={`${styles.at} ${styles.stName}`}>
         {/* English has two lines of wording above the name: a smaller largest size keeps them apart. */}
@@ -165,8 +163,8 @@ export function BottleDesign({ d }: { d: DesignData }) {
       <Art src={bottleArt} stretch />
       <div className={`${styles.at} ${styles.btRight}`}>
         <Lines lines={HAMD_PLAIN} className={styles.btVerse} arabic />
-        <p className={`${styles.btVerse} ${styles.btBlessed}`} {...ownLang(d.blessed, d)}>
-          {d.blessed}
+        <p className={`${styles.btVerse} ${styles.btBlessed}`} {...BLESSED_LINE}>
+          {BLESSED}
         </p>
       </div>
       <div className={`${styles.at} ${styles.btName}`}>
