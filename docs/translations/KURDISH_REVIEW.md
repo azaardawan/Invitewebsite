@@ -589,4 +589,4 @@ Order-form labels in the Embroidered Garden manifest (Kurdish shows the Arabic u
 Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts`; Kurdish uses the Arabic until approved;
 the Quran verse and du'a always stay Arabic):
 «رزقنا الله بأجمل العطايا» → stays Arabic in every language (owner, 2026-10-11): no Kurdish needed.
-«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوڕی», Badini «کوڕێ» (offered on the order form; Arabic stays the default).
+«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوڕی», Badini «کوڕێ» (the default on Kurdish orders; «بن» stays a choice).

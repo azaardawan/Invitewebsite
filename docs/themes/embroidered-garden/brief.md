@@ -29,8 +29,8 @@ Fixed text (not editable by the customer):
   and the du'a «اللّهُمَّ أنبِتهُ نباتًا حسنًا واجعلهُ قُرّةَ عينٍ لنا، واجعَلهُ صغيرًا بارًّا وكبيرًا بارًّا».
 - Fixed in every language (owner, 2026-10-11): the verse, the du'a and «رزقنا الله بأجمل العطايا».
 - The customer's: the names, the date, and the connector «بن» (manifest `wording`, on the order form):
-  "Son of" by default on English orders, «بن» elsewhere; Sorani «کوڕی», Badini «کوڕێ», the Arabic, or their
-  own word are choices.
+  by default "Son of" (English), «کوڕی» (Sorani), «کوڕێ» (Badini), «بن» (Arabic); «بن» or their own word
+  are choices.
 
 ## 3. Products and the customer's choices
 | Product | Text on it | Files | Chosen on the order form |
