@@ -4,6 +4,8 @@ import type { DbOrTx } from '@/server/db/client';
 import { invitations, themePalettes, type CardOptions } from '@/server/db/schema';
 import { storeSignature } from '@/server/media/assets';
 import { MediaError } from '@/server/media/process';
+import { isBottleSize } from '@/catalog/products';
+import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES } from '@/lib/birth-date-format';
 import { OrderError } from './common';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -17,13 +19,30 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  * - `signature` / `signature2` (signature): each a PNG data URL from a drawing pad, `keep` (unchanged) or
  *   `none`; the customer chooses one signature or two (the second is then `none`);
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
- * - `stickerShape` (sticker): round or square chocolate stickers.
+ * - `stickerShape` (sticker): round or square chocolate stickers;
+ * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
+ * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written.
  */
-export type OrderExtras = { cardBack?: { title: string; message: string }; signature?: string; signature2?: string; paletteId?: string; stickerShape?: string };
+export type OrderExtras = {
+  cardBack?: { title: string; message: string };
+  signature?: string;
+  signature2?: string;
+  paletteId?: string;
+  stickerShape?: string;
+  bottleSize?: string;
+  birthDateStyle?: string;
+  birthDateDigits?: string;
+};
 
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
-export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'>, extras: OrderExtras) {
-  const set: Partial<Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape'>> = {};
+export async function extrasUpdate(
+  db: DbOrTx,
+  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> & { fieldKeys?: readonly string[] },
+  extras: OrderExtras,
+) {
+  const set: Partial<
+    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits'>
+  > = {};
   const errors: Record<string, string> = {};
 
   if (extras.cardBack && inv.featureKeys.includes('print_card')) {
@@ -78,6 +97,24 @@ export async function extrasUpdate(db: DbOrTx, inv: Pick<InvitationRow, 'themeId
   if (extras.stickerShape !== undefined && inv.featureKeys.includes('sticker')) {
     if (extras.stickerShape === 'round' || extras.stickerShape === 'square') set.stickerShape = extras.stickerShape;
     else errors.stickerShape = 'invalid';
+  }
+
+  if (extras.bottleSize !== undefined && inv.featureKeys.includes('bottle_label')) {
+    if (isBottleSize(extras.bottleSize)) set.bottleSize = extras.bottleSize;
+    else errors.bottleSize = 'invalid';
+  }
+
+  if (inv.fieldKeys?.includes('birth_date')) {
+    const style = extras.birthDateStyle;
+    const digits = extras.birthDateDigits;
+    if (style !== undefined) {
+      if ((BIRTH_DATE_STYLES as readonly string[]).includes(style)) set.birthDateStyle = style as InvitationRow['birthDateStyle'];
+      else errors.birthDateStyle = 'invalid';
+    }
+    if (digits !== undefined) {
+      if ((BIRTH_DATE_DIGITS as readonly string[]).includes(digits)) set.birthDateDigits = digits as InvitationRow['birthDateDigits'];
+      else errors.birthDateStyle = 'invalid';
+    }
   }
 
   if (Object.keys(errors).length) throw new OrderError('invalidFields', errors);

@@ -1,4 +1,5 @@
 import 'server-only';
+import { manifestByCodeRef } from '@/theme-registry';
 import { selfEditState } from '@/server/invitation/customer-edit';
 import { keepsakeReady } from '@/server/documents/delivery';
 import { documentAvailable } from '@/server/documents/documents';
@@ -34,6 +35,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
     .where(eq(orders.receiptTokenHash, receiptTokenHash(token)));
   if (!row) return null;
   const snapshot = row.order.snapshot as OrderSnapshot;
+  // Designs without an online invitation (manifest `onlineInvitation: false`) sell files only: no link.
+  const onlineInvitation = manifestByCodeRef(snapshot.themeVersion.codeRef)?.onlineInvitation !== false;
   return {
     /** Internal id, for server-side follow-ups (payment checks); never rendered. */
     orderId: row.order.id,
@@ -69,7 +72,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       live: isLive(row.invitation, now),
       publishedAt: row.invitation.publishedAt,
       expiresAt: row.invitation.expiresAt,
-      path: row.invitation.publishedAt ? invitationPath(row.invitation.slug, row.invitation.publicId) : null,
+      onlineInvitation,
+      path: row.invitation.publishedAt && onlineInvitation ? invitationPath(row.invitation.slug, row.invitation.publicId) : null,
     },
   };
 }

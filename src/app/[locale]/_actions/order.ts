@@ -32,7 +32,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape') };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits') };
 }
 
 /** The optional order-form sections (card back, signature, colour set); absent sections are left alone. */
@@ -43,6 +43,9 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
   if (form.has('palette')) extras.paletteId = str(form, 'palette');
   if (form.has('stickerShape')) extras.stickerShape = str(form, 'stickerShape');
+  if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
+  if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
+  if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');
   return extras;
 }
 

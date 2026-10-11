@@ -11,6 +11,7 @@ import { ProductPages } from '@/app/print/ProductPages';
 const query = z.object({
   view: z.enum(['story', 'sticker', 'stickerSheet', 'bottle', 'bottleSheet']).default('story'),
   shape: z.enum(['round', 'square']).default('round'),
+  bottle: z.enum(['250', '330', '500', '600']).default('500'),
   gender: z.enum(['boy', 'girl']).default('boy'),
   /** Try a layout without saving it. */
   layout: z.string().max(20).optional(),
@@ -31,6 +32,6 @@ export default async function ProductSamplePreview({ params, searchParams }: Pag
     const slot = q.data.view.startsWith('sticker') ? 'sticker' : q.data.view.startsWith('bottle') ? 'bottle' : 'story';
     art[slot] = { ...(art[slot] ?? { src: '', ...CARD_SIDE_DEFAULTS, insetMm: slot === 'sticker' ? 4 : slot === 'bottle' ? 6 : 0 }), layout: q.data.layout };
   }
-  const data = productDataFrom(props, art, { stickerShape: q.data.shape, watermark: false });
+  const data = productDataFrom(props, art, { stickerShape: q.data.shape, bottleSize: q.data.bottle, watermark: false, codeRef: sample.version.codeRef });
   return <ProductPages view={q.data.view} data={data} />;
 }

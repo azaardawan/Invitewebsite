@@ -40,6 +40,12 @@ export type ThemeManifest = {
    * Admin and the customer picks one. Without it the theme keeps its fixed colours.
    */
   colors?: { slots: { key: string; label: { ar: string; en: string }; default: string }[] };
+  /**
+   * `false`: the design has no online invitation page; customers buy only its files (the printable card
+   * and newborn extras such as the story, stickers and bottle label). No public link, no QR code, nothing
+   * to share; `Theme.tsx` is used only for previews. Default `true`.
+   */
+  onlineInvitation?: boolean;
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
@@ -84,6 +90,7 @@ export const manifestSchema = z
           .max(8),
       })
       .optional(),
+    onlineInvitation: z.boolean().optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {

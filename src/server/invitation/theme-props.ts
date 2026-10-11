@@ -5,6 +5,7 @@ import type { FieldKey } from '@/catalog/fields';
 import { localeMeta, type Locale } from '@/i18n/config';
 import { messagesFor } from '@/i18n/messages';
 import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type CalendarNames } from '@/lib/invitation-format';
+import { DEFAULT_BIRTH_DATE_FORMAT, formatBirthDate, type BirthDateFormat } from '@/lib/birth-date-format';
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
 
 type InvitationMessages = ThemeLabels &
@@ -63,6 +64,8 @@ export function buildThemeProps(input: {
   colors?: Record<string, string> | null;
   /** The occasion (section key) the invitation is for. */
   occasion?: string | null;
+  /** How the customer wants the date of birth written (newborn); omitted = Gregorian, Arabic-Indic digits. */
+  birthDateFormat?: BirthDateFormat;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -99,8 +102,16 @@ export function buildThemeProps(input: {
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
     occasion: input.occasion ?? null,
-    birthDate: fields.birth_date ? formatEventDate(fields.birth_date, cal, msgs) : null,
+    birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
   };
+}
+
+/** The date of birth's parts plus its lines in the customer's chosen style. */
+function birthDateParts(date: string | undefined, locale: Locale, cal: string | null, msgs: InvitationMessages, format: BirthDateFormat) {
+  const parts = date ? formatEventDate(date, cal, msgs) : null;
+  if (!parts) return null;
+  const lines = formatBirthDate(date, format.style, format.digits, { locale, intlLocale: localeMeta[locale].intlLocale }, msgs) ?? [parts.full];
+  return { ...parts, lines };
 }
 
 /** The theme's colours: each slot's chosen colour (when valid) or its default. */

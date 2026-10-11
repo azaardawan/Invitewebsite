@@ -126,8 +126,14 @@ export type ThemeProps = {
    */
   occasion: string | null;
   /** Newborn: the date of birth (`fields.birth_date`) in the invitation's language, or null. */
-  birthDate: EventDateParts | null;
+  birthDate: BirthDateParts | null;
 };
+
+/**
+ * The date of birth: its parts, plus `lines`, the date written the way the customer chose on the order
+ * form (Gregorian, numeric, Hijri, or Gregorian + Hijri as two lines). Show `lines` wherever the date is printed.
+ */
+export type BirthDateParts = EventDateParts & { lines: string[] };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;
 

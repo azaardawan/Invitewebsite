@@ -5,6 +5,8 @@ import '@fontsource-variable/vazirmatn';
 import type React from 'react';
 import { FONTS, JUSTIFY, type ArtworkSide, type PrintLook } from './ArtworkCard';
 import { TINT, mix } from './look';
+import { BOTTLE_GAP_MM, BOTTLE_SIZES, bottlesPerSheet, type BottleSize } from '@/catalog/products';
+import type { PrintExtraProps } from '@/theme-sdk/print';
 export { tintedLook } from './look';
 
 /**
@@ -29,14 +31,24 @@ export type ProductData = {
   /** The owner's settings per extra (null = defaults on the shared look). */
   design: { story: ArtworkSide | null; sticker: ArtworkSide | null; bottle: ArtworkSide | null };
   stickerShape: 'round' | 'square';
+  /** The bottle the label wraps (sizes in src/catalog/products.ts). */
+  bottleSize: BottleSize;
   watermark: boolean;
+  /** For a design that draws its own extras (print/Story.tsx …): its code and what it is given. */
+  theme: { codeRef: string; props: Omit<PrintExtraProps, 'shape' | 'size'> } | null;
 };
 
-/** Sizes in mm (story in CSS px). A 4 cm sticker suits chocolates; the label wraps a 0.5 L bottle (≈ 21 cm round). */
+/** A bottle label's size in mm. */
+export function bottleDims(size: BottleSize) {
+  return BOTTLE_SIZES[size];
+}
+
+
+/** Sizes in mm (story in CSS px). A 4 cm sticker suits chocolates; bottle labels come in four sizes (`bottleDims`). */
 export const PRODUCT_SIZES = {
   story: { width: 1080, height: 1920 },
   sticker: { mm: 40, gapMm: 4 },
-  bottle: { width: 215, height: 55, gapMm: 6 },
+  bottle: { gapMm: BOTTLE_GAP_MM },
 } as const;
 
 type Style = {
@@ -232,15 +244,15 @@ export function Sticker({ d, cutLine = false }: { d: ProductData; cutLine?: bool
 }
 
 /** An A4 sheet of stickers (4 × 6 = 24) with light cut lines, at their real size. */
-export function StickerSheet({ d }: { d: ProductData }) {
+export function StickerSheet({ d, sticker }: { d: ProductData; sticker?: (d: ProductData) => React.ReactNode }) {
   const { mm, gapMm } = PRODUCT_SIZES.sticker;
   const cols = 4;
   const rows = 6;
   return (
     <div style={{ width: '210mm', height: '297mm', position: 'relative', display: 'grid', placeContent: 'center', gridTemplateColumns: `repeat(${cols}, ${mm}mm)`, gridAutoRows: `${mm}mm`, gap: `${gapMm}mm` }}>
-      {Array.from({ length: cols * rows }, (_, i) => (
-        <Sticker key={i} d={{ ...d, watermark: false }} cutLine />
-      ))}
+      {Array.from({ length: cols * rows }, (_, i) =>
+        sticker ? <div key={i}>{sticker({ ...d, watermark: false })}</div> : <Sticker key={i} d={{ ...d, watermark: false }} cutLine />,
+      )}
       {d.watermark ? <Watermark labels={d.labels} /> : null}
     </div>
   );
@@ -251,7 +263,7 @@ export function StickerSheet({ d }: { d: ProductData }) {
 /** One water bottle label (wraps a 0.5 L bottle with a small overlap) in one of three layouts. */
 export function BottleLabel({ d, cutLine = false }: { d: ProductData; cutLine?: boolean }) {
   const s = styleOf(d.design.bottle, d, { inset: 6, layout: 'classic' });
-  const { width, height } = PRODUCT_SIZES.bottle;
+  const { width, height } = bottleDims(d.bottleSize);
   const name = (mm: number, color = s.accent) => (d.babyName ? <p style={{ margin: 0, fontFamily: s.heading, fontWeight: 700, fontSize: `${mm * s.scale}mm`, lineHeight: 1.4, paddingBottom: '1.4mm', color, overflowWrap: 'anywhere' }}>{d.babyName}</p> : null);
   const quote = s.show.quote && d.quote ? <p style={{ margin: 0, fontSize: `${3.2 * s.scale}mm`, lineHeight: 1.4 }}>{d.quote}</p> : null;
   const details = [s.show.date ? d.birthDate : null, s.show.parents ? d.parents : null].filter(Boolean).join(' · ');
@@ -307,13 +319,13 @@ export function BottleLabel({ d, cutLine = false }: { d: ProductData; cutLine?: 
   );
 }
 
-/** An A4 landscape sheet of three labels with light cut lines, at their real size. */
-export function BottleSheet({ d }: { d: ProductData }) {
+/** An A4 landscape sheet of as many labels as fit (three for most sizes), with light cut lines, at their real size. */
+export function BottleSheet({ d, label }: { d: ProductData; label?: (d: ProductData) => React.ReactNode }) {
   return (
     <div style={{ width: '297mm', height: '210mm', position: 'relative', display: 'grid', placeContent: 'center', gap: `${PRODUCT_SIZES.bottle.gapMm}mm` }}>
-      {[0, 1, 2].map((i) => (
-        <BottleLabel key={i} d={{ ...d, watermark: false }} cutLine />
-      ))}
+      {Array.from({ length: bottlesPerSheet(d.bottleSize) }, (_, i) =>
+        label ? <div key={i}>{label({ ...d, watermark: false })}</div> : <BottleLabel key={i} d={{ ...d, watermark: false }} cutLine />,
+      )}
       {d.watermark ? <Watermark labels={d.labels} /> : null}
     </div>
   );

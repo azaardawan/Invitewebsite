@@ -58,11 +58,13 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
     colors: inv.colors,
     occasion: await occasionKey(db, inv.sectionId),
+    birthDateFormat: { style: inv.birthDateStyle, digits: inv.birthDateDigits },
   });
 
   if (kind === 'card' || kind === 'cardBleed') {
     const opts = inv.cardOptions ?? {};
-    const qrUrl = opts.showQr !== false ? invitationUrl(inv) : null;
+    // A design without an online invitation has nothing for a QR code to open.
+    const qrUrl = opts.showQr !== false && manifest?.onlineInvitation !== false ? invitationUrl(inv) : null;
     const artwork = await themeArtwork(db, inv.themeId);
     return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look)) };
   }
