@@ -9,8 +9,8 @@ import { printData } from '@/server/documents/data';
 import { renderProduct, type ProductItem, type ProductRenderer } from '@/server/documents/render';
 import { isPaid, productData } from './data';
 
-/** Bump to regenerate every stored extra after a design change in the platform's components (2: denser watermark, note across the middle). */
-const PRODUCT_PIPELINE_VERSION = 2;
+/** Bump to regenerate every stored extra after a design change in the platform's components (2: denser watermark; 3: the note only). */
+const PRODUCT_PIPELINE_VERSION = 3;
 
 const KIND = {
   'story.png': 'STORY_PNG',
