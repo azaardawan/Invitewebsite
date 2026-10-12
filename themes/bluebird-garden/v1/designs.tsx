@@ -160,7 +160,7 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
       <Piece src={birdLeft} className={styles.birdL} />
       <Piece src={birdRight} className={styles.birdR} />
       {round ? <span aria-hidden className={styles.ring} /> : null}
-      <Name name={d.name} size={fit(d.name, 46, '20cqw')} className={styles.stName} />
+      <Name name={d.name} size={fit(d.name, 46, father ? '16cqw' : '20cqw')} className={styles.stName} />
       {father ? <Father d={d} className={styles.stFather} /> : null}
     </div>
   );
@@ -176,7 +176,7 @@ export function BottleDesign({ d }: { d: DesignData }) {
       <Piece src={flowersRight} className={styles.flR} />
       <Piece src={birdLeft} className={styles.birdL} />
       <Piece src={birdRight} className={styles.birdR} />
-      <Name name={d.name} size={fit(d.name, 120, '52cqh', 'cqh')} className={styles.btName} />
+      <Name name={d.name} size={fit(d.name, 120, father ? '40cqh' : '52cqh', 'cqh')} className={styles.btName} />
       {father ? <Father d={d} className={styles.btFather} /> : null}
     </div>
   );
