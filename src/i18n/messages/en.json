@@ -1061,8 +1061,7 @@
       "baby_name": "Adam",
       "mother_name": "Noor",
       "father_name": "Ali",
-      "baby_quote": "Our little star has arrived",
-      "girl_baby_name": "Reem"
+      "baby_quote": "Our little star has arrived"
     },
     "long": {
       "person_1_name": "Abdulrahman",
@@ -1073,15 +1072,24 @@
       "baby_name": "Abdul Rahman",
       "mother_name": "Fatima Al-Zahraa",
       "father_name": "Mohammed Al-Hasani",
-      "baby_quote": "A new heart has joined our family, and our home is full of joy",
-      "girl_baby_name": "Noor Al-Huda"
+      "baby_quote": "A new heart has joined our family, and our home is full of joy"
     },
     "m1Name": "Sara",
     "m1Text": "Congratulations! Wishing you a lifetime of love and happiness.",
     "m2Name": "Ahmed",
     "m2Text": "Mabrook to you both, may your home be full of joy.",
     "m3Name": "Laila",
-    "m3Text": "So happy for you. See you at the celebration!"
+    "m3Text": "So happy for you. See you at the celebration!",
+    "names": {
+      "boy": "Adam|Yousif|Hamza|Zain|Laith|Taim|Yazan|Saleem|Elias|Karam|Malik|Yaseen|Anas|Aws|Raad|Saqr|Hadi|Basil|Rayan|Saif",
+      "boyLong": "Abdul Rahman|Mohammed Al-Amin|Abdullah|Nour Al-Din|Saif Al-Din|Abdul Aziz|Zain Al-Abideen|Salah Al-Din|Abdul Malik|Abdul Karim|Alaa Al-Din|Abdul Wahab|Shams Al-Din|Badr Al-Din|Abdul Raheem|Abdul Hadi|Izz Al-Din|Abdul Basit|Muhyi Al-Din|Abdul Latif",
+      "girl": "Reem|Leen|Maryam|Sara|Layan|Tala|Haya|Rahaf|Jana|Salma|Mayar|Dana|Lara|Yara|Malak|Razan|Ghina|Joury|Shahad|Masa",
+      "girlLong": "Noor Al-Huda|Fatima Al-Zahraa|Sidrat Al-Muntaha|Shams Al-Duha|Noor Al-Yaqeen|Ayat Al-Rahman|Hibat Al-Rahman|Diaa Al-Huda|Noor Al-Iman|Zahrat Al-Rabee|Bint Al-Huda|Rooh Al-Fuad",
+      "man": "Ali|Ahmed|Hussein|Mustafa|Karrar|Haider|Sajjad|Ammar|Yasir|Khalid|Samer|Wisam|Rami|Maher|Nabil|Tariq|Firas|Ziad|Muhannad|Ayman",
+      "manLong": "Mohammed Al-Hasani|Ahmed Al-Jubouri|Hussein Al-Obaidi|Mustafa Al-Rubaie|Ali Al-Saadi|Haider Al-Mousawi|Ammar Al-Tamimi|Khalid Al-Dulaimi|Samer Al-Azzawi|Yasir Al-Khafaji|Tariq Al-Shammari|Ziad Al-Kubaisi",
+      "woman": "Noor|Zainab|Ruqaya|Huda|Duaa|Alaa|Rana|Shaimaa|Marwa|Israa|Ban|Sura|Hiba|Rasha|Nadia|Aseel|Dina|Lama|Raghad|Duha",
+      "womanLong": "Zahraa Al-Mousawi|Huda Al-Obaidi|Ruqaya Al-Saadi|Alaa Al-Tamimi|Duaa Al-Rubaie|Marwa Al-Khafaji|Israa Al-Dulaimi|Sura Al-Azzawi|Rana Al-Shammari|Hiba Al-Kubaisi|Shaimaa Al-Jubouri|Ban Al-Karkhi"
+    }
   },
   "receipt": {
     "title": "Order receipt",

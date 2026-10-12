@@ -10,6 +10,7 @@ import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps, sampleValues } from './theme-props';
 import { occasionKey } from './load';
 import { themeOccasions } from '@/server/catalog/occasions';
+import { themeNumber } from '@/theme-registry';
 
 export type SampleRequest = {
   themeKey: string;
@@ -76,7 +77,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     locale: req.locale,
     fieldKeys,
     features,
-    values: sampleValues(req.locale, req.names ?? 'short', undefined, group?.key === 'girl' ? 'girl' : 'boy'),
+    values: sampleValues(req.locale, req.names ?? 'short', { babyGender: group?.key === 'girl' ? 'girl' : 'boy', seed: themeNumber(theme.key) }),
     musicSrc: music ? publicMediaUrl(music.key) : null,
     border: await themeBorder(db, theme.id),
     colorSlots: manifest.colors?.slots ?? [],

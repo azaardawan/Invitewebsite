@@ -1,4 +1,5 @@
 import 'server-only';
+import { sampleNames, type SampleNameLists } from '@/catalog/sample-names';
 import type { ThemeBorderSpec } from '@/theme-sdk/border';
 import type { FeatureKey } from '@/catalog/features';
 import type { FieldKey } from '@/catalog/fields';
@@ -155,13 +156,29 @@ function sampleGuestbook(locale: Locale) {
   return [1, 2, 3].map((i) => ({ guestName: s[`m${i}Name`] ?? '', message: s[`m${i}Text`] ?? '' })).filter((m) => m.guestName && m.message);
 }
 
-/** Sample content for theme previews (short or long names), in the invitation language. */
-export function sampleValues(locale: Locale, variant: 'short' | 'long', now = new Date(), babyGender: 'boy' | 'girl' = 'boy'): Record<string, string> {
-  const { girl_baby_name: girlName, ...samples } = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> })
-    .invitationSamples[variant];
+/**
+ * Sample content for theme previews (short or long names), in the invitation language. `seed` (the design's
+ * permanent number) picks its own example names, so designs don't all show the same ones; a design for a girl
+ * shows a girl's name.
+ */
+export function sampleValues(
+  locale: Locale,
+  variant: 'short' | 'long',
+  opts: { now?: Date; babyGender?: 'boy' | 'girl'; seed?: number } = {},
+): Record<string, string> {
+  const { names, ...all } = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> & { names: SampleNameLists } })
+    .invitationSamples;
+  const now = opts.now ?? new Date();
+  const babyGender = opts.babyGender ?? 'boy';
   const date = new Date(now.getTime() + 45 * 86400000).toISOString().slice(0, 10);
   const born = new Date(now.getTime() - 5 * 86400000).toISOString().slice(0, 10);
-  // A design for a girl shows a girl's name in its samples.
-  const baby: Record<string, string> = babyGender === 'girl' && girlName ? { baby_name: girlName } : {};
-  return { ...samples, ...baby, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad', baby_gender: babyGender, birth_date: born };
+  return {
+    ...all[variant],
+    ...sampleNames(names, { seed: opts.seed, variant, babyGender }),
+    event_date: date,
+    event_time: '19:30',
+    venue_map_url: 'https://maps.google.com/?q=Baghdad',
+    baby_gender: babyGender,
+    birth_date: born,
+  };
 }
