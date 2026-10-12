@@ -45,6 +45,7 @@ Customer choices on the order form:
 | A5 card (bleed 3 mm) | the same as the story |
 | Stickers 40 mm | name (+ father if ticked), birds, flowers; round has a blue ring |
 | Bottle label | name (+ father if ticked), birds, flowers |
+| A5 card back (landscape) | the customer's title in blue glass, their message, the baby's name; paper, delphiniums and birds as on the front |
 
 Before payment everything is watermarked by the platform; files are served only once paid.
 Packages and the cover are set by the owner in Admin.

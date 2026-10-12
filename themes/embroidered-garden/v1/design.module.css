@@ -276,10 +276,68 @@
 }
 
 /* ---- Boxes the design draws in (the extras get theirs from the platform) ---- */
+/* ---- Back of the A5 card (landscape): linen, the card's four embroidered corners ---- */
+.corner {
+  position: absolute;
+  width: 31.3cqw;
+  height: auto;
+  pointer-events: none;
+}
+
+.corner0 {
+  left: 0;
+  top: 0;
+}
+
+.corner1 {
+  right: 0;
+  top: 0;
+}
+
+.corner2 {
+  left: 0;
+  bottom: 0;
+}
+
+.corner3 {
+  right: 0;
+  bottom: 0;
+}
+
+.backColumn {
+  position: absolute;
+  inset: 12% 27%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5cqh;
+}
+
+.backColumn .name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.backMessage {
+  font-size: 2.4cqw;
+  line-height: 1.9;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 .cardBox {
   position: relative;
   width: 154mm;
   height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
   overflow: hidden;
   container-type: size;
 }

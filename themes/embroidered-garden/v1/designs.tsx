@@ -7,6 +7,11 @@ import cardArt from './assets/card.webp';
 import roundArt from './assets/sticker-round.webp';
 import squareArt from './assets/sticker-square.webp';
 import bottleArt from './assets/bottle.webp';
+import backPaper from './assets/back-paper.webp';
+import cornerTl from './assets/back-corner-tl.webp';
+import cornerTr from './assets/back-corner-tr.webp';
+import cornerBl from './assets/back-corner-bl.webp';
+import cornerBr from './assets/back-corner-br.webp';
 
 /**
  * The owner's five designs (docs/themes/embroidered-garden/owner-designs/) with the customer's details
@@ -173,6 +178,35 @@ export function BottleDesign({ d }: { d: DesignData }) {
       {d.father ? <p className={`${styles.at} ${styles.btFather}`} {...d.fatherAttrs}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines ? [d.birthLines.join(' · ')] : null} className={styles.btDate} />
       <Lines lines={DUA_PLAIN} className={`${styles.at} ${styles.btLeft} ${styles.btVerse}`} arabic />
+    </div>
+  );
+}
+
+/** Stitched lettering that may wrap (the back's title and name). */
+function Stitched({ text, size, d }: { text: string; size: string; d: DesignData }) {
+  return (
+    <p className={styles.name} style={{ fontSize: size }} {...ownLang(text, d)}>
+      <span className={styles.thread}>{text}</span>
+    </p>
+  );
+}
+
+/**
+ * The back of the A5 card (landscape): the same linen with the card's embroidered corners; the customer's
+ * title stitched in sage, their message, then the baby's name.
+ */
+export function CardBackDesign({ d, title, message }: { d: DesignData; title: string; message: string | null }) {
+  return (
+    <div className={styles.root} dir={d.dir} lang={d.lang}>
+      <Art src={backPaper} />
+      {[cornerTl, cornerTr, cornerBl, cornerBr].map((src, i) => (
+        <Image key={i} src={src} alt="" aria-hidden unoptimized priority className={`${styles.corner} ${styles[`corner${i}`] ?? ''}`} />
+      ))}
+      <div className={styles.backColumn}>
+        <Stitched text={title} size={fit(title, 46, '9cqw')} d={d} />
+        {message ? <p className={styles.backMessage}>{message}</p> : null}
+        {d.name ? <Stitched text={d.name} size={fit(d.name, 24, '5.6cqw')} d={d} /> : null}
+      </div>
     </div>
   );
 }

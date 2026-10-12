@@ -52,3 +52,7 @@ so names are set as live text. The art is about 175–270 dpi at print size.
 - Baby's name: **Marhey** Bold (owner's choice, #12 on the comparison sheet), filled with a sage
   satin-stitch thread texture.
 - Story and card text: **Noto Sans Arabic**. Sticker and bottle-wrap text: **Aref Ruqaa** (as in the owner's designs).
+
+## Card back
+The A5 card's back (landscape, `print/CardBack.tsx`): the front's linen with its four embroidered corners
+(`assets/back-*.webp`, cut from the owner's card), the customer's title stitched in sage, their message and the baby's name.

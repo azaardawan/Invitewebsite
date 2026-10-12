@@ -181,3 +181,35 @@ export function BottleDesign({ d }: { d: DesignData }) {
     </div>
   );
 }
+
+/** Glass lettering that may wrap (the back's title and name), centred in its column. */
+function GlassText({ text, size, dir }: { text: string; size: string; dir: 'rtl' | 'ltr' }) {
+  return (
+    <p className={styles.name} style={{ fontSize: size }} {...ownLang(text, dir)}>
+      <span className={styles.glass} data-text={text}>
+        {text}
+      </span>
+    </p>
+  );
+}
+
+/**
+ * The back of the A5 card (landscape): the same paper, delphiniums and birds as the front; the customer's
+ * title in blue glass, their message, then the baby's name.
+ */
+export function CardBackDesign({ d, title, message }: { d: DesignData; title: string; message: string | null }) {
+  return (
+    <div className={`${styles.root} ${styles.back}`} dir={d.dir} lang={d.lang}>
+      <Paper />
+      <Piece src={flowersLeft} className={styles.flL} />
+      <Piece src={flowersRight} className={styles.flR} />
+      <Piece src={birdLeft} className={styles.birdL} />
+      <Piece src={birdRight} className={styles.birdR} />
+      <div className={styles.backColumn}>
+        <GlassText text={title} size={fit(title, 50, '10cqw')} dir={d.dir} />
+        {message ? <p className={styles.backMessage}>{message}</p> : null}
+        {d.name ? <GlassText text={d.name} size={fit(d.name, 26, '6.4cqw')} dir={d.dir} /> : null}
+      </div>
+    </div>
+  );
+}
