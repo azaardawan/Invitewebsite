@@ -379,11 +379,70 @@
   font-size: 11cqh;
 }
 
+/* ---- Back of the A5 card (landscape) ---- */
+.back .flL,
+.back .flR {
+  height: 96cqh;
+  width: auto;
+  bottom: -8%;
+}
+
+.back .flL {
+  left: -9%;
+}
+
+.back .flR {
+  right: -9%;
+}
+
+.back .birdL {
+  left: 21%;
+  top: 8%;
+  width: 8.5cqw;
+}
+
+.back .birdR {
+  right: 21%;
+  top: 11%;
+  width: 8cqw;
+}
+
+.backColumn {
+  position: absolute;
+  inset: 14% 25% 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+}
+
+.backColumn .name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.backMessage {
+  font-size: 2.5cqw;
+  line-height: 1.9;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 /* ---- Boxes the design draws in (the extras get theirs from the platform) ---- */
 .cardBox {
   position: relative;
   width: 154mm;
   height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
   overflow: hidden;
   container-type: size;
 }
