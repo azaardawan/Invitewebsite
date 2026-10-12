@@ -86,3 +86,12 @@ describe('theme props (the Theme Contract)', () => {
     expect(p.mapUrl).toBeNull();
   });
 });
+
+describe('sample names', () => {
+  it("a design for a girl shows a girl's name; boys' designs keep the boy's", () => {
+    expect(sampleValues('ar', 'short').baby_name).toBe('آدم');
+    expect(sampleValues('ar', 'short', undefined, 'girl')).toMatchObject({ baby_name: 'ريم', baby_gender: 'girl' });
+    expect(sampleValues('en', 'long', undefined, 'girl').baby_name).toBe('Noor Al-Huda');
+    expect(sampleValues('ar', 'short')).not.toHaveProperty('girl_baby_name');
+  });
+});

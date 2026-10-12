@@ -156,10 +156,12 @@ function sampleGuestbook(locale: Locale) {
 }
 
 /** Sample content for theme previews (short or long names), in the invitation language. */
-export function sampleValues(locale: Locale, variant: 'short' | 'long', now = new Date()): Record<string, string> {
-  const samples = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> })
+export function sampleValues(locale: Locale, variant: 'short' | 'long', now = new Date(), babyGender: 'boy' | 'girl' = 'boy'): Record<string, string> {
+  const { girl_baby_name: girlName, ...samples } = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> })
     .invitationSamples[variant];
   const date = new Date(now.getTime() + 45 * 86400000).toISOString().slice(0, 10);
   const born = new Date(now.getTime() - 5 * 86400000).toISOString().slice(0, 10);
-  return { ...samples, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad', baby_gender: 'boy', birth_date: born };
+  // A design for a girl shows a girl's name in its samples.
+  const baby: Record<string, string> = babyGender === 'girl' && girlName ? { baby_name: girlName } : {};
+  return { ...samples, ...baby, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad', baby_gender: babyGender, birth_date: born };
 }

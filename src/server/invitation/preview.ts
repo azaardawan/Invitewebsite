@@ -1,7 +1,7 @@
 import 'server-only';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { assets, musicTracks, themeVersions, themes } from '@/server/db/schema';
+import { assets, musicTracks, subsections, themeVersions, themes } from '@/server/db/schema';
 import { packagesWithShape } from '@/server/catalog/themes';
 import type { Locale } from '@/i18n/config';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -68,12 +68,15 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
         .where(eq(musicTracks.id, theme.musicTrackId))
     : [];
 
+  // A design in the newborn "girl" group shows a girl's example name.
+  const [group] = theme.subsectionId ? await db.select({ key: subsections.key }).from(subsections).where(eq(subsections.id, theme.subsectionId)) : [];
+
   const props = buildThemeProps({
     mode: 'sample',
     locale: req.locale,
     fieldKeys,
     features,
-    values: sampleValues(req.locale, req.names ?? 'short'),
+    values: sampleValues(req.locale, req.names ?? 'short', undefined, group?.key === 'girl' ? 'girl' : 'boy'),
     musicSrc: music ? publicMediaUrl(music.key) : null,
     border: await themeBorder(db, theme.id),
     colorSlots: manifest.colors?.slots ?? [],
