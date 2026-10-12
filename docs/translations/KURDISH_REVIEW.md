@@ -607,3 +607,7 @@ Order-form labels in the Rosebird Garden manifest (#8, `themes/rosebird-garden/v
 
 Text inside the Rosebird Garden design: «بنت» (daughter of) → ✅ owner (2026-10-12): Sorani «کچی», Badini «کچا»
 (the default on Kurdish orders; «بنت» stays a choice). The praise lines, birth-order line and du'a stay Arabic.
+
+Example names for girl designs (`invitationSamples.short|long.girl_baby_name`; Kurdish previews show the Arabic until approved):
+- short «ريم» / Reem → Sorani: ڕۆژان / Badini: ڕۆژان (◐)
+- long «نور الهدى» / Noor Al-Huda → Sorani: نوورولهودا / Badini: نوورولهودا (◐)
