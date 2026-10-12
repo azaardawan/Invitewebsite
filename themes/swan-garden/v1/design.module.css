@@ -1,0 +1,539 @@
+/* Swan Garden, rebuilt from the owner's pieces. Positions follow the owner's designs (% of the box). */
+
+/* The name: Lalezar (owner's choice pending), in pink glass. */
+@font-face {
+  font-family: 'SG Glass';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/lalezar-arabic-400-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+@font-face {
+  font-family: 'SG Glass';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/lalezar-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+/* The small text: Tajawal, as in the owner's design. It has no Kurdish letters (ڕ ێ ۆ ڵ ە …): those come from Noto. */
+@font-face {
+  font-family: 'SG Sans';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/tajawal-arabic-400-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+@font-face {
+  font-family: 'SG Sans';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/tajawal-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'SG Noto';
+  font-weight: 100 900;
+  font-display: block;
+  src: url('./fonts/noto-sans-arabic-arabic-wght-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #c27685;
+  font-family: 'SG Sans', 'SG Noto', sans-serif;
+  font-weight: 400;
+  text-align: center;
+  background: #efe9e0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.root p {
+  margin: 0;
+}
+
+.linen {
+  object-fit: cover;
+}
+
+.piece {
+  position: absolute;
+  height: auto;
+  pointer-events: none;
+}
+
+.line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* A line of text centred on a point: `--x`/`--y` are its centre, in % of the box. */
+.at {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y);
+  translate: -50% -50%;
+  white-space: nowrap;
+}
+
+/* ---- The name: pink glass ---- */
+.name {
+  font-family: 'SG Glass', 'SG Noto', sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+.glass {
+  position: relative;
+  display: inline-block;
+  padding: 0 0.08em;
+  color: transparent;
+  background: linear-gradient(180deg, #fff4f6 0%, #f7c9d3 22%, #eaa2b3 46%, #d98599 58%, #f2bccb 76%, #fff1f4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 0.012em rgba(196, 112, 135, 0.8);
+  filter: drop-shadow(0 0.03em 0.025em rgba(160, 80, 105, 0.35)) drop-shadow(0 0 0.05em rgba(255, 205, 218, 0.85));
+}
+
+/* The shine: a white highlight laid over the same letters. */
+.glass::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  padding: 0 0.08em;
+  color: transparent;
+  -webkit-text-stroke: 0;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95) 0 14%, rgba(255, 255, 255, 0) 26% 58%, rgba(255, 255, 255, 0.6) 66%, rgba(255, 255, 255, 0) 76%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* «بنت …» in green, as in the owner's design. */
+.father {
+  color: #5e7a36;
+}
+
+.date {
+  color: #8f7d6a;
+}
+
+.date .line + .line {
+  font-size: 0.85em;
+}
+
+.handle {
+  font-family: 'SG Sans', sans-serif;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  text-shadow: 0 0 0.2em rgba(120, 60, 80, 0.8), 0 0 0.5em rgba(120, 60, 80, 0.5);
+}
+
+/* ---- Story (1080 × 1920) and A5 card ---- */
+.story .praise {
+  --y: 11.6%;
+  font-size: 4.3cqw;
+  line-height: 1.65;
+}
+
+.story .gift {
+  --y: 21.6%;
+  font-size: 4.3cqw;
+}
+
+.story .nameAt {
+  --y: 41%;
+}
+
+.story .fatherAt {
+  --y: 53.2%;
+  font-size: 3.9cqw;
+}
+
+.story .dateAt {
+  --y: 57%;
+  font-size: 3.3cqw;
+  line-height: 1.5;
+}
+
+.story .dua {
+  --y: 64.6%;
+  font-size: 4.2cqw;
+  line-height: 1.8;
+}
+
+.story .water {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 15%;
+  object-fit: cover;
+}
+
+.story .swanBow {
+  left: 19%;
+  bottom: 6%;
+  width: 35cqw;
+}
+
+.story .swan {
+  left: 43%;
+  bottom: 3.6%;
+  width: 33cqw;
+}
+
+.story .flL,
+.story .flR {
+  width: 52cqw;
+  bottom: -6%;
+}
+
+.story .flL {
+  left: -9%;
+}
+
+.story .flR {
+  right: -9%;
+}
+
+.story .bellsL,
+.story .bellsR {
+  width: 26cqw;
+  top: 58.5%;
+}
+
+.story .bellsL {
+  left: -4%;
+}
+
+.story .bellsR {
+  right: -4%;
+}
+
+.story .handle {
+  --y: 98.6%;
+  font-size: 2.6cqw;
+}
+
+.card .praise {
+  --y: 9.4%;
+  font-size: 3.6cqw;
+  line-height: 1.65;
+}
+
+.card .gift {
+  --y: 17.6%;
+  font-size: 3.6cqw;
+}
+
+.card .nameAt {
+  --y: 31.6%;
+}
+
+.card .fatherAt {
+  --y: 43.6%;
+  font-size: 3.3cqw;
+}
+
+.card .dateAt {
+  --y: 47.2%;
+  font-size: 2.7cqw;
+  line-height: 1.4;
+}
+
+.card .dua {
+  --y: 54.6%;
+  font-size: 3.5cqw;
+  line-height: 1.8;
+}
+
+.card .water {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 16%;
+  object-fit: cover;
+}
+
+.card .swanBow {
+  left: 21%;
+  bottom: 7%;
+  width: 30cqw;
+}
+
+.card .swan {
+  left: 44%;
+  bottom: 4.6%;
+  width: 28cqw;
+}
+
+.card .flL,
+.card .flR {
+  width: 49cqw;
+  bottom: -3%;
+}
+
+.card .flL {
+  left: -10%;
+}
+
+.card .flR {
+  right: -10%;
+}
+
+.card .bellsL,
+.card .bellsR {
+  width: 21cqw;
+  top: 47%;
+}
+
+.card .bellsL {
+  left: -5%;
+}
+
+.card .bellsR {
+  right: -5%;
+}
+
+.card .handle {
+  --y: 97.4%;
+  font-size: 2.1cqw;
+}
+
+/* ---- Chocolate stickers (40 mm) ---- */
+.sticker .water {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 32%;
+  object-fit: cover;
+}
+
+.sticker .swanBow {
+  left: 19%;
+  bottom: 11%;
+  width: 34cqw;
+}
+
+.sticker .swan {
+  left: 45%;
+  bottom: 8%;
+  width: 31cqw;
+}
+
+.sticker .flL,
+.sticker .flR {
+  width: 50cqw;
+  bottom: -8%;
+}
+
+.sticker .flL {
+  left: -16%;
+}
+
+.sticker .flR {
+  right: -16%;
+}
+
+.sticker .bellsL,
+.sticker .bellsR {
+  width: 22cqw;
+  top: 16%;
+}
+
+.sticker .bellsL {
+  left: -1%;
+}
+
+.sticker .bellsR {
+  right: -1%;
+}
+
+.round .flL {
+  left: -10%;
+}
+
+.round .flR {
+  right: -10%;
+}
+
+.round .bellsL {
+  left: 4%;
+  top: 22%;
+}
+
+.round .bellsR {
+  right: 4%;
+  top: 22%;
+}
+
+.ring {
+  position: absolute;
+  inset: 1.6%;
+  border-radius: 50%;
+  border: 1.1cqw solid #d6a3a5;
+}
+
+.stName {
+  --y: 31%;
+}
+
+.withFather .stName {
+  --y: 26%;
+}
+
+.stFather {
+  --y: 43%;
+  font-size: 6.4cqw;
+}
+
+/* ---- Water-bottle label: a swan at each end facing the name ---- */
+.bottle .water {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 26%;
+  object-fit: cover;
+}
+
+.bottle .flL,
+.bottle .flR {
+  height: 112cqh;
+  width: auto;
+  bottom: -12%;
+}
+
+.bottle .flL {
+  left: -2%;
+}
+
+.bottle .flR {
+  right: -2%;
+}
+
+.bottle .swanL,
+.bottle .swanR {
+  height: 56cqh;
+  width: auto;
+  bottom: 9%;
+}
+
+/* The swan's own artwork faces left: the left one is mirrored to face the name. */
+.bottle .swanL {
+  left: 14%;
+  scale: -1 1;
+}
+
+.bottle .swanR {
+  right: 14%;
+}
+
+.btName {
+  --y: 46%;
+}
+
+.withFather .btName {
+  --y: 35%;
+}
+
+.btFather {
+  --y: 66%;
+  font-size: 10cqh;
+}
+
+/* ---- Back of the A5 card (landscape) ---- */
+.back .flL,
+.back .flR {
+  height: 78cqh;
+  width: auto;
+  bottom: -6%;
+}
+
+.back .flL {
+  left: -4%;
+}
+
+.back .flR {
+  right: -4%;
+}
+
+.back .bellsL,
+.back .bellsR {
+  height: 44cqh;
+  width: auto;
+  top: -4%;
+}
+
+.back .bellsL {
+  left: 2%;
+}
+
+.back .bellsR {
+  right: 2%;
+}
+
+.backColumn {
+  position: absolute;
+  inset: 14% 25% 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+}
+
+.backColumn .name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+}
+
+.backMessage {
+  font-size: 2.5cqw;
+  line-height: 1.9;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Boxes the design draws in (the extras get theirs from the platform) ---- */
+.cardBox {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* Preview page: the story, as large as the screen allows. */
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #f4ece6;
+}
+
+.phoneBox {
+  position: relative;
+  width: min(100%, calc((100dvh - 32px) * 9 / 16), 480px);
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgb(110 70 80 / 0.18);
+  container-type: size;
+}

@@ -611,3 +611,7 @@ Text inside the Rosebird Garden design: «بنت» (daughter of) → ✅ owner (
 Example names for theme previews (`invitationSamples.names`: boys', girls', men's and women's names, short and long,
 separated by `|`; each design takes its own by its number). Kurdish previews use the Arabic names until the owner
 gives Kurdish lists (same order, same count) or approves them in Arabic script.
+
+
+Order-form labels in the Swan Garden manifest (#9, `themes/swan-garden/v1/manifest.ts`): «كلمة «بنت»» and the father tick box,
+as for Rosebird Garden and Bluebird Garden above. The design's text (praise, «أكرمنا الله بأجمل العطايا», du'a) stays Arabic.
