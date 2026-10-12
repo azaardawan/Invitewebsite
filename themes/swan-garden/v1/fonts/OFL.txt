@@ -1,6 +1,6 @@
 Fonts in this folder, each under the SIL Open Font License 1.1 (full text below):
 
-- Aref Ruqaa Ink: Copyright 2015-2022 The Aref Ruqaa Project Authors (https://github.com/aliftype/aref-ruqaa)
+- Aref Ruqaa Ink: Copyright 2015-2022 The Aref Ruqaa Project Authors (https://github.com/aliftype/aref-ruqaa); its colour (SVG) layer removed so every browser draws the pink glass
 - Tajawal: Google Inc.
 - Noto Sans Arabic: Copyright 2022 The Noto Project Authors (https://github.com/notofonts/arabic)
 

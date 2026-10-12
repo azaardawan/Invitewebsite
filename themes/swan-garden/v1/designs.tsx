@@ -64,7 +64,10 @@ function ownLang(text: string, dir: 'rtl' | 'ltr') {
 
 const ARABIC = { lang: 'ar', dir: 'rtl' } as const;
 
-/** Name size: `max`, but never wider than `budget` (long names shrink). */
+/**
+ * Name size: `max`, but never wider than `budget` (long names shrink). The maxima are kept low: Ruqaa letters are
+ * tall (ك ل) and have long tails (م ر ي), so a short name would otherwise run into the lines around it.
+ */
 function fit(text: string, budget: number, max: string, unit = 'cqw'): string {
   const len = Math.max(3, [...text].length);
   const perChar = /[A-Za-z]/.test(text) ? 0.6 : 0.42; // Aref Ruqaa Ink Bold
@@ -158,7 +161,7 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
       <p className={`${styles.at} ${styles.gift}`} {...ARABIC}>
         {GIFT}
       </p>
-      <Name name={d.name} size={fit(d.name, 70, variant === 'story' ? '31cqw' : '25cqw')} className={styles.nameAt} />
+      <Name name={d.name} size={fit(d.name, 70, variant === 'story' ? '24cqw' : '18cqw')} className={styles.nameAt} />
       <Father d={d} className={styles.fatherAt} />
       <BirthDate lines={d.birthLines} className={styles.dateAt} />
       <Lines lines={DUA} className={styles.dua} />
@@ -178,7 +181,7 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
       <Garden />
       <Swans />
       {round ? <span aria-hidden className={styles.ring} /> : null}
-      <Name name={d.name} size={fit(d.name, 54, father ? '19cqw' : '23cqw')} className={styles.stName} />
+      <Name name={d.name} size={fit(d.name, 48, father ? '14cqw' : '17cqw')} className={styles.stName} />
       {father ? <Father d={d} className={styles.stFather} /> : null}
     </div>
   );
@@ -195,7 +198,7 @@ export function BottleDesign({ d }: { d: DesignData }) {
       <Piece src={flowersRight} className={styles.flR} />
       <Piece src={swanBow} className={styles.swanL} />
       <Piece src={swanBow} className={styles.swanR} />
-      <Name name={d.name} size={fit(d.name, 110, father ? '42cqh' : '52cqh', 'cqh')} className={styles.btName} />
+      <Name name={d.name} size={fit(d.name, 110, father ? '30cqh' : '36cqh', 'cqh')} className={styles.btName} />
       {father ? <Father d={d} className={styles.btFather} /> : null}
     </div>
   );
@@ -225,9 +228,9 @@ export function CardBackDesign({ d, title, message }: { d: DesignData; title: st
       <Piece src={flowersLeft} className={styles.flL} />
       <Piece src={flowersRight} className={styles.flR} />
       <div className={styles.backColumn}>
-        <GlassText text={title} size={fit(title, 50, '10cqw')} dir={d.dir} />
+        <GlassText text={title} size={fit(title, 50, '13cqw')} dir={d.dir} />
         {message ? <p className={styles.backMessage}>{message}</p> : null}
-        {d.name ? <GlassText text={d.name} size={fit(d.name, 26, '6.4cqw')} dir={d.dir} /> : null}
+        {d.name ? <GlassText text={d.name} size={fit(d.name, 30, '8.5cqw')} dir={d.dir} /> : null}
       </div>
     </div>
   );
