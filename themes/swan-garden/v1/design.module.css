@@ -1,19 +1,19 @@
 /* Swan Garden, rebuilt from the owner's pieces. Positions follow the owner's designs (% of the box). */
 
-/* The name: Lalezar (owner's choice pending), in pink glass. */
+/* The name: Aref Ruqaa Ink Bold (owner's choice, font #14), in pink glass. */
 @font-face {
   font-family: 'SG Glass';
-  font-weight: 400;
+  font-weight: 700;
   font-display: block;
-  src: url('./fonts/lalezar-arabic-400-normal.woff2') format('woff2');
+  src: url('./fonts/aref-ruqaa-ink-arabic-700-normal.woff2') format('woff2');
   unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
 }
 
 @font-face {
   font-family: 'SG Glass';
-  font-weight: 400;
+  font-weight: 700;
   font-display: block;
-  src: url('./fonts/lalezar-latin-400-normal.woff2') format('woff2');
+  src: url('./fonts/aref-ruqaa-ink-latin-700-normal.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
 }
 
@@ -85,9 +85,9 @@
 
 /* ---- The name: pink glass ---- */
 .name {
-  font-family: 'SG Glass', 'SG Noto', sans-serif;
-  font-weight: 400;
-  line-height: 1.7;
+  font-family: 'SG Glass', 'SG Noto', serif;
+  font-weight: 700;
+  line-height: 1.9;
 }
 
 .glass {
@@ -148,22 +148,22 @@
 }
 
 .story .nameAt {
-  --y: 41%;
+  --y: 40%;
 }
 
 .story .fatherAt {
-  --y: 53.2%;
+  --y: 54.6%;
   font-size: 3.9cqw;
 }
 
 .story .dateAt {
-  --y: 57%;
+  --y: 58.2%;
   font-size: 3.3cqw;
   line-height: 1.5;
 }
 
 .story .dua {
-  --y: 64.6%;
+  --y: 65.4%;
   font-size: 4.2cqw;
   line-height: 1.8;
 }
@@ -233,22 +233,22 @@
 }
 
 .card .nameAt {
-  --y: 31.6%;
+  --y: 30.8%;
 }
 
 .card .fatherAt {
-  --y: 43.6%;
+  --y: 45.2%;
   font-size: 3.3cqw;
 }
 
 .card .dateAt {
-  --y: 47.2%;
+  --y: 48.6%;
   font-size: 2.7cqw;
   line-height: 1.4;
 }
 
 .card .dua {
-  --y: 54.6%;
+  --y: 55.8%;
   font-size: 3.5cqw;
   line-height: 1.8;
 }
@@ -389,7 +389,7 @@
 }
 
 .stFather {
-  --y: 43%;
+  --y: 45%;
   font-size: 6.4cqw;
 }
 

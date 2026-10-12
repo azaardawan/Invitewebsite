@@ -67,7 +67,7 @@ const ARABIC = { lang: 'ar', dir: 'rtl' } as const;
 /** Name size: `max`, but never wider than `budget` (long names shrink). */
 function fit(text: string, budget: number, max: string, unit = 'cqw'): string {
   const len = Math.max(3, [...text].length);
-  const perChar = /[A-Za-z]/.test(text) ? 0.55 : 0.5; // Lalezar
+  const perChar = /[A-Za-z]/.test(text) ? 0.6 : 0.42; // Aref Ruqaa Ink Bold
   return `min(${max}, ${(budget / (len * perChar)).toFixed(2)}${unit})`;
 }
 
@@ -158,7 +158,7 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
       <p className={`${styles.at} ${styles.gift}`} {...ARABIC}>
         {GIFT}
       </p>
-      <Name name={d.name} size={fit(d.name, 70, variant === 'story' ? '27cqw' : '22cqw')} className={styles.nameAt} />
+      <Name name={d.name} size={fit(d.name, 70, variant === 'story' ? '31cqw' : '25cqw')} className={styles.nameAt} />
       <Father d={d} className={styles.fatherAt} />
       <BirthDate lines={d.birthLines} className={styles.dateAt} />
       <Lines lines={DUA} className={styles.dua} />

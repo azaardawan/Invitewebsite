@@ -28,7 +28,7 @@ Customer choices: the connector «بنت» ("Daughter of" / «کچی» / «کچ�
 own word), shown in green as in the design; the father's name on the stickers and bottle (off by default).
 
 ## 4. Type
-- Name: pink glass; font chosen by the owner from the sheet (Lalezar until then).
+- Name: pink glass, Aref Ruqaa Ink Bold (owner's choice, font #14 of the free-font sheets).
 - Small text: Tajawal (Kurdish letters from Noto Sans Arabic).
 
 ## 5. Products
