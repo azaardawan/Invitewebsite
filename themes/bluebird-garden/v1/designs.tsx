@@ -138,7 +138,7 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
       <p className={`${styles.at} ${styles.order}`} {...ARABIC}>
         {d.order}
       </p>
-      <Name name={d.name} size={fit(d.name, 72, variant === 'story' ? '25cqw' : '20cqw')} className={styles.nameAt} />
+      <Name name={d.name} size={fit(d.name, 72, variant === 'story' ? '25cqw' : '18cqw')} className={styles.nameAt} />
       <Father d={d} className={styles.father} />
       <BirthDate lines={d.birthLines} className={styles.dateAt} />
       <Lines lines={DUA} className={styles.dua} />
@@ -160,7 +160,7 @@ export function StickerDesign({ d, round }: { d: DesignData; round: boolean }) {
       <Piece src={birdLeft} className={styles.birdL} />
       <Piece src={birdRight} className={styles.birdR} />
       {round ? <span aria-hidden className={styles.ring} /> : null}
-      <Name name={d.name} size={fit(d.name, 46, '20cqw')} className={styles.stName} />
+      <Name name={d.name} size={fit(d.name, 46, father ? '16cqw' : '20cqw')} className={styles.stName} />
       {father ? <Father d={d} className={styles.stFather} /> : null}
     </div>
   );
@@ -176,7 +176,7 @@ export function BottleDesign({ d }: { d: DesignData }) {
       <Piece src={flowersRight} className={styles.flR} />
       <Piece src={birdLeft} className={styles.birdL} />
       <Piece src={birdRight} className={styles.birdR} />
-      <Name name={d.name} size={fit(d.name, 120, '52cqh', 'cqh')} className={styles.btName} />
+      <Name name={d.name} size={fit(d.name, 120, father ? '40cqh' : '52cqh', 'cqh')} className={styles.btName} />
       {father ? <Father d={d} className={styles.btFather} /> : null}
     </div>
   );
