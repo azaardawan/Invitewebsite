@@ -138,7 +138,7 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
       <p className={`${styles.at} ${styles.order}`} {...ARABIC}>
         {d.order}
       </p>
-      <Name name={d.name} size={fit(d.name, 72, variant === 'story' ? '25cqw' : '20cqw')} className={styles.nameAt} />
+      <Name name={d.name} size={fit(d.name, 72, variant === 'story' ? '25cqw' : '18cqw')} className={styles.nameAt} />
       <Father d={d} className={styles.father} />
       <BirthDate lines={d.birthLines} className={styles.dateAt} />
       <Lines lines={DUA} className={styles.dua} />

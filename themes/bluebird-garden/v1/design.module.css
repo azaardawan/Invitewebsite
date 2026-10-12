@@ -216,12 +216,12 @@
 }
 
 .card .father {
-  --y: 37.4%;
+  --y: 37.8%;
   font-size: 3.2cqw;
 }
 
 .card .dateAt {
-  --y: 41%;
+  --y: 41.3%;
   font-size: 2.6cqw;
   line-height: 1.35;
 }

@@ -599,3 +599,11 @@ Order-form labels in the Bluebird Garden manifest (`themes/bluebird-garden/v1/ma
   Sorani: ناوی باوک لەسەر لکێنەری چوکلێت و لکێنەری بوتڵ پیشان بدرێت / Badini: ناڤێ بابی ل سەر لکێنەرێن چوکلێتێ و لکێنەرا بوتلێ بهێتە نیشاندان (◐).
 
 Text inside the Bluebird Garden design (praise lines, birth-order line, du'a) stays Arabic in every language (owner, 2026-10-11).
+
+Order-form labels in the Rosebird Garden manifest (#8, `themes/rosebird-garden/v1/manifest.ts`; Kurdish shows the Arabic until approved):
+- «ترتيب المولودة» / Birth order → Sorani: ڕیزبەندی کچۆڵە / Badini: ڕیزبەندیا کچکێ (◐).
+- «كلمة «بنت»» → Sorani: وشەی «کچی» / Badini: پەیڤا «کچا» (◐).
+- The father tick box: as for Bluebird Garden above.
+
+Text inside the Rosebird Garden design: «بنت» (daughter of) → ✅ owner (2026-10-12): Sorani «کچی», Badini «کچا»
+(the default on Kurdish orders; «بنت» stays a choice). The praise lines, birth-order line and du'a stay Arabic.
