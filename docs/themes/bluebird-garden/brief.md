@@ -49,3 +49,6 @@ Customer choices on the order form:
 
 Before payment everything is watermarked by the platform; files are served only once paid.
 Packages and the cover are set by the owner in Admin.
+
+## Version 2 (2026-10-13)
+v1 is activated and frozen. `v2` keeps the baby's name clear of the lines and art around it (short names with tall letters/tails, long English names) and wraps a long father line on round stickers. Make it current in Admin (Themes → the design → Versions → Make current); orders already placed keep v1.

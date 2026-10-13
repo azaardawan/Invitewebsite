@@ -21,3 +21,6 @@ Customer choices on the order form:
 
 Everything else (fields, fonts, products, card back) is as in `docs/themes/bluebird-garden/brief.md`.
 Admin: put #8 in Newborn → **Girl**, add a cover and packages, then activate.
+
+## Version 2 (2026-10-13)
+v1 is activated and frozen. `v2` keeps the baby's name clear of the lines and art around it (short names with tall letters/tails, long English names) and wraps a long father line on round stickers. Make it current in Admin (Themes → the design → Versions → Make current); orders already placed keep v1.

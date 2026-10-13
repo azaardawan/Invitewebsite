@@ -67,7 +67,7 @@ const ARABIC = { lang: 'ar', dir: 'rtl' } as const;
 /** Name size: `max`, but never wider than `budget` cqw (long names shrink). */
 function fit(text: string, budget: number, max: string, unit = 'cqw'): string {
   const len = Math.max(3, [...text].length);
-  const perChar = /[A-Za-z]/.test(text) ? 0.64 : 0.46; // Scheherazade New Bold (its Latin is wide)
+  const perChar = /[A-Za-z]/.test(text) ? 0.5 : 0.46; // Scheherazade New Bold
   return `min(${max}, ${(budget / (len * perChar)).toFixed(2)}${unit})`;
 }
 

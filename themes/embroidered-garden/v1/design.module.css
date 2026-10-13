@@ -108,20 +108,20 @@
 .story {
   --hamd-y: 27.3%;
   --blessed-y: 35.7%;
-  --name-y: 47.4%;
-  --father-y: 57.8%;
-  --date-y: 62.8%;
-  --dua-y: 70.6%;
+  --name-y: 48%;
+  --father-y: 57.4%;
+  --date-y: 62.4%;
+  --dua-y: 70.2%;
   --verse: 4.15cqw;
 }
 
 .card {
   --hamd-y: 25.8%;
   --blessed-y: 34.8%;
-  --name-y: 48.6%;
-  --father-y: 60.4%;
+  --name-y: 49.5%;
+  --father-y: 60.2%;
   --date-y: 65.4%;
-  --dua-y: 73.4%;
+  --dua-y: 72.6%;
   --verse: 3.9cqw;
 }
 

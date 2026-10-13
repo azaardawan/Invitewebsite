@@ -56,3 +56,6 @@ so names are set as live text. The art is about 175–270 dpi at print size.
 ## Card back
 The A5 card's back (landscape, `print/CardBack.tsx`): the front's linen with its four embroidered corners
 (`assets/back-*.webp`, cut from the owner's card), the customer's title stitched in sage, their message and the baby's name.
+
+## Version 2 (2026-10-13)
+v1 is activated and frozen. `v2` keeps the baby's name clear of the lines and art around it (short names with tall letters/tails, long English names) and wraps a long father line on round stickers. Make it current in Admin (Themes → the design → Versions → Make current); orders already placed keep v1.
