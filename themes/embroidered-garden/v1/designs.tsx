@@ -134,7 +134,7 @@ export function StoryDesign({ d, variant }: { d: DesignData; variant: 'story' | 
         {BLESSED}
       </p>
       <div className={`${styles.at} ${styles.nameAt}`}>
-        <Name name={d.name} size={fit(d.name, 64, story ? '23cqw' : '21cqw')} />
+        <Name name={d.name} size={fit(d.name, 64, story ? '20cqw' : '17.5cqw')} />
       </div>
       {d.father ? <p className={`${styles.at} ${styles.father}`} {...d.fatherAttrs}>{d.father}</p> : null}
       <BirthDate lines={d.birthLines} className={styles.cardDate} />
