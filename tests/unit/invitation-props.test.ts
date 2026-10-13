@@ -86,3 +86,27 @@ describe('theme props (the Theme Contract)', () => {
     expect(p.mapUrl).toBeNull();
   });
 });
+
+describe('sample names', () => {
+  it("a design for a girl shows a girl's name; boys' designs keep the boy's", () => {
+    expect(sampleValues('ar', 'short').baby_name).toBe('آدم');
+    expect(sampleValues('ar', 'short', { babyGender: 'girl' })).toMatchObject({ baby_name: 'ريم', baby_gender: 'girl' });
+    expect(sampleValues('en', 'long', { babyGender: 'girl' }).baby_name).toBe('Noor Al-Huda');
+    expect(sampleValues('ar', 'short')).not.toHaveProperty('names');
+  });
+
+  it('each design (by its number) gets its own names, in every language alike', () => {
+    for (const variant of ['short', 'long'] as const) {
+      for (const babyGender of ['boy', 'girl'] as const) {
+        const babies = Array.from({ length: 12 }, (_, seed) => sampleValues('ar', variant, { seed, babyGender }).baby_name);
+        expect(new Set(babies).size).toBe(12);
+      }
+      const couples = Array.from({ length: 12 }, (_, seed) => sampleValues('ar', variant, { seed }).person_1_name);
+      expect(new Set(couples).size).toBe(12);
+    }
+    const s = sampleValues('ar', 'short', { seed: 7 });
+    expect(s.father_name).not.toBe(s.person_1_name);
+    expect(sampleValues('en', 'short', { seed: 7 }).baby_name).toBe('Saleem');
+    expect(sampleValues('ar', 'short', { seed: 7 }).baby_name).toBe('سليم');
+  });
+});

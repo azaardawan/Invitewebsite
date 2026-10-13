@@ -1081,7 +1081,17 @@
     "m2Name": "Ahmed",
     "m2Text": "Mabrook to you both, may your home be full of joy.",
     "m3Name": "Laila",
-    "m3Text": "So happy for you. See you at the celebration!"
+    "m3Text": "So happy for you. See you at the celebration!",
+    "names": {
+      "boy": "Adam|Yousif|Hamza|Zain|Laith|Taim|Yazan|Saleem|Elias|Karam|Malik|Yaseen|Anas|Aws|Raad|Saqr|Hadi|Basil|Rayan|Saif",
+      "boyLong": "Abdul Rahman|Mohammed Al-Amin|Abdullah|Nour Al-Din|Saif Al-Din|Abdul Aziz|Zain Al-Abideen|Salah Al-Din|Abdul Malik|Abdul Karim|Alaa Al-Din|Abdul Wahab|Shams Al-Din|Badr Al-Din|Abdul Raheem|Abdul Hadi|Izz Al-Din|Abdul Basit|Muhyi Al-Din|Abdul Latif",
+      "girl": "Reem|Leen|Maryam|Sara|Layan|Tala|Haya|Rahaf|Jana|Salma|Mayar|Dana|Lara|Yara|Malak|Razan|Ghina|Joury|Shahad|Masa",
+      "girlLong": "Noor Al-Huda|Fatima Al-Zahraa|Sidrat Al-Muntaha|Shams Al-Duha|Noor Al-Yaqeen|Ayat Al-Rahman|Hibat Al-Rahman|Diaa Al-Huda|Noor Al-Iman|Zahrat Al-Rabee|Bint Al-Huda|Rooh Al-Fuad",
+      "man": "Ali|Ahmed|Hussein|Mustafa|Karrar|Haider|Sajjad|Ammar|Yasir|Khalid|Samer|Wisam|Rami|Maher|Nabil|Tariq|Firas|Ziad|Muhannad|Ayman",
+      "manLong": "Mohammed Al-Hasani|Ahmed Al-Jubouri|Hussein Al-Obaidi|Mustafa Al-Rubaie|Ali Al-Saadi|Haider Al-Mousawi|Ammar Al-Tamimi|Khalid Al-Dulaimi|Samer Al-Azzawi|Yasir Al-Khafaji|Tariq Al-Shammari|Ziad Al-Kubaisi",
+      "woman": "Noor|Zainab|Ruqaya|Huda|Duaa|Alaa|Rana|Shaimaa|Marwa|Israa|Ban|Sura|Hiba|Rasha|Nadia|Aseel|Dina|Lama|Raghad|Duha",
+      "womanLong": "Zahraa Al-Mousawi|Huda Al-Obaidi|Ruqaya Al-Saadi|Alaa Al-Tamimi|Duaa Al-Rubaie|Marwa Al-Khafaji|Israa Al-Dulaimi|Sura Al-Azzawi|Rana Al-Shammari|Hiba Al-Kubaisi|Shaimaa Al-Jubouri|Ban Al-Karkhi"
+    }
   },
   "receipt": {
     "title": "Order receipt",
@@ -1191,6 +1201,8 @@
     "backToOccasions": "All occasions",
     "livePreview": "Live preview",
     "previewHint": "This is the real design with sample names. Scroll inside it and tap to open.",
+    "filesPreview": "Files preview",
+    "filesOnlyHint": "This design comes as files to download and print (story, card, stickers). There is no online invitation.",
     "shortNames": "Short names",
     "longNames": "Long names",
     "openFull": "Open full screen",
@@ -1337,7 +1349,27 @@
       "heading": "Sticker shape",
       "help": "Round suits most chocolates; square suits square pieces and boxes. You get a print-ready A4 sheet (PDF) and a single sticker picture (PNG).",
       "round": "Round",
-      "square": "Square"
+      "square": "Square",
+      "both": "Both"
+    },
+    "birthDateFormat": {
+      "heading": "How the date of birth is written",
+      "help": "This is how the date appears on the story, card and stickers.",
+      "digits": "Digits",
+      "arab": "٠١٢٣",
+      "latn": "0123"
+    },
+    "bottleSize": {
+      "heading": "Water bottle size",
+      "help": "The label wraps around the bottle. Check the size with a paper strip; the PNG can be resized for any bottle.",
+      "option": "{ml} ml"
+    },
+    "wording": {
+      "heading": "Wording on the design",
+      "help": "You can choose the word that joins the two names. The Quran verses and the Arabic text of the design stay as they are.",
+      "arabic": "Arabic (as in the design)",
+      "inLanguage": "In the invitation's language ({language})",
+      "custom": "Write your own"
     }
   },
   "contact": {

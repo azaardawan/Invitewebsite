@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
@@ -15,7 +15,32 @@ export type OrderFormExtras = {
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
   /** Chocolate stickers (sticker): round or square. */
-  sticker?: { current: 'round' | 'square' };
+  sticker?: { current: 'round' | 'square' | 'both' };
+  /** Bottle labels (bottle_label): which bottle size. */
+  bottle?: { current: string; sizes: readonly string[] };
+  /** Date of birth: how it is written; `examples` is `${style}:${digits}` → the date written that way. */
+  birthDate?: { style: string; digits: string; examples: Record<string, string>; showDigits: boolean };
+  /**
+   * The design's changeable lines (manifest `wording`): Arabic by default, the design's version in the
+   * invitation's language when it has one, or the customer's own words. `current` = what is stored (absent = Arabic).
+   */
+  wording?: {
+    lines: {
+      key: string;
+      label: string;
+      ar: string;
+      versions: Partial<Record<string, string>>;
+      defaultIn: string[];
+      /** Fixed alternatives besides `ar` (value `opt:<n>`). */
+      options: string[];
+      /** Whether the customer may write their own text. */
+      custom: boolean;
+      maxLength: number;
+    }[];
+    current: Record<string, string>;
+  };
+  /** The design's yes/no choices (manifest `switches`) and the current answers. */
+  switches?: { key: string; label: string; on: boolean }[];
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
 };
@@ -51,6 +76,8 @@ export function OrderForm({
   const [state, formAction, pending] = useActionState(action, {});
   const values = state.values ?? initialValues;
   const errors = state.fieldErrors ?? {};
+  // The invitation's language, as chosen below: the wording section offers the design's version in it.
+  const [lang, setLang] = useState<Locale>(invitationLocale);
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
@@ -146,19 +173,64 @@ export function OrderForm({
         <fieldset className="flex flex-col gap-3">
           <legend className="text-[15px] font-medium text-heading">{t('stickerShape.heading')}</legend>
           <p className="text-sm text-muted">{t('stickerShape.help')}</p>
-          <div className="flex gap-3">
-            {(['round', 'square'] as const).map((shape) => (
+          <div className="flex flex-wrap gap-3">
+            {(['round', 'square', 'both'] as const).map((shape) => (
               <label
                 key={shape}
                 className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
               >
                 <input type="radio" name="stickerShape" value={shape} defaultChecked={(values.stickerShape || extras.sticker!.current) === shape} className="sr-only" />
-                <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                {shape === 'both' ? (
+                  <span aria-hidden className="flex gap-1">
+                    <span className="block size-10 rounded-full border-2 border-accent bg-blush" />
+                    <span className="block size-10 rounded-md border-2 border-accent bg-blush" />
+                  </span>
+                ) : (
+                  <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                )}
                 <span className="text-sm font-medium">{t(`stickerShape.${shape}`)}</span>
               </label>
             ))}
           </div>
         </fieldset>
+      ) : null}
+
+      {extras.wording ? <DesignWording extra={extras.wording} lang={lang} values={state.values} errors={errors} /> : null}
+
+      {extras.switches?.length ? (
+        <div className="flex flex-col gap-2">
+          {extras.switches.map((s) => (
+            <label key={s.key} className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3">
+              <input type="hidden" name={`sw.${s.key}`} value="" />
+              <input
+                type="checkbox"
+                name={`s.${s.key}`}
+                value="1"
+                defaultChecked={state.values?.[`sw.${s.key}`] !== undefined ? state.values[`s.${s.key}`] === '1' : s.on}
+                className="mt-1"
+              />
+              <span className="text-sm">{s.label}</span>
+            </label>
+          ))}
+        </div>
+      ) : null}
+
+      {extras.birthDate ? <BirthDateFormat extra={extras.birthDate} values={values} label={(k) => t(`birthDateFormat.${k}` as 'birthDateFormat.heading')} /> : null}
+
+      {extras.bottle ? (
+        <div className="flex flex-col gap-2">
+          <label htmlFor="bottleSize" className="text-[15px] font-medium text-heading">
+            {t('bottleSize.heading')}
+          </label>
+          <p className="text-sm text-muted">{t('bottleSize.help')}</p>
+          <select id="bottleSize" name="bottleSize" defaultValue={values.bottleSize || extras.bottle.current} className={inputCls}>
+            {extras.bottle.sizes.map((size) => (
+              <option key={size} value={size}>
+                {t('bottleSize.option', { ml: size })}
+              </option>
+            ))}
+          </select>
+        </div>
       ) : null}
 
       {extras.palettes ? (
@@ -247,7 +319,7 @@ export function OrderForm({
         <label htmlFor="invitationLocale" className="text-[15px] font-medium text-heading">
           {t('languageLabel')}
         </label>
-        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} className={inputCls}>
+        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} onChange={(e) => setLang(e.target.value as Locale)} className={inputCls}>
           {locales.map((l) => (
             <option key={l} value={l}>
               {localeMeta[l].autonym}
@@ -264,5 +336,162 @@ export function OrderForm({
         {pending ? t('saving') : submitLabel}
       </button>
     </form>
+  );
+}
+
+/** How the date of birth is written on the designs: four styles (shown on the customer's date) and the digits. */
+function BirthDateFormat({
+  extra,
+  values,
+  label,
+}: {
+  extra: NonNullable<OrderFormExtras['birthDate']>;
+  values: Record<string, string>;
+  label: (key: 'heading' | 'help' | 'digits' | 'arab' | 'latn') => string;
+}) {
+  const [digits, setDigits] = useState(values.birthDateDigits || extra.digits);
+  const initialStyle = values.birthDateStyle || extra.style;
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-[15px] font-medium text-heading">{label('heading')}</legend>
+      <p className="text-sm text-muted">{label('help')}</p>
+      <div className="flex flex-col gap-2">
+        {(['long', 'numeric', 'hijri', 'both'] as const).map((style) => (
+          <label
+            key={style}
+            className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+          >
+            <input type="radio" name="birthDateStyle" value={style} defaultChecked={initialStyle === style} className="mt-1" />
+            <span className="whitespace-pre-line text-sm" dir="auto">
+              {extra.examples[`${style}:${extra.showDigits ? digits : 'latn'}`]}
+            </span>
+          </label>
+        ))}
+      </div>
+      {extra.showDigits ? (
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <span className="font-medium">{label('digits')}</span>
+          {(['arab', 'latn'] as const).map((d) => (
+            <label key={d} className="flex items-center gap-2">
+              <input type="radio" name="birthDateDigits" value={d} checked={digits === d} onChange={() => setDigits(d)} />
+              {label(d)}
+            </label>
+          ))}
+        </div>
+      ) : (
+        <input type="hidden" name="birthDateDigits" value="latn" />
+      )}
+    </fieldset>
+  );
+}
+
+/** The design's changeable lines: Arabic (the default), the design's version in the invitation's language, or the customer's own. */
+function DesignWording({
+  extra,
+  lang,
+  values,
+  errors,
+}: {
+  extra: NonNullable<OrderFormExtras['wording']>;
+  lang: Locale;
+  values?: Record<string, string>;
+  errors: Record<string, string>;
+}) {
+  const t = useTranslations('store');
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-[15px] font-medium text-heading">{t('wording.heading')}</legend>
+      <p className="text-sm text-muted">{t('wording.help')}</p>
+      {extra.lines.map((line) => (
+        <WordingLine key={line.key} line={line} lang={lang} stored={extra.current[line.key]} values={values} error={errors[`w.${line.key}`]} />
+      ))}
+    </fieldset>
+  );
+}
+
+function WordingLine({
+  line,
+  lang,
+  stored,
+  values,
+  error,
+}: {
+  line: NonNullable<OrderFormExtras['wording']>['lines'][number];
+  lang: Locale;
+  stored?: string;
+  values?: Record<string, string>;
+  error?: string;
+}) {
+  const t = useTranslations('store');
+  const name = `w.${line.key}`;
+  const version = lang !== 'ar' ? line.versions[lang] : undefined;
+  // Nothing stored = the language's default (Arabic, or the version where the design makes it the default).
+  const defaultChoice = version && line.defaultIn.includes(lang) ? 'lang' : 'ar';
+  const optionIndex = stored ? line.options.indexOf(stored) : -1;
+  const fromStored = !stored
+    ? null
+    : stored === line.ar
+      ? 'ar'
+      : optionIndex >= 0
+        ? `opt:${optionIndex}`
+        : Object.values(line.versions).includes(stored)
+          ? 'lang'
+          : line.custom
+            ? 'custom'
+            : null;
+  // What the customer picked (or just submitted); until then the default follows the language chosen above.
+  const [picked, setChoice] = useState<string | null>(values?.[name] || fromStored);
+  const choice = picked ?? defaultChoice;
+  const shown = choice === 'lang' && !version ? 'ar' : choice;
+  const option = 'flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-surface px-4 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20';
+  return (
+    <div className="flex flex-col gap-2" role="radiogroup" aria-label={line.label}>
+      <span className="text-sm font-medium">{line.label}</span>
+      <label className={option}>
+        <input type="radio" name={name} value="ar" checked={shown === 'ar'} onChange={() => setChoice('ar')} className="mt-1" />
+        <span className="flex flex-col text-sm">
+          <span lang="ar" dir="rtl">
+            {line.ar}
+          </span>
+          {line.options.length ? null : <span className="text-xs text-muted">{t('wording.arabic')}</span>}
+        </span>
+      </label>
+      {line.options.map((text, i) => (
+        <label key={i} className={option}>
+          <input type="radio" name={name} value={`opt:${i}`} checked={shown === `opt:${i}`} onChange={() => setChoice(`opt:${i}`)} className="mt-1" />
+          <span className="text-sm" lang="ar" dir="rtl">
+            {text}
+          </span>
+        </label>
+      ))}
+      {version ? (
+        <label className={option}>
+          <input type="radio" name={name} value="lang" checked={shown === 'lang'} onChange={() => setChoice('lang')} className="mt-1" />
+          <span className="flex flex-col text-sm">
+            <span dir="auto">{version}</span>
+            <span className="text-xs text-muted">{t('wording.inLanguage', { language: localeMeta[lang].autonym })}</span>
+          </span>
+        </label>
+      ) : null}
+      {line.custom ? (
+        <label className={option}>
+          <input type="radio" name={name} value="custom" checked={shown === 'custom'} onChange={() => setChoice('custom')} className="mt-1" />
+          <span className="text-sm">{t('wording.custom')}</span>
+        </label>
+      ) : null}
+      {shown === 'custom' && line.custom ? (
+        <input
+          type="text"
+          name={`${name}.text`}
+          dir="auto"
+          maxLength={line.maxLength}
+          defaultValue={values?.[`${name}.text`] ?? (fromStored === 'custom' ? stored : '')}
+          aria-label={`${line.label}: ${t('wording.custom')}`}
+          aria-invalid={error ? true : undefined}
+          className={inputCls}
+        />
+      ) : null}
+      {error ? <p className="text-sm text-danger">{t(`fieldErrors.${error}` as 'fieldErrors.required')}</p> : null}
+    </div>
   );
 }

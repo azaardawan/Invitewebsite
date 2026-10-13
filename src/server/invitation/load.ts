@@ -37,6 +37,11 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       colorSlots: (version!.manifest as ThemeManifest).colors?.slots ?? [],
       colors: inv.colors,
       occasion: await occasionKey(db, inv.sectionId),
+      birthDateFormat: { style: inv.birthDateStyle, digits: inv.birthDateDigits },
+      wordingLines: (version!.manifest as ThemeManifest).wording ?? [],
+      wording: inv.wording,
+      switchDefs: (version!.manifest as ThemeManifest).switches ?? [],
+      switches: inv.switches,
     }),
   };
 }

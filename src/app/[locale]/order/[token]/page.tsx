@@ -41,18 +41,27 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
       </div>
       <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-20">
         <div className="flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start">
-          <div className="w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
-            <iframe src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
-          </div>
+          {draft.onlineInvitation ? (
+            <div className="w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
+              <iframe src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
+            </div>
+          ) : (
+            <>
+              <iframe src={previewSrc} title={t('filesPreview')} className="block aspect-[9/16] w-full max-w-[380px] rounded-[18px] bg-surface shadow-[0_30px_60px_rgb(58_21_32/0.18)]" />
+              <p className="max-w-[380px] text-center text-sm text-muted">{t('filesOnlyHint')}</p>
+            </>
+          )}
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium text-accent">
             {draft.status === 'DRAFT' ? (
               <Link href={`/order/${token}/edit`} className="underline underline-offset-4">
                 {t('edit')}
               </Link>
             ) : null}
-            <a href={previewSrc} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
-              {t('openPreview')}
-            </a>
+            {draft.onlineInvitation ? (
+              <a href={previewSrc} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                {t('openPreview')}
+              </a>
+            ) : null}
           </div>
         </div>
 
@@ -86,6 +95,8 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               card: t('extras.card'),
               story: t('extras.story'),
               sticker: t('extras.sticker'),
+              round: t('stickerShape.round'),
+              square: t('stickerShape.square'),
               bottle: t('extras.bottle'),
               downloadPng: t('extras.downloadPng'),
               downloadSheet: t('extras.downloadSheet'),

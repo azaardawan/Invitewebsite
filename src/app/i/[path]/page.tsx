@@ -9,6 +9,7 @@ import { consumeRateLimit, rateLimited } from '@/server/rate-limit';
 const MISS_LIMIT = 30;
 import { resolvePublicInvitation } from '@/server/invitation/public';
 import { invitationRenderData } from '@/server/invitation/load';
+import { manifestByCodeRef } from '@/theme-registry';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { env } from '@/server/env';
 import { isLocale } from '@/i18n/config';
@@ -59,6 +60,8 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
     return <InvitationEnded title={msgs.endedTitle} body={msgs.endedBody} brand={msgs.brand} />;
   }
   const { codeRef, props } = await invitationRenderData(db(), r.invitation, 'live');
+  // Designs without an online invitation are files only (manifest `onlineInvitation: false`).
+  if (manifestByCodeRef(codeRef)?.onlineInvitation === false) notFound();
   const msgs = invitationMessages(r.invitation.locale);
   return (
     <>

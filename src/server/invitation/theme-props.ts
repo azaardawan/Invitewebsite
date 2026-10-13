@@ -1,11 +1,14 @@
 import 'server-only';
+import { sampleNames, type SampleNameLists } from '@/catalog/sample-names';
 import type { ThemeBorderSpec } from '@/theme-sdk/border';
 import type { FeatureKey } from '@/catalog/features';
 import type { FieldKey } from '@/catalog/fields';
 import { localeMeta, type Locale } from '@/i18n/config';
 import { messagesFor } from '@/i18n/messages';
 import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type CalendarNames } from '@/lib/invitation-format';
+import { DEFAULT_BIRTH_DATE_FORMAT, formatBirthDate, type BirthDateFormat } from '@/lib/birth-date-format';
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
+import { wordingDefault, type DesignSwitch, type WordingLine } from '@/theme-sdk/manifest';
 
 type InvitationMessages = ThemeLabels &
   CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string; and: string; youreInvited: string; endedTitle: string; endedBody: string; brand: string };
@@ -63,6 +66,14 @@ export function buildThemeProps(input: {
   colors?: Record<string, string> | null;
   /** The occasion (section key) the invitation is for. */
   occasion?: string | null;
+  /** How the customer wants the date of birth written (newborn); omitted = Gregorian, Arabic-Indic digits. */
+  birthDateFormat?: BirthDateFormat;
+  /** The design's changeable lines (manifest) and the customer's choices (absent = the Arabic default). */
+  wordingLines?: readonly WordingLine[];
+  wording?: Record<string, string> | null;
+  /** The design's yes/no choices (manifest) and the customer's answers (absent = the default). */
+  switchDefs?: readonly DesignSwitch[];
+  switches?: Record<string, boolean> | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -99,8 +110,28 @@ export function buildThemeProps(input: {
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
     occasion: input.occasion ?? null,
-    birthDate: fields.birth_date ? formatEventDate(fields.birth_date, cal, msgs) : null,
+    birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
+    wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
+    switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),
   };
+}
+
+/** Each yes/no choice: the customer's answer, else the design's default. */
+export function resolveSwitches(defs: readonly DesignSwitch[], chosen: Record<string, boolean> | null): Record<string, boolean> {
+  return Object.fromEntries(defs.map((d) => [d.key, typeof chosen?.[d.key] === 'boolean' ? chosen[d.key]! : d.default]));
+}
+
+/** Each changeable line: the customer's text when they chose one, else the default for the language. */
+export function resolveWording(lines: readonly WordingLine[], chosen: Record<string, string> | null, locale: Locale): Record<string, string> {
+  return Object.fromEntries(lines.map((l) => [l.key, chosen?.[l.key]?.trim() || wordingDefault(l, locale)]));
+}
+
+/** The date of birth's parts plus its lines in the customer's chosen style. */
+function birthDateParts(date: string | undefined, locale: Locale, cal: string | null, msgs: InvitationMessages, format: BirthDateFormat) {
+  const parts = date ? formatEventDate(date, cal, msgs) : null;
+  if (!parts) return null;
+  const lines = formatBirthDate(date, format.style, format.digits, { locale, intlLocale: localeMeta[locale].intlLocale }, msgs) ?? [parts.full];
+  return { ...parts, lines };
 }
 
 /** The theme's colours: each slot's chosen colour (when valid) or its default. */
@@ -125,11 +156,29 @@ function sampleGuestbook(locale: Locale) {
   return [1, 2, 3].map((i) => ({ guestName: s[`m${i}Name`] ?? '', message: s[`m${i}Text`] ?? '' })).filter((m) => m.guestName && m.message);
 }
 
-/** Sample content for theme previews (short or long names), in the invitation language. */
-export function sampleValues(locale: Locale, variant: 'short' | 'long', now = new Date()): Record<string, string> {
-  const samples = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> })
-    .invitationSamples[variant];
+/**
+ * Sample content for theme previews (short or long names), in the invitation language. `seed` (the design's
+ * permanent number) picks its own example names, so designs don't all show the same ones; a design for a girl
+ * shows a girl's name.
+ */
+export function sampleValues(
+  locale: Locale,
+  variant: 'short' | 'long',
+  opts: { now?: Date; babyGender?: 'boy' | 'girl'; seed?: number } = {},
+): Record<string, string> {
+  const { names, ...all } = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> & { names: SampleNameLists } })
+    .invitationSamples;
+  const now = opts.now ?? new Date();
+  const babyGender = opts.babyGender ?? 'boy';
   const date = new Date(now.getTime() + 45 * 86400000).toISOString().slice(0, 10);
   const born = new Date(now.getTime() - 5 * 86400000).toISOString().slice(0, 10);
-  return { ...samples, event_date: date, event_time: '19:30', venue_map_url: 'https://maps.google.com/?q=Baghdad', baby_gender: 'boy', birth_date: born };
+  return {
+    ...all[variant],
+    ...sampleNames(names, { seed: opts.seed, variant, babyGender }),
+    event_date: date,
+    event_time: '19:30',
+    venue_map_url: 'https://maps.google.com/?q=Baghdad',
+    baby_gender: babyGender,
+    birth_date: born,
+  };
 }

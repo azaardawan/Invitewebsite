@@ -1,0 +1,384 @@
+/* Embroidered Garden on the owner's artwork. Positions follow the owner's designs (% of the box). */
+
+@font-face {
+  font-family: 'EG Ruqaa';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/aref-ruqaa-arabic-400-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+@font-face {
+  font-family: 'EG Ruqaa';
+  font-weight: 400;
+  font-display: block;
+  src: url('./fonts/aref-ruqaa-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+/* The baby's name: Marhey Bold (owner's choice, 2026-10-11). */
+@font-face {
+  font-family: 'EG Marhey';
+  font-weight: 700;
+  font-display: block;
+  src: url('./fonts/marhey-arabic-700-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+@font-face {
+  font-family: 'EG Marhey';
+  font-weight: 700;
+  font-display: block;
+  src: url('./fonts/marhey-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'EG Sans';
+  font-weight: 100 900;
+  font-display: block;
+  src: url('./fonts/noto-sans-arabic-arabic-wght-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200E, U+FB50-FDFF, U+FE70-FEFC;
+}
+
+@font-face {
+  font-family: 'EG Sans';
+  font-weight: 100 900;
+  font-display: block;
+  src: url('./fonts/noto-sans-arabic-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #6f6a50;
+  font-family: 'EG Sans', sans-serif;
+  font-weight: 400;
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.root p {
+  margin: 0;
+}
+
+.art {
+  object-fit: cover;
+}
+
+.line {
+  display: block;
+  white-space: nowrap;
+}
+
+/* A line of text centred on a point: `--x`/`--y` are its centre, in % of the box. */
+.at {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y);
+  translate: -50% -50%;
+  white-space: nowrap;
+}
+
+/* The baby's name: satin-stitch thread, slightly raised off the linen. */
+.name {
+  font-family: 'EG Marhey', sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  filter: drop-shadow(0 0.025em 0.018em rgb(52 62 44 / 0.5)) drop-shadow(0 -0.008em 0 rgb(255 255 255 / 0.55));
+}
+
+.thread {
+  padding: 0.08em 0.12em;
+  background-color: #6f8463;
+  /* Satin stitches: fine diagonal threads, each shaded dark → light → dark. */
+  background-image:
+    repeating-linear-gradient(140deg, #4f6445 0, #7c9270 0.008em, #a1b493 0.013em, #75896a 0.019em, #4f6445 0.026em),
+    linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(0 0 0 / 0.1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---- Instagram story and A5 card (same composition) ---- */
+.story {
+  --hamd-y: 27.3%;
+  --blessed-y: 35.7%;
+  --name-y: 48%;
+  --father-y: 57.4%;
+  --date-y: 62.4%;
+  --dua-y: 70.2%;
+  --verse: 4.15cqw;
+}
+
+.card {
+  --hamd-y: 25.8%;
+  --blessed-y: 34.8%;
+  --name-y: 49.5%;
+  --father-y: 60.2%;
+  --date-y: 65.4%;
+  --dua-y: 72.6%;
+  --verse: 3.9cqw;
+}
+
+.hamd,
+.dua {
+  font-size: var(--verse);
+  line-height: 2.05;
+}
+
+.hamd {
+  --y: var(--hamd-y);
+}
+
+.blessed {
+  --y: var(--blessed-y);
+  font-size: var(--verse);
+}
+
+/* Translated lines (blessing, "son of") may be longer than the Arabic: let them wrap. */
+.blessed,
+.father,
+.stBlessed,
+.stFather,
+.btFather {
+  inline-size: max-content;
+  max-inline-size: 66cqw;
+  white-space: normal;
+  text-wrap: balance;
+  line-height: 1.5;
+}
+
+.nameAt {
+  --y: var(--name-y);
+}
+
+.father {
+  --y: var(--father-y);
+  font-size: calc(var(--verse) * 0.95);
+}
+
+.dua {
+  --y: var(--dua-y);
+}
+
+/* ---- Chocolate stickers (the owner's sticker artwork fills the sticker) ---- */
+.sticker {
+  font-family: 'EG Ruqaa', serif;
+}
+
+.round {
+  background: #efebdb;
+}
+
+.square {
+  background: #e9e5da;
+}
+
+.stBlessed {
+  --y: 31%;
+  font-size: 6.2cqw;
+}
+
+.stName {
+  --y: 44%;
+}
+
+.stFather {
+  --y: 59.5%;
+  font-size: 6.6cqw;
+}
+
+/* ---- Water bottle wrap ---- */
+.bottle {
+  font-family: 'EG Ruqaa', serif;
+}
+
+.btVerse {
+  font-size: 7.2cqh;
+  line-height: 1.75;
+}
+
+.btBlessed {
+  max-inline-size: 30cqw;
+  font-size: 6.4cqh;
+  margin-inline: auto;
+  white-space: normal;
+  text-wrap: balance;
+  line-height: 1.4;
+}
+
+.btRight {
+  --x: 78%;
+  --y: 50%;
+}
+
+.btName {
+  --y: 36%;
+}
+
+.btFather {
+  --y: 57%;
+  font-size: 8.4cqh;
+}
+
+.btLeft {
+  --x: 21%;
+  --y: 49%;
+}
+
+/* ---- Date of birth (in the customer's chosen style) ---- */
+.date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+.sprig {
+  flex: none;
+  width: 2.4em;
+  height: 1em;
+}
+
+.dateText {
+  line-height: 1.45;
+}
+
+/* Gregorian + Hijri: two tighter, smaller lines. */
+.date:has(.line + .line) .dateText {
+  font-size: 0.85em;
+  line-height: 1.25;
+}
+
+.cardDate {
+  --y: var(--date-y);
+  font-size: calc(var(--verse) * 0.85);
+}
+
+.stDate {
+  --y: 68.5%;
+  font-size: 4.8cqw;
+}
+
+/* Small stickers: no sprigs, so the date never touches the wreath. */
+.stDate .sprig {
+  display: none;
+}
+
+.btDate {
+  --y: 70%;
+  font-size: 6.6cqh;
+}
+
+/* ---- Boxes the design draws in (the extras get theirs from the platform) ---- */
+/* ---- Back of the A5 card (landscape): linen, the card's four embroidered corners ---- */
+.corner {
+  position: absolute;
+  width: 31.3cqw;
+  height: auto;
+  pointer-events: none;
+}
+
+.corner0 {
+  left: 0;
+  top: 0;
+}
+
+.corner1 {
+  right: 0;
+  top: 0;
+}
+
+.corner2 {
+  left: 0;
+  bottom: 0;
+}
+
+.corner3 {
+  right: 0;
+  bottom: 0;
+}
+
+.backColumn {
+  position: absolute;
+  inset: 12% 27%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5cqh;
+}
+
+.backColumn .name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.backMessage {
+  font-size: 2.4cqw;
+  line-height: 1.9;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.cardBox {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  container-type: size;
+}
+
+/* Preview page: the story, as large as the screen allows, on linen. */
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #e9e5da;
+}
+
+.phoneBox {
+  position: relative;
+  width: min(100%, calc((100dvh - 32px) * 9 / 16), 480px);
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgb(40 35 25 / 0.18);
+  container-type: size;
+}
+
+/* English orders: a smaller name and narrower lines on the small sticker, so every line stays inside the
+   clear centre of the wreath (it narrows towards the top and bottom). */
+.sticker:lang(en) .stName {
+  --y: 44%;
+}
+
+/* A long father's name wraps upwards (into the room under the name), a Hijri second line downwards. */
+.sticker:lang(en) .stFather {
+  --y: 60%;
+  translate: -50% -100%;
+  font-size: 4.6cqw;
+  max-inline-size: 52cqw;
+  line-height: 1.2;
+}
+
+.sticker:lang(en) .stDate {
+  --y: 62%;
+  translate: -50% 0;
+  font-size: 4cqw;
+}

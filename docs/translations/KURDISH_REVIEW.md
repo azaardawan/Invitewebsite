@@ -514,6 +514,9 @@ Applied to `ckb.json` and `bdn.json`.
 
 ## Batch 22 — newborn baby occasion and its extras — ✅ APPROVED (owner, 2026-10-10)
 
+Note (2026-10-11): Batches 21 and 22 were first imported one column off (Sorani got the Badini text,
+Badini got the confidence marks). Both files were restored from the tables below.
+
 The new "مولود جديد" occasion: its details, the extras (Instagram story, chocolate stickers, bottle label), the
 watermarked previews and the sticker shape. Applied to `ckb.json` and `bdn.json`; the names below are added by the
 seed wherever the Arabic is unchanged and the Kurdish is empty.
@@ -558,7 +561,62 @@ and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ �
 «اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
 And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).
 
-## Batch 23 — separate terms for newborn invitations (PENDING)
+## Batch 23 — date-of-birth format, bottle size, files-only designs — ⏳ PENDING owner approval
+
+Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Arabic until approved).
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.birthDateFormat.heading` | طريقة كتابة تاريخ الولادة | How the date of birth is written | شێوازی نووسینی بەرواری لەدایکبوون | شێوازێ نڤیسینا دیرۆکا ژدایکبوونێ | ◐ |
+| 2 | `store.birthDateFormat.help` | هكذا سيظهر التاريخ على الستوري والبطاقة والملصقات. | This is how the date appears on the story, card and stickers. | بەروارەکە بەم شێوەیە لەسەر ستۆری و کارت و لکێنەرەکان دەردەکەوێت. | دیرۆک ب ڤی شێوەی ل سەر ستۆری و کارت و لکێنەران دێ دیار بیت. | ◐ |
+| 3 | `store.birthDateFormat.digits` | الأرقام | Digits | ژمارەکان | ژمارە | ● |
+| 4 | `store.birthDateFormat.arab` | ٠١٢٣ | ٠١٢٣ | ٠١٢٣ | ٠١٢٣ | ● |
+| 5 | `store.birthDateFormat.latn` | 0123 | 0123 | 0123 | 0123 | ● |
+| 6 | `store.bottleSize.heading` | حجم قنينة الماء | Water bottle size | قەبارەی بوتڵی ئاو | قەبارێ بوتلا ئاڤێ | ◐ |
+| 7 | `store.bottleSize.help` | الملصق يلتف حول القنينة… | The label wraps around the bottle… | لکێنەرەکە بە دەوری بوتڵەکەدا دەپێچرێت. قەبارەکە بە پارچە کاغەزێک بپشکنن؛ وێنەی PNG دەتوانرێت بۆ هەر بوتڵێک گەورە یان بچووک بکرێت. | لکێنەر ل دۆر بوتلێ دهێتە پێچان. قەبارێ ب پارچەکا کاغەزێ بپشکنن؛ وێنەیێ PNG دشێت بۆ هەر بوتلەکێ بهێتە مەزنکرن یان بچووککرن. | ◐ |
+| 8 | `store.bottleSize.option` | {ml} مل | {ml} ml | {ml} مل | {ml} مل | ● |
+| 9 | `store.filesPreview` | عرض الملفات | Files preview | پیشاندانی فایلەکان | نیشاندانا فایلان | ◐ |
+| 10 | `store.filesOnlyHint` | هذا تصميم ملفات فقط للتحميل والطباعة (ستوري، بطاقة، ملصقات)، وليس دعوة إلكترونية. | This design comes as files to download and print… | ئەم دیزاینە تەنها فایلە بۆ داگرتن و چاپکردن (ستۆری، کارت، لکێنەر)، بانگهێشتی ئۆنلاین نییە. | ئەڤ دیزاینە بتنێ فایلن بۆ داگرتن و چاپکرنێ (ستۆری، کارت، لکێنەر)، ڤەخواندنا ئۆنلاین نینە. | ◐ |
+| 11 | `store.wording.heading` | نص التصميم | Wording on the design | دەقی دیزاین | نڤیسینا دیزاینێ | ◐ |
+| 12 | `store.wording.help` | يمكنكم اختيار كلمة الربط بين الاسمين. الآيات والنص العربي في التصميم يبقيان كما هما. | You can choose the word that joins the two names… | دەتوانن ئەو وشەیە هەڵبژێرن کە دوو ناوەکە پێکەوە دەبەستێتەوە. ئایەتەکان و دەقی عەرەبی دیزاینەکە وەک خۆیان دەمێننەوە. | هوین دشێن وێ پەیڤێ هەلبژێرن یا هەردوو ناڤان پێکڤە گرێدەدەت. ئایەت و نڤیسینا عەرەبی یا دیزاینێ وەک خۆ دمینن. | ◐ |
+| 13 | `store.wording.arabic` | العربية (كما في التصميم) | Arabic (as in the design) | عەرەبی (وەک لە دیزاینەکەدا) | عەرەبی (وەک د دیزاینێ دا) | ◐ |
+| 14 | `store.wording.inLanguage` | بلغة الدعوة ({language}) | In the invitation's language ({language}) | بە زمانی بانگهێشتنامەکە ({language}) | ب زمانێ داخوازنامێ ({language}) | ◐ |
+| 15 | `store.wording.custom` | اكتبوا نصكم | Write your own | دەقی خۆتان بنووسن | نڤیسینا خۆ بنڤیسن | ◐ |
+| 16 | `store.stickerShape.both` | الاثنان | Both | هەردووکیان | هەردوو | ◐ |
+
+Order-form labels in the Embroidered Garden manifest (Kurdish shows the Arabic until approved):
+«كلمة «بن»» → Sorani: وشەی «کوڕی» / Badini: پەیڤا «کوڕێ» (◐).
+
+Text inside the Embroidered Garden design (`themes/embroidered-garden/v1/copy.ts`; Kurdish uses the Arabic until approved;
+the Quran verse and du'a always stay Arabic):
+«رزقنا الله بأجمل العطايا» → stays Arabic in every language (owner, 2026-10-11): no Kurdish needed.
+«بن» (son of) → ✅ owner (2026-10-11): Sorani «کوڕی», Badini «کوڕێ» (the default on Kurdish orders; «بن» stays a choice).
+
+Order-form labels in the Bluebird Garden manifest (`themes/bluebird-garden/v1/manifest.ts`; Kurdish shows the Arabic until approved):
+- «ترتيب المولود» / Birth order → Sorani: ڕیزبەندی منداڵ / Badini: ڕیزبەندیا زاروکی (◐).
+- «كلمة «بن»» → Sorani: وشەی «کوڕی» / Badini: پەیڤا «کوڕێ» (◐).
+- «إظهار اسم الأب على ملصقات الشوكولاتة وملصق القنينة» / Show the father's name on the chocolate stickers and bottle label →
+  Sorani: ناوی باوک لەسەر لکێنەری چوکلێت و لکێنەری بوتڵ پیشان بدرێت / Badini: ناڤێ بابی ل سەر لکێنەرێن چوکلێتێ و لکێنەرا بوتلێ بهێتە نیشاندان (◐).
+
+Text inside the Bluebird Garden design (praise lines, birth-order line, du'a) stays Arabic in every language (owner, 2026-10-11).
+
+Order-form labels in the Rosebird Garden manifest (#8, `themes/rosebird-garden/v1/manifest.ts`; Kurdish shows the Arabic until approved):
+- «ترتيب المولودة» / Birth order → Sorani: ڕیزبەندی کچۆڵە / Badini: ڕیزبەندیا کچکێ (◐).
+- «كلمة «بنت»» → Sorani: وشەی «کچی» / Badini: پەیڤا «کچا» (◐).
+- The father tick box: as for Bluebird Garden above.
+
+Text inside the Rosebird Garden design: «بنت» (daughter of) → ✅ owner (2026-10-12): Sorani «کچی», Badini «کچا»
+(the default on Kurdish orders; «بنت» stays a choice). The praise lines, birth-order line and du'a stay Arabic.
+
+Example names for theme previews (`invitationSamples.names`: boys', girls', men's and women's names, short and long,
+separated by `|`; each design takes its own by its number). Kurdish previews use the Arabic names until the owner
+gives Kurdish lists (same order, same count) or approves them in Arabic script.
+
+
+Order-form labels in the Swan Garden manifest (#9, `themes/swan-garden/v1/manifest.ts`): «كلمة «بنت»» and the father tick box,
+as for Rosebird Garden and Bluebird Garden above. The design's text (praise, «أكرمنا الله بأجمل العطايا», du'a) stays Arabic.
+
+## Batch 24 — separate terms for newborn invitations (PENDING)
 
 Newborn orders accept their own terms («شروط دعوات المولود», `/legal/terms-newborn`); weddings and the other
 occasions keep the main terms. The text is seeded as a draft in Admin → Legal policies (Arabic and English); it can

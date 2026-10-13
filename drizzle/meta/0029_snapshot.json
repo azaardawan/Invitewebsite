@@ -1,5 +1,5 @@
 {
-  "id": "70aefd5a-c455-4197-866f-e9ca62e8b8da",
+  "id": "7b0aaced-e2c3-4e28-a745-d652141de328",
   "prevId": "44e79381-12b0-48de-9400-886c935456ad",
   "version": "7",
   "dialect": "postgresql",
@@ -2543,6 +2543,27 @@
           "notNull": true,
           "default": "'round'"
         },
+        "bottle_size": {
+          "name": "bottle_size",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'500'"
+        },
+        "birth_date_style": {
+          "name": "birth_date_style",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'long'"
+        },
+        "birth_date_digits": {
+          "name": "birth_date_digits",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'arab'"
+        },
         "card_options": {
           "name": "card_options",
           "type": "jsonb",
@@ -4371,8 +4392,7 @@
       "values": [
         "TERMS",
         "PRIVACY",
-        "REFUND",
-        "TERMS_NEWBORN"
+        "REFUND"
       ]
     }
   },

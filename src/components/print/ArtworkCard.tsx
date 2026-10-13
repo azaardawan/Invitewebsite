@@ -101,7 +101,7 @@ export function ArtworkCardFront({ design, sheet, ...p }: PrintCardProps & { des
   const gender = p.fields.baby_gender === 'boy' ? p.labels.itsABoy : p.fields.baby_gender === 'girl' ? p.labels.itsAGirl : null;
   const parents = [p.fields.mother_name, p.fields.father_name].filter(Boolean).join(` ${p.labels.and} `);
   const details = [
-    p.birthDate ? [p.labels.bornOn, p.birthDate.full] : null,
+    p.birthDate ? [p.labels.bornOn, p.birthDate.lines.join(' · ')] : null,
     p.event.date ? [p.labels.date, p.event.date.full] : null,
     p.event.time ? [p.labels.time, p.event.time] : null,
     p.fields.venue_name ? [p.labels.venue, p.fields.venue_name] : null,

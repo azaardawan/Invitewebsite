@@ -9,7 +9,7 @@
  */
 import type { FieldKey } from '@/catalog/fields';
 import type { ThemeBorderSpec } from './border';
-import type { EventDateParts, InvitationLocale } from './types';
+import type { BirthDateParts, EventDateParts, InvitationLocale } from './types';
 
 /** Localized platform strings a print design may show. Never hard-code text. */
 export type PrintLabels = {
@@ -46,7 +46,11 @@ type PrintBase = {
   /** The theme's colour slots with the customer's chosen colours (also set as `--bahja-color-<key>`). */
   colors: Record<string, string>;
   /** Newborn: the date of birth in the invitation's language, or null. */
-  birthDate: EventDateParts | null;
+  birthDate: BirthDateParts | null;
+  /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
+  wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`): the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
 };
 
 export type PrintCardProps = PrintBase & {
@@ -73,4 +77,31 @@ export type KeepsakeMessage = { guestName: string; message: string };
 export type KeepsakeProps = PrintBase & {
   /** Visible messages in the order received. Can be empty or run to several hundred. */
   messages: readonly KeepsakeMessage[];
+};
+
+/**
+ * A design's own newborn extras (optional): `print/Story.tsx` (Instagram story, 1080 × 1920 px),
+ * `print/Sticker.tsx` (one chocolate sticker, 40 mm, round or square) and `print/Bottle.tsx` (one water-bottle
+ * label, size chosen by the customer). Each is drawn inside a box of exactly that size that is a CSS size
+ * container, so lay out with `cqw`/`cqh`. The platform clips round stickers, lays the copies out on print
+ * sheets, adds the watermark before payment and makes the PNG/PDF files. Artwork the owner uploads in Admin
+ * for an extra replaces the design's own. Server components, like the card.
+ */
+export type PrintExtraProps = {
+  locale: InvitationLocale;
+  dir: 'rtl' | 'ltr';
+  lang: string;
+  /** Only the fields the package includes. */
+  fields: Readonly<Partial<Record<FieldKey, string>>>;
+  /** The date of birth; print `birthDate.lines` (the style the customer chose). */
+  birthDate: BirthDateParts | null;
+  /** The design's changeable lines (manifest `wording`): the customer's choice or the Arabic default. */
+  wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`): the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
+  labels: Pick<PrintLabels, 'itsABoy' | 'itsAGirl' | 'bornOn' | 'and'>;
+  /** Stickers: the shape the customer chose. */
+  shape: 'round' | 'square';
+  /** The box in CSS px (story) or mm (sticker, bottle label). */
+  size: { width: number; height: number; unit: 'px' | 'mm' };
 };

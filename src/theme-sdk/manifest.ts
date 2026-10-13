@@ -40,9 +40,58 @@ export type ThemeManifest = {
    * Admin and the customer picks one. Without it the theme keeps its fixed colours.
    */
   colors?: { slots: { key: string; label: { ar: string; en: string }; default: string }[] };
+  /**
+   * `false`: the design has no online invitation page; customers buy only its files (the printable card
+   * and newborn extras such as the story, stickers and bottle label). No public link, no QR code, nothing
+   * to share; `Theme.tsx` is used only for previews. Default `true`.
+   */
+  onlineInvitation?: boolean;
+  /**
+   * Lines of the design's own wording the customer may change on the order form (never Quran or du'a):
+   * the Arabic is the default (except in the languages listed in `defaultIn`, which default to their
+   * version); `versions` are offered as a choice for orders in that language; or the customer writes their
+   * own (up to `maxLength`). A line with `options` offers those fixed alternatives too, and `custom: false`
+   * takes away the customer's own text. The theme reads `props.wording[key]`.
+   */
+  wording?: WordingLine[];
+  /**
+   * Yes/no choices for the customer on the order form (e.g. "show the father's name on the stickers"),
+   * each with its default. The theme reads `props.switches[key]`.
+   */
+  switches?: DesignSwitch[];
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
+
+export type WordingLine = {
+  key: string;
+  /** What the line is, shown on the order form. */
+  label: { ar: string; en: string };
+  /** The default text, in every language. */
+  ar: string;
+  /** The same line in other languages, offered as a choice. */
+  versions?: Partial<Record<'en' | 'ckb' | 'bdn', string>>;
+  /** Languages whose version is the default instead of the Arabic. */
+  defaultIn?: readonly ('en' | 'ckb' | 'bdn')[];
+  /** Fixed alternatives offered besides `ar` (which stays the first and default), e.g. «أوّل / ثاني / ثالث». */
+  options?: readonly string[];
+  /** `false`: the customer cannot write their own text for this line (only the offered choices). */
+  custom?: boolean;
+  maxLength: number;
+};
+
+export type DesignSwitch = {
+  key: string;
+  /** The question, shown next to the tick box on the order form. */
+  label: { ar: string; en: string };
+  default: boolean;
+};
+
+/** A line's default text for an invitation language: its version where `defaultIn` lists the language, else the Arabic. */
+export function wordingDefault(line: Pick<WordingLine, 'ar' | 'versions' | 'defaultIn'>, locale: string): string {
+  const l = locale as 'en' | 'ckb' | 'bdn';
+  return (line.defaultIn?.includes(l) && line.versions?.[l]) || line.ar;
+}
 
 export function defineTheme<const T extends ThemeManifest>(manifest: T): T {
   return manifest;
@@ -84,6 +133,26 @@ export const manifestSchema = z
           .max(8),
       })
       .optional(),
+    onlineInvitation: z.boolean().optional(),
+    wording: z
+      .array(
+        z.object({
+          key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
+          label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+          ar: z.string().min(1),
+          versions: z.object({ en: z.string().min(1), ckb: z.string().min(1), bdn: z.string().min(1) }).partial().optional(),
+          defaultIn: z.array(z.enum(['en', 'ckb', 'bdn'])).optional(),
+          options: z.array(z.string().min(1)).max(8).optional(),
+          custom: z.boolean().optional(),
+          maxLength: z.number().int().min(1).max(120),
+        }),
+      )
+      .max(6)
+      .optional(),
+    switches: z
+      .array(z.object({ key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/), label: z.object({ ar: z.string().min(1), en: z.string().min(1) }), default: z.boolean() }))
+      .max(6)
+      .optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {
@@ -105,6 +174,12 @@ export const manifestSchema = z
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
+    if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');
+    if (m.switches && new Set(m.switches.map((w) => w.key)).size !== m.switches.length) issue('switches contain duplicate keys');
+    for (const w of m.wording ?? []) {
+      for (const l of w.defaultIn ?? []) if (!w.versions?.[l]) issue(`wording.${w.key}: defaultIn ${l} has no version`);
+      for (const text of [w.ar, ...Object.values(w.versions ?? {}), ...(w.options ?? [])]) if (text.length > w.maxLength) issue(`wording.${w.key}: "${text}" is longer than maxLength`);
+    }
   });
 
 /**

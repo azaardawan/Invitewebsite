@@ -74,12 +74,12 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
-    ...(r.invitation.publishedAt ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
+    ...(r.invitation.publishedAt && r.invitation.onlineInvitation ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
   // Have the WhatsApp link-preview picture ready before the customer shares the invitation.
-  if (paid && r.invitation.live) after(() => ensurePreview(db(), r!.invitation.id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
+  if (paid && r.invitation.live && r.invitation.onlineInvitation) after(() => ensurePreview(db(), r!.invitation.id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
   const replies = paid && r.invitation.hasRsvp ? await attendanceCounts(db(), r.invitation.id) : null;
   const num = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ar-IQ');
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
@@ -154,29 +154,32 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       </dl>
       <p className="mt-2 text-xs text-muted">{t('amountNote')}</p>
 
-      <section className="mt-8 space-y-3">
-        <h2 className="font-semibold">{t('invitationLink')}</h2>
-        {url ? (
-          <p className="break-all rounded-md bg-canvas px-3 py-2 text-sm" dir="ltr">
-            {url}
-          </p>
-        ) : (
-          <p className="text-sm text-muted">{t('notPublishedYet')}</p>
-        )}
-        <ReceiptActions
-          url={url}
-          shareText={t('shareText', { url: url ?? '' })}
-          confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
-          labels={{
-            copyLink: t('copyLink'),
-            copied: t('copied'),
-            shareWhatsApp: t('shareWhatsApp'),
-            saveWhatsApp: t('saveWhatsApp'),
-            openInvitation: t('openInvitation'),
-            print: t('print'),
-          }}
-        />
-      </section>
+      {/* Designs without an online invitation are files only: no link to show or share. */}
+      {r.invitation.onlineInvitation ? (
+        <section className="mt-8 space-y-3">
+          <h2 className="font-semibold">{t('invitationLink')}</h2>
+          {url ? (
+            <p className="break-all rounded-md bg-canvas px-3 py-2 text-sm" dir="ltr">
+              {url}
+            </p>
+          ) : (
+            <p className="text-sm text-muted">{t('notPublishedYet')}</p>
+          )}
+          <ReceiptActions
+            url={url}
+            shareText={t('shareText', { url: url ?? '' })}
+            confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
+            labels={{
+              copyLink: t('copyLink'),
+              copied: t('copied'),
+              shareWhatsApp: t('shareWhatsApp'),
+              saveWhatsApp: t('saveWhatsApp'),
+              openInvitation: t('openInvitation'),
+              print: t('print'),
+            }}
+          />
+        </section>
+      ) : null}
 
       {paid && r.invitation.selfEdit.included ? (
         <section id="edit" className="mt-8 space-y-2 print:hidden">
@@ -259,6 +262,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               card: tStore('extras.card'),
               story: tStore('extras.story'),
               sticker: tStore('extras.sticker'),
+              round: tStore('stickerShape.round'),
+              square: tStore('stickerShape.square'),
               bottle: tStore('extras.bottle'),
               downloadPng: tStore('extras.downloadPng'),
               downloadSheet: tStore('extras.downloadSheet'),

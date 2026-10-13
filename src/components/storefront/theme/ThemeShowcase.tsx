@@ -25,6 +25,7 @@ export function ThemeShowcase({
   packages,
   defaultPackageId,
   occasion,
+  filesOnly = false,
 }: {
   themeKey: string;
   lang: string;
@@ -32,6 +33,8 @@ export function ThemeShowcase({
   defaultPackageId?: string;
   /** The occasion the customer came from, for a design sold in several (wording and order). */
   occasion?: string;
+  /** A design sold only as files (story, card, stickers…): shown as a picture, not as a phone invitation. */
+  filesOnly?: boolean;
 }) {
   const t = useTranslations('store');
   const [pkg, setPkg] = useState(defaultPackageId ?? packages[0]?.id);
@@ -41,17 +44,27 @@ export function ThemeShowcase({
   return (
     <div className="grid gap-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start lg:gap-20">
       <div id="preview" className="flex scroll-mt-6 flex-col items-center gap-4 lg:sticky lg:top-6">
-        <div className="relative w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
-          <span aria-hidden className="absolute top-5 left-1/2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-[#ffffff33]" />
+        {filesOnly ? (
           <iframe
             key={src}
             src={src}
-            title={t('livePreview')}
+            title={t('filesPreview')}
             loading="lazy"
-            className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[720px]"
+            className="block aspect-[9/16] w-full max-w-[380px] rounded-[18px] bg-surface shadow-[0_30px_60px_rgb(58_21_32/0.18)]"
           />
-        </div>
-        <p className="max-w-[380px] text-center text-sm text-muted">{t('previewHint')}</p>
+        ) : (
+          <div className="relative w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
+            <span aria-hidden className="absolute top-5 left-1/2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-[#ffffff33]" />
+            <iframe
+              key={src}
+              src={src}
+              title={t('livePreview')}
+              loading="lazy"
+              className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[720px]"
+            />
+          </div>
+        )}
+        <p className="max-w-[380px] text-center text-sm text-muted">{filesOnly ? t('filesOnlyHint') : t('previewHint')}</p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           {(['short', 'long'] as const).map((n) => (
             <button
@@ -64,9 +77,11 @@ export function ThemeShowcase({
               {n === 'short' ? t('shortNames') : t('longNames')}
             </button>
           ))}
-          <a href={src} target="_blank" rel="noopener" className="h-10 px-3 text-sm leading-10 font-medium text-accent underline underline-offset-4">
-            {t('openFull')}
-          </a>
+          {filesOnly ? null : (
+            <a href={src} target="_blank" rel="noopener" className="h-10 px-3 text-sm leading-10 font-medium text-accent underline underline-offset-4">
+              {t('openFull')}
+            </a>
+          )}
         </div>
       </div>
 

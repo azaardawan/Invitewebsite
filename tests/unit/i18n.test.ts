@@ -22,6 +22,11 @@ describe('translations', () => {
     for (const k of [...keys(ckb), ...keys(bdn)]) expect(arKeys.has(k), k).toBe(true);
   });
 
+  it('Kurdish values are words, never the review table\'s confidence marks (a mis-imported column)', () => {
+    const values = (obj: object): string[] => Object.values(obj).flatMap((v) => (typeof v === 'object' && v !== null ? values(v) : [String(v)]));
+    for (const messages of [ckb, bdn]) expect(values(messages).filter((v) => /^[●◐○]$/.test(v.trim()))).toEqual([]);
+  });
+
   it('untranslated Kurdish keys fall back to Arabic, approved ones win', () => {
     const merged = mergeMessages({ a: { x: 'ar-x', y: 'ar-y' } }, { a: { x: 'ku-x' } });
     expect(merged).toEqual({ a: { x: 'ku-x', y: 'ar-y' } });

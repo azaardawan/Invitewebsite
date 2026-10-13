@@ -90,9 +90,18 @@ export const invitations = pgTable(
     publishedAt: timestamp('published_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
-    /** Chocolate stickers (`sticker` feature): the shape the customer chose. */
-    stickerShape: text('sticker_shape', { enum: ['round', 'square'] }).notNull().default('round'),
+    /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
+    stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
+    /** Bottle labels (`bottle_label` feature): the bottle size the customer chose (src/catalog/products.ts). */
+    bottleSize: text('bottle_size', { enum: ['250', '330', '500', '600'] }).notNull().default('500'),
+    /** Newborn: how the customer wants the date of birth written (src/lib/birth-date-format.ts). */
+    birthDateStyle: text('birth_date_style', { enum: ['long', 'numeric', 'hijri', 'both'] }).notNull().default('long'),
+    birthDateDigits: text('birth_date_digits', { enum: ['arab', 'latn'] }).notNull().default('arab'),
     cardOptions: jsonb('card_options').$type<CardOptions>().notNull().default({}),
+    /** The design's changeable lines (manifest `wording`) the customer changed, by key; absent = the Arabic default. */
+    wording: jsonb('wording').$type<Record<string, string>>().notNull().default({}),
+    /** The design's yes/no choices (manifest `switches`) the customer answered, by key; absent = the default. */
+    switches: jsonb('switches').$type<Record<string, boolean>>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */

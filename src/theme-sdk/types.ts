@@ -126,8 +126,21 @@ export type ThemeProps = {
    */
   occasion: string | null;
   /** Newborn: the date of birth (`fields.birth_date`) in the invitation's language, or null. */
-  birthDate: EventDateParts | null;
+  birthDate: BirthDateParts | null;
+  /**
+   * The design's changeable lines (manifest `wording`), by key: the customer's choice, or the Arabic default.
+   * Always has every declared key.
+   */
+  wording: Readonly<Record<string, string>>;
+  /** The design's yes/no choices (manifest `switches`), by key: the customer's answer or the default. */
+  switches: Readonly<Record<string, boolean>>;
 };
+
+/**
+ * The date of birth: its parts, plus `lines`, the date written the way the customer chose on the order
+ * form (Gregorian, numeric, Hijri, or Gregorian + Hijri as two lines). Show `lines` wherever the date is printed.
+ */
+export type BirthDateParts = EventDateParts & { lines: string[] };
 
 export type ThemeComponent = (props: ThemeProps) => React.ReactNode;
 

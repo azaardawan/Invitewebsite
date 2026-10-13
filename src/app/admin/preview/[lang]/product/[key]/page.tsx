@@ -11,7 +11,9 @@ import { ProductPages } from '@/app/print/ProductPages';
 const query = z.object({
   view: z.enum(['story', 'sticker', 'stickerSheet', 'bottle', 'bottleSheet']).default('story'),
   shape: z.enum(['round', 'square']).default('round'),
-  gender: z.enum(['boy', 'girl']).default('boy'),
+  bottle: z.enum(['250', '330', '500', '600']).default('500'),
+  /** Default: the design's own (girl designs show a girl). */
+  gender: z.enum(['boy', 'girl']).optional(),
   /** Try a layout without saving it. */
   layout: z.string().max(20).optional(),
 });
@@ -25,12 +27,12 @@ export default async function ProductSamplePreview({ params, searchParams }: Pag
   if (!q.success) notFound();
   const sample = await resolveSample(db(), { themeKey: key, locale: lang });
   if (!sample) notFound();
-  const props = { ...sample.props, fields: { ...sample.props.fields, baby_gender: q.data.gender, baby_name: sample.props.fields.baby_name ?? sample.props.fields.person_1_name } };
+  const props = { ...sample.props, fields: { ...sample.props.fields, baby_gender: q.data.gender ?? sample.props.fields.baby_gender, baby_name: sample.props.fields.baby_name ?? sample.props.fields.person_1_name } };
   const art = await themeArtwork(db(), sample.theme.id);
   if (q.data.layout) {
     const slot = q.data.view.startsWith('sticker') ? 'sticker' : q.data.view.startsWith('bottle') ? 'bottle' : 'story';
     art[slot] = { ...(art[slot] ?? { src: '', ...CARD_SIDE_DEFAULTS, insetMm: slot === 'sticker' ? 4 : slot === 'bottle' ? 6 : 0 }), layout: q.data.layout };
   }
-  const data = productDataFrom(props, art, { stickerShape: q.data.shape, watermark: false });
+  const data = productDataFrom(props, art, { stickerShape: q.data.shape, bottleSize: q.data.bottle, watermark: false, codeRef: sample.version.codeRef });
   return <ProductPages view={q.data.view} data={data} />;
 }

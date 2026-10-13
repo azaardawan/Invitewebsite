@@ -2,7 +2,8 @@ import 'server-only';
 import { invitationNames } from '@/catalog/fields';
 import { and, eq, gt, inArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations } from '@/server/db/schema';
+import { invitations, themeVersions } from '@/server/db/schema';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
 import { invitationPublicId, slugFromNames } from '@/lib/ids';
 import type { RequestContext } from '@/server/auth/request-context';
@@ -32,7 +33,24 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
   }
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
   // Card back, signature and colour set (only what the package includes).
-  const extra = await extrasUpdate(db, { themeId: p.theme.id, featureKeys: p.pkg.featureKeys, cardOptions: {}, signatureAssetId: null, signature2AssetId: null, colors: null }, input.extras ?? {});
+  const extra = await extrasUpdate(
+    db,
+    {
+      themeId: p.theme.id,
+      featureKeys: p.pkg.featureKeys,
+      fieldKeys: p.pkg.fieldKeys,
+      cardOptions: {},
+      signatureAssetId: null,
+      signature2AssetId: null,
+      colors: null,
+      wordingLines: (p.version.manifest as ThemeManifest).wording,
+      wording: {},
+      switchDefs: (p.version.manifest as ThemeManifest).switches,
+      switches: {},
+      locale: input.locale,
+    },
+    input.extras ?? {},
+  );
 
   const token = newPreviewToken();
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -94,7 +112,17 @@ export async function updateDraft(
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
     const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now);
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
-    const extra = await extrasUpdate(tx, locked!, input.extras ?? {});
+    const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
+    const extra = await extrasUpdate(
+      tx,
+      {
+        ...locked!,
+        wordingLines: (version?.manifest as ThemeManifest | undefined)?.wording,
+        switchDefs: (version?.manifest as ThemeManifest | undefined)?.switches,
+        locale: input.locale ?? locked!.locale,
+      },
+      input.extras ?? {},
+    );
     await tx
       .update(invitations)
       .set({

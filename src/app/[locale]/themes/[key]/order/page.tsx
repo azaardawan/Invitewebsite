@@ -61,7 +61,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           invitationLocale={locale}
           minDate={baghdadToday()}
           submitLabel={t('continue')}
-          extras={await orderFormExtras(locale, th.id, pkg.featureKeys)}
+          extras={await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: th.manifest.wording, switchDefs: th.manifest.switches }, pkg.fieldKeys)}
         />
       </div>
     </div>
