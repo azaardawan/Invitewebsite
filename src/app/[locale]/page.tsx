@@ -6,6 +6,8 @@ import { TopPicks } from '@/components/storefront/home/TopPicks';
 import { Hero } from '@/components/storefront/home/Hero';
 import { ThemeCarousel } from '@/components/storefront/home/ThemeCarousel';
 import { CtaBand, Faq, Features, HowItWorks, Occasions, SectionTitle } from '@/components/storefront/home/Sections';
+import { publicContact } from '@/server/settings/public';
+import { socialLinks } from '@/lib/contact-links';
 
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
@@ -13,8 +15,26 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const t = await getTranslations('home');
   const [sections, themes, top] = await Promise.all([storefrontSections(), storefrontThemes({ limit: 12 }), storefrontTopPicks()]);
 
+  // What search engines show for the site: its name (بهجه, also known as Bahja) and its logo.
+  const site = (process.env.APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+  const common = await getTranslations({ locale: 'ar', namespace: 'common' });
+  const english = await getTranslations({ locale: 'en', namespace: 'common' });
+  const structuredData = [
+    { '@context': 'https://schema.org', '@type': 'WebSite', name: common('brand'), alternateName: [english('brand'), 'bahjaaa.com'], url: `${site}/` },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: common('brand'),
+      alternateName: english('brand'),
+      url: `${site}/`,
+      logo: `${site}/logo.png`,
+      sameAs: socialLinks(await publicContact()).map((l) => l.href),
+    },
+  ];
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
       <Hero />
       <Occasions sections={sections} />
       <TopPicks

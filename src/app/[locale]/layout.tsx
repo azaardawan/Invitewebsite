@@ -26,7 +26,11 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
   const t = await getTranslations({ locale, namespace: 'common' });
   return {
     title: { default: t('brand'), template: `%s · ${t('brand')}` },
+    applicationName: t('brand'),
     metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
+    // The logo card for links shared anywhere and for search results; a page with its own picture (a design) replaces it.
+    openGraph: { siteName: t('brand'), type: 'website', images: [{ url: '/og.png', width: 1200, height: 630, alt: t('brand') }] },
+    twitter: { card: 'summary_large_image', images: ['/og.png'] },
   };
 }
 
