@@ -8,6 +8,7 @@ import { sha256 } from '@/lib/crypto';
 import { printData } from '@/server/documents/data';
 import { renderProduct, type ProductItem, type ProductRenderer } from '@/server/documents/render';
 import { isPaid, productData } from './data';
+import { shapeVariant } from '@/server/catalog/card-shapes';
 
 /** Bump to regenerate every stored extra after a design change in the platform's components (2: denser watermark; 3: the note only). */
 const PRODUCT_PIPELINE_VERSION = 3;
@@ -78,7 +79,7 @@ export function productFileName(item: ProductItem, publicId: string) {
  * seen before paying and are watermarked until then (the watermark is part of what is stored, so paying
  * renders a clean copy); the files themselves (PNG, PDF sheets) are only given out once paid.
  */
-export async function ensureProductFile(db: DbOrTx, invitationId: string, item: ProductItem, render: ProductRenderer = renderProduct) {
+export async function ensureProductFile(db: DbOrTx, invitationId: string, item: ProductItem, render: ProductRenderer = renderProduct, opts: { shape?: unknown } = {}) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new ProductError('notFound');
   if (!inv.featureKeys.includes(FEATURE[item])) throw new ProductError('notIncluded');
@@ -86,32 +87,35 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   const paid = isPaid(inv);
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
 
+  // The card preview: one per card shape the package includes (`shape`, default the first).
+  const card = item === 'card.preview' ? await printData(db, inv, 'card', { shape: opts.shape }) : null;
+  const shape = card?.kind === 'card' ? card.shape : undefined;
+  const variant = card?.kind === 'card' ? shapeVariant(card.shape, card.shapes) : '';
   const shown =
-    item === 'card.preview'
-      ? await (async () => {
-          const d = await printData(db, inv, 'card');
-          return d.kind === 'card' ? { props: d.props, design: d.design.front } : null;
-        })()
+    card
+      ? card.kind === 'card'
+        ? { props: card.props, design: card.design.front }
+        : null
       : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
   const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid }));
 
   const [existing] = await db
     .select()
     .from(generatedDocuments)
-    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[item])));
+    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[item]), eq(generatedDocuments.variant, variant)));
   if (existing && existing.sourceHash === sourceHash) {
     const stored = await storage().get(existing.storageKey);
     if (stored) return { data: stored, type: contentType(item), fileName: productFileName(item, inv.publicId) };
   }
-  const data = await render(item, inv.id, { bottleSize: inv.bottleSize });
+  const data = await render(item, inv.id, { bottleSize: inv.bottleSize, ...(shape ? { shape } : {}) });
   const ext = contentType(item) === 'application/pdf' ? 'pdf' : contentType(item) === 'image/png' ? 'png' : 'jpg';
   const storageKey = `documents/${randomUUID()}.${ext}`;
   await storage().put(storageKey, data, contentType(item));
-  const values = { invitationId: inv.id, kind: KIND[item], storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: data.length, generatedBy: null, generatedAt: new Date() };
+  const values = { invitationId: inv.id, kind: KIND[item], variant, storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: data.length, generatedBy: null, generatedAt: new Date() };
   await db
     .insert(generatedDocuments)
     .values(values)
-    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind], set: values });
+    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind, generatedDocuments.variant], set: values });
   if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
   return { data, type: contentType(item), fileName: productFileName(item, inv.publicId) };
 }

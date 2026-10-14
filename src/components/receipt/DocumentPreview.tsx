@@ -15,7 +15,10 @@ export function DocumentPreview({
   openHref,
   downloadHref,
   labels,
+  ratio = { front: '148 / 210', back: '210 / 148' },
 }: {
+  /** Width / height of each side's picture (CSS aspect-ratio); a card shape other than A5 passes its own. */
+  ratio?: { front: string; back: string };
   title: string;
   imageSrc: string | null;
   back?: { src: string; title: string };
@@ -42,7 +45,7 @@ export function DocumentPreview({
     }, 300);
   };
 
-  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: 'aspect-[210/148]' } : { src: imageSrc, alt: title, ratio: 'aspect-[148/210]' };
+  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: ratio.back } : { src: imageSrc, alt: title, ratio: ratio.front };
 
   return (
     <figure className="flex min-w-0 flex-col gap-2">
@@ -52,8 +55,8 @@ export function DocumentPreview({
           href={openHref}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ transform: `rotateY(${angle}deg)`, transition: angle === -90 ? 'none' : 'transform 300ms ease-in-out' }}
-          className={`relative block w-full overflow-hidden rounded-lg border border-line bg-canvas shadow-[0_6px_18px_rgb(0_0_0/0.08)] transition-shadow hover:shadow-[0_8px_24px_rgb(0_0_0/0.14)] ${showing.ratio}`}
+          style={{ transform: `rotateY(${angle}deg)`, transition: angle === -90 ? 'none' : 'transform 300ms ease-in-out', aspectRatio: showing.ratio }}
+          className="relative block w-full overflow-hidden rounded-lg border border-line bg-canvas shadow-[0_6px_18px_rgb(0_0_0/0.08)] transition-shadow hover:shadow-[0_8px_24px_rgb(0_0_0/0.14)]"
         >
           <Picture key={showing.src ?? 'none'} src={showing.src} alt={showing.alt} pdf={labels.pdf} />
         </a>

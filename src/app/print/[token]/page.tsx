@@ -40,7 +40,8 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     const shape = (await searchParams).shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
     return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />;
   }
-  const data = await printData(db(), inv, claim.kind);
+  // Cards: `shape` picks one of the invitation's card shapes (default its first).
+  const data = await printData(db(), inv, claim.kind, { shape: (await searchParams).shape });
   if (data.kind === 'card') return <CardPages codeRef={data.codeRef} data={data} view={view === 'front' || view === 'back' ? view : undefined} watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)} />;
   const loaders = printComponents[data.codeRef];
   // Keepsake: every A4 page edge to edge (no page margins), so the theme's border sits in the same place on

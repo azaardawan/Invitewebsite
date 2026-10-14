@@ -709,3 +709,19 @@ only be published once the Kurdish is in. Sections shared with the main terms re
 - دبیت ئەم ڤان مەرجان نوو بکەین، و ل سەر هەر داخوازیەکێ ئەو وەشان دهێتە جێبەجێکرن یا تو دەمێ داخوازیێ ل سەر ڕازی بووی.
 - بۆ پەیوەندیێ: ب ڕێکا واتسئاپێ یان ڕێکێن پەیوەندیێ ل لاپەرێ «پەیوەندیێ ب مە بکە».
 ```
+
+## Batch 25 — printable card shapes (PENDING)
+
+The names of the card shapes, shown on the order review page and the receipt when a package includes a shape
+other than A5 (or several). Until approved, these show in Arabic to Kurdish visitors.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.cardShapes.A5` | بطاقة A5 | A5 card | کارتی A5 | کارتا A5 | ● |
+| 2 | `store.cardShapes.5x7` | بطاقة 5×7 | 5×7 card | کارتی 5×7 | کارتا 5×7 | ● |
+| 3 | `store.cardShapes.leaf` | بطاقة على شكل ورقة شجر | Leaf-shaped card | کارت بە شێوەی گەڵا | کارت ب شێوێ بەلگی | ◐ |
+| 4 | `store.cardShapes.heart` | بطاقة على شكل قلب | Heart-shaped card | کارت بە شێوەی دڵ | کارت ب شێوێ دلی | ● |
+| 5 | `store.cardShapes.oval` | بطاقة بيضوية | Oval card | کارتی هێلکەیی | کارتا هێلکەیی | ◐ |
+| 6 | `store.cardShapes.ogee-arch` | بطاقة على شكل قوس | Arch-shaped card | کارت بە شێوەی کەوانە | کارت ب شێوێ کەڤانێ | ◐ |
+| 7 | `store.cardShapes.butterfly` | بطاقة على شكل فراشة | Butterfly-shaped card | کارت بە شێوەی پەپوولە | کارت ب شێوێ پەپویکێ | ◐ |
+| 8 | `store.cardShapes.cloud` | بطاقة على شكل غيمة | Cloud-shaped card | کارت بە شێوەی هەور | کارت ب شێوێ ئەورێ | ◐ |

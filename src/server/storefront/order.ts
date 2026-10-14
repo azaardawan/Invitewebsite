@@ -19,6 +19,7 @@ import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES, formatBirthDate, type DateStyle, 
 import { localeMeta } from '@/i18n/config';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { baghdadToday } from '@/server/orders/validation';
+import { invitationCardShapes } from '@/server/catalog/card-shapes';
 
 /** Everything the review and edit screens need about a customer's draft, found by its preview token. */
 export async function draftByToken(token: string) {
@@ -37,6 +38,8 @@ export async function draftByToken(token: string) {
     status: inv.status,
     /** The terms this order will accept (newborn invitations have their own): its /legal/… page. */
     termsSlug: POLICY_SLUGS[await termsPolicyFor(db(), section?.key)] as 'terms' | 'terms-newborn',
+    /** The printable card's shapes (most designs: just A5). */
+    cardShapes: invitationCardShapes(inv, row.manifest as ThemeManifest),
     locale: inv.locale,
     values: inv.fieldValues,
     featureKeys: inv.featureKeys,

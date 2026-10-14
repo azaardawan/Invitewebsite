@@ -4,8 +4,10 @@ import { PDFDocument } from 'pdf-lib';
 import { env } from '@/server/env';
 import { printToken, type ProductView, type RenderKind } from './tokens';
 import { BOTTLE_SIZES, DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
+import { CARD_SHAPES, type CardShape } from '@/catalog/card-shapes';
 
-export type PdfRenderer = (kind: RenderKind, invitationId: string) => Promise<Buffer>;
+/** `shape`: which card shape to print (cards only; default the invitation's first). */
+export type PdfRenderer = (kind: RenderKind, invitationId: string, opts?: { shape?: CardShape }) => Promise<Buffer>;
 
 function printOrigin() {
   return (env().PRINT_ORIGIN ?? `http://127.0.0.1:${process.env.PORT ?? 3000}`).replace(/\/$/, '');
@@ -18,7 +20,7 @@ function printOrigin() {
  * it is a real browser. Cards are printed one side at a time (portrait front, landscape back) and joined,
  * so each side's border is laid out for its own page shape.
  */
-export const renderPdf: PdfRenderer = async (kind, invitationId) => {
+export const renderPdf: PdfRenderer = async (kind, invitationId, opts = {}) => {
   const browser = await chromium.launch({
     executablePath: env().CHROMIUM_PATH || undefined,
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
@@ -27,8 +29,9 @@ export const renderPdf: PdfRenderer = async (kind, invitationId) => {
     const url = `/print/${printToken(kind, invitationId)}`;
     if (kind !== 'card' && kind !== 'cardBleed') return await pdfOf(browser, url);
     const merged = await PDFDocument.create();
+    const shape = opts.shape ? `&shape=${opts.shape}` : '';
     for (const side of ['front', 'back']) {
-      const part = await PDFDocument.load(await pdfOf(browser, `${url}?view=${side}`));
+      const part = await PDFDocument.load(await pdfOf(browser, `${url}?view=${side}${shape}`));
       for (const p of await merged.copyPages(part, part.getPageIndices())) merged.addPage(p);
     }
     return Buffer.from(await merged.save());
@@ -48,7 +51,7 @@ async function pdfOf(browser: Browser, path: string) {
 }
 
 export type PreviewKind = 'card' | 'cardBack' | 'keepsake' | 'og';
-export type PreviewRenderer = (kind: PreviewKind, invitationId: string) => Promise<Buffer>;
+export type PreviewRenderer = (kind: PreviewKind, invitationId: string, opts?: { shape?: CardShape }) => Promise<Buffer>;
 
 const PX_PER_MM = 96 / 25.4;
 /** Viewport in px: page sizes of what the customer gets (A5 card portrait, back landscape, A4 cover), and 1200 × 630 for link previews. */
@@ -63,21 +66,31 @@ const PREVIEW_VIEWPORT: Record<PreviewKind, { width: number; height: number; sca
  * A picture rendered in the same browser as the PDFs: a document page (print page, captured as a JPEG
  * instead of a PDF) or, for `og`, the invitation's cover as a guest first sees it.
  */
-export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
+export const renderPreview: PreviewRenderer = async (kind, invitationId, opts = {}) => {
   const browser = await chromium.launch({
     executablePath: env().CHROMIUM_PATH || undefined,
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
   });
   try {
-    const v = PREVIEW_VIEWPORT[kind];
+    // A card in another shape: the picture is that shape's size (its back the same size, unless landscape).
+    const spec = opts.shape ? CARD_SHAPES[opts.shape] : null;
+    const v =
+      spec && (kind === 'card' || kind === 'cardBack')
+        ? kind === 'cardBack' && spec.landscapeBack
+          ? { width: mmPx(spec.heightMm), height: mmPx(spec.widthMm), scale: 1.2 }
+          : { width: mmPx(spec.widthMm), height: mmPx(spec.heightMm), scale: 1.2 }
+        : PREVIEW_VIEWPORT[kind];
+    const shapeQuery = opts.shape ? `shape=${opts.shape}` : '';
     const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.scale, reducedMotion: 'reduce' });
     if (kind !== 'og') await page.emulateMedia({ media: 'print' });
     const url =
       kind === 'og'
         ? `/print/${printToken('og', invitationId)}`
         : kind === 'cardBack'
-          ? `/print/${printToken('card', invitationId)}?view=back`
-          : `/print/${printToken(kind, invitationId)}`;
+          ? `/print/${printToken('card', invitationId)}?view=back${shapeQuery ? `&${shapeQuery}` : ''}`
+          : kind === 'card'
+            ? `/print/${printToken(kind, invitationId)}?view=front${shapeQuery ? `&${shapeQuery}` : ''}`
+            : `/print/${printToken(kind, invitationId)}`;
     const res = await page.goto(`${printOrigin()}${url}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
@@ -108,7 +121,7 @@ export type ProductItem =
   | 'sticker.preview'
   | 'bottle.preview'
   | 'card.preview';
-export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize }) => Promise<Buffer>;
+export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize; shape?: CardShape }) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
 const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square.pdf' | 'bottle.pdf'>, { view: string; width: number; height: number; scale: number; type: 'png' | 'jpeg'; transparent?: boolean }> = {
@@ -137,10 +150,16 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     const base = PRODUCT_SHOTS[item];
     // Bottle labels come in several sizes: the picture is the size the customer chose.
     const dims = BOTTLE_SIZES[opts.bottleSize ?? DEFAULT_BOTTLE_SIZE];
-    const shot = base.view === 'bottle' ? { ...base, width: mmPx(dims.width), height: mmPx(dims.height) } : base;
+    const cardSpec = base.view === 'card' && opts.shape ? CARD_SHAPES[opts.shape] : null;
+    const shot =
+      base.view === 'bottle'
+        ? { ...base, width: mmPx(dims.width), height: mmPx(dims.height) }
+        : cardSpec
+          ? { ...base, width: mmPx(cardSpec.widthMm), height: mmPx(cardSpec.heightMm) }
+          : base;
     const page = await browser.newPage({ viewport: { width: shot.width, height: shot.height }, deviceScaleFactor: shot.scale, reducedMotion: 'reduce' });
     await page.emulateMedia({ media: 'print' });
-    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}${square}`;
+    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front${opts.shape ? `&shape=${opts.shape}` : ''}` : `/print/${printToken(shot.view as ProductView, invitationId)}${square}`;
     const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);

@@ -1,4 +1,6 @@
 import { themeNumber } from '@/theme-registry';
+import { invitationCardShapes } from '@/server/catalog/card-shapes';
+import { manifestByCodeRef } from '@/theme-registry';
 import { invitationNames } from '@/catalog/fields';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -42,6 +44,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const row = await getInvitation(db(), id);
   if (!row) notFound();
   const t = await getTranslations('admin.invitations');
+  const tStore = await getTranslations('store');
   const locale = await getLocale();
   const intl = locale === 'ar' ? 'ar-IQ' : 'en-GB';
   const inv = row.invitation;
@@ -53,6 +56,8 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const showGuests = inv.featureKeys.includes('rsvp') && can(authz, 'guests.view');
   const canDocs = can(authz, 'documents.generate');
   const hasCard = inv.featureKeys.includes('print_card');
+  // The card's shapes (one file each); the links above are for the first one.
+  const otherShapes = invitationCardShapes(inv, manifestByCodeRef(row.codeRef)).slice(1);
   const hasKeepsake = inv.featureKeys.includes('keepsake_pdf');
   const delivery = canDocs && (hasCard || hasKeepsake) ? await customerDelivery(db(), inv.id) : null;
   // WhatsApp messages go to the customer in their invitation's language.
@@ -183,6 +188,21 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
               ) : (
                 <p className="text-sm text-muted">{t('cardAfterPayment')}</p>
               )}
+              {documentAvailable(inv, 'card') && otherShapes.length ? (
+                <ul className="space-y-1 text-sm" data-card-shapes>
+                  {otherShapes.map((shape) => (
+                    <li key={shape} className="flex flex-wrap gap-x-4">
+                      <span className="font-medium">{tStore(`cardShapes.${shape}`)}</span>
+                      <a href={`/admin/api/documents/${inv.id}/card?shape=${shape}`} className="text-accent underline">
+                        {t('downloadCard')}
+                      </a>
+                      <a href={`/admin/api/documents/${inv.id}/card?shape=${shape}&bleed=1`} className="text-accent underline">
+                        {t('downloadCardBleed')}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
 
               {inv.cardCustomKey ? (
                 <div className="flex flex-wrap items-center gap-3 rounded-md bg-canvas px-3 py-2 text-sm">

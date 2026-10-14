@@ -3,7 +3,8 @@ import '@fontsource/aref-ruqaa/700.css';
 import '@fontsource-variable/noto-sans-arabic';
 import '@fontsource-variable/vazirmatn';
 import type React from 'react';
-import type { PrintCardBackProps, PrintCardProps } from '@/theme-sdk/print';
+import type { PrintCardBackProps, PrintCardProps, PrintCardShape } from '@/theme-sdk/print';
+import { CARD_SHAPES } from '@/catalog/card-shapes';
 import { invitationNames } from '@/catalog/fields';
 
 /** One side of the owner's own card artwork (Admin → Themes → Printable card design), ready to print. */
@@ -39,21 +40,31 @@ export const FONTS = {
 export const JUSTIFY = { top: 'flex-start', center: 'center', bottom: 'flex-end' } as const;
 
 /** The artwork fills the page (and its bleed); the text sits in a block inset from the trim edge. */
-function Frame({ design, sheet, dir, lang, children }: { design: ArtworkSide; sheet: Sheet; dir: string; lang: string; children: React.ReactNode }) {
+function Frame({ design, sheet, dir, lang, card, children }: { design: ArtworkSide; sheet: Sheet; dir: string; lang: string; card?: PrintCardShape; children: React.ReactNode }) {
   const out = sheet.pageHasBleed ? 0 : sheet.bleedMm;
   const inset = design.insetMm + (sheet.pageHasBleed ? sheet.bleedMm : 0);
+  // A cut-out shape: the text sits in the shape's safe area and the thin frame follows its outline.
+  const shaped = card?.outline && card.safe ? card : null;
+  const edge = sheet.pageHasBleed ? sheet.bleedMm : 0;
+  const outline = shaped ? (CARD_SHAPES[shaped.shape].outline as string | null) : null;
   return (
     <div dir={dir} lang={lang} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', color: design.ink, fontFamily: FONTS[design.bodyFont], background: design.src ? undefined : (design.paper ?? DEFAULT_PAPER) }}>
       {design.src ? (
         // eslint-disable-next-line @next/next/no-img-element -- print document
         <img src={design.src} alt="" style={{ position: 'absolute', inset: `-${out}mm`, width: `calc(100% + ${2 * out}mm)`, height: `calc(100% + ${2 * out}mm)`, objectFit: 'cover' }} />
       ) : (
-        <div style={{ position: 'absolute', inset: `${8 + inset / 3}mm`, border: `0.4mm solid ${design.accent}`, borderRadius: '3mm', opacity: 0.5 }} />
+        outline ? (
+          <svg aria-hidden viewBox="0 0 1 1" preserveAspectRatio="none" style={{ position: 'absolute', inset: `${edge}mm`, width: `calc(100% - ${2 * edge}mm)`, height: `calc(100% - ${2 * edge}mm)`, opacity: 0.5 }}>
+            <path d={outline} transform="translate(0.04 0.04) scale(0.92)" fill="none" stroke={design.accent} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+          </svg>
+        ) : (
+          <div style={{ position: 'absolute', inset: `${8 + inset / 3}mm`, border: `0.4mm solid ${design.accent}`, borderRadius: '3mm', opacity: 0.5 }} />
+        )
       )}
       <div
         style={{
           position: 'absolute',
-          inset: `${inset}mm`,
+          inset: shaped?.safe ? `${shaped.safe.top + edge}mm ${shaped.safe.right + edge}mm ${shaped.safe.bottom + edge}mm ${shaped.safe.left + edge}mm` : `${inset}mm`,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -89,7 +100,8 @@ export function DefaultCardFront({ look, ...p }: PrintCardProps & { sheet: Sheet
     paper: look?.paper,
     align: 'center',
     insetMm: 18,
-    scale: 100,
+    // A cut-out shape: the text sits in its safe area, scaled to fit that height (about 110 mm at full size).
+    scale: p.card?.safe ? Math.max(50, Math.min(90, Math.round((p.card.heightMm - p.card.safe.top - p.card.safe.bottom) / 1.15))) : 100,
   };
   return <ArtworkCardFront {...p} design={design} />;
 }
@@ -107,7 +119,7 @@ export function ArtworkCardFront({ design, sheet, ...p }: PrintCardProps & { des
     p.fields.venue_name ? [p.labels.venue, p.fields.venue_name] : null,
   ].filter((d): d is [string, string] => !!d);
   return (
-    <Frame design={design} sheet={sheet} dir={p.dir} lang={p.lang}>
+    <Frame design={design} sheet={sheet} dir={p.dir} lang={p.lang} card={p.card}>
       {gender ? <p style={{ margin: 0, color: design.accent, fontWeight: 600 }}>{gender}</p> : null}
       {names.length ? (
         <h1 style={{ ...heading, fontSize: mm(names.length > 1 ? 11 : 13, design) }}>
@@ -151,7 +163,7 @@ export function ArtworkCardFront({ design, sheet, ...p }: PrintCardProps & { des
 export function ArtworkCardBack({ design, sheet, ...p }: PrintCardBackProps & { design: ArtworkSide; sheet: Sheet }) {
   const names = invitationNames(p.fields).join(` ${p.labels.and} `);
   return (
-    <Frame design={design} sheet={sheet} dir={p.dir} lang={p.lang}>
+    <Frame design={design} sheet={sheet} dir={p.dir} lang={p.lang} card={p.card}>
       <h1 style={{ margin: 0, fontFamily: FONTS[design.headingFont], color: design.accent, fontWeight: 700, fontSize: mm(16, design), lineHeight: 1.15 }}>{p.title}</h1>
       {p.message ? <p style={{ margin: 0, maxWidth: '140mm', whiteSpace: 'pre-line' }}>{p.message}</p> : null}
       {p.signatures.length ? (

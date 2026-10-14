@@ -82,6 +82,8 @@ export const invitations = pgTable(
     /** Package fields/features at creation (the package can change later; this invitation can't). */
     fieldKeys: text('field_keys').array().notNull(),
     featureKeys: text('feature_keys').array().notNull(),
+    /** Printable card shapes from the package at creation; null = the design's main shape (older invitations). */
+    cardShapes: text('card_shapes').array(),
     /** Song snapshot (owner decision G): replacing a theme's song doesn't change existing invitations. */
     musicTrackId: uuid('music_track_id').references(() => musicTracks.id, { onDelete: 'restrict' }),
     status: invitationStatus('status').notNull().default('DRAFT'),

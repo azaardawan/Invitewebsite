@@ -46,8 +46,36 @@ export async function CardPages({
     )
   );
   const mark = watermark ? <Watermark labels={watermark} /> : null;
-  const front = { width: data.page.width, height: data.page.height, overflow: 'hidden', position: 'relative' } as const;
-  const backSheet = { width: data.backPage.width, height: data.backPage.height, overflow: 'hidden', position: 'relative' } as const;
+  // A cut-out shape: the customer's file is cut to it (white outside); the print-shop file keeps everything,
+  // with the bleed, and adds a thin cutting line (the back's is the front's mirror image).
+  const shaped = data.cut;
+  const forShop = data.sheet.pageHasBleed;
+  const clip = (side: 'front' | 'back') => (shaped && !forShop ? { clipPath: `url(#bahja-cut-${side})` } : {});
+  const front = { width: data.page.width, height: data.page.height, overflow: 'hidden', position: 'relative', ...clip('front') } as const;
+  const backSheet = { width: data.backPage.width, height: data.backPage.height, overflow: 'hidden', position: 'relative', ...clip('back') } as const;
+  const cutDefs = shaped ? (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
+      <defs>
+        <clipPath id="bahja-cut-front" clipPathUnits="objectBoundingBox">
+          <path d={shaped.outline} />
+        </clipPath>
+        <clipPath id="bahja-cut-back" clipPathUnits="objectBoundingBox">
+          <path d={shaped.outline} transform="translate(1 0) scale(-1 1)" />
+        </clipPath>
+      </defs>
+    </svg>
+  ) : null;
+  const cutLine = (card: { widthMm: number; heightMm: number; bleedMm: number; outline: string | null }) =>
+    shaped && forShop && card.outline ? (
+      <svg
+        aria-hidden
+        data-cut-line
+        viewBox={`0 0 ${card.widthMm + 2 * card.bleedMm} ${card.heightMm + 2 * card.bleedMm}`}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 50 }}
+      >
+        <path d={card.outline} fill="none" stroke="#ec008c" strokeWidth={0.25} />
+      </svg>
+    ) : null;
   const backSide = (
     <div style={{ ...vars, page: view === 'back' ? undefined : 'back' } as React.CSSProperties}>
       <div style={backSheet}>
@@ -61,6 +89,7 @@ export async function CardPages({
           <DefaultCardBack {...data.back} look={data.look} />
         )}
         {mark}
+        {cutLine(data.back.card)}
       </div>
     </div>
   );
@@ -69,10 +98,12 @@ export async function CardPages({
     return (
       <>
         <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}${BASE}`}</style>
+        {cutDefs}
         <div style={vars}>
           <div style={front}>
             {frontSide}
             {mark}
+            {cutLine(data.props.card)}
           </div>
         </div>
       </>
@@ -84,6 +115,7 @@ export async function CardPages({
     return (
       <>
         <style>{`@page{size:${data.backPage.width} ${data.backPage.height};margin:0}${BASE}`}</style>
+        {cutDefs}
         {Card ? (
           <div aria-hidden style={{ ...vars, height: 0, overflow: 'hidden' }}>
             <Card {...data.props} />
@@ -96,10 +128,12 @@ export async function CardPages({
   return (
     <>
       <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}@page back{size:${data.backPage.width} ${data.backPage.height};margin:0}${BASE}`}</style>
+        {cutDefs}
       <div style={{ ...vars, breakAfter: 'page' }}>
         <div style={front}>
             {frontSide}
             {mark}
+            {cutLine(data.props.card)}
           </div>
       </div>
       {backSide}

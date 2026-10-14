@@ -146,6 +146,29 @@ clear of the border at the sides) with `box-decoration-break: clone` so it repea
 numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
+### Card shapes (A5, or cut-out shapes such as a leaf or a heart)
+
+A design's card is A5 unless its manifest says otherwise. `print.card.size` is the main shape and
+`print.card.shapes` lists every shape the design offers (the main one included), from
+`src/catalog/card-shapes.ts`: `A5`, `5x7`, and the cut-out shapes `leaf`, `heart`, `oval`, `ogee-arch`,
+`butterfly`, `cloud`. Shapes are per design: a design that doesn't list one never offers it. The owner ticks
+per package which of the design's shapes the customer gets; each shape is its own PDF (front and back).
+
+```ts
+print: { card: { size: 'leaf', bleedMm: 3, qr: true } }                          // leaf only
+print: { card: { size: 'A5', shapes: ['A5', 'leaf'], bleedMm: 3, qr: true } }    // A5 and a leaf
+```
+
+`Card.tsx` and `CardBack.tsx` read `props.card` (`PrintCardShape`) and lay out for the shape being printed:
+`widthMm × heightMm` plus `bleedMm` on every side; for a cut-out shape `outline` (the cut line as an SVG
+path in mm on that page, bleed included) and `safe` (mm to keep clear from each trim edge so text sits well
+inside the shape). A cut-out shape's back is the same size as the front, its outline mirrored (A5's back is
+landscape). Fill the whole page box with the paper colour or artwork; the platform cuts the customer's file to
+the outline and adds a magenta cutting line to the print-shop file. Draw a border along the shape with
+`<svg viewBox={`0 0 ${w + 2 * bleed} ${h + 2 * bleed}`}><path d={card.outline} /></svg>`. To add a new
+shape, trace it as described at the top of `src/catalog/card-shapes.ts` (and name it in the messages).
+The owner's own card artwork in Admin applies to the design's main shape only.
+
 ### Newborn extras drawn by the design
 
 A newborn design may ship its own `print/Story.tsx`, `print/Sticker.tsx` and/or `print/Bottle.tsx`

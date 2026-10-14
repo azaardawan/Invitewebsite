@@ -6,7 +6,9 @@ import { packageFeatures, packageFields, packages, sections, themeVersions, them
 import { recordAudit } from '@/server/audit/audit';
 import { FEATURE_KEYS, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
-import { packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
+import { designCardShapes, packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
+import { CARD_SHAPE_KEYS, type CardShape } from '@/catalog/card-shapes';
+import { storedCardShapes } from './card-shapes';
 import { CatalogError, auditActor, i18nContent, moveInList, optionalI18nContent, type Actor } from './common';
 import { assertStillReady, packagesWithShape } from './themes';
 
@@ -19,6 +21,8 @@ export const packageInput = z.object({
   priceIqd: z.coerce.number().int().min(1000).max(100_000_000),
   fieldKeys: z.array(z.enum(FIELD_KEYS as [FieldKey, ...FieldKey[]])).min(1),
   featureKeys: z.array(z.enum(FEATURE_KEYS as [FeatureKey, ...FeatureKey[]])),
+  /** Printable card shapes (of those the design offers); omitted keeps them (a new package: the main shape). */
+  cardShapes: z.array(z.enum(CARD_SHAPE_KEYS as [CardShape, ...CardShape[]])).min(1).optional(),
 });
 export type PackageInput = z.input<typeof packageInput>;
 
@@ -38,6 +42,14 @@ async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], fe
   return row;
 }
 
+/** Card shapes to store: only shapes the design offers (null = just its main shape). */
+function cardShapesFor(manifest: ThemeManifest, input: readonly string[] | undefined, current: string[] | null) {
+  if (input === undefined) return current;
+  const offered = designCardShapes(manifest);
+  if (input.some((s) => !offered.includes(s as CardShape))) throw new CatalogError('invalid');
+  return storedCardShapes(input, manifest);
+}
+
 async function activeCount(tx: DbOrTx, themeId: string, excludeId?: string) {
   const [r] = await tx
     .select({ n: sql<number>`count(*)::int` })
@@ -53,8 +65,8 @@ async function writeShape(tx: DbOrTx, packageId: string, fields: string[], featu
   if (features.length) await tx.insert(packageFeatures).values(features.map((featureKey) => ({ packageId, featureKey })));
 }
 
-function snapshot(p: { name: unknown; description: unknown; priceIqd: number }, fields: string[], features: string[]) {
-  return { name: p.name, description: p.description, priceIqd: p.priceIqd, fieldKeys: [...fields].sort(), featureKeys: [...features].sort() };
+function snapshot(p: { name: unknown; description: unknown; priceIqd: number; cardShapes?: string[] | null }, fields: string[], features: string[]) {
+  return { name: p.name, description: p.description, priceIqd: p.priceIqd, fieldKeys: [...fields].sort(), featureKeys: [...features].sort(), cardShapes: p.cardShapes ?? null };
 }
 
 export async function createPackage(db: DbOrTx, themeId: string, input: PackageInput, actor: Actor) {
@@ -62,7 +74,8 @@ export async function createPackage(db: DbOrTx, themeId: string, input: PackageI
   const fields = [...new Set(data.fieldKeys)];
   const features = [...new Set(data.featureKeys)];
   return db.transaction(async (tx) => {
-    await lockAndValidate(tx, themeId, fields, features);
+    const locked = await lockAndValidate(tx, themeId, fields, features);
+    const cardShapes = cardShapesFor(locked.version!.manifest as ThemeManifest, data.cardShapes, null);
     if ((await activeCount(tx, themeId)) >= MAX_ACTIVE_PACKAGES) throw new CatalogError('tooManyPackages');
     const [max] = await tx
       .select({ n: sql<number>`coalesce(max(${packages.sortOrder}), -1)::int` })
@@ -70,7 +83,7 @@ export async function createPackage(db: DbOrTx, themeId: string, input: PackageI
       .where(eq(packages.themeId, themeId));
     const [row] = await tx
       .insert(packages)
-      .values({ themeId, name: data.name, description: data.description, priceIqd: data.priceIqd, sortOrder: (max?.n ?? -1) + 1 })
+      .values({ themeId, name: data.name, description: data.description, priceIqd: data.priceIqd, cardShapes, sortOrder: (max?.n ?? -1) + 1 })
       .returning();
     await writeShape(tx, row!.id, fields, features);
     await recordAudit(tx, {
@@ -91,11 +104,12 @@ export async function updatePackage(db: DbOrTx, packageId: string, input: Packag
   return db.transaction(async (tx) => {
     const [pkg] = await tx.select().from(packages).where(eq(packages.id, packageId));
     if (!pkg) throw new CatalogError('notFound');
-    await lockAndValidate(tx, pkg.themeId, fields, features);
+    const locked = await lockAndValidate(tx, pkg.themeId, fields, features);
+    const cardShapes = cardShapesFor(locked.version!.manifest as ThemeManifest, data.cardShapes, pkg.cardShapes);
     const before = (await packagesWithShape(tx, pkg.themeId)).find((p) => p.id === packageId)!;
     await tx
       .update(packages)
-      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd })
+      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd, cardShapes })
       .where(eq(packages.id, packageId));
     await writeShape(tx, packageId, fields, features);
     await assertStillReady(tx, pkg.themeId);
@@ -106,7 +120,7 @@ export async function updatePackage(db: DbOrTx, packageId: string, input: Packag
       objectType: 'package',
       objectId: packageId,
       before: snapshot(before, before.fieldKeys, before.featureKeys),
-      after: snapshot({ ...data, description: data.description }, fields, features),
+      after: snapshot({ ...data, description: data.description, cardShapes }, fields, features),
     });
   });
 }

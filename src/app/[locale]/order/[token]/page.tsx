@@ -11,6 +11,7 @@ import { OrderSteps } from '@/components/storefront/order/OrderSteps';
 import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
+import { CARD_SHAPES } from '@/catalog/card-shapes';
 
 export const dynamicParams = true;
 
@@ -88,6 +89,11 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
             base={`/p/${token}/extra`}
             featureKeys={draft.featureKeys}
             stickerShape={draft.current.stickerShape}
+            cardShapes={
+              draft.cardShapes.length > 1 || draft.cardShapes[0] !== 'A5'
+                ? draft.cardShapes.map((shape) => ({ shape, label: t(`cardShapes.${shape}`), ratio: `${CARD_SHAPES[shape].widthMm} / ${CARD_SHAPES[shape].heightMm}` }))
+                : []
+            }
             watermarked
             labels={{
               title: t('extras.title'),

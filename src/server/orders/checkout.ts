@@ -17,6 +17,8 @@ import { markOrderPaid } from './payment';
 import { findByPreviewToken } from './drafts';
 import { accessCodeFor, accessCodeHash, receiptTokenFor, receiptTokenHash } from './tokens';
 import { validateFieldValues } from './validation';
+import { invitationCardShapes, packageCardShapes } from '@/server/catalog/card-shapes';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
 
 const customerSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -76,7 +78,13 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     // Re-check availability and price now (the theme may have been archived or re-priced since the draft).
     const [themeRow] = await tx.select({ key: themes.key }).from(themes).where(eq(themes.id, inv!.themeId));
     const p = await loadPurchasable(tx, themeRow!.key, inv!.packageId);
-    if (p.version.id !== inv!.themeVersionId || !sameSet(p.pkg.fieldKeys, inv!.fieldKeys) || !sameSet(p.pkg.featureKeys, inv!.featureKeys)) {
+    const manifest = p.version.manifest as ThemeManifest;
+    if (
+      p.version.id !== inv!.themeVersionId ||
+      !sameSet(p.pkg.fieldKeys, inv!.fieldKeys) ||
+      !sameSet(p.pkg.featureKeys, inv!.featureKeys) ||
+      !sameSet(packageCardShapes(p.pkg, manifest), invitationCardShapes(inv!, manifest))
+    ) {
       throw new OrderError('packageChanged');
     }
     const fields = validateFieldValues(inv!.fieldValues, inv!.fieldKeys, p.defs, now);

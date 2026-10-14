@@ -10,6 +10,7 @@
 import type { FieldKey } from '@/catalog/fields';
 import type { ThemeBorderSpec } from './border';
 import type { BirthDateParts, EventDateParts, InvitationLocale } from './types';
+import type { CardShape } from '@/catalog/card-shapes';
 
 /** Localized platform strings a print design may show. Never hard-code text. */
 export type PrintLabels = {
@@ -53,7 +54,27 @@ type PrintBase = {
   switches: Readonly<Record<string, boolean>>;
 };
 
+/**
+ * The shape this card is printed in (designs may offer several: manifest `print.card.shapes`). Draw for
+ * `widthMm × heightMm` plus `bleedMm` on every side. For a cut-out shape, `outline` is the cut line as an
+ * SVG path in mm on that page (origin at the page's top-left corner, bleed included; mirrored on the back),
+ * e.g. for a frame: `<svg viewBox={`0 0 ${w + 2 * bleed} ${h + 2 * bleed}`}><path d={outline} /></svg>`.
+ * The platform cuts the customer's file to the outline and draws the cutting line on the print-shop file,
+ * so keep text about 6 mm inside the outline. Null for a rectangle.
+ */
+export type PrintCardShape = {
+  shape: CardShape;
+  widthMm: number;
+  heightMm: number;
+  bleedMm: number;
+  outline: string | null;
+  /** Where text fits well inside a cut-out shape: mm to keep clear from each trim edge. Null for a rectangle. */
+  safe: { top: number; right: number; bottom: number; left: number } | null;
+};
+
 export type PrintCardProps = PrintBase & {
+  /** The card's shape and size (A5 for most designs). */
+  card: PrintCardShape;
   /** QR code image (data URL) linking to the online invitation; null when the theme or the team turns it off. */
   qrDataUrl: string | null;
   /** One extra line the team added for this card only (e.g. "Family invitation"); null when none. Print it near the details. */
@@ -66,6 +87,8 @@ export type PrintCardProps = PrintBase & {
  * (or their signature). Without a CardBack the platform prints a simple back with the theme's border.
  */
 export type PrintCardBackProps = PrintBase & {
+  /** The back's shape and size: A5's back is landscape; a cut-out shape's back is the front mirrored. */
+  card: PrintCardShape;
   /** Big text, e.g. "Thank you". The customer's own, or a default in the invitation's language. */
   title: string;
   /** Smaller text under it; null when the customer left it empty. */

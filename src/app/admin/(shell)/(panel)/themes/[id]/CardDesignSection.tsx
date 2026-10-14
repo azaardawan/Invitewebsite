@@ -7,6 +7,11 @@ import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { Card } from '@/components/admin/bits';
 import { themeCardSideAction } from '@/app/admin/_actions/catalog';
+import { CARD_SHAPES, type CardShape } from '@/catalog/card-shapes';
+import { designCardShapes } from '@/theme-sdk/manifest';
+import { manifestByCodeRef } from '@/theme-registry';
+
+const PX_PER_MM = 96 / 25.4;
 
 const input = 'w-full rounded-md border border-line bg-surface px-3 py-2';
 
@@ -39,8 +44,23 @@ export async function CardDesignSection({
   const own = { front: !!loaders?.card, back: !!loaders?.cardBack };
   // A design without its own front prints the platform's simple front, so there is always something to show.
   const previewable = true;
-  const src = (side: 'front' | 'back') =>
-    `/admin/preview/${locale}/card/${themeKey}?side=${side}${version ? `&v=${version}` : ''}&t=${updatedAt.getTime()}`;
+  const src = (side: 'front' | 'back', shape?: CardShape, shop = false) =>
+    `/admin/preview/${locale}/card/${themeKey}?side=${side}${shape ? `&shape=${shape}` : ''}${shop ? '&shop=1' : ''}${version ? `&v=${version}` : ''}&t=${updatedAt.getTime()}`;
+  // Every card shape the design offers (most: just A5), each side at its own size, shown at half size.
+  const shapes = designCardShapes(codeRef ? manifestByCodeRef(codeRef) : null);
+  const tShapes = await getTranslations('store.cardShapes');
+  const frame = (title: string, url: string, wMm: number, hMm: number) => {
+    const w = Math.round(wMm * PX_PER_MM);
+    const h = Math.round(hMm * PX_PER_MM);
+    return (
+      <figure className="space-y-1">
+        <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: Math.round(w / 2), height: Math.round(h / 2) }}>
+          <iframe title={title} src={url} style={{ width: w, height: h, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
+        </div>
+        <figcaption className="text-center text-xs text-muted">{title}</figcaption>
+      </figure>
+    );
+  };
 
   return (
     <Card className="space-y-4">
@@ -50,20 +70,21 @@ export async function CardDesignSection({
       </div>
 
       {previewable ? (
-        <div className="flex flex-wrap items-start gap-4" dir="ltr">
-          {/* Front A5 portrait (148 × 210 mm ≈ 559 × 794 px) and back landscape, shown at half size. */}
-          <figure className="space-y-1">
-            <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: 280, height: 397 }}>
-              <iframe title={t('front')} src={src('front')} style={{ width: 560, height: 794, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
-            </div>
-            <figcaption className="text-center text-xs text-muted">{t('front')}</figcaption>
-          </figure>
-          <figure className="space-y-1">
-            <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: 397, height: 280 }}>
-              <iframe title={t('back')} src={src('back')} style={{ width: 794, height: 560, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
-            </div>
-            <figcaption className="text-center text-xs text-muted">{t('back')}</figcaption>
-          </figure>
+        <div className="space-y-4" dir="ltr">
+          {shapes.map((shape, i) => {
+            const spec = CARD_SHAPES[shape];
+            const [bw, bh] = spec.landscapeBack ? [spec.heightMm, spec.widthMm] : [spec.widthMm, spec.heightMm];
+            const name = shapes.length > 1 || shape !== 'A5' ? ` · ${tShapes(shape)}` : '';
+            const bleed = codeRef ? (manifestByCodeRef(codeRef)?.print?.card?.bleedMm ?? 3) : 3;
+            return (
+              <div key={shape} className="flex flex-wrap items-start gap-4" data-card-shape={shape}>
+                {frame(`${t('front')}${name}`, src('front', i ? shape : undefined), spec.widthMm, spec.heightMm)}
+                {frame(`${t('back')}${name}`, src('back', i ? shape : undefined), bw, bh)}
+                {/* A cut-out shape: the print-shop file, with its bleed and the magenta cutting line. */}
+                {spec.outline ? frame(`${t('printShop')}${name}`, src('front', shape, true), spec.widthMm + 2 * bleed, spec.heightMm + 2 * bleed) : null}
+              </div>
+            );
+          })}
         </div>
       ) : null}
       {!own.front && !resolved.front ? <p className="text-sm text-muted">{t('noFront')}</p> : null}

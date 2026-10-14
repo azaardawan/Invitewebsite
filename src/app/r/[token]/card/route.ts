@@ -19,7 +19,8 @@ export async function GET(req: Request, { params }: RouteContext<'/r/[token]/car
     return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '3600' } });
   }
   try {
-    const { pdf, fileName } = await ensureDocument(db(), r.invitation.id, 'card');
+    // `?shape=leaf`: one of the card shapes the package includes (default the first).
+    const { pdf, fileName } = await ensureDocument(db(), r.invitation.id, 'card', { shape: new URL(req.url).searchParams.get('shape') ?? undefined });
     await trackEvent(db(), { name: 'card_download', invitationId: r.invitation.id, orderId: r.orderId });
     return new Response(new Uint8Array(pdf), {
       headers: {

@@ -9,7 +9,7 @@ import { DocumentError, ensurePreview } from '@/server/documents/documents';
 const PREVIEWS_PER_HOUR = 60;
 
 /** The card's front or back, or the keepsake cover, as a picture for the receipt's previews. */
-export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/preview/[kind]'>) {
+export async function GET(req: Request, { params }: RouteContext<'/r/[token]/preview/[kind]'>) {
   const { token, kind } = await params;
   if (kind !== 'card' && kind !== 'cardBack' && kind !== 'keepsake') return new Response('Not found', { status: 404 });
   const r = await getReceipt(db(), token);
@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/pr
     return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '3600' } });
   }
   try {
-    const image = await ensurePreview(db(), r.invitation.id, kind);
+    const image = await ensurePreview(db(), r.invitation.id, kind, undefined, { shape: new URL(req.url).searchParams.get('shape') ?? undefined });
     if (!image) return new Response('Not found', { status: 404 });
     return new Response(new Uint8Array(image), {
       headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' },
