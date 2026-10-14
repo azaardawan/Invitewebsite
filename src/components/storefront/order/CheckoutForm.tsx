@@ -14,16 +14,19 @@ export function CheckoutForm({
   token,
   idempotencyKey,
   paymentNote,
+  termsSlug = 'terms',
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   token: string;
   idempotencyKey: string;
   paymentNote: string;
+  /** Newborn invitations link their own terms. */
+  termsSlug?: 'terms' | 'terms-newborn';
 }) {
   const t = useTranslations('store');
   const locale = useLocale();
   // Opens in a new tab so the half-filled form isn't lost (Arabic has no locale prefix).
-  const legalHref = (slug: 'terms' | 'refund') => `${locale === 'ar' ? '' : `/${locale}`}/legal/${slug}`;
+  const legalHref = (slug: 'terms' | 'terms-newborn' | 'refund') => `${locale === 'ar' ? '' : `/${locale}`}/legal/${slug}`;
   const [state, formAction, pending] = useActionState(action, {});
   const v = state.values ?? {};
   const fe = state.fieldErrors ?? {};
@@ -82,7 +85,7 @@ export function CheckoutForm({
         <span>
           {t.rich('acceptTerms', {
             terms: (chunks) => (
-              <a href={legalHref('terms')} target="_blank" rel="noopener" className="font-medium text-accent underline">
+              <a href={legalHref(termsSlug)} target="_blank" rel="noopener" className="font-medium text-accent underline">
                 {chunks}
               </a>
             ),

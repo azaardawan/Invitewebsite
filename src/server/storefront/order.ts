@@ -2,7 +2,7 @@ import 'server-only';
 import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { packages, themeVersions, themes, type CardOptions } from '@/server/db/schema';
+import { packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { manifestByCodeRef } from '@/theme-registry';
 import type { DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
@@ -12,6 +12,7 @@ import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { listPalettes, themeColorSlots } from '@/server/catalog/palettes';
 import type { OrderFormExtras } from '@/components/storefront/order/OrderForm';
 import { findByPreviewToken } from '@/server/orders/drafts';
+import { POLICY_SLUGS, termsPolicyFor } from '@/server/legal/policies';
 import { orderFields } from './catalog';
 import { BOTTLE_SIZE_KEYS, DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES, formatBirthDate, type DateStyle, type DigitStyle } from '@/lib/birth-date-format';
@@ -31,8 +32,11 @@ export async function draftByToken(token: string) {
     .innerJoin(themeVersions, eq(themeVersions.id, inv.themeVersionId))
     .where(eq(themes.id, inv.themeId));
   if (!row) return null;
+  const [section] = inv.sectionId ? await db().select({ key: sections.key }).from(sections).where(eq(sections.id, inv.sectionId)) : [];
   return {
     status: inv.status,
+    /** The terms this order will accept (newborn invitations have their own): its /legal/… page. */
+    termsSlug: POLICY_SLUGS[await termsPolicyFor(db(), section?.key)] as 'terms' | 'terms-newborn',
     locale: inv.locale,
     values: inv.fieldValues,
     featureKeys: inv.featureKeys,

@@ -281,6 +281,7 @@ export async function themeSettingsAction(_: ActionState, form: FormData): Promi
           sectionId: readString(form, 'sectionId') ?? null,
           subsectionId: form.has('subsectionId') ? (readString(form, 'subsectionId') ?? null) : undefined,
           coverAssetId: readString(form, 'coverAssetId') ?? null,
+          coverFocus: readCoverFocus(form),
           musicTrackId: readString(form, 'musicTrackId') ?? null,
           // The form marks that it carries the tick boxes, so unticking all of them clears the list.
           extraSectionIds: form.has('extraSectionsShown') ? form.getAll('extraSectionIds').filter((v): v is string => typeof v === 'string') : undefined,
@@ -406,4 +407,11 @@ export async function paletteStatusAction(_: ActionState, form: FormData): Promi
   const actor = await actorWith('themes.manage');
   const themeId = id(form, 'themeId');
   return run(() => setPaletteStatus(db(), themeId, id(form), status(form), actor), [`/admin/themes/${themeId}`]);
+}
+
+/** The cover's position from the Admin cropper (absent when the form has no cropper: keep the saved one). */
+function readCoverFocus(form: FormData) {
+  if (!form.has('coverFocusX')) return undefined;
+  const n = (k: string) => Number(form.get(k));
+  return { x: n('coverFocusX'), y: n('coverFocusY'), zoom: n('coverFocusZoom') };
 }

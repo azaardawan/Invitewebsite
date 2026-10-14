@@ -4,12 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { Price } from '../currency';
 import { RankBadge } from '../RankBadge';
+import { coverImageStyle, type CoverFocus } from '@/lib/cover-focus';
 
 export type CarouselTheme = {
   key: string;
   name: string;
   section: string;
   coverUrl: string | null;
+  coverFocus?: CoverFocus | null;
   minPriceIqd: number | null;
   rank?: number | null;
 };
@@ -108,7 +110,7 @@ export function ThemeCarousel({
               {t.coverUrl ? (
                 // Covers are already optimized WebP from the upload pipeline.
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={t.coverUrl} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" />
+                <img src={t.coverUrl} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" style={coverImageStyle(t.coverFocus)} />
               ) : null}
             </Link>
             <div className="flex flex-col gap-1 text-center lg:text-start">

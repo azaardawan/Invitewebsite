@@ -2,8 +2,9 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Price } from './currency';
 import { RankBadge } from './RankBadge';
+import { coverImageStyle, type CoverFocus } from '@/lib/cover-focus';
 
-export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null; rank?: number | null; occasion?: string };
+export type GridTheme = { key: string; name: string; section: string; coverUrl: string | null; coverFocus?: CoverFocus | null; minPriceIqd: number | null; rank?: number | null; occasion?: string };
 
 const TINTS = ['bg-[#efe2ea]', 'bg-blush', 'bg-paper', 'bg-sand', 'bg-[#efd0c8]'];
 
@@ -22,7 +23,7 @@ export async function ThemeGrid({ themes: list }: { themes: GridTheme[] }) {
               {th.coverUrl ? (
                 // Covers are already optimized WebP from the upload pipeline.
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={th.coverUrl} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" />
+                <img src={th.coverUrl} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" style={coverImageStyle(th.coverFocus)} />
               ) : null}
               <RankBadge rank={th.rank} labels={{ bestSeller: t('bestSeller'), topPick: t('topPick') }} className="absolute bottom-3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2" />
             </span>

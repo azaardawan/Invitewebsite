@@ -56,4 +56,19 @@ test.describe('storefront languages', () => {
     const body = await (await request.get('/robots.txt')).text();
     expect(body).toContain('Disallow: /');
   });
+
+  test('search engines and shared links get the logo, not a blank icon', async ({ page, request }) => {
+    await page.goto('/');
+    const icon = await page.locator('link[rel="icon"][type="image/png"]').getAttribute('href');
+    expect(icon).toMatch(/^\/icon\.png/);
+    for (const path of [icon!, '/favicon.ico', '/apple-icon.png', '/logo.png', '/og.png']) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      expect(res.headers()['content-type'], path).toMatch(/^image\//);
+    }
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\.png$/);
+    const data = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent())!) as { '@type': string; name: string; logo?: string }[];
+    expect(data.find((d) => d['@type'] === 'WebSite')?.name).toBe('بهجه');
+    expect(data.find((d) => d['@type'] === 'Organization')?.logo).toMatch(/\/logo\.png$/);
+  });
 });

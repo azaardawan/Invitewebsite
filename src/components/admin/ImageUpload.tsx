@@ -4,9 +4,27 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 /** Uploads an image to the admin upload endpoint and stores the resulting asset id in a hidden input. */
-export function ImageUpload({ name, label, initial }: { name: string; label: string; initial?: { id: string; url: string } | null }) {
+export function ImageUpload({
+  name,
+  label,
+  initial,
+  onChange,
+  preview = true,
+}: {
+  name: string;
+  label: string;
+  initial?: { id: string; url: string } | null;
+  /** Told about every new upload or removal (e.g. the cover cropper). */
+  onChange?: (value: { id: string; url: string } | null) => void;
+  /** Show the small picture of the upload (off when the caller shows its own). */
+  preview?: boolean;
+}) {
   const t = useTranslations('admin.catalog');
-  const [value, setValue] = useState(initial ?? null);
+  const [value, setValueState] = useState(initial ?? null);
+  const setValue = (v: { id: string; url: string } | null) => {
+    setValueState(v);
+    onChange?.(v);
+  };
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +54,7 @@ export function ImageUpload({ name, label, initial }: { name: string; label: str
     <div className="space-y-2">
       <span className="block text-sm font-medium">{label}</span>
       <input type="hidden" name={name} value={value?.id ?? ''} />
-      {value ? (
+      {value && preview ? (
         // eslint-disable-next-line @next/next/no-img-element -- admin preview of an uploaded asset
         <img src={value.url} alt="" className="h-32 w-auto rounded-md border border-line object-cover" />
       ) : null}

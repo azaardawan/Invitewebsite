@@ -9,7 +9,7 @@ import { currentPolicy, policyTypeFromSlug, type PolicyType } from '@/server/leg
 import { PageHeading } from '@/components/storefront/ThemeGrid';
 import { PolicyText } from '@/components/legal/PolicyText';
 
-const TITLE_KEY: Record<PolicyType, 'terms' | 'privacy' | 'refund'> = { TERMS: 'terms', PRIVACY: 'privacy', REFUND: 'refund' };
+const TITLE_KEY: Record<PolicyType, 'terms' | 'termsNewborn' | 'privacy' | 'refund'> = { TERMS: 'terms', TERMS_NEWBORN: 'termsNewborn', PRIVACY: 'privacy', REFUND: 'refund' };
 
 export async function generateMetadata({ params }: PageProps<'/[locale]/legal/[type]'>): Promise<Metadata> {
   const { locale, type } = await params;

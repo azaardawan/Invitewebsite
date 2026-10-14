@@ -121,6 +121,7 @@ export async function storefrontThemes(opts: { sectionKey?: string; subsectionKe
       // Its subsection belongs to the main occasion only.
       subsection: r.sub && shown.key === r.section.key ? { key: r.sub.key, name: r.sub.name } : null,
       coverUrl: r.coverKey ? publicMediaUrl(r.coverKey) : null,
+      coverFocus: r.theme.coverFocus ?? null,
       minPriceIqd: r.minPrice === null ? null : Number(r.minPrice),
       rank: ranks.get(r.theme.id) ?? null,
     };

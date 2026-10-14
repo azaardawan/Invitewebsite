@@ -1,0 +1,1 @@
+ALTER TABLE "themes" ADD COLUMN "cover_focus" jsonb;

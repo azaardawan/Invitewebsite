@@ -35,7 +35,22 @@ test('owner configures a theme end to end: music → cover → package → revie
   // Settings: cover image + song.
   const cover = await sharp({ create: { width: 600, height: 900, channels: 3, background: '#b08d57' } }).png().toBuffer();
   await page.locator('input[type=file]').first().setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: cover });
-  await expect(page.locator('img[src*="/media/images/"]')).toBeVisible();
+  // Place the cover yourself: zoom in, then drag it right-to-left inside the arch; the small frames follow.
+  const editor = page.locator('[data-cover-editor]');
+  await expect(editor.locator('img')).toBeVisible();
+  await page.getByRole('slider', { name: 'تكبير' }).fill('2');
+  await editor.scrollIntoViewIfNeeded();
+  const box = (await editor.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 - 50, box.y + box.height / 2, { steps: 5 });
+  await page.mouse.up();
+  const placed = await editor.locator('img').getAttribute('style');
+  expect(placed).toContain('scale(2)');
+  expect(Number(/object-position: ([\d.]+)%/.exec(placed!)![1])).toBeGreaterThan(60);
+  for (const f of ['grid', 'top', 'home']) await expect(page.locator(`[data-cover-preview=${f}] img`)).toHaveAttribute('style', /scale\(2\)/);
+  await page.locator('[data-cover-cropper]').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('cover-cropper.png') });
   await page.getByLabel('الأغنية').selectOption({ label: 'أغنية تجريبية' });
   // Every language is required, so Kurdish visitors never see another language.
   await page.getByLabel('الكردية السورانية').first().fill('دیزاینی تاقیکاری');
@@ -59,6 +74,11 @@ test('owner configures a theme end to end: music → cover → package → revie
   await expect(page.getByText('جاهز للمراجعة').first()).toBeVisible();
   await page.getByRole('button', { name: 'تفعيل وعرض للبيع' }).click();
   await expect(page.getByText('معروض للبيع').first()).toBeVisible();
+  // The website's cards use the position chosen above.
+  const shopper = await browser.newPage({ baseURL: testInfo.project.use.baseURL });
+  await shopper.goto('/themes');
+  await expect(shopper.locator('img[style*="scale(2)"]').first()).toBeVisible();
+  await shopper.close();
   await expect(page.getByText('مُجمّد (لا يمكن تعديله)')).toBeVisible();
 
   // The song can't be archived while a live theme uses it.

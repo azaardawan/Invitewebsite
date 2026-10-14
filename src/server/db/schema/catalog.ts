@@ -1,3 +1,4 @@
+import type { CoverFocus } from '../../../lib/cover-focus';
 import { sql } from 'drizzle-orm';
 import {
   bigint,
@@ -204,6 +205,8 @@ export const themes = pgTable(
     status: themeStatus('status').notNull().default('DEVELOPMENT'),
     sortOrder: integer('sort_order').notNull().default(0),
     coverAssetId: uuid('cover_asset_id').references(() => assets.id, { onDelete: 'restrict' }),
+    /** How the cover sits in the storefront's frames (Admin → the design → cover); null = centred. */
+    coverFocus: jsonb('cover_focus').$type<CoverFocus>(),
     musicTrackId: uuid('music_track_id').references(() => musicTracks.id, { onDelete: 'restrict' }),
     /** The version sold to new customers. Existing invitations keep their own version. */
     currentVersionId: uuid('current_version_id').references((): AnyPgColumn => themeVersions.id, { onDelete: 'restrict' }),

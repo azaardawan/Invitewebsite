@@ -3,8 +3,9 @@ import { Link } from '@/i18n/navigation';
 import { Price } from '../currency';
 import { RankBadge } from '../RankBadge';
 import { SectionTitle } from './Sections';
+import { coverImageStyle, type CoverFocus } from '@/lib/cover-focus';
 
-export type TopPick = { key: string; name: string; section: string; coverUrl: string | null; minPriceIqd: number | null; rank: number };
+export type TopPick = { key: string; name: string; section: string; coverUrl: string | null; coverFocus?: CoverFocus | null; minPriceIqd: number | null; rank: number };
 
 /**
  * The owner's top 3 themes in one compact row (shown only when chosen in Admin → Themes).
@@ -51,6 +52,7 @@ export async function TopPicks({ picks }: { picks: TopPick[] }) {
                         loading={i === 0 ? 'eager' : 'lazy'}
                         decoding="async"
                         className="size-full object-cover transition duration-700 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.03]"
+                        style={coverImageStyle(p.coverFocus)}
                       />
                     ) : null}
                   </span>

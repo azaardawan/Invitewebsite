@@ -243,6 +243,22 @@ describe('theme lifecycle', () => {
     await expect(transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor)).rejects.toMatchObject({ code: 'notReady' });
   });
 
+  it('keeps the owner\'s cover position until the picture changes', async () => {
+    const t = await registeredTheme();
+    const [c1, c2] = await Promise.all([cover(), cover()]);
+    const base = { name: t.name, sectionId: t.sectionId };
+    const focus = async () => (await db().select().from(themes).where(eq(themes.id, t.id)))[0]!.coverFocus;
+    await updateThemeSettings(db(), t.id, { ...base, coverAssetId: c1.id, coverFocus: { x: 20, y: 75.55, zoom: 1.5 } }, actor);
+    expect(await focus()).toEqual({ x: 20, y: 75.6, zoom: 1.5 });
+    // Saving other settings (no cropper in the form) keeps it.
+    await updateThemeSettings(db(), t.id, { ...base, coverAssetId: c1.id }, actor);
+    expect(await focus()).toEqual({ x: 20, y: 75.6, zoom: 1.5 });
+    // A new picture without a position starts centred.
+    await updateThemeSettings(db(), t.id, { ...base, coverAssetId: c2.id }, actor);
+    expect(await focus()).toBeNull();
+    await expect(updateThemeSettings(db(), t.id, { ...base, coverAssetId: c2.id, coverFocus: { x: 120, y: 50, zoom: 1 } }, actor)).rejects.toThrow();
+  });
+
   it('requires a song when a package includes music', async () => {
     const t = await registeredTheme();
     const c = await cover();

@@ -232,6 +232,20 @@
       "when": 1791751272973,
       "tag": "0032_design_switches",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791893927516,
+      "tag": "0033_newborn_terms",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1791963751530,
+      "tag": "0034_cover_focus",
+      "breakpoints": true
     }
   ]
 }

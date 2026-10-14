@@ -1,0 +1,1 @@
+ALTER TYPE "public"."legal_policy_type" ADD VALUE 'TERMS_NEWBORN';
