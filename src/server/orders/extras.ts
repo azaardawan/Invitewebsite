@@ -1,4 +1,5 @@
 import 'server-only';
+import { CARD_SHAPE_FEATURES, shapeIncluded } from '@/catalog/features';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, themePalettes, type CardOptions } from '@/server/db/schema';
@@ -22,7 +23,7 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  *   `none`; the customer chooses one signature or two (the second is then `none`);
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
  * - `stickerShape` (sticker): round or square chocolate stickers, or both (a set of each);
- * - `cardShape` (card_shapes): one of the design's shaped cards (manifest `print.shapes`), or '' for the card;
+ * - `cardShape` (card_leaf / card_heart): one of the design's shaped cards that the package sells (manifest `print.shapes`), or '' for the card;
  * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
  * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
  * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the Arabic), `lang` (the
@@ -126,9 +127,9 @@ export async function extrasUpdate(
     else errors.stickerShape = 'invalid';
   }
 
-  if (extras.cardShape !== undefined && inv.featureKeys.includes('card_shapes')) {
+  if (extras.cardShape !== undefined && inv.featureKeys.some((k) => (Object.values(CARD_SHAPE_FEATURES) as string[]).includes(k))) {
     if (extras.cardShape === '') set.cardShape = null;
-    else if (inv.cardShapes?.includes(extras.cardShape)) set.cardShape = extras.cardShape;
+    else if (inv.cardShapes?.includes(extras.cardShape) && shapeIncluded(inv.featureKeys, extras.cardShape)) set.cardShape = extras.cardShape;
     else errors.cardShape = 'invalid';
   }
 

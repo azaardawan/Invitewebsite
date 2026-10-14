@@ -14,7 +14,7 @@ export type OrderFormExtras = {
   cardBack?: { title: string; message: string; limits: { title: number; message: number } };
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
-  /** Shaped cards (card_shapes): the card ('') or one of the design's shapes, each drawn from its cut line. */
+  /** Shaped cards (card_leaf, card_heart): the card ('') or one of the design's shapes, each drawn from its cut line. */
   cardShape?: { current: string; options: { key: string; label: string; widthMm: number; heightMm: number; outline: string }[] };
   /** Chocolate stickers (sticker): round or square. */
   sticker?: { current: 'round' | 'square' | 'both' };

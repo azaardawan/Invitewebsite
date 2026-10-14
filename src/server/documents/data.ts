@@ -1,4 +1,5 @@
 import 'server-only';
+import { shapeIncluded } from '@/catalog/features';
 import { themeBorder } from '@/server/catalog/border';
 import { and, asc, eq, isNotNull } from 'drizzle-orm';
 import QRCode from 'qrcode';
@@ -72,7 +73,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     const artwork = await themeArtwork(db, inv.themeId);
     // The shaped card the customer chose instead of the card (only while the package includes it).
     const shapes = (version!.manifest as ThemeManifest | null)?.print?.shapes ?? manifest?.print?.shapes ?? [];
-    const shape = inv.cardShape && inv.featureKeys.includes('card_shapes') ? (shapes.find((x) => x.key === inv.cardShape) ?? null) : null;
+    const shape = shapeIncluded(inv.featureKeys, inv.cardShape) ? (shapes.find((x) => x.key === inv.cardShape) ?? null) : null;
     return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape)) };
   }
   const { base } = printBase(theme);

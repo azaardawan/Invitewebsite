@@ -1,4 +1,5 @@
 import 'server-only';
+import { shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
@@ -97,10 +98,12 @@ export async function orderFormExtras(
   }
   if (featureKeys.includes('signature')) extras.signature = { current: current.signatureSrcs ?? [] };
   if (featureKeys.includes('sticker')) extras.sticker = { current: current.stickerShape ?? 'round' };
-  if (featureKeys.includes('card_shapes') && current.cardShapes?.length) {
+  // Only the shapes this package sells (the leaf and the heart are separate features).
+  const shapes = (current.cardShapes ?? []).filter((x) => shapeIncluded(featureKeys, x.key));
+  if (shapes.length) {
     extras.cardShape = {
-      current: current.cardShape ?? '',
-      options: current.cardShapes.map((x) => ({ key: x.key, label: localized(x.label, locale), widthMm: x.widthMm, heightMm: x.heightMm, outline: x.outline })),
+      current: shapeIncluded(featureKeys, current.cardShape) ? (current.cardShape ?? '') : '',
+      options: shapes.map((x) => ({ key: x.key, label: localized(x.label, locale), widthMm: x.widthMm, heightMm: x.heightMm, outline: x.outline })),
     };
   }
   if (featureKeys.includes('bottle_label')) extras.bottle = { current: current.bottleSize ?? DEFAULT_BOTTLE_SIZE, sizes: BOTTLE_SIZE_KEYS };
