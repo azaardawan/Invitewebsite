@@ -53,6 +53,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       /** Internal id, for the card download; never rendered. */
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
+      /** The shaped card chosen instead of the card (leaf, heart…), or null. */
+      cardShape: row.invitation.featureKeys.includes('card_shapes') ? row.invitation.cardShape : null,
       /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */
       featureKeys: row.invitation.featureKeys,
       stickerShape: row.invitation.stickerShape,

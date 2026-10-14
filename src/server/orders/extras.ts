@@ -22,6 +22,7 @@ export const CARD_BACK_LIMITS = { title: 40, message: 300 } as const;
  *   `none`; the customer chooses one signature or two (the second is then `none`);
  * - `paletteId` (color_choice): one of the theme's colour sets, or '' for the theme's own colours;
  * - `stickerShape` (sticker): round or square chocolate stickers, or both (a set of each);
+ * - `cardShape` (card_shapes): one of the design's shaped cards (manifest `print.shapes`), or '' for the card;
  * - `bottleSize` (bottle_label): the bottle the label wraps (src/catalog/products.ts);
  * - `birthDateStyle` / `birthDateDigits` (packages with the date of birth): how the date is written;
  * - `wording` (designs with changeable lines, manifest `wording`): per line `ar` (the Arabic), `lang` (the
@@ -36,6 +37,7 @@ export type OrderExtras = {
   signature2?: string;
   paletteId?: string;
   stickerShape?: string;
+  cardShape?: string;
   bottleSize?: string;
   birthDateStyle?: string;
   birthDateDigits?: string;
@@ -60,11 +62,13 @@ export async function extrasUpdate(
     /** For `switches`: the design's yes/no choices and what is stored now. */
     switchDefs?: readonly DesignSwitch[];
     switches?: Record<string, boolean>;
+    /** For `cardShape`: the keys of the design's shaped cards (manifest `print.shapes`). */
+    cardShapes?: readonly string[];
   },
   extras: OrderExtras,
 ) {
   const set: Partial<
-    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording' | 'switches'>
+    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'cardShape' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording' | 'switches'>
   > = {};
   const errors: Record<string, string> = {};
 
@@ -120,6 +124,12 @@ export async function extrasUpdate(
   if (extras.stickerShape !== undefined && inv.featureKeys.includes('sticker')) {
     if (extras.stickerShape === 'round' || extras.stickerShape === 'square' || extras.stickerShape === 'both') set.stickerShape = extras.stickerShape;
     else errors.stickerShape = 'invalid';
+  }
+
+  if (extras.cardShape !== undefined && inv.featureKeys.includes('card_shapes')) {
+    if (extras.cardShape === '') set.cardShape = null;
+    else if (inv.cardShapes?.includes(extras.cardShape)) set.cardShape = extras.cardShape;
+    else errors.cardShape = 'invalid';
   }
 
   if (extras.bottleSize !== undefined && inv.featureKeys.includes('bottle_label')) {

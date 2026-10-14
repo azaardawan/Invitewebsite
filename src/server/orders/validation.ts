@@ -1,7 +1,7 @@
 import 'server-only';
 import { safeMapUrl } from '@/lib/invitation-format';
 import { normalizePhone, toAsciiDigits } from '@/lib/phone';
-import { fieldOptions } from '@/catalog/fields';
+import { fieldOptions, isOptionalField } from '@/catalog/fields';
 
 export type FieldError =
   | 'required'
@@ -36,7 +36,8 @@ function cleanText(value: string, multiline: boolean): string | null {
 
 /**
  * Server-side validation of customer-entered invitation fields. Every field the
- * package includes is required; anything else is dropped. Never trust the form.
+ * package includes is required (except the Field Library's optional ones, which
+ * may stay empty); anything else is dropped. Never trust the form.
  */
 export function validateFieldValues(
   input: Record<string, unknown>,
@@ -53,7 +54,7 @@ export function validateFieldValues(
     const def = defs.get(key);
     const raw = input[key];
     if (typeof raw !== 'string' || raw.trim() === '') {
-      errors[key] = 'required';
+      if (!isOptionalField(key)) errors[key] = 'required';
       continue;
     }
     switch (def?.type) {

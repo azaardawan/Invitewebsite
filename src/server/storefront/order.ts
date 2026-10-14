@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { manifestByCodeRef } from '@/theme-registry';
-import type { DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
+import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
 import { localized } from '@/lib/localized';
 import { signatureUrls } from '@/server/invitation/load';
@@ -47,6 +47,8 @@ export async function draftByToken(token: string) {
       signatureSrcs: await signatureUrls(db(), inv),
       colors: inv.colors,
       stickerShape: inv.stickerShape,
+      cardShape: inv.cardShape,
+      cardShapes: (row.manifest as ThemeManifest).print?.shapes ?? [],
       bottleSize: inv.bottleSize,
       birthDate: { style: inv.birthDateStyle, digits: inv.birthDateDigits, value: inv.fieldValues.birth_date ?? null },
       wordingLines: (row.manifest as ThemeManifest).wording ?? [],
@@ -75,6 +77,9 @@ export async function orderFormExtras(
     signatureSrcs?: string[];
     colors?: Record<string, string> | null;
     stickerShape?: 'round' | 'square' | 'both';
+    /** The design's shaped cards (manifest `print.shapes`) and the one chosen (null = the card). */
+    cardShapes?: readonly CardShape[];
+    cardShape?: string | null;
     bottleSize?: BottleSize;
     birthDate?: { style: DateStyle; digits: DigitStyle; value: string | null };
     /** The design's changeable lines (manifest `wording`) and what the customer chose so far. */
@@ -92,6 +97,12 @@ export async function orderFormExtras(
   }
   if (featureKeys.includes('signature')) extras.signature = { current: current.signatureSrcs ?? [] };
   if (featureKeys.includes('sticker')) extras.sticker = { current: current.stickerShape ?? 'round' };
+  if (featureKeys.includes('card_shapes') && current.cardShapes?.length) {
+    extras.cardShape = {
+      current: current.cardShape ?? '',
+      options: current.cardShapes.map((x) => ({ key: x.key, label: localized(x.label, locale), widthMm: x.widthMm, heightMm: x.heightMm, outline: x.outline })),
+    };
+  }
   if (featureKeys.includes('bottle_label')) extras.bottle = { current: current.bottleSize ?? DEFAULT_BOTTLE_SIZE, sizes: BOTTLE_SIZE_KEYS };
   if (fieldKeys.includes('birth_date')) {
     // Each style shown on the customer's own date (or today's, until they enter it).

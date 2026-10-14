@@ -1,0 +1,315 @@
+/*
+ * The opening: the envelope fills the screen (its sides are trimmed on narrow phones, it is centred on
+ * wider screens). After the tap: gold light sweeps over the embossing (0–0.85 s), the seal glints and lifts
+ * away (0.8–1.35 s), light glows from where the flaps meet, the four flaps swing open (1–2.45 s) and the
+ * light spreads over the crest page underneath (the dark surround fades as the flaps part). At 2.05 s the invitation is live
+ * (names appear, the song begins) and what is left of the overlay fades out.
+ * Everything uses transform and opacity only.
+ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+}
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, #3c4220 0%, #23270f 100%);
+}
+
+/* ---------------------------------------------------------------- the envelope (2:3, the owner's artwork) */
+
+.envelope {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  transform: translateX(-50%);
+  container-type: inline-size;
+  perspective: 1800px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.flap {
+  position: absolute;
+  inset: 0;
+  background: url(./assets/envelope.webp) center / 100% 100% no-repeat;
+  backface-visibility: visible;
+}
+/* Cut along the envelope's own fold lines (measured on the artwork, in % of the picture). */
+.flapTop {
+  clip-path: polygon(0 0, 100% 0, 100% 4.75%, 49.8% 48.1%, 0 4.57%);
+  transform-origin: 50% 0;
+}
+.flapBottom {
+  clip-path: polygon(0 81.65%, 43.15% 42.3%, 49.8% 48.1%, 56.74% 42.12%, 100% 82.03%, 100% 100%, 0 100%);
+  transform-origin: 50% 100%;
+}
+.flapLeft {
+  clip-path: polygon(0 4.57%, 43.15% 42.3%, 0 81.65%);
+  transform-origin: 0 50%;
+}
+.flapRight {
+  clip-path: polygon(100% 4.75%, 56.74% 42.12%, 100% 82.03%);
+  transform-origin: 100% 50%;
+}
+
+/* The wax seal and its leaves, exactly where they were painted on the envelope. */
+.seal {
+  position: absolute;
+  left: 17.48%;
+  top: 34.83%;
+  width: 65.43%;
+  height: 23.7%;
+}
+.sealArt {
+  position: absolute;
+  inset: 0;
+  background: url(./assets/seal.webp) center / 100% 100% no-repeat;
+}
+
+/* The couple's initials, pressed into the seal's flat face (centre 49.7 % / 40.4 % of the seal, ⌀ 21 % of the envelope). */
+.letters {
+  position: absolute;
+  left: 49.7%;
+  top: 40.4%;
+  transform: translate(-50%, -50%);
+  max-width: 15.5cqw;
+  font-family: var(--font-script);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: center;
+  color: #4f350c;
+  -webkit-text-stroke: 0.045em #4f350c;
+  text-shadow:
+    0 0.045em 0 rgb(255 238 186 / 0.8),
+    0 -0.03em 0.02em rgb(46 28 4 / 0.6);
+  unicode-bidi: isolate;
+}
+.letters[data-size='l'] {
+  font-size: 7.4cqw;
+}
+.letters[data-size='m'] {
+  font-size: 5.6cqw;
+}
+.letters[data-size='s'] {
+  font-size: 4.3cqw;
+}
+.letters[data-size='xs'] {
+  font-size: 3.4cqw;
+}
+.join {
+  display: inline-block;
+  margin-inline: 0.16em;
+  font-family: var(--font-text);
+  font-size: 0.62em;
+  font-weight: 600;
+  vertical-align: 0.18em;
+  -webkit-text-stroke: 0;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 44.4%;
+  width: 150cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 241 205 / 0.95) 0%, rgb(246 214 140 / 0.7) 16%, rgb(225 180 90 / 0.25) 34%, rgb(225 180 90 / 0) 56%);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.08);
+  pointer-events: none;
+}
+.shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgb(255 236 190 / 0) 38%, rgb(255 236 190 / 0.32) 50%, rgb(255 236 190 / 0) 62%);
+  mix-blend-mode: screen;
+  transform: translateX(-110%);
+}
+
+/* ---------------------------------------------------------------- the open button */
+
+.openButton {
+  position: absolute;
+  left: 50%;
+  bottom: max(28px, calc(env(safe-area-inset-bottom) + 18px));
+  transform: translateX(-50%);
+  min-height: 48px;
+  padding: 0 30px;
+  border: 1.5px solid #d6b56a;
+  border-radius: 999px;
+  background: rgb(35 39 15 / 0.72);
+  color: #f6ecd4;
+  font-family: var(--font-text);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 0 0 0 rgb(214 181 106 / 0.45);
+  animation: roc-invite 2.6s ease-in-out 0.8s infinite;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.openButton:focus-visible {
+  outline: 2px solid #f6ecd4;
+  outline-offset: 3px;
+}
+@keyframes roc-invite {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(214 181 106 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgb(214 181 106 / 0);
+  }
+}
+
+/* ---------------------------------------------------------------- the opening */
+
+.overlay[data-stage='opening'] .openButton {
+  animation: roc-fade-out 0.3s ease forwards;
+  pointer-events: none;
+}
+.overlay[data-stage='opening'] .shine::before {
+  animation: roc-shine 0.85s cubic-bezier(0.4, 0, 0.3, 1) forwards;
+}
+.overlay[data-stage='opening'] .sealArt {
+  animation: roc-glint 0.7s ease-in-out 0.15s;
+}
+.overlay[data-stage='opening'] .seal {
+  animation: roc-seal-lift 0.55s cubic-bezier(0.5, 0, 0.7, 0.4) 0.8s forwards;
+}
+.overlay[data-stage='opening'] .glow {
+  animation: roc-glow 2s ease-out 0.5s forwards;
+}
+.overlay[data-stage='opening'] .flapTop {
+  animation: roc-open-top 1.4s cubic-bezier(0.45, 0.05, 0.35, 1) 1s forwards;
+}
+.overlay[data-stage='opening'] .flapBottom {
+  animation: roc-open-bottom 1.4s cubic-bezier(0.45, 0.05, 0.35, 1) 1.05s forwards;
+}
+.overlay[data-stage='opening'] .flapLeft {
+  animation: roc-open-left 1.3s cubic-bezier(0.45, 0.05, 0.35, 1) 1.15s forwards;
+}
+.overlay[data-stage='opening'] .flapRight {
+  animation: roc-open-right 1.3s cubic-bezier(0.45, 0.05, 0.35, 1) 1.15s forwards;
+}
+.overlay[data-stage='opening'] .backdrop {
+  animation: roc-fade-out 0.5s ease 1s forwards;
+}
+
+/* The invitation is live: whatever is left of the overlay fades away (then it is removed). */
+.overlay[data-stage='open'] {
+  animation: roc-fade-out 0.45s ease forwards;
+  pointer-events: none;
+}
+.overlay[data-stage='open'] .openButton {
+  opacity: 0;
+}
+.overlay[data-stage='open']:not([data-reduced]) .flap,
+.overlay[data-stage='open']:not([data-reduced]) .seal,
+.overlay[data-stage='open']:not([data-reduced]) .backdrop {
+  opacity: 0;
+}
+
+@keyframes roc-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes roc-shine {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+@keyframes roc-glint {
+  50% {
+    filter: brightness(1.35) saturate(1.1);
+  }
+}
+@keyframes roc-seal-lift {
+  to {
+    transform: translateY(-9%) scale(1.08);
+    opacity: 0;
+  }
+}
+@keyframes roc-glow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.08);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.26);
+  }
+  65% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+@keyframes roc-open-top {
+  72% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateX(165deg);
+    opacity: 0;
+  }
+}
+@keyframes roc-open-bottom {
+  72% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateX(-165deg);
+    opacity: 0;
+  }
+}
+@keyframes roc-open-left {
+  72% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(-165deg);
+    opacity: 0;
+  }
+}
+@keyframes roc-open-right {
+  72% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(165deg);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: no flaps, no light; the envelope simply fades (the platform checks it is gone within 1 s). */
+.reduced .openButton {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .openButton {
+    animation: none;
+  }
+}

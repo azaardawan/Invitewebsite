@@ -92,6 +92,11 @@ export const invitations = pgTable(
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
+    /**
+     * Shaped cards (`card_shapes` feature): the shape the customer chose instead of the card (a key of the design's
+     * manifest `print.shapes`, e.g. `leaf`); null = the card itself.
+     */
+    cardShape: text('card_shape'),
     /** Bottle labels (`bottle_label` feature): the bottle size the customer chose (src/catalog/products.ts). */
     bottleSize: text('bottle_size', { enum: ['250', '330', '500', '600'] }).notNull().default('500'),
     /** Newborn: how the customer wants the date of birth written (src/lib/birth-date-format.ts). */
