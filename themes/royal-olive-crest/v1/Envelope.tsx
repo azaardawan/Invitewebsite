@@ -23,6 +23,7 @@ export function Envelope({ seal, onOpen }: { seal: SealText | null; onOpen: () =
   );
 }
 
+/** Fallback script family; the real one follows the invitation's language (fonts.module.css, --font-script). */
 const SCRIPT = '"ROC Script"';
 /** The joining symbol's size, relative to the letters. */
 const JOIN = 0.72;
@@ -32,10 +33,10 @@ const RTL = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
 /** A piece of the monogram: letters (script), the joining symbol (text font) or the drawn heart. */
 type Piece = { kind: 'text'; text: string; font: string; rtl: boolean } | { kind: 'heart' };
 
-function pieces(seal: SealText): { list: Piece[]; join: number } {
-  if ('custom' in seal) return { list: [{ kind: 'text', text: seal.custom, font: SCRIPT, rtl: RTL.test(seal.custom) }], join: -1 };
+function pieces(seal: SealText, script: string): { list: Piece[]; join: number } {
+  if ('custom' in seal) return { list: [{ kind: 'text', text: seal.custom, font: script, rtl: RTL.test(seal.custom) }], join: -1 };
   const rtl = RTL.test(seal.first + (seal.second ?? ''));
-  const letter = (t: string): Piece => ({ kind: 'text', text: t, font: SCRIPT, rtl });
+  const letter = (t: string): Piece => ({ kind: 'text', text: t, font: script, rtl });
   const join: Piece | null = seal.join ? (seal.join === '♥' ? { kind: 'heart' } : { kind: 'text', text: seal.join, font: TEXT, rtl: RTL.test(seal.join) }) : null;
   const order = [letter(seal.first), ...(join ? [join] : []), ...(seal.second ? [letter(seal.second)] : [])];
   // Visual order, left to right: Arabic and Kurdish read from the right, so the groom's letter is on the right.
@@ -58,6 +59,8 @@ function SealLetters({ seal }: { seal: SealText }) {
     const canvas = ref.current;
     if (!canvas) return;
     let alive = true;
+    // Alyamama for Arabic, Reem Kufi on Kurdish invitations, Pinyon Script for Latin letters
+    const script = getComputedStyle(canvas).getPropertyValue('--font-script').trim() || SCRIPT;
     const draw = () => {
       if (!alive) return;
       const css = canvas.clientWidth;
@@ -65,10 +68,10 @@ function SealLetters({ seal }: { seal: SealText }) {
       const dpr = Math.min(window.devicePixelRatio || 1, 3);
       canvas.width = canvas.height = Math.round(css * dpr);
       const ctx = canvas.getContext('2d');
-      if (ctx) engrave(ctx, canvas.width, JSON.parse(key) as SealText);
+      if (ctx) engrave(ctx, canvas.width, JSON.parse(key) as SealText, script);
     };
     const fontsReady = document.fonts
-      ? Promise.all([document.fonts.load(`700 100px ${SCRIPT}`, key), document.fonts.load(`600 100px ${TEXT}`, key)]).catch(() => undefined)
+      ? Promise.all([document.fonts.load(`700 100px ${script}`, key), document.fonts.load(`600 100px ${TEXT}`, key)]).catch(() => undefined)
       : Promise.resolve();
     void fontsReady.then(draw);
     const ro = new ResizeObserver(draw);
@@ -81,12 +84,12 @@ function SealLetters({ seal }: { seal: SealText }) {
   return <canvas ref={ref} className={o.letters} />;
 }
 
-function engrave(ctx: CanvasRenderingContext2D, size: number, seal: SealText) {
-  const { list, join } = pieces(seal);
+function engrave(ctx: CanvasRenderingContext2D, size: number, seal: SealText, script: string) {
+  const { list, join } = pieces(seal, script);
   const BASE = 100;
   const ink = list.map((p) => {
     if (p.kind === 'heart') return { l: 0, r: 0.42 * BASE, a: 0.38 * BASE, d: 0 };
-    ctx.font = `${p.font === SCRIPT ? 700 : 600} ${p.font === TEXT ? BASE * JOIN : BASE}px ${p.font}`;
+    ctx.font = `${p.font === TEXT ? 600 : 700} ${p.font === TEXT ? BASE * JOIN : BASE}px ${p.font}`;
     ctx.direction = p.rtl ? 'rtl' : 'ltr';
     ctx.textAlign = 'left';
     const m = ctx.measureText(p.text);
@@ -136,10 +139,10 @@ function engrave(ctx: CanvasRenderingContext2D, size: number, seal: SealText) {
         ctx.scale(s, (0.38 * BASE) / 21.5);
         ctx.fill(new Path2D(HEART));
       } else {
-        ctx.font = `${p.font === SCRIPT ? 700 : 600} ${p.font === TEXT ? BASE * JOIN : BASE}px ${p.font}`;
+        ctx.font = `${p.font === TEXT ? 600 : 700} ${p.font === TEXT ? BASE * JOIN : BASE}px ${p.font}`;
         ctx.direction = p.rtl ? 'rtl' : 'ltr';
         ctx.textAlign = 'left';
-        ctx.lineWidth = p.font === SCRIPT ? 0.045 * BASE : 0;
+        ctx.lineWidth = p.font === TEXT ? 0 : 0.045 * BASE;
         ctx.fillText(p.text, 0, 0);
         if (ctx.lineWidth) ctx.strokeText(p.text, 0, 0);
       }

@@ -97,7 +97,8 @@ it (see `docs/THEME_CONTRACT.md` §4). `start()` now fades the song in over 1.2 
 - Olive `#4A5228`, deep olive `#262A10`, ink `#39412D`, gold `#C9A45C` / light `#E6C77D` / deep `#8C6C2C`,
   cream `#F6ECD4`. Text on cream is dark olive (owner's choice for the verse); gold only for decoration and
   for the names on green.
-- Script (names, initials, dates): **Pinyon Script** (Latin) + **Aref Ruqaa Bold** (Arabic, Kurdish).
+- Script (names, initials, dates): **Pinyon Script** (Latin), **Alyamama Bold** (Arabic) and **Reem Kufi SemiBold**
+  (Kurdish invitations; Alyamama has no Kurdish ە). Owner's choice, 2026-10-14 (Alyamama supplied by the owner).
 - Text: **Cormorant Garamond** (Latin) + **Amiri** (Arabic, Kurdish, the verse). All SIL OFL 1.1.
 
 ## 7. Print
@@ -128,7 +129,7 @@ rim, the cream gap and the thin gold line run along the new edge as on #9), and 
 stretch. The gold rim is redrawn from #9's own cross-section for a clean cut edge.
 
 Names: the largest thing on every page and card, centred, in script in every language (Pinyon Script for Latin,
-Aref Ruqaa for Arabic and Kurdish); long names step down a size so they stay whole. The QR code is drawn in the
+Alyamama for Arabic, Reem Kufi for Kurdish); long names step down a size so they stay whole. The QR code is drawn in the
 theme's deep olive on transparent (manifest `print.card.qrColors`).
 
 Files the customer gets (receipt): the PDF (each side on a page with a 10 mm margin) and a transparent 300 dpi
