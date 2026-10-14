@@ -71,45 +71,16 @@
   background: url(./assets/seal.webp) center / 100% 100% no-repeat;
 }
 
-/* The couple's initials, pressed into the seal's flat face (centre 49.7 % / 40.4 % of the seal, ⌀ 21 % of the envelope). */
+/* The couple's initials, engraved into the seal's flat face: a square canvas over the face (centre 49.2 % /
+   41.9 % of the seal, ⌀ 19.5 % of the envelope, measured on the artwork). Envelope.tsx fits the letters inside. */
 .letters {
   position: absolute;
-  left: 49.7%;
-  top: 40.4%;
+  left: 49.2%;
+  top: 41.9%;
+  width: 19.5cqw;
+  aspect-ratio: 1;
   transform: translate(-50%, -50%);
-  max-width: 15.5cqw;
-  font-family: var(--font-script);
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  text-align: center;
-  color: #4f350c;
-  -webkit-text-stroke: 0.045em #4f350c;
-  text-shadow:
-    0 0.045em 0 rgb(255 238 186 / 0.8),
-    0 -0.03em 0.02em rgb(46 28 4 / 0.6);
-  unicode-bidi: isolate;
-}
-.letters[data-size='l'] {
-  font-size: 7.4cqw;
-}
-.letters[data-size='m'] {
-  font-size: 5.6cqw;
-}
-.letters[data-size='s'] {
-  font-size: 4.3cqw;
-}
-.letters[data-size='xs'] {
-  font-size: 3.4cqw;
-}
-.join {
-  display: inline-block;
-  margin-inline: 0.16em;
-  font-family: var(--font-text);
-  font-size: 0.62em;
-  font-weight: 600;
-  vertical-align: 0.18em;
-  -webkit-text-stroke: 0;
+  pointer-events: none;
 }
 
 .glow {

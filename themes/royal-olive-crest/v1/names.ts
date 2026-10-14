@@ -1,6 +1,6 @@
 /**
- * The couple's names are the largest thing on every page, in script (Pinyon Script for Latin letters, Aref Ruqaa
- * for Arabic and Kurdish). A long name steps down so it stays whole on narrow cards instead of breaking mid-word.
+ * The couple's names are the largest thing on every page, in script (Pinyon Script for Latin letters, Alyamama
+ * for Arabic, Reem Kufi on Kurdish invitations). A long name steps down so it stays whole on narrow cards instead of breaking mid-word.
  * Returns a factor (in em) for the name's own font size.
  */
 export function nameScale(name: string | undefined): number {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type FeatureKey } from '@/catalog/features';
+import { CARD_SHAPE_FEATURES, FEATURE_KEYS, featureDependencyProblems, isCardShapeKey, isPlatformFeature, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
 
 /** A shaped printed card a design offers (manifest `print.shapes`). */
@@ -52,7 +52,7 @@ export type ThemeManifest = {
     card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean; qrColors?: { dark: string; light: string } };
     keepsake?: { size: 'A4' };
     /**
-     * Shaped printed cards (feature `card_shapes`): the customer may choose one of these instead of the
+     * Shaped printed cards (features `card_leaf`, `card_heart`; one per shape key `leaf`, `heart`): the customer may choose one of these instead of the
      * card. `outline` is the cut line, an SVG path in millimetres (origin top-left of a `widthMm` ×
      * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over), or with
      * `backSideways` the card turned over and a quarter turn (its box is then `heightMm` × `widthMm`).
@@ -221,7 +221,12 @@ export const manifestSchema = z
     }
     if (m.features.includes('print_card') && !m.print?.card) issue('print_card requires print.card');
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
-    if (m.features.includes('card_shapes') && !m.print?.shapes?.length) issue('card_shapes requires print.shapes');
+    for (const [shape, feature] of Object.entries(CARD_SHAPE_FEATURES)) {
+      const has = m.print?.shapes?.some((x) => x.key === shape);
+      if (m.features.includes(feature) && !has) issue(`${feature} requires a "${shape}" shape in print.shapes`);
+      if (has && !m.features.includes(feature)) issue(`print.shapes "${shape}" is sold with the ${feature} feature: list it in features`);
+    }
+    if (m.print?.shapes?.some((x) => !isCardShapeKey(x.key))) issue(`print.shapes keys must be one of: ${Object.keys(CARD_SHAPE_FEATURES).join(', ')}`);
     if (m.print?.shapes && new Set(m.print.shapes.map((x) => x.key)).size !== m.print.shapes.length) issue('print.shapes contain duplicate keys');
     if (m.print?.shapes?.some((x) => x.key === 'a5')) issue('print.shapes: "a5" is the card itself, not a shape');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');

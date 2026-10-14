@@ -24,23 +24,7 @@
   background-image: url(../assets/leaf-front.webp);
 }
 .leaf-back {
-  background: none;
-}
-/* The leaf's back, turned sideways (180.6 × 107 mm): the cream card with its gold edge, and the owner's #9 at
-   87 % of the length, placed where it fits inside the cut line (measured on the outline). */
-.paper {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.leafArt {
-  position: absolute;
-  left: 6.5%;
-  top: 23.4%;
-  width: 87%;
-  height: 61.5%;
-  background: url(../assets/leaf-back.webp) center / 100% 100% no-repeat;
+  background-image: url(../assets/leaf-back.webp);
 }
 .heart-front {
   background-image: url(../assets/heart-front.webp);
@@ -68,24 +52,15 @@
   inset: 36% 15% 34% 19%;
   gap: 2mm;
 }
-/* Inside #9's cream middle (clear 39–73 % down, 33–68 % across): the title and message only. */
+/* Leaf back (#9 on the leaf, read sideways): the cream middle between the crest panel (left) and the flourish
+   panel (right); clear 30-80 % across, 12-88 % down at its centre. */
 .leaf-back .back {
-  inset: 39% 32% 27% 33%;
+  inset: 19% 25% 17% 37%;
   gap: 1.6mm;
 }
-.leaf-back .backNames {
-  display: none;
-}
-/* The QR code sits in the cream border under #9 (11 mm, no caption: the border is about 15 mm deep there). */
-.leaf-back .qr {
-  position: absolute;
-  left: 50%;
-  bottom: -23.5mm;
-  transform: translateX(-50%);
-}
 .leaf-back .qr img {
-  width: 11mm;
-  height: 11mm;
+  width: 12mm;
+  height: 12mm;
 }
 .leaf-back .qr figcaption {
   display: none;

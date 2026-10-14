@@ -24,7 +24,7 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_shapes'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_leaf', 'card_heart'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     // A printed card and the online invitation with its music.
@@ -39,7 +39,7 @@ export default defineTheme({
     },
     // The complete theme: + messages to the couple, the keepsake PDF, and the leaf or heart card instead of the card.
     {
-      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_shapes'],
+      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_leaf', 'card_heart'],
       fields: [...allFields],
     },
   ],

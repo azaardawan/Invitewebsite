@@ -19,7 +19,3 @@ export function sealText(fields: Partial<Record<string, string>>, join: string):
   return { first, join: second ? join : null, second };
 }
 
-/** Letters on the seal, counted for sizing (the joining symbol counts as one). */
-export function sealLength(t: SealText): number {
-  return 'custom' in t ? Array.from(t.custom).length : 1 + (t.second ? 2 : 0);
-}

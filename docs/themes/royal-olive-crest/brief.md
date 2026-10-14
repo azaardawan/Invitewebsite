@@ -71,7 +71,8 @@ Every combination is allowed; the owner sets the packages in Admin. Designed exa
 | Printed A5 card | ✅ | ✅ | ✅ |
 | Countdown, map, guest form | — | ✅ | ✅ |
 | Congratulations messages, keepsake PDF | — | — | ✅ |
-| Leaf or heart card instead of the A5 card (`card_shapes`) | — | — | ✅ |
+| Leaf card instead of the A5 card (`card_leaf`) | — | — | ✅ |
+| Heart card instead of the A5 card (`card_heart`) | — | — | ✅ |
 
 A missing feature removes its whole page (the countdown page, the map button, the form).
 
@@ -96,7 +97,8 @@ it (see `docs/THEME_CONTRACT.md` §4). `start()` now fades the song in over 1.2 
 - Olive `#4A5228`, deep olive `#262A10`, ink `#39412D`, gold `#C9A45C` / light `#E6C77D` / deep `#8C6C2C`,
   cream `#F6ECD4`. Text on cream is dark olive (owner's choice for the verse); gold only for decoration and
   for the names on green.
-- Script (names, initials, dates): **Pinyon Script** (Latin) + **Aref Ruqaa Bold** (Arabic, Kurdish).
+- Script (names, initials, dates): **Pinyon Script** (Latin), **Alyamama Bold** (Arabic) and **Reem Kufi SemiBold**
+  (Kurdish invitations; Alyamama has no Kurdish ە). Owner's choice, 2026-10-14 (Alyamama supplied by the owner).
 - Text: **Cormorant Garamond** (Latin) + **Amiri** (Arabic, Kurdish, the verse). All SIL OFL 1.1.
 
 ## 7. Print
@@ -107,24 +109,27 @@ it (see `docs/THEME_CONTRACT.md` §4). `start()` now fades the song in over 1.2 
 
 ## 8. Shaped printed cards: leaf and heart (built, 2026-10-14)
 
-The customer chooses **one** printed card on the order form: the **A5 card**, the **leaf** or the **heart**, in
-packages with the new feature **"Shaped printed card" (`card_shapes`)**; a package without it (e.g. Normal) only has
-the A5 card. Platform feature: see `docs/THEME_CONTRACT.md` §6 "Shaped cards".
+The customer chooses **one** printed card on the order form: the **A5 card**, the **leaf** or the **heart**. Each shape
+is its own feature, **"Leaf card" (`card_leaf`)** and **"Heart card" (`card_heart`)** (owner's request, 2026-10-14), so
+a package can offer the leaf, the heart, both or neither; a package with neither (e.g. Normal) only has the A5 card. Platform feature: see `docs/THEME_CONTRACT.md` §6 "Shaped cards".
 
 | | Leaf | Heart |
 |---|---|---|
 | Size (cut) | 107 × 180.6 mm (the agreed "about 12 × 18", at the artwork's own proportions) | 150 × 157.9 mm |
 | Front | #12: names + date in calligraphy, gold on green | #14: names + date |
-| Back | **#9 as designed**, read with the card turned sideways (like the A5 back), placed at 87 % inside the leaf's cut line on cream with a gold edge; QR code in the cream border below it | #13, fitted to the front's outline |
+| Back | **#9**, read with the card turned sideways (like the A5 back), rebuilt on the leaf's own cut line (see below) | #13, fitted to the front's outline |
 | Both backs | The customer's title and message (long messages step down a size), the names, the QR code | |
 
 A card is cut along **one** line, so each back must lie on the front's outline (mirrored: the card turned over).
 Neither owner back matched its front: the heart back (10 % narrower) was reshaped row by row onto the front's
-outline; the leaf back (#9, a slimmer "eye") keeps its exact look, scaled to fit inside the leaf turned sideways
-(owner's choice, 2026-10-14), with the space around it in cream and a gold edge along the cut.
+outline. The leaf back (#9) is a slimmer "eye" than the leaf. Owner's
+decision (2026-10-14): "exact look of #9, expanded or reduced to the shape of the front, without changing the design".
+So #9 is resized as one picture onto the leaf's cut line (`scripts/leafback.py`, no solid panels): each column of #9
+is stretched to the leaf's, only the gold rim and thin line keep their exact thickness along the edge. Nothing is
+moved or redrawn; the crest comes out a little taller because the leaf is fuller.
 
 Names: the largest thing on every page and card, centred, in script in every language (Pinyon Script for Latin,
-Aref Ruqaa for Arabic and Kurdish); long names step down a size so they stay whole. The QR code is drawn in the
+Alyamama for Arabic, Reem Kufi for Kurdish); long names step down a size so they stay whole. The QR code is drawn in the
 theme's deep olive on transparent (manifest `print.card.qrColors`).
 
 Files the customer gets (receipt): the PDF (each side on a page with a 10 mm margin) and a transparent 300 dpi
@@ -134,7 +139,8 @@ exactly on the outline. The artwork ends at the cut line (no bleed beyond it): a
 Regenerate the artwork and cut lines with `scripts/shapes.py` (outlines go to `themes/royal-olive-crest/v1/outlines.ts`):
 
 ```bash
-python3 -I scripts/shapes.py leaf <#12 PNG> <#9 PNG> cream 107 out/   # front + outline; the back is #9 itself
+python3 -I scripts/shapes.py leaf <#12 PNG> <#9 PNG> cream 107 out/   # front + outline
+python3 -I scripts/leafback.py <#9 PNG> themes/royal-olive-crest/v1/outlines.ts leaf-back.png 8.0565 180 0 32   # the back
 python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
 ```
 
@@ -144,6 +150,6 @@ python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
 2. Themes → Royal Olive Crest → Fields: label `person_1_name` "اسم العريس" / "Groom's name" and `person_2_name`
    "اسم العروس" / "Bride's name" if not already the section defaults.
 3. Packages: include `seal_initials` so customers can type their own initials (without it the initials are
-   always worked out from the names). Add "Shaped printed card" to the packages that offer the leaf and heart.
+   always worked out from the names). Add "Leaf card" and/or "Heart card" to the packages that offer them.
 4. Pick the song. The Kurdish wording (batches 25–26 in `docs/translations/KURDISH_REVIEW.md`) is approved and live,
    including the design's Kurdish name.

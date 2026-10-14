@@ -40,7 +40,7 @@ export async function CardDesignSection({
   const resolved = await themeArtwork(db(), themeId);
   const loaders = codeRef ? printComponents[codeRef] : undefined;
   const own = { front: !!loaders?.card, back: !!loaders?.cardBack };
-  // The design's shaped cards (leaf, heart…), sold with the `card_shapes` feature.
+  // The design's shaped cards (leaf, heart…), each sold with its own feature (`card_leaf`, `card_heart`).
   const shapes = (codeRef ? manifestByCodeRef(codeRef)?.print?.shapes : undefined) ?? [];
   // A design without its own front prints the platform's simple front, so there is always something to show.
   const previewable = true;

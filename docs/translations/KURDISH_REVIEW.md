@@ -738,3 +738,14 @@ The owner approved every row as suggested; all live (row 9 in the design's manif
 | 7 | `receipt.shapePngFront` | صورة الوجه (PNG) | Front picture (PNG) | وێنەی ڕووی پێشەوە (PNG) | وێنێ ڕویێ پێشیێ (PNG) | ◐ |
 | 8 | `receipt.shapePngBack` | صورة الظهر (PNG) | Back picture (PNG) | وێنەی ڕووی پشتەوە (PNG) | وێنێ ڕویێ پشتێ (PNG) | ◐ |
 | 9 | Shape names (Royal Olive Crest manifest, Arabic/English only today) | ورقة شجر / قلب | Leaf / Heart | گەڵا / دڵ | بەلگ / دل | ◐ |
+
+## Batch 27 — Royal Olive Crest: the leaf and the heart sold separately — ⏳ PENDING owner approval
+
+The single feature "shaped printed card" (batch 26 row 1, `store.features.card_shapes`) became two, so a package can
+offer the leaf, the heart or both. Suggestions only; until approved the Kurdish pages show the Arabic. Admin texts
+are Arabic/English only.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.features.card_leaf` | بطاقة مطبوعة على شكل ورقة شجر، تختارها بدل البطاقة | A leaf-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی گەڵا، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ بەلگی، ل شوینا کارتێ | ◐ |
+| 2 | `store.features.card_heart` | بطاقة مطبوعة على شكل قلب، تختارها بدل البطاقة | A heart-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی دڵ، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ دلی، ل شوینا کارتێ | ◐ |

@@ -93,7 +93,7 @@ export const invitations = pgTable(
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
     /**
-     * Shaped cards (`card_shapes` feature): the shape the customer chose instead of the card (a key of the design's
+     * Shaped cards (`card_leaf` / `card_heart` features): the shape the customer chose instead of the card (a key of the design's
      * manifest `print.shapes`, e.g. `leaf`); null = the card itself.
      */
     cardShape: text('card_shape'),

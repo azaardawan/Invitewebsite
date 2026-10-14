@@ -73,7 +73,7 @@ export type PrintCardBackProps = PrintBase & {
 };
 
 /**
- * One side of a shaped printed card (`print/Shape.tsx`, manifest `print.shapes`, feature `card_shapes`). Draw the
+ * One side of a shaped printed card (`print/Shape.tsx`, manifest `print.shapes`, features `card_leaf` / `card_heart`). Draw the
  * artwork filling the `widthMm` × `heightMm` box, inside `outline` (this side's cut line as an SVG path in mm:
  * the back's is the front's mirrored). The platform places it on the page, adds the cut line for print
  * shops and makes the transparent PNG. Front: the card's content (names, date…); back: the customer's
