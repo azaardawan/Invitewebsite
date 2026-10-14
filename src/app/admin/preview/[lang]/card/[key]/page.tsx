@@ -19,6 +19,8 @@ const query = z.object({
   png: z.literal('1').optional(),
   /** The design's long sample names, to check they fit. */
   names: z.enum(['short', 'long']).optional(),
+  /** `1`: a sample message on the back (the long one with `names=long`), to check it fits. */
+  msg: z.literal('1').optional(),
   v: z.coerce.number().int().min(1).optional(),
 });
 
@@ -42,7 +44,7 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
     sample.props,
     manifest,
     q.data.cut ? 'cardBleed' : 'card',
-    {},
+    q.data.msg && sample.props.fields.invitation_message ? { backMessage: sample.props.fields.invitation_message } : {},
     'https://bahjaaa.com/i/sample',
     await themeCardDesign(db(), sample.theme.id),
     null,
