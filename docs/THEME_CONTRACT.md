@@ -70,7 +70,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 
 | API | Use |
 |---|---|
-| `useMusic()` | `start()` from the "Open invitation" tap (phones block autoplay otherwise); `toggle()` for the music button; `playing`, `available`. **Music always loops.** It pauses automatically when the phone locks. |
+| `useMusic()` | `start()` from the "Open invitation" tap (phones block autoplay otherwise). A design whose song should only begin when the opening ends calls `prime()` from the tap (unlocks sound silently) and `start()` later. `start()` fades the song in. `toggle()` for the music button; `playing`, `available`. **Music always loops.** It pauses automatically when the phone locks. |
 | `GuestFormSlot` | Headless guest form. The theme designs it; the platform validates, submits and stores. Nothing is saved in sample/preview. Renders nothing when the package lacks `rsvp`. |
 | `useCountdown(startsAt)` | Live countdown (shared 1-second clock) |
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
@@ -79,7 +79,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 ## 4A. Opening animation (required for sellable themes)
 
 Every non-internal theme starts on a cover with a button labelled `labels.openInvitation`. Its click handler
-calls `useMusic().start()` and plays the opening animation (CSS `@keyframes`/transitions on `transform` and
+calls `useMusic().start()` (or `prime()`, with `start()` when the opening ends) and plays the opening animation (CSS `@keyframes`/transitions on `transform` and
 `opacity`; optionally a Lottie or a small muted inline video layer). The opening finishes within **4 s**
 (looping idle effects are allowed). When `useReducedMotion()` is true, the cover fades and the invitation is
 visible within **1 s**. `e2e/themes.spec.ts` enforces all three.

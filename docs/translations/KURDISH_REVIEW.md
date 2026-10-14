@@ -709,3 +709,15 @@ only be published once the Kurdish is in. Sections shared with the main terms re
 - دبیت ئەم ڤان مەرجان نوو بکەین، و ل سەر هەر داخوازیەکێ ئەو وەشان دهێتە جێبەجێکرن یا تو دەمێ داخوازیێ ل سەر ڕازی بووی.
 - بۆ پەیوەندیێ: ب ڕێکا واتسئاپێ یان ڕێکێن پەیوەندیێ ل لاپەرێ «پەیوەندیێ ب مە بکە».
 ```
+
+## Batch 25 — Royal Olive Crest: initials on the wax seal — ⏳ PENDING owner approval
+
+Suggestions only; nothing here is live (Kurdish pages show the Arabic until approved). The design's own lines
+reuse the owner-approved Olive Ring Box wording (same Arabic sentences), and the Quran verse stays in Arabic.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | Field Library label `seal_initials` (Admin) | الأحرف الأولى على الختم | Initials on the seal | پیتە سەرەتاییەکان لەسەر مۆر | تیپێن ئێکێ ل سەر مۆرێ | ○ |
+| 2 | `store.sealInitialsHint` | اختياري: اتركه فارغًا ونكتب الحرف الأول من كل اسم (العريس أولًا)، أو اكتب الأحرف كما تريدها. | Optional: leave it empty and we write the first letter of each name (groom first), or type the initials as you want them. | ئارەزوومەندانە: بەتاڵی بهێڵە و پیتی یەکەمی هەر ناوێک دەنووسین (زاوا یەکەم)، یان پیتەکان وەک دەتەوێت بنووسە. | ب دلێ خۆ: ڤالا بهێلە و ئەم دێ تیپا ئێکێ یا هەر ناڤەکی نڤیسین (زاڤا ئێکەم)، یان تیپان وەکی تە دڤێت بنڤیسە. | ○ |
+| 3 | Order-form label of the design's `sealJoin` choice (manifest, Arabic/English only today) | الرمز بين الحرفين على الختم | Symbol between the initials on the seal | هێمای نێوان دوو پیتەکە لەسەر مۆر | نیشانا د ناڤبەرا هەردوو تیپان دا ل سەر مۆرێ | ○ |
+| 4 | Design name (Admin → Themes) | الشعار الملكي الزيتوني | Royal Olive Crest | دروشمی شاهانەی زەیتوونی | نیشانا شاهانە یا زەیتوونی | ○ |

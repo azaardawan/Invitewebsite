@@ -1251,6 +1251,7 @@
     "saving": "Preparing…",
     "dateHint": "Choose a date from today onward.",
     "mapHint": "Paste a Google Maps or Apple Maps link.",
+    "sealInitialsHint": "Optional: leave it empty and we write the first letter of each name (groom first), or type the initials as you want them.",
     "optionalNone": "",
     "fieldErrors": {
       "required": "This field is required.",

@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
-import { fieldOptions } from '@/catalog/fields';
+import { fieldOptions, isOptionalField } from '@/catalog/fields';
 
 export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
 
@@ -115,13 +115,15 @@ export function OrderForm({
       {fields.map((f) => {
         const id = `f-${f.key}`;
         const err = errors[f.key];
+        const optional = isOptionalField(f.key);
+        const hinted = f.type === 'date' || f.key === 'venue_map_url' || f.key === 'seal_initials';
         const common = {
           id,
           name: `f.${f.key}`,
           defaultValue: values[f.key] ?? '',
-          required: true,
+          required: !optional,
           'aria-invalid': err ? true : undefined,
-          'aria-describedby': err ? `${id}-err` : f.type === 'date' || f.key === 'venue_map_url' ? `${id}-hint` : undefined,
+          'aria-describedby': err ? `${id}-err` : hinted ? `${id}-hint` : undefined,
           className: inputCls,
         } as const;
         return (
@@ -164,6 +166,8 @@ export function OrderForm({
               <p id={`${id}-hint`} className="text-sm text-muted">{t('dateHint')}</p>
             ) : f.key === 'venue_map_url' ? (
               <p id={`${id}-hint`} className="text-sm text-muted">{t('mapHint')}</p>
+            ) : f.key === 'seal_initials' ? (
+              <p id={`${id}-hint`} className="text-sm text-muted">{t('sealInitialsHint')}</p>
             ) : null}
           </div>
         );
