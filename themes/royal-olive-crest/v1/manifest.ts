@@ -55,11 +55,13 @@ export default defineTheme({
     },
   ],
   print: {
-    card: { size: 'A5', bleedMm: 3, qr: true },
+    // The QR code in the theme's deep olive on the cream paper (transparent background), not black on white.
+    card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#39412d', light: '#00000000' } },
     keepsake: { size: 'A4' },
     // The owner's leaf (#12/#9) and heart (#14/#13) cards; sizes as agreed (about 11 × 18 cm and 15 × 16 cm).
+    // The leaf's back (#9) is a landscape design: read with the card turned sideways, like the A5 card's back.
     shapes: [
-      { key: 'leaf', label: { ar: 'ورقة شجر', en: 'Leaf' }, widthMm: 107, heightMm: 180.6, outline: LEAF_OUTLINE },
+      { key: 'leaf', label: { ar: 'ورقة شجر', en: 'Leaf' }, widthMm: 107, heightMm: 180.6, outline: LEAF_OUTLINE, backSideways: true },
       { key: 'heart', label: { ar: 'قلب', en: 'Heart' }, widthMm: 150, heightMm: 157.9, outline: HEART_OUTLINE },
     ],
   },

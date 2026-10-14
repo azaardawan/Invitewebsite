@@ -80,7 +80,7 @@ export type PrintCardBackProps = PrintBase & {
  * title and message. A server component, like the card.
  */
 export type PrintShapeProps = PrintBase & {
-  /** Which of the design's shapes (its manifest key). */
+  /** Which of the design's shapes (its manifest key). `widthMm` × `heightMm` is this side's box (a sideways back is landscape). */
   shape: string;
   side: 'front' | 'back';
   widthMm: number;

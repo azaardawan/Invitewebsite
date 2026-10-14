@@ -17,6 +17,8 @@ const query = z.object({
   cut: z.literal('1').optional(),
   /** With `shape`: just the shape on a transparent page (what the PNG shows). */
   png: z.literal('1').optional(),
+  /** The design's long sample names, to check they fit. */
+  names: z.enum(['short', 'long']).optional(),
   v: z.coerce.number().int().min(1).optional(),
 });
 
@@ -30,7 +32,7 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
   if (!isLocale(lang)) notFound();
   const q = query.safeParse(await searchParams);
   if (!q.success) notFound();
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v });
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v, names: q.data.names });
   if (!sample) notFound();
   const manifest = manifestByCodeRef(sample.version.codeRef);
   if (!manifest) notFound();

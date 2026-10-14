@@ -131,7 +131,8 @@ export async function cardData(
   const { base, cardBackTitle } = printBase(theme);
   const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
   const [w, h] = CARD_SIZES[spec.size];
-  const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M' }) : null;
+  // In the design's colours when it sets them (scanners read any strong contrast), otherwise black on white.
+  const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M', ...(spec.qrColors ? { color: spec.qrColors } : {}) }) : null;
   // Card-only wording from Admin: replace (or remove) the message, add one extra line.
   const fields = { ...base.fields };
   if (opts.message !== undefined) {
@@ -157,18 +158,27 @@ export async function cardData(
 export const SHAPE_MARGIN_MM = 10;
 
 /**
- * A shaped card's two sides: the box, each side's cut line (the back's is the front's mirrored: the card turned
- * over) and the page around it. `cutLine`: the print-shop file draws the cut line.
+ * A shaped card's two sides: each side's box, cut line and page (with a margin around the shape). The back's cut
+ * line is the front's mirrored (the card turned over); with `backSideways` the card is also turned a quarter
+ * (the front's top on the left), which is the front's outline with x and y swapped. `cutLine`: the print-shop
+ * file draws the cut line.
  */
 export function shapeSheet(shape: CardShape, kind: 'card' | 'cardBleed') {
+  const front = { widthMm: shape.widthMm, heightMm: shape.heightMm, outline: shape.outline };
+  const back = shape.backSideways
+    ? { widthMm: shape.heightMm, heightMm: shape.widthMm, outline: transposePath(shape.outline) }
+    : { widthMm: shape.widthMm, heightMm: shape.heightMm, outline: mirrorPath(shape.outline, shape.widthMm) };
+  const page = (b: { widthMm: number; heightMm: number }) => ({ width: `${b.widthMm + 2 * SHAPE_MARGIN_MM}mm`, height: `${b.heightMm + 2 * SHAPE_MARGIN_MM}mm` });
   return {
     key: shape.key,
-    widthMm: shape.widthMm,
-    heightMm: shape.heightMm,
-    outline: { front: shape.outline, back: mirrorPath(shape.outline, shape.widthMm) },
-    page: { width: `${shape.widthMm + 2 * SHAPE_MARGIN_MM}mm`, height: `${shape.heightMm + 2 * SHAPE_MARGIN_MM}mm` },
+    sides: { front: { ...front, page: page(front) }, back: { ...back, page: page(back) } },
     cutLine: kind === 'cardBleed',
   };
+}
+
+/** An outline with x and y swapped: mirrored and turned a quarter (the top goes to the left). */
+export function transposePath(d: string): string {
+  return d.replace(/(-?\d+(?:\.\d+)?)([\s,]+)(-?\d+(?:\.\d+)?)/g, (_, x, sep, y) => `${y}${sep}${x}`);
 }
 
 /** An outline (absolute M/L/C/Q/Z commands, x y pairs) mirrored left-right within a box `width` wide. */

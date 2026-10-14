@@ -2,6 +2,7 @@ import { ThemeBorder, type KeepsakeProps } from '@/theme-sdk';
 import { CREST_BORDER } from '../border';
 import { copyFor } from '../copy';
 import fonts from '../fonts.module.css';
+import { nameScale } from '../names';
 import p from './print.module.css';
 
 /**
@@ -18,9 +19,9 @@ export default function Keepsake({ locale, dir, lang, fields, event, labels, mes
         <div className={p.coverInner}>
           <p className={p.coverEyebrow}>{labels.keepsakeTitle}</p>
           <h1 className={p.names}>
-            {fields.person_1_name ? <span>{fields.person_1_name}</span> : null}
+            {fields.person_1_name ? <span style={{ fontSize: `${nameScale(fields.person_1_name)}em` }}>{fields.person_1_name}</span> : null}
             {fields.person_1_name && fields.person_2_name ? <span className={p.and}>{labels.and}</span> : null}
-            {fields.person_2_name ? <span>{fields.person_2_name}</span> : null}
+            {fields.person_2_name ? <span style={{ fontSize: `${nameScale(fields.person_2_name)}em` }}>{fields.person_2_name}</span> : null}
           </h1>
           {event.date ? <p className={p.coverDate}>{event.date.full}</p> : null}
           <p className={p.coverSub}>{t.keepsakeSubtitle}</p>

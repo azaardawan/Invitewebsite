@@ -1,6 +1,7 @@
 import { ThemeBorder, type PrintCardProps } from '@/theme-sdk';
 import { CREST_BORDER } from '../border';
 import fonts from '../fonts.module.css';
+import { nameScale } from '../names';
 import p from './print.module.css';
 
 /**
@@ -14,9 +15,9 @@ export default function Card({ dir, lang, fields, event, labels, qrDataUrl, extr
       <ThemeBorder border={border} fallback={CREST_BORDER} medium="print" />
       <div className={p.cardSafe}>
         <h1 className={p.names}>
-          {fields.person_1_name ? <span>{fields.person_1_name}</span> : null}
+          {fields.person_1_name ? <span style={{ fontSize: `${nameScale(fields.person_1_name)}em` }}>{fields.person_1_name}</span> : null}
           {fields.person_1_name && fields.person_2_name ? <span className={p.and}>{labels.and}</span> : null}
-          {fields.person_2_name ? <span>{fields.person_2_name}</span> : null}
+          {fields.person_2_name ? <span style={{ fontSize: `${nameScale(fields.person_2_name)}em` }}>{fields.person_2_name}</span> : null}
         </h1>
         {fields.invitation_message ? <p className={p.cardMessage}>{fields.invitation_message}</p> : null}
         <dl className={p.cardDetails}>

@@ -18,6 +18,7 @@ import { copyFor, type Copy } from './copy';
 import { CREST_BORDER } from './border';
 import { Envelope } from './Envelope';
 import { sealText } from './initials';
+import { nameScale } from './names';
 import fonts from './fonts.module.css';
 import o from './opening.module.css';
 import s from './theme.module.css';
@@ -120,7 +121,11 @@ export default function RoyalOliveCrest(props: ThemeProps) {
           <div className={`${s.sheet} ${s.sheetNames}`}>
             <div className={s.heroContent}>
               <h1 className={s.names}>
-                {fields.person_1_name ? <span className={s.name}>{fields.person_1_name}</span> : null}
+                {fields.person_1_name ? (
+                  <span className={s.name} style={{ fontSize: `${nameScale(fields.person_1_name)}em` }}>
+                    {fields.person_1_name}
+                  </span>
+                ) : null}
                 {fields.person_1_name && fields.person_2_name ? (
                   <>
                     <span className={s.and} aria-hidden="true">
@@ -129,7 +134,11 @@ export default function RoyalOliveCrest(props: ThemeProps) {
                     <span className={s.srOnly}> {labels.and} </span>
                   </>
                 ) : null}
-                {fields.person_2_name ? <span className={s.name}>{fields.person_2_name}</span> : null}
+                {fields.person_2_name ? (
+                  <span className={s.name} style={{ fontSize: `${nameScale(fields.person_2_name)}em` }}>
+                    {fields.person_2_name}
+                  </span>
+                ) : null}
               </h1>
               {event.date ? <p className={s.heroDate}>{event.date.full}</p> : null}
             </div>

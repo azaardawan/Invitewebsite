@@ -142,33 +142,33 @@ function ShapePages({
 }) {
   const vars = colorVars(data.props.colors);
   const mark = watermark ? <Watermark labels={watermark} /> : null;
-  const box = { width: `${shape.widthMm}mm`, height: `${shape.heightMm}mm` };
-  const page = png ? box : shape.page;
   const side = (s: 'front' | 'back') => {
-    const outline = shape.outline[s];
+    const sheet = shape.sides[s];
+    const box = { width: `${sheet.widthMm}mm`, height: `${sheet.heightMm}mm` };
+    const page = png ? box : sheet.page;
     const props: PrintShapeProps = {
       ...(s === 'front' ? data.props : data.back),
       shape: shape.key,
       side: s,
-      widthMm: shape.widthMm,
-      heightMm: shape.heightMm,
-      outline,
+      widthMm: sheet.widthMm,
+      heightMm: sheet.heightMm,
+      outline: sheet.outline,
       qrDataUrl: data.props.qrDataUrl,
       extraLine: s === 'front' ? data.props.extraLine : null,
       title: data.back.title,
       message: data.back.message,
     };
     return (
-      <div data-card-side={s} style={{ ...vars, position: 'relative', ...page, overflow: 'hidden', breakAfter: 'page' }}>
+      <div data-card-side={s} style={{ ...vars, position: 'relative', ...page, overflow: 'hidden', breakAfter: 'page', page: s === 'back' && !view ? 'back' : undefined } as React.CSSProperties}>
         <div style={{ position: 'absolute', left: png ? 0 : `${SHAPE_MARGIN_MM}mm`, top: png ? 0 : `${SHAPE_MARGIN_MM}mm`, ...box }}>
           <Shape {...props} />
           {shape.cutLine && !png ? (
             <svg
-              viewBox={`0 0 ${shape.widthMm} ${shape.heightMm}`}
+              viewBox={`0 0 ${sheet.widthMm} ${sheet.heightMm}`}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
               aria-hidden
             >
-              <path d={outline} fill="none" stroke={CUT_COLOR} strokeWidth={0.1} />
+              <path d={sheet.outline} fill="none" stroke={CUT_COLOR} strokeWidth={0.1} />
             </svg>
           ) : null}
         </div>
@@ -176,10 +176,16 @@ function ShapePages({
       </div>
     );
   };
+  const size = (s: 'front' | 'back') => {
+    const sheet = shape.sides[s];
+    return png ? `${sheet.widthMm}mm ${sheet.heightMm}mm` : `${sheet.page.width} ${sheet.page.height}`;
+  };
   const background = png ? 'html,body{margin:0;padding:0;background:transparent}' : BASE;
+  // One side: its own page size. Both (checking by eye): the back on its own named page.
+  const pages = view ? `@page{size:${size(view)};margin:0}` : `@page{size:${size('front')};margin:0}@page back{size:${size('back')};margin:0}`;
   return (
     <>
-      <style>{`@page{size:${page.width} ${page.height};margin:0}${background}`}</style>
+      <style>{`${pages}${background}`}</style>
       {view !== 'back' ? side('front') : null}
       {view !== 'front' ? side('back') : null}
     </>

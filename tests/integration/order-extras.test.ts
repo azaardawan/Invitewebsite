@@ -8,7 +8,7 @@ import { createPackage } from '@/server/catalog/packages';
 import { listPalettes, savePalette, setPaletteStatus } from '@/server/catalog/palettes';
 import { createDraft, updateDraft } from '@/server/orders/drafts';
 import { invitationRenderData } from '@/server/invitation/load';
-import { printData } from '@/server/documents/data';
+import { printData, shapeSheet } from '@/server/documents/data';
 import { updateCardOptions } from '@/server/documents/documents';
 import { manifestSchema } from '@/theme-sdk/manifest';
 import { storeImage } from '@/server/media/assets';
@@ -288,11 +288,19 @@ describe('shaped printed cards (card_shapes)', () => {
     const data = await printData(db(), await row(d.invitationId), 'card');
     expect(data.kind === 'card' && data.shape).toMatchObject({
       key: 'leaf',
-      widthMm: 100,
-      heightMm: 160,
-      outline: { front: LEAF.outline, back: 'M50 0 L0 80 L50 160 L100 80 Z' },
-      page: { width: '120mm', height: '180mm' },
+      sides: {
+        front: { widthMm: 100, heightMm: 160, outline: LEAF.outline, page: { width: '120mm', height: '180mm' } },
+        // Turned over: mirrored left-right.
+        back: { widthMm: 100, heightMm: 160, outline: 'M50 0 L0 80 L50 160 L100 80 Z' },
+      },
       cutLine: false,
+    });
+    // A back read sideways: turned over and a quarter turn, a landscape box with x and y swapped.
+    expect(shapeSheet({ ...LEAF, backSideways: true }, 'card').sides.back).toEqual({
+      widthMm: 160,
+      heightMm: 100,
+      outline: 'M0 50 L80 100 L160 50 L80 0 Z',
+      page: { width: '180mm', height: '120mm' },
     });
     const shop = await printData(db(), await row(d.invitationId), 'cardBleed');
     expect(shop.kind === 'card' && shop.shape?.cutLine).toBe(true);

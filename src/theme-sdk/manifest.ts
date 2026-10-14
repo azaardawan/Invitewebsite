@@ -3,7 +3,15 @@ import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type Featur
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
 
 /** A shaped printed card a design offers (manifest `print.shapes`). */
-export type CardShape = { key: string; label: { ar: string; en: string }; widthMm: number; heightMm: number; outline: string };
+export type CardShape = {
+  key: string;
+  label: { ar: string; en: string };
+  widthMm: number;
+  heightMm: number;
+  outline: string;
+  /** The back is read with the card turned a quarter (a landscape design on a portrait card, like the A5 card's back). */
+  backSideways?: boolean;
+};
 
 /**
  * A theme version's manifest: what the theme supports and which package
@@ -34,12 +42,17 @@ export type ThemeManifest = {
   validStates: { features: FeatureKey[]; fields: FieldKey[] }[];
   /** Print companions, required when `print_card` / `keepsake_pdf` are supported. */
   print?: {
-    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean };
+    /**
+     * `qrColors`: the QR code in the design's colours instead of black on white (`dark` must contrast strongly
+     * with `light` and with the paper under a transparent `light`, e.g. '#00000000').
+     */
+    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean; qrColors?: { dark: string; light: string } };
     keepsake?: { size: 'A4' };
     /**
      * Shaped printed cards (feature `card_shapes`): the customer may choose one of these instead of the
      * card. `outline` is the cut line, an SVG path in millimetres (origin top-left of a `widthMm` ×
-     * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over).
+     * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over), or with
+     * `backSideways` the card turned over and a quarter turn (its box is then `heightMm` × `widthMm`).
      * `print/Shape.tsx` draws both sides.
      */
     shapes?: CardShape[];
@@ -125,7 +138,14 @@ export const manifestSchema = z
     validStates: z.array(z.object({ features: z.array(featureKey), fields: z.array(fieldKey).min(1) })).min(1).max(10),
     print: z
       .object({
-        card: z.object({ size: z.enum(['A5', '5x7']), bleedMm: z.number().min(0).max(10), qr: z.boolean() }).optional(),
+        card: z
+          .object({
+            size: z.enum(['A5', '5x7']),
+            bleedMm: z.number().min(0).max(10),
+            qr: z.boolean(),
+            qrColors: z.object({ dark: z.string().regex(/^#[0-9a-fA-F]{6}$/), light: z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/) }).optional(),
+          })
+          .optional(),
         keepsake: z.object({ size: z.literal('A4') }).optional(),
         shapes: z
           .array(
@@ -135,6 +155,7 @@ export const manifestSchema = z
               widthMm: z.number().min(40).max(300),
               heightMm: z.number().min(40).max(300),
               outline: z.string().regex(/^M[0-9.\s,MLCQZz-]+$/).max(40_000),
+              backSideways: z.boolean().optional(),
             }),
           )
           .min(1)

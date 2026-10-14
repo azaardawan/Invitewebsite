@@ -127,6 +127,9 @@ you draw on the front also frames the landscape back, laid out for its shape. Wi
 platform prints a simple landscape back (title, message, names or signatures, in the theme's colours). The
 customer sees both sides on their receipt and can turn the card over. See `themes/demo-wedding/v1/print/CardBack.tsx`.
 
+The QR code is black on white unless the manifest sets `print.card.qrColors: { dark, light }` (e.g. the design's
+deep colour on a transparent `#00000000`, so the paper shows through); keep strong contrast so phones scan it.
+
 `print/Card.tsx` and `print/Keepsake.tsx` default-export **server components** (no hooks, no
 animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/theme-sdk`:
 
@@ -153,8 +156,9 @@ A design may offer shaped printed cards that the customer chooses **instead of**
 `print.shapes: [{ key, label: {ar, en}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
 millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the
 front artwork. `print/Shape.tsx` (required then) default-exports a server component receiving `PrintShapeProps`: the
-card's props plus `shape`, `side` (`front`/`back`), the box size, this side's `outline` (the back's is the front's
-mirrored: the card turned over), `qrDataUrl`, `extraLine`, and the back's `title`/`message`. Draw the artwork filling
+card's props plus `shape`, `side` (`front`/`back`), this side's box size and `outline` (the back's is the front's
+mirrored: the card turned over; with `backSideways: true` the back is a landscape design read with the card turned a
+quarter, so its box is `heightMm` × `widthMm` and its outline the front's with x and y swapped), `qrDataUrl`, `extraLine`, and the back's `title`/`message`. Draw the artwork filling
 the box, **transparent outside the shape**, with the text well inside it. The platform puts each side on a page with a
 10 mm margin (the customer's PDF), adds a thin magenta cut line on the outline for the print shop
 (`?bleed=1` / print-shop download), and makes a transparent 300 dpi PNG of each side. Admin → Themes previews every

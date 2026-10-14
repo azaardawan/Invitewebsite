@@ -79,10 +79,12 @@ export async function CardDesignSection({
           <p className="text-sm text-muted">{t('shapesIntro')}</p>
           <div className="flex flex-wrap items-start gap-4" dir="ltr">
             {shapes.flatMap((shape) => {
-              // The shape's page (shape + margin) at 96 px per inch, shown at 40 %.
-              const w = Math.round(((shape.widthMm + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
-              const h = Math.round(((shape.heightMm + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
-              return (['front', 'back'] as const).map((side) => (
+              return (['front', 'back'] as const).map((side) => {
+                // The side's page (shape + margin) at 96 px per inch, shown at 40 %; a sideways back is landscape.
+                const turned = side === 'back' && shape.backSideways;
+                const w = Math.round((((turned ? shape.heightMm : shape.widthMm) + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
+                const h = Math.round((((turned ? shape.widthMm : shape.heightMm) + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
+                return (
                 <figure key={`${shape.key}-${side}`} className="space-y-1">
                   <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: w * 0.4, height: h * 0.4 }}>
                     <iframe title={`${localized(shape.label, locale)} — ${t(side)}`} src={`${src(side)}&shape=${shape.key}`} style={{ width: w, height: h, border: 0, transform: 'scale(0.4)', transformOrigin: '0 0' }} />
@@ -94,7 +96,8 @@ export async function CardDesignSection({
                     </a>
                   </figcaption>
                 </figure>
-              ));
+                );
+              });
             })}
           </div>
         </div>
