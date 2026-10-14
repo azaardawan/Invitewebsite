@@ -739,10 +739,10 @@ The owner approved every row as suggested; all live (row 9 in the design's manif
 | 8 | `receipt.shapePngBack` | صورة الظهر (PNG) | Back picture (PNG) | وێنەی ڕووی پشتەوە (PNG) | وێنێ ڕویێ پشتێ (PNG) | ◐ |
 | 9 | Shape names (Royal Olive Crest manifest, Arabic/English only today) | ورقة شجر / قلب | Leaf / Heart | گەڵا / دڵ | بەلگ / دل | ◐ |
 
-## Batch 27 — Royal Olive Crest: the leaf and the heart sold separately — ⏳ PENDING owner approval
+## Batch 27 — Royal Olive Crest: the leaf and the heart sold separately — ✅ APPROVED (2026-10-14)
 
 The single feature "shaped printed card" (batch 26 row 1, `store.features.card_shapes`) became two, so a package can
-offer the leaf, the heart or both. Suggestions only; until approved the Kurdish pages show the Arabic. Admin texts
+offer the leaf, the heart or both. The owner approved both rows as suggested; live. Admin texts
 are Arabic/English only.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
