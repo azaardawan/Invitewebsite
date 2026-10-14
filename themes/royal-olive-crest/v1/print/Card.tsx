@@ -19,7 +19,11 @@ export default function Card({ dir, lang, fields, event, labels, qrDataUrl, extr
           {fields.person_1_name && fields.person_2_name ? <span className={p.and}>{labels.and}</span> : null}
           {fields.person_2_name ? <span style={{ fontSize: `${nameScale(fields.person_2_name)}em` }}>{fields.person_2_name}</span> : null}
         </h1>
-        {fields.invitation_message ? <p className={p.cardMessage}>{fields.invitation_message}</p> : null}
+        {fields.invitation_message ? (
+          <p className={p.cardMessage} data-long={fields.invitation_message.length > 180 ? '' : undefined}>
+            {fields.invitation_message}
+          </p>
+        ) : null}
         <dl className={p.cardDetails}>
           {event.date ? (
             <div>

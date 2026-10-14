@@ -26,8 +26,8 @@
   margin: 0;
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: 44pt;
-  line-height: 1.2;
+  font-size: 40pt;
+  line-height: 1.18;
   color: #4a5228;
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -56,16 +56,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5mm;
+  gap: 4mm;
 }
 .cardMessage {
   max-width: 106mm;
   margin: 0;
-  font-size: 12.5pt;
+  font-size: 11.5pt;
   line-height: 1.75;
   white-space: pre-line;
   overflow-wrap: anywhere;
   text-wrap: pretty;
+}
+.cardMessage[data-long] {
+  font-size: 10pt;
+  line-height: 1.65;
 }
 .cardDetails {
   display: flex;
@@ -101,8 +105,8 @@
   margin: 0;
 }
 .cardQr img {
-  width: 20mm;
-  height: 20mm;
+  width: 18mm;
+  height: 18mm;
 }
 .cardQr figcaption {
   font-size: 7pt;
