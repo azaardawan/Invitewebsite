@@ -1,4 +1,5 @@
 import 'server-only';
+import { COVER_ZOOM_MAX, normalizeCoverFocus } from '@/lib/cover-focus';
 import { and, asc, eq, ilike, inArray, ne, notInArray, or, sql, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
@@ -284,6 +285,8 @@ export const themeSettingsInput = z.object({
   /** A subsection of the same section; omitted keeps the current one (cleared if the section changes). */
   subsectionId: z.uuid().nullish(),
   coverAssetId: z.uuid().nullish(),
+  /** Where the cover sits in the storefront's frames; omitted keeps it, null centres it. */
+  coverFocus: z.object({ x: z.number().min(0).max(100), y: z.number().min(0).max(100), zoom: z.number().min(1).max(COVER_ZOOM_MAX) }).nullish(),
   musicTrackId: z.uuid().nullish(),
   /** Other occasions the design is also sold in; omitted keeps the current ones. */
   extraSectionIds: z.array(z.uuid()).max(20).optional(),
@@ -323,6 +326,13 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
       sectionId,
       subsectionId: subsectionId ?? null,
       coverAssetId: data.coverAssetId ?? null,
+      // A new picture starts centred unless a position for it was sent with it.
+      coverFocus:
+        data.coverFocus !== undefined
+          ? data.coverFocus && normalizeCoverFocus(data.coverFocus)
+          : (data.coverAssetId ?? null) === before.coverAssetId
+            ? before.coverFocus
+            : null,
       musicTrackId: data.musicTrackId ?? null,
     };
     await tx.update(themes).set(next).where(eq(themes.id, themeId));
@@ -346,7 +356,7 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
       action: 'theme.settings_updated',
       objectType: 'theme',
       objectId: themeId,
-      before: { name: before.name, description: before.description, sectionId: before.sectionId, subsectionId: before.subsectionId, coverAssetId: before.coverAssetId, musicTrackId: before.musicTrackId, extraSectionIds: extraBefore },
+      before: { name: before.name, description: before.description, sectionId: before.sectionId, subsectionId: before.subsectionId, coverAssetId: before.coverAssetId, coverFocus: before.coverFocus, musicTrackId: before.musicTrackId, extraSectionIds: extraBefore },
       after: { ...next, extraSectionIds: extraAfter },
     });
   });

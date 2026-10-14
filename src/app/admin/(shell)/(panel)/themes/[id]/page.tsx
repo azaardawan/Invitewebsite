@@ -23,6 +23,7 @@ import { PLATFORM_FEATURES } from '@/catalog/features';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 import { ImageUpload } from '@/components/admin/ImageUpload';
+import { CoverCropper } from '@/components/admin/CoverCropper';
 import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
 import { ThemePreviewPanel } from '@/components/admin/ThemePreviewPanel';
 import { formatUsd } from '@/lib/currency';
@@ -239,7 +240,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   </label>
                 ))}
             </fieldset>
-            <ImageUpload name="coverAssetId" label={t('themes.cover')} initial={d.cover ? { id: d.cover.id, url: publicMediaUrl(d.cover.storageKey) } : null} />
+            <CoverCropper label={t('themes.cover')} initial={d.cover ? { id: d.cover.id, url: publicMediaUrl(d.cover.storageKey) } : null} initialFocus={d.theme.coverFocus ?? null} />
             <label className="block">
               <span className="mb-1 block text-sm font-medium">{t('themes.musicSelect')}</span>
               <select name="musicTrackId" defaultValue={d.theme.musicTrackId ?? ''} className="w-full rounded-md border border-line bg-surface px-3 py-2">

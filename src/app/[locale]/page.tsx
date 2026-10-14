@@ -43,6 +43,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
           name: localized(th.name, locale),
           section: occasionsLabel(th.occasions, locale),
           coverUrl: th.coverUrl,
+          coverFocus: th.coverFocus,
           minPriceIqd: th.minPriceIqd,
           rank: th.rank!,
         }))}
@@ -57,6 +58,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
                 name: localized(th.name, locale),
                 section: occasionsLabel(th.occasions, locale),
                 coverUrl: th.coverUrl,
+                coverFocus: th.coverFocus,
                 minPriceIqd: th.minPriceIqd,
                 rank: th.rank,
               }))}

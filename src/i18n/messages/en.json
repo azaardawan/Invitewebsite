@@ -458,7 +458,20 @@
         "topBadge1": "Best seller",
         "topBadge": "Top {n}",
         "alsoIn": "Also sold in",
-        "alsoInHint": "Tick other occasions to show this design there too. It appears once in combined lists (\"Wedding · Engagement\"), and the customer's invitation records which occasion it is for (the design picks its wording from it)."
+        "alsoInHint": "Tick other occasions to show this design there too. It appears once in combined lists (\"Wedding · Engagement\"), and the customer's invitation records which occasion it is for (the design picks its wording from it).",
+        "coverCrop": {
+          "help": "Drag the picture inside the arch, or use the sliders, to choose what shows on the website. The small frames show each place it appears.",
+          "x": "Left / right",
+          "y": "Up / down",
+          "zoom": "Zoom",
+          "centre": "Back to the middle",
+          "previews": "How it will look",
+          "frames": {
+            "grid": "Designs list",
+            "top": "Top 3",
+            "home": "Homepage"
+          }
+        }
       },
       "errors": {
         "invalid": "Please check the fields.",

@@ -41,6 +41,7 @@ export default async function OccasionPage({ params, searchParams }: PageProps<'
         name: localized(th.name, locale),
         section: th.subsection ? localized(th.subsection.name, locale) : localized(th.sectionName, locale),
         coverUrl: th.coverUrl,
+        coverFocus: th.coverFocus,
         minPriceIqd: th.minPriceIqd,
         rank: th.rank,
         occasion: th.occasions.length > 1 ? key : undefined,
