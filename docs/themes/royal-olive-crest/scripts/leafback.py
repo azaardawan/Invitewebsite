@@ -4,12 +4,14 @@ The back shares the front's cut line (the card turned over and read sideways: th
 which is fuller than #9's slim eye. #9 is mapped onto the card with an explicit, smooth map:
   * along the edge, every point keeps its distance from the rim (scaled), so the gold rim, the cream gap and the
     thin gold line run along the new edge exactly as on #9;
-  * the two end panels (crest, shield, flourishes and their S-curves) move and scale as solid pieces, so they keep
+  * optionally (panel_max > 0) the two end panels move and scale as solid pieces, so they keep
     their proportions;
   * in between, the two blend over a wide band, so the plain green and cream take the stretch.
 The outer rim is then redrawn from #9's own cross-section for a clean, even cut edge.
 
-usage: leafback4.py <#9 PNG> <outlines.ts> <out.png> [px_per_mm]
+usage: leafback.py <#9 PNG> <outlines.ts> <out.png> [px_per_mm] [blend] [panel_max] [edge_band]
+  panel_max 0 (used): #9 simply resized onto the leaf, nothing held solid; edge_band: #9 px kept at
+  their exact distance from the rim (the gold rim and thin line).
 """
 import re
 import sys
@@ -96,7 +98,7 @@ lS = at_x(loS, xxS[0])[None, :].repeat(hS, 0)
 uT = at_x(upT, xT_of[0])[None, :].repeat(hS, 0)
 lT = at_x(loT, xT_of[0])[None, :].repeat(hS, 0)
 colS = np.maximum(lS - uS, 1)
-B = np.minimum(70.0, colS / 3)
+B = np.minimum(float(sys.argv[7]) if len(sys.argv) > 7 else 70.0, colS / 3)
 dt, db = yyS - uS, lS - yyS
 # piecewise: [0,B] -> [0,gB]; [B, colS-B] -> [gB, colT-gB] linear; [colS-B, colS] -> [colT-gB, colT]
 colT = lT - uT
@@ -107,7 +109,8 @@ yT_of = np.where(dt < B, uT + dt * g,
 E = np.stack([xT_of, yT_of], -1)
 
 # ---------------------------------------------------------------- the end panels: one similarity each
-panels = {'L': (40, 560), 'R': (1330, 1735)}
+# PANEL_MAX 0: no solid panels, #9 is simply stretched to the card (owner's choice)
+panels = {'L': (40, 560), 'R': (1330, 1735)} if PANEL_MAX > 0 else {}
 
 
 def panel_xform(k):

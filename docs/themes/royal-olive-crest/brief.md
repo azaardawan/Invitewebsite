@@ -122,11 +122,11 @@ a package can offer the leaf, the heart, both or neither; a package with neither
 
 A card is cut along **one** line, so each back must lie on the front's outline (mirrored: the card turned over).
 Neither owner back matched its front: the heart back (10 % narrower) was reshaped row by row onto the front's
-outline. The leaf back (#9) is a slimmer "eye" than the leaf: shrinking it inside the leaf (first version) did not look
-like #9, so #9 is now fitted to the leaf's cut line with `scripts/leafback.py`: the crest panel and the flourish panel
-move and scale as solid pieces (never distorted), everything near the edge keeps #9's distance from the rim (the gold
-rim, the cream gap and the thin gold line run along the new edge as on #9), and the plain green and cream take the
-stretch. The gold rim is redrawn from #9's own cross-section for a clean cut edge.
+outline. The leaf back (#9) is a slimmer "eye" than the leaf. Owner's
+decision (2026-10-14): "exact look of #9, expanded or reduced to the shape of the front, without changing the design".
+So #9 is resized as one picture onto the leaf's cut line (`scripts/leafback.py`, no solid panels): each column of #9
+is stretched to the leaf's, only the gold rim and thin line keep their exact thickness along the edge. Nothing is
+moved or redrawn; the crest comes out a little taller because the leaf is fuller.
 
 Names: the largest thing on every page and card, centred, in script in every language (Pinyon Script for Latin,
 Alyamama for Arabic, Reem Kufi for Kurdish); long names step down a size so they stay whole. The QR code is drawn in the
@@ -140,7 +140,7 @@ Regenerate the artwork and cut lines with `scripts/shapes.py` (outlines go to `t
 
 ```bash
 python3 -I scripts/shapes.py leaf <#12 PNG> <#9 PNG> cream 107 out/   # front + outline
-python3 -I scripts/leafback.py <#9 PNG> themes/royal-olive-crest/v1/outlines.ts leaf-back.png 8.0565 180 1.3   # the back
+python3 -I scripts/leafback.py <#9 PNG> themes/royal-olive-crest/v1/outlines.ts leaf-back.png 8.0565 180 0 32   # the back
 python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
 ```
 
