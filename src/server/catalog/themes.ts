@@ -75,7 +75,7 @@ export async function syncThemesFromRegistry(
           .where(section ? eq(themes.sectionId, section.id) : sql`${themes.sectionId} is null`);
         [theme] = await tx
           .insert(themes)
-          .values({ key, name: { ...first.title, ckb: null, bdn: null }, sectionId: section?.id ?? null, sortOrder: (max?.n ?? -1) + 1 })
+          .values({ key, name: { ar: first.title.ar, en: first.title.en, ckb: first.title.ckb ?? null, bdn: first.title.bdn ?? null }, sectionId: section?.id ?? null, sortOrder: (max?.n ?? -1) + 1 })
           .returning();
         report.registeredThemes.push(key);
         await recordAudit(tx, { ...auditActor(actor), action: 'theme.registered', objectType: 'theme', objectId: theme!.id, after: { key } });

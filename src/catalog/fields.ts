@@ -35,7 +35,7 @@ export const STANDARD_FIELDS = {
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link', ckb: 'بەستەری شوێن لەسەر نەخشە', bdn: 'لینکا جهی ل سەر نەخشەی' } },
   /** Optional: when empty, the theme writes the first letters of the two names (first name first). */
-  seal_initials: { type: 'text', maxLength: 9, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal' } },
+  seal_initials: { type: 'text', maxLength: 9, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal', ckb: 'پیتە سەرەتاییەکان لەسەر مۆر', bdn: 'تیپێن ئێکێ ل سەر مۆرێ' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
   // Newborn baby.
   baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },

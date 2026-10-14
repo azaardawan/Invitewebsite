@@ -20,7 +20,7 @@ const allFields = [
 export default defineTheme({
   key: 'royal-olive-crest',
   version: 1,
-  title: { ar: 'الشعار الملكي الزيتوني', en: 'Royal Olive Crest' },
+  title: { ar: 'الشعار الملكي الزيتوني', en: 'Royal Olive Crest', ckb: 'دروشمی شاهانەی زەیتوونی', bdn: 'نیشانا شاهانە یا زەیتوونی' },
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],
@@ -47,7 +47,12 @@ export default defineTheme({
   wording: [
     {
       key: 'sealJoin',
-      label: { ar: 'الرمز بين الحرفين على الختم', en: 'Symbol between the initials on the seal' },
+      label: {
+        ar: 'الرمز بين الحرفين على الختم',
+        en: 'Symbol between the initials on the seal',
+        ckb: 'هێمای نێوان دوو پیتەکە لەسەر مۆر',
+        bdn: 'نیشانا د ناڤبەرا هەردوو تیپان دا ل سەر مۆرێ',
+      },
       ar: '&',
       options: ['♥', '·', 'و'],
       custom: false,
@@ -61,8 +66,8 @@ export default defineTheme({
     // The owner's leaf (#12/#9) and heart (#14/#13) cards; sizes as agreed (about 11 × 18 cm and 15 × 16 cm).
     // The leaf's back (#9) is a landscape design: read with the card turned sideways, like the A5 card's back.
     shapes: [
-      { key: 'leaf', label: { ar: 'ورقة شجر', en: 'Leaf' }, widthMm: 107, heightMm: 180.6, outline: LEAF_OUTLINE, backSideways: true },
-      { key: 'heart', label: { ar: 'قلب', en: 'Heart' }, widthMm: 150, heightMm: 157.9, outline: HEART_OUTLINE },
+      { key: 'leaf', label: { ar: 'ورقة شجر', en: 'Leaf', ckb: 'گەڵا', bdn: 'بەلگ' }, widthMm: 107, heightMm: 180.6, outline: LEAF_OUTLINE, backSideways: true },
+      { key: 'heart', label: { ar: 'قلب', en: 'Heart', ckb: 'دڵ', bdn: 'دل' }, widthMm: 150, heightMm: 157.9, outline: HEART_OUTLINE },
     ],
   },
 });

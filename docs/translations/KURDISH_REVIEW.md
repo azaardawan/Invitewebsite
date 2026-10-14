@@ -710,9 +710,10 @@ only be published once the Kurdish is in. Sections shared with the main terms re
 - بۆ پەیوەندیێ: ب ڕێکا واتسئاپێ یان ڕێکێن پەیوەندیێ ل لاپەرێ «پەیوەندیێ ب مە بکە».
 ```
 
-## Batch 25 — Royal Olive Crest: initials on the wax seal — ⏳ PENDING owner approval
+## Batch 25 — Royal Olive Crest: initials on the wax seal — ✅ APPROVED (2026-10-14)
 
-Suggestions only; nothing here is live (Kurdish pages show the Arabic until approved). The design's own lines
+The owner approved every row as suggested; all live (row 1 in the Field Library, rows 3–4 in the design's
+manifest; the Kurdish name is the design's starting name in Admin → Themes). The design's own lines
 reuse the owner-approved Olive Ring Box wording (same Arabic sentences), and the Quran verse stays in Arabic.
 
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
@@ -722,9 +723,9 @@ reuse the owner-approved Olive Ring Box wording (same Arabic sentences), and the
 | 3 | Order-form label of the design's `sealJoin` choice (manifest, Arabic/English only today) | الرمز بين الحرفين على الختم | Symbol between the initials on the seal | هێمای نێوان دوو پیتەکە لەسەر مۆر | نیشانا د ناڤبەرا هەردوو تیپان دا ل سەر مۆرێ | ○ |
 | 4 | Design name (Admin → Themes) | الشعار الملكي الزيتوني | Royal Olive Crest | دروشمی شاهانەی زەیتوونی | نیشانا شاهانە یا زەیتوونی | ○ |
 
-## Batch 26 — Royal Olive Crest: leaf and heart cards (shaped printed cards) — ⏳ PENDING owner approval
+## Batch 26 — Royal Olive Crest: leaf and heart cards (shaped printed cards) — ✅ APPROVED (2026-10-14)
 
-Suggestions only; the Kurdish pages show the Arabic until approved. Admin texts are Arabic/English only.
+The owner approved every row as suggested; all live (row 9 in the design's manifest). Admin texts are Arabic/English only.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|

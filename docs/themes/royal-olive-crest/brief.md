@@ -145,4 +145,5 @@ python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
    "اسم العروس" / "Bride's name" if not already the section defaults.
 3. Packages: include `seal_initials` so customers can type their own initials (without it the initials are
    always worked out from the names). Add "Shaped printed card" to the packages that offer the leaf and heart.
-4. Pick the song and the Kurdish design name (suggestions in `docs/translations/KURDISH_REVIEW.md`, batches 25–26).
+4. Pick the song. The Kurdish wording (batches 25–26 in `docs/translations/KURDISH_REVIEW.md`) is approved and live,
+   including the design's Kurdish name.

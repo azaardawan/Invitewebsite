@@ -31,8 +31,11 @@ themes/<key>/v<N>/
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
+- `title`, `wording[].label` and `print.shapes[].label` may also carry `ckb` / `bdn`, only with Kurdish the owner
+  approved in `docs/translations/KURDISH_REVIEW.md`; without it the Kurdish pages show the Arabic. The title's
+  Kurdish becomes the design's Kurdish name when it is first registered (the owner can change it in Admin).
 - `wording`: lines of the design's own text the customer may change on the order form (never Quran or du'a),
-  each `{ key, label: {ar, en}, ar, versions?: {en?, ckb?, bdn?}, defaultIn?, maxLength }`. The Arabic is the
+  each `{ key, label: {ar, en, ckb?, bdn?}, ar, versions?: {en?, ckb?, bdn?}, defaultIn?, maxLength }`. The Arabic is the
   default, except in the languages listed in `defaultIn` (their version is); a version is offered as a choice
   for orders in that language; or the customer writes their own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
   A line may add `options` (fixed alternatives offered after the Arabic, e.g. «ثاني / ثالث») and `custom: false`
@@ -153,7 +156,7 @@ it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
 A design may offer shaped printed cards that the customer chooses **instead of** the A5 card, in packages with the
 `card_shapes` feature (it needs `print_card`). Declare them in the manifest
-`print.shapes: [{ key, label: {ar, en}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
+`print.shapes: [{ key, label: {ar, en, ckb?, bdn?}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
 millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the
 front artwork. `print/Shape.tsx` (required then) default-exports a server component receiving `PrintShapeProps`: the
 card's props plus `shape`, `side` (`front`/`back`), this side's box size and `outline` (the back's is the front's

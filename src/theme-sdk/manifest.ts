@@ -3,9 +3,12 @@ import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type Featur
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
 
 /** A shaped printed card a design offers (manifest `print.shapes`). */
+/** A design's own text in Arabic and English, plus the owner-approved Kurdish when there is one (else Arabic shows). */
+export type ThemeText = { ar: string; en: string; ckb?: string; bdn?: string };
+
 export type CardShape = {
   key: string;
-  label: { ar: string; en: string };
+  label: ThemeText;
   widthMm: number;
   heightMm: number;
   outline: string;
@@ -24,7 +27,7 @@ export type ThemeManifest = {
   /** Integer version. Must match the `v<N>` folder name. */
   version: number;
   /** Working title shown in Admin until the owner sets the display name. */
-  title: { ar: string; en: string };
+  title: ThemeText;
   /** Experience format (see §13 of the architecture). V1: invitations only. */
   experience: 'INVITATION';
   /** Section keys this theme was designed for (e.g. `wedding`); first is the default. */
@@ -89,7 +92,7 @@ export type ThemeManifest = {
 export type WordingLine = {
   key: string;
   /** What the line is, shown on the order form. */
-  label: { ar: string; en: string };
+  label: ThemeText;
   /** The default text, in every language. */
   ar: string;
   /** The same line in other languages, offered as a choice. */
@@ -126,11 +129,13 @@ const featureKey = z.enum(FEATURE_KEYS as [FeatureKey, ...FeatureKey[]]);
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && new Set(a).size === a.length && a.every((x) => b.includes(x));
 
+const themeText = z.object({ ar: z.string().min(1), en: z.string().min(1), ckb: z.string().min(1).optional(), bdn: z.string().min(1).optional() });
+
 export const manifestSchema = z
   .object({
     key: z.string().regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/, 'lowercase-kebab'),
     version: z.number().int().min(1),
-    title: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+    title: themeText,
     experience: z.literal('INVITATION'),
     sections: z.array(z.string().regex(/^[a-z][a-z0-9-]*$/)).min(1),
     fields: z.array(fieldKey).min(1),
@@ -151,7 +156,7 @@ export const manifestSchema = z
           .array(
             z.object({
               key: z.string().regex(/^[a-z][a-z0-9-]*$/),
-              label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+              label: themeText,
               widthMm: z.number().min(40).max(300),
               heightMm: z.number().min(40).max(300),
               outline: z.string().regex(/^M[0-9.\s,MLCQZz-]+$/).max(40_000),
@@ -182,7 +187,7 @@ export const manifestSchema = z
       .array(
         z.object({
           key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
-          label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+          label: themeText,
           ar: z.string().min(1),
           versions: z.object({ en: z.string().min(1), ckb: z.string().min(1), bdn: z.string().min(1) }).partial().optional(),
           defaultIn: z.array(z.enum(['en', 'ckb', 'bdn'])).optional(),
