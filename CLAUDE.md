@@ -17,6 +17,12 @@ product spec's §74 business rules override assumptions.
   Custom SQL (triggers, grants) goes in `pnpm drizzle-kit generate --custom` migrations.
 - Before pushing: `pnpm lint && pnpm typecheck && pnpm i18n:check && pnpm test && pnpm build`,
   plus `pnpm exec playwright test` for UI changes.
+- The owner works in several chats at once, each on its own branch. **Stay current with `main`:** run
+  `git fetch origin main && git merge origin/main` when you start a task, again before every push, and
+  before opening a PR (merge, never rebase or force-push a pushed branch). Resolve conflicts keeping both
+  sides' work. If `main` added migrations, renumber yours after them: take `main`'s `drizzle/meta`, delete
+  your migration SQL, run `pnpm db:generate` again. Kurdish review batch numbers: take the next free number.
+  Then rerun the checks above before pushing.
 - Themes live in `themes/<key>/v<N>/` with a `manifest.ts` (`defineTheme`). The registry
   (`src/theme-registry/generated.ts`) is generated automatically; never hand-register a theme.
   Theme code may only import `@/theme-sdk` and `@/catalog` (ESLint enforces this).
