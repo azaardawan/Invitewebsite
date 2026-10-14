@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
 
+/** A shaped printed card a design offers (manifest `print.shapes`). */
+export type CardShape = { key: string; label: { ar: string; en: string }; widthMm: number; heightMm: number; outline: string };
+
 /**
  * A theme version's manifest: what the theme supports and which package
  * combinations it was designed for. See docs/THEME_GUIDE.md and
@@ -33,6 +36,13 @@ export type ThemeManifest = {
   print?: {
     card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean };
     keepsake?: { size: 'A4' };
+    /**
+     * Shaped printed cards (feature `card_shapes`): the customer may choose one of these instead of the
+     * card. `outline` is the cut line, an SVG path in millimetres (origin top-left of a `widthMm` ×
+     * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over).
+     * `print/Shape.tsx` draws both sides.
+     */
+    shapes?: CardShape[];
   };
   /**
    * Colours the theme takes from the platform (CSS variables `--bahja-color-<key>`), each with the
@@ -117,6 +127,19 @@ export const manifestSchema = z
       .object({
         card: z.object({ size: z.enum(['A5', '5x7']), bleedMm: z.number().min(0).max(10), qr: z.boolean() }).optional(),
         keepsake: z.object({ size: z.literal('A4') }).optional(),
+        shapes: z
+          .array(
+            z.object({
+              key: z.string().regex(/^[a-z][a-z0-9-]*$/),
+              label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+              widthMm: z.number().min(40).max(300),
+              heightMm: z.number().min(40).max(300),
+              outline: z.string().regex(/^M[0-9.\s,MLCQZz-]+$/).max(40_000),
+            }),
+          )
+          .min(1)
+          .max(4)
+          .optional(),
       })
       .optional(),
     colors: z
@@ -172,6 +195,9 @@ export const manifestSchema = z
     }
     if (m.features.includes('print_card') && !m.print?.card) issue('print_card requires print.card');
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
+    if (m.features.includes('card_shapes') && !m.print?.shapes?.length) issue('card_shapes requires print.shapes');
+    if (m.print?.shapes && new Set(m.print.shapes.map((x) => x.key)).size !== m.print.shapes.length) issue('print.shapes contain duplicate keys');
+    if (m.print?.shapes?.some((x) => x.key === 'a5')) issue('print.shapes: "a5" is the card itself, not a shape');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');

@@ -14,6 +14,8 @@ export type OrderFormExtras = {
   cardBack?: { title: string; message: string; limits: { title: number; message: number } };
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
+  /** Shaped cards (card_shapes): the card ('') or one of the design's shapes, each drawn from its cut line. */
+  cardShape?: { current: string; options: { key: string; label: string; widthMm: number; heightMm: number; outline: string }[] };
   /** Chocolate stickers (sticker): round or square. */
   sticker?: { current: 'round' | 'square' | 'both' };
   /** Bottle labels (bottle_label): which bottle size. */
@@ -172,6 +174,34 @@ export function OrderForm({
           </div>
         );
       })}
+
+      {extras.cardShape ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-[15px] font-medium text-heading">{t('cardShape.heading')}</legend>
+          <p className="text-sm text-muted">{t('cardShape.help')}</p>
+          <div className="flex flex-wrap gap-3">
+            {[{ key: '', label: t('cardShape.card'), widthMm: 148, heightMm: 210, outline: 'M0 0 L148 0 L148 210 L0 210 Z' }, ...extras.cardShape.options].map((o) => (
+              <label
+                key={o.key || 'card'}
+                className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+              >
+                <input type="radio" name="cardShape" value={o.key} defaultChecked={(values.cardShape ?? extras.cardShape!.current) === o.key} className="sr-only" />
+                <svg aria-hidden viewBox={`-2 -2 ${o.widthMm + 4} ${o.heightMm + 4}`} className="h-14 w-14 text-accent" preserveAspectRatio="xMidYMid meet">
+                  <path d={o.outline} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+                </svg>
+                <span className="text-sm font-medium">{o.label}</span>
+                {o.key ? (
+                  <span className="text-xs text-muted" dir="ltr">
+                    {t('cardShape.size', { w: Math.round(o.widthMm / 10), h: Math.round(o.heightMm / 10) })}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted">A5</span>
+                )}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
 
       {extras.sticker ? (
         <fieldset className="flex flex-col gap-3">

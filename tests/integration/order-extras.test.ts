@@ -254,3 +254,68 @@ describe('fixed choices and yes/no switches of a design', () => {
     expect(await fails('opt:7')).toBe('invalidChoice');
   });
 });
+
+describe('shaped printed cards (card_shapes)', () => {
+  const LEAF = { key: 'leaf', label: { ar: 'ورقة', en: 'Leaf' }, widthMm: 100, heightMm: 160, outline: 'M50 0 L100 80 L50 160 L0 80 Z' };
+  let shop3: { themeKey: string; withShapes: string; cardOnly: string };
+
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('shapes');
+    const features = ['print_card', 'card_shapes'] as const;
+    await syncThemesFromRegistry(
+      db(),
+      [testManifest(key, 1, { features: [...features], fields: [...BASIC_FIELDS], validStates: [{ features: [...features], fields: [...BASIC_FIELDS] }], print: { card: { size: 'A5', bleedMm: 3, qr: false }, shapes: [LEAF] } })],
+      base.actor,
+      { complete: false },
+    );
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 320, height: 420, channels: 3, background: '#bb8' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: base.song.id }, base.actor);
+    const better = await createPackage(db(), t!.id, { name: { ar: 'مميز', en: 'Better' }, priceIqd: 40000, fieldKeys: [...BASIC_FIELDS], featureKeys: [...features] }, base.actor);
+    const normal = await createPackage(db(), t!.id, { name: { ar: 'عادي', en: 'Normal' }, priceIqd: 20000, fieldKeys: [...BASIC_FIELDS], featureKeys: ['print_card'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    shop3 = { themeKey: key, withShapes: better.id, cardOnly: normal.id };
+  });
+
+  const order = (packageId: string, extras: Parameters<typeof createDraft>[1]['extras']) =>
+    createDraft(db(), { themeKey: shop3.themeKey, packageId, locale: 'ar', values: weddingValues(), extras }, { ...ctx, ipHash: randomToken(8) });
+
+  it('stores the chosen shape, prints it with its mirrored back and a cut line for print shops, and can go back to the card', async () => {
+    const d = await order(shop3.withShapes, { cardShape: 'leaf' });
+    expect((await row(d.invitationId)).cardShape).toBe('leaf');
+    const data = await printData(db(), await row(d.invitationId), 'card');
+    expect(data.kind === 'card' && data.shape).toMatchObject({
+      key: 'leaf',
+      widthMm: 100,
+      heightMm: 160,
+      outline: { front: LEAF.outline, back: 'M50 0 L0 80 L50 160 L100 80 Z' },
+      page: { width: '120mm', height: '180mm' },
+      cutLine: false,
+    });
+    const shop = await printData(db(), await row(d.invitationId), 'cardBleed');
+    expect(shop.kind === 'card' && shop.shape?.cutLine).toBe(true);
+
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { cardShape: '' } });
+    expect((await row(d.invitationId)).cardShape).toBeNull();
+    const card = await printData(db(), await row(d.invitationId), 'card');
+    expect(card.kind === 'card' && card.shape).toBeNull();
+  });
+
+  it('refuses a shape the design does not have, and ignores the choice in a package without shapes', async () => {
+    const err = await order(shop3.withShapes, { cardShape: 'star' }).then(
+      () => undefined,
+      (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
+    );
+    expect(err?.cardShape).toBe('invalid');
+    const plain = await order(shop3.cardOnly, { cardShape: 'leaf' });
+    expect((await row(plain.invitationId)).cardShape).toBeNull();
+  });
+
+  it('a theme selling card_shapes must declare its shapes', () => {
+    const m = testManifest('no-shapes', 1, { features: ['print_card', 'card_shapes'], fields: [...BASIC_FIELDS], validStates: [{ features: ['print_card', 'card_shapes'], fields: [...BASIC_FIELDS] }] });
+    const r = manifestSchema.safeParse(m);
+    expect(r.success ? [] : r.error.issues.map((i) => i.message)).toContain('card_shapes requires print.shapes');
+  });
+});

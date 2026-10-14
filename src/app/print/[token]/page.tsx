@@ -24,7 +24,8 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
   const { token } = await params;
   // Cards: `view=front` / `view=back` print one side (the PDF joins them; the back is also the receipt's
   // picture). Without it both sides are shown, for checking by eye.
-  const view = (await searchParams).view;
+  const sp = await searchParams;
+  const view = sp.view;
   const claim = verifyPrintToken(decodeURIComponent(token));
   if (!claim) notFound();
   const [inv] = await db().select().from(invitations).where(eq(invitations.id, claim.invitationId));
@@ -37,11 +38,21 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
   }
   if ((PRODUCT_VIEWS as readonly string[]).includes(claim.kind)) {
     // `shape=square`: the square sticker set of a customer who chose both shapes.
-    const shape = (await searchParams).shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
+    const shape = sp.shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
     return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />;
   }
   const data = await printData(db(), inv, claim.kind);
-  if (data.kind === 'card') return <CardPages codeRef={data.codeRef} data={data} view={view === 'front' || view === 'back' ? view : undefined} watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)} />;
+  // `png=1` (shaped cards): only the shape, on a transparent page, for the PNG picture.
+  if (data.kind === 'card')
+    return (
+      <CardPages
+        codeRef={data.codeRef}
+        data={data}
+        view={view === 'front' || view === 'back' ? view : undefined}
+        png={sp.png === '1'}
+        watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)}
+      />
+    );
   const loaders = printComponents[data.codeRef];
   // Keepsake: every A4 page edge to edge (no page margins), so the theme's border sits in the same place on
   // the cover and every message page; the theme spaces its messages with padding (box-decoration-break: clone).

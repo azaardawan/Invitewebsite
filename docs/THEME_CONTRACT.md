@@ -146,6 +146,20 @@ clear of the border at the sides) with `box-decoration-break: clone` so it repea
 numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
+### Shaped cards (leaf, heart…)
+
+A design may offer shaped printed cards that the customer chooses **instead of** the A5 card, in packages with the
+`card_shapes` feature (it needs `print_card`). Declare them in the manifest
+`print.shapes: [{ key, label: {ar, en}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
+millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the
+front artwork. `print/Shape.tsx` (required then) default-exports a server component receiving `PrintShapeProps`: the
+card's props plus `shape`, `side` (`front`/`back`), the box size, this side's `outline` (the back's is the front's
+mirrored: the card turned over), `qrDataUrl`, `extraLine`, and the back's `title`/`message`. Draw the artwork filling
+the box, **transparent outside the shape**, with the text well inside it. The platform puts each side on a page with a
+10 mm margin (the customer's PDF), adds a thin magenta cut line on the outline for the print shop
+(`?bleed=1` / print-shop download), and makes a transparent 300 dpi PNG of each side. Admin → Themes previews every
+shape (with or without the cut line).
+
 ### Newborn extras drawn by the design
 
 A newborn design may ship its own `print/Story.tsx`, `print/Sticker.tsx` and/or `print/Bottle.tsx`

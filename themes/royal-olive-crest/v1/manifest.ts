@@ -1,4 +1,5 @@
 import { defineTheme } from '@/theme-sdk/manifest';
+import { HEART_OUTLINE, LEAF_OUTLINE } from './outlines';
 
 /**
  * Royal Olive Crest: an olive-green envelope sealed with a gold wax seal bearing the couple's initials
@@ -23,7 +24,7 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_shapes'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     // A printed card and the online invitation with its music.
@@ -36,9 +37,9 @@ export default defineTheme({
       features: ['music', 'countdown', 'map', 'rsvp', 'print_card'],
       fields: [...allFields],
     },
-    // The complete theme: + messages to the couple and the keepsake PDF.
+    // The complete theme: + messages to the couple, the keepsake PDF, and the leaf or heart card instead of the card.
     {
-      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card'],
+      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_shapes'],
       fields: [...allFields],
     },
   ],
@@ -53,5 +54,13 @@ export default defineTheme({
       maxLength: 1,
     },
   ],
-  print: { card: { size: 'A5', bleedMm: 3, qr: true }, keepsake: { size: 'A4' } },
+  print: {
+    card: { size: 'A5', bleedMm: 3, qr: true },
+    keepsake: { size: 'A4' },
+    // The owner's leaf (#12/#9) and heart (#14/#13) cards; sizes as agreed (about 11 × 18 cm and 15 × 16 cm).
+    shapes: [
+      { key: 'leaf', label: { ar: 'ورقة شجر', en: 'Leaf' }, widthMm: 107, heightMm: 180.6, outline: LEAF_OUTLINE },
+      { key: 'heart', label: { ar: 'قلب', en: 'Heart' }, widthMm: 150, heightMm: 157.9, outline: HEART_OUTLINE },
+    ],
+  },
 });

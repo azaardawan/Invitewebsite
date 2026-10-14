@@ -32,7 +32,7 @@ Numbers are the owner's (chat, 2026-10-14). Shipped files are in `themes/royal-o
 | 16 / P5 | Crown and shield | Guest form and closing ornament | `crest.webp` |
 | P1 | Gold divider | Between venue and details, closing | `divider.webp` |
 | P7 | Corner flourish | The theme border (top-right and bottom-left corners) on the invitation, card and keepsake | `corner.webp` |
-| 9 / 12, 13 / 14 | Leaf back / front, heart back / front | **Step 2:** shaped printed cards (see §8) | — |
+| 12 / 9, 14 / 13 | Leaf front / back, heart front / back | Shaped printed cards (see §8) | `leaf-*.webp`, `heart-*.webp` |
 | 15 | Scalloped panel | Not used | — |
 
 The red/yellow halos on the cut-outs came from background removal (they are not cut marks); the export
@@ -71,6 +71,7 @@ Every combination is allowed; the owner sets the packages in Admin. Designed exa
 | Printed A5 card | ✅ | ✅ | ✅ |
 | Countdown, map, guest form | — | ✅ | ✅ |
 | Congratulations messages, keepsake PDF | — | — | ✅ |
+| Leaf or heart card instead of the A5 card (`card_shapes`) | — | — | ✅ |
 
 A missing feature removes its whole page (the countdown page, the map button, the form).
 
@@ -104,21 +105,34 @@ it (see `docs/THEME_CONTRACT.md` §4). `start()` now fades the song in over 1.2 
 - **A5 card back** (#8, landscape): the customer's title and message, then the names. The artwork's frame is its border.
 - **Keepsake** (A4): #10 as the cover, then the messages on cream pages with the corner flourishes on every page.
 
-## 8. Step 2 (agreed, not built yet): shaped printed cards
+## 8. Shaped printed cards: leaf and heart (built, 2026-10-14)
 
-The customer chooses **one** printed card: the **A5 card**, the **leaf**, or the **heart**. The leaf and
-heart belong to better packages (e.g. Normal = A5 only); the owner ticks the allowed shapes per package in Admin.
+The customer chooses **one** printed card on the order form: the **A5 card**, the **leaf** or the **heart**, in
+packages with the new feature **"Shaped printed card" (`card_shapes`)**; a package without it (e.g. Normal) only has
+the A5 card. Platform feature: see `docs/THEME_CONTRACT.md` §6 "Shaped cards".
 
 | | Leaf | Heart |
 |---|---|---|
-| Size | about 12 × 18 cm | about 15 × 15 cm |
-| Front | #12: names + date | #14: names + date |
-| Back | #9: title + message | #13: title + message |
-| QR | small, on the back | small, on the back |
+| Size (cut) | 107 × 180.6 mm (the agreed "about 12 × 18", at the artwork's own proportions) | 150 × 157.9 mm |
+| Front | #12: names + date in calligraphy, gold on green | #14: names + date |
+| Back | **The leaf in cream** (#12 mirrored, green turned cream): the owner's #9 is a slimmer, even "eye" shape that can't share the front's cut line (see below) | #13, fitted to the front's outline |
+| Both backs | The customer's title and message (long messages step down a size), the names, the QR code | |
 
-Files: the customer PDF (the shape on a plain page) and the **print-shop PDF with a thin cut line around the
-exact shape**, plus a **PNG** so a print shop can resize it. This needs a platform feature (card shapes per
-theme and per package, a choice on the order form, die-line PDFs).
+A card is cut along **one** line, so each back must have the front's outline, mirrored. Neither owner back
+matched its front (heart back 10 % narrower, leaf back a different shape): the heart back was reshaped row by
+row onto the front's outline; the leaf back could not be without tearing its ornaments, so it is the cream
+version of the front for now. **To use #9's look, the owner can supply a leaf back drawn on #12's outline.**
+
+Files the customer gets (receipt): the PDF (each side on a page with a 10 mm margin) and a transparent 300 dpi
+PNG of each side. The print shop file (Admin → invitation → print-shop download) adds a thin magenta cut line
+exactly on the outline. The artwork ends at the cut line (no bleed beyond it): ask the print shop to cut on the line.
+
+Regenerate the artwork and cut lines with `scripts/shapes.py` (outlines go to `themes/royal-olive-crest/v1/outlines.ts`):
+
+```bash
+python3 -I scripts/shapes.py leaf <#12 PNG> <#9 PNG> cream 107 out/
+python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
+```
 
 ## 9. Admin setup after deploy
 
@@ -126,5 +140,5 @@ theme and per package, a choice on the order form, die-line PDFs).
 2. Themes → Royal Olive Crest → Fields: label `person_1_name` "اسم العريس" / "Groom's name" and `person_2_name`
    "اسم العروس" / "Bride's name" if not already the section defaults.
 3. Packages: include `seal_initials` so customers can type their own initials (without it the initials are
-   always worked out from the names).
-4. Pick the song and the Kurdish design name (suggestions in `docs/translations/KURDISH_REVIEW.md`, batch 25).
+   always worked out from the names). Add "Shaped printed card" to the packages that offer the leaf and heart.
+4. Pick the song and the Kurdish design name (suggestions in `docs/translations/KURDISH_REVIEW.md`, batches 25–26).

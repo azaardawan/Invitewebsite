@@ -6,7 +6,7 @@ import type { DbOrTx } from '@/server/db/client';
 import { guestResponses, invitations, themeVersions } from '@/server/db/schema';
 import { buildThemeProps, invitationMessages } from '@/server/invitation/theme-props';
 import { manifestByCodeRef } from '@/theme-registry';
-import type { ThemeManifest } from '@/theme-sdk/manifest';
+import type { CardShape, ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
@@ -70,7 +70,10 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     // A design without an online invitation has nothing for a QR code to open.
     const qrUrl = opts.showQr !== false && manifest?.onlineInvitation !== false ? invitationUrl(inv) : null;
     const artwork = await themeArtwork(db, inv.themeId);
-    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look)) };
+    // The shaped card the customer chose instead of the card (only while the package includes it).
+    const shapes = (version!.manifest as ThemeManifest | null)?.print?.shapes ?? manifest?.print?.shapes ?? [];
+    const shape = inv.cardShape && inv.featureKeys.includes('card_shapes') ? (shapes.find((x) => x.key === inv.cardShape) ?? null) : null;
+    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape)) };
   }
   const { base } = printBase(theme);
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
@@ -122,6 +125,8 @@ export async function cardData(
   design: ResolvedCardDesign,
   /** The owner's look for this design's extras; the platform's simple card front and back follow it too. */
   ownerLook: ExtrasLook | null = null,
+  /** A shaped card (leaf, heart…) printed instead of the card, or null. */
+  shape: CardShape | null = null,
 ) {
   const { base, cardBackTitle } = printBase(theme);
   const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
@@ -145,5 +150,29 @@ export async function cardData(
   const sheet = { bleedMm: spec.bleedMm, pageHasBleed: kind === 'cardBleed' };
   const gender = base.fields.baby_gender === 'boy' || base.fields.baby_gender === 'girl' ? base.fields.baby_gender : null;
   const look = tintedLook(ownerLook ?? defaultLook(base.colors), gender);
-  return { kind: 'card' as const, props, back, page, backPage, design, sheet, look };
+  return { kind: 'card' as const, props, back, page, backPage, design, sheet, look, shape: shape ? shapeSheet(shape, kind) : null };
+}
+
+/** Around a shaped card on its PDF page: room for the print shop to handle it (the cut line runs around the shape). */
+export const SHAPE_MARGIN_MM = 10;
+
+/**
+ * A shaped card's two sides: the box, each side's cut line (the back's is the front's mirrored: the card turned
+ * over) and the page around it. `cutLine`: the print-shop file draws the cut line.
+ */
+export function shapeSheet(shape: CardShape, kind: 'card' | 'cardBleed') {
+  return {
+    key: shape.key,
+    widthMm: shape.widthMm,
+    heightMm: shape.heightMm,
+    outline: { front: shape.outline, back: mirrorPath(shape.outline, shape.widthMm) },
+    page: { width: `${shape.widthMm + 2 * SHAPE_MARGIN_MM}mm`, height: `${shape.heightMm + 2 * SHAPE_MARGIN_MM}mm` },
+    cutLine: kind === 'cardBleed',
+  };
+}
+
+/** An outline (absolute M/L/C/Q/Z commands, x y pairs) mirrored left-right within a box `width` wide. */
+export function mirrorPath(d: string, width: number): string {
+  let i = 0;
+  return d.replace(/-?\d+(?:\.\d+)?/g, (n) => (i++ % 2 === 0 ? String(Math.round((width - Number(n)) * 100) / 100) : n));
 }

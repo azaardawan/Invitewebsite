@@ -291,7 +291,20 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               />
             ))}
           </div>
-          {r.invitation.hasPrintCard ? <p className="text-xs text-muted">{t('printCardHelp')}</p> : null}
+          {r.invitation.hasPrintCard && r.invitation.cardShape && !r.invitation.customCard ? (
+            <div className="space-y-2">
+              <p className="text-xs text-muted">{t('shapeCardHelp')}</p>
+              <p className="flex flex-wrap gap-2">
+                {(['front', 'back'] as const).map((side) => (
+                  <a key={side} href={`${base}/card-png/${side}`} className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium" download>
+                    {t(side === 'front' ? 'shapePngFront' : 'shapePngBack')}
+                  </a>
+                ))}
+              </p>
+            </div>
+          ) : r.invitation.hasPrintCard ? (
+            <p className="text-xs text-muted">{t('printCardHelp')}</p>
+          ) : null}
           {r.invitation.hasPrintCard && !r.invitation.customCard ? (
             <details id="card-back" open={sp.cardBack !== undefined} className="rounded-2xl border border-line bg-surface px-4 py-3">
               <summary className="cursor-pointer text-sm font-semibold">{tStore('cardBack.heading')}</summary>

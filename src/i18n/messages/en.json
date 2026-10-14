@@ -293,6 +293,7 @@
         "congratulations": "Guest congratulation message",
         "keepsake_pdf": "Keepsake PDF of messages",
         "print_card": "Printable invitation card",
+        "card_shapes": "Shaped printed card (leaf, heart…) instead of the card",
         "self_edit": "Customer edits after publishing (up to 3)",
         "signature": "Customer signature (drawn when ordering)",
         "color_choice": "Customer chooses a colour set",
@@ -537,6 +538,9 @@
         "themeHint": "Subsections are managed under Admin → Sections."
       },
       "cardDesign": {
+        "shapesHeading": "Shaped cards",
+        "shapesIntro": "The customer picks one of these instead of the card when the package includes \"Shaped printed card\". The print-shop file adds the cut line around the shape.",
+        "withCutLine": "with cut line",
         "heading": "Printable card design",
         "intro": "The front (portrait) and back (landscape) of this theme’s printable card. Each side uses the theme’s own design until you upload your own artwork for it; the invitation’s text is then written on your artwork with the colours, fonts and placement you choose here. Changes apply to every card downloaded from now on.",
         "front": "Front",
@@ -761,6 +765,8 @@
       "keepsakeAfterPublish": "The keepsake is available once the invitation is published.",
       "cardTitle": "Printable card (A5)",
       "downloadCardBleed": "Print-shop version (3 mm bleed)",
+      "cardShapeChosen": "Card shape: {shape}",
+      "downloadShapePng": "PNG ({side, select, front {front} other {back}})",
       "sendWhatsApp": "Send to the customer on WhatsApp",
       "cardCustomActive": "Your uploaded design is used instead of the automatic card.",
       "cardBackToAutomatic": "Back to the automatic card",
@@ -1156,6 +1162,9 @@
     "waMessage": "Hello Bahja, I placed order {order} for {amount}. How do I complete payment?",
     "printCardTitle": "Printable invitation card",
     "printCardHelp": "A print-ready A5 PDF (148 × 210 mm) with the same names, date and venue, and a QR code to the online invitation. It may take a few seconds to prepare.",
+    "shapeCardHelp": "Your printed card in the shape you chose: a print-ready PDF (the shape on its page). The print shop cuts around the shape's outline. Here are both sides as transparent PNG pictures too, if the print shop wants to resize them:",
+    "shapePngFront": "Front picture (PNG)",
+    "shapePngBack": "Back picture (PNG)",
     "printCardDownload": "Download printable card (PDF)",
     "keepsakeTitle": "Your keepsake of wishes",
     "keepsakeHelp": "Every message your guests wrote, gathered in a PDF in the design of your invitation.",
@@ -1231,6 +1240,7 @@
       "congratulations": "Congratulation messages from guests",
       "keepsake_pdf": "A keepsake PDF of all messages",
       "print_card": "Printable invitation card",
+      "card_shapes": "A specially shaped printed card, such as a leaf or a heart, instead of the card",
       "self_edit": "Edit your invitation yourself after publishing",
       "signature": "Your own signature on the invitation",
       "color_choice": "Choose the invitation colours",
@@ -1358,6 +1368,12 @@
       "bottle": "Water bottle label",
       "downloadPng": "Picture (PNG)",
       "downloadSheet": "Print sheet (PDF)"
+    },
+    "cardShape": {
+      "heading": "Printed card shape",
+      "help": "Choose the regular card or one of this design's shapes. You get a print-ready PDF and a transparent PNG, and the print shop gets the cut line around the shape.",
+      "card": "The card",
+      "size": "{w} × {h} cm"
     },
     "stickerShape": {
       "heading": "Sticker shape",

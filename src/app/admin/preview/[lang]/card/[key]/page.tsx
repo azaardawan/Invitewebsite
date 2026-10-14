@@ -11,6 +11,12 @@ import { CardPages } from '@/app/print/CardPages';
 
 const query = z.object({
   side: z.enum(['front', 'back']).default('front'),
+  /** One of the design's shaped cards (leaf, heart…) instead of the card. */
+  shape: z.string().max(40).optional(),
+  /** With `shape`: the print-shop version (with the cut line). */
+  cut: z.literal('1').optional(),
+  /** With `shape`: just the shape on a transparent page (what the PNG shows). */
+  png: z.literal('1').optional(),
   v: z.coerce.number().int().min(1).optional(),
 });
 
@@ -28,13 +34,17 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
   if (!sample) notFound();
   const manifest = manifestByCodeRef(sample.version.codeRef);
   if (!manifest) notFound();
+  const shape = q.data.shape ? manifest.print?.shapes?.find((x) => x.key === q.data.shape) : null;
+  if (q.data.shape && !shape) notFound();
   const data = await cardData(
     sample.props,
     manifest,
-    'card',
+    q.data.cut ? 'cardBleed' : 'card',
     {},
     'https://bahjaaa.com/i/sample',
     await themeCardDesign(db(), sample.theme.id),
+    null,
+    shape ?? null,
   );
-  return <CardPages codeRef={sample.version.codeRef} data={data} view={q.data.side} />;
+  return <CardPages codeRef={sample.version.codeRef} data={data} view={q.data.side} png={q.data.png === '1'} />;
 }

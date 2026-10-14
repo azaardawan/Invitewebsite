@@ -17,6 +17,8 @@ export const FEATURES = {
   keepsake_pdf: { requires: ['congratulations'], requiresFields: [] },
   /** Printable invitation card PDF for the customer. */
   print_card: { requires: [], requiresFields: [] },
+  /** The customer may choose one of the design's shaped cards (leaf, heart…) instead of the card. */
+  card_shapes: { requires: ['print_card'], requiresFields: [] },
   /** The customer can change their invitation's details themselves after publishing (a few times). */
   self_edit: { requires: [], requiresFields: [] },
   /** The customer draws their own signature when ordering; the theme shows it where its designer placed it. */

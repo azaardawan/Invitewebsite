@@ -10,7 +10,7 @@ import { storage } from '@/server/storage';
 import { sha256 } from '@/lib/crypto';
 import { printData } from './data';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
-import { renderPdf, renderPreview, type PdfRenderer, type PreviewKind, type PreviewRenderer } from './render';
+import { renderPdf, renderPreview, renderShapePng, type PdfRenderer, type PreviewKind, type PreviewRenderer, type ShapePngRenderer } from './render';
 import { invitationRenderData } from '@/server/invitation/load';
 import { isLive } from '@/server/orders/payment';
 import type { DocumentKind } from './tokens';
@@ -167,6 +167,20 @@ export async function printShopCard(db: DbOrTx, invitationId: string, render: Pd
     if (custom) return { pdf: custom, fileName: `invitation-card-${inv.publicId}.pdf` };
   }
   return { pdf: await render('cardBleed', inv.id), fileName: `invitation-card-${inv.publicId}-print-shop.pdf` };
+}
+
+/**
+ * One side of the shaped card the customer chose (leaf, heart…) as a transparent PNG, for print shops that
+ * place or resize it themselves. Rendered fresh each time (not stored). Null without a shaped card.
+ */
+export async function shapeCardPng(db: DbOrTx, invitationId: string, side: 'front' | 'back', render: ShapePngRenderer = renderShapePng) {
+  const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
+  if (!inv) throw new DocumentError('notFound');
+  if (!documentAvailable(inv, 'card')) throw new DocumentError(inv.featureKeys.includes('print_card') ? 'notPaid' : 'notIncluded');
+  if (inv.cardCustomKey) return null;
+  const data = await printData(db, inv, 'card');
+  if (data.kind !== 'card' || !data.shape) return null;
+  return { png: await render(side, inv.id), fileName: `invitation-${data.shape.key}-${side}-${inv.publicId}.png` };
 }
 
 export const CARD_LIMITS = { message: 300, extraLine: 120, uploadBytes: 15 * 1024 * 1024 } as const;
