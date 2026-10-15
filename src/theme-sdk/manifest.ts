@@ -1,6 +1,20 @@
 import { z } from 'zod';
-import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type FeatureKey } from '@/catalog/features';
+import { CARD_SHAPE_FEATURES, FEATURE_KEYS, featureDependencyProblems, isCardShapeKey, isPlatformFeature, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
+
+/** A shaped printed card a design offers (manifest `print.shapes`). */
+/** A design's own text in Arabic and English, plus the owner-approved Kurdish when there is one (else Arabic shows). */
+export type ThemeText = { ar: string; en: string; ckb?: string; bdn?: string };
+
+export type CardShape = {
+  key: string;
+  label: ThemeText;
+  widthMm: number;
+  heightMm: number;
+  outline: string;
+  /** The back is read with the card turned a quarter (a landscape design on a portrait card, like the A5 card's back). */
+  backSideways?: boolean;
+};
 
 /**
  * A theme version's manifest: what the theme supports and which package
@@ -13,7 +27,7 @@ export type ThemeManifest = {
   /** Integer version. Must match the `v<N>` folder name. */
   version: number;
   /** Working title shown in Admin until the owner sets the display name. */
-  title: { ar: string; en: string };
+  title: ThemeText;
   /** Experience format (see §13 of the architecture). V1: invitations only. */
   experience: 'INVITATION';
   /** Section keys this theme was designed for (e.g. `wedding`); first is the default. */
@@ -31,8 +45,20 @@ export type ThemeManifest = {
   validStates: { features: FeatureKey[]; fields: FieldKey[] }[];
   /** Print companions, required when `print_card` / `keepsake_pdf` are supported. */
   print?: {
-    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean };
+    /**
+     * `qrColors`: the QR code in the design's colours instead of black on white (`dark` must contrast strongly
+     * with `light` and with the paper under a transparent `light`, e.g. '#00000000').
+     */
+    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean; qrColors?: { dark: string; light: string } };
     keepsake?: { size: 'A4' };
+    /**
+     * Shaped printed cards (features `card_leaf`, `card_heart`; one per shape key `leaf`, `heart`): the customer may choose one of these instead of the
+     * card. `outline` is the cut line, an SVG path in millimetres (origin top-left of a `widthMm` ×
+     * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over), or with
+     * `backSideways` the card turned over and a quarter turn (its box is then `heightMm` × `widthMm`).
+     * `print/Shape.tsx` draws both sides.
+     */
+    shapes?: CardShape[];
   };
   /**
    * Colours the theme takes from the platform (CSS variables `--bahja-color-<key>`), each with the
@@ -66,7 +92,7 @@ export type ThemeManifest = {
 export type WordingLine = {
   key: string;
   /** What the line is, shown on the order form. */
-  label: { ar: string; en: string };
+  label: ThemeText;
   /** The default text, in every language. */
   ar: string;
   /** The same line in other languages, offered as a choice. */
@@ -103,11 +129,13 @@ const featureKey = z.enum(FEATURE_KEYS as [FeatureKey, ...FeatureKey[]]);
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && new Set(a).size === a.length && a.every((x) => b.includes(x));
 
+const themeText = z.object({ ar: z.string().min(1), en: z.string().min(1), ckb: z.string().min(1).optional(), bdn: z.string().min(1).optional() });
+
 export const manifestSchema = z
   .object({
     key: z.string().regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/, 'lowercase-kebab'),
     version: z.number().int().min(1),
-    title: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+    title: themeText,
     experience: z.literal('INVITATION'),
     sections: z.array(z.string().regex(/^[a-z][a-z0-9-]*$/)).min(1),
     fields: z.array(fieldKey).min(1),
@@ -115,8 +143,29 @@ export const manifestSchema = z
     validStates: z.array(z.object({ features: z.array(featureKey), fields: z.array(fieldKey).min(1) })).min(1).max(10),
     print: z
       .object({
-        card: z.object({ size: z.enum(['A5', '5x7']), bleedMm: z.number().min(0).max(10), qr: z.boolean() }).optional(),
+        card: z
+          .object({
+            size: z.enum(['A5', '5x7']),
+            bleedMm: z.number().min(0).max(10),
+            qr: z.boolean(),
+            qrColors: z.object({ dark: z.string().regex(/^#[0-9a-fA-F]{6}$/), light: z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/) }).optional(),
+          })
+          .optional(),
         keepsake: z.object({ size: z.literal('A4') }).optional(),
+        shapes: z
+          .array(
+            z.object({
+              key: z.string().regex(/^[a-z][a-z0-9-]*$/),
+              label: themeText,
+              widthMm: z.number().min(40).max(300),
+              heightMm: z.number().min(40).max(300),
+              outline: z.string().regex(/^M[0-9.\s,MLCQZz-]+$/).max(40_000),
+              backSideways: z.boolean().optional(),
+            }),
+          )
+          .min(1)
+          .max(4)
+          .optional(),
       })
       .optional(),
     colors: z
@@ -138,7 +187,7 @@ export const manifestSchema = z
       .array(
         z.object({
           key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
-          label: z.object({ ar: z.string().min(1), en: z.string().min(1) }),
+          label: themeText,
           ar: z.string().min(1),
           versions: z.object({ en: z.string().min(1), ckb: z.string().min(1), bdn: z.string().min(1) }).partial().optional(),
           defaultIn: z.array(z.enum(['en', 'ckb', 'bdn'])).optional(),
@@ -172,6 +221,14 @@ export const manifestSchema = z
     }
     if (m.features.includes('print_card') && !m.print?.card) issue('print_card requires print.card');
     if (m.features.includes('keepsake_pdf') && !m.print?.keepsake) issue('keepsake_pdf requires print.keepsake');
+    for (const [shape, feature] of Object.entries(CARD_SHAPE_FEATURES)) {
+      const has = m.print?.shapes?.some((x) => x.key === shape);
+      if (m.features.includes(feature) && !has) issue(`${feature} requires a "${shape}" shape in print.shapes`);
+      if (has && !m.features.includes(feature)) issue(`print.shapes "${shape}" is sold with the ${feature} feature: list it in features`);
+    }
+    if (m.print?.shapes?.some((x) => !isCardShapeKey(x.key))) issue(`print.shapes keys must be one of: ${Object.keys(CARD_SHAPE_FEATURES).join(', ')}`);
+    if (m.print?.shapes && new Set(m.print.shapes.map((x) => x.key)).size !== m.print.shapes.length) issue('print.shapes contain duplicate keys');
+    if (m.print?.shapes?.some((x) => x.key === 'a5')) issue('print.shapes: "a5" is the card itself, not a shape');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');

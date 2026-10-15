@@ -31,8 +31,11 @@ themes/<key>/v<N>/
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
+- `title`, `wording[].label` and `print.shapes[].label` may also carry `ckb` / `bdn`, only with Kurdish the owner
+  approved in `docs/translations/KURDISH_REVIEW.md`; without it the Kurdish pages show the Arabic. The title's
+  Kurdish becomes the design's Kurdish name when it is first registered (the owner can change it in Admin).
 - `wording`: lines of the design's own text the customer may change on the order form (never Quran or du'a),
-  each `{ key, label: {ar, en}, ar, versions?: {en?, ckb?, bdn?}, defaultIn?, maxLength }`. The Arabic is the
+  each `{ key, label: {ar, en, ckb?, bdn?}, ar, versions?: {en?, ckb?, bdn?}, defaultIn?, maxLength }`. The Arabic is the
   default, except in the languages listed in `defaultIn` (their version is); a version is offered as a choice
   for orders in that language; or the customer writes their own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
   A line may add `options` (fixed alternatives offered after the Arabic, e.g. «ثاني / ثالث») and `custom: false`
@@ -70,7 +73,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 
 | API | Use |
 |---|---|
-| `useMusic()` | `start()` from the "Open invitation" tap (phones block autoplay otherwise); `toggle()` for the music button; `playing`, `available`. **Music always loops.** It pauses automatically when the phone locks. |
+| `useMusic()` | `start()` from the "Open invitation" tap (phones block autoplay otherwise). A design whose song should only begin when the opening ends calls `prime()` from the tap (unlocks sound silently) and `start()` later. `start()` fades the song in. `toggle()` for the music button; `playing`, `available`. **Music always loops.** It pauses automatically when the phone locks. |
 | `GuestFormSlot` | Headless guest form. The theme designs it; the platform validates, submits and stores. Nothing is saved in sample/preview. Renders nothing when the package lacks `rsvp`. |
 | `useCountdown(startsAt)` | Live countdown (shared 1-second clock) |
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
@@ -79,7 +82,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 ## 4A. Opening animation (required for sellable themes)
 
 Every non-internal theme starts on a cover with a button labelled `labels.openInvitation`. Its click handler
-calls `useMusic().start()` and plays the opening animation (CSS `@keyframes`/transitions on `transform` and
+calls `useMusic().start()` (or `prime()`, with `start()` when the opening ends) and plays the opening animation (CSS `@keyframes`/transitions on `transform` and
 `opacity`; optionally a Lottie or a small muted inline video layer). The opening finishes within **4 s**
 (looping idle effects are allowed). When `useReducedMotion()` is true, the cover fades and the invitation is
 visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
@@ -127,6 +130,9 @@ you draw on the front also frames the landscape back, laid out for its shape. Wi
 platform prints a simple landscape back (title, message, names or signatures, in the theme's colours). The
 customer sees both sides on their receipt and can turn the card over. See `themes/demo-wedding/v1/print/CardBack.tsx`.
 
+The QR code is black on white unless the manifest sets `print.card.qrColors: { dark, light }` (e.g. the design's
+deep colour on a transparent `#00000000`, so the paper shows through); keep strong contrast so phones scan it.
+
 `print/Card.tsx` and `print/Keepsake.tsx` default-export **server components** (no hooks, no
 animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/theme-sdk`:
 
@@ -145,6 +151,23 @@ in the same place on every page): give the messages section its own padding (abo
 clear of the border at the sides) with `box-decoration-break: clone` so it repeats on each page. No page
 numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
+
+### Shaped cards (leaf, heart…)
+
+A design may offer shaped printed cards that the customer chooses **instead of** the A5 card. Each shape is sold by
+its own feature, so a package can offer one, both or neither: `leaf` by `card_leaf`, `heart` by `card_heart` (both
+need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`). A design lists the feature of every shape it
+draws, and draws every shape whose feature it lists. Declare them in the manifest
+`print.shapes: [{ key, label: {ar, en, ckb?, bdn?}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
+millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the
+front artwork. `print/Shape.tsx` (required then) default-exports a server component receiving `PrintShapeProps`: the
+card's props plus `shape`, `side` (`front`/`back`), this side's box size and `outline` (the back's is the front's
+mirrored: the card turned over; with `backSideways: true` the back is a landscape design read with the card turned a
+quarter, so its box is `heightMm` × `widthMm` and its outline the front's with x and y swapped), `qrDataUrl`, `extraLine`, and the back's `title`/`message`. Draw the artwork filling
+the box, **transparent outside the shape**, with the text well inside it. The platform puts each side on a page with a
+10 mm margin (the customer's PDF), adds a thin magenta cut line on the outline for the print shop
+(`?bleed=1` / print-shop download), and makes a transparent 300 dpi PNG of each side. Admin → Themes previews every
+shape (with or without the cut line).
 
 ### Newborn extras drawn by the design
 

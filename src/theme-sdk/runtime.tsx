@@ -49,13 +49,18 @@ export function InvitationRuntime({
 
 // ---------------- Music ----------------
 
-type MusicValue = { available: boolean; playing: boolean; start: () => void; toggle: () => void };
-const MusicContext = createContext<MusicValue>({ available: false, playing: false, start: () => {}, toggle: () => {} });
+type MusicValue = { available: boolean; playing: boolean; start: () => void; prime: () => void; toggle: () => void };
+const MusicContext = createContext<MusicValue>({ available: false, playing: false, start: () => {}, prime: () => {}, toggle: () => {} });
+
+/** How long `start()` takes to bring the song in (where the browser lets a page set the volume; iPhones play at full volume). */
+const FADE_IN_MS = 1200;
 
 function MusicProvider({ src, children }: { src: string | null; children: ReactNode }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const resumeOnVisible = useRef(false);
+  // Set once the theme asked for sound; a pending `prime()` must then not pause the song again.
+  const wanted = useRef(false);
 
   const ensure = useCallback(() => {
     if (!src) return null;
@@ -71,14 +76,56 @@ function MusicProvider({ src, children }: { src: string | null; children: ReactN
     return audio.current;
   }, [src]);
 
-  /** Must be called from a user gesture (e.g. "Open invitation"): mobile browsers block autoplay otherwise. */
+  /**
+   * Plays the song. Call it from the guest's tap ("Open invitation"), or later after `prime()` was called
+   * from that tap (e.g. when the opening animation ends): phones block sound that no tap allowed.
+   */
   const start = useCallback(() => {
-    ensure()?.play().catch(() => setPlaying(false));
+    const a = ensure();
+    if (!a) return;
+    wanted.current = true;
+    a.muted = false;
+    a.volume = 0;
+    const began = performance.now();
+    const rise = () => {
+      // Stopped mid-fade (the phone locked, the guest paused): it comes back at full volume.
+      const t = a.paused ? 1 : Math.min(1, (performance.now() - began) / FADE_IN_MS);
+      a.volume = t;
+      if (t < 1) requestAnimationFrame(rise);
+    };
+    a.play().then(() => requestAnimationFrame(rise), () => {
+      a.volume = 1;
+      setPlaying(false);
+    });
+  }, [ensure]);
+
+  /**
+   * From the guest's tap, when the song should only begin later: unlocks sound for this page without
+   * playing anything (a silent, muted start that stops at once). Then call `start()` when the time comes.
+   */
+  const prime = useCallback(() => {
+    const a = ensure();
+    if (!a || wanted.current) return;
+    a.muted = true;
+    a.play().then(
+      () => {
+        if (wanted.current) return;
+        a.pause();
+        a.currentTime = 0;
+        a.muted = false;
+      },
+      () => {
+        a.muted = false;
+      },
+    );
   }, [ensure]);
 
   const toggle = useCallback(() => {
     const a = ensure();
     if (!a) return;
+    wanted.current = true;
+    a.muted = false;
+    a.volume = 1;
     if (a.paused) a.play().catch(() => setPlaying(false));
     else a.pause();
   }, [ensure]);
@@ -102,11 +149,14 @@ function MusicProvider({ src, children }: { src: string | null; children: ReactN
     };
   }, []);
 
-  const value = useMemo(() => ({ available: Boolean(src), playing, start, toggle }), [src, playing, start, toggle]);
+  const value = useMemo(() => ({ available: Boolean(src), playing, start, prime, toggle }), [src, playing, start, prime, toggle]);
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
 }
 
-/** The invitation's song. `start()` from the "Open invitation" tap; `toggle()` for the music button. Always loops. */
+/**
+ * The invitation's song. `start()` from the "Open invitation" tap, or `prime()` from that tap and `start()` when the
+ * opening ends; `toggle()` for the music button. Always loops.
+ */
 export function useMusic(): MusicValue {
   return useContext(MusicContext);
 }

@@ -47,6 +47,29 @@ async function pdfOf(browser: Browser, path: string) {
   return pdf;
 }
 
+/**
+ * One side of a shaped card as a transparent PNG at 300 dpi (just the shape, nothing around it), so a print
+ * shop can place or resize it themselves.
+ */
+export type ShapePngRenderer = (side: 'front' | 'back', invitationId: string) => Promise<Buffer>;
+export const renderShapePng: ShapePngRenderer = async (side, invitationId) => {
+  const browser = await chromium.launch({
+    executablePath: env().CHROMIUM_PATH || undefined,
+    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+  });
+  try {
+    // 300 dpi: 96 CSS px per inch × 3.125.
+    const page = await browser.newPage({ viewport: { width: 1200, height: 1200 }, deviceScaleFactor: 3.125, reducedMotion: 'reduce' });
+    await page.emulateMedia({ media: 'print' });
+    const res = await page.goto(`${printOrigin()}/print/${printToken('card', invitationId)}?view=${side}&png=1`, { waitUntil: 'networkidle', timeout: 60_000 });
+    if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
+    await page.evaluate(() => document.fonts.ready);
+    return await page.locator('[data-card-side]').first().screenshot({ type: 'png', omitBackground: true });
+  } finally {
+    await browser.close();
+  }
+};
+
 export type PreviewKind = 'card' | 'cardBack' | 'keepsake' | 'og';
 export type PreviewRenderer = (kind: PreviewKind, invitationId: string) => Promise<Buffer>;
 
@@ -83,6 +106,9 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId) => {
     await page.evaluate(() => document.fonts.ready);
     // The cover's images and entrance settle.
     if (kind === 'og') await page.waitForTimeout(800);
+    // A shaped card (leaf, heart…): its page has its own size; picture the whole page.
+    const shaped = kind === 'og' ? null : page.locator('[data-card-side]').first();
+    if (shaped && (await shaped.count())) return await shaped.screenshot({ type: 'jpeg', quality: 82 });
     return await page.screenshot({ type: 'jpeg', quality: 82 });
   } finally {
     await browser.close();

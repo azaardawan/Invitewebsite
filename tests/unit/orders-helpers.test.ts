@@ -79,6 +79,17 @@ describe('invitation field validation', () => {
     expect(r.ok || r.errors).toEqual({ person_1_name: 'required' });
   });
 
+  it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {
+    const withSeal = new Map(defs).set('seal_initials', { type: 'text', maxLength: 9 });
+    const empty = validateFieldValues({ ...good, seal_initials: ' ' }, [...keys, 'seal_initials'], withSeal, now);
+    expect(empty.ok).toBe(true);
+    if (empty.ok) expect(empty.values).not.toHaveProperty('seal_initials');
+    const filled = validateFieldValues({ ...good, seal_initials: 'D ♥ A' }, [...keys, 'seal_initials'], withSeal, now);
+    expect(filled.ok && filled.values.seal_initials).toBe('D ♥ A');
+    const long = validateFieldValues({ ...good, seal_initials: 'ABCDEFGHIJ' }, [...keys, 'seal_initials'], withSeal, now);
+    expect(long.ok || long.errors).toEqual({ seal_initials: 'tooLong' });
+  });
+
   it('rejects past dates, far-future dates, bad times, long text and non-map links', () => {
     const r = validateFieldValues(
       { ...good, event_date: '2026-09-30', event_time: '25:00', person_1_name: 'x'.repeat(21), venue_map_url: 'https://evil.example' },

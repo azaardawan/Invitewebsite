@@ -709,3 +709,43 @@ only be published once the Kurdish is in. Sections shared with the main terms re
 - دبیت ئەم ڤان مەرجان نوو بکەین، و ل سەر هەر داخوازیەکێ ئەو وەشان دهێتە جێبەجێکرن یا تو دەمێ داخوازیێ ل سەر ڕازی بووی.
 - بۆ پەیوەندیێ: ب ڕێکا واتسئاپێ یان ڕێکێن پەیوەندیێ ل لاپەرێ «پەیوەندیێ ب مە بکە».
 ```
+
+## Batch 25 — Royal Olive Crest: initials on the wax seal — ✅ APPROVED (2026-10-14)
+
+The owner approved every row as suggested; all live (row 1 in the Field Library, rows 3–4 in the design's
+manifest; the Kurdish name is the design's starting name in Admin → Themes). The design's own lines
+reuse the owner-approved Olive Ring Box wording (same Arabic sentences), and the Quran verse stays in Arabic.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | Field Library label `seal_initials` (Admin) | الأحرف الأولى على الختم | Initials on the seal | پیتە سەرەتاییەکان لەسەر مۆر | تیپێن ئێکێ ل سەر مۆرێ | ○ |
+| 2 | `store.sealInitialsHint` | اختياري: اتركه فارغًا ونكتب الحرف الأول من كل اسم (العريس أولًا)، أو اكتب الأحرف كما تريدها. | Optional: leave it empty and we write the first letter of each name (groom first), or type the initials as you want them. | ئارەزوومەندانە: بەتاڵی بهێڵە و پیتی یەکەمی هەر ناوێک دەنووسین (زاوا یەکەم)، یان پیتەکان وەک دەتەوێت بنووسە. | ب دلێ خۆ: ڤالا بهێلە و ئەم دێ تیپا ئێکێ یا هەر ناڤەکی نڤیسین (زاڤا ئێکەم)، یان تیپان وەکی تە دڤێت بنڤیسە. | ○ |
+| 3 | Order-form label of the design's `sealJoin` choice (manifest, Arabic/English only today) | الرمز بين الحرفين على الختم | Symbol between the initials on the seal | هێمای نێوان دوو پیتەکە لەسەر مۆر | نیشانا د ناڤبەرا هەردوو تیپان دا ل سەر مۆرێ | ○ |
+| 4 | Design name (Admin → Themes) | الشعار الملكي الزيتوني | Royal Olive Crest | دروشمی شاهانەی زەیتوونی | نیشانا شاهانە یا زەیتوونی | ○ |
+
+## Batch 26 — Royal Olive Crest: leaf and heart cards (shaped printed cards) — ✅ APPROVED (2026-10-14)
+
+The owner approved every row as suggested; all live (row 9 in the design's manifest). Admin texts are Arabic/English only.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.features.card_shapes` | بطاقة مطبوعة بشكل مميّز، مثل ورقة شجر أو قلب، تختارها بدل البطاقة | A specially shaped printed card, such as a leaf or a heart, instead of the card | کارتێکی چاپکراوی شێوە تایبەت، وەک گەڵایەک یان دڵێک، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوەیەکێ تایبەت، وەکی بەلگەکێ یان دلەکی، ل شوینا کارتێ | ○ |
+| 2 | `store.cardShape.heading` | شكل البطاقة المطبوعة | Printed card shape | شێوەی کارتی چاپکراو | شێوێ کارتا چاپکری | ◐ |
+| 3 | `store.cardShape.help` | اختر البطاقة العادية أو أحد أشكال هذا التصميم… | Choose the regular card or one of this design's shapes… | کارتە ئاساییەکە یان یەکێک لە شێوەکانی ئەم دیزاینە هەڵبژێرە. فایلێکی PDF بۆ چاپ و وێنەیەکی PNG بە باکگراوندی ڕوون وەردەگریت، و هێڵی بڕینی دەوری شێوەکە بۆ چاپخانە ئامادە دەکەین. | کارتا ئاسایی یان ئێک ژ شێوەیێن ڤی دیزاینی هەلبژێرە. تو دێ فایلەکێ PDF بۆ چاپێ و وێنەیەکێ PNG ب پشتەکا ڕوهن وەرگری، و ئەم دێ هێلا بڕینێ ل دۆر شێوەی بۆ چاپخانێ ئامادە کەین. | ○ |
+| 4 | `store.cardShape.card` | البطاقة | The card | کارتەکە | کارت | ● |
+| 5 | `store.cardShape.size` | {w} × {h} سم | {w} × {h} cm | {w} × {h} سم | {w} × {h} سم | ● |
+| 6 | `receipt.shapeCardHelp` | بطاقتك المطبوعة بالشكل الذي اخترته… | Your printed card in the shape you chose… | کارتی چاپکراوەکەت بەو شێوەیەی هەڵتبژارد: فایلێکی PDF ئامادەی چاپ (شێوەکە لەسەر پەڕەکەی). چاپخانە بە دەوری سنووری شێوەکەدا دەیبڕێت. ئەمەش هەردوو ڕووەکەیەتی وەک وێنەی PNG بە باکگراوندی ڕوون، ئەگەر چاپخانە ویستی قەبارەکەی بگۆڕێت: | کارتا تە یا چاپکری ب وی شێوەی یێ تە هەلبژارتی: فایلەکێ PDF یێ ئامادەی چاپێ (شێوە ل سەر لاپەرێ خۆ). چاپخانە ل دۆر سنوورێ شێوەی دبڕیت. ئەڤە هەردوو ڕوین وەک وێنێن PNG ب پشتەکا ڕوهن ژی، ئەگەر چاپخانێ ڤیا قەبارێ بگوهۆڕیت: | ○ |
+| 7 | `receipt.shapePngFront` | صورة الوجه (PNG) | Front picture (PNG) | وێنەی ڕووی پێشەوە (PNG) | وێنێ ڕویێ پێشیێ (PNG) | ◐ |
+| 8 | `receipt.shapePngBack` | صورة الظهر (PNG) | Back picture (PNG) | وێنەی ڕووی پشتەوە (PNG) | وێنێ ڕویێ پشتێ (PNG) | ◐ |
+| 9 | Shape names (Royal Olive Crest manifest, Arabic/English only today) | ورقة شجر / قلب | Leaf / Heart | گەڵا / دڵ | بەلگ / دل | ◐ |
+
+## Batch 27 — Royal Olive Crest: the leaf and the heart sold separately — ✅ APPROVED (2026-10-14)
+
+The single feature "shaped printed card" (batch 26 row 1, `store.features.card_shapes`) became two, so a package can
+offer the leaf, the heart or both. The owner approved both rows as suggested; live. Admin texts
+are Arabic/English only.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.features.card_leaf` | بطاقة مطبوعة على شكل ورقة شجر، تختارها بدل البطاقة | A leaf-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی گەڵا، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ بەلگی، ل شوینا کارتێ | ◐ |
+| 2 | `store.features.card_heart` | بطاقة مطبوعة على شكل قلب، تختارها بدل البطاقة | A heart-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی دڵ، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ دلی، ل شوینا کارتێ | ◐ |

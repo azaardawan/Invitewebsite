@@ -17,6 +17,10 @@ export const FEATURES = {
   keepsake_pdf: { requires: ['congratulations'], requiresFields: [] },
   /** Printable invitation card PDF for the customer. */
   print_card: { requires: [], requiresFields: [] },
+  /** The customer may choose the design's leaf-shaped card instead of the card. */
+  card_leaf: { requires: ['print_card'], requiresFields: [] },
+  /** The customer may choose the design's heart-shaped card instead of the card. */
+  card_heart: { requires: ['print_card'], requiresFields: [] },
   /** The customer can change their invitation's details themselves after publishing (a few times). */
   self_edit: { requires: [], requiresFields: [] },
   /** The customer draws their own signature when ordering; the theme shows it where its designer placed it. */
@@ -41,6 +45,22 @@ export function isPlatformFeature(key: string) {
 }
 
 export type FeatureKey = keyof typeof FEATURES;
+
+/**
+ * Shaped printed cards: each shape a design can offer (manifest `print.shapes[].key`) and the feature that sells
+ * it, so a package can include the leaf, the heart, both or neither.
+ */
+export const CARD_SHAPE_FEATURES = { leaf: 'card_leaf', heart: 'card_heart' } as const satisfies Record<string, FeatureKey>;
+export type CardShapeKey = keyof typeof CARD_SHAPE_FEATURES;
+
+export function isCardShapeKey(value: string): value is CardShapeKey {
+  return Object.hasOwn(CARD_SHAPE_FEATURES, value);
+}
+
+/** Whether a package's features include the given shape (an unknown shape is never included). */
+export function shapeIncluded(featureKeys: readonly string[], shape: string | null | undefined): boolean {
+  return !!shape && isCardShapeKey(shape) && featureKeys.includes(CARD_SHAPE_FEATURES[shape]);
+}
 export const FEATURE_KEYS = Object.keys(FEATURES) as FeatureKey[];
 
 export function isFeatureKey(value: string): value is FeatureKey {

@@ -72,6 +72,29 @@ export type PrintCardBackProps = PrintBase & {
   message: string | null;
 };
 
+/**
+ * One side of a shaped printed card (`print/Shape.tsx`, manifest `print.shapes`, features `card_leaf` / `card_heart`). Draw the
+ * artwork filling the `widthMm` × `heightMm` box, inside `outline` (this side's cut line as an SVG path in mm:
+ * the back's is the front's mirrored). The platform places it on the page, adds the cut line for print
+ * shops and makes the transparent PNG. Front: the card's content (names, date…); back: the customer's
+ * title and message. A server component, like the card.
+ */
+export type PrintShapeProps = PrintBase & {
+  /** Which of the design's shapes (its manifest key). `widthMm` × `heightMm` is this side's box (a sideways back is landscape). */
+  shape: string;
+  side: 'front' | 'back';
+  widthMm: number;
+  heightMm: number;
+  outline: string;
+  /** QR code to the online invitation, or null; the design prints it on the side it chooses. */
+  qrDataUrl: string | null;
+  /** Front: one extra line the team added, or null. */
+  extraLine: string | null;
+  /** Back: the big title (the customer's, or a default) and the smaller message (or null). */
+  title: string;
+  message: string | null;
+};
+
 export type KeepsakeMessage = { guestName: string; message: string };
 
 export type KeepsakeProps = PrintBase & {

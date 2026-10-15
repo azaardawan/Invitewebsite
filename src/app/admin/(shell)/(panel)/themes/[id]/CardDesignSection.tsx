@@ -3,6 +3,9 @@ import { db } from '@/server/db/client';
 import { CARD_FONTS, CARD_SIDE_DEFAULTS, themeArtwork, type ArtworkSlot } from '@/server/catalog/card-design';
 import type { CardDesign, CardSideDesign } from '@/server/db/schema';
 import { printComponents } from '@/theme-registry/print.generated';
+import { manifestByCodeRef } from '@/theme-registry';
+import { localized } from '@/lib/localized';
+import { SHAPE_MARGIN_MM } from '@/server/documents/data';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { Card } from '@/components/admin/bits';
@@ -37,6 +40,8 @@ export async function CardDesignSection({
   const resolved = await themeArtwork(db(), themeId);
   const loaders = codeRef ? printComponents[codeRef] : undefined;
   const own = { front: !!loaders?.card, back: !!loaders?.cardBack };
+  // The design's shaped cards (leaf, heart…), each sold with its own feature (`card_leaf`, `card_heart`).
+  const shapes = (codeRef ? manifestByCodeRef(codeRef)?.print?.shapes : undefined) ?? [];
   // A design without its own front prints the platform's simple front, so there is always something to show.
   const previewable = true;
   const src = (side: 'front' | 'back') =>
@@ -67,6 +72,36 @@ export async function CardDesignSection({
         </div>
       ) : null}
       {!own.front && !resolved.front ? <p className="text-sm text-muted">{t('noFront')}</p> : null}
+
+      {shapes.length ? (
+        <div className="space-y-2">
+          <h3 className="font-semibold">{t('shapesHeading')}</h3>
+          <p className="text-sm text-muted">{t('shapesIntro')}</p>
+          <div className="flex flex-wrap items-start gap-4" dir="ltr">
+            {shapes.flatMap((shape) => {
+              return (['front', 'back'] as const).map((side) => {
+                // The side's page (shape + margin) at 96 px per inch, shown at 40 %; a sideways back is landscape.
+                const turned = side === 'back' && shape.backSideways;
+                const w = Math.round((((turned ? shape.heightMm : shape.widthMm) + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
+                const h = Math.round((((turned ? shape.widthMm : shape.heightMm) + 2 * SHAPE_MARGIN_MM) * 96) / 25.4);
+                return (
+                <figure key={`${shape.key}-${side}`} className="space-y-1">
+                  <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: w * 0.4, height: h * 0.4 }}>
+                    <iframe title={`${localized(shape.label, locale)} — ${t(side)}`} src={`${src(side)}&shape=${shape.key}`} style={{ width: w, height: h, border: 0, transform: 'scale(0.4)', transformOrigin: '0 0' }} />
+                  </div>
+                  <figcaption className="text-center text-xs text-muted">
+                    {localized(shape.label, locale)} · {t(side)} ·{' '}
+                    <a className="underline" href={`${src(side)}&shape=${shape.key}&cut=1`} target="_blank" rel="noopener noreferrer">
+                      {t('withCutLine')}
+                    </a>
+                  </figcaption>
+                </figure>
+                );
+              });
+            })}
+          </div>
+        </div>
+      ) : null}
 
       {canManage
         ? (['front', 'back'] as const).map((side) => (

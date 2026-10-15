@@ -22,6 +22,8 @@ export type FieldSpec = {
   label: I18nText;
   /** `choice` fields: the stored values (labels live in the message files under `fieldOptions`). */
   options?: readonly string[];
+  /** The customer may leave it empty (the theme then works it out itself). Every other field is required. */
+  optional?: boolean;
 };
 
 export const STANDARD_FIELDS = {
@@ -32,6 +34,8 @@ export const STANDARD_FIELDS = {
   event_time: { type: 'time', label: { ar: 'وقت المناسبة', en: 'Event time', ckb: 'کاتی بۆنە', bdn: 'دەمێ ئاهەنگێ' } },
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link', ckb: 'بەستەری شوێن لەسەر نەخشە', bdn: 'لینکا جهی ل سەر نەخشەی' } },
+  /** Optional: when empty, the theme writes the first letters of the two names (first name first). */
+  seal_initials: { type: 'text', maxLength: 9, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal', ckb: 'پیتە سەرەتاییەکان لەسەر مۆر', bdn: 'تیپێن ئێکێ ل سەر مۆرێ' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
   // Newborn baby.
   baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },
@@ -51,6 +55,11 @@ export function isFieldKey(value: string): value is FieldKey {
 
 /** Absolute upper bound for any admin-configured text length. */
 export const MAX_TEXT_LENGTH = 1000;
+
+/** Whether the customer may leave this field empty. */
+export function isOptionalField(key: string): boolean {
+  return isFieldKey(key) && (STANDARD_FIELDS[key] as FieldSpec).optional === true;
+}
 
 /** The fixed options of a `choice` field (empty for other fields). */
 export function fieldOptions(key: string): readonly string[] {

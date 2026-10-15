@@ -1,3 +1,4 @@
+import { shapeIncluded } from '@/catalog/features';
 import { themeNumber } from '@/theme-registry';
 import { invitationNames } from '@/catalog/fields';
 import Link from 'next/link';
@@ -164,6 +165,17 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                   <a href={`/admin/api/documents/${inv.id}/card?bleed=1`} className="text-accent underline">
                     {t('downloadCardBleed')}
                   </a>
+                  {shapeIncluded(inv.featureKeys, inv.cardShape) && !inv.cardCustomKey ? (
+                    <>
+                      <span className="text-muted">{t('cardShapeChosen', { shape: inv.cardShape ?? '' })}</span>
+                      <a href={`/admin/api/documents/${inv.id}/card?png=front`} className="text-accent underline">
+                        {t('downloadShapePng', { side: 'front' })}
+                      </a>
+                      <a href={`/admin/api/documents/${inv.id}/card?png=back`} className="text-accent underline">
+                        {t('downloadShapePng', { side: 'back' })}
+                      </a>
+                    </>
+                  ) : null}
                   {!inv.cardCustomKey ? (
                     <a href={`/admin/api/documents/${inv.id}/card?fresh=1`} className="text-muted underline">
                       {t('regenerate')}

@@ -4,12 +4,13 @@ import { getCurrentAdmin } from '@/server/auth/current';
 import { nextAuthStep } from '@/server/auth/session';
 import { requestContext } from '@/server/auth/request-context';
 import { can } from '@/server/rbac/authz';
-import { DocumentError, ensureDocument, printShopCard } from '@/server/documents/documents';
+import { DocumentError, ensureDocument, printShopCard, shapeCardPng } from '@/server/documents/documents';
 
 /**
  * Admin download of an invitation's printable card or keepsake PDF
  * (`documents.generate`). `?fresh=1` regenerates it even if nothing changed;
- * `?bleed=1` (card only) gives the print-shop version with 3 mm bleed.
+ * `?bleed=1` (card only) gives the print-shop version with 3 mm bleed (a shaped card: with its cut line);
+ * `?png=front|back` (a shaped card) one side as a transparent PNG.
  */
 export async function GET(req: Request, { params }: RouteContext<'/admin/api/documents/[id]/[kind]'>) {
   const current = await getCurrentAdmin();
@@ -20,6 +21,14 @@ export async function GET(req: Request, { params }: RouteContext<'/admin/api/doc
   const sp = new URL(req.url).searchParams;
   const force = sp.get('fresh') === '1';
   try {
+    const png = sp.get('png');
+    if (kind === 'card' && (png === 'front' || png === 'back')) {
+      const file = await shapeCardPng(db(), id, png);
+      if (!file) return new Response('Not found', { status: 404 });
+      return new Response(new Uint8Array(file.png), {
+        headers: { 'Content-Type': 'image/png', 'Content-Disposition': `attachment; filename="${file.fileName}"`, 'Cache-Control': 'private, no-store' },
+      });
+    }
     const actor = { adminId: current.user.id, ipHash: (await requestContext()).ipHash };
     const { pdf, fileName } = kind === 'card' && sp.get('bleed') === '1' ? await printShopCard(db(), id) : await ensureDocument(db(), id, kind, { actor, force });
     return new Response(new Uint8Array(pdf), {

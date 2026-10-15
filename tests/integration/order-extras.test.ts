@@ -8,7 +8,7 @@ import { createPackage } from '@/server/catalog/packages';
 import { listPalettes, savePalette, setPaletteStatus } from '@/server/catalog/palettes';
 import { createDraft, updateDraft } from '@/server/orders/drafts';
 import { invitationRenderData } from '@/server/invitation/load';
-import { printData } from '@/server/documents/data';
+import { printData, shapeSheet } from '@/server/documents/data';
 import { updateCardOptions } from '@/server/documents/documents';
 import { manifestSchema } from '@/theme-sdk/manifest';
 import { storeImage } from '@/server/media/assets';
@@ -252,5 +252,103 @@ describe('fixed choices and yes/no switches of a design', () => {
       (await order({ wording: { order: { choice, text: 'my own' } } }).catch((e: { fieldErrors?: Record<string, string> }) => e.fieldErrors))?.['w.order' as never];
     expect(await fails('custom')).toBe('invalidChoice');
     expect(await fails('opt:7')).toBe('invalidChoice');
+  });
+});
+
+describe('shaped printed cards (card_leaf, card_heart)', () => {
+  const LEAF = { key: 'leaf', label: { ar: 'ورقة', en: 'Leaf' }, widthMm: 100, heightMm: 160, outline: 'M50 0 L100 80 L50 160 L0 80 Z' };
+  const HEART = { key: 'heart', label: { ar: 'قلب', en: 'Heart' }, widthMm: 120, heightMm: 120, outline: 'M60 20 L120 40 L60 120 L0 40 Z' };
+  let shop3: { themeKey: string; withShapes: string; leafOnly: string; cardOnly: string };
+
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('shapes');
+    const features = ['print_card', 'card_leaf', 'card_heart'] as const;
+    await syncThemesFromRegistry(
+      db(),
+      [testManifest(key, 1, { features: [...features], fields: [...BASIC_FIELDS], validStates: [{ features: [...features], fields: [...BASIC_FIELDS] }], print: { card: { size: 'A5', bleedMm: 3, qr: false }, shapes: [LEAF, HEART] } })],
+      base.actor,
+      { complete: false },
+    );
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 320, height: 420, channels: 3, background: '#bb8' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: base.song.id }, base.actor);
+    const better = await createPackage(db(), t!.id, { name: { ar: 'مميز', en: 'Better' }, priceIqd: 40000, fieldKeys: [...BASIC_FIELDS], featureKeys: [...features] }, base.actor);
+    const leaf = await createPackage(db(), t!.id, { name: { ar: 'ورقة', en: 'Leaf' }, priceIqd: 30000, fieldKeys: [...BASIC_FIELDS], featureKeys: ['print_card', 'card_leaf'] }, base.actor);
+    const normal = await createPackage(db(), t!.id, { name: { ar: 'عادي', en: 'Normal' }, priceIqd: 20000, fieldKeys: [...BASIC_FIELDS], featureKeys: ['print_card'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    shop3 = { themeKey: key, withShapes: better.id, leafOnly: leaf.id, cardOnly: normal.id };
+  });
+
+  const order = (packageId: string, extras: Parameters<typeof createDraft>[1]['extras']) =>
+    createDraft(db(), { themeKey: shop3.themeKey, packageId, locale: 'ar', values: weddingValues(), extras }, { ...ctx, ipHash: randomToken(8) });
+
+  it('stores the chosen shape, prints it with its mirrored back and a cut line for print shops, and can go back to the card', async () => {
+    const d = await order(shop3.withShapes, { cardShape: 'leaf' });
+    expect((await row(d.invitationId)).cardShape).toBe('leaf');
+    const data = await printData(db(), await row(d.invitationId), 'card');
+    expect(data.kind === 'card' && data.shape).toMatchObject({
+      key: 'leaf',
+      sides: {
+        front: { widthMm: 100, heightMm: 160, outline: LEAF.outline, page: { width: '120mm', height: '180mm' } },
+        // Turned over: mirrored left-right.
+        back: { widthMm: 100, heightMm: 160, outline: 'M50 0 L0 80 L50 160 L100 80 Z' },
+      },
+      cutLine: false,
+    });
+    // A back read sideways: turned over and a quarter turn, a landscape box with x and y swapped.
+    expect(shapeSheet({ ...LEAF, backSideways: true }, 'card').sides.back).toEqual({
+      widthMm: 160,
+      heightMm: 100,
+      outline: 'M0 50 L80 100 L160 50 L80 0 Z',
+      page: { width: '180mm', height: '120mm' },
+    });
+    const shop = await printData(db(), await row(d.invitationId), 'cardBleed');
+    expect(shop.kind === 'card' && shop.shape?.cutLine).toBe(true);
+
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { cardShape: '' } });
+    expect((await row(d.invitationId)).cardShape).toBeNull();
+    const card = await printData(db(), await row(d.invitationId), 'card');
+    expect(card.kind === 'card' && card.shape).toBeNull();
+  });
+
+  it('refuses a shape the design does not have, and ignores the choice in a package without shapes', async () => {
+    const err = await order(shop3.withShapes, { cardShape: 'star' }).then(
+      () => undefined,
+      (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
+    );
+    expect(err?.cardShape).toBe('invalid');
+    const plain = await order(shop3.cardOnly, { cardShape: 'leaf' });
+    expect((await row(plain.invitationId)).cardShape).toBeNull();
+  });
+
+  it('sells each shape on its own: a leaf package offers the leaf, not the heart', async () => {
+    const leaf = await order(shop3.leafOnly, { cardShape: 'leaf' });
+    expect((await row(leaf.invitationId)).cardShape).toBe('leaf');
+    const err = await order(shop3.leafOnly, { cardShape: 'heart' }).then(
+      () => undefined,
+      (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
+    );
+    expect(err?.cardShape).toBe('invalid');
+    const both = await order(shop3.withShapes, { cardShape: 'heart' });
+    expect((await row(both.invitationId)).cardShape).toBe('heart');
+  });
+
+  it('a theme lists the feature of every shape it draws, and draws every shape it sells', () => {
+    const issues = (features: ('print_card' | 'card_leaf' | 'card_heart')[], shapes: (typeof LEAF)[]) => {
+      const m = testManifest('shapes-check', 1, {
+        features,
+        fields: [...BASIC_FIELDS],
+        validStates: [{ features, fields: [...BASIC_FIELDS] }],
+        print: { card: { size: 'A5', bleedMm: 3, qr: false }, ...(shapes.length ? { shapes } : {}) },
+      });
+      const r = manifestSchema.safeParse(m);
+      return r.success ? [] : r.error.issues.map((i) => i.message);
+    };
+    expect(issues(['print_card', 'card_leaf'], [])).toContain('card_leaf requires a "leaf" shape in print.shapes');
+    expect(issues(['print_card', 'card_leaf'], [LEAF, HEART])).toContain('print.shapes "heart" is sold with the card_heart feature: list it in features');
+    expect(issues(['print_card'], [{ ...LEAF, key: 'star' }])).toContain('print.shapes keys must be one of: leaf, heart');
+    expect(issues(['print_card', 'card_leaf', 'card_heart'], [LEAF, HEART])).toEqual([]);
   });
 });
