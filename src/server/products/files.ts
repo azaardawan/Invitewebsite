@@ -22,6 +22,7 @@ const KIND = {
   'sticker.preview': 'STICKER_PREVIEW',
   'bottle.preview': 'BOTTLE_PREVIEW',
   'card.preview': 'CARD_DRAFT_PREVIEW',
+  'cardBack.preview': 'CARD_BACK_DRAFT_PREVIEW',
   'sticker-square.png': 'STICKER_SQUARE_PNG',
   'sticker-square.pdf': 'STICKER_SQUARE_PDF',
   'sticker-square.preview': 'STICKER_SQUARE_PREVIEW',
@@ -37,6 +38,7 @@ const FEATURE: Record<ProductItem, string> = {
   'bottle.pdf': 'bottle_label',
   'bottle.preview': 'bottle_label',
   'card.preview': 'print_card',
+  'cardBack.preview': 'print_card',
   'sticker-square.png': 'sticker',
   'sticker-square.pdf': 'sticker',
   'sticker-square.preview': 'sticker',
@@ -87,10 +89,11 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
 
   const shown =
-    item === 'card.preview'
+    item === 'card.preview' || item === 'cardBack.preview'
       ? await (async () => {
           const d = await printData(db, inv, 'card');
-          return d.kind === 'card' ? { props: d.props, design: d.design.front } : null;
+          // Each side with what it shows, and the shape (leaf, heart) the customer chose.
+          return d.kind === 'card' ? { props: d.props, design: item === 'card.preview' ? d.design.front : d.design.back, shape: d.shape?.key ?? null } : null;
         })()
       : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
   const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid }));

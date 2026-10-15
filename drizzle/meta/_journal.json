@@ -260,6 +260,13 @@
       "when": 1792007838845,
       "tag": "0036_card_leaf_heart",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1792049515248,
+      "tag": "0037_card_back_preview",
+      "breakpoints": true
     }
   ]
 }

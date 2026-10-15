@@ -25,6 +25,8 @@ export const documentKind = pgEnum('document_kind', [
   'STICKER_SQUARE_PNG',
   'STICKER_SQUARE_PDF',
   'STICKER_SQUARE_PREVIEW',
+  // The card's back before payment (watermarked), next to CARD_DRAFT_PREVIEW (its front).
+  'CARD_BACK_DRAFT_PREVIEW',
 ]);
 
 /**

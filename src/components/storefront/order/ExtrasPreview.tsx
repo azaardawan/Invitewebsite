@@ -20,6 +20,8 @@ export function ExtrasPreview({
     title: string;
     note: string;
     card: string;
+    /** The card's back, shown next to its front. */
+    cardBack: string;
     story: string;
     sticker: string;
     bottle: string;
@@ -35,6 +37,7 @@ export function ExtrasPreview({
 }) {
   const items = [
     featureKeys.includes('print_card') && !downloads ? { key: 'card', label: labels.card, src: `${base}/card.preview`, box: 'aspect-[148/210] w-40' } : null,
+    featureKeys.includes('print_card') && !downloads ? { key: 'card-back', label: labels.cardBack, src: `${base}/cardBack.preview`, box: 'aspect-[210/148] w-56' } : null,
     featureKeys.includes('story') ? { key: 'story', label: labels.story, src: `${base}/story.preview`, box: 'aspect-[9/16] w-40', png: `${base}/story.png` } : null,
     featureKeys.includes('sticker')
       ? {
