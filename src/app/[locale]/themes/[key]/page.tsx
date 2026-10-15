@@ -12,6 +12,7 @@ import { whatsappHref } from '@/lib/contact-links';
 import { env } from '@/server/env';
 import { RankBadge } from '@/components/storefront/RankBadge';
 import { manifestByCodeRef } from '@/theme-registry';
+import { packageDetailLines } from '@/lib/package-details';
 
 export const dynamicParams = true;
 
@@ -37,6 +38,8 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
   const t = await getTranslations('store');
   const home = await getTranslations('home');
   const { whatsapp } = await publicContact();
+  const fieldLabels = th.fields.map((f) => ({ key: f.key, label: localized(f.label, locale) }));
+  const detailWords = { pair: (a: string, b: string) => t('includesPair', { a, b }), when: t('includesWhen') };
   const pageUrl = `${env().APP_URL.replace(/\/$/, '')}${locale === 'ar' ? '' : `/${locale}`}/themes/${th.key}`;
 
   return (
@@ -68,7 +71,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
             description: p.description ? localized(p.description, locale) : null,
             priceIqd: p.priceIqd,
             features: p.featureKeys.filter(isFeatureKey).map((f) => t(`features.${f}`)),
-            fieldsCount: p.fieldKeys.length,
+            details: packageDetailLines(fieldLabels, p.fieldKeys, detailWords),
           }))}
         />
       </div>

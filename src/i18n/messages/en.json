@@ -1231,6 +1231,9 @@
     "openFull": "Open full screen",
     "packagesTitle": "Choose your package",
     "includes": "Includes",
+    "includesLink": "A private link to your invitation to send on WhatsApp",
+    "includesPair": "{a} and {b}",
+    "includesWhen": "Date and time",
     "choose": "Choose this package",
     "popular": "Most chosen",
     "features": {
@@ -1250,7 +1253,6 @@
       "sticker": "Chocolate stickers, round or square, ready to print",
       "bottle_label": "A label that wraps around water bottles, ready to print"
     },
-    "fieldsCount": "{count} details to fill in",
     "orderTitle": "Your invitation details",
     "orderSubtitle": "Write the names and details exactly as you want guests to see them. You'll see a preview before paying.",
     "stepDetails": "Details",

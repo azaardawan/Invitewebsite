@@ -760,3 +760,18 @@ suggested; live.
 |---|---|---|---|---|---|---|
 | 1 | `store.sealInitialsFirst` | العريس | Groom | زاوا | زاڤا | ● |
 | 2 | `store.sealInitialsSecond` | العروس | Bride | بووک | بویک | ● |
+
+## Batch 29 — Package checklist: what every package includes — ✅ APPROVED (2026-10-15)
+
+The package checklist on a theme page now starts with the private invitation link and the details the customer
+fills in (the field labels themselves are already approved), instead of "7 details to fill in". The two names are
+joined into one line («ناوی زاوا و ناوی بووک») and the date and time are one line. The owner gives standing approval
+for Kurdish in this work; live.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.includesLink` | رابط خاص بدعوتكم ترسلونه على واتساب | A private link to your invitation to send on WhatsApp | بەستەرێکی تایبەت بە بانگهێشتنامەکەتان بۆ ناردن لە واتسئاپ | لینکەکا تایبەت ب داخوازناما هەوە بۆ فرێکرنێ ل واتسئاپێ | ● |
+| 2 | `store.includesPair` | {a} و{b} | {a} and {b} | {a} و {b} | {a} و {b} | ● |
+| 3 | `store.includesWhen` | التاريخ والوقت | Date and time | بەروار و کات | دیرۆک و دەم | ● |
+
+`store.fieldsCount` («# زانیاری بۆ پڕکردنەوە») is no longer used and was removed.
