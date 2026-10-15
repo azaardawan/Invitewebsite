@@ -412,3 +412,42 @@
 #frame .root:is([data-locale='ckb'], [data-locale='bdn']) {
   --vl-ar: var(--vl-ar-body);
 }
+
+/*
+ * The cover fills the whole screen: below the poster its paper continues (the same ruled lines and the lace down
+ * the left edge), with the button and its line centred in that space, so a tall phone shows no plain band.
+ */
+#frame .vl-cover {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: #f3ebe2;
+}
+#frame .vl-cover-actions {
+  flex: 1;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7cqw 22px 10cqw 12cqw;
+  background: #f3ebe2;
+}
+/* The continued paper fades with the poster when the envelope comes forward. */
+#frame .vl-cover-actions::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    url(./assets/lace-strip.webp) left top / 7.8% auto repeat-y,
+    repeating-linear-gradient(to bottom, transparent 0 calc(6.2cqw - 1.5px), #e9d7c4 calc(6.2cqw - 1.5px) 6.2cqw) 7.5% 3.4cqw / 91% 100% no-repeat;
+}
+#frame .root[data-phase='opening'] .vl-cover-actions::before {
+  animation: vr-focus-background 0.5s ease forwards;
+}
+#frame .vl-cover-hint {
+  padding: 0 6px;
+  background: #f3ebe2;
+}
