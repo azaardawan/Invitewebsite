@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, publicIdFromSlugPath, slugFromNames } from '@/lib/ids';
 import { normalizePhone } from '@/lib/phone';
+import { fieldValuesFromForm, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
 
 describe('ids and URLs', () => {
@@ -80,14 +81,31 @@ describe('invitation field validation', () => {
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {
-    const withSeal = new Map(defs).set('seal_initials', { type: 'text', maxLength: 9 });
-    const empty = validateFieldValues({ ...good, seal_initials: ' ' }, [...keys, 'seal_initials'], withSeal, now);
+    const withSeal = new Map(defs).set('seal_initials', { type: 'initials', maxLength: 3 });
+    const empty = validateFieldValues({ ...good, seal_initials: '' }, [...keys, 'seal_initials'], withSeal, now);
     expect(empty.ok).toBe(true);
     if (empty.ok) expect(empty.values).not.toHaveProperty('seal_initials');
-    const filled = validateFieldValues({ ...good, seal_initials: 'D ♥ A' }, [...keys, 'seal_initials'], withSeal, now);
-    expect(filled.ok && filled.values.seal_initials).toBe('D ♥ A');
-    const long = validateFieldValues({ ...good, seal_initials: 'ABCDEFGHIJ' }, [...keys, 'seal_initials'], withSeal, now);
+    // Two boxes, one per person: no separator to type (the symbol between them is chosen apart).
+    const filled = validateFieldValues({ ...good, seal_initials: ' D | A ' }, [...keys, 'seal_initials'], withSeal, now);
+    expect(filled.ok && filled.values.seal_initials).toBe('D|A');
+    const one = validateFieldValues({ ...good, seal_initials: '|ن' }, [...keys, 'seal_initials'], withSeal, now);
+    expect(one.ok && one.values.seal_initials).toBe('|ن');
+    const long = validateFieldValues({ ...good, seal_initials: 'ABCD|E' }, [...keys, 'seal_initials'], withSeal, now);
     expect(long.ok || long.errors).toEqual({ seal_initials: 'tooLong' });
+  });
+
+  it('joins the two initials boxes of a form into one value', () => {
+    const form = new FormData();
+    form.set('f.person_1_name', 'Dara');
+    form.set('f.seal_initials.first', ' D ');
+    form.set('f.seal_initials.second', 'A|');
+    expect(fieldValuesFromForm(form)).toEqual({ person_1_name: 'Dara', seal_initials: 'D|A' });
+    const blank = new FormData();
+    blank.set('f.seal_initials.first', '');
+    blank.set('f.seal_initials.second', ' ');
+    expect(fieldValuesFromForm(blank)).toEqual({ seal_initials: '' });
+    expect(splitInitials('D|A')).toEqual({ first: 'D', second: 'A', whole: false });
+    expect(splitInitials('D & A')).toEqual({ first: 'D & A', second: '', whole: true });
   });
 
   it('rejects past dates, far-future dates, bad times, long text and non-map links', () => {

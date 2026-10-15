@@ -1,7 +1,7 @@
 import 'server-only';
 import { safeMapUrl } from '@/lib/invitation-format';
 import { normalizePhone, toAsciiDigits } from '@/lib/phone';
-import { fieldOptions, isOptionalField } from '@/catalog/fields';
+import { fieldOptions, INITIALS_MAX, isOptionalField, joinInitials, splitInitials } from '@/catalog/fields';
 
 export type FieldError =
   | 'required'
@@ -65,6 +65,16 @@ export function validateFieldValues(
         if (!v) errors[key] = 'required';
         else if (v.length > (def.maxLength ?? DEFAULT_MAX[def.type])) errors[key] = 'tooLong';
         else values[key] = v;
+        break;
+      }
+      case 'initials': {
+        // Two boxes, one per person (`first|second`); a little text each (a letter, or a few).
+        const { first, second } = splitInitials(raw);
+        const a = cleanText(first, false) ?? '';
+        const b = cleanText(second, false) ?? '';
+        if (Array.from(a).length > INITIALS_MAX || Array.from(b).length > INITIALS_MAX) errors[key] = 'tooLong';
+        else if (joinInitials(a, b)) values[key] = joinInitials(a, b);
+        else if (!isOptionalField(key)) errors[key] = 'required';
         break;
       }
       case 'date': {

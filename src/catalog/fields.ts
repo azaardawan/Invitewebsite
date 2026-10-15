@@ -6,11 +6,15 @@
  * the values here are the seeded defaults. Adding a field: add it here, then
  * `pnpm db:seed`. Every future theme can then use it.
  */
+/** Letters per box of an `initials` field. */
+export const INITIALS_MAX = 3;
+
 /**
  * `date`: an upcoming event (today up to two years ahead). `birthdate`: a date of birth (up to three years back,
- * or up to a year ahead for an expected birth). `choice`: one of the field's fixed `options`.
+ * or up to a year ahead for an expected birth). `choice`: one of the field's fixed `options`. `initials`: two small
+ * boxes, one letter (or a few) for each of the couple, stored as `first|second` (see `splitInitials`).
  */
-export const FIELD_TYPES = ['text', 'longtext', 'date', 'birthdate', 'time', 'url', 'phone', 'choice'] as const;
+export const FIELD_TYPES = ['text', 'longtext', 'date', 'birthdate', 'time', 'url', 'phone', 'choice', 'initials'] as const;
 export type FieldType = (typeof FIELD_TYPES)[number];
 
 export type I18nText = { ar: string; en: string; ckb?: string | null; bdn?: string | null };
@@ -34,8 +38,8 @@ export const STANDARD_FIELDS = {
   event_time: { type: 'time', label: { ar: 'وقت المناسبة', en: 'Event time', ckb: 'کاتی بۆنە', bdn: 'دەمێ ئاهەنگێ' } },
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },
   venue_map_url: { type: 'url', label: { ar: 'رابط موقع المكان على الخريطة', en: 'Venue map link', ckb: 'بەستەری شوێن لەسەر نەخشە', bdn: 'لینکا جهی ل سەر نەخشەی' } },
-  /** Optional: when empty, the theme writes the first letters of the two names (first name first). */
-  seal_initials: { type: 'text', maxLength: 9, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal', ckb: 'پیتە سەرەتاییەکان لەسەر مۆر', bdn: 'تیپێن ئێکێ ل سەر مۆرێ' } },
+  /** Optional: one box per person; when empty, the theme writes the first letters of the two names (first name first). */
+  seal_initials: { type: 'initials', maxLength: INITIALS_MAX, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal', ckb: 'پیتە سەرەتاییەکان لەسەر مۆر', bdn: 'تیپێن ئێکێ ل سەر مۆرێ' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
   // Newborn baby.
   baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },
@@ -47,6 +51,41 @@ export const STANDARD_FIELDS = {
 } as const satisfies Record<string, FieldSpec>;
 
 export type FieldKey = keyof typeof STANDARD_FIELDS;
+
+/**
+ * An `initials` field's two boxes, as stored (`first|second`). Either may be empty. A value without the bar (typed
+ * before the field had two boxes) is one free text: `{ first: value, second: '', whole: true }`.
+ */
+export function splitInitials(value: string | undefined): { first: string; second: string; whole: boolean } {
+  const v = value ?? '';
+  const i = v.indexOf('|');
+  return i < 0 ? { first: v, second: '', whole: v !== '' } : { first: v.slice(0, i), second: v.slice(i + 1), whole: false };
+}
+
+/** The stored value of two initials boxes ('' when both are empty). */
+export function joinInitials(first: string, second: string): string {
+  const a = first.replace(/\|/g, '').trim();
+  const b = second.replace(/\|/g, '').trim();
+  return a || b ? `${a}|${b}` : '';
+}
+
+/**
+ * The invitation fields of a submitted form (`f.<key>` inputs). An `initials` field comes as two boxes,
+ * `f.<key>.first` and `f.<key>.second`, joined into one value.
+ */
+export function fieldValuesFromForm(form: FormData): Record<string, string> {
+  const values: Record<string, string> = {};
+  const boxes: Record<string, { first: string; second: string }> = {};
+  for (const [k, v] of form.entries()) {
+    if (!k.startsWith('f.') || typeof v !== 'string') continue;
+    const m = /^f\.(.+)\.(first|second)$/.exec(k);
+    if (m) (boxes[m[1]!] ??= { first: '', second: '' })[m[2] as 'first' | 'second'] = v;
+    else values[k.slice(2)] = v;
+  }
+  for (const [key, b] of Object.entries(boxes)) values[key] = joinInitials(b.first, b.second);
+  return values;
+}
+
 export const FIELD_KEYS = Object.keys(STANDARD_FIELDS) as FieldKey[];
 
 export function isFieldKey(value: string): value is FieldKey {

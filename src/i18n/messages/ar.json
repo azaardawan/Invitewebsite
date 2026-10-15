@@ -1264,6 +1264,8 @@
     "dateHint": "اختر تاريخًا من اليوم فصاعدًا.",
     "mapHint": "الصق رابطًا من خرائط Google أو Apple.",
     "sealInitialsHint": "اختياري: اتركه فارغًا ونكتب الحرف الأول من كل اسم (العريس أولًا)، أو اكتب الأحرف كما تريدها.",
+    "sealInitialsFirst": "العريس",
+    "sealInitialsSecond": "العروس",
     "optionalNone": "",
     "fieldErrors": {
       "required": "هذا الحقل مطلوب.",

@@ -17,6 +17,7 @@ import { setPublicGuestbook } from '@/server/guests/guestbook';
 import { setPublicAttendance } from '@/server/guests/attendance';
 import { DocumentError, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
 import type { ActionState } from './state';
+import { fieldValuesFromForm } from '@/catalog/fields';
 
 const uuid = z.uuid();
 
@@ -45,8 +46,7 @@ export async function editInvitationAction(_: ActionState, form: FormData): Prom
   const { user } = await requireAdmin({ permission: 'invitations.edit' });
   try {
     const id = ids(form);
-    const values: Record<string, string> = {};
-    for (const [k, v] of form.entries()) if (k.startsWith('f.') && typeof v === 'string') values[k.slice(2)] = v;
+    const values = fieldValuesFromForm(form);
     await updateInvitationValues(db(), id, { values, expectedVersion: Number(form.get('version')), reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
     return done(id);
   } catch (e) {

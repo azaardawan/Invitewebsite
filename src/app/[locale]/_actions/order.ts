@@ -10,6 +10,7 @@ import { createDraft, updateDraft } from '@/server/orders/drafts';
 import type { OrderExtras } from '@/server/orders/extras';
 import { createOrder } from '@/server/orders/checkout';
 import { startPayment } from '@/server/payments/service';
+import { fieldValuesFromForm } from '@/catalog/fields';
 
 /** What storefront order forms get back when something needs fixing. Codes are keys under `store`. */
 export type OrderFormState = {
@@ -25,9 +26,7 @@ function str(form: FormData, name: string): string {
 }
 
 function fieldValues(form: FormData): Record<string, string> {
-  const values: Record<string, string> = {};
-  for (const [k, v] of form.entries()) if (k.startsWith('f.') && typeof v === 'string') values[k.slice(2)] = v;
-  return values;
+  return fieldValuesFromForm(form);
 }
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
