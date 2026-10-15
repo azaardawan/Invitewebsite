@@ -398,3 +398,17 @@
   color: var(--vl-cream);
   cursor: pointer;
 }
+
+/* The poster and its envelope are artwork with a fixed left and right: never mirrored for right-to-left pages. */
+#frame .vl-stage {
+  direction: ltr;
+}
+#frame .vl-envelope .vl-seal {
+  right: auto;
+  bottom: auto;
+}
+
+/* Kurdish invitations: Amiri throughout, since Aref Ruqaa lacks some Kurdish letters (ە, ێ…) and would mix fonts. */
+#frame .root:is([data-locale='ckb'], [data-locale='bdn']) {
+  --vl-ar: var(--vl-ar-body);
+}

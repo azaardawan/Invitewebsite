@@ -111,7 +111,7 @@ export default function VintageLoveLetters(props: ThemeProps) {
 
   return (
     <div id={s.frame} className={`${fonts.fonts} ${s.page}`}>
-      <article className={c('root', reduced && 'reduced')} lang={lang} dir={dir} data-script={script} data-phase={phase}>
+      <article className={c('root', reduced && 'reduced')} lang={lang} dir={dir} data-script={script} data-locale={locale} data-phase={phase}>
         {/* SVG clip paths for the envelope's flap and pocket (from the prototype). */}
         <svg className={c('vl-clip-defs')} aria-hidden="true" width="0" height="0">
           <defs>

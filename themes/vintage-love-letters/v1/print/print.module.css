@@ -44,6 +44,7 @@
   background: #f2ece0 url(../assets/cover-base.webp) center / 100% 100% no-repeat;
 }
 .envelope {
+  direction: ltr;
   position: absolute;
   left: 24.93%;
   top: 37.66%;
@@ -57,6 +58,8 @@
   height: 100%;
 }
 .envelope .seal {
+  right: auto;
+  bottom: auto;
   left: 38.97%;
   top: 41.39%;
   width: 21.72%;
