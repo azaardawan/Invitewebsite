@@ -338,6 +338,8 @@
     "dateHint": "بەروارێک لە ئەمڕۆوە بە دواوە هەڵبژێرە.",
     "mapHint": "بەستەرێک لە نەخشەی Google یان Apple لێرە دابنێ.",
     "sealInitialsHint": "ئارەزوومەندانە: بەتاڵی بهێڵە و پیتی یەکەمی هەر ناوێک دەنووسین (زاوا یەکەم)، یان پیتەکان وەک دەتەوێت بنووسە.",
+    "sealInitialsFirst": "زاوا",
+    "sealInitialsSecond": "بووک",
     "optionalNone": "",
     "fieldErrors": {
       "required": "ئەم خانەیە پێویستە.",
