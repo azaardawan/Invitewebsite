@@ -775,3 +775,12 @@ for Kurdish in this work; live.
 | 3 | `store.includesWhen` | التاريخ والوقت | Date and time | بەروار و کات | دیرۆک و دەم | ● |
 
 `store.fieldsCount` («# زانیاری بۆ پڕکردنەوە») is no longer used and was removed.
+
+## Batch 31 — four new wedding designs: their own lines — ⏳ AWAITING WORDING
+
+Burgundy & Lace (#12), Espresso & Ivory (#13), Winter Flower (#14) and Vintage Love Letters (#15) each have a few
+lines of their own (headings such as «تفاصيل الزفاف», «ننتظر ردكم», the opening's «ندعوكم لمشاركتنا فرحة زفافنا»).
+They are in each theme's `copy.ts` (Arabic and English). Until the owner approves Kurdish wording, Kurdish
+invitations of these designs show these lines in Arabic; everything else (buttons, form, countdown, the customer's
+own text) is already Kurdish. Design names (manifest `title`) also have no Kurdish yet; the owner can name them in
+Admin. No suggestions were written yet: send the lines you want in Kurdish, or ask for suggestions to review.

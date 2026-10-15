@@ -1,0 +1,255 @@
+/*
+ * Vintage Love Letters print companions. The card front is the source poster itself (title, sealed envelope, lace,
+ * rose and tulips) with the customer's names on its red strips and the date, venue and QR code in the empty
+ * lined paper at the bottom. The back and the keepsake pages use the poster's paper with the lace border.
+ */
+
+.card,
+.back,
+.keepsake {
+  --wine: #6c2118;
+  --ink: #49170f;
+  color: var(--ink);
+  font-family: 'VL Serif', Georgia, serif;
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.keepsake * {
+  box-sizing: border-box;
+}
+.card p,
+.back p,
+.keepsake p,
+.card h1,
+.back h1,
+.keepsake h1,
+.keepsake h2 {
+  margin: 0;
+  font-weight: 400;
+}
+[data-script='arabic'].card,
+[data-script='arabic'].back,
+[data-script='arabic'].keepsake {
+  font-family: 'VL Arabic Body', serif;
+}
+
+/* ---------------------------------------------------------------- the poster (card front, keepsake cover) */
+
+.poster {
+  position: relative;
+  overflow: hidden;
+  background: #f2ece0 url(../assets/cover-base.webp) center / 100% 100% no-repeat;
+}
+.envelope {
+  position: absolute;
+  left: 24.93%;
+  top: 37.66%;
+  width: 52.77%;
+  height: 24.45%;
+}
+.envelope img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.envelope .seal {
+  left: 38.97%;
+  top: 41.39%;
+  width: 21.72%;
+  height: 31.31%;
+}
+.strip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8.3%;
+  padding: 0 2%;
+  color: #f4e8d8;
+  font-size: 15pt;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+[data-script='arabic'] .strip {
+  font-family: 'VL Arabic Body', serif;
+  font-size: 16pt;
+}
+.stripOne {
+  left: 13.2%;
+  top: 64.8%;
+  width: 42.4%;
+}
+.stripTwo {
+  left: 50.8%;
+  top: 69.1%;
+  width: 41.6%;
+}
+.details {
+  position: absolute;
+  left: 31%;
+  right: 6%;
+  top: 79%;
+  bottom: 4.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2mm;
+}
+.date {
+  font-size: 13pt;
+  line-height: 1.3;
+}
+.time,
+.venue,
+.extra {
+  font-size: 9.5pt;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+[data-script='arabic'] :is(.time, .venue, .extra) {
+  font-size: 10.5pt;
+}
+.extra {
+  font-style: italic;
+}
+.qr {
+  margin: 0.8mm 0 0;
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+}
+.qr img {
+  width: 13mm;
+  height: 13mm;
+}
+.qr figcaption {
+  font-size: 6.5pt;
+  max-width: 24mm;
+  text-align: start;
+}
+
+.card.poster {
+  width: 154mm;
+  height: 216mm;
+}
+
+/* ---------------------------------------------------------------- A5 card back, landscape (216 × 154 mm) */
+
+.paper {
+  position: relative;
+  overflow: hidden;
+  background: #f2ece0 url(../assets/paper.webp) center / cover no-repeat;
+}
+.back.paper {
+  width: 216mm;
+  height: 154mm;
+}
+.backSafe {
+  position: absolute;
+  inset: 20mm 34mm;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.rose {
+  position: absolute;
+  z-index: 3;
+  width: 26mm;
+  top: 10mm;
+  left: 14mm;
+}
+.backTitle {
+  font-style: italic;
+  font-size: 34pt;
+  line-height: 1.1;
+  color: var(--wine);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+[data-script='arabic'] .backTitle {
+  font-family: 'VL Arabic', 'VL Arabic Body', serif;
+  font-style: normal;
+  font-size: 30pt;
+  line-height: 1.5;
+}
+.backMessage {
+  max-width: 130mm;
+  font-size: 13pt;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.backNames {
+  font-size: 18pt;
+}
+.backSignature {
+  max-height: 22mm;
+  max-width: 60mm;
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+
+.cover {
+  width: 210mm;
+  height: 297mm;
+  break-after: page;
+}
+.cover .strip {
+  font-size: 20pt;
+}
+.messages {
+  padding: 30mm 28mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: #f2ece0 url(../assets/paper.webp) top center / 100% auto repeat-y;
+  min-height: 297mm;
+}
+.messagesTitle {
+  margin: 0 0 9mm !important;
+  font-style: italic;
+  font-size: 28pt;
+  color: var(--wine);
+}
+[data-script='arabic'] .messagesTitle {
+  font-family: 'VL Arabic', 'VL Arabic Body', serif;
+  font-style: normal;
+}
+.empty {
+  font-size: 12pt;
+}
+.note {
+  break-inside: avoid;
+  margin: 0 auto 6mm;
+  max-width: 140mm;
+  padding: 5mm 7mm;
+  background: #f7f0e3;
+  border: 0.25mm solid #ceb79d;
+  text-align: start;
+}
+.noteText {
+  font-size: 12.5pt;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.noteFrom {
+  margin-top: 2.5mm !important;
+  font-size: 10pt;
+  opacity: 0.8;
+}
+.closing {
+  margin-top: 10mm;
+  font-style: italic;
+  font-size: 14pt;
+  break-inside: avoid;
+}

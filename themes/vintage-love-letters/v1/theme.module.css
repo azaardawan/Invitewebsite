@@ -1,0 +1,400 @@
+/*
+ * Vintage Love Letters, poster edition. Converted from the designer's prototype (docs/themes/vintage-love-letters/):
+ * the rules below keep the prototype's class names, order and specificity (#frame stands for the prototype's
+ * root id), so the screens match the approved design. Changed for Bahja: the couple's names are live text on the
+ * poster's red strips (the poster artwork's placeholder names were painted out), the photographs are removed, and
+ * the preview tools and original-card screen are gone. Additions are at the end, marked "Bahja".
+ */
+
+#frame {
+  --vl-cream: #f2ece0;
+  --vl-wine: #6c2118;
+  --vl-deep: #38120e;
+  --vl-red: #ac2e34;
+  --vl-thread: #ceb79d;
+  --vl-paper: url(./assets/paper.webp);
+  --vl-lace: url(./assets/lace.webp);
+}
+
+#frame * {box-sizing:border-box}
+#frame [hidden] {display:none!important}
+#frame button,
+#frame select,
+#frame input,
+#frame textarea {font:inherit}
+#frame .root {container-type:inline-size;max-width:510px;margin:auto;background:var(--vl-cream);color:var(--vl-deep);font-family:var(--vl-type)}
+#frame .vl-stage {position:relative;aspect-ratio:397/559;width:100%;overflow:hidden;background:var(--vl-cream);isolation:isolate}
+#frame .vl-base {display:block;position:absolute;inset:0;width:100%;height:100%}
+#frame .vl-envelope {position:absolute;left:24.928692%;top:37.655594%;width:52.767347%;height:24.448102%;transform-origin:50% 50%;isolation:isolate}
+#frame .vl-envelope img {position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill}
+#frame .vl-motion-layers {visibility:hidden;position:absolute;inset:0;perspective:850px}
+#frame .vl-original-envelope {z-index:7}
+#frame .vl-envelope .vl-seal {left:38.972693%;top:41.385073%;width:21.722159%;height:31.310165%;z-index:8}
+#frame .vl-envelope-hit {position:absolute;inset:0;z-index:12;border:0;background:transparent;color:transparent;border-radius:0}
+#frame .vl-envelope-hit:focus-visible {outline:2px solid var(--vl-wine);outline-offset:7px}
+#frame .vl-cover-actions {padding:20px 22px 24px;text-align:center;background:var(--vl-cream)}
+#frame .vl-primary {border:1px solid var(--vl-wine);border-radius:0;background:var(--vl-wine);color:var(--vl-cream);min-height:48px;padding:13px 27px;font:400 19px/1.3 var(--vl-type);transition:background .2s}
+#frame .vl-primary:disabled {opacity:.7;cursor:wait}
+#frame .vl-cover-hint {margin:13px 0 0;font:16px/1.5 var(--vl-type);color:var(--vl-wine)}
+#frame .vl-interior {position:absolute;inset:.4% 1.9% 4.8% 3.2%;background:linear-gradient(180deg,#b09b76 0%,#cdbb98 30%,#e4d7bc 82%);box-shadow:inset 0 4px 8px #38120e40;z-index:1}
+#frame .vl-letter-window {position:absolute;left:4%;right:2%;top:-116%;height:211%;overflow:hidden;z-index:3}
+#frame .vl-letter {position:absolute;left:7%;width:86%;height:39%;bottom:3%;background:var(--vl-cream);border:1px solid #d1c0a4;box-shadow:0 2px 6px #38120e30;transform-origin:50% 50%;padding:8% 5%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:var(--vl-wine);font-family:var(--vl-type)}
+#frame .vl-letter:before {content:'';position:absolute;inset:7%;border:1px solid #6c211838;pointer-events:none}
+#frame .vl-letter .vl-small {font:400 1.6cqw/1.5 system-ui,sans-serif;letter-spacing:.2cqw}
+#frame .vl-letter strong {font:400 4.2cqw/1.15 var(--vl-type);margin:7% 0;white-space:nowrap}
+#frame .vl-letter em {font-style:italic;font-size:.8em}
+#frame .vl-letter-rule {display:block;width:17%;height:1px;background:var(--vl-thread);margin-bottom:7%}
+#frame .vl-letter-invite {font:400 2.5cqw/1.3 var(--vl-type);max-width:80%;text-wrap:balance}
+#frame .vl-front {clip-path:url(#vr-front-clip);z-index:4}
+#frame .vl-flap {position:absolute;inset:0;transform-origin:50% .3%;transform:rotateX(0deg);z-index:6;transform-style:preserve-3d}
+#frame .vl-flap-face {position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#frame .vl-flap-art {clip-path:url(#vr-flap-clip)}
+#frame .vl-flap-back {transform:rotateX(180deg)}
+#frame .vl-flap-back .vl-flap-art {filter:brightness(.88);opacity:.98}
+#frame .root[data-phase=opening] .vl-motion-layers {visibility:visible}
+#frame .root[data-phase=opening] .vl-base {animation:vr-focus-background .5s ease forwards}
+#frame .root[data-phase=opening] .vl-envelope {animation:vr-focus-envelope .65s cubic-bezier(.22,.7,.18,1) forwards}
+#frame .root[data-phase=opening] :is(.vl-original-envelope,.vl-original-seal) {animation:vr-remove-original 1ms .35s forwards}
+#frame .root[data-phase=opening] .vl-flap {animation:vr-open-flap .8s .35s cubic-bezier(.4,0,.25,1) forwards,vr-lower-flap .6s 2.45s cubic-bezier(.4,0,.5,1) forwards}
+#frame .root[data-phase=opening] .vl-flap-front .vl-seal {animation:vr-turn-seal 1ms .72s forwards}
+#frame .root[data-phase=opening] .vl-letter {animation:vr-extract-letter 2.05s 1.2s cubic-bezier(.4,0,.22,1) forwards}
+#frame .root[data-phase=opening] :is(.vl-interior,.vl-front) {animation:vr-lower-pocket .6s 2.45s cubic-bezier(.4,0,.5,1) forwards}
+#frame .root[data-phase=opening] .vl-letter-window {animation:vr-clear-letter-window 1ms 2.4s forwards}
+@keyframes vr-focus-background {to{opacity:0}}
+@keyframes vr-focus-envelope {to{transform:translate(-2.5%,45%) scale(1.32)}}
+@keyframes vr-remove-original {to{visibility:hidden}}
+@keyframes vr-turn-seal {to{visibility:hidden}}
+@keyframes vr-open-flap {0%{transform:rotateX(0);z-index:6}43%{z-index:6}44%{z-index:2}100%{transform:rotateX(180deg);z-index:2}}
+@keyframes vr-extract-letter {0%{transform:translateY(0)}59%{transform:translateY(-124%)}71%{transform:translateY(-124%)}100%{transform:translateY(-91%) scale(1.5);box-shadow:0 8px 20px #38120e15}}
+@keyframes vr-lower-pocket {to{transform:translateY(48%);opacity:0}}
+@keyframes vr-lower-flap {from{transform:rotateX(180deg);z-index:2}to{transform:translateY(48%) rotateX(180deg);opacity:0;z-index:2}}
+@keyframes vr-clear-letter-window {to{overflow:visible;z-index:9}}
+#frame .root {color-scheme:only light;overflow:hidden}
+#frame .website {background:var(--vl-cream);color:#49170f;overflow:hidden}
+#frame .website :is(h1,h2,h3,p,figure,figcaption) {margin:0}
+#frame .website :is(h1,h2,h3) {font-family:var(--vl-type);font-weight:400;text-wrap:balance}
+#frame .website h2 {font-size:clamp(36px,11cqw,58px);line-height:1.03}
+#frame .website :is(p,span,label,legend) {opacity:1}
+#frame .website [data-ink=wine] {color:#49170f}
+#frame .website [data-ink=cream] {color:var(--vl-cream)}
+#frame .vp-kicker {font:400 clamp(11px,2.9cqw,14px)/1.5 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+#frame .vp-welcome {position:relative;padding:0 0 11%;background:var(--vl-cream) var(--vl-paper) center top/100% auto;isolation:isolate}
+#frame .vp-poster-heading {position:relative;padding-top:10%;height:64cqw;max-height:327px;overflow:hidden;direction:ltr}
+#frame .vp-handwritten {position:absolute;top:-7%;left:-3%;width:39%;height:auto;transform:rotate(-9deg);pointer-events:none}
+#frame .vp-rose {position:absolute;left:9%;top:18%;width:24%;height:auto;filter:drop-shadow(0 3px 2px #38120e25);z-index:2}
+#frame .vp-title {position:absolute;top:22%;left:28%;width:67%;z-index:3}
+#frame .vp-title-art {display:block;width:100%;height:auto;transform:rotate(-2deg)}
+#frame .vp-arabic-title {display:none;text-align:center;transform:rotate(-2deg);padding-top:3%}
+#frame .vp-arabic-title>span {display:block;padding:4% 5% 9%;background:var(--vl-wine);color:var(--vl-cream)!important;-webkit-text-fill-color:var(--vl-cream)!important;font:400 12cqw/1.2 var(--vl-ar)}
+#frame .vp-arabic-title em {display:block;margin-top:-7%;font:400 11cqw/1.4 var(--vl-ar);paint-order:stroke fill;-webkit-text-stroke:1px var(--vl-cream)}
+#frame .vp-family {position:absolute;bottom:4%;left:12%;right:7%;font:400 clamp(11px,2.7cqw,14px)/1.6 system-ui,sans-serif;letter-spacing:.13em;text-align:center}
+#frame .vp-date-stamp {position:absolute;top:-5%;right:-9%;z-index:3;display:flex;flex-direction:column;align-items:center;width:29%;padding:7% 2% 4%;background:#f5ecdb;outline:1px solid #6c21184f;outline-offset:-7px;transform:rotate(8deg);box-shadow:2px 3px 3px #38120e3d;clip-path:polygon(0 0,7% 2%,14% 0,21% 2%,28% 0,35% 2%,42% 0,49% 2%,56% 0,63% 2%,70% 0,77% 2%,84% 0,91% 2%,100% 0,100% 100%,91% 98%,84% 100%,77% 98%,70% 100%,63% 98%,56% 100%,49% 98%,42% 100%,35% 98%,28% 100%,21% 98%,14% 100%,7% 98%,0 100%)}
+#frame .vp-date-stamp span {font:400 clamp(8px,2cqw,10px)/1.4 system-ui,sans-serif;text-align:center;letter-spacing:.03em}
+#frame .vp-date-stamp strong {font:400 clamp(32px,10cqw,52px)/1 var(--vl-type);margin:3% 0 5%}
+#frame .vp-letter-message {position:relative;margin:0 10%;padding:1% 0 0;text-align:center}
+#frame .vp-letter-dear {display:block;font:italic clamp(20px,5.5cqw,29px)/1.3 var(--vl-type);margin-bottom:7%}
+#frame #vl-live-message {font:400 clamp(21px,5.8cqw,30px)/1.45 var(--vl-type);text-wrap:pretty;overflow-wrap:anywhere}
+#frame .vp-letter-signature {margin:9% 0 2%!important;font:400 clamp(11px,2.7cqw,14px)/1.5 system-ui,sans-serif;letter-spacing:.2em}
+#frame .vp-hero-date {display:block;font-size:clamp(17px,4.8cqw,25px);line-height:1.4}
+#frame .vp-countdown {position:relative;background:var(--vl-wine);padding:12% 7% 9%;text-align:center}
+#frame .vp-countdown:before {content:'';position:absolute;inset:-1px 0 auto;height:12px;background:var(--vl-cream);clip-path:polygon(0 0,100% 0,100% 55%,95% 35%,90% 65%,85% 50%,80% 85%,75% 60%,70% 80%,65% 40%,60% 65%,55% 45%,50% 80%,45% 55%,40% 70%,35% 35%,30% 65%,25% 40%,20% 80%,15% 55%,10% 85%,5% 50%,0 65%)}
+#frame .vp-countdown h2 {margin:4% 0 8%!important;font-style:italic}
+#frame .vp-countdown-ticket {position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#f2ece0;padding:6% 2%;box-shadow:3px 5px 0 #38120e55;transform:rotate(-1.5deg)}
+#frame .vp-countdown-ticket:before,
+#frame .vp-countdown-ticket:after {content:'';position:absolute;top:calc(50% - 8px);width:16px;height:16px;border-radius:50%;background:var(--vl-wine)}
+#frame .vp-countdown-ticket:before {left:-8px}
+#frame .vp-countdown-ticket:after {right:-8px}
+#frame .vp-countdown-ticket>div {display:flex;align-items:center;flex-direction:column;border-inline-start:1px dashed #6c21184d;min-width:0}
+#frame .vp-countdown-ticket>div:first-child {border:0}
+#frame .vp-countdown-ticket strong {font:400 clamp(30px,10cqw,51px)/1 var(--vl-type);font-variant-numeric:tabular-nums}
+#frame .vp-countdown-ticket span {font:400 clamp(10px,2.7cqw,14px)/1.4 system-ui,sans-serif;margin-top:10%}
+#frame .vp-countdown-date {font:400 clamp(18px,5cqw,26px)/1.4 var(--vl-type);margin-top:8%!important}
+#frame .vp-details {position:relative;background:var(--vl-cream) var(--vl-paper) center/100% auto;padding:12% 0 13%;isolation:isolate}
+#frame .vp-detail-heading {position:relative;text-align:center;z-index:1}
+#frame .vp-detail-heading h2 {margin:4% 0 8%!important;font-style:italic}
+#frame .vp-stationery {position:relative;padding:0 8% 0 12%}
+#frame .vp-lace-edge {position:absolute;top:3%;bottom:1%;left:2%;width:16%;background:var(--vl-lace) left top/auto 12cqw repeat-y;opacity:1;z-index:0}
+#frame .vp-calendar-card {position:relative;margin:0 16% 0 5%;padding:9% 6% 13%;text-align:center;background:#f7f0e3;border:1px solid #ceb79d;box-shadow:3px 4px 7px #38120e26;transform:rotate(-4deg);z-index:1}
+#frame .vp-calendar-card:before {content:'';position:absolute;inset:5%;border:1px solid #6c21184d;pointer-events:none}
+#frame .vp-weekday {font:400 clamp(14px,4.1cqw,21px)/1.2 var(--vl-type);text-transform:uppercase;letter-spacing:.2em}
+#frame .vp-calendar-day {display:block;font:400 clamp(80px,27cqw,138px)/.9 var(--vl-type);margin:4% 0}
+#frame .vp-calendar-month {font:400 clamp(15px,4.5cqw,23px)/1.4 var(--vl-type);letter-spacing:.08em;text-transform:uppercase}
+#frame .vp-time-line {display:flex;align-items:center;justify-content:center;gap:10px;margin:7% auto 0;padding-top:7%;border-top:1px solid #6c21184d;max-width:75%}
+#frame .vp-time-line span {font:400 11px/1.4 system-ui,sans-serif}
+#frame .vp-time-line strong {font:400 clamp(18px,5.5cqw,28px)/1.2 var(--vl-type)}
+#frame .vp-venue-card {position:relative;z-index:2;width:91%;margin:-4% 0 0 9%;padding:10% 8%;background:var(--vl-wine);box-shadow:4px 5px 0 #38120e30;transform:rotate(2deg);text-align:center}
+#frame .vp-venue-card h3 {font-size:clamp(29px,8.3cqw,43px);line-height:1.1;margin:6% 0!important;overflow-wrap:anywhere}
+#frame .vp-venue-card>p:last-of-type {font:italic clamp(18px,5.1cqw,26px)/1.4 var(--vl-type);text-wrap:balance}
+#frame .vp-map-link {display:inline-block;margin-top:8%;padding:10px 14px;border:1px solid #f2ece099;font:400 17px/1.2 var(--vl-type);text-underline-offset:4px}
+#frame .vp-rsvp {position:relative;background:var(--vl-deep);padding:11% 6% 10%;text-align:center}
+#frame .vp-reply-heading h2 {font-style:italic;margin:4% 0!important}
+#frame .vp-reply-heading>p:last-child {font:400 clamp(20px,5.3cqw,27px)/1.4 var(--vl-type)}
+#frame .vp-reply-paper {position:relative;margin:10% 1% 0;padding:30% 8% 9%;background:#f7f0e3;box-shadow:4px 5px 0 #ac2e3444;text-align:start;isolation:isolate}
+#frame .vp-reply-paper:before {content:'';position:absolute;inset:0;background:var(--vl-paper) center top/100% auto;opacity:.2;z-index:-1}
+#frame .vp-postmark {position:absolute;top:7%;left:10%;height:49px;min-width:38%;border-block:1px solid #6c211880;transform:rotate(-8deg);display:flex;flex-direction:column;justify-content:center;gap:5px;font:400 10px/1.1 system-ui,sans-serif;letter-spacing:.1em;text-align:center}
+#frame .vp-reply-seal {position:absolute;right:7%;top:4%;width:25%;height:auto;transform:rotate(8deg)}
+#frame .vp-field {display:grid;gap:10px;margin-bottom:24px;font:400 clamp(20px,5.5cqw,28px)/1.25 var(--vl-type)}
+#frame .vp-field :is(input,textarea) {width:100%;min-width:0;border:0;border-bottom:1px solid #6c21186b;background:#fffaf0;border-radius:0;padding:12px 10px;font:400 17px/1.5 var(--vl-type);color:#49170f;box-shadow:none;outline-offset:4px}
+#frame .vp-field input {min-height:49px}
+#frame .vp-field textarea {resize:vertical;min-height:96px;background:repeating-linear-gradient(transparent 0,transparent 26px,#6c211821 27px,transparent 28px),#fffaf0;line-height:28px;padding-block:6px}
+#frame .vp-reply-paper fieldset {padding:0;margin:0 0 24px;border:0;min-width:0}
+#frame .vp-reply-paper legend {padding:0;margin-bottom:10px;font:400 clamp(20px,5.5cqw,28px)/1.4 var(--vl-type)}
+#frame .vp-attendance {display:flex;align-items:center;gap:10px;min-height:44px;font:400 clamp(18px,4.8cqw,25px)/1.25 var(--vl-type)}
+#frame .vp-attendance input {width:18px;height:18px;flex-shrink:0;accent-color:var(--vl-wine)}
+#frame .vp-send {width:100%;min-height:49px;background:var(--vl-wine);border:1px solid var(--vl-wine);border-radius:0;padding:13px 14px;font:400 clamp(19px,5cqw,26px)/1.25 var(--vl-type);color:var(--vl-cream)}
+#frame .vp-send:disabled {opacity:.7}
+#frame .vp-form-error {font:400 16px/1.5 system-ui,sans-serif;margin:0 0 16px!important;border-inline-start:3px solid var(--vl-wine);padding-inline-start:12px}
+#frame .vp-success h3 {font-size:36px;line-height:1.1}
+#frame .vp-success p {font-size:23px;line-height:1.4;margin:18px 0 26px!important}
+#frame .vp-guestbook {margin-top:12%;padding:0 5%}
+#frame .vp-guestbook h3 {font-size:clamp(28px,8cqw,41px);font-style:italic;line-height:1.2}
+#frame #vl-guestbook-empty {font:400 clamp(17px,4.7cqw,24px)/1.4 var(--vl-type);margin-top:12px!important}
+#frame .vl-guest-note {padding:20px;text-align:start;background:var(--vl-cream);margin-top:20px;transform:rotate(-1deg);overflow-wrap:anywhere}
+#frame .vl-guest-note p {font:400 23px/1.4 var(--vl-type)}
+#frame .vl-guest-note footer {font:400 16px/1.4 system-ui,sans-serif;margin-top:14px}
+#frame .vp-ending {position:relative;background:var(--vl-wine);padding:7% 5% 8%;overflow:hidden}
+#frame .vp-ending-page {position:relative;background:var(--vl-cream) var(--vl-paper) center/100% auto;min-height:81cqw;padding:12% 7% 14%;transform:rotate(-2deg);box-shadow:3px 5px 0 #38120e3d;isolation:isolate}
+#frame .vp-ending-page:before {content:'';position:absolute;inset:0;background:#f2ece06b;z-index:-1}
+#frame .vp-ending-copy {position:relative;width:63%;margin-left:auto;text-align:center;z-index:1}
+#frame .vp-ending-copy h2 {font-size:clamp(31px,9cqw,46px)!important;line-height:1.07!important;font-style:italic;margin:7% 0 12%!important}
+#frame .vp-ending-names {font:400 clamp(23px,6.6cqw,34px)/1.2 var(--vl-type);margin:8% -3% 6%!important}
+#frame .vp-ending-names em {font-size:.7em}
+#frame #vl-ending-date {font:400 clamp(16px,4.3cqw,22px)/1.4 var(--vl-type)}
+#frame .vp-tulips {position:absolute;left:-3%;bottom:2%;width:44%;height:auto;max-height:89%;object-fit:contain;transform:rotate(-9deg);z-index:2;pointer-events:none}
+#frame .vp-ending-spark {position:absolute;left:20%;top:12%;width:8%;height:auto}
+#frame .vp-sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@keyframes vp-ink-appear {from{transform:translateY(.22em) rotate(2deg)}to{transform:translateY(0) rotate(0)}}
+#frame .root[data-script=arabic] .website {font-family:var(--vl-ar)}
+#frame .root[data-script=arabic] .vp-title-art {display:none}
+#frame .root[data-script=arabic] .vp-arabic-title {display:block}
+#frame .root[data-script=arabic] .website h2 {line-height:1.4}
+#frame .root[data-script=arabic] #vl-live-message {line-height:1.7}
+#frame .root[data-script=arabic] .vp-family {font-size:clamp(17px,4.5cqw,23px)}
+#frame .root[data-script=arabic] .vp-countdown-ticket span {font-family:var(--vl-ar);font-size:clamp(15px,4cqw,20px)}
+#frame .root[data-script=arabic] .vp-date-stamp span {font-family:var(--vl-ar);font-size:clamp(11px,2.8cqw,14px)}
+#frame .root[data-script=arabic] .vp-ending-copy h2 {font-size:clamp(31px,8.6cqw,44px)!important;line-height:1.5!important}
+#frame .root[data-script=arabic] .vp-ending-names {direction:ltr}
+#frame .vp-welcome,
+#frame .vp-details {background-size:210% auto;background-position:50% 50%}
+#frame .vp-reply-paper:before {background-size:220% auto;background-position:50% 50%}
+#frame .vp-ending-page {background-size:210% auto;background-position:50% 50%}
+#frame .vp-lace-edge {overflow:hidden;background:none}
+#frame .vp-lace-edge:before {content:'';position:absolute;top:50%;left:50%;width:160cqw;height:12cqw;background:var(--vl-lace) left top/auto 100% repeat-x;transform:translate(-50%,-50%) rotate(90deg)}
+#frame .root[data-script=arabic] #vl-live-message {font-size:clamp(24px,6.5cqw,33px);line-height:1.7}
+#frame .root[data-script=arabic] .vp-letter-dear {font-size:clamp(22px,6cqw,31px)}
+#frame .root[data-script=arabic] .vp-reply-paper {padding-top:32%}
+@media(prefers-reduced-motion:reduce) {
+#frame *,
+#frame *:before,
+#frame *:after {animation-duration:.001ms!important;animation-delay:0ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
+
+/* ---------------------------------------------------------------- Bahja */
+
+.page {
+  min-height: 100svh;
+  background: var(--vl-cream);
+}
+#frame .root {
+  max-width: 470px;
+}
+#frame .root *,
+#frame .root *::before,
+#frame .root *::after {
+  box-sizing: border-box;
+}
+#frame .vl-clip-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* The prototype set every website text colour by its section's ink (deep wine on paper, cream on wine). */
+#frame .website [data-ink='wine'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #49170f;
+  -webkit-text-fill-color: #49170f;
+}
+#frame .website [data-ink][data-ink='cream'],
+#frame .website [data-ink='cream'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #f2ece0;
+  -webkit-text-fill-color: #f2ece0;
+}
+#frame .website .vp-countdown-ticket[data-ink='wine'] :is(strong, span),
+#frame .website .vp-reply-paper[data-ink='wine'] :is(h3, p, span, strong, label, legend, input, textarea),
+#frame .website .vp-date-stamp[data-ink='wine'] :is(span, strong) {
+  color: #49170f;
+  -webkit-text-fill-color: #49170f;
+}
+/* The nearest ink wins: wine paper inside a cream section, and cream cards inside a wine one. */
+#frame .website [data-ink='cream'] [data-ink='wine'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #49170f;
+  -webkit-text-fill-color: #49170f;
+}
+#frame .website [data-ink='wine'] [data-ink='cream'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #f2ece0;
+  -webkit-text-fill-color: #f2ece0;
+}
+#frame .website [data-ink] .vp-send[data-ink='cream'] {
+  color: #f2ece0;
+  -webkit-text-fill-color: #f2ece0;
+}
+
+/* ---- the couple's names on the poster's red strips (live text) */
+#frame .vl-strip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8.3%;
+  width: 42.4%;
+  padding: 0 3%;
+  color: #f4e8d8;
+  font: 400 5.2cqw/1 var(--vl-type);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#frame .root[data-script='arabic'] .vl-strip {
+  font-family: var(--vl-ar-body);
+  font-size: 5.4cqw;
+  letter-spacing: 0;
+}
+#frame .vl-cover-names {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+#frame .vl-strip-cover.vl-strip-one {
+  left: 13.2%;
+  top: 64.8%;
+}
+#frame .vl-strip-cover.vl-strip-two {
+  left: 50.8%;
+  top: 69.1%;
+  width: 41.6%;
+}
+#frame .root[data-phase='opening'] .vl-cover-names {
+  animation: vr-focus-background 0.5s ease forwards;
+}
+
+/* The same strips on the website, where the poster's name artwork was. */
+#frame .vl-names-block {
+  position: relative;
+  margin: 2% 0 9%;
+  padding-top: 26cqw;
+}
+#frame .vl-names-block .vp-date-stamp {
+  top: 0;
+  right: 8%;
+}
+#frame .vl-names {
+  position: relative;
+  height: 27cqw;
+  margin: 0;
+  font-size: inherit;
+}
+#frame .vl-names .vl-strip {
+  height: 46%;
+  width: 56%;
+  font-size: 6.4cqw;
+  box-shadow: 0 7px 12px #38120e40;
+}
+#frame .root[data-script='arabic'] .vl-names .vl-strip {
+  font-size: 6.6cqw;
+}
+#frame .vl-names .vl-strip-one {
+  left: 5%;
+  top: 0;
+  background: #6d2118;
+  z-index: 1;
+}
+#frame .vl-names .vl-strip-two {
+  right: 5%;
+  top: 46%;
+  background: #4f140f;
+  z-index: 2;
+}
+#frame .website .vl-strip span {
+  color: #f4e8d8;
+  -webkit-text-fill-color: #f4e8d8;
+}
+
+#frame .vl-families {
+  font: 400 clamp(16px, 4.4cqw, 22px) / 1.5 var(--vl-type);
+  margin-top: 5% !important;
+  overflow-wrap: anywhere;
+}
+#frame .root[data-script='arabic'] .vl-families {
+  font-family: var(--vl-ar-body);
+}
+
+/* The letter in the envelope carries the full names: keep them inside it. */
+#frame .vl-letter strong {
+  white-space: normal;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+#frame .root[data-script='arabic'] .vl-letter :is(strong, .vl-small, .vl-letter-invite) {
+  font-family: var(--vl-ar);
+}
+
+/* Arabic-script invitations: body text in Amiri where Aref Ruqaa would be hard to read at small sizes. */
+#frame .root[data-script='arabic'] .website :is(.vp-field input, .vp-field textarea, .vl-guest-note p) {
+  font-family: var(--vl-ar-body);
+}
+#frame .root[data-script='arabic'] :is(.vl-primary, .vl-cover-hint) {
+  font-family: var(--vl-ar);
+}
+
+#frame .vl-primary {
+  cursor: pointer;
+}
+#frame .vl-primary:focus-visible,
+#frame .vp-send:focus-visible,
+#frame .vp-field :is(input, textarea):focus-visible,
+#frame .vp-attendance:focus-within {
+  outline: 2px solid var(--vl-wine);
+  outline-offset: 3px;
+}
+#frame .vp-send {
+  cursor: pointer;
+}
+#frame .vl-counter {
+  font: 400 13px/1.4 system-ui, sans-serif !important;
+  text-align: end;
+  opacity: 0.7;
+}
+#frame .vp-form-error {
+  display: block;
+}
+#frame .vp-success {
+  text-align: center;
+}
+
+/* The lace border on the closing page sits behind its text and tulips. */
+#frame .vp-ending-page > [data-bahja-border] {
+  z-index: 0 !important;
+  opacity: 0.85;
+}
+
+/* Music button, once the invitation is open. */
+#frame .vl-audio {
+  position: fixed;
+  z-index: 20;
+  inset-block-end: max(16px, env(safe-area-inset-bottom));
+  inset-inline-end: 16px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--vl-thread);
+  background: #6c2118e6;
+  color: var(--vl-cream);
+  cursor: pointer;
+}
