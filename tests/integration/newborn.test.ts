@@ -118,6 +118,10 @@ describe('newborn extras', () => {
     expect((await ensureProductFile(db(), id, 'cardBack.preview', r.render)).type).toBe('image/jpeg');
     await ensureProductFile(db(), id, 'cardBack.preview', r.render);
     expect(r.calls).toEqual(['card.preview', 'cardBack.preview']); // the back is reused while unchanged
+    // The visitor's limit only counts fresh pictures: a stored one is handed out even when the limit is used up.
+    const never = async () => false;
+    expect((await ensureProductFile(db(), id, 'cardBack.preview', r.render, never)).type).toBe('image/jpeg');
+    await expect(ensureProductFile(db(), id, 'story.preview', r.render, never)).rejects.toMatchObject({ code: 'rateLimited' });
     // Not without a printed card in the package.
     const noCard = await order(false);
     await db().update(invitations).set({ featureKeys: [] }).where(eq(invitations.id, noCard));
