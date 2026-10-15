@@ -775,3 +775,14 @@ for Kurdish in this work; live.
 | 3 | `store.includesWhen` | التاريخ والوقت | Date and time | بەروار و کات | دیرۆک و دەم | ● |
 
 `store.fieldsCount` («# زانیاری بۆ پڕکردنەوە») is no longer used and was removed.
+
+## Batch 30 — Royal Olive Crest v2: thank-you line on the printed cards — ✅ APPROVED (2026-10-15)
+
+A short title above the names on the front of every printed card (A5, leaf, heart); the customer can keep it or
+write their own (manifest `wording.cardThanks`, defaults to the invitation's language). Standing approval; live
+with v2.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `cardThanks` (default line) | شكرًا لحضوركم حفل زفافنا | Thank you for coming to our wedding | سوپاس بۆ ئامادەبوونتان لە ئاهەنگی زەماوەندەکەمان | سوپاس بۆ ئامادەبوونا هەوە ل ئاهەنگا داوەتا مە | ● |
+| 2 | `cardThanks` (order-form label) | سطر الشكر على واجهة البطاقة المطبوعة | Thank-you line on the front of the printed card | دێڕی سوپاس لەسەر ڕووی کارتی چاپکراو | دێڕا سوپاسێ ل سەر ڕوویێ کارتا چاپکری | ● |

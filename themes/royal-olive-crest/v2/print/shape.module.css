@@ -1,0 +1,194 @@
+/*
+ * Shaped cards. The box is the card's exact size (the platform sizes it); the artwork fills it and is
+ * transparent outside the shape. Text areas are the artwork's empty space (fractions of the box), kept well
+ * inside the cut line. Physical units for type.
+ */
+
+.shape {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #39412d;
+  font-family: var(--font-text);
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.shape * {
+  box-sizing: border-box;
+}
+.leaf-front {
+  background-image: url(../assets/leaf-front.webp);
+}
+.leaf-back {
+  background-image: url(../assets/leaf-back.webp);
+}
+.heart-front {
+  background-image: url(../assets/heart-front.webp);
+}
+.heart-back {
+  background-image: url(../assets/heart-back.webp);
+}
+
+.front,
+.back {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+}
+/* Leaf: below the crest, clear of the side ornaments, above where the leaf narrows to its tip. */
+/*
+ * Text areas = the artwork's measured clear space (no gold decoration), with a margin; checked by rendering
+ * every card with and without its text (docs/themes/royal-olive-crest/brief.md §8).
+ * Leaf front: between the crest and the lower ornaments (clear 34–67 % down, 17–89 % across).
+ */
+.leaf-front .front {
+  inset: 36% 15% 34% 19%;
+  gap: 2mm;
+}
+/* Leaf back (#9 on the leaf, read sideways): the cream middle between the crest panel (left) and the flourish
+   panel (right); clear 30-80 % across, 12-88 % down at its centre. */
+.leaf-back .back {
+  inset: 15% 23% 15% 35%;
+  gap: 2.4mm;
+}
+/* The QR code: lower left of the cream, beside the names (leaf) / left of the names (heart). */
+.leaf-back .qr {
+  left: 32.5%;
+  top: 69%;
+}
+.leaf-back .qr img {
+  width: 13mm;
+  height: 13mm;
+}
+.heart-back .qr {
+  left: 19%;
+  top: 53%;
+}
+.leaf-back .qr figcaption {
+  display: none;
+}
+/* Heart front: under the crest, above the lower ornaments (clear 43–70 % down). Back: between the top
+   flourishes and the crest (clear 19–67 % down). */
+.heart-front .front {
+  inset: 44% 22% 31%;
+  gap: 1.5mm;
+}
+.heart-back .back {
+  inset: 20% 22% 34%;
+  gap: 2mm;
+}
+
+/* Front: names and date in calligraphy, gold on green. */
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 34pt;
+  line-height: 1.12;
+  color: #dcb565;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.heart-front .names {
+  font-size: 29pt;
+}
+.heart-front .date {
+  font-size: 13pt;
+}
+/* A short thank-you title above the names (wording.cardThanks). */
+.thanks {
+  margin: 0 0 1mm;
+  font-family: var(--font-script);
+  font-size: 12.5pt;
+  line-height: 1.3;
+  color: #e6c77d;
+  text-wrap: balance;
+}
+.heart-front .thanks {
+  font-size: 12pt;
+}
+.and {
+  font-family: var(--font-text);
+  font-size: 15pt;
+  line-height: 1.2;
+  color: #e6c77d;
+}
+.date {
+  margin: 1mm 0 0;
+  font-family: var(--font-script);
+  font-size: 15pt;
+  line-height: 1.45;
+  color: #e6c77d;
+  text-wrap: balance;
+}
+
+/* Back: the customer's title and message, dark olive on cream. */
+.title {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 27pt;
+  line-height: 1.25;
+  color: #4a5228;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.message {
+  margin: 0;
+  font-size: 10.5pt;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+/* Up to 300 characters: a long message steps down so it always fits the shape. */
+.message[data-long] {
+  font-size: 8.5pt;
+  line-height: 1.5;
+}
+.leaf-back .title {
+  font-size: 25pt;
+}
+.leaf-back .message {
+  font-size: 11pt;
+  line-height: 1.5;
+}
+.leaf-back .message[data-long] {
+  font-size: 10pt;
+  line-height: 1.5;
+}
+.leaf-back .backNames {
+  font-size: 19pt;
+}
+.backNames {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 18pt;
+  color: #8c6c2c;
+}
+.qr {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8mm;
+  margin: 0;
+}
+.qr img {
+  width: 15mm;
+  height: 15mm;
+}
+.qr figcaption {
+  font-size: 6pt;
+  color: #5b5f45;
+}
