@@ -19,7 +19,7 @@ const allFields = [
 export default defineTheme({
   key: 'burgundy-lace',
   version: 1,
-  title: { ar: 'العنابي والدانتيل', en: 'Burgundy & Lace' },
+  title: { ar: 'العنابي والدانتيل', en: 'Burgundy & Lace', ckb: 'عەنابی و دانتێلا', bdn: 'عەنابی و دانتێل' },
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],

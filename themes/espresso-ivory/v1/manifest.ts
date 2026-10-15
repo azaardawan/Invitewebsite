@@ -20,7 +20,7 @@ const allFields = [
 export default defineTheme({
   key: 'espresso-ivory',
   version: 1,
-  title: { ar: 'الإسبريسو والعاجي', en: 'Espresso & Ivory' },
+  title: { ar: 'الإسبريسو والعاجي', en: 'Espresso & Ivory', ckb: 'ئێسپرێسۆ و عاجی', bdn: 'ئێسپرێسۆ و عاجی' },
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],

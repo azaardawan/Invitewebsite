@@ -776,12 +776,11 @@ for Kurdish in this work; live.
 
 `store.fieldsCount` («# زانیاری بۆ پڕکردنەوە») is no longer used and was removed.
 
-## Batch 31 — four new wedding designs: their own lines — ⏳ AWAITING APPROVAL
+## Batch 31 — four new wedding designs: their own lines — ✅ APPROVED (2026-10-15)
 
 Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15).
-These are the lines each design writes itself (in each theme's `copy.ts`). Until approved, Kurdish invitations of
-these designs show them in Arabic; everything else (buttons, form, countdown, the customer's own text) is already
-Kurdish. Glossary reused from approved rows: wedding هاوسەرگیری / داوەت, joy خۆشی / شاهی, presence ئامادەبوون,
+These are the lines each design writes itself (in each theme's `copy.ts`). The owner approved every row as
+suggested ("approve all"); live in the four themes, and the design names in their manifests. Glossary reused from approved rows: wedding هاوسەرگیری / داوەت, joy خۆشی / شاهی, presence ئامادەبوون,
 celebration ئاهەنگ. A «/» marks a line break in the design. Lines shared by several designs are listed once.
 
 | # | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Designs |

@@ -20,7 +20,7 @@ const allFields = [
 export default defineTheme({
   key: 'vintage-love-letters',
   version: 1,
-  title: { ar: 'رسائل الحب العتيقة', en: 'Vintage Love Letters' },
+  title: { ar: 'رسائل الحب العتيقة', en: 'Vintage Love Letters', ckb: 'نامە کۆنەکانی خۆشەویستی', bdn: 'نامێن کەڤن یێن ڤیانێ' },
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],

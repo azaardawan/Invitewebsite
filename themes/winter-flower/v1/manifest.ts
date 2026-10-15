@@ -20,7 +20,7 @@ const allFields = [
 export default defineTheme({
   key: 'winter-flower',
   version: 1,
-  title: { ar: 'زهرة الشتاء', en: 'Winter Flower' },
+  title: { ar: 'زهرة الشتاء', en: 'Winter Flower', ckb: 'گوڵی زستان', bdn: 'گولا زڤستانێ' },
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: [...allFields],
