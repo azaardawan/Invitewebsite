@@ -749,3 +749,14 @@ are Arabic/English only.
 |---|---|---|---|---|---|---|
 | 1 | `store.features.card_leaf` | بطاقة مطبوعة على شكل ورقة شجر، تختارها بدل البطاقة | A leaf-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی گەڵا، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ بەلگی، ل شوینا کارتێ | ◐ |
 | 2 | `store.features.card_heart` | بطاقة مطبوعة على شكل قلب، تختارها بدل البطاقة | A heart-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی دڵ، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ دلی، ل شوینا کارتێ | ◐ |
+
+## Batch 28 — Royal Olive Crest: the seal's initials in two boxes — ✅ APPROVED (2026-10-15)
+
+The initials on the wax seal are now typed in two small boxes, one per person; these are the captions under the
+boxes (the same words as the approved name labels «ناوی زاوا / ناوی بووک»). The owner approved both rows as
+suggested; live.
+
+| # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `store.sealInitialsFirst` | العريس | Groom | زاوا | زاڤا | ● |
+| 2 | `store.sealInitialsSecond` | العروس | Bride | بووک | بویک | ● |

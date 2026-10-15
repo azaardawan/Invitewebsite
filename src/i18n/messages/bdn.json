@@ -363,6 +363,8 @@
     "dateHint": "دیرۆکەکێ ژ ئەڤرۆ و پێڤە هەلبژێرە.",
     "mapHint": "لینکەکێ ژ نەخشێن Google یان Apple ل ڤێرە دانێ.",
     "sealInitialsHint": "ب دلێ خۆ: ڤالا بهێلە و ئەم دێ تیپا ئێکێ یا هەر ناڤەکی نڤیسین (زاڤا ئێکەم)، یان تیپان وەکی تە دڤێت بنڤیسە.",
+    "sealInitialsFirst": "زاڤا",
+    "sealInitialsSecond": "بویک",
     "optionalNone": "",
     "fieldErrors": {
       "required": "ئەڤ خانە پێدڤییە.",

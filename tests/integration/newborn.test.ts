@@ -111,6 +111,23 @@ describe('newborn extras', () => {
     expect(r.calls).toEqual(['sticker.pdf', 'story.png']);
   });
 
+  it('show the printed card on both sides before payment, each side stored on its own', async () => {
+    const id = await order(false);
+    const r = fake();
+    expect((await ensureProductFile(db(), id, 'card.preview', r.render)).type).toBe('image/jpeg');
+    expect((await ensureProductFile(db(), id, 'cardBack.preview', r.render)).type).toBe('image/jpeg');
+    await ensureProductFile(db(), id, 'cardBack.preview', r.render);
+    expect(r.calls).toEqual(['card.preview', 'cardBack.preview']); // the back is reused while unchanged
+    // The visitor's limit only counts fresh pictures: a stored one is handed out even when the limit is used up.
+    const never = async () => false;
+    expect((await ensureProductFile(db(), id, 'cardBack.preview', r.render, never)).type).toBe('image/jpeg');
+    await expect(ensureProductFile(db(), id, 'story.preview', r.render, never)).rejects.toMatchObject({ code: 'rateLimited' });
+    // Not without a printed card in the package.
+    const noCard = await order(false);
+    await db().update(invitations).set({ featureKeys: [] }).where(eq(invitations.id, noCard));
+    await expect(ensureProductFile(db(), noCard, 'cardBack.preview', r.render)).rejects.toMatchObject({ code: 'notIncluded' });
+  });
+
   it('with both sticker shapes: a round set and a square set, each its own file', async () => {
     const one = await order(true, 'round');
     await expect(ensureProductFile(db(), one, 'sticker-square.png', fake().render)).rejects.toMatchObject({ code: 'notIncluded' });

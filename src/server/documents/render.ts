@@ -133,7 +133,8 @@ export type ProductItem =
   | 'story.preview'
   | 'sticker.preview'
   | 'bottle.preview'
-  | 'card.preview';
+  | 'card.preview'
+  | 'cardBack.preview';
 export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize }) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
@@ -147,6 +148,8 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square
   'sticker-square.preview': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 4, type: 'png', transparent: true },
   'bottle.preview': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 1.6, type: 'jpeg' },
   'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
+  // The A5 back is landscape (a shaped card's back is pictured at its own size, below).
+  'cardBack.preview': { view: 'cardBack', width: mmPx(210), height: mmPx(148), scale: 1.2, type: 'jpeg' },
 };
 
 export const renderProduct: ProductRenderer = async (item, invitationId, opts = {}) => {
@@ -166,10 +169,16 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     const shot = base.view === 'bottle' ? { ...base, width: mmPx(dims.width), height: mmPx(dims.height) } : base;
     const page = await browser.newPage({ viewport: { width: shot.width, height: shot.height }, deviceScaleFactor: shot.scale, reducedMotion: 'reduce' });
     await page.emulateMedia({ media: 'print' });
-    const path = shot.view === 'card' ? `/print/${printToken('card', invitationId)}?view=front` : `/print/${printToken(shot.view as ProductView, invitationId)}${square}`;
+    const card = shot.view === 'card' || shot.view === 'cardBack';
+    const path = card
+      ? `/print/${printToken('card', invitationId)}?view=${shot.view === 'cardBack' ? 'back' : 'front'}`
+      : `/print/${printToken(shot.view as ProductView, invitationId)}${square}`;
     const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
+    // A shaped card (leaf, heart…): its page has its own size; picture the card itself.
+    const shaped = card ? page.locator('[data-card-side]').first() : null;
+    if (shaped && (await shaped.count())) return await shaped.screenshot({ type: 'jpeg', quality: 84 });
     return await page.screenshot({ type: shot.type, ...(shot.type === 'jpeg' ? { quality: 84 } : {}), omitBackground: shot.transparent ?? false });
   } finally {
     await browser.close();

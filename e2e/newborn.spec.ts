@@ -24,7 +24,7 @@ test('newborn extras: watermarked previews before paying, clean files to downloa
   await page.goto(`/order/${draft.previewToken}`);
   const extras = page.locator('#extras');
   await expect(extras.getByRole('note')).toContainText('تُزال العلامة بعد الشراء');
-  for (const key of ['card', 'story', 'sticker', 'bottle']) await expect(extras.locator(`[data-extra=${key}] img`)).toBeVisible();
+  for (const key of ['card', 'card-back', 'story', 'sticker', 'bottle']) await expect(extras.locator(`[data-extra=${key}] img`)).toBeVisible();
   await expect.poll(() => extras.locator('[data-extra=story] img').evaluate((img: HTMLImageElement) => img.naturalWidth), { timeout: 60_000 }).toBeGreaterThan(400);
   await extras.screenshot({ path: testInfo.outputPath('review-extras.png') });
   // The files themselves are not given out before payment.

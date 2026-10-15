@@ -260,6 +260,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               title: tStore('extras.title'),
               note: tStore('extras.watermarkNote'),
               card: tStore('extras.card'),
+              cardBack: tStore('cardBack.heading'),
               story: tStore('extras.story'),
               sticker: tStore('extras.sticker'),
               round: tStore('stickerShape.round'),

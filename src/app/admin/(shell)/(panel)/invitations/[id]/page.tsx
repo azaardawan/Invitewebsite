@@ -1,6 +1,6 @@
 import { shapeIncluded } from '@/catalog/features';
 import { themeNumber } from '@/theme-registry';
-import { invitationNames } from '@/catalog/fields';
+import { INITIALS_MAX, invitationNames, splitInitials } from '@/catalog/fields';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -412,6 +412,12 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                   <span className="mb-1 block text-sm font-medium">{localized(f.label, locale)}</span>
                   {f.type === 'longtext' ? (
                     <textarea name={`f.${f.key}`} defaultValue={inv.fieldValues[f.key] ?? ''} rows={3} dir="auto" className={input} />
+                  ) : f.type === 'initials' ? (
+                    <span className="flex gap-2">
+                      {(['first', 'second'] as const).map((side) => (
+                        <input key={side} name={`f.${f.key}.${side}`} defaultValue={splitInitials(inv.fieldValues[f.key])[side]} maxLength={INITIALS_MAX} dir="auto" aria-label={`${localized(f.label, locale)} ${side === 'first' ? 1 : 2}`} className={`${input} w-20 text-center`} />
+                      ))}
+                    </span>
                   ) : (
                     <input
                       name={`f.${f.key}`}

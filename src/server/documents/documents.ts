@@ -29,7 +29,7 @@ function artwork(data: Awaited<ReturnType<typeof printData>>) {
 }
 
 export class DocumentError extends Error {
-  constructor(public readonly code: 'notFound' | 'notIncluded' | 'notPaid' | 'notPdf' | 'notA5' | 'tooLarge' | 'tooLong') {
+  constructor(public readonly code: 'notFound' | 'notIncluded' | 'notPaid' | 'notPdf' | 'notA5' | 'tooLarge' | 'tooLong' | 'rateLimited') {
     super(code);
   }
 }
@@ -114,7 +114,7 @@ export async function ensureDocument(
  * invitation's cover). Stored and reused while nothing it shows has changed. Null when there is nothing
  * automatic to picture: an uploaded card (the receipt shows a plain PDF tile), or an invitation not live (og).
  */
-export async function ensurePreview(db: DbOrTx, invitationId: string, kind: PreviewKind, render: PreviewRenderer = renderPreview): Promise<Buffer | null> {
+export async function ensurePreview(db: DbOrTx, invitationId: string, kind: PreviewKind, render: PreviewRenderer = renderPreview, mayRender?: () => Promise<boolean>): Promise<Buffer | null> {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new DocumentError('notFound');
   let sourceHash: string;
@@ -142,6 +142,8 @@ export async function ensurePreview(db: DbOrTx, invitationId: string, kind: Prev
     const stored = await storage().get(existing.storageKey);
     if (stored) return stored;
   }
+  // Only a fresh picture costs a browser render; the caller may cap those (a stored one is not counted).
+  if (mayRender && !(await mayRender())) throw new DocumentError('rateLimited');
   const image = await render(kind, inv.id);
   const storageKey = `documents/${randomUUID()}.jpg`;
   await storage().put(storageKey, image, 'image/jpeg');

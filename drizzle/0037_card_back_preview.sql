@@ -1,0 +1,1 @@
+ALTER TYPE "public"."document_kind" ADD VALUE 'CARD_BACK_DRAFT_PREVIEW';

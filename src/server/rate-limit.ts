@@ -30,6 +30,14 @@ export async function rateLimited(db: DbOrTx, key: string, limit: number, window
   return (row?.count ?? 0) >= limit;
 }
 
+/**
+ * Fresh pictures (previews, extras) a visitor may have drawn per hour: each costs a browser render. Stored ones
+ * are not counted. `PREVIEW_RENDERS_PER_HOUR` raises it where every visitor shares one address (the e2e server).
+ */
+export function previewRendersPerHour() {
+  return Number(process.env.PREVIEW_RENDERS_PER_HOUR) || 60;
+}
+
 /** Housekeeping (scheduled job in M11): drop windows older than a day. */
 export async function pruneRateLimits(db: DbOrTx, now = new Date()) {
   await db.delete(rateLimitBuckets).where(and(lt(rateLimitBuckets.windowStart, new Date(now.getTime() - 86400_000))));

@@ -46,6 +46,8 @@ export default defineConfig({
         PRINT_ORIGIN: `http://localhost:${PORT}`,
         // Background jobs (src/server/scheduler.ts) stay off so test runs are deterministic.
         DISABLE_SCHEDULER: '1',
+        // Every test comes from one address: don't let the per-visitor picture limit fail later tests.
+        PREVIEW_RENDERS_PER_HOUR: '100000',
         ...(process.env.PW_CHROMIUM_PATH ? { CHROMIUM_PATH: process.env.PW_CHROMIUM_PATH } : {}),
       },
     },
