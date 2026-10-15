@@ -45,3 +45,14 @@ test('Royal Olive Crest: the seal initials are two boxes, joined by the chosen s
   await expect(page.getByRole('radiogroup', { name: 'الرمز بين الحرفين على الختم' }).getByRole('radio', { name: '♥' })).toBeChecked();
   await page.screenshot({ path: testInfo.outputPath('order-form.png'), fullPage: true });
 });
+
+test('the package checklist lists the link and the details, not only the paid features', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
+  const { packageId } = onSale();
+  await page.goto('/themes/royal-olive-crest');
+  const card = page.locator('li', { has: page.locator(`a[href*="pkg=${packageId}"]`) });
+  for (const line of ['رابط خاص بدعوتكم ترسلونه على واتساب', 'اسم العريس واسم العروس', 'التاريخ والوقت', 'اسم القاعة', 'بطاقة دعوة قابلة للطباعة']) {
+    await expect(card.getByText(line, { exact: true })).toBeVisible();
+  }
+  await card.screenshot({ path: testInfo.outputPath('package.png') });
+});
