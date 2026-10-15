@@ -1,6 +1,5 @@
 'use server';
 
-import { designCardShapes } from '@/theme-sdk/manifest';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
@@ -347,10 +346,7 @@ async function packageShape(themeId: string, form: FormData) {
   const fields = picked('fields');
   for (const f of featureKeys) for (const k of FEATURES[f].requiresFields as readonly string[]) fields.add(k);
   if (!featureKeys.includes('map')) fields.delete('venue_map_url');
-  // Card shapes: only when the form shows them (designs offering more than one); at least one stays.
-  const shapes = picked('cardShapes');
-  const cardShapes = form.has('cardShapesShown') && shapes.size ? designCardShapes(manifest).filter((s) => shapes.has(s)) : undefined;
-  return { featureKeys, fieldKeys: manifest.fields.filter((k) => fields.has(k)), cardShapes };
+  return { featureKeys, fieldKeys: manifest.fields.filter((k) => fields.has(k)) };
 }
 
 function packageFields(form: FormData) {

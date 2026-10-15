@@ -21,8 +21,7 @@ export async function GET(req: Request, { params }: RouteContext<'/admin/api/doc
   const force = sp.get('fresh') === '1';
   try {
     const actor = { adminId: current.user.id, ipHash: (await requestContext()).ipHash };
-    const shape = sp.get('shape') ?? undefined;
-    const { pdf, fileName } = kind === 'card' && sp.get('bleed') === '1' ? await printShopCard(db(), id, undefined, { shape }) : await ensureDocument(db(), id, kind, { actor, force, shape });
+    const { pdf, fileName } = kind === 'card' && sp.get('bleed') === '1' ? await printShopCard(db(), id) : await ensureDocument(db(), id, kind, { actor, force });
     return new Response(new Uint8Array(pdf), {
       headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${fileName}"`, 'Cache-Control': 'private, no-store' },
     });

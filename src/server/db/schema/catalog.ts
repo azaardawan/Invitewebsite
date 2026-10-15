@@ -287,8 +287,6 @@ export const packages = pgTable(
     description: jsonb('description_i18n').$type<I18nContent>(),
     /** Whole Iraqi dinars. */
     priceIqd: bigint('price_iqd', { mode: 'number' }).notNull(),
-    /** Printable card shapes this package includes (src/catalog/card-shapes.ts); null = the design's main shape. */
-    cardShapes: text('card_shapes').array(),
     sortOrder: integer('sort_order').notNull().default(0),
     status: packageStatus('status').notNull().default('ACTIVE'),
     ...timestamps,

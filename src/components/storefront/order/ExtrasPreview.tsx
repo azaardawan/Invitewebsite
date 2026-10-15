@@ -10,10 +10,7 @@ export function ExtrasPreview({
   labels,
   watermarked,
   downloads,
-  cardShapes = [],
 }: {
-  /** The printable card's shapes when there are several or one isn't A5: one preview each (name and proportions). */
-  cardShapes?: { shape: string; label: string; ratio: string }[];
   /** Where the pictures come from, e.g. `/p/<token>/extra` (draft) or `/r/<token>/extra` (receipt). */
   base: string;
   featureKeys: readonly string[];
@@ -37,17 +34,7 @@ export function ExtrasPreview({
   downloads?: boolean;
 }) {
   const items = [
-    ...(featureKeys.includes('print_card') && !downloads
-      ? cardShapes.length
-        ? cardShapes.map((c, i) => ({
-            key: i === 0 ? 'card' : `card-${c.shape}`,
-            label: cardShapes.length > 1 ? `${labels.card} · ${c.label}` : labels.card,
-            src: `${base}/card.preview${i === 0 ? '' : `?shape=${c.shape}`}`,
-            box: 'w-40',
-            ratio: c.ratio,
-          }))
-        : [{ key: 'card', label: labels.card, src: `${base}/card.preview`, box: 'aspect-[148/210] w-40' }]
-      : []),
+    featureKeys.includes('print_card') && !downloads ? { key: 'card', label: labels.card, src: `${base}/card.preview`, box: 'aspect-[148/210] w-40' } : null,
     featureKeys.includes('story') ? { key: 'story', label: labels.story, src: `${base}/story.preview`, box: 'aspect-[9/16] w-40', png: `${base}/story.png` } : null,
     featureKeys.includes('sticker')
       ? {
@@ -87,13 +74,7 @@ export function ExtrasPreview({
           <li key={i.key} className="flex flex-col items-center gap-2" data-extra={i.key}>
             {/* Rendered on the server (watermarked until paid); a few seconds the first time. */}
             {/* eslint-disable-next-line @next/next/no-img-element -- generated picture */}
-            <img
-              src={i.src}
-              alt={i.label}
-              loading="lazy"
-              className={`${i.box} border border-line bg-paper object-contain shadow-sm`}
-              style={'ratio' in i && i.ratio ? { aspectRatio: i.ratio } : undefined}
-            />
+            <img src={i.src} alt={i.label} loading="lazy" className={`${i.box} border border-line bg-paper object-contain shadow-sm`} />
             <span className="text-sm font-medium text-heading">{i.label}</span>
             {downloads ? (
               <span className="flex gap-3 text-xs">

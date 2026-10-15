@@ -21,7 +21,6 @@ import { attendanceAction, cardBackAction, guestbookAction, payAction } from './
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
-import { CARD_SHAPES, type CardShape } from '@/catalog/card-shapes';
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
@@ -86,19 +85,10 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
   const files = paid
     ? [
-        // One card per shape the package includes (most designs: just one). An uploaded card replaces the first.
         ...(r.invitation.hasPrintCard
-          ? r.invitation.cardShapes.map((shape, i) => ({
-              kind: 'card' as const,
-              key: `card-${shape}`,
-              query: i === 0 ? '' : `shape=${shape}`,
-              title: r.invitation.cardShapes.length > 1 ? `${t('printCardTitle')} · ${tStore(`cardShapes.${shape}`)}` : t('printCardTitle'),
-              download: t('printCardDownload'),
-              preview: i > 0 || !r.invitation.customCard,
-              ratio: cardRatio(shape),
-            }))
+          ? [{ kind: 'card' as const, title: t('printCardTitle'), download: t('printCardDownload'), preview: !r.invitation.customCard }]
           : []),
-        ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, key: 'keepsake', query: '', title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true, ratio: undefined }] : []),
+        ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
       ]
     : [];
 
@@ -291,14 +281,13 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           <div className={`grid gap-4 ${files.length > 1 ? 'grid-cols-2' : 'mx-auto max-w-[220px] grid-cols-1'}`}>
             {files.map((f) => (
               <DocumentPreview
-                key={f.key}
+                key={f.kind}
                 title={f.title}
-                imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
-                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading') } : undefined}
-                openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
-                downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
+                imageSrc={f.preview ? `${base}/preview/${f.kind}` : null}
+                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack`, title: tStore('cardBack.heading') } : undefined}
+                openHref={`${base}/${f.kind}?inline=1`}
+                downloadHref={`${base}/${f.kind}`}
                 labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
-                ratio={f.ratio}
               />
             ))}
           </div>
@@ -346,10 +335,4 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
       <p className="mt-2 text-xs text-muted print:hidden">{t('keepLink')}</p>
     </main>
   );
-}
-
-/** Picture proportions of a card shape's front and back (a rectangle's back is landscape). */
-function cardRatio(shape: CardShape) {
-  const { widthMm: w, heightMm: h, landscapeBack } = CARD_SHAPES[shape];
-  return { front: `${w} / ${h}`, back: landscapeBack ? `${h} / ${w}` : `${w} / ${h}` };
 }

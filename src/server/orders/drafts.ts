@@ -14,7 +14,6 @@ import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
 import { extrasUpdate, type OrderExtras } from './extras';
 import { occasionSectionId, themeOccasions } from '@/server/catalog/occasions';
-import { packageCardShapes } from '@/server/catalog/card-shapes';
 
 /** `occasion`: which occasion (section key) the invitation is for, for a design sold in several. */
 export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown>; extras?: OrderExtras; occasion?: string };
@@ -68,7 +67,6 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
         fieldValues: result.values,
         fieldKeys: p.pkg.fieldKeys,
         featureKeys: p.pkg.featureKeys,
-        cardShapes: packageCardShapes(p.pkg, p.version.manifest as ThemeManifest),
         musicTrackId: p.theme.musicTrackId,
         ...extra,
         previewTokenHash: previewTokenHash(token),

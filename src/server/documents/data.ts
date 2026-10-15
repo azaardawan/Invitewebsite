@@ -9,7 +9,7 @@ import { manifestByCodeRef } from '@/theme-registry';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
-import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintCardShape, PrintLabels } from '@/theme-sdk/print';
+import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
 import { occasionKey, signatureUrls } from '@/server/invitation/load';
 import type { RenderKind } from './tokens';
 import type { CardOptions } from '@/server/db/schema';
@@ -17,9 +17,6 @@ import type { ThemeProps } from '@/theme-sdk/types';
 import { defaultLook, themeArtwork, type ResolvedCardDesign } from '@/server/catalog/card-design';
 import type { ExtrasLook } from '@/server/db/schema';
 import { tintedLook } from '@/components/print/look';
-import { CARD_SHAPES, outlinePath, safeAreaMm, type CardShape } from '@/catalog/card-shapes';
-import { invitationCardShapes, resolveCardShape } from '@/server/catalog/card-shapes';
-import { designCardShapes } from '@/theme-sdk/manifest';
 
 type InvitationRow = typeof invitations.$inferSelect;
 type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string; watermark: string; watermarkNote: string };
@@ -30,6 +27,7 @@ type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty:
  */
 export type PageSpec = { width: string; height: string; margin: string; cropMm: number };
 
+const CARD_SIZES = { A5: [148, 210], '5x7': [127, 178] } as const;
 
 export function invitationUrl(inv: Pick<InvitationRow, 'slug' | 'publicId'>): string {
   return `${env().APP_URL.replace(/\/$/, '')}${invitationPath(inv.slug, inv.publicId)}`;
@@ -44,7 +42,7 @@ export async function visibleMessages(db: DbOrTx, invitationId: string) {
 }
 
 /** Everything a theme's print component and the PDF page need for one invitation. */
-export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind, extra: { shape?: unknown } = {}) {
+export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind) {
   const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const codeRef = version!.codeRef;
   const manifest = manifestByCodeRef(codeRef);
@@ -72,15 +70,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     // A design without an online invitation has nothing for a QR code to open.
     const qrUrl = opts.showQr !== false && manifest?.onlineInvitation !== false ? invitationUrl(inv) : null;
     const artwork = await themeArtwork(db, inv.themeId);
-    // Several shapes: the one asked for (when the invitation has it). The owner's card artwork is drawn for
-    // the design's main shape only; other shapes use the design's own drawing.
-    // The design's manifest as registered (the code's own when the registry has it).
-    const design_ = manifest ?? (version!.manifest as ThemeManifest | null) ?? undefined;
-    const shapes = invitationCardShapes(inv, design_);
-    const shape = resolveCardShape(extra.shape, shapes);
-    const main = shape === designCardShapes(design_)[0];
-    const design = main ? { front: artwork.front, back: artwork.back } : { front: null, back: null };
-    return { codeRef, shapes, ...(await cardData(theme, design_, kind, opts, qrUrl, design, artwork.look, shape)) };
+    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look)) };
   }
   const { base } = printBase(theme);
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
@@ -132,19 +122,10 @@ export async function cardData(
   design: ResolvedCardDesign,
   /** The owner's look for this design's extras; the platform's simple card front and back follow it too. */
   ownerLook: ExtrasLook | null = null,
-  /** Which of the design's card shapes to print (default: its main one). */
-  shapeKey?: CardShape,
 ) {
   const { base, cardBackTitle } = printBase(theme);
   const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
-  const shape = shapeKey ?? spec.size;
-  const dims = CARD_SHAPES[shape];
-  const [w, h] = [dims.widthMm, dims.heightMm];
-  const b = spec.bleedMm;
-  // The back of a rectangle is landscape; a cut-out shape's back is the same shape, mirrored.
-  const [bw, bh] = dims.landscapeBack ? [h, w] : [w, h];
-  const card: PrintCardShape = { shape, widthMm: w, heightMm: h, bleedMm: b, outline: outlinePath(shape, { width: w, height: h, offsetX: b, offsetY: b }), safe: safeAreaMm(shape, { width: w, height: h }) };
-  const backCard: PrintCardShape = { shape, widthMm: bw, heightMm: bh, bleedMm: b, outline: outlinePath(shape, { width: bw, height: bh, offsetX: b, offsetY: b, mirror: true }), safe: safeAreaMm(shape, { width: bw, height: bh, mirror: true }) };
+  const [w, h] = CARD_SIZES[spec.size];
   const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M' }) : null;
   // Card-only wording from Admin: replace (or remove) the message, add one extra line.
   const fields = { ...base.fields };
@@ -152,18 +133,17 @@ export async function cardData(
     if (opts.message.trim()) fields.invitation_message = opts.message.trim();
     else delete fields.invitation_message;
   }
-  const props: PrintCardProps = { ...base, card, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
+  const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
   // The back: the customer's big title (or a default) and smaller message.
-  const back: PrintCardBackProps = { ...base, card: backCard, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
+  const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
   const page: PageSpec =
     kind === 'card'
       ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
       : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
-  const backPage: PageSpec = dims.landscapeBack ? { ...page, width: page.height, height: page.width } : page;
+  // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
+  const backPage: PageSpec = { ...page, width: page.height, height: page.width };
   const sheet = { bleedMm: spec.bleedMm, pageHasBleed: kind === 'cardBleed' };
   const gender = base.fields.baby_gender === 'boy' || base.fields.baby_gender === 'girl' ? base.fields.baby_gender : null;
   const look = tintedLook(ownerLook ?? defaultLook(base.colors), gender);
-  // A cut-out shape: the customer's file is cut to it, the print-shop file shows where to cut.
-  const cut = dims.outline ? { outline: dims.outline as string } : null;
-  return { kind: 'card' as const, props, back, page, backPage, design, sheet, look, shape, cut };
+  return { kind: 'card' as const, props, back, page, backPage, design, sheet, look };
 }

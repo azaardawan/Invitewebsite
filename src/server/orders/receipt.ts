@@ -9,7 +9,6 @@ import { invitations, orders } from '@/server/db/schema';
 import { invitationPath } from '@/lib/ids';
 import { receiptTokenHash , accessCodeFor, formatAccessCode } from './tokens';
 import { isLive } from './payment';
-import { invitationCardShapes } from '@/server/catalog/card-shapes';
 
 export type OrderSnapshot = {
   theme: { key: string; name: { ar: string; en: string; ckb?: string | null; bdn?: string | null } };
@@ -37,8 +36,7 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
   if (!row) return null;
   const snapshot = row.order.snapshot as OrderSnapshot;
   // Designs without an online invitation (manifest `onlineInvitation: false`) sell files only: no link.
-  const manifest = manifestByCodeRef(snapshot.themeVersion.codeRef);
-  const onlineInvitation = manifest?.onlineInvitation !== false;
+  const onlineInvitation = manifestByCodeRef(snapshot.themeVersion.codeRef)?.onlineInvitation !== false;
   return {
     /** Internal id, for server-side follow-ups (payment checks); never rendered. */
     orderId: row.order.id,
@@ -55,8 +53,6 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       /** Internal id, for the card download; never rendered. */
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
-      /** The printable card's shapes (one file each; most designs: just A5). */
-      cardShapes: invitationCardShapes(row.invitation, manifest),
       /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */
       featureKeys: row.invitation.featureKeys,
       stickerShape: row.invitation.stickerShape,

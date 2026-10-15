@@ -29,10 +29,6 @@ product spec's §74 business rules override assumptions.
 - Every theme has a permanent number in `themes/numbers.json` (shown as `#N` in Admin). When the owner says
   "theme 7", look the key up there. A new theme folder gets the next number when the registry is generated;
   commit the file. Numbers are never reused.
-- Printable cards come in shapes (`src/catalog/card-shapes.ts`: A5, leaf, heart, oval, ogee arch, butterfly,
-  cloud…). A design lists the ones it offers in `print.card.shapes` (default: just `print.card.size`) and the
-  owner ticks per package which ones the customer gets. Card.tsx reads `props.card` (size, outline, safe area);
-  see THEME_CONTRACT §6 "Card shapes".
 - The owner can replace either side of a theme's printable card with their own artwork in Admin
   (`themes.card_design`, `src/server/catalog/card-design.ts`); the platform writes the text on it.
 - Newborn extras (`story`, `sticker`, `bottle_label`) are platform features drawn by `src/components/print/Products.tsx`

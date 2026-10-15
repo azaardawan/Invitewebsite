@@ -40,8 +40,6 @@ export const generatedDocuments = pgTable(
       .notNull()
       .references(() => invitations.id, { onDelete: 'cascade' }),
     kind: documentKind('kind').notNull(),
-    /** Which one of several of the same kind: the card shape ('' = the invitation's main shape). */
-    variant: text('variant').notNull().default(''),
     storageKey: text('storage_key').notNull(),
     sourceHash: text('source_hash').notNull(),
     themeVersionId: uuid('theme_version_id')
@@ -52,5 +50,5 @@ export const generatedDocuments = pgTable(
     generatedBy: uuid('generated_by').references(() => adminUsers.id, { onDelete: 'set null' }),
     generatedAt: timestamp('generated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex('generated_documents_invitation_kind_variant_idx').on(t.invitationId, t.kind, t.variant), index('generated_documents_generated_idx').on(t.generatedAt)],
+  (t) => [uniqueIndex('generated_documents_invitation_kind_idx').on(t.invitationId, t.kind), index('generated_documents_generated_idx').on(t.generatedAt)],
 );

@@ -471,9 +471,7 @@
             "top": "Top 3",
             "home": "Homepage"
           }
-        },
-        "packageCardShapes": "Card shapes",
-        "packageCardShapesHint": "Which card shape(s) the customer gets in this package. Each shape is its own file."
+        }
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -582,8 +580,7 @@
         "showParents": "Parents' names",
         "showQuote": "The quote",
         "ownLook": "Use this item's own colours and fonts below (otherwise the shared look)",
-        "paper": "Paper (background)",
-        "printShop": "Print-shop file (with cutting line)"
+        "paper": "Paper (background)"
       },
       "productDesign": {
         "heading": "Newborn extras design",
@@ -1386,16 +1383,6 @@
       "arabic": "Arabic (as in the design)",
       "inLanguage": "In the invitation's language ({language})",
       "custom": "Write your own"
-    },
-    "cardShapes": {
-      "A5": "A5 card",
-      "5x7": "5×7 card",
-      "leaf": "Leaf-shaped card",
-      "heart": "Heart-shaped card",
-      "oval": "Oval card",
-      "ogee-arch": "Arch-shaped card",
-      "butterfly": "Butterfly-shaped card",
-      "cloud": "Cloud-shaped card"
     }
   },
   "contact": {

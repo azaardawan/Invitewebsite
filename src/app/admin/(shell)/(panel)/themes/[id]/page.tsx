@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { packageCardShapes } from '@/server/catalog/card-shapes';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/server/db/client';
@@ -19,7 +18,7 @@ import { CardDesignSection } from './CardDesignSection';
 import { ProductDesignSection } from './ProductDesignSection';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
-import { designCardShapes, type ThemeManifest } from '@/theme-sdk/manifest';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { PLATFORM_FEATURES } from '@/catalog/features';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
@@ -52,15 +51,10 @@ function PackageContents({
   fields,
   fieldLabel,
   t,
-  cardShapes,
-  shapeLabel,
 }: {
   manifest: ThemeManifest;
   features: readonly string[];
   fields: readonly string[];
-  /** The printable card shapes this package includes (shown when the design offers more than one). */
-  cardShapes: readonly string[];
-  shapeLabel: (shape: string) => string;
   fieldLabel: (key: string) => string;
   t: Translate;
 }) {
@@ -76,19 +70,6 @@ function PackageContents({
           </label>
         ))}
       </fieldset>
-      {designCardShapes(manifest).length > 1 ? (
-        <fieldset className="space-y-1.5" data-package-card-shapes>
-          <legend className="text-sm font-medium">{t('themes.packageCardShapes')}</legend>
-          <p className="text-xs text-muted">{t('themes.packageCardShapesHint')}</p>
-          <input type="hidden" name="cardShapesShown" value="1" />
-          {designCardShapes(manifest).map((shape) => (
-            <label key={shape} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="cardShapes" value={shape} defaultChecked={cardShapes.includes(shape)} />
-              <span>{shapeLabel(shape)}</span>
-            </label>
-          ))}
-        </fieldset>
-      ) : null}
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium">{t('themes.packageFields')}</legend>
         <p className="text-xs text-muted">{t('themes.packageFieldsHint')}</p>
@@ -109,7 +90,6 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const d = await getThemeDetail(db(), id).catch((e) => (e instanceof CatalogError ? null : Promise.reject(e)));
   if (!d) notFound();
   const t = await getTranslations('admin.catalog');
-  const tShapes = await getTranslations('store.cardShapes');
   const locale = await getLocale();
   const [sections, music, settings] = await Promise.all([
     listSections(db(), { includeArchived: true }),
@@ -421,7 +401,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <div className="w-48">
                     <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
                   </div>
-                  <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} cardShapes={packageCardShapes(p, manifest)} shapeLabel={(s) => tShapes(s as never)} />
+                  <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
                 <ActionForm action={packageStatusAction} confirmMessage={t('common.confirm')} className="mt-3">
@@ -446,7 +426,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <div className="w-48">
                   <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
                 </div>
-                <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} cardShapes={designCardShapes(manifest).slice(0, 1)} shapeLabel={(s) => tShapes(s as never)} />
+                <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
             </details>

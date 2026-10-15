@@ -10,7 +10,7 @@ import { FONTS, type PrintLook } from './ArtworkCard';
  * title, their message, then the couple's names or the signatures, in the theme's colours. Landscape. The theme's
  * border (drawn with <ThemeBorder> on the front) repeats on this page by itself. Fills the page it is given.
  */
-export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message, look, card }: PrintCardBackProps & { look?: PrintLook }) {
+export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors, title, message, look }: PrintCardBackProps & { look?: PrintLook }) {
   const ink = look?.ink ?? colors.ink ?? colors.text ?? '#3b2f2a';
   const accent = look?.accent ?? colors.accent ?? colors.primary ?? '#8a6a3b';
   const names = invitationNames(fields).join(` ${labels.and} `);
@@ -23,8 +23,7 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         boxSizing: 'border-box',
         width: '100%',
         height: '100%',
-        // A cut-out shape narrows towards its edges: keep the text well inside it.
-        padding: card?.safe ? `${card.safe.top}mm ${card.safe.right}mm ${card.safe.bottom}mm ${card.safe.left}mm` : '16mm 28mm',
+        padding: '16mm 28mm',
         background: look?.paper ?? colors.paper ?? colors.background ?? '#fbf7f0',
         color: ink,
         fontFamily: look ? FONTS[look.bodyFont] : "'Noto Sans Arabic Variable', 'Noto Sans Arabic', sans-serif",
@@ -37,7 +36,7 @@ export function DefaultCardBack({ dir, lang, fields, labels, signatures, colors,
         overflow: 'hidden',
       }}
     >
-      <h1 style={{ margin: 0, fontFamily: look ? FONTS[look.headingFont] : "'Aref Ruqaa', serif", fontWeight: 700, fontSize: card?.safe ? '12mm' : '16mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
+      <h1 style={{ margin: 0, fontFamily: look ? FONTS[look.headingFont] : "'Aref Ruqaa', serif", fontWeight: 700, fontSize: '16mm', lineHeight: 1.15, color: accent, overflowWrap: 'anywhere' }}>{title}</h1>
       {message ? <p style={{ margin: 0, maxWidth: '140mm', fontSize: '4.4mm', lineHeight: 1.8, whiteSpace: 'pre-line', overflowWrap: 'anywhere' }}>{message}</p> : null}
       {signatures.length ? (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: '8mm' }}>

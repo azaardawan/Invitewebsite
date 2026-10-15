@@ -17,6 +17,6 @@ export type {
 export { hasFeature, formatNumber } from './types';
 export { ThemeBorder, Signature } from './border';
 export type { ThemeBorderSpec, BorderKind } from './border';
-export type { PrintCardProps, PrintCardBackProps, PrintCardShape, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';
+export type { PrintCardProps, PrintCardBackProps, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';

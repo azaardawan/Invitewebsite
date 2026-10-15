@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { FEATURE_KEYS, featureDependencyProblems, isPlatformFeature, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
-import { CARD_SHAPE_KEYS, type CardShape } from '@/catalog/card-shapes';
 
 /**
  * A theme version's manifest: what the theme supports and which package
@@ -32,12 +31,7 @@ export type ThemeManifest = {
   validStates: { features: FeatureKey[]; fields: FieldKey[] }[];
   /** Print companions, required when `print_card` / `keepsake_pdf` are supported. */
   print?: {
-    /**
-     * `size`: the card's main shape (see src/catalog/card-shapes.ts). `shapes`: every shape the design offers,
-     * the main one included (default: just `size`); the owner chooses per package which ones the customer
-     * gets, and Card.tsx / CardBack.tsx read `props.card` to lay out for the shape being printed.
-     */
-    card?: { size: CardShape; shapes?: CardShape[]; bleedMm: number; qr: boolean };
+    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean };
     keepsake?: { size: 'A4' };
   };
   /**
@@ -121,15 +115,7 @@ export const manifestSchema = z
     validStates: z.array(z.object({ features: z.array(featureKey), fields: z.array(fieldKey).min(1) })).min(1).max(10),
     print: z
       .object({
-        card: z
-          .object({
-            size: z.enum(CARD_SHAPE_KEYS as [CardShape, ...CardShape[]]),
-            shapes: z.array(z.enum(CARD_SHAPE_KEYS as [CardShape, ...CardShape[]])).min(1).optional(),
-            bleedMm: z.number().min(0).max(10),
-            qr: z.boolean(),
-          })
-          .refine((c) => !c.shapes || (c.shapes.includes(c.size) && new Set(c.shapes).size === c.shapes.length), 'print.card.shapes must list print.card.size once, and no shape twice')
-          .optional(),
+        card: z.object({ size: z.enum(['A5', '5x7']), bleedMm: z.number().min(0).max(10), qr: z.boolean() }).optional(),
         keepsake: z.object({ size: z.literal('A4') }).optional(),
       })
       .optional(),
@@ -225,11 +211,4 @@ export function matchesValidState(
 
 export function codeRef(m: Pick<ThemeManifest, 'key' | 'version'>) {
   return `${m.key}@${m.version}`;
-}
-
-/** The card shapes a design offers, its main shape first (A5 for a design without a printable card). */
-export function designCardShapes(m: Pick<ThemeManifest, 'print'> | null | undefined): CardShape[] {
-  const card = m?.print?.card;
-  if (!card) return ['A5'];
-  return [card.size, ...(card.shapes ?? []).filter((s) => s !== card.size)];
 }

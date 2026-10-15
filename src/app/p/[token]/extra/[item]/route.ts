@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * Only previews: the files themselves are given out on the receipt once paid. The watermark is drawn by the
  * server's render, so the clean picture never reaches the browser before payment.
  */
-export async function GET(req: Request, { params }: RouteContext<'/p/[token]/extra/[item]'>) {
+export async function GET(_req: Request, { params }: RouteContext<'/p/[token]/extra/[item]'>) {
   const { token, item } = await params;
   if (!(PRODUCT_ITEMS as string[]).includes(item) || !isPreview(item as ProductItem)) return new Response('Not found', { status: 404 });
   const inv = await findByPreviewToken(db(), token);
@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: RouteContext<'/p/[token]/ext
     return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '3600' } });
   }
   try {
-    const file = await ensureProductFile(db(), inv.id, item as ProductItem, undefined, { shape: new URL(req.url).searchParams.get('shape') ?? undefined });
+    const file = await ensureProductFile(db(), inv.id, item as ProductItem);
     return new Response(new Uint8Array(file.data), {
       headers: { 'Content-Type': file.type, 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' },
     });
