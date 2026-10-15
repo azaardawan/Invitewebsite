@@ -99,9 +99,10 @@
 }
 /* A short thank-you title above the names (wording.cardThanks). */
 .cardThanks {
-  margin: 0 0 2mm;
+  max-width: 100mm;
+  margin: 0 0 3mm;
   font-family: var(--font-script);
-  font-size: 17pt;
+  font-size: 32pt;
   line-height: 1.3;
   color: #8c6c2c;
   text-wrap: balance;

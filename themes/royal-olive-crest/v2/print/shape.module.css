@@ -77,7 +77,7 @@
 /* Heart front: under the crest, above the lower ornaments (clear 43–70 % down). Back: between the top
    flourishes and the crest (clear 19–67 % down). */
 .heart-front .front {
-  inset: 44% 22% 31%;
+  inset: 46% 22% 26%;
   gap: 1.5mm;
 }
 .heart-back .back {
@@ -107,15 +107,15 @@
 }
 /* A short thank-you title above the names (wording.cardThanks). */
 .thanks {
-  margin: 0 0 1mm;
+  margin: 0 0 1.5mm;
   font-family: var(--font-script);
-  font-size: 12.5pt;
+  font-size: 19pt;
   line-height: 1.3;
   color: #e6c77d;
   text-wrap: balance;
 }
 .heart-front .thanks {
-  font-size: 12pt;
+  font-size: 17pt;
 }
 .and {
   font-family: var(--font-text);
