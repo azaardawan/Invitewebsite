@@ -775,3 +775,56 @@ for Kurdish in this work; live.
 | 3 | `store.includesWhen` | التاريخ والوقت | Date and time | بەروار و کات | دیرۆک و دەم | ● |
 
 `store.fieldsCount` («# زانیاری بۆ پڕکردنەوە») is no longer used and was removed.
+
+## Batch 31 — four new wedding designs: their own lines — ✅ APPROVED (2026-10-15)
+
+Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15).
+These are the lines each design writes itself (in each theme's `copy.ts`). The owner approved every row as
+suggested ("approve all"); live in the four themes, and the design names in their manifests. Glossary reused from approved rows: wedding هاوسەرگیری / داوەت, joy خۆشی / شاهی, presence ئامادەبوون,
+celebration ئاهەنگ. A «/» marks a line break in the design. Lines shared by several designs are listed once.
+
+| # | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Designs |
+|---|---|---|---|---|---|---|
+| 1 | بمناسبة زفافنا | The wedding of | بە بۆنەی هاوسەرگیریمان | ب بۆنا داوەتا مە | ● | B, E, W |
+| 2 | ندعوكم لمشاركتنا / فرحة زفافنا | You are cordially invited to the wedding of | بانگهێشتتان دەکەین بۆ بەشداریکردن / لە خۆشیی هاوسەرگیریمان | مە هوین داخواز کرینە بۆ پشکداریێ / د شاهیا داوەتا مە دا | ◐ | B, E |
+| 3 | ننتظر مشاركتكم / أجمل أيامنا | We can’t wait to celebrate with you! | چاوەڕێی بەشداریتانین / لە خۆشترین ڕۆژمان | ئەم چاڤەڕێی پشکداریا هەوەینە / د خۆشترین ڕۆژا مە دا | ◐ | B, E |
+| 4 | دعوة زفاف | You are invited | بانگهێشتنامەی هاوسەرگیری | داخوازناما داوەتێ | ● | B, E |
+| 5 | بكل الحب | All of our love / With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ | ◐ | all |
+| 6 | موعد فرحتنا يقترب | Countdown to | کاتی خۆشیمان نزیک دەبێتەوە | دەمێ شاهیا مە نێزیک دبیت | ◐ | B, E |
+| 7 | نبدأ حكايتنا | “I Do” | چیرۆکەکەمان دەست پێدەکەین | ئەم دەست ب چیرۆکا خۆ دکەین | ◐ | B, E |
+| 8 | الزمان والمكان | The date & place | کات و شوێن | دەم و جه | ● | B, E |
+| 9 | تفاصيل الزفاف | Details | زانیارییەکانی هاوسەرگیری | زانیاریێن داوەتێ | ◐ | all |
+| 10 | موعد الاحتفال | The celebration begins | کاتی ئاهەنگ | دەمێ ئاهەنگێ | ● | B, E |
+| 11 | مكان اللقاء | Join us at | شوێنی دیدار | جهێ هەڤدیتنێ | ◐ | B, E |
+| 12 | بانتظار ردكم / ننتظر ردكم | Kindly reply | چاوەڕێی وەڵامتانین | ئەم چاڤەڕێی بەرسڤا هەوەینە | ● | all |
+| 13 | تأكيد الحضور | Rsvp | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ◐ | B, E |
+| 14 | يسعدنا أن تشاركونا فرحتنا | We would love to celebrate with you | خۆشحاڵ دەبین بەشداری خۆشیمان بکەن | دێ دلخۆش بین ئەگەر هوین پشکداریێ د شاهیا مە دا بکەن | ◐ | B, E |
+| 15 | رسائل الأهل والأحبة في يوم زفافنا (keepsake) | Wishes from our family and friends | نامەی خێزان و خۆشەویستان لە ڕۆژی هاوسەرگیریماندا | نامێن مالباتێ و هەڤالان د ڕۆژا داوەتا مە دا | ◐ | B, E |
+| 16 | شكرًا لكل من شاركنا فرحتنا (keepsake) | Thank you for sharing our joy | سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری | ● | B, E |
+| 17 | موعد فرحتنا | Save the date | کاتی خۆشیمان | دەمێ شاهیا مە | ◐ | W, V |
+| 18 | نحتفل معكم يوم (before the date) | A celebration on | لەگەڵتان ئاهەنگ دەگێڕین لە ڕۆژی | ئەم دێ دگەل هەوە ئاهەنگێ گێڕین ل ڕۆژا | ○ | W |
+| 19 | معاً دائماً | Together, always | هەمیشە پێکەوە | هەردەم پێکڤە | ● | W |
+| 20 | بداية حكايتنا معاً | Our next chapter / A beautiful beginning | دەستپێکی چیرۆکی پێکەوەمان | دەستپێکا چیرۆکا مە یا پێکڤە | ◐ | W, V |
+| 21 | تكتمل فرحتنا بحضوركم ومشاركتكم أجمل أيامنا. | Your presence will make our day complete. | خۆشیمان بە ئامادەبوون و بەشداریتان لە خۆشترین ڕۆژمان تەواو دەبێت. | شاهیا مە ب ئامادەبوون و پشکداریا هەوە د خۆشترین ڕۆژا مە دا تەمام دبیت. | ◐ | W, V |
+| 22 | حتى نبدأ حكايتنا | Until our next chapter | تا چیرۆکەکەمان دەست پێدەکەین | هەتا ئەم دەست ب چیرۆکا خۆ دکەین | ◐ | W, V |
+| 23 | ننتظر يوم فرحتنا | Counting the days | چاوەڕێی ڕۆژی خۆشیمانین | ئەم چاڤەڕێی ڕۆژا شاهیا خۆینە | ◐ | W, V |
+| 24 | موعد ننتظره معكم | A note for your diary | کاتێک کە لەگەڵتان چاوەڕێی دەکەین | دەمەکێ ئەم دگەل هەوە چاڤەڕێ دکەین | ◐ | W, V |
+| 25 | الساعة (before the time) | At | کاتژمێر | دەمژمێر | ◐ | W, V |
+| 26 | بمشاركة أهلنا وأحبتنا | Together with our families | بە بەشداریی خێزان و خۆشەویستانمان | ب پشکداریا مالبات و هەڤالێن مە | ◐ | W, V |
+| 27 | مكان الاحتفال | The celebration | شوێنی ئاهەنگ | جهێ ئاهەنگێ | ● | W, V |
+| 28 | ننتظر رسالتكم | A letter back to us | چاوەڕێی نامەکەتانین | ئەم چاڤەڕێی نامەیا هەوەینە | ◐ | W, V |
+| 29 | حجزنا لكم مكاناً في فرحتنا. | We have saved a place for you. | شوێنێکمان بۆ ئێوە لە خۆشیماندا گرتووە. | مە جهەک بۆ هەوە د شاهیا خۆ دا گرتییە. | ◐ | W, V |
+| 30 | شكراً من القلب لكل من شاركنا فرحتنا (keepsake) | With heartfelt thanks to everyone who shared our joy | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری | ◐ | W, V |
+| 31 | رسالة صغيرة لبداية جميلة (under the Open button) | A little letter. A beautiful beginning. | نامەیەکی بچووک بۆ دەستپێکێکی جوان | نامەیەکا بچووک بۆ دەستپێکەکا جوان | ◐ | V |
+| 32 | تبدأ حكايتنا بحضوركم. (on the letter) | Our next chapter begins with you. | چیرۆکەکەمان بە ئامادەبوونتان دەست پێدەکات. | چیرۆکا مە ب ئامادەبوونا هەوە دەست پێدکەت. | ◐ | V |
+| 33 | دعوة / زفاف (the poster title, two boxes) | Wedding / Invitation | بانگهێشتنامە / هاوسەرگیری | داخوازنامە / داوەت | ◐ | V |
+| 34 | إلى أهلنا وأحبتنا، | To our dearest family & friends, | بۆ خێزان و خۆشەویستانمان، | بۆ مالبات و هەڤالێن مە، | ◐ | V |
+
+Design names (manifest `title`; they become the designs' Kurdish names in Admin, which the owner can change):
+
+| # | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|
+| 35 | العنابي والدانتيل | Burgundy & Lace | عەنابی و دانتێلا | عەنابی و دانتێل | ○ |
+| 36 | الإسبريسو والعاجي | Espresso & Ivory | ئێسپرێسۆ و عاجی | ئێسپرێسۆ و عاجی | ○ |
+| 37 | زهرة الشتاء | Winter Flower | گوڵی زستان | گولا زڤستانێ | ● |
+| 38 | رسائل الحب العتيقة | Vintage Love Letters | نامە کۆنەکانی خۆشەویستی | نامێن کەڤن یێن ڤیانێ | ◐ |
