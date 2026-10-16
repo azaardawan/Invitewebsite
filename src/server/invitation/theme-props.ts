@@ -74,6 +74,9 @@ export function buildThemeProps(input: {
   /** The design's yes/no choices (manifest) and the customer's answers (absent = the default). */
   switchDefs?: readonly DesignSwitch[];
   switches?: Record<string, boolean> | null;
+  /** The customer's photos in order (packages with `photos`), and the design's photo settings (for samples and names). */
+  photos?: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number } }[];
+  photoSpec?: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -113,7 +116,30 @@ export function buildThemeProps(input: {
     birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
     wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
     switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),
+    photos: resolvePhotos(features, input.mode, input.locale, input.photos ?? [], input.photoSpec ?? null),
   };
+}
+
+/** Placeholder pictures for samples (no real people), used in turn for every place a design has. */
+export const SAMPLE_PHOTOS = [1, 2, 3, 4, 5, 6].map((n) => `/samples/photos/photo-${n}.webp`);
+
+/** The photos a theme shows: the customer's (or placeholders in samples), each with the design's name for its place. */
+export function resolvePhotos(
+  features: readonly string[],
+  mode: InvitationMode,
+  locale: Locale,
+  photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number } }[],
+  spec: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null,
+): ThemeProps['photos'] {
+  if (!features.includes('photos')) return [];
+  const label = (i: number) => {
+    const l = spec?.labels?.[i];
+    return l ? (l[locale] ?? l.ar) : null;
+  };
+  if (mode === 'sample') {
+    return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i) }));
+  }
+  return photos.slice(0, spec?.max ?? photos.length).map((p, i) => ({ src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i) }));
 }
 
 /** Each yes/no choice: the customer's answer, else the design's default. */

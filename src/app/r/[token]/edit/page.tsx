@@ -10,6 +10,8 @@ import { localized } from '@/server/catalog/common';
 import { orderFields } from '@/server/storefront/catalog';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
+import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
+import { photoState } from '@/server/storefront/order';
 import { receiptFor } from '../data';
 import { customerEditAction } from '../actions';
 
@@ -40,12 +42,48 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
   const today = new Date().toISOString().slice(0, 10);
   const existingDate = inv!.fieldValues.event_date;
   const minDate = existingDate && existingDate < today ? existingDate : today;
+  // The customer's photos (packages with `photos`): changed here too, saved one by one.
+  const photos = await photoState(inv!);
+  const ts = await getTranslations({ locale, namespace: 'store' });
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">
       <p className="mb-6">{back}</p>
       <h1 className="text-xl font-semibold">{t('editTitle')}</h1>
       <p className="mt-2 text-sm text-muted">{t('editHelp', { left: r.invitation.selfEdit.left, total: SELF_EDIT_LIMIT })}</p>
+      {photos ? (
+        <div className="mt-8">
+          <PhotoSlots
+            base={`/r/${encodeURIComponent(token)}/photos`}
+            max={photos.max}
+            min={photos.min}
+            aspect={photos.aspect}
+            names={photos.names}
+            initial={photos.photos}
+            labels={{
+              title: ts('photos.title'),
+              help: ts('photos.helpPublished', { max: photos.max }),
+              count: ts.raw('photos.count') as string,
+              add: ts('photos.add'),
+              addMany: ts('photos.addMany'),
+              replace: ts('photos.replace'),
+              remove: ts('photos.remove'),
+              adjust: ts('photos.adjust'),
+              done: ts('photos.done'),
+              zoom: ts('photos.zoom'),
+              uploading: ts('photos.uploading'),
+              photo: ts.raw('photos.photo') as string,
+              errors: {
+                tooLarge: ts('photos.errors.tooLarge'),
+                unsupportedImage: ts('photos.errors.unsupportedImage'),
+                imageTooSmall: ts('photos.errors.imageTooSmall'),
+                rateLimited: ts('photos.errors.rateLimited'),
+                generic: ts('photos.errors.generic'),
+              },
+            }}
+          />
+        </div>
+      ) : null}
       <div className="mt-8">
         <NextIntlClientProvider locale={locale} messages={{ store: messages.store } as never}>
           <OrderForm

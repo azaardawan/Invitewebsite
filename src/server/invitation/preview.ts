@@ -84,6 +84,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     colors: req.colors ?? null,
     wordingLines: manifest.wording ?? [],
     switchDefs: manifest.switches ?? [],
+    photoSpec: manifest.photos ?? null,
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
   });
   return { theme, version, manifest, props };

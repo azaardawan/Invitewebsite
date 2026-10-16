@@ -2,7 +2,8 @@ import 'server-only';
 import { invitationNames } from '@/catalog/fields';
 import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
+import { invitationPhotos, invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
+import { deletePhotoFiles } from '@/server/photos/photos';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { fieldDefs } from '@/server/orders/common';
@@ -177,3 +178,20 @@ export function invitationState(inv: { status: InvitationStatus; expiresAt: Date
 export async function activeMusicTracks(db: DbOrTx) {
   return db.select({ id: musicTracks.id, title: musicTracks.title }).from(musicTracks).where(eq(musicTracks.status, 'ACTIVE')).orderBy(musicTracks.title);
 }
+
+/** Takes one of the customer's photos off their invitation (e.g. an unsuitable picture). Audited with a reason. */
+export async function removeInvitationPhoto(db: DbOrTx, id: string, input: { position: number; reason: string }, actor: Actor) {
+  const reason = requireReason(input.reason);
+  const removed = await db.transaction(async (tx) => {
+    await lockFor(tx, id);
+    const [row] = await tx
+      .delete(invitationPhotos)
+      .where(and(eq(invitationPhotos.invitationId, id), eq(invitationPhotos.position, input.position)))
+      .returning();
+    if (!row) throw new InvitationAdminError('notFound');
+    await recordAudit(tx, { ...auditActor(actor), action: 'invitation.photo_removed', objectType: 'invitation', objectId: id, before: { position: input.position }, reason });
+    return row;
+  });
+  await deletePhotoFiles(db, [removed.assetId, removed.displayAssetId]);
+}
+

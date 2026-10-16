@@ -7,6 +7,7 @@ import type { InvitationMode } from '@/theme-sdk/types';
 import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps } from './theme-props';
 import { attendanceCounts } from '@/server/guests/attendance';
+import { listPhotos } from '@/server/photos/photos';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -42,6 +43,8 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       wording: inv.wording,
       switchDefs: (version!.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
+      photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id) : [],
+      photoSpec: (version!.manifest as ThemeManifest).photos ?? null,
     }),
   };
 }

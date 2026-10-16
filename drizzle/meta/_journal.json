@@ -295,6 +295,13 @@
       "when": 1792173431730,
       "tag": "0041_family_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792185752849,
+      "tag": "0042_invitation_photos",
+      "breakpoints": true
     }
   ]
 }

@@ -906,3 +906,34 @@ fiancé / fiancée دەستگیرانی کوڕ / کچ, دەزگرانێ کوڕ /
 Not translated (Arabic and English only, like every design's yes/no question): Burgundy's switch «الأحرف الأولى من اسمينا
 على ختم الشمع (بدل الوردة)». The Vintage poster's «ENGAGEMENT» band is English lettering in every language, like the
 poster's own «WEDDING Invitation».
+
+
+## Batch 34 — customers' own photos in a design — ⏳ PENDING APPROVAL
+
+Designs can now show the customer's own photos (up to 20). The review page gets a "Your photos" panel and the package
+checklist says how many photos a design holds. Placeholders (`{max}`, `{min}`, `{n}` and the `{max, plural, …}` form) stay as they are.
+
+| # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | `store.features.photos` | صوركم الخاصة داخل التصميم | Your own photos in the design | وێنەکانی خۆتان لەناو دیزاینەکەدا | وێنێن هەوە د دیزاینێ دا |
+| 2 | `store.photosUpTo` | {max, plural, one {صورتكم الخاصة داخل التصميم} other {حتى # من صوركم الخاصة}} | {max, plural, one {Your own photo in the design} other {Up to # of your own photos}} | {max, plural, one {وێنەکەی خۆتان لەناو دیزاینەکەدا} other {تا # وێنەی خۆتان}} | {max, plural, one {وێنێ هەوە د دیزاینێ دا} other {هەتا # وێنێن هەوە}} |
+| 3 | `store.errors.photosMissing` | أضيفوا الصور التي يحتاجها هذا التصميم (في «صوركم» أعلاه) قبل المتابعة. | Please add the photos this design needs (see “Your photos” above) before continuing. | تکایە پێش بەردەوامبوون ئەو وێنانە زیاد بکەن کە ئەم دیزاینە پێویستی پێیانە (لە «وێنەکانتان» لە سەرەوە). | هیڤیە بەری بەردەوامبوونێ وان وێنان زێدە بکەن یێن ئەڤ دیزاینە پێدڤی پێ هەی (ل «وێنێن هەوە» ل سەری). |
+| 4 | `store.photos.title` | صوركم | Your photos | وێنەکانتان | وێنێن هەوە |
+| 5 | `store.photos.help` | يعرض هذا التصميم حتى {max} صور. أضيفوا صوركم وضعوا كل صورة في إطارها، ويمكنكم تغييرها حتى الدفع. | This design shows up to {max} photos. Add your own and place each one in its frame; you can change them until you pay. | ئەم دیزاینە تا {max} وێنە پیشان دەدات. وێنەکانی خۆتان زیاد بکەن و هەر وێنەیەک لە چوارچێوەکەیدا دابنێن؛ تا کاتی پارەدان دەتوانن بیانگۆڕن. | ئەڤ دیزاینە هەتا {max} وێنەیان نیشان ددەت. وێنێن خۆ زێدە بکەن و هەر وێنەکێ د چوارچۆڤێ وی دا دانن؛ هەتا دەمێ پارەدانێ هوین دشێن وان بگوهۆڕن. |
+| 6 | `store.photos.helpMin` | يعرض هذا التصميم حتى {max} صور، وتحتاجون إلى {min} على الأقل. ضعوا كل صورة في إطارها، ويمكنكم تغييرها حتى الدفع. | This design shows up to {max} photos; add at least {min}. Place each one in its frame; you can change them until you pay. | ئەم دیزاینە تا {max} وێنە پیشان دەدات؛ لانیکەم {min} زیاد بکەن. هەر وێنەیەک لە چوارچێوەکەیدا دابنێن؛ تا کاتی پارەدان دەتوانن بیانگۆڕن. | ئەڤ دیزاینە هەتا {max} وێنەیان نیشان ددەت؛ کێمترین {min} زێدە بکەن. هەر وێنەکێ د چوارچۆڤێ وی دا دانن؛ هەتا دەمێ پارەدانێ هوین دشێن وان بگوهۆڕن. |
+| 7 | `store.photos.helpPublished` | يعرض هذا التصميم حتى {max} صور. تظهر التغييرات على دعوتكم فوراً. | This design shows up to {max} photos. Changes appear on your invitation straight away. | ئەم دیزاینە تا {max} وێنە پیشان دەدات. گۆڕانکارییەکان یەکسەر لە بانگهێشتنامەکەتاندا دەردەکەون. | ئەڤ دیزاینە هەتا {max} وێنەیان نیشان ددەت. گوهۆڕین دەستبجهـ ل سەر داخوازناما هەوە دیار دبن. |
+| 8 | `store.photos.count` | أُضيفت {n} من {max} صور | {n} of {max} photos added | {n} لە {max} وێنە زیادکران | {n} ژ {max} وێنەیان هاتنە زێدەکرن |
+| 9 | `store.photos.add` | أضف صورة | Add photo | وێنە زیاد بکە | وێنەکێ زێدە بکە |
+| 10 | `store.photos.addMany` | أضف عدة صور | Add several photos | چەند وێنەیەک زیاد بکە | چەند وێنەیان زێدە بکە |
+| 11 | `store.photos.replace` | استبدال | Replace | گۆڕین | گوهۆڕین |
+| 12 | `store.photos.remove` | حذف | Remove | سڕینەوە | ژێبرن |
+| 13 | `store.photos.adjust` | ضبط | Adjust | ڕێکخستن | ڕێکخستن |
+| 14 | `store.photos.done` | تم | Done | تەواو | تەمام |
+| 15 | `store.photos.zoom` | تكبير | Zoom | گەورەکردن | مەزنکرن |
+| 16 | `store.photos.uploading` | جارٍ الرفع… | Uploading… | بارکردن… | بارکرن… |
+| 17 | `store.photos.photo` | الصورة {n} | Photo {n} | وێنەی {n} | وێنێ {n} |
+| 18 | `store.photos.errors.tooLarge` | هذه الصورة كبيرة جداً. اختاروا صورة أقل من ١٥ ميغابايت. | This photo is too large. Please choose one under 15 MB. | ئەم وێنەیە زۆر گەورەیە. تکایە وێنەیەکی کەمتر لە ١٥ مێگابایت هەڵبژێرن. | ئەڤ وێنە گەلەک مەزنە. هیڤیە وێنەکێ ژ ١٥ مێگابایتان کێمتر هەلبژێرن. |
+| 19 | `store.photos.errors.unsupportedImage` | هذا الملف ليس صورة يمكن استخدامها. اختاروا صورة JPG أو PNG أو WebP. | This file isn't a photo we can use. Please choose a JPG, PNG or WebP photo. | ئەم فایلە وێنەیەک نییە کە بتوانین بەکاری بهێنین. تکایە وێنەیەکی JPG، PNG یان WebP هەڵبژێرن. | ئەڤ فایلە نە وێنەیەکە کو ئەم بشێین بکاربینین. هیڤیە وێنەکێ JPG، PNG یان WebP هەلبژێرن. |
+| 20 | `store.photos.errors.imageTooSmall` | هذه الصورة صغيرة جداً. اختاروا صورة أكبر. | This photo is too small. Please choose a larger one. | ئەم وێنەیە زۆر بچووکە. تکایە وێنەیەکی گەورەتر هەڵبژێرن. | ئەڤ وێنە گەلەک بچووکە. هیڤیە وێنەکێ مەزنتر هەلبژێرن. |
+| 21 | `store.photos.errors.rateLimited` | رفعتم صوراً كثيرة الآن. حاولوا بعد قليل. | Too many uploads for now. Please try again in a while. | ئێستا وێنەی زۆرتان بارکرد. تکایە دوای کەمێک هەوڵ بدەنەوە. | نوکە هەوە گەلەک وێنە بارکرن. هیڤیە پشتی دەمەکێ دووبارە هەول بدەن. |
+| 22 | `store.photos.errors.generic` | تعذّر حفظ الصورة. حاولوا مرة أخرى. | The photo couldn't be saved. Please try again. | وێنەکە پاشەکەوت نەکرا. تکایە دووبارە هەوڵ بدەنەوە. | وێنە نەهاتە پاشەکەفتکرن. هیڤیە دووبارە هەول بدەن. |

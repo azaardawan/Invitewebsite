@@ -314,7 +314,8 @@
         "color_choice": "Customer chooses a colour set",
         "story": "Instagram story picture",
         "sticker": "Chocolate stickers (round or square)",
-        "bottle_label": "Water bottle label"
+        "bottle_label": "Water bottle label",
+        "photos": "Customer adds their own photos"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -845,7 +846,12 @@
       "attendanceMakePrivate": "Make the reply count private",
       "cardBackTitle": "Back of the card: big title (the customer's; empty = default)",
       "cardBackMessage": "Back of the card: message",
-      "occasion": "Occasion"
+      "occasion": "Occasion",
+      "photosTitle": "Customer photos ({count})",
+      "photoN": "Photo {n}",
+      "photosNone": "No photos added yet.",
+      "photoRemove": "Remove this photo",
+      "photoRemoveConfirm": "Remove this photo from the invitation? It is deleted and cannot be brought back."
     },
     "legal": {
       "heading": "Legal policies",
@@ -1273,7 +1279,8 @@
       "color_choice": "Choose the invitation colours",
       "story": "An Instagram story picture to share",
       "sticker": "Chocolate stickers, round or square, ready to print",
-      "bottle_label": "A label that wraps around water bottles, ready to print"
+      "bottle_label": "A label that wraps around water bottles, ready to print",
+      "photos": "Your own photos in the design"
     },
     "orderTitle": "Your invitation details",
     "orderSubtitle": "Write the names and details exactly as you want guests to see them. You'll see a preview before paying.",
@@ -1321,7 +1328,8 @@
       "generic": "Something went wrong. Please try again.",
       "editNotAllowed": "This invitation can no longer be edited here.",
       "editLimitReached": "You have used all your edits. Contact us for any other change.",
-      "invalidCoupon": "This coupon code isn't valid, has expired or has been used up."
+      "invalidCoupon": "This coupon code isn't valid, has expired or has been used up.",
+      "photosMissing": "Please add the photos this design needs (see “Your photos” above) before continuing."
     },
     "reviewTitle": "Review your invitation",
     "reviewSubtitle": "This is exactly how your guests will see it. The preview link works for 24 hours after your last edit.",
@@ -1429,7 +1437,31 @@
       "arabic": "Arabic (as in the design)",
       "inLanguage": "In the invitation's language ({language})",
       "custom": "Write your own"
-    }
+    },
+    "photos": {
+      "title": "Your photos",
+      "help": "This design shows up to {max} photos. Add your own and place each one in its frame; you can change them until you pay.",
+      "helpMin": "This design shows up to {max} photos; add at least {min}. Place each one in its frame; you can change them until you pay.",
+      "helpPublished": "This design shows up to {max} photos. Changes appear on your invitation straight away.",
+      "count": "{n} of {max} photos added",
+      "add": "Add photo",
+      "addMany": "Add several photos",
+      "replace": "Replace",
+      "remove": "Remove",
+      "adjust": "Adjust",
+      "done": "Done",
+      "zoom": "Zoom",
+      "uploading": "Uploading…",
+      "photo": "Photo {n}",
+      "errors": {
+        "tooLarge": "This photo is too large. Please choose one under 15 MB.",
+        "unsupportedImage": "This file isn't a photo we can use. Please choose a JPG, PNG or WebP photo.",
+        "imageTooSmall": "This photo is too small. Please choose a larger one.",
+        "rateLimited": "Too many uploads for now. Please try again in a while.",
+        "generic": "The photo couldn't be saved. Please try again."
+      }
+    },
+    "photosUpTo": "{max, plural, one {Your own photo in the design} other {Up to # of your own photos}}"
   },
   "contact": {
     "title": "Contact us",

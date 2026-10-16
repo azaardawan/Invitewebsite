@@ -1,4 +1,5 @@
 import 'server-only';
+import { listPhotos, photoSpec } from '@/server/photos/photos';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
@@ -81,6 +82,9 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     }
     const fields = validateFieldValues(inv!.fieldValues, inv!.fieldKeys, p.defs, now);
     if (!fields.ok) throw new OrderError('invalidFields', fields.errors);
+    // A design that needs photos (manifest `photos.min`) is not ordered without them.
+    const photos = await photoSpec(tx, inv!);
+    if (photos && photos.min > 0 && (await listPhotos(tx, inv!.id)).length < photos.min) throw new OrderError('photosMissing');
     // Like the price, the online time is the package's at checkout (the owner may have changed it since the draft).
     if (inv!.lifetime !== p.pkg.lifetime) await tx.update(invitations).set({ lifetime: p.pkg.lifetime }).where(eq(invitations.id, inv!.id));
 

@@ -1,0 +1,57 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background: #f6f1ea;
+  color: #3a2c24;
+  font-family: system-ui, sans-serif;
+}
+
+.card {
+  width: 100%;
+  max-width: 24rem;
+  display: grid;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 1.25rem;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(58 44 36 / 0.08);
+}
+
+.cover {
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 1rem 1rem;
+}
+
+.names {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.4rem, 7vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+.line {
+  margin: 0;
+}
+
+.gallery {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.thumb {
+  aspect-ratio: 3 / 4;
+  border-radius: 0.75rem;
+}
+
+.caption {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}

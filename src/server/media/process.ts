@@ -45,6 +45,25 @@ export async function processImage(input: Buffer) {
   return { data, mime: 'image/webp', width: info.width, height: info.height, ext: 'webp' as const };
 }
 
+/** A customer photo's two sizes: the long side at most `full` (prints) and `display` (the online invitation). */
+export const PHOTO_SIZES = { full: 2400, display: 1280 } as const;
+
+/**
+ * A customer's photo, checked like any upload (format from the bytes, size limits, EXIF orientation applied, all
+ * metadata such as GPS location removed) and re-encoded to WebP in two sizes.
+ */
+export async function processPhoto(input: Buffer) {
+  const checked = await processImage(input);
+  const size = async (side: number, quality: number) => {
+    const { data, info } = await sharp(checked.data)
+      .resize({ width: side, height: side, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality })
+      .toBuffer({ resolveWithObject: true });
+    return { data, width: info.width, height: info.height };
+  };
+  return { full: await size(PHOTO_SIZES.full, 84), display: await size(PHOTO_SIZES.display, 78) };
+}
+
 /** Accepts MP3 only, verified by parsing the audio frames; returns its duration. */
 export async function processAudio(input: Buffer) {
   if (input.byteLength > MEDIA_LIMITS.audioMaxBytes) throw new MediaError('tooLarge');
