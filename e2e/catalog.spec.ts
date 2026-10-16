@@ -65,8 +65,14 @@ test('owner configures a theme end to end: music → cover → package → revie
   await add.getByLabel('الكردية السورانية').first().fill('پاکێجی زێڕین');
   await add.getByLabel('الكردية البادينية').first().fill('پاکێجا زێڕین');
   await add.getByLabel('السعر (دينار عراقي)').fill('75000');
+  // How long it stays online: one of four choices (30 days is picked to start with).
+  const lifetimes = add.locator('[data-package-lifetimes]');
+  await expect(lifetimes.getByRole('radio')).toHaveCount(4);
+  await expect(lifetimes.getByRole('radio', { name: '٣٠ يوماً' })).toBeChecked();
+  await lifetimes.getByRole('radio', { name: 'للأبد' }).check();
   await add.getByRole('button', { name: 'إنشاء' }).click();
   await expect(page.getByText('التصميم مستوفٍ لكل الشروط.')).toBeVisible();
+  await expect(page.locator('[data-package-lifetime=forever]')).toContainText('باقة ذهبية');
 
   // Lifecycle: review → on sale.
   page.on('dialog', (d) => d.accept());
@@ -78,6 +84,9 @@ test('owner configures a theme end to end: music → cover → package → revie
   const shopper = await browser.newPage({ baseURL: testInfo.project.use.baseURL });
   await shopper.goto('/themes');
   await expect(shopper.locator('img[style*="scale(2)"]').first()).toBeVisible();
+  // The package says how long the invitation stays online.
+  await shopper.goto('/themes/demo-wedding');
+  await expect(shopper.getByText('متاحة للأبد').first()).toBeVisible();
   await shopper.close();
   await expect(page.getByText('مُجمّد (لا يمكن تعديله)')).toBeVisible();
 

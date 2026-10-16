@@ -25,8 +25,6 @@ export class OrderError extends Error {
   }
 }
 
-/** Public invitations stay live for this long after publication (owner decision, rev. 2). */
-export const INVITATION_LIFETIME_DAYS = 30;
 /** A draft's preview link stays valid this long after the last edit (decision J). */
 export const PREVIEW_TTL_MS = 24 * 3600_000;
 

@@ -7,7 +7,7 @@ import { DocumentError, ensurePreview } from '@/server/documents/documents';
 
 
 /** The card's front or back, or the keepsake cover, as a picture for the receipt's previews. */
-export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/preview/[kind]'>) {
+export async function GET(req: Request, { params }: RouteContext<'/r/[token]/preview/[kind]'>) {
   const { token, kind } = await params;
   if (kind !== 'card' && kind !== 'cardBack' && kind !== 'keepsake') return new Response('Not found', { status: 404 });
   const r = await getReceipt(db(), token);
@@ -15,8 +15,11 @@ export async function GET(_req: Request, { params }: RouteContext<'/r/[token]/pr
   if (!r || r.status !== 'PAID' || !offered) return new Response('Not found', { status: 404 });
   const ipHash = hashIp(clientIpFrom(await headers()));
   const mayRender = async () => !ipHash || (await consumeRateLimit(db(), `preview:ip:${ipHash}`, previewRendersPerHour(), 3600));
+  // Which of the customer's cards (`?card=a5|leaf|heart`); left out, their first.
+  const card = new URL(req.url).searchParams.get('card');
+  if (card !== null && !r.invitation.cards.includes(card)) return new Response('Not found', { status: 404 });
   try {
-    const image = await ensurePreview(db(), r.invitation.id, kind, undefined, mayRender);
+    const image = await ensurePreview(db(), r.invitation.id, kind, undefined, mayRender, kind === 'keepsake' ? null : card);
     if (!image) return new Response('Not found', { status: 404 });
     return new Response(new Uint8Array(image), {
       headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' },

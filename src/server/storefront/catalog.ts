@@ -165,6 +165,7 @@ export async function storefrontTheme(key: string) {
       name: p.name,
       description: p.description,
       priceIqd: p.priceIqd,
+      lifetime: p.lifetime,
       fieldKeys: p.fieldKeys,
       featureKeys: p.featureKeys,
       /** Index of this package's designed state, for sample previews. */

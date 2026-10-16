@@ -3,7 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { invitations, legalPolicyVersions, orders } from '@/server/db/schema';
 import { acceptedVersions, currentPolicy, discardDraft, policyAdminView, publishDraft, saveDraft } from '@/server/legal/policies';
-import { seedLegalDrafts } from '@/server/legal/seed';
+import { seedLegalDrafts, updateTermsLifetimeLine } from '@/server/legal/seed';
 import { seedCatalog, sectionIdByKey } from '@/server/catalog/seed';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
@@ -110,3 +110,42 @@ describe('contact settings', () => {
     ).rejects.toThrow();
   });
 });
+
+describe('terms: each package has its own online time', () => {
+  const OLD = {
+    ar: '- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.',
+    en: '- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.',
+    ckb: '- بانگهێشتنامەکە ٣٠ ڕۆژ لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە.',
+    bdn: '- داخوازنامە ٣٠ ڕۆژان ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن.',
+  };
+  const around = (lang: keyof typeof OLD, line: string) => `# ${lang}\n- before\n${line}\n- after`;
+
+  it('publishes a new version with only that sentence changed, once, and never touches the owner\'s own wording', async () => {
+    await discardDraft(db(), 'TERMS', actor);
+    await saveDraft(db(), 'TERMS', { ar: around('ar', OLD.ar), en: around('en', OLD.en), ckb: around('ckb', OLD.ckb), bdn: around('bdn', OLD.bdn) }, actor);
+    const before = await publishDraft(db(), 'TERMS', actor);
+
+    await updateTermsLifetimeLine(db());
+    const live = await currentPolicy(db(), 'TERMS');
+    expect(live?.version).toBe(before + 1);
+    expect(live?.content.en).toBe(around('en', "- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us."));
+    for (const lang of ['ar', 'ckb', 'bdn'] as const) {
+      expect(live?.content[lang]).not.toContain(OLD[lang]);
+      expect(live?.content[lang]).toMatch(/^# \w+\n- before\n.+\n- after$/);
+    }
+    expect(live?.content.ar).toContain('٦٠ يوماً');
+    // Nothing left to change: no further version.
+    await updateTermsLifetimeLine(db());
+    expect((await currentPolicy(db(), 'TERMS'))?.version).toBe(before + 1);
+
+    // A draft in progress gets the sentence, and is left for the owner to publish.
+    await saveDraft(db(), 'TERMS', { ar: around('ar', OLD.ar), en: 'My own words about how long it stays online.' }, actor);
+    await updateTermsLifetimeLine(db());
+    const { draft } = await policyAdminView(db(), 'TERMS');
+    expect(draft?.content.ar).not.toContain(OLD.ar);
+    expect(draft?.content.en).toBe('My own words about how long it stays online.');
+    expect((await currentPolicy(db(), 'TERMS'))?.version).toBe(before + 1);
+    await discardDraft(db(), 'TERMS', actor);
+  });
+});
+

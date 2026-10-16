@@ -6,7 +6,20 @@
     "currency": "Currency",
     "currencyIqd": "IQD",
     "currencyUsd": "USD",
-    "usdApproxNote": "USD prices are approximate at our exchange rate; payment is made in Iraqi dinars."
+    "usdApproxNote": "USD prices are approximate at our exchange rate; payment is made in Iraqi dinars.",
+    "lifetime": {
+      "30": "30 days",
+      "60": "60 days",
+      "365": "1 year",
+      "forever": "Forever"
+    },
+    "onlineFor": {
+      "30": "Online for 30 days",
+      "60": "Online for 60 days",
+      "365": "Online for 1 year",
+      "forever": "Online forever"
+    },
+    "noEnd": "No end date"
   },
   "home": {
     "heroLine1": "Invitations designed",
@@ -35,10 +48,10 @@
     "featureMusic": "Music that starts when it opens",
     "featureRsvp": "RSVPs and congratulation messages",
     "featurePrint": "A print-ready invitation card",
-    "featureDays": "Live for 30 days after publishing",
+    "featureDays": "Online for 30 days, a year or forever, depending on the package",
     "faqTitle": "Frequently asked questions",
     "faq1q": "How long does the invitation stay available?",
-    "faq1a": "Your invitation stays available to guests for 30 days from the moment it is published, and you can contact us to extend it.",
+    "faq1a": "It depends on the package you choose: 30 days, 60 days, a year, or forever, counted from the moment it is published. Each package shows how long it lasts, and you can contact us to extend it.",
     "faq2q": "Can I see my invitation before paying?",
     "faq2a": "Yes. After you add the names and details, you see your complete invitation as a preview, then decide.",
     "faq3q": "How do I share the invitation?",
@@ -473,7 +486,9 @@
             "top": "Top 3",
             "home": "Homepage"
           }
-        }
+        },
+        "lifetime": "How long the invitation stays online",
+        "lifetimeHint": "Counted from when the invitation is paid and published. Orders already paid keep their own end date."
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -815,7 +830,8 @@
         "invalidFields": "Please fix the highlighted details.",
         "reason": "Please write a reason (5–500 characters).",
         "days": "Choose between 1 and 365 days.",
-        "music": "Choose an active song."
+        "music": "Choose an active song.",
+        "forever": "This invitation never ends, so there is nothing to extend."
       },
       "guestbookPublicOn": "Guest messages are shown under the invitation (the customer's choice).",
       "guestbookPublicOff": "Guest messages are private (keepsake only).",
@@ -1377,9 +1393,10 @@
     },
     "cardShape": {
       "heading": "Printed card shape",
-      "help": "Choose the regular card or one of this design's shapes. You get a print-ready PDF and a transparent PNG, and the print shop gets the cut line around the shape.",
+      "help": "Tick the regular card, one of this design's shapes, or several. Each card you tick comes as its own print-ready PDF (a shape also as a transparent PNG), and the print shop gets the cut line around each shape.",
       "card": "The card",
-      "size": "{w} × {h} cm"
+      "size": "{w} × {h} cm",
+      "required": "Choose at least one card."
     },
     "stickerShape": {
       "heading": "Sticker shape",

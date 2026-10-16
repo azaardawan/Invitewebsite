@@ -12,7 +12,7 @@ Date: 2026-09-30
   - Availability and price are re-checked at checkout. If the theme was archived or the package changed since the draft, checkout is refused.
 - **Payment confirmation (`markOrderPaid`).** One transaction with a row lock does all of this:
   - assigns a gap-free `INV-YYYY-00001` (per Baghdad year);
-  - publishes the invitation for exactly 30 days;
+  - publishes the invitation for its package's online time (30 days, 60 days, 1 year or forever; see decision A);
   - records status history and audit entries.
 
   It is idempotent: duplicate webhooks, redirect checks, or a manual publish racing a webhook all end in one invoice and one publication. Manual publication requires the admin and a reason. The WAYL wiring arrives in M6.
@@ -115,8 +115,12 @@ Customer-facing routes:
 
 ## 2. Contradictions and decisions that need the owner
 
-**A. ✅ DECIDED — publish immediately, 30 days, extensions on request.**
-There is no go-live date. Verified payment publishes the invitation at once, with `expires_at = published_at + 30 days`. If a customer needs longer, they contact Bahja and Admin extends it (audited, with a reason).
+**A. ✅ DECIDED — publish immediately, for the package's online time, extensions on request.**
+There is no go-live date. Verified payment publishes the invitation at once, with `expires_at = published_at + the package's online time`.
+*(Owner update, 2026-10-16:* the owner picks the online time per package: **30 days** (the default), **60 days**, **1 year** or
+**forever** (`packages.lifetime`, `src/catalog/lifetime.ts`). The draft copies it and checkout takes the package's current value,
+like the price; a paid invitation never changes. Forever is stored as the far-future `FOREVER` date (9999-12-31), so every
+"is it live?" check stays the same; Admin and the receipt show "No end date", and it cannot be extended.*) If a customer needs longer, they contact Bahja and Admin extends it (audited, with a reason).
 To avoid surprises, the checkout and the receipt both show the exact expiry date. If the entered `event_date` is later than that expiry, checkout shows a short note: *"Your invitation will be live until X. Contact us if you need an extension."* This is informational only and never blocks payment.
 
 **B. Theme code cannot be added "without rebuilding the application."**
@@ -547,7 +551,7 @@ Failure modes covered:
 
 | Data | Public lifetime | Retained | Then |
 |---|---|---|---|
-| Invitation page | 30 days after publication (plus extensions) | Record kept 24 months after expiry | Field values anonymized; record stub kept |
+| Invitation page | The package's online time after publication: 30/60 days, 1 year or forever (plus extensions) | Record kept 24 months after expiry | Field values anonymized; record stub kept |
 | Guest responses (attendance + messages) | Readable by Admin | 12 months after expiry (keepsake PDF produced first) | Deleted |
 | Keepsake PDF | Admin download | 12 months after expiry | Deleted from storage |
 | Orders, invoices, payments, legal acceptances | — | 7 years (typical accounting horizon; confirm the Iraqi requirement) | Archived |

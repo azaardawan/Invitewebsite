@@ -31,7 +31,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), cardShape: str(form, 'cardShape'), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), ...(form.has('cardChoicesSent') ? { cardChoices: form.getAll('cardChoices').map(String).join(',') } : {}), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
 }
 
 /** The changeable-line choices as typed (`w.<key>`, `w.<key>.text`), so a failed submit keeps them. */
@@ -49,7 +49,8 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
   if (form.has('palette')) extras.paletteId = str(form, 'palette');
   if (form.has('stickerShape')) extras.stickerShape = str(form, 'stickerShape');
-  if (form.has('cardShape')) extras.cardShape = str(form, 'cardShape');
+  // Ticked cards (several allowed); the hidden `cardChoicesSent` tells "none ticked" from "no such section".
+  if (form.has('cardChoicesSent')) extras.cardChoices = form.getAll('cardChoices').map(String);
   if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
   if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
   if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');

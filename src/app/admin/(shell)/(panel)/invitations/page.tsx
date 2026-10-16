@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { isForever } from '@/catalog/lifetime';
 import { invitationNames } from '@/catalog/fields';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { z } from 'zod';
@@ -22,6 +23,9 @@ export default async function InvitationsPage({ searchParams }: PageProps<'/admi
   const filter = z.enum(FILTERS).safeParse(params.filter).data;
   const rows = await listInvitations(db(), { q: q || undefined, filter });
   const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'medium', timeZone: 'Asia/Baghdad' }).format(d) : '—');
+  const common = await getTranslations('common');
+  /** An invitation's end: its date, or "No end date" for a package that lasts forever. */
+  const until = (d: Date | null) => (isForever(d) ? common('noEnd') : date(d));
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -68,7 +72,7 @@ export default async function InvitationsPage({ searchParams }: PageProps<'/admi
                 <div className="text-sm">
                   <Badge status={BADGE[state]}>{t(`states.${state}`)}</Badge>
                   <p className="mt-1 text-muted">
-                    {t('expiresAt')}: {date(inv.expiresAt)}
+                    {t('expiresAt')}: {until(inv.expiresAt)}
                   </p>
                   {orderNumber ? (
                     <p className="font-mono text-xs text-muted" dir="ltr">

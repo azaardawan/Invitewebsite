@@ -24,7 +24,7 @@ import {
   updateThemeSettings,
   type ThemeStatus,
 } from '@/server/catalog/themes';
-import { createPackage, movePackage, setPackageStatus, updatePackage } from '@/server/catalog/packages';
+import { createPackage, movePackage, setPackageStatus, updatePackage, type PackageInput } from '@/server/catalog/packages';
 import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, EXTRA_SLOTS, updateThemeCardSide, updateThemeExtrasLook, type ArtworkSlot } from '@/server/catalog/card-design';
 import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
@@ -354,6 +354,7 @@ function packageFields(form: FormData) {
     name: readI18n(form, 'name'),
     description: readI18n(form, 'description'),
     priceIqd: Number(String(form.get('priceIqd') ?? '').replace(/[,\s٬]/g, '')),
+    lifetime: (form.get('lifetime') ?? undefined) as PackageInput['lifetime'],
   };
 }
 

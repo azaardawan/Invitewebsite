@@ -2,7 +2,7 @@ import 'server-only';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { legalPolicyVersions, type LegalContent } from '@/server/db/schema';
-import type { PolicyType } from './policies';
+import { currentPolicy, policyAdminView, publishDraft, saveDraft, type PolicyType } from './policies';
 
 /**
  * Starting drafts written from how Bahja actually works. They are seeded as
@@ -23,7 +23,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - يُنشأ الطلب عند تأكيدك له، ويُدفع بالطريقة المذكورة في صفحة الإيصال. تُنشر الدعوة بعد تأكيد الدفع.
 
 ## مدة النشر
-- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
+- تبقى الدعوة منشورة طوال مدة الباقة (٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد) من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
 
 ## محتوى الدعوة
 - أنت مسؤول عن صحة المعلومات التي تكتبها وعن حقك في نشرها.
@@ -51,7 +51,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - Your order is created when you confirm it and is paid as described on your receipt page. The invitation is published once payment is confirmed.
 
 ## Publication period
-- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.
+- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us.
 
 ## Invitation content
 - You are responsible for the accuracy of the information you enter and for your right to publish it.
@@ -79,7 +79,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - داخوازی دەمێ تو پشتڕاست دکەی چێدبیت، و ب وێ ڕێکێ پارە دهێتە دان یا ل لاپەرێ پسوولێ هاتی. داخوازنامە پشتی پشتڕاستکرنا پارەدانێ دهێتە بەلاڤکرن.
 
 ## دەمێ بەلاڤکرنێ
-- داخوازنامە ٣٠ ڕۆژان ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن.
+- داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن.
 
 ## ناڤەروکا داخوازنامێ
 - تو بەرپرسیاری ژ دروستیا وان زانیاریێن تو دنڤیسی و ژ مافێ تە د بەلاڤکرنا وان دا.
@@ -107,7 +107,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - داواکاری کاتێک دروست دەبێت کە پشتڕاستی دەکەیتەوە، و بەو ڕێگایە پارەی دەدرێت کە لە پەرەی پسوولەکەدا هاتووە. بانگهێشتنامەکە دوای پشتڕاستکردنەوەی پارەدان بڵاو دەکرێتەوە.
 
 ## ماوەی بڵاوکردنەوە
-- بانگهێشتنامەکە ٣٠ ڕۆژ لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە.
+- بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە.
 
 ## ناوەڕۆکی بانگهێشتنامە
 - تۆ بەرپرسیاریت لە دروستی ئەو زانیارییانەی دەینووسیت و لە مافی بڵاوکردنەوەیان.
@@ -152,7 +152,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - اكتب فقط ما ترغب في مشاركته من بيانات المولود. لا نستخدم هذه البيانات لأي غرض غير دعوتك.
 
 ## مدة النشر
-- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
+- تبقى الدعوة منشورة طوال مدة الباقة (٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد) من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
 
 ## محتوى الدعوة
 - أنت مسؤول عن صحة المعلومات التي تكتبها وعن حقك في نشرها.
@@ -189,7 +189,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - Only write the details about your baby that you are happy to share. We use them for your invitation only.
 
 ## Publication period
-- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.
+- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us.
 
 ## Invitation content
 - You are responsible for the accuracy of the information you enter and for your right to publish it.
@@ -374,3 +374,65 @@ export async function seedLegalDrafts(db: DbOrTx) {
     }
   }
 }
+
+/**
+ * The online-time sentence of the terms, as first written (30 days for everyone) and as it reads now that each package
+ * has its own time (owner request, 2026-10-16), per language.
+ */
+const LIFETIME_LINES: Record<keyof LegalContent, [string, string]> = {
+  ar: [
+    '- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.',
+    '- تبقى الدعوة منشورة طوال مدة الباقة (٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد) من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.',
+  ],
+  en: [
+    '- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.',
+    "- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us.",
+  ],
+  ckb: [
+    '- بانگهێشتنامەکە ٣٠ ڕۆژ لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە.',
+    '- بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە.',
+  ],
+  bdn: [
+    '- داخوازنامە ٣٠ ڕۆژان ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن.',
+    '- داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن.',
+  ],
+};
+
+/** The content with the old online-time sentence replaced in every language; null when there is nothing to change. */
+export function withPackageLifetimeLine(content: LegalContent): LegalContent | null {
+  let changed = false;
+  const next = { ...content };
+  for (const lang of ['ar', 'en', 'ckb', 'bdn'] as const) {
+    const text = next[lang];
+    const [before, after] = LIFETIME_LINES[lang];
+    if (text && text.includes(before)) {
+      next[lang] = text.split(before).join(after);
+      changed = true;
+    }
+  }
+  return changed ? next : null;
+}
+
+/**
+ * The terms (wedding and newborn) say each package has its own online time instead of "30 days" (owner request,
+ * 2026-10-16). Runs with every seed and does something only while the exact original sentence is still there, so an
+ * owner's own wording is never touched. A draft in progress gets the new sentence (the owner publishes it); otherwise a
+ * new version with only that sentence changed is published, through the usual service (audited, as the system).
+ */
+export async function updateTermsLifetimeLine(db: DbOrTx) {
+  const actor = { adminId: null, ipHash: null };
+  for (const type of ['TERMS', 'TERMS_NEWBORN'] as const) {
+    const { draft } = await policyAdminView(db, type);
+    if (draft) {
+      const next = withPackageLifetimeLine(draft.content);
+      if (next) await saveDraft(db, type, next, actor);
+      continue;
+    }
+    const current = await currentPolicy(db, type);
+    const next = current && withPackageLifetimeLine(current.content);
+    if (!next) continue;
+    await saveDraft(db, type, next, actor);
+    await publishDraft(db, type, actor);
+  }
+}
+

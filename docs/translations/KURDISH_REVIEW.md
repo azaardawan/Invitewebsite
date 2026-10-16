@@ -828,3 +828,36 @@ Design names (manifest `title`; they become the designs' Kurdish names in Admin,
 | 36 | الإسبريسو والعاجي | Espresso & Ivory | ئێسپرێسۆ و عاجی | ئێسپرێسۆ و عاجی | ○ |
 | 37 | زهرة الشتاء | Winter Flower | گوڵی زستان | گولا زڤستانێ | ● |
 | 38 | رسائل الحب العتيقة | Vintage Love Letters | نامە کۆنەکانی خۆشەویستی | نامێن کەڤن یێن ڤیانێ | ◐ |
+
+## Batch 32 — how long a package stays online (30 days, 60 days, 1 year, forever) — ✅ APPROVED (2026-10-16)
+
+The owner now picks per package how long the invitation stays online, and a package with several card shapes lets the
+customer tick one, several or all of the cards (rows 13–14; the approved single-choice help text stays live in Kurdish until row 13 is approved). The packages on a theme page show it
+(«Online for 30 days» … «Online forever»), and the receipt shows «No end date» for a package that never ends.
+The home page's line and first FAQ answer no longer promise only 30 days in Arabic and English. Their approved Kurdish
+said 30 days; rows 10–11 replace it. Approved by the owner and live, rows 1–14 (row 12 in the starter Terms).
+
+| # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `common.lifetime.30` | ٣٠ يوماً | 30 days | ٣٠ ڕۆژ | ٣٠ ڕۆژ | ● |
+| 2 | `common.lifetime.60` | ٦٠ يوماً | 60 days | ٦٠ ڕۆژ | ٦٠ ڕۆژ | ● |
+| 3 | `common.lifetime.365` | سنة واحدة | 1 year | ساڵێک | ساڵەک | ● |
+| 4 | `common.lifetime.forever` | للأبد | Forever | بۆ هەمیشە | بۆ هەردەم | ◐ |
+| 5 | `common.onlineFor.30` | متاحة لمدة ٣٠ يوماً | Online for 30 days | بۆ ماوەی ٣٠ ڕۆژ بەردەستە | بۆ ماوێ ٣٠ ڕۆژان بەردەستە | ◐ |
+| 6 | `common.onlineFor.60` | متاحة لمدة ٦٠ يوماً | Online for 60 days | بۆ ماوەی ٦٠ ڕۆژ بەردەستە | بۆ ماوێ ٦٠ ڕۆژان بەردەستە | ◐ |
+| 7 | `common.onlineFor.365` | متاحة لمدة سنة | Online for 1 year | بۆ ماوەی ساڵێک بەردەستە | بۆ ماوێ ساڵەکێ بەردەستە | ◐ |
+| 8 | `common.onlineFor.forever` | متاحة للأبد | Online forever | بۆ هەمیشە بەردەستە | بۆ هەردەم بەردەستە | ◐ |
+| 9 | `common.noEnd` | بلا تاريخ انتهاء | No end date | بێ بەرواری کۆتایی | بێ دیرۆکا دوماهیێ | ◐ |
+| 10 | `home.featureDays` | متاحة ٣٠ يوماً أو سنة أو للأبد حسب الباقة | Online for 30 days, a year or forever, depending on the package | ٣٠ ڕۆژ، ساڵێک یان بۆ هەمیشە بەردەستە، بەپێی پاکێجەکە | ٣٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم بەردەستە، ل دویڤ پاکێجێ | ◐ |
+| 11 | `home.faq1a` | حسب الباقة التي تختارونها: ٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد، من لحظة نشرها. تظهر مدة كل باقة عليها، ويمكنكم التواصل معنا لتمديدها. | It depends on the package you choose: 30 days, 60 days, a year, or forever, counted from the moment it is published. Each package shows how long it lasts, and you can contact us to extend it. | بەپێی ئەو پاکێجەی هەڵیدەبژێرن: ٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە، لە کاتی بڵاوکردنەوەیەوە. ماوەی هەر پاکێجێک لەسەری نووسراوە، و دەتوانن پەیوەندیمان پێوە بکەن بۆ درێژکردنەوەی. | ل دویڤ وی پاکێجێ هوین هەلدبژێرن: ٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم، ژ دەمێ بەلاڤکرنا وێ. ماوێ هەر پاکێجەکێ ل سەر نڤیسییە، و هوین دشێن پەیوەندیێ ب مە بکەن بۆ درێژکرنا وێ. | ◐ |
+| 13 | `store.cardShape.help` | اختر البطاقة العادية أو أحد أشكال هذا التصميم أو أكثر من واحد. تحصل لكل بطاقة تختارها على ملف PDF خاص للطباعة (وللشكل صورة PNG بخلفية شفافة أيضاً)، ونجهّز للمطبعة خط القص حول كل شكل. | Tick the regular card, one of this design's shapes, or several. Each card you tick comes as its own print-ready PDF (a shape also as a transparent PNG), and the print shop gets the cut line around each shape. | کارتە ئاساییەکە، یەکێک لە شێوەکانی ئەم دیزاینە، یان زیاتر لە یەکێک هەڵبژێرە. بۆ هەر کارتێک کە هەڵیدەبژێریت فایلێکی PDFـی تایبەت بۆ چاپ وەردەگریت (بۆ شێوەکانیش وێنەیەکی PNG بە باکگراوندی ڕوون)، و هێڵی بڕینی دەوری هەر شێوەیەک بۆ چاپخانە ئامادە دەکەین. | کارتا ئاسایی، ئێک ژ شێوەیێن ڤی دیزاینی، یان پتر ژ ئێکێ هەلبژێرە. بۆ هەر کارتەکا تو هەلدبژێری دێ فایلەکێ PDF یێ تایبەت بۆ چاپێ وەرگری (بۆ شێوەیان ژی وێنەیەکێ PNG ب پشتەکا ڕوهن)، و ئەم دێ هێلا بڕینێ ل دۆر هەر شێوەیەکێ بۆ چاپخانێ ئامادە کەین. | ◐ |
+| 14 | `store.cardShape.required` | اختر بطاقة واحدة على الأقل. | Choose at least one card. | لانیکەم کارتێک هەڵبژێرە. | کێمترین ئێک کارتێ هەلبژێرە. | ◐ |
+
+
+The starter Terms (`src/server/legal/seed.ts`, only used before the owner publishes their own) now say the invitation stays
+online for its package's time. Their Kurdish line still says 30 days and was left as it is; suggested replacements
+(the live Terms are edited in Admin → Legal):
+
+| # | Where | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|
+| 12 | Terms, the invitation's online time | بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە. | داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن. | ◐ |

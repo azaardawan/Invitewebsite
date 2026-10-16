@@ -37,6 +37,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
   const occasion = th.occasions.length > 1 ? th.occasions.find((o) => o.key === occasionParam) : undefined;
   const t = await getTranslations('store');
   const home = await getTranslations('home');
+  const common = await getTranslations('common');
   const { whatsapp } = await publicContact();
   const fieldLabels = th.fields.map((f) => ({ key: f.key, label: localized(f.label, locale) }));
   const detailWords = { pair: (a: string, b: string) => t('includesPair', { a, b }), when: t('includesWhen') };
@@ -70,6 +71,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
             name: localized(p.name, locale),
             description: p.description ? localized(p.description, locale) : null,
             priceIqd: p.priceIqd,
+            onlineFor: common(`onlineFor.${p.lifetime}`),
             features: p.featureKeys.filter(isFeatureKey).map((f) => t(`features.${f}`)),
             details: packageDetailLines(fieldLabels, p.fieldKeys, detailWords),
           }))}

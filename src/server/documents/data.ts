@@ -1,5 +1,5 @@
 import 'server-only';
-import { shapeIncluded } from '@/catalog/features';
+import { MAIN_CARD, chosenCards } from '@/catalog/features';
 import { themeBorder } from '@/server/catalog/border';
 import { and, asc, eq, isNotNull } from 'drizzle-orm';
 import QRCode from 'qrcode';
@@ -42,8 +42,28 @@ export async function visibleMessages(db: DbOrTx, invitationId: string) {
     .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id)) as Promise<{ guestName: string; message: string }[]>;
 }
 
-/** Everything a theme's print component and the PDF page need for one invitation. */
-export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind) {
+/** The design's shaped cards (manifest `print.shapes`), from the invitation's version, else the registry. */
+function designShapes(versionManifest: unknown, manifest: ThemeManifest | undefined): CardShape[] {
+  return (versionManifest as ThemeManifest | null)?.print?.shapes ?? manifest?.print?.shapes ?? [];
+}
+
+/** The printed cards an invitation gets (`a5` and/or shape keys), in order, with each shape's details; the first is its main card. */
+export async function invitationCardDetails(db: DbOrTx, inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys' | 'cardChoices'>) {
+  const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
+  const shapes = version ? designShapes(version.manifest, manifestByCodeRef(version.codeRef)) : [];
+  return chosenCards(inv.featureKeys, inv.cardChoices, shapes.map((x) => x.key)).map((key) => ({ key, shape: shapes.find((x) => x.key === key) ?? null }));
+}
+
+/** The printed cards an invitation gets (`a5` and/or shape keys), in order; the first is its main card. */
+export async function invitationCards(db: DbOrTx, inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys' | 'cardChoices'>) {
+  return (await invitationCardDetails(db, inv)).map((c) => c.key);
+}
+
+/**
+ * Everything a theme's print component and the PDF page need for one invitation. `card`: which of the customer's
+ * printed cards (`a5` or a shape key); left out or not one of theirs, their first.
+ */
+export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind, pick: { card?: string | null } = {}) {
   const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const codeRef = version!.codeRef;
   const manifest = manifestByCodeRef(codeRef);
@@ -71,9 +91,11 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     // A design without an online invitation has nothing for a QR code to open.
     const qrUrl = opts.showQr !== false && manifest?.onlineInvitation !== false ? invitationUrl(inv) : null;
     const artwork = await themeArtwork(db, inv.themeId);
-    // The shaped card the customer chose instead of the card (only while the package includes it).
-    const shapes = (version!.manifest as ThemeManifest | null)?.print?.shapes ?? manifest?.print?.shapes ?? [];
-    const shape = shapeIncluded(inv.featureKeys, inv.cardShape) ? (shapes.find((x) => x.key === inv.cardShape) ?? null) : null;
+    // Which of the customer's cards: the A5 card or one of the shaped cards they ticked (only while the package includes it).
+    const shapes = designShapes(version!.manifest, manifest);
+    const cards = chosenCards(inv.featureKeys, inv.cardChoices, shapes.map((x) => x.key));
+    const card = pick.card && cards.includes(pick.card) ? pick.card : cards[0]!;
+    const shape = card === MAIN_CARD ? null : (shapes.find((x) => x.key === card) ?? null);
     return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape)) };
   }
   const { base } = printBase(theme);
@@ -126,7 +148,7 @@ export async function cardData(
   design: ResolvedCardDesign,
   /** The owner's look for this design's extras; the platform's simple card front and back follow it too. */
   ownerLook: ExtrasLook | null = null,
-  /** A shaped card (leaf, heart…) printed instead of the card, or null. */
+  /** The shaped card (leaf, heart…) this file is for, or null for the A5 card. */
   shape: CardShape | null = null,
 ) {
   const { base, cardBackTitle } = printBase(theme);

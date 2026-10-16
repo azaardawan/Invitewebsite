@@ -68,6 +68,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
         fieldValues: result.values,
         fieldKeys: p.pkg.fieldKeys,
         featureKeys: p.pkg.featureKeys,
+        lifetime: p.pkg.lifetime,
         musicTrackId: p.theme.musicTrackId,
         ...extra,
         previewTokenHash: previewTokenHash(token),
