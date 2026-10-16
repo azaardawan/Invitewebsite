@@ -829,13 +829,13 @@ Design names (manifest `title`; they become the designs' Kurdish names in Admin,
 | 37 | زهرة الشتاء | Winter Flower | گوڵی زستان | گولا زڤستانێ | ● |
 | 38 | رسائل الحب العتيقة | Vintage Love Letters | نامە کۆنەکانی خۆشەویستی | نامێن کەڤن یێن ڤیانێ | ◐ |
 
-## Batch 32 — how long a package stays online (30 days, 60 days, 1 year, forever) — ⏳ PENDING APPROVAL
+## Batch 32 — how long a package stays online (30 days, 60 days, 1 year, forever) — ✅ APPROVED (2026-10-16)
 
 The owner now picks per package how long the invitation stays online, and a package with several card shapes lets the
 customer tick one, several or all of the cards (rows 13–14; the approved single-choice help text stays live in Kurdish until row 13 is approved). The packages on a theme page show it
 («Online for 30 days» … «Online forever»), and the receipt shows «No end date» for a package that never ends.
 The home page's line and first FAQ answer no longer promise only 30 days in Arabic and English. Their approved Kurdish
-(which says 30 days) stays live until rows 10–11 are approved, so Kurdish visitors never see Arabic there.
+said 30 days; rows 10–11 replace it. Approved by the owner and live, rows 1–14 (row 12 in the starter Terms).
 
 | # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
