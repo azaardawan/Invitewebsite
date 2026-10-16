@@ -23,7 +23,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - يُنشأ الطلب عند تأكيدك له، ويُدفع بالطريقة المذكورة في صفحة الإيصال. تُنشر الدعوة بعد تأكيد الدفع.
 
 ## مدة النشر
-- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
+- تبقى الدعوة منشورة طوال مدة الباقة (٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد) من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
 
 ## محتوى الدعوة
 - أنت مسؤول عن صحة المعلومات التي تكتبها وعن حقك في نشرها.
@@ -51,7 +51,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - Your order is created when you confirm it and is paid as described on your receipt page. The invitation is published once payment is confirmed.
 
 ## Publication period
-- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.
+- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us.
 
 ## Invitation content
 - You are responsible for the accuracy of the information you enter and for your right to publish it.
@@ -152,7 +152,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - اكتب فقط ما ترغب في مشاركته من بيانات المولود. لا نستخدم هذه البيانات لأي غرض غير دعوتك.
 
 ## مدة النشر
-- تبقى الدعوة منشورة ٣٠ يوماً من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
+- تبقى الدعوة منشورة طوال مدة الباقة (٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد) من تاريخ النشر، ثم تظهر للزوار رسالة بانتهاء الدعوة. يمكن تمديدها بالاتفاق معنا.
 
 ## محتوى الدعوة
 - أنت مسؤول عن صحة المعلومات التي تكتبها وعن حقك في نشرها.
@@ -189,7 +189,7 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
 - Only write the details about your baby that you are happy to share. We use them for your invitation only.
 
 ## Publication period
-- The invitation stays online for 30 days from publication; after that, visitors see a message that it has ended. It can be extended by arrangement with us.
+- The invitation stays online for its package's time from publication (30 days, 60 days, 1 year or forever); after that, visitors see a message that it has ended. It can be extended by arrangement with us.
 
 ## Invitation content
 - You are responsible for the accuracy of the information you enter and for your right to publish it.

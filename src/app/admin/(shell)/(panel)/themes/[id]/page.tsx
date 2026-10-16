@@ -20,6 +20,7 @@ import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { PLATFORM_FEATURES } from '@/catalog/features';
+import { DEFAULT_LIFETIME, PACKAGE_LIFETIMES, type PackageLifetime } from '@/catalog/lifetime';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 import { ImageUpload } from '@/components/admin/ImageUpload';
@@ -90,6 +91,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const d = await getThemeDetail(db(), id).catch((e) => (e instanceof CatalogError ? null : Promise.reject(e)));
   if (!d) notFound();
   const t = await getTranslations('admin.catalog');
+  const tc = await getTranslations('common');
   const locale = await getLocale();
   const [sections, music, settings] = await Promise.all([
     listSections(db(), { includeArchived: true }),
@@ -377,8 +379,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
         {active.map((p) => (
           <div key={p.id} className="rounded-md border border-line p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-medium">
-                {localized(p.name, locale)} · {price(p.priceIqd)}
+              <p className="font-medium" data-package-lifetime={p.lifetime}>
+                {localized(p.name, locale)} · {price(p.priceIqd)} · {tc(`lifetime.${p.lifetime}`)}
               </p>
               {canManage ? (
                 <MoveButtons
@@ -401,6 +403,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <div className="w-48">
                     <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
                   </div>
+                  <LifetimeChoice value={p.lifetime} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
                   <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
@@ -426,6 +429,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 <div className="w-48">
                   <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
                 </div>
+                <LifetimeChoice value={DEFAULT_LIFETIME} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
                 <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
@@ -518,5 +522,23 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
         </ul>
       </Card>
     </div>
+  );
+}
+
+/** The package's online time: one of four choices (30 days, 60 days, 1 year, forever). */
+function LifetimeChoice({ value, label, hint, option }: { value: PackageLifetime; label: string; hint: string; option: (l: PackageLifetime) => string }) {
+  return (
+    <fieldset className="space-y-2" data-package-lifetimes>
+      <legend className="text-sm font-medium">{label}</legend>
+      <div className="flex flex-wrap gap-2">
+        {PACKAGE_LIFETIMES.map((l) => (
+          <label key={l} className="flex cursor-pointer items-center gap-2 rounded-md border border-line px-3 py-1.5 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent/10">
+            <input type="radio" name="lifetime" value={l} defaultChecked={l === value} className="accent-[var(--color-accent)]" />
+            {option(l)}
+          </label>
+        ))}
+      </div>
+      <p className="text-xs text-muted">{hint}</p>
+    </fieldset>
   );
 }

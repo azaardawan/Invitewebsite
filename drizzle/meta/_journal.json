@@ -267,6 +267,13 @@
       "when": 1792049515248,
       "tag": "0037_card_back_preview",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1792163600993,
+      "tag": "0038_package_lifetime",
+      "breakpoints": true
     }
   ]
 }

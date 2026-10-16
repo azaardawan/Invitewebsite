@@ -1,4 +1,5 @@
 import { after } from 'next/server';
+import { isForever } from '@/catalog/lifetime';
 import { getTranslations } from 'next-intl/server';
 import { ensurePreview } from '@/server/documents/documents';
 import { isLocale, type Locale } from '@/i18n/config';
@@ -47,6 +48,9 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     );
   }
   const date = (d: Date | null) => (d ? formatLongDate(d, locale) : '—');
+  const common = await getTranslations({ locale, namespace: 'common' });
+  /** An invitation's end: its date, or "No end date" for a package that lasts forever. */
+  const until = (d: Date | null) => (isForever(d) ? common('noEnd') : date(d));
   const url = r.invitation.path ? `${env().APP_URL}${r.invitation.path}` : null;
   const paid = r.status === 'PAID';
   const stillPayable = paymentWindowOpen(r);
@@ -74,7 +78,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
-    ...(r.invitation.publishedAt && r.invitation.onlineInvitation ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
+    ...(r.invitation.publishedAt && r.invitation.onlineInvitation ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), until(r.invitation.expiresAt)]] as [string, string][]) : []),
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
@@ -168,7 +172,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           <ReceiptActions
             url={url}
             shareText={t('shareText', { url: url ?? '' })}
-            confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
+            confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: until(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
             labels={{
               copyLink: t('copyLink'),
               copied: t('copied'),

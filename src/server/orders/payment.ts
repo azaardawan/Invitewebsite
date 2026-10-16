@@ -6,7 +6,8 @@ import { invitations, invoiceCounters, orderStatusHistory, orders } from '@/serv
 import { recordAudit } from '@/server/audit/audit';
 import { notifyOwner, paidOrderMessage } from '@/server/notify/owner';
 import { themeNumber } from '@/theme-registry';
-import { INVITATION_LIFETIME_DAYS, OrderError } from './common';
+import { lifetimeExpiry } from '@/catalog/lifetime';
+import { OrderError } from './common';
 import type { OrderSnapshot } from './receipt';
 
 /** Next gap-free invoice number for the (Baghdad) year: INV-2026-00001. Must run inside the PAID transaction. */
@@ -20,12 +21,12 @@ async function nextInvoiceNumber(tx: DbOrTx, now: Date) {
   return `INV-${year}-${String(row!.last).padStart(5, '0')}`;
 }
 
-/** Publishes an invitation for 30 days from now. Idempotent: an already-published invitation keeps its dates. */
+/** Publishes an invitation for its package's online time (30/60/365 days or forever) from now. Idempotent: an already-published invitation keeps its dates. */
 export async function publishInvitation(tx: DbOrTx, invitationId: string, now: Date) {
   const [inv] = await tx.select().from(invitations).where(eq(invitations.id, invitationId)).for('update');
   if (!inv) throw new OrderError('notFound');
   if (inv.publishedAt) return { published: false, publishedAt: inv.publishedAt, expiresAt: inv.expiresAt! };
-  const expiresAt = new Date(now.getTime() + INVITATION_LIFETIME_DAYS * 86400_000);
+  const expiresAt = lifetimeExpiry(now, inv.lifetime);
   await tx
     .update(invitations)
     .set({ status: 'PUBLISHED', publishedAt: now, expiresAt, previewTokenHash: null, previewExpiresAt: null })

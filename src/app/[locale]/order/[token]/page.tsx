@@ -21,6 +21,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
   const { locale, token } = (await params) as { locale: Locale; token: string };
   setRequestLocale(locale);
   const t = await getTranslations('store');
+  const common = await getTranslations('common');
   const draft = await draftByToken(token);
   if (!draft) {
     return (
@@ -76,6 +77,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               <span className="font-semibold text-heading">
                 {localized(draft.theme.name, locale)} · {localized(draft.pkg.name, locale)}
               </span>
+              {draft.onlineInvitation ? <span className="text-sm text-muted" data-online-for>{common(`onlineFor.${draft.pkg.lifetime}`)}</span> : null}
             </div>
             <div className="flex flex-col items-end">
               <span className="text-xs text-muted">{t('total')}</span>

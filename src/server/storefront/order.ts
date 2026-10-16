@@ -61,7 +61,7 @@ export async function draftByToken(token: string) {
     theme: { key: row.theme.key, name: row.theme.name },
     /** False for a design sold only as files (no online invitation). */
     onlineInvitation: manifestByCodeRef(row.codeRef)?.onlineInvitation !== false,
-    pkg: { id: row.pkg.id, name: row.pkg.name, priceIqd: row.pkg.priceIqd },
+    pkg: { id: row.pkg.id, name: row.pkg.name, priceIqd: row.pkg.priceIqd, lifetime: row.pkg.lifetime },
   };
 }
 

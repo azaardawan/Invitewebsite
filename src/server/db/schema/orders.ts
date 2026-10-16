@@ -1,3 +1,4 @@
+import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
   bigint,
@@ -88,7 +89,10 @@ export const invitations = pgTable(
     previewTokenHash: text('preview_token_hash').unique(),
     previewExpiresAt: timestamp('preview_expires_at', { withTimezone: true }),
     publishedAt: timestamp('published_at', { withTimezone: true }),
+    /** When it ends; FOREVER (src/catalog/lifetime.ts) for a package that never ends. */
     expiresAt: timestamp('expires_at', { withTimezone: true }),
+    /** The package's online time, copied when the draft is made and again at checkout; used when it is published. */
+    lifetime: text('lifetime', { enum: PACKAGE_LIFETIMES }).notNull().default('30'),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),

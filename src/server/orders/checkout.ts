@@ -81,6 +81,8 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     }
     const fields = validateFieldValues(inv!.fieldValues, inv!.fieldKeys, p.defs, now);
     if (!fields.ok) throw new OrderError('invalidFields', fields.errors);
+    // Like the price, the online time is the package's at checkout (the owner may have changed it since the draft).
+    if (inv!.lifetime !== p.pkg.lifetime) await tx.update(invitations).set({ lifetime: p.pkg.lifetime }).where(eq(invitations.id, inv!.id));
 
     const [customer] = await tx
       .insert(customers)
@@ -98,6 +100,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
         priceIqd: p.pkg.priceIqd,
         fieldKeys: p.pkg.fieldKeys,
         featureKeys: p.pkg.featureKeys,
+        lifetime: p.pkg.lifetime,
       },
       customer: { name: c.data.name, phone, email: c.data.email },
       invitation: { publicId: inv!.publicId, locale: inv!.locale, fieldValues: fields.values },

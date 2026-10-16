@@ -28,6 +28,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   // A newborn design from the Boy or Girl group starts with that gender chosen (the customer can change it).
   const gender = th.section.key === 'newborn' && (th.subsectionKey === 'boy' || th.subsectionKey === 'girl') ? th.subsectionKey : undefined;
   const t = await getTranslations('store');
+  const common = await getTranslations('common');
 
   return (
     <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">
@@ -45,6 +46,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           <span className="text-sm text-accent">
             <Price iqd={pkg.priceIqd} />
           </span>
+          {th.manifest.onlineInvitation !== false ? <span className="text-sm text-muted" data-online-for>{common(`onlineFor.${pkg.lifetime}`)}</span> : null}
         </div>
         <Link href={`/themes/${th.key}#preview`} className="shrink-0 text-sm font-medium text-accent underline underline-offset-4">
           {t('changePackage')}

@@ -10,6 +10,8 @@ export type ShowcasePackage = {
   name: string;
   description: string | null;
   priceIqd: number;
+  /** How long the invitation stays online ("Online for 30 days", "Online forever"). */
+  onlineFor: string;
   features: string[];
   /** What the customer fills in ("The groom's name and the bride's name", "Date and time"…). */
   details: string[];
@@ -111,7 +113,7 @@ export function ThemeShowcase({
                   <div className="flex flex-col gap-2">
                     <span className="text-xs font-semibold tracking-wide text-gold uppercase">{t('includes')}</span>
                     <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
-                      {[...(filesOnly ? [] : [t('includesLink')]), ...p.details, ...p.features].map((f, i) => (
+                      {[...(filesOnly ? [] : [t('includesLink'), p.onlineFor]), ...p.details, ...p.features].map((f, i) => (
                         <li key={i} className="flex items-start gap-2">
                           <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6e1f33" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
                             <path d="M5 12l5 5 9-10" />

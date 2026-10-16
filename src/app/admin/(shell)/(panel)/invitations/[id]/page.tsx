@@ -1,4 +1,5 @@
 import { shapeIncluded } from '@/catalog/features';
+import { isForever } from '@/catalog/lifetime';
 import { themeNumber } from '@/theme-registry';
 import { INITIALS_MAX, invitationNames, splitInitials } from '@/catalog/fields';
 import Link from 'next/link';
@@ -50,6 +51,9 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const path = invitationPath(inv.slug, inv.publicId);
   const url = `${env().APP_URL.replace(/\/$/, '')}${path}`;
   const date = (d: Date | null) => (d ? new Intl.DateTimeFormat(intl, { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Baghdad' }).format(d) : '—');
+  const common = await getTranslations('common');
+  /** An invitation's end: its date, or "No end date" for a package that lasts forever. */
+  const until = (d: Date | null) => (isForever(d) ? common('noEnd') : date(d));
   const published = Boolean(inv.publishedAt);
   const showGuests = inv.featureKeys.includes('rsvp') && can(authz, 'guests.view');
   const canDocs = can(authz, 'documents.generate');
@@ -107,7 +111,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
         </p>
         <p>
           <span className="text-muted">{t('expiresAt')}: </span>
-          {date(inv.expiresAt)}
+          {until(inv.expiresAt)}
         </p>
         <p>
           <span className="text-muted">{t('theme')}: </span>
@@ -361,7 +365,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
         </Card>
       ) : null}
 
-      {published && can(authz, 'invitations.extend') ? (
+      {published && !isForever(inv.expiresAt) && can(authz, 'invitations.extend') ? (
         <Card>
           <h2 className="mb-3 font-semibold">{t('extendTitle')}</h2>
           <ActionForm action={extendInvitationAction} className="grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
