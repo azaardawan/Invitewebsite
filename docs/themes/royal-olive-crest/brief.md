@@ -1,6 +1,11 @@
-# Theme Brief: Royal Olive Crest (`royal-olive-crest` v1, theme #11)
+# Theme Brief: Royal Olive Crest (`royal-olive-crest`, theme #11; current version v2)
 
-Agreed with the owner in chat, 2026-10-14. Code in `themes/royal-olive-crest/v1/`.
+Agreed with the owner in chat, 2026-10-14. Code in `themes/royal-olive-crest/v2/` (v1 is activated and frozen).
+
+**v2 (2026-10-15, owner's changes after the first real order):** every printed card's front has a short thank-you
+title above the names (`wording.cardThanks`, «شكرًا لحضوركم حفل زفافنا» by default, the customer may write their
+own); the QR code sits in a corner (A5: bottom right of the front; leaf and heart: lower left of the cream on the
+back, beside the names); the leaf back's text is bigger (it filled too little of the cream).
 
 ## 1. Idea
 
@@ -15,7 +20,7 @@ Agreed with the owner in chat, 2026-10-14. Code in `themes/royal-olive-crest/v1/
 
 ## 2. The owner's artwork and where it is used
 
-Numbers are the owner's (chat, 2026-10-14). Shipped files are in `themes/royal-olive-crest/v1/assets/` (WebP).
+Numbers are the owner's (chat, 2026-10-14). Shipped files are in `themes/royal-olive-crest/v2/assets/` (WebP).
 
 | # | Artwork | Used for | File |
 |---|---|---|---|
@@ -40,7 +45,7 @@ cleans them. Regenerate everything with the scripts in `scripts/` (Python 3 with
 
 ```bash
 python3 -I scripts/envelope.py <owner #1 PNG> env-clean.png seal-layer.png
-python3 -I scripts/export.py <folder with env-clean.png, seal-layer.png and src/*.png> themes/royal-olive-crest/v1/assets
+python3 -I scripts/export.py <folder with env-clean.png, seal-layer.png and src/*.png> themes/royal-olive-crest/v2/assets
 ```
 
 ## 3. Fields and wording
@@ -103,7 +108,8 @@ it (see `docs/THEME_CONTRACT.md` §4). `start()` now fades the song in over 1.2 
 
 ## 7. Print
 
-- **A5 card front** (#11): names, message, date, time, venue, optional QR, between the crest and the bottom ornament.
+- **A5 card front** (#11): the thank-you title, names, message, date, time and venue between the crest and the bottom
+  ornament; the optional QR code in the bottom right corner.
 - **A5 card back** (#8, landscape): the customer's title and message, then the names. The artwork's frame is its border.
 - **Keepsake** (A4): #10 as the cover, then the messages on cream pages with the corner flourishes on every page.
 
@@ -118,7 +124,8 @@ a package can offer the leaf, the heart, both or neither; a package with neither
 | Size (cut) | 107 × 180.6 mm (the agreed "about 12 × 18", at the artwork's own proportions) | 150 × 157.9 mm |
 | Front | #12: names + date in calligraphy, gold on green | #14: names + date |
 | Back | **#9**, read with the card turned sideways (like the A5 back), rebuilt on the leaf's own cut line (see below) | #13, fitted to the front's outline |
-| Both backs | The customer's title and message (long messages step down a size), the names, the QR code | |
+| Fronts (v2) | A short thank-you title above the names (`wording.cardThanks`) | |
+| Both backs | The customer's title and message (long messages step down a size), the names; the QR code in the lower left of the cream | |
 
 A card is cut along **one** line, so each back must lie on the front's outline (mirrored: the card turned over).
 Neither owner back matched its front: the heart back (10 % narrower) was reshaped row by row onto the front's
@@ -136,11 +143,11 @@ Files the customer gets (receipt): the PDF (each side on a page with a 10 mm mar
 PNG of each side. The print shop file (Admin → invitation → print-shop download) adds a thin magenta cut line
 exactly on the outline. The artwork ends at the cut line (no bleed beyond it): ask the print shop to cut on the line.
 
-Regenerate the artwork and cut lines with `scripts/shapes.py` (outlines go to `themes/royal-olive-crest/v1/outlines.ts`):
+Regenerate the artwork and cut lines with `scripts/shapes.py` (outlines go to `themes/royal-olive-crest/v2/outlines.ts`):
 
 ```bash
 python3 -I scripts/shapes.py leaf <#12 PNG> <#9 PNG> cream 107 out/   # front + outline
-python3 -I scripts/leafback.py <#9 PNG> themes/royal-olive-crest/v1/outlines.ts leaf-back.png 8.0565 180 0 32   # the back
+python3 -I scripts/leafback.py <#9 PNG> themes/royal-olive-crest/v2/outlines.ts leaf-back.png 8.0565 180 0 32   # the back
 python3 -I scripts/shapes.py heart <#14 PNG> <#13 PNG> none 150 out/
 ```
 
