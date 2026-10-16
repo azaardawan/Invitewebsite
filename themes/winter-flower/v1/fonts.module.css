@@ -1,0 +1,32 @@
+/*
+ * Winter Flower typefaces, from the designer's hand-off (docs/themes/winter-flower/brief.md).
+ * WF Display / WF Italic: Playfair Display, the source invitation's face (SIL OFL). WF Arabic: Amiri (SIL OFL).
+ * Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'WF Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-display.woff) format('woff');
+}
+@font-face {
+  font-family: 'WF Italic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-italic.woff) format('woff');
+}
+@font-face {
+  font-family: 'WF Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-arabic.woff) format('woff');
+}
+
+.fonts {
+  --vl-type: 'WF Display', Georgia, serif;
+  --vl-ar: 'WF Arabic', 'WF Display', serif;
+}

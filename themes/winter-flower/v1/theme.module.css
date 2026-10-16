@@ -1,0 +1,307 @@
+/*
+ * Winter Flower. Converted from the designer's prototype (docs/themes/winter-flower/): the rules below keep the
+ * prototype's class names, order and specificity (#frame stands for the prototype's root id), so the screens
+ * match the approved design. Removed for Bahja: the couple photographs, the preview tools and the original-card
+ * screen. Additions for Bahja are at the end, marked "Bahja".
+ */
+
+#frame {
+  --wf-paper: #fbfcfb;
+  --wf-ice: #e8eff3;
+  --wf-blue: #8da4b4;
+  --wf-ink: #354c61;
+  --wf-line: #8da4b4;
+  --wf-dark: #334c63;
+}
+
+#frame .root {container-type:inline-size;max-width:510px;margin:auto;background:var(--wf-paper);color:var(--wf-ink);font:400 18px/1.5 var(--vl-type);overflow:hidden;color-scheme:only light}
+#frame .root :is(h1,h2,h3,p,figure) {margin:0;font-weight:400}
+#frame .root :is(h1,h2,h3) {font-family:var(--vl-type);text-wrap:balance}
+#frame .root img {display:block;max-width:100%}
+#frame .wf-kicker {font:400 clamp(11px,2.8cqw,14px)/1.6 var(--vl-type);letter-spacing:.17em;text-transform:uppercase}
+#frame .website {background:var(--wf-paper)}
+#frame .website h2 {font:400 clamp(29px,8.5cqw,43px)/1.2 'WF Italic',var(--vl-type)}
+#frame .wf-welcome {position:relative;overflow:visible;isolation:isolate;z-index:2;background:#fff;padding:16% 0 11%}
+#frame .wf-hero-flower {position:absolute;height:auto;z-index:3;pointer-events:none;transform-origin:0 0;transform:none}
+#frame .root[data-phase=closed] .wf-hero-flower {transform:translate3d(var(--closed-x,0px),var(--closed-y,0px),0) scale(var(--closed-scale,1))}
+#frame .root[data-phase=closed] .wf-hero-copy {opacity:0;visibility:hidden;pointer-events:none}
+#frame .root[data-phase=opening] .wf-hero-flower {transition:transform 2000ms cubic-bezier(.42,0,.58,1);will-change:transform}
+#frame .root[data-phase=opening] .wf-hero-copy {transition:opacity 1600ms 200ms ease}
+#frame .wf-hero-copy {opacity:1}
+#frame .wf-floral-hit {position:absolute;inset:0;z-index:4;width:100%;height:100%;border:0;border-radius:0;background:transparent;touch-action:pan-y}
+#frame .wf-floral-hit:focus-visible {outline:2px solid var(--wf-ink);outline-offset:-6px}
+#frame .reduced :is(.wf-hero-flower,.wf-hero-copy) {transition:none!important}
+#frame .root[data-phase=opening] #wf-website-body {animation:wf-body-reveal 2s ease both}
+@keyframes wf-body-reveal {0%,25%{opacity:0}100%{opacity:1}}
+#frame .reduced #wf-website-body {animation:none!important}
+#frame .wf-hero-left {width:30%;left:-12%;top:-5%}
+#frame .wf-hero-right {width:29%;right:-13%;bottom:-9%}
+#frame .wf-hero-copy {position:relative;width:69%;margin:auto;text-align:center;z-index:2}
+#frame .wf-hero-copy>.wf-kicker {font-size:clamp(11px,2.65cqw,13px);letter-spacing:.14em}
+#frame .wf-names {font:400 clamp(36px,11.7cqw,60px)/1.15 var(--vl-type);letter-spacing:.12em;text-transform:uppercase;margin:16% -3% 16%!important}
+#frame .wf-names>span {display:block}
+#frame .wf-names em {display:flex;align-items:center;justify-content:center;gap:10px;margin:8% 0;font:400 clamp(15px,4.6cqw,23px)/1.3 'WF Italic',serif;letter-spacing:.1em}
+#frame .wf-names em:before,
+#frame .wf-names em:after {content:'';width:15%;height:1px;background:var(--wf-line)}
+#frame #vl-live-message {font:400 clamp(17px,4.7cqw,24px)/1.65 var(--vl-type);overflow-wrap:anywhere;text-wrap:pretty}
+#frame .wf-hero-date {border-block:1px solid var(--wf-line);margin:14% 0 9%;padding:8% 0 9%}
+#frame .wf-hero-date span {display:block;font-size:clamp(10px,2.6cqw,13px)}
+#frame .wf-hero-date strong {display:block;margin-top:7%;font:400 clamp(20px,5.6cqw,29px)/1.5 var(--vl-type)}
+#frame .wf-flourish {width:22%;height:auto;margin:0 auto}
+#frame .wf-photo-section {position:relative;isolation:isolate;padding:17% 10% 12%;text-align:center;background:linear-gradient(180deg,#fff 0%,#fff 9%,#f1f6f7 49%,#f4f7f8 100%)}
+#frame .wf-photo-note {position:relative;z-index:1;font:400 clamp(19px,5.4cqw,28px)/1.55 'WF Italic',var(--vl-type);max-width:86%;margin:0 auto!important;padding:7% 0 1%}
+#frame .wf-countdown {position:relative;padding:5% 7% 13%;text-align:center;background:linear-gradient(#f4f7f8,#eef3f5);color:var(--wf-paper)}
+#frame .wf-countdown h2 {margin:5% 0 10%!important;font-size:clamp(29px,8cqw,40px)!important}
+#frame .wf-countdown-values {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:8% 0;border-block:1px solid #d5e1e885}
+#frame .wf-countdown-values>div {min-width:0;border-inline-start:1px solid #c9d9e65c}
+#frame .wf-countdown-values>div:first-child {border:0}
+#frame .wf-countdown-values strong {display:block;font:400 clamp(28px,8cqw,41px)/1.15 var(--vl-type);font-variant-numeric:tabular-nums}
+#frame .wf-countdown-values span {display:block;font:400 clamp(11px,2.6cqw,13px)/1.5 var(--vl-type);letter-spacing:.06em;margin-top:13%}
+#frame #vl-countdown-date {font:400 clamp(16px,4.5cqw,23px)/1.4 var(--vl-type);margin-top:8%}
+#frame .wf-details {position:relative;padding:3% 9% 13%;background:linear-gradient(#eef3f5,#f6f8f8)}
+#frame .wf-details-frame {position:relative;isolation:isolate;border:1px solid var(--wf-line);padding:15% 7% 9%;text-align:center;background:radial-gradient(ellipse at 30% 5%,#fff 25%,#fffefa 100%);border-radius:46% 46% 0 0/7% 7% 0 0;box-shadow:0 12px 26px #354c6110}
+#frame .wf-details-frame:before {content:'';position:absolute;inset:6px;border:1px solid #8da4b46b;border-radius:inherit;pointer-events:none;z-index:-1}
+#frame .wf-details h2 {margin:5% 0 12%!important}
+#frame .wf-date-table {display:grid;grid-template-columns:1fr 1fr;gap:3%;border-block:3px double #8da4b485;padding:10% 0}
+#frame .wf-calendar {display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}
+#frame #vl-weekday {font-size:clamp(13px,3.6cqw,18px);text-transform:uppercase;letter-spacing:.06em}
+#frame #vl-detail-day {display:block;font:400 clamp(48px,16cqw,82px)/1.2 var(--vl-type)}
+#frame #vl-detail-month {font:400 clamp(12px,3.4cqw,17px)/1.5 var(--vl-type)}
+#frame .wf-time {display:flex;flex-direction:column;justify-content:center;align-items:center;border-inline-start:1px solid var(--wf-line);padding-inline:10%;gap:12px}
+#frame #vl-event-time {font:400 clamp(23px,6.5cqw,33px)/1.3 var(--vl-type);white-space:nowrap}
+#frame .wf-time>span:last-child {font-size:clamp(12px,3.5cqw,18px);line-height:1.5}
+#frame .wf-venue {padding:12% 0 10%;border-bottom:1px solid #8da4b480;margin-bottom:9%}
+#frame .wf-venue h3 {font:400 clamp(27px,7.5cqw,38px)/1.3 var(--vl-type);margin:7% 0 0!important;overflow-wrap:anywhere}
+#frame .wf-rsvp {position:relative;isolation:isolate;padding:3% 9% 12%;background:linear-gradient(#f6f8f8,#e8f0f3 65%,#f7f9f9);text-align:center}
+#frame .wf-rsvp-title h2 {margin:4% 0 7%!important}
+#frame .wf-rsvp-title>p:last-child {font:400 clamp(18px,5cqw,26px)/1.5 var(--vl-type)}
+#frame .wf-reply-card {position:relative;z-index:1;margin-top:11%;padding:11% 8%;border:1px solid var(--wf-line);outline:1px solid #8da4b46b;outline-offset:-7px;background:linear-gradient(120deg,#fff,#fffefa);text-align:start;box-shadow:0 16px 28px #354c6115}
+#frame .wf-field {display:grid;gap:9px;font:400 clamp(19px,5cqw,26px)/1.4 var(--vl-type);margin-bottom:23px}
+#frame .wf-field input,
+#frame .wf-field textarea {background:#fff;border:1px solid #8da4b4;border-radius:0;min-height:48px;padding:11px;width:100%;min-width:0;font:400 17px/1.5 var(--vl-type);color:var(--wf-ink)}
+#frame .wf-field textarea {min-height:104px;resize:vertical}
+#frame .wf-reply-card fieldset {padding:0;margin:0 0 23px;border:0;min-width:0}
+#frame .wf-reply-card legend {padding:0;margin-bottom:10px;font:400 clamp(19px,5cqw,26px)/1.4 var(--vl-type)}
+#frame .wf-attendance {display:flex;align-items:center;gap:10px;min-height:44px;font:400 clamp(17px,4.5cqw,23px)/1.4 var(--vl-type)}
+#frame .wf-attendance input {width:18px;height:18px;flex-shrink:0;accent-color:var(--wf-dark)}
+#frame .wf-button {display:inline-block;background:var(--wf-dark);border:1px solid var(--wf-dark);border-radius:0;color:var(--wf-paper);min-height:49px;padding:12px 18px;font:400 clamp(18px,4.7cqw,24px)/1.4 var(--vl-type)}
+#frame .wf-button:disabled {opacity:.7}
+#frame #vl-send {width:100%}
+#frame .wf-outline {background:#fff;color:var(--wf-ink);margin-top:8%;text-decoration:none}
+#frame .wf-guestbook {position:relative;z-index:1;margin:13% 3% 0;padding-top:10%;border-top:1px solid #8da4b475}
+#frame .wf-guestbook h3 {font:400 clamp(25px,7cqw,36px)/1.3 'WF Italic',var(--vl-type)}
+#frame #vl-guestbook-empty {font:400 clamp(17px,4.6cqw,23px)/1.5 var(--vl-type);margin-top:12px}
+#frame .vl-guest-note {position:relative;padding:25px 22px;margin-top:20px;background:#fffefa;border-block:1px solid var(--wf-line);text-align:start;overflow-wrap:anywhere;box-shadow:4px 5px 0 #dfe8ec}
+#frame .vl-guest-note p {font:400 21px/1.5 var(--vl-type)}
+#frame .vl-guest-note footer {font:400 14px/1.5 system-ui,sans-serif;margin-top:14px}
+#frame .wf-ending {position:relative;min-height:112cqw;padding:18% 10% 16% 35%;background:linear-gradient(#f7f9f9,#fff 45%);overflow:hidden;isolation:isolate}
+#frame .wf-ending-frame {position:absolute;inset:5% 6%;border:1px solid var(--wf-line);border-radius:48% 48% 0 0/17% 17% 0 0;z-index:-1}
+#frame .wf-ending-frame:after {content:'';position:absolute;inset:6px;border:1px solid #8da4b46b;border-radius:inherit}
+#frame .wf-ending-flowers {position:absolute;left:8%;bottom:6%;width:22%;height:auto}
+#frame .wf-ending-copy {text-align:center}
+#frame .wf-ending h2 {margin:9% 0 14%!important;font-size:clamp(28px,8.1cqw,41px)!important}
+#frame .wf-signature {font:400 clamp(27px,8cqw,41px)/1.2 'WF Italic',var(--vl-type)}
+#frame .wf-signature span {display:block}
+#frame .wf-signature em {display:block;font-family:'WF Italic',serif;font-style:normal;font-size:.6em;margin:4% 0}
+#frame #vl-ending-date {font:400 clamp(15px,4.1cqw,21px)/1.5 var(--vl-type);margin:12% 0}
+#frame .wf-ending .wf-flourish {width:30%}
+#frame .wf-sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@keyframes wf-letter-appear {from{transform:translateY(.2em)}to{transform:translateY(0)}}
+#frame .root[data-script=arabic] .wf-names {font-size:clamp(38px,12cqw,61px);margin-block:8%!important;line-height:1.4}
+#frame .root[data-script=arabic] .wf-names em {margin:0;line-height:1.3}
+#frame .root[data-script=arabic] #vl-live-message {font-size:clamp(23px,6.2cqw,32px)}
+#frame .root[data-script=arabic] .wf-signature {font-family:var(--vl-ar)}
+#frame .root[data-script=arabic] .wf-kicker {font-size:clamp(16px,4.2cqw,21px)}
+#frame .root[data-script=arabic] .wf-hero-copy>.wf-kicker {font-size:clamp(16px,4.2cqw,21px)}
+#frame .root[data-script=arabic] .wf-countdown-values span {font-size:clamp(15px,4cqw,20px)}
+@media(prefers-reduced-motion:reduce) {
+#frame *,
+#frame *:before,
+#frame *:after {animation-duration:.001ms!important;animation-delay:0ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+#frame .wf-photo-trail {position:absolute;top:0;left:12%;right:12%;height:34cqw;border-inline:1px solid transparent;border-image:linear-gradient(#8da4b4 45%,#8da4b400) 1;pointer-events:none}
+#frame .wf-photo-trail:before {content:'';position:absolute;inset:0 -6px;border-inline:3px solid transparent;border-image:linear-gradient(#8da4b4 45%,#8da4b400) 1}
+#frame .wf-photo-section>.wf-kicker {position:relative;z-index:1}
+#frame .wf-photo-botanical {position:absolute;left:-13%;top:15%;width:34%;height:auto;transform:rotate(-16deg);z-index:0;pointer-events:none}
+#frame .wf-photo-note:before {content:'';display:block;width:34%;height:1px;background:#8da4b480;margin:0 auto 8%}
+#frame .wf-countdown-panel {position:relative;isolation:isolate;padding:14% 6% 11%;background:radial-gradient(ellipse at 50% 0,#537185,#344e64 65%,#2c4356);border:1px solid #466175;border-radius:48% 48% 2px 2px/20% 20% 2px 2px;box-shadow:0 14px 30px #354c6120}
+#frame .wf-countdown-panel:before {content:'';position:absolute;inset:8px;border:1px solid #cfdee89c;border-radius:inherit;pointer-events:none;z-index:-1}
+#frame .wf-countdown-panel:after {content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background:repeating-linear-gradient(12deg,#ffffff04 0 1px,transparent 1px 4px),repeating-linear-gradient(100deg,#00000003 0 1px,transparent 1px 5px)}
+#frame .wf-countdown-ornament {width:25%;height:auto;filter:brightness(0) invert(1);opacity:.85;margin:0 auto 8%}
+#frame .wf-details-frame:after {content:'';position:absolute;left:43%;right:43%;height:3px;border-top:1px solid #8da4b4;border-bottom:1px solid #8da4b480;top:4.5%;pointer-events:none}
+#frame .wf-rsvp-title {position:relative;z-index:1;padding:5% 5% 0}
+#frame .wf-rsvp-title:before {content:'';display:block;width:30%;height:26px;border-top:1px solid var(--wf-line);border-radius:50%;margin:0 auto 3%}
+#frame .wf-rsvp-botanical {position:absolute;right:-18%;top:18%;width:31%;height:auto;transform:rotate(13deg);pointer-events:none;z-index:0}
+#frame .wf-reply-card:before {content:'';position:absolute;left:15%;right:15%;top:-8px;height:6px;background:#b7cbd7;border-block:1px solid #8da4b4;pointer-events:none}
+#frame .wf-field input,
+#frame .wf-field textarea {background:#fffefb;border-color:#9badba}
+#frame .wf-button {background:linear-gradient(#46677e,#334c63);border-color:#3a586e;box-shadow:inset 0 1px 0 #c9dbe750}
+#frame .wf-outline {background:#fffefa;box-shadow:none}
+#frame .wf-photo-section:after,
+#frame .wf-details:after,
+#frame .wf-rsvp:after {content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.35;background:repeating-linear-gradient(1deg,#8da4b40d 0 1px,transparent 1px 4px),repeating-linear-gradient(91deg,#8da4b409 0 1px,transparent 1px 5px)}
+#frame .wf-details-frame {z-index:1}
+#frame .root[data-script=arabic] .wf-photo-note {font-family:var(--vl-ar);font-style:normal}
+#frame .root[data-script=latin] #vl-weekday {font-family:var(--vl-type)}
+
+
+/* ---------------------------------------------------------------- Bahja */
+
+.page {
+  min-height: 100svh;
+  background: var(--wf-paper);
+}
+#frame .root {
+  max-width: 430px;
+}
+#frame .root *,
+#frame .root *::before,
+#frame .root *::after {
+  box-sizing: border-box;
+}
+
+/* The prototype set every text colour by its section's ink (dark slate on paper, white on the blue panel). */
+#frame [data-ink='dark'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #354c61;
+  -webkit-text-fill-color: #354c61;
+}
+#frame [data-ink][data-ink='light'],
+#frame [data-ink='light'] :is(h1, h2, h3, p, span, strong, em, label, legend, a, button, input, textarea, figcaption, footer) {
+  color: #fbfcfb;
+  -webkit-text-fill-color: #fbfcfb;
+}
+
+/* The invitation below the flowers appears with the opening (it is there without JavaScript). */
+#frame .root[data-hydrated][data-phase='closed'] #wf-website-body {
+  display: none;
+}
+
+/* The whole flower arrangement is the button; a quiet line under it says what a tap does. */
+#frame .wf-floral-hit {
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#frame .wf-open-hint {
+  margin-bottom: 5%;
+  padding: 6px 14px;
+  background: #fbfcfbd9;
+  animation: wf-breathe 2.8s ease-in-out infinite;
+}
+#frame .root[data-script='arabic'] .wf-open-hint {
+  font-family: var(--vl-ar);
+  letter-spacing: 0;
+}
+@keyframes wf-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* The side rules come from the platform border; above the flowers' joined stems. */
+#frame .wf-welcome > [data-bahja-border] {
+  z-index: -1 !important;
+}
+
+#frame .wf-families {
+  font: 400 clamp(15px, 4cqw, 20px) / 1.6 var(--vl-type);
+  margin-top: 6% !important;
+  overflow-wrap: anywhere;
+}
+#frame .wf-names > span {
+  overflow-wrap: anywhere;
+}
+
+/* Where the couple photo was: the caption line, set large in the italic. */
+#frame .wf-story {
+  position: relative;
+  z-index: 1;
+  margin: 9% 0 3% !important;
+  font: 400 clamp(29px, 8.6cqw, 44px) / 1.3 'WF Italic', var(--vl-type);
+}
+#frame .root[data-script='arabic'] .wf-story {
+  font-family: var(--vl-ar);
+  line-height: 1.6;
+}
+#frame .wf-photo-section {
+  padding-bottom: 14%;
+}
+
+#frame .wf-date-table[data-single] {
+  grid-template-columns: 1fr;
+}
+#frame .wf-date-table[data-single] .wf-time {
+  border-inline-start: 0;
+}
+#frame .wf-started {
+  font: 400 clamp(22px, 6cqw, 30px) / 1.4 var(--vl-type);
+  padding: 8% 0;
+}
+#frame .root[data-script='arabic'] .wf-started {
+  font-family: var(--vl-ar);
+}
+
+#frame .wf-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+#frame .wf-error {
+  display: block;
+  font: 400 15px/1.5 system-ui, sans-serif;
+  padding-inline-start: 10px;
+  border-inline-start: 3px solid var(--wf-dark);
+  margin: 4px 0 12px;
+}
+#frame .wf-counter {
+  font: 400 13px/1.4 system-ui, sans-serif !important;
+  text-align: end;
+  opacity: 0.7;
+}
+#frame .wf-field input:focus-visible,
+#frame .wf-field textarea:focus-visible,
+#frame .wf-attendance:focus-within,
+#frame .wf-button:focus-visible,
+#frame .wf-floral-hit:focus-visible {
+  outline: 2px solid var(--wf-dark);
+  outline-offset: 3px;
+}
+#frame .wf-button {
+  cursor: pointer;
+}
+#frame .wf-success {
+  text-align: center;
+  padding: 6% 0;
+}
+#frame .wf-success h3 {
+  font: 400 31px/1.2 'WF Italic', var(--vl-type);
+}
+#frame .wf-success p {
+  font: 400 20px/1.5 var(--vl-type);
+  margin-top: 14px !important;
+}
+#frame .root[data-script='arabic'] :is(.wf-success h3, .wf-success p, .wf-guestbook h3, .vl-guest-note p) {
+  font-family: var(--vl-ar);
+}
+
+/* Music button, once the invitation is open. */
+#frame .wf-audio {
+  position: fixed;
+  z-index: 20;
+  inset-block-end: max(16px, env(safe-area-inset-bottom));
+  inset-inline-end: 16px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--wf-line);
+  background: #fbfcfbe6;
+  color: var(--wf-ink);
+  cursor: pointer;
+}

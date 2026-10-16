@@ -11,6 +11,7 @@ import { setPublicGuestbook } from '@/server/guests/guestbook';
 import { setPublicAttendance } from '@/server/guests/attendance';
 import { saveCustomerCardBack } from '@/server/documents/card-back';
 import { customerEditInvitation } from '@/server/invitation/customer-edit';
+import { fieldValuesFromForm } from '@/catalog/fields';
 
 /** "Pay now" on the private receipt: sends the customer to WAYL (reusing an open link). */
 export async function payAction(form: FormData) {
@@ -64,8 +65,7 @@ type EditState = { error?: string; fieldErrors?: Record<string, string>; values?
 
 /** The customer edits their published invitation (packages with `self_edit`). Errors are keys under `store`. */
 export async function customerEditAction(token: string, _prev: EditState, form: FormData): Promise<EditState> {
-  const values: Record<string, string> = {};
-  for (const [k, v] of form.entries()) if (k.startsWith('f.') && typeof v === 'string') values[k.slice(2)] = v;
+  const values = fieldValuesFromForm(form);
   const result = await customerEditInvitation(db(), {
     receiptToken: token,
     values,

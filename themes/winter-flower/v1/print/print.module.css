@@ -1,0 +1,323 @@
+/*
+ * Winter Flower print companions, laid out like the source invitation's card: white paper, slate-blue double
+ * rules down both sides, a flower stem on the upper left and one on the lower right, the text centred in spaced
+ * capitals with a date and time table. Physical units only; text stays inside the 5 mm safe area.
+ */
+
+.card,
+.back,
+.keepsake {
+  --ink: #354c61;
+  --line: #8da4b4;
+  color: var(--ink);
+  font-family: 'WF Display', Georgia, serif;
+  text-align: center;
+  background: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.keepsake * {
+  box-sizing: border-box;
+}
+.card p,
+.back p,
+.keepsake p,
+.card h1,
+.back h1,
+.keepsake h1,
+.keepsake h2 {
+  margin: 0;
+  font-weight: 400;
+}
+[data-script='arabic'].card,
+[data-script='arabic'].back,
+[data-script='arabic'].keepsake {
+  font-family: 'WF Arabic', 'WF Display', serif;
+}
+
+.flowerTop,
+.flowerBottom {
+  position: absolute;
+  z-index: 1;
+  width: auto;
+}
+.flowerTop {
+  left: 3mm;
+  top: 1mm;
+  height: 118mm;
+}
+.flowerBottom {
+  right: 3mm;
+  bottom: 1mm;
+  height: 118mm;
+}
+
+.kicker {
+  font-size: 8pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1.7;
+}
+[data-script='arabic'] .kicker {
+  font-size: 12pt;
+  letter-spacing: 0;
+}
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 7mm 0 !important;
+  font-size: 31pt;
+  line-height: 1.15;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+[data-script='arabic'] .names {
+  font-size: 32pt;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+.and {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin: 3mm 0;
+  font-family: 'WF Italic', serif;
+  font-size: 11pt;
+  letter-spacing: 0.1em;
+}
+[data-script='arabic'] .and {
+  font-family: inherit;
+  font-size: 15pt;
+  margin: 0;
+}
+.and::before,
+.and::after {
+  content: '';
+  width: 9mm;
+  border-top: 0.25mm solid var(--line);
+}
+.message {
+  font-size: 11pt;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+[data-script='arabic'] .message {
+  font-size: 13pt;
+  line-height: 1.75;
+}
+.message[data-long] {
+  font-size: 9.5pt;
+}
+.families {
+  font-size: 9.5pt;
+  line-height: 1.6;
+  margin-top: 2mm !important;
+}
+.table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  margin: 4mm 0;
+  padding: 3.5mm 0;
+  border-block: 0.25mm solid var(--line);
+}
+.table[data-single] {
+  grid-template-columns: 1fr;
+}
+.table > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8mm;
+}
+.table > div + div {
+  border-inline-start: 0.25mm solid var(--line);
+}
+.big {
+  font-size: 15pt;
+  line-height: 1.3;
+}
+.venue {
+  font-size: 11pt;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.extra {
+  font-size: 9.5pt;
+  font-style: italic;
+  margin-top: 2mm !important;
+}
+.flourish {
+  width: 22mm;
+  height: auto;
+  margin-top: 4mm;
+}
+.qr {
+  margin: 3mm 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+}
+.qr img {
+  width: 16mm;
+  height: 16mm;
+}
+.qr figcaption {
+  font-size: 7pt;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------------- A5 card front (148 × 210 mm + 3 mm bleed) */
+
+.card {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+}
+.cardSafe {
+  position: absolute;
+  inset: 16mm 34mm 13mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------- A5 card back, landscape (216 × 154 mm) */
+
+.back {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+}
+.back .flowerTop,
+.back .flowerBottom {
+  height: 88mm;
+}
+.backSafe {
+  position: absolute;
+  inset: 20mm 46mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.backTitle {
+  font-family: 'WF Italic', 'WF Display', serif;
+  font-size: 30pt;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+[data-script='arabic'] .backTitle {
+  font-family: 'WF Arabic', serif;
+  font-size: 28pt;
+  line-height: 1.5;
+}
+.backMessage {
+  max-width: 120mm;
+  font-size: 12pt;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.backNames {
+  font-family: 'WF Italic', 'WF Display', serif;
+  font-size: 18pt;
+}
+[data-script='arabic'] .backNames {
+  font-family: 'WF Arabic', serif;
+}
+.backSignature {
+  max-height: 22mm;
+  max-width: 60mm;
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  break-after: page;
+}
+.cover .flowerTop,
+.cover .flowerBottom {
+  height: 165mm;
+}
+.coverInner {
+  position: absolute;
+  inset: 40mm 48mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+}
+.cover .names {
+  font-size: 38pt;
+}
+.messages {
+  padding: 30mm 26mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.messagesTitle {
+  margin: 0 0 9mm !important;
+  font-family: 'WF Italic', 'WF Display', serif;
+  font-size: 26pt;
+}
+[data-script='arabic'] .messagesTitle {
+  font-family: 'WF Arabic', serif;
+}
+.empty {
+  font-size: 12pt;
+}
+.note {
+  break-inside: avoid;
+  margin: 0 auto 6mm;
+  max-width: 140mm;
+  padding: 5mm 7mm;
+  background: #fffefa;
+  border-block: 0.25mm solid var(--line);
+  text-align: start;
+}
+.noteText {
+  font-size: 12pt;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.noteFrom {
+  margin-top: 2.5mm !important;
+  font-size: 9.5pt;
+  opacity: 0.8;
+}
+.closing {
+  margin-top: 10mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3mm;
+  font-family: 'WF Italic', 'WF Display', serif;
+  font-size: 13pt;
+  break-inside: avoid;
+}
+[data-script='arabic'] .closing {
+  font-family: 'WF Arabic', serif;
+}

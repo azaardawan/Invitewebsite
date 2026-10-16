@@ -49,13 +49,13 @@ python3 -I scripts/export.py <folder with env-clean.png, seal-layer.png and src/
 |---|---|---|
 | `person_1_name` | Groom | Platform convention (starter label "اسم العريس"). |
 | `person_2_name` | Bride | |
-| `seal_initials` | **New in the Field Library, optional.** Initials on the seal | Empty: the first letter of each name, **groom first**, in the script the names were typed in (Arabic names → Arabic letters). Filled: printed exactly as typed (up to 9 characters). |
+| `seal_initials` | **New in the Field Library, optional** (type `initials`: two boxes, groom and bride, up to 3 letters each; owner's change 2026-10-15). Initials on the seal | Each empty box: the first letter of that name, **groom first**, in the script the names were typed in (Arabic names → Arabic letters). The chosen symbol (`sealJoin`) always goes between the two, so the customer never types a separator. |
 | `event_date`, `event_time` | Crest page, venue page, countdown page | |
 | `venue_name`, `venue_map_url` | Venue page | |
 | `invitation_message` | Message page | Fits the 300-character limit. |
 
 Wording choice on the order form (manifest `wording.sealJoin`): the symbol between the two initials,
-**& (default), ♥, · or و**. Only used when the customer leaves `seal_initials` empty. The ♥ is drawn in the
+**& (default), ♥, · or و**, whether the letters come from the names or from the two boxes. The ♥ is drawn in the
 letters' gold, never as an emoji.
 
 The letters are engraved into the seal's flat face: dark bronze, bolder than the script font's default,

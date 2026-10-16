@@ -22,6 +22,7 @@ const KIND = {
   'sticker.preview': 'STICKER_PREVIEW',
   'bottle.preview': 'BOTTLE_PREVIEW',
   'card.preview': 'CARD_DRAFT_PREVIEW',
+  'cardBack.preview': 'CARD_BACK_DRAFT_PREVIEW',
   'sticker-square.png': 'STICKER_SQUARE_PNG',
   'sticker-square.pdf': 'STICKER_SQUARE_PDF',
   'sticker-square.preview': 'STICKER_SQUARE_PREVIEW',
@@ -37,6 +38,7 @@ const FEATURE: Record<ProductItem, string> = {
   'bottle.pdf': 'bottle_label',
   'bottle.preview': 'bottle_label',
   'card.preview': 'print_card',
+  'cardBack.preview': 'print_card',
   'sticker-square.png': 'sticker',
   'sticker-square.pdf': 'sticker',
   'sticker-square.preview': 'sticker',
@@ -49,7 +51,7 @@ export const PRODUCT_ITEMS = Object.keys(KIND) as ProductItem[];
 export const isPreview = (item: ProductItem) => item.endsWith('.preview');
 
 export class ProductError extends Error {
-  constructor(public readonly code: 'notFound' | 'notIncluded' | 'notPaid') {
+  constructor(public readonly code: 'notFound' | 'notIncluded' | 'notPaid' | 'rateLimited') {
     super(code);
   }
 }
@@ -76,9 +78,10 @@ export function productFileName(item: ProductItem, publicId: string) {
 /**
  * A newborn extra for an invitation, stored and reused while nothing it shows has changed. Previews can be
  * seen before paying and are watermarked until then (the watermark is part of what is stored, so paying
- * renders a clean copy); the files themselves (PNG, PDF sheets) are only given out once paid.
+ * renders a clean copy); the files themselves (PNG, PDF sheets) are only given out once paid. `mayRender` is asked
+ * only when a fresh file has to be drawn (the costly part): a stored one is handed out without counting.
  */
-export async function ensureProductFile(db: DbOrTx, invitationId: string, item: ProductItem, render: ProductRenderer = renderProduct) {
+export async function ensureProductFile(db: DbOrTx, invitationId: string, item: ProductItem, render: ProductRenderer = renderProduct, mayRender?: () => Promise<boolean>) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new ProductError('notFound');
   if (!inv.featureKeys.includes(FEATURE[item])) throw new ProductError('notIncluded');
@@ -87,10 +90,11 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
 
   const shown =
-    item === 'card.preview'
+    item === 'card.preview' || item === 'cardBack.preview'
       ? await (async () => {
           const d = await printData(db, inv, 'card');
-          return d.kind === 'card' ? { props: d.props, design: d.design.front } : null;
+          // Each side with what it shows, and the shape (leaf, heart) the customer chose.
+          return d.kind === 'card' ? { props: d.props, design: item === 'card.preview' ? d.design.front : d.design.back, shape: d.shape?.key ?? null } : null;
         })()
       : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
   const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid }));
@@ -103,6 +107,7 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
     const stored = await storage().get(existing.storageKey);
     if (stored) return { data: stored, type: contentType(item), fileName: productFileName(item, inv.publicId) };
   }
+  if (mayRender && !(await mayRender())) throw new ProductError('rateLimited');
   const data = await render(item, inv.id, { bottleSize: inv.bottleSize });
   const ext = contentType(item) === 'application/pdf' ? 'pdf' : contentType(item) === 'image/png' ? 'png' : 'jpg';
   const storageKey = `documents/${randomUUID()}.${ext}`;

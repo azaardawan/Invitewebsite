@@ -93,6 +93,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               title: t('extras.title'),
               note: t('extras.watermarkNote'),
               card: t('extras.card'),
+              cardBack: t('cardBack.heading'),
               story: t('extras.story'),
               sticker: t('extras.sticker'),
               round: t('stickerShape.round'),

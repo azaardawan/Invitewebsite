@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
-import { fieldOptions, isOptionalField } from '@/catalog/fields';
+import { fieldOptions, INITIALS_MAX, isOptionalField, splitInitials } from '@/catalog/fields';
 
 export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
 
@@ -130,7 +130,7 @@ export function OrderForm({
         } as const;
         return (
           <div key={f.key} className="flex flex-col gap-2">
-            <label htmlFor={id} id={`${id}-label`} className="text-[15px] font-medium text-heading">
+            <label htmlFor={f.type === 'initials' ? undefined : id} id={`${id}-label`} className="text-[15px] font-medium text-heading">
               {f.label}
             </label>
             {f.type === 'choice' ? (
@@ -142,6 +142,27 @@ export function OrderForm({
                   >
                     <input type="radio" name={`f.${f.key}`} value={o} defaultChecked={values[f.key] === o} className="sr-only" />
                     {t(`fieldOptions.${f.key}.${o}` as 'fieldOptions.baby_gender.boy')}
+                  </label>
+                ))}
+              </div>
+            ) : f.type === 'initials' ? (
+              // One box per person, so nobody has to guess a separator; the symbol between them is chosen below.
+              <div role="group" aria-labelledby={`${id}-label`} className="flex items-start gap-3">
+                {(['first', 'second'] as const).map((side) => (
+                  <label key={side} className="flex flex-col items-center gap-1">
+                    <input
+                      id={side === 'first' ? id : `${id}-second`}
+                      name={`f.${f.key}.${side}`}
+                      defaultValue={splitInitials(values[f.key])[side]}
+                      aria-invalid={err ? true : undefined}
+                      aria-describedby={err ? `${id}-err` : `${id}-hint`}
+                      type="text"
+                      dir="auto"
+                      maxLength={INITIALS_MAX}
+                      autoComplete="off"
+                      className={`${inputCls.replace('w-full', 'w-16')} h-16 text-center text-2xl`}
+                    />
+                    <span className="text-xs text-muted">{t(side === 'first' ? 'sealInitialsFirst' : 'sealInitialsSecond')}</span>
                   </label>
                 ))}
               </div>
