@@ -30,6 +30,8 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'person_1_name', label: { ar: 'اسم العريس', en: "Groom's name", ckb: 'ناوی زاوا', bdn: 'ناڤێ زاڤای' } },
       { key: 'person_2_name', label: { ar: 'اسم العروس', en: "Bride's name", ckb: 'ناوی بووک', bdn: 'ناڤێ بویکێ' } },
       { key: 'family_names' },
+      { key: 'person_1_family' },
+      { key: 'person_2_family' },
       { key: 'event_date' },
       { key: 'event_time' },
       { key: 'venue_name', label: { ar: 'اسم القاعة', en: 'Hall name', ckb: 'ناوی هۆڵ', bdn: 'ناڤێ هۆلێ' } },
@@ -44,6 +46,8 @@ const STARTER_SECTIONS: StarterSection[] = [
     fields: [
       { key: 'person_1_name', label: { ar: 'اسم الخطيب', en: "Fiancé's name", ckb: 'ناوی دەستگیرانی کوڕ', bdn: 'ناڤێ دەزگرانێ کوڕ' } },
       { key: 'person_2_name', label: { ar: 'اسم الخطيبة', en: "Fiancée's name", ckb: 'ناوی دەستگیرانی کچ', bdn: 'ناڤێ دەزگرانا کچ' } },
+      { key: 'person_1_family', label: { ar: 'عائلة الخطيب', en: "Fiancé's family" } },
+      { key: 'person_2_family', label: { ar: 'عائلة الخطيبة', en: "Fiancée's family" } },
       { key: 'event_date' },
       { key: 'event_time' },
       { key: 'venue_name' },

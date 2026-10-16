@@ -871,3 +871,38 @@ online for its package's time. Their Kurdish line still says 30 days and was lef
 | # | Where | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
 |---|---|---|---|---|
 | 12 | Terms, the invitation's online time | بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە. | داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن. | ◐ |
+
+## Batch 33 — the four wedding designs v2: families, engagement wording, the arch card — ⏳ AWAITING APPROVAL
+
+Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15), version 2.
+Each design now has a section for the two families (the customer types each family's name), and says «engagement»
+instead of «wedding» when it is sold as an engagement. Until these rows are approved, Kurdish invitations show the
+Arabic for these lines. Glossary reused from approved rows: engagement دەستگیرانی / دەزگرانی (section names),
+fiancé / fiancée دەستگیرانی کوڕ / کچ, دەزگرانێ کوڕ / دەزگرانا کچ (field labels), family بنەماڵە / مالبات.
+
+| # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | All four: families heading | بمباركة العائلتين | Together with their families | بە بەرەکەتی هەردوو بنەماڵە | ب بەرەکەتا هەردوو مالباتان | ◐ |
+| 2 | All four: caption, wedding | عائلة العريس | The groom’s family | بنەماڵەی زاوا | مالباتا زاڤای | ● |
+| 3 | All four: caption, wedding | عائلة العروس | The bride’s family | بنەماڵەی بووک | مالباتا بویکێ | ● |
+| 4 | All four: caption, engagement | عائلة الخطيب | The groom-to-be’s family | بنەماڵەی دەستگیرانی کوڕ | مالباتا دەزگرانێ کوڕ | ◐ |
+| 5 | All four: caption, engagement | عائلة الخطيبة | The bride-to-be’s family | بنەماڵەی دەستگیرانی کچ | مالباتا دەزگرانا کچ | ◐ |
+| 6 | B, E, W: engagement of batch 31 row 1 | بمناسبة خطوبتنا | The engagement of | بە بۆنەی دەستگیرانیمان | ب بۆنا دەزگرانیا مە | ● |
+| 7 | B, E: engagement of batch 31 row 2 | ندعوكم لمشاركتنا / فرحة خطوبتنا | You are cordially invited to the engagement of | بانگهێشتتان دەکەین بۆ بەشداریکردن / لە خۆشیی دەستگیرانیمان | مە هوین داخواز کرینە بۆ پشکداریێ / د شاهیا دەزگرانیا مە دا | ◐ |
+| 8 | B, E: engagement of batch 31 row 4 | دعوة خطوبة | You are invited | بانگهێشتنامەی دەستگیرانی | داخوازناما دەزگرانیێ | ● |
+| 9 | All four: engagement of batch 31 row 9 | تفاصيل الخطوبة | Details | زانیارییەکانی دەستگیرانی | زانیاریێن دەزگرانیێ | ◐ |
+| 10 | B, E keepsake: engagement of batch 31 row 15 | رسائل الأهل والأحبة في يوم خطوبتنا | Wishes from our family and friends | نامەی خێزان و خۆشەویستان لە ڕۆژی دەستگیرانیماندا | نامێن مالباتێ و هەڤالان د ڕۆژا دەزگرانیا مە دا | ◐ |
+| 11 | V: poster title, second word (under «دعوة») | خطوبة | Engagement | دەستگیرانی | دەزگرانی | ● |
+| 12 | `store.features.card_arch` | بطاقة مطبوعة على شكل قوس أو إطار مزخرف، تختارها بدل البطاقة | An arch- or frame-shaped printed card, instead of the card | کارتێکی چاپکراو بە شێوەی کەوانە یان چوارچێوەی نەخشێنراو، لە جیاتی کارتەکە | کارتەکا چاپکری ب شێوێ کەڤانەکێ یان چوارچۆڤەیەکا نەخشاندی، ل شوینا کارتێ | ◐ |
+| 13 | Field library: `person_1_family` | عائلة العريس | Groom's family | بنەماڵەی زاوا | مالباتا زاڤای | ● |
+| 14 | Field library: `person_2_family` | عائلة العروس | Bride's family | بنەماڵەی بووک | مالباتا بویکێ | ● |
+| 15 | Engagement section: `person_1_family` | عائلة الخطيب | Fiancé's family | بنەماڵەی دەستگیرانی کوڕ | مالباتا دەزگرانێ کوڕ | ◐ |
+| 16 | Engagement section: `person_2_family` | عائلة الخطيبة | Fiancée's family | بنەماڵەی دەستگیرانی کچ | مالباتا دەزگرانا کچ | ◐ |
+| 17 | Card shape name, B, W, V | قوس | Arch | کەوانە | کەڤان | ● |
+| 18 | Card shape name, E | إطار البطاقة | Cartouche | چوارچێوەی کارت | چوارچۆڤا کارتێ | ◐ |
+| 19 | `invitationSamples.short.person_1_family` / `person_2_family` (previews) | آل الحسني / آل الكرخي | The Al-Husseini family / The Al-Karkhi family | بنەماڵەی ئەحمەد / بنەماڵەی کەریم | بنەمالا ئەحمەد / بنەمالا کەریم | ● |
+| 20 | `invitationSamples.long.person_1_family` / `person_2_family` (previews) | آل عبد الرحمن الحسني الكرام / آل محمد الكرخي الكرام | The family of Abdulrahman Al-Husseini / … Mohammed Al-Karkhi | بنەماڵەی بەڕێز عەبدولڕەحمان ئەحمەد / بنەماڵەی بەڕێز محەمەد کەریم | بنەمالا بەڕێز عەبدولرەحمان ئەحمەد / بنەمالا بەڕێز محەمەد کەریم | ● |
+
+Not translated (Arabic and English only, like every design's yes/no question): Burgundy's switch «الأحرف الأولى من اسمينا
+على ختم الشمع (بدل الوردة)». The Vintage poster's «ENGAGEMENT» band is English lettering in every language, like the
+poster's own «WEDDING Invitation».

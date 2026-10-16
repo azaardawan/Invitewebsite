@@ -131,6 +131,7 @@ function printBase(theme: ThemeProps) {
     birthDate: theme.birthDate,
     wording: theme.wording,
     switches: theme.switches,
+    occasion: theme.occasion,
   };
   return { base, cardBackTitle };
 }

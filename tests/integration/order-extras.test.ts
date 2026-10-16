@@ -365,7 +365,7 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
   });
 
   it('a theme lists the feature of every shape it draws, and draws every shape it sells', () => {
-    const issues = (features: ('print_card' | 'card_leaf' | 'card_heart')[], shapes: (typeof LEAF)[]) => {
+    const issues = (features: ('print_card' | 'card_leaf' | 'card_heart' | 'card_arch')[], shapes: (typeof LEAF)[]) => {
       const m = testManifest('shapes-check', 1, {
         features,
         fields: [...BASIC_FIELDS],
@@ -377,7 +377,9 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
     };
     expect(issues(['print_card', 'card_leaf'], [])).toContain('card_leaf requires a "leaf" shape in print.shapes');
     expect(issues(['print_card', 'card_leaf'], [LEAF, HEART])).toContain('print.shapes "heart" is sold with the card_heart feature: list it in features');
-    expect(issues(['print_card'], [{ ...LEAF, key: 'star' }])).toContain('print.shapes keys must be one of: leaf, heart');
+    expect(issues(['print_card'], [{ ...LEAF, key: 'star' }])).toContain('print.shapes keys must be one of: leaf, heart, arch');
     expect(issues(['print_card', 'card_leaf', 'card_heart'], [LEAF, HEART])).toEqual([]);
+    expect(issues(['print_card', 'card_arch'], [])).toContain('card_arch requires a "arch" shape in print.shapes');
+    expect(issues(['print_card', 'card_heart', 'card_arch'], [HEART, { ...LEAF, key: 'arch' }])).toEqual([]);
   });
 });

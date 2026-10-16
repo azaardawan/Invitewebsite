@@ -8,6 +8,7 @@
  */
 const PAIRS: readonly (readonly [string, string])[] = [
   ['person_1_name', 'person_2_name'],
+  ['person_1_family', 'person_2_family'],
   ['mother_name', 'father_name'],
 ];
 const WHEN = ['event_date', 'event_time'] as const;
