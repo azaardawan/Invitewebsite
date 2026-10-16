@@ -34,6 +34,9 @@ export const STANDARD_FIELDS = {
   person_1_name: { type: 'text', maxLength: 40, label: { ar: 'الاسم الأول', en: 'First name', ckb: 'ناوی یەکەم', bdn: 'ناڤێ ئێکێ' } },
   person_2_name: { type: 'text', maxLength: 40, label: { ar: 'الاسم الثاني', en: 'Second name', ckb: 'ناوی دووەم', bdn: 'ناڤێ دووێ' } },
   family_names: { type: 'longtext', maxLength: 150, label: { ar: 'أسماء العائلتين', en: 'Family names', ckb: 'ناوی هەردوو بنەماڵە', bdn: 'ناڤێن هەردوو بنەمالان' } },
+  /** Each family on its own (e.g. the groom's and the bride's); the theme gives them their own place. */
+  person_1_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العريس', en: "Groom's family" } },
+  person_2_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العروس', en: "Bride's family" } },
   event_date: { type: 'date', label: { ar: 'تاريخ المناسبة', en: 'Event date', ckb: 'بەرواری بۆنە', bdn: 'دیرۆکا ئاهەنگێ' } },
   event_time: { type: 'time', label: { ar: 'وقت المناسبة', en: 'Event time', ckb: 'کاتی بۆنە', bdn: 'دەمێ ئاهەنگێ' } },
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },

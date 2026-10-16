@@ -64,7 +64,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `attendance` | How many guests replied coming / not coming (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
 | `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
-| `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. |
+| `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. Print companions get it too (`occasion` in their props). |
 | `wording` | The design's changeable lines (manifest `wording`) by key: the customer's choice, or the Arabic default. Every declared key is present. Also given to print companions and newborn extras. A line in another script than the invitation (Arabic on an English order) should get its own `lang`/`dir`. |
 | `switches` | The design's yes/no choices (manifest `switches`) by key: the customer's answer, or the default. Every declared key is present. Also given to print companions and newborn extras. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
@@ -152,13 +152,13 @@ clear of the border at the sides) with `box-decoration-break: clone` so it repea
 numbers are printed. Use physical units and `print-color-adjust: exact`. Chromium renders
 it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
-### Shaped cards (leaf, heart…)
+### Shaped cards (leaf, heart, arch)
 
 A design may offer shaped printed cards next to the A5 card. On the order form the customer ticks **one, several or
 all** of the cards the package sells (the A5 card and/or its shapes; `invitations.card_choices`, read through
-`chosenCards`), and gets each ticked card as its own files (PDF; a shape also as PNGs), asked for with `?card=a5|leaf|heart`.
-Each shape is sold by its own feature, so a package can offer one, both or neither: `leaf` by `card_leaf`, `heart` by `card_heart` (both
-need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`). A design lists the feature of every shape it
+`chosenCards`), and gets each ticked card as its own files (PDF; a shape also as PNGs), asked for with `?card=a5|leaf|heart|arch`.
+Each shape is sold by its own feature, so a package can offer any of them or none: `leaf` by `card_leaf`, `heart` by `card_heart`,
+`arch` (a tall card with a rounded top, or the design's own framed shape) by `card_arch` (all need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`). A design lists the feature of every shape it
 draws, and draws every shape whose feature it lists. Declare them in the manifest
 `print.shapes: [{ key, label: {ar, en, ckb?, bdn?}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
 millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the

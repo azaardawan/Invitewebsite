@@ -288,6 +288,13 @@
       "when": 1792164280987,
       "tag": "0040_drop_card_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792173431730,
+      "tag": "0041_family_fields",
+      "breakpoints": true
     }
   ]
 }

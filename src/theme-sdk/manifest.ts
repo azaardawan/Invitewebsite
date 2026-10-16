@@ -52,7 +52,7 @@ export type ThemeManifest = {
     card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean; qrColors?: { dark: string; light: string } };
     keepsake?: { size: 'A4' };
     /**
-     * Shaped printed cards (features `card_leaf`, `card_heart`; one per shape key `leaf`, `heart`): the customer may choose one of these instead of the
+     * Shaped printed cards (features `card_leaf`, `card_heart`, `card_arch`; one per shape key `leaf`, `heart`, `arch`): the customer may choose one of these instead of the
      * card. `outline` is the cut line, an SVG path in millimetres (origin top-left of a `widthMm` ×
      * `heightMm` box), traced from the front. The back is the same shape mirrored (the card turned over), or with
      * `backSideways` the card turned over and a quarter turn (its box is then `heightMm` × `widthMm`).

@@ -1,0 +1,96 @@
+/*
+ * Winter Flower shaped cards (Shape.tsx). The box is the card's exact size; transparent outside the cut line.
+ * Type comes from print.module.css; this file places it inside each shape.
+ */
+
+.shape {
+  --ink: #354c61;
+  --line: #8da4b4;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--ink);
+  font-family: 'WF Display', Georgia, serif;
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+[data-script='arabic'].shape {
+  font-family: 'WF Arabic', 'WF Display', serif;
+}
+.shape * {
+  box-sizing: border-box;
+}
+.shape p,
+.shape h1 {
+  margin: 0;
+  font-weight: 400;
+}
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ground {
+  fill: #fff;
+}
+.rule,
+.ruleInner {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 0.8;
+}
+.ruleInner {
+  stroke-width: 0.5;
+  opacity: 0.6;
+}
+.content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6mm;
+}
+/* Arch: between the two stems, below the round top. */
+.arch .content {
+  inset: 22% 20% 16%;
+}
+.arch.back .content {
+  inset: 22% 16% 14%;
+  gap: 3mm;
+}
+/* Heart: between the lobes' flowers and above the point. */
+.heart .content {
+  inset: 22% 24% 30%;
+}
+.heart.back .content {
+  inset: 18% 22% 25%;
+  gap: 2mm;
+}
+.names {
+  margin: 3mm 0 !important;
+  font-size: 22pt;
+}
+.heart .names {
+  font-size: 20pt;
+}
+.flourish {
+  width: 26mm;
+  height: auto;
+  margin-top: 2mm;
+}
+.title {
+  font-size: 26pt;
+}
+.message {
+  max-width: none;
+  font-size: 10.5pt;
+}
+.message[data-long] {
+  font-size: 9pt;
+}
+.backNames {
+  font-size: 13pt;
+}

@@ -112,9 +112,11 @@ test('every theme renders every designed state correctly', async ({ page }, test
 test('every sellable theme looks right with any single feature switched off', async ({ page }, testInfo) => {
   // Packages are built feature by feature in Admin, so a theme must handle any subset, not only its designed states.
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
-  test.setTimeout(5 * 60_000);
+  const sellable = generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false);
+  // About ten seconds per case (open, wait for the opening, check, screenshot), so the budget grows with the catalogue.
+  test.setTimeout(Math.max(5 * 60_000, sellable.reduce((n, m) => n + m.features.length, 0) * 10_000));
   await signInAsNewOwner(page);
-  for (const m of generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
+  for (const m of sellable) {
     for (const off of m.features) {
       // Switching a feature off also switches off what depends on it (no messages without the guest form…).
       const dropped = new Set<string>([off]);
