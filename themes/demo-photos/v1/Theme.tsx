@@ -1,6 +1,6 @@
 'use client';
 
-import { GuestFormSlot, Photo, type ThemeProps } from '@/theme-sdk';
+import { Photo, type ThemeProps } from '@/theme-sdk';
 import styles from './theme.module.css';
 
 /** The customer's first photo on the cover, the others in a gallery below (any number from none to seven). */
@@ -26,7 +26,6 @@ export default function DemoPhotosTheme({ fields, labels, event, photos }: Theme
             ))}
           </ul>
         ) : null}
-        <GuestFormSlot render={(form) => (form.status === 'sent' ? <p role="status">{labels.sent}</p> : <p className={styles.line}>{labels.guestFormTitle}</p>)} />
       </article>
     </main>
   );

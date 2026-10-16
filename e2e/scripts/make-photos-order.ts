@@ -21,7 +21,7 @@ try {
   const cover = await storeImage(db(), await sharp({ create: { width: 420, height: 600, channels: 3, background: '#d8c3a5' } }).png().toBuffer(), { uploadedBy: null });
   await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, coverAssetId: t.coverAssetId ?? cover.id, musicTrackId: t.musicTrackId }, actor);
   const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.featureKeys.includes('photos'));
-  const packageId = existing?.id ?? (await createPackage(db(), t.id, { name: { ar: 'الصور', en: 'Photos' }, priceIqd: 45000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'rsvp'] }, actor)).id;
+  const packageId = existing?.id ?? (await createPackage(db(), t.id, { name: { ar: 'الصور', en: 'Photos' }, priceIqd: 45000, fieldKeys: [...FIELDS], featureKeys: ['photos'] }, actor)).id;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
   if (t.status !== 'ACTIVE') await transitionTheme(db(), t.id, 'ACTIVE', actor);
   const date = new Date(Date.now() + 40 * 86400_000).toISOString().slice(0, 10);

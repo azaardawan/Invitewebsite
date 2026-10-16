@@ -11,10 +11,10 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['wedding'],
   fields: ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name'],
-  features: ['photos', 'rsvp'],
+  features: ['photos'],
   validStates: [
-    { features: ['rsvp'], fields: ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name'] },
-    { features: ['photos', 'rsvp'], fields: ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name'] },
+    { features: [], fields: ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name'] },
+    { features: ['photos'], fields: ['person_1_name', 'person_2_name', 'event_date', 'event_time', 'venue_name'] },
   ],
   photos: {
     max: 7,
