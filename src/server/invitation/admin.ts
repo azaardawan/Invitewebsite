@@ -8,10 +8,11 @@ import { auditActor, type Actor } from '@/server/catalog/common';
 import { fieldDefs } from '@/server/orders/common';
 import { validateFieldValues } from '@/server/orders/validation';
 import { slugFromNames } from '@/lib/ids';
+import { isForever } from '@/catalog/lifetime';
 
 export class InvitationAdminError extends Error {
   constructor(
-    public readonly code: 'notFound' | 'stale' | 'notPublished' | 'notUnpublished' | 'invalidFields' | 'reason' | 'days' | 'music',
+    public readonly code: 'notFound' | 'stale' | 'notPublished' | 'notUnpublished' | 'invalidFields' | 'reason' | 'days' | 'music' | 'forever',
     public readonly fieldErrors: Record<string, string> = {},
   ) {
     super(code);
@@ -113,6 +114,7 @@ export async function extendInvitation(db: DbOrTx, id: string, input: { days: nu
   return db.transaction(async (tx) => {
     const inv = await lockFor(tx, id);
     if (!inv.publishedAt || !inv.expiresAt) throw new InvitationAdminError('notPublished');
+    if (isForever(inv.expiresAt)) throw new InvitationAdminError('forever');
     const from = inv.expiresAt > now ? inv.expiresAt : now;
     const expiresAt = new Date(from.getTime() + input.days * 86400_000);
     await tx.update(invitations).set({ expiresAt, version: inv.version + 1 }).where(eq(invitations.id, id));

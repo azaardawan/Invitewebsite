@@ -8,7 +8,7 @@ import { createPackage } from '@/server/catalog/packages';
 import { listPalettes, savePalette, setPaletteStatus } from '@/server/catalog/palettes';
 import { createDraft, updateDraft } from '@/server/orders/drafts';
 import { invitationRenderData } from '@/server/invitation/load';
-import { printData, shapeSheet } from '@/server/documents/data';
+import { invitationCards, printData, shapeSheet } from '@/server/documents/data';
 import { updateCardOptions } from '@/server/documents/documents';
 import { manifestSchema } from '@/theme-sdk/manifest';
 import { storeImage } from '@/server/media/assets';
@@ -257,6 +257,8 @@ describe('fixed choices and yes/no switches of a design', () => {
 
 describe('shaped printed cards (card_leaf, card_heart)', () => {
   const LEAF = { key: 'leaf', label: { ar: 'ورقة', en: 'Leaf' }, widthMm: 100, heightMm: 160, outline: 'M50 0 L100 80 L50 160 L0 80 Z' };
+  /** The design's shapes in its own order (the order cards are listed in). */
+  const SHAPE_ORDER = ['leaf', 'heart'];
   const HEART = { key: 'heart', label: { ar: 'قلب', en: 'Heart' }, widthMm: 120, heightMm: 120, outline: 'M60 20 L120 40 L60 120 L0 40 Z' };
   let shop3: { themeKey: string; withShapes: string; leafOnly: string; cardOnly: string };
 
@@ -285,8 +287,8 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
     createDraft(db(), { themeKey: shop3.themeKey, packageId, locale: 'ar', values: weddingValues(), extras }, { ...ctx, ipHash: randomToken(8) });
 
   it('stores the chosen shape, prints it with its mirrored back and a cut line for print shops, and can go back to the card', async () => {
-    const d = await order(shop3.withShapes, { cardShape: 'leaf' });
-    expect((await row(d.invitationId)).cardShape).toBe('leaf');
+    const d = await order(shop3.withShapes, { cardChoices: ['leaf'] });
+    expect((await row(d.invitationId)).cardChoices).toEqual(['leaf']);
     const data = await printData(db(), await row(d.invitationId), 'card');
     expect(data.kind === 'card' && data.shape).toMatchObject({
       key: 'leaf',
@@ -307,32 +309,59 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
     const shop = await printData(db(), await row(d.invitationId), 'cardBleed');
     expect(shop.kind === 'card' && shop.shape?.cutLine).toBe(true);
 
-    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { cardShape: '' } });
-    expect((await row(d.invitationId)).cardShape).toBeNull();
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { cardChoices: ['a5'] } });
+    expect((await row(d.invitationId)).cardChoices).toEqual(['a5']);
     const card = await printData(db(), await row(d.invitationId), 'card');
     expect(card.kind === 'card' && card.shape).toBeNull();
   });
 
   it('refuses a shape the design does not have, and ignores the choice in a package without shapes', async () => {
-    const err = await order(shop3.withShapes, { cardShape: 'star' }).then(
+    const err = await order(shop3.withShapes, { cardChoices: ['leaf', 'star'] }).then(
       () => undefined,
       (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
     );
-    expect(err?.cardShape).toBe('invalid');
-    const plain = await order(shop3.cardOnly, { cardShape: 'leaf' });
-    expect((await row(plain.invitationId)).cardShape).toBeNull();
+    expect(err?.cardChoices).toBe('invalid');
+    // Nothing ticked: at least one card is needed.
+    const none = await order(shop3.withShapes, { cardChoices: [] }).then(
+      () => undefined,
+      (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
+    );
+    expect(none?.cardChoices).toBe('required');
+    const plain = await order(shop3.cardOnly, { cardChoices: ['leaf'] });
+    expect((await row(plain.invitationId)).cardChoices).toEqual(['a5']);
+    expect(await invitationCards(db(), await row(plain.invitationId))).toEqual(['a5']);
   });
 
   it('sells each shape on its own: a leaf package offers the leaf, not the heart', async () => {
-    const leaf = await order(shop3.leafOnly, { cardShape: 'leaf' });
-    expect((await row(leaf.invitationId)).cardShape).toBe('leaf');
-    const err = await order(shop3.leafOnly, { cardShape: 'heart' }).then(
+    const leaf = await order(shop3.leafOnly, { cardChoices: ['leaf'] });
+    expect((await row(leaf.invitationId)).cardChoices).toEqual(['leaf']);
+    const err = await order(shop3.leafOnly, { cardChoices: ['heart'] }).then(
       () => undefined,
       (e: { fieldErrors?: Record<string, string> }) => e.fieldErrors,
     );
-    expect(err?.cardShape).toBe('invalid');
-    const both = await order(shop3.withShapes, { cardShape: 'heart' });
-    expect((await row(both.invitationId)).cardShape).toBe('heart');
+    expect(err?.cardChoices).toBe('invalid');
+    const heart = await order(shop3.withShapes, { cardChoices: ['heart'] });
+    expect((await row(heart.invitationId)).cardChoices).toEqual(['heart']);
+  });
+
+  it('the customer can tick several cards, or all of them: each is its own file', async () => {
+    // Ticked in any order; stored in the fixed order (the card first, then the design's shapes).
+    const d = await order(shop3.withShapes, { cardChoices: ['heart', 'a5', 'leaf'] });
+    const inv = await row(d.invitationId);
+    expect(await invitationCards(db(), inv)).toEqual(['a5', ...SHAPE_ORDER]);
+    for (const card of ['a5', 'leaf', 'heart']) {
+      const data = await printData(db(), inv, 'card', { card });
+      expect(data.kind === 'card' && (data.shape?.key ?? 'a5')).toBe(card);
+    }
+    // No choice given: the first ticked card.
+    const first = await printData(db(), inv, 'card');
+    expect(first.kind === 'card' && first.shape).toBeNull();
+    // Two of three.
+    const two = await order(shop3.withShapes, { cardChoices: ['leaf', 'heart'] });
+    expect(await invitationCards(db(), await row(two.invitationId))).toEqual(SHAPE_ORDER);
+    // A card that was not ticked is never printed: the first ticked one is.
+    const other = await printData(db(), await row(two.invitationId), 'card', { card: 'a5' });
+    expect(other.kind === 'card' && other.shape?.key).toBe(SHAPE_ORDER[0]);
   });
 
   it('a theme lists the feature of every shape it draws, and draws every shape it sells', () => {

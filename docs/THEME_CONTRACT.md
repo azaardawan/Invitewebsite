@@ -154,8 +154,10 @@ it, so the theme's own fonts and Arabic/Kurdish shaping come out as on screen.
 
 ### Shaped cards (leaf, heart…)
 
-A design may offer shaped printed cards that the customer chooses **instead of** the A5 card. Each shape is sold by
-its own feature, so a package can offer one, both or neither: `leaf` by `card_leaf`, `heart` by `card_heart` (both
+A design may offer shaped printed cards next to the A5 card. On the order form the customer ticks **one, several or
+all** of the cards the package sells (the A5 card and/or its shapes; `invitations.card_choices`, read through
+`chosenCards`), and gets each ticked card as its own files (PDF; a shape also as PNGs), asked for with `?card=a5|leaf|heart`.
+Each shape is sold by its own feature, so a package can offer one, both or neither: `leaf` by `card_leaf`, `heart` by `card_heart` (both
 need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`). A design lists the feature of every shape it
 draws, and draws every shape whose feature it lists. Declare them in the manifest
 `print.shapes: [{ key, label: {ar, en, ckb?, bdn?}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in

@@ -61,6 +61,20 @@ export function isCardShapeKey(value: string): value is CardShapeKey {
 export function shapeIncluded(featureKeys: readonly string[], shape: string | null | undefined): boolean {
   return !!shape && isCardShapeKey(shape) && featureKeys.includes(CARD_SHAPE_FEATURES[shape]);
 }
+
+/** The regular (A5) card among the cards a customer picks; a design's shapes never use this key. */
+export const MAIN_CARD = 'a5';
+
+/**
+ * The printed cards an invitation gets: the ones the customer ticked (the A5 card and/or the design's shapes) that the
+ * package includes, in a fixed order (the card first, then the shapes in the design's order). Never empty: with
+ * nothing valid ticked, the A5 card.
+ */
+export function chosenCards(featureKeys: readonly string[], choices: readonly string[] | null | undefined, shapeOrder: readonly string[]): string[] {
+  const picked = new Set(choices ?? []);
+  const list = [MAIN_CARD, ...shapeOrder.filter((k) => k !== MAIN_CARD)].filter((k) => picked.has(k) && (k === MAIN_CARD || shapeIncluded(featureKeys, k)));
+  return list.length ? list : [MAIN_CARD];
+}
 export const FEATURE_KEYS = Object.keys(FEATURES) as FeatureKey[];
 
 export function isFeatureKey(value: string): value is FeatureKey {

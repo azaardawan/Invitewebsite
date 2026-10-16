@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
-import { draftByToken } from '@/server/storefront/order';
+import { cardPictures, draftByToken } from '@/server/storefront/order';
 import { Price } from '@/components/storefront/currency';
 import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
@@ -21,6 +21,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
   const { locale, token } = (await params) as { locale: Locale; token: string };
   setRequestLocale(locale);
   const t = await getTranslations('store');
+  const common = await getTranslations('common');
   const draft = await draftByToken(token);
   if (!draft) {
     return (
@@ -76,6 +77,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               <span className="font-semibold text-heading">
                 {localized(draft.theme.name, locale)} · {localized(draft.pkg.name, locale)}
               </span>
+              {draft.onlineInvitation ? <span className="text-sm text-muted" data-online-for>{common(`onlineFor.${draft.pkg.lifetime}`)}</span> : null}
             </div>
             <div className="flex flex-col items-end">
               <span className="text-xs text-muted">{t('total')}</span>
@@ -88,6 +90,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
             base={`/p/${token}/extra`}
             featureKeys={draft.featureKeys}
             stickerShape={draft.current.stickerShape}
+            cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale)}
             watermarked
             labels={{
               title: t('extras.title'),

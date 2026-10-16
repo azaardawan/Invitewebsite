@@ -1,4 +1,5 @@
 import { after } from 'next/server';
+import { isForever } from '@/catalog/lifetime';
 import { getTranslations } from 'next-intl/server';
 import { ensurePreview } from '@/server/documents/documents';
 import { isLocale, type Locale } from '@/i18n/config';
@@ -47,6 +48,9 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     );
   }
   const date = (d: Date | null) => (d ? formatLongDate(d, locale) : '—');
+  const common = await getTranslations({ locale, namespace: 'common' });
+  /** An invitation's end: its date, or "No end date" for a package that lasts forever. */
+  const until = (d: Date | null) => (isForever(d) ? common('noEnd') : date(d));
   const url = r.invitation.path ? `${env().APP_URL}${r.invitation.path}` : null;
   const paid = r.status === 'PAID';
   const stillPayable = paymentWindowOpen(r);
@@ -74,7 +78,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
     [t('amount'), formatIqdIn(r.amountIqd, locale)],
     [t('purchaseDate'), date(r.createdAt)],
     ...(r.paidAt ? ([[t('paidDate'), date(r.paidAt)]] as [string, string][]) : []),
-    ...(r.invitation.publishedAt && r.invitation.onlineInvitation ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), date(r.invitation.expiresAt)]] as [string, string][]) : []),
+    ...(r.invitation.publishedAt && r.invitation.onlineInvitation ? ([[t('publishedAt'), date(r.invitation.publishedAt)], [t('expiresAt'), until(r.invitation.expiresAt)]] as [string, string][]) : []),
   ];
 
   const base = `/r/${encodeURIComponent(token)}`;
@@ -85,10 +89,19 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
   const files = paid
     ? [
+        // One file per printed card the customer ticked (the A5 card and/or shapes); an uploaded card replaces them.
         ...(r.invitation.hasPrintCard
-          ? [{ kind: 'card' as const, title: t('printCardTitle'), download: t('printCardDownload'), preview: !r.invitation.customCard }]
+          ? (r.invitation.customCard ? ['a5'] : r.invitation.cards).map((c) => ({
+              kind: 'card' as const,
+              key: `card-${c}`,
+              // Only the A5 card: the same addresses as before; with shapes, each file is asked for by key.
+              query: r.invitation.customCard || (r.invitation.cards.length === 1 && c === 'a5') ? '' : `card=${c}`,
+              title: r.invitation.cardLabels[c] ? `${t('printCardTitle')} · ${localized(r.invitation.cardLabels[c]!, locale)}` : t('printCardTitle'),
+              download: t('printCardDownload'),
+              preview: !r.invitation.customCard,
+            }))
           : []),
-        ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
+        ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, key: 'keepsake', query: '', title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
       ]
     : [];
 
@@ -168,7 +181,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           <ReceiptActions
             url={url}
             shareText={t('shareText', { url: url ?? '' })}
-            confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: date(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
+            confirmText={`${t('confirmText', { invoice: r.invoiceNumber ?? r.orderNumber, url: url ?? '', expires: until(r.invitation.expiresAt) })}\n${t('receiptLinkLine', { url: `${env().APP_URL.replace(/\/$/, '')}${base}` })}\n${t('accessCodeLine', { code: r.accessCode })}`}
             labels={{
               copyLink: t('copyLink'),
               copied: t('copied'),
@@ -282,26 +295,31 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
           <div className={`grid gap-4 ${files.length > 1 ? 'grid-cols-2' : 'mx-auto max-w-[220px] grid-cols-1'}`}>
             {files.map((f) => (
               <DocumentPreview
-                key={f.kind}
+                key={f.key}
                 title={f.title}
-                imageSrc={f.preview ? `${base}/preview/${f.kind}` : null}
-                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack`, title: tStore('cardBack.heading') } : undefined}
-                openHref={`${base}/${f.kind}?inline=1`}
-                downloadHref={`${base}/${f.kind}`}
+                imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
+                back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading') } : undefined}
+                openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
+                downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
                 labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
               />
             ))}
           </div>
-          {r.invitation.hasPrintCard && r.invitation.cardShape && !r.invitation.customCard ? (
+          {r.invitation.hasPrintCard && r.invitation.cards.some((c) => c !== 'a5') && !r.invitation.customCard ? (
             <div className="space-y-2">
               <p className="text-xs text-muted">{t('shapeCardHelp')}</p>
-              <p className="flex flex-wrap gap-2">
-                {(['front', 'back'] as const).map((side) => (
-                  <a key={side} href={`${base}/card-png/${side}`} className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium" download>
-                    {t(side === 'front' ? 'shapePngFront' : 'shapePngBack')}
-                  </a>
+              {r.invitation.cards
+                .filter((c) => c !== 'a5')
+                .map((c) => (
+                  <p key={c} className="flex flex-wrap items-center gap-2" data-shape-pngs={c}>
+                    {r.invitation.cards.length > 1 && r.invitation.cardLabels[c] ? <span className="text-sm font-medium">{localized(r.invitation.cardLabels[c]!, locale)}</span> : null}
+                    {(['front', 'back'] as const).map((side) => (
+                      <a key={side} href={`${base}/card-png/${side}?card=${c}`} className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium" download>
+                        {t(side === 'front' ? 'shapePngFront' : 'shapePngBack')}
+                      </a>
+                    ))}
+                  </p>
                 ))}
-              </p>
             </div>
           ) : r.invitation.hasPrintCard ? (
             <p className="text-xs text-muted">{t('printCardHelp')}</p>

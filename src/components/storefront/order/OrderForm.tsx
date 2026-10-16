@@ -15,7 +15,8 @@ export type OrderFormExtras = {
   /** Signature pads (signature): the current signature images (none, one or two). */
   signature?: { current: string[] };
   /** Shaped cards (card_leaf, card_heart): the card ('') or one of the design's shapes, each drawn from its cut line. */
-  cardShape?: { current: string; options: { key: string; label: string; widthMm: number; heightMm: number; outline: string }[] };
+  /** The cards ticked so far (`a5` = the regular card) and the design's shapes this package sells. */
+  cardShape?: { current: string[]; options: { key: string; label: string; widthMm: number; heightMm: number; outline: string }[] };
   /** Chocolate stickers (sticker): round or square. */
   sticker?: { current: 'round' | 'square' | 'both' };
   /** Bottle labels (bottle_label): which bottle size. */
@@ -200,18 +201,32 @@ export function OrderForm({
         <fieldset className="flex flex-col gap-3">
           <legend className="text-[15px] font-medium text-heading">{t('cardShape.heading')}</legend>
           <p className="text-sm text-muted">{t('cardShape.help')}</p>
-          <div className="flex flex-wrap gap-3">
-            {[{ key: '', label: t('cardShape.card'), widthMm: 148, heightMm: 210, outline: 'M0 0 L148 0 L148 210 L0 210 Z' }, ...extras.cardShape.options].map((o) => (
+          {/* Tells the server the section was sent, so ticking nothing is an error rather than "no choice". */}
+          <input type="hidden" name="cardChoicesSent" value="1" />
+          <div className="flex flex-wrap gap-3" data-card-choices>
+            {[{ key: 'a5', label: t('cardShape.card'), widthMm: 148, heightMm: 210, outline: 'M0 0 L148 0 L148 210 L0 210 Z' }, ...extras.cardShape.options].map((o) => (
               <label
-                key={o.key || 'card'}
-                className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+                key={o.key}
+                className="relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
               >
-                <input type="radio" name="cardShape" value={o.key} defaultChecked={(values.cardShape ?? extras.cardShape!.current) === o.key} className="sr-only" />
+                <input
+                  type="checkbox"
+                  name="cardChoices"
+                  value={o.key}
+                  defaultChecked={(values.cardChoices !== undefined ? values.cardChoices.split(',') : extras.cardShape!.current).includes(o.key)}
+                  className="peer sr-only"
+                />
+                {/* A tick in the corner of each chosen card: several can be chosen. */}
+                <span aria-hidden className="absolute top-2 end-2 hidden size-5 items-center justify-center rounded-full bg-accent text-white peer-checked:flex">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12l5 5 9-10" />
+                  </svg>
+                </span>
                 <svg aria-hidden viewBox={`-2 -2 ${o.widthMm + 4} ${o.heightMm + 4}`} className="h-14 w-14 text-accent" preserveAspectRatio="xMidYMid meet">
                   <path d={o.outline} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
                 </svg>
                 <span className="text-sm font-medium">{o.label}</span>
-                {o.key ? (
+                {o.key !== 'a5' ? (
                   <span className="text-xs text-muted" dir="ltr">
                     {t('cardShape.size', { w: Math.round(o.widthMm / 10), h: Math.round(o.heightMm / 10) })}
                   </span>
@@ -221,6 +236,7 @@ export function OrderForm({
               </label>
             ))}
           </div>
+          {errors.cardChoices ? <p className="text-sm text-danger">{t(errors.cardChoices === 'required' ? 'cardShape.required' : 'fieldErrors.invalidText')}</p> : null}
         </fieldset>
       ) : null}
 

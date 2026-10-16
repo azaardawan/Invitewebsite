@@ -786,3 +786,88 @@ with v2.
 |---|---|---|---|---|---|---|
 | 1 | `cardThanks` (default line) | شكرًا لحضوركم حفل زفافنا | Thank you for coming to our wedding | سوپاس بۆ ئامادەبوونتان لە ئاهەنگی زەماوەندەکەمان | سوپاس بۆ ئامادەبوونا هەوە ل ئاهەنگا داوەتا مە | ● |
 | 2 | `cardThanks` (order-form label) | سطر الشكر على واجهة البطاقة المطبوعة | Thank-you line on the front of the printed card | دێڕی سوپاس لەسەر ڕووی کارتی چاپکراو | دێڕا سوپاسێ ل سەر ڕوویێ کارتا چاپکری | ● |
+## Batch 31 — four new wedding designs: their own lines — ✅ APPROVED (2026-10-15)
+
+Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15).
+These are the lines each design writes itself (in each theme's `copy.ts`). The owner approved every row as
+suggested ("approve all"); live in the four themes, and the design names in their manifests. Glossary reused from approved rows: wedding هاوسەرگیری / داوەت, joy خۆشی / شاهی, presence ئامادەبوون,
+celebration ئاهەنگ. A «/» marks a line break in the design. Lines shared by several designs are listed once.
+
+| # | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. | Designs |
+|---|---|---|---|---|---|---|
+| 1 | بمناسبة زفافنا | The wedding of | بە بۆنەی هاوسەرگیریمان | ب بۆنا داوەتا مە | ● | B, E, W |
+| 2 | ندعوكم لمشاركتنا / فرحة زفافنا | You are cordially invited to the wedding of | بانگهێشتتان دەکەین بۆ بەشداریکردن / لە خۆشیی هاوسەرگیریمان | مە هوین داخواز کرینە بۆ پشکداریێ / د شاهیا داوەتا مە دا | ◐ | B, E |
+| 3 | ننتظر مشاركتكم / أجمل أيامنا | We can’t wait to celebrate with you! | چاوەڕێی بەشداریتانین / لە خۆشترین ڕۆژمان | ئەم چاڤەڕێی پشکداریا هەوەینە / د خۆشترین ڕۆژا مە دا | ◐ | B, E |
+| 4 | دعوة زفاف | You are invited | بانگهێشتنامەی هاوسەرگیری | داخوازناما داوەتێ | ● | B, E |
+| 5 | بكل الحب | All of our love / With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ | ◐ | all |
+| 6 | موعد فرحتنا يقترب | Countdown to | کاتی خۆشیمان نزیک دەبێتەوە | دەمێ شاهیا مە نێزیک دبیت | ◐ | B, E |
+| 7 | نبدأ حكايتنا | “I Do” | چیرۆکەکەمان دەست پێدەکەین | ئەم دەست ب چیرۆکا خۆ دکەین | ◐ | B, E |
+| 8 | الزمان والمكان | The date & place | کات و شوێن | دەم و جه | ● | B, E |
+| 9 | تفاصيل الزفاف | Details | زانیارییەکانی هاوسەرگیری | زانیاریێن داوەتێ | ◐ | all |
+| 10 | موعد الاحتفال | The celebration begins | کاتی ئاهەنگ | دەمێ ئاهەنگێ | ● | B, E |
+| 11 | مكان اللقاء | Join us at | شوێنی دیدار | جهێ هەڤدیتنێ | ◐ | B, E |
+| 12 | بانتظار ردكم / ننتظر ردكم | Kindly reply | چاوەڕێی وەڵامتانین | ئەم چاڤەڕێی بەرسڤا هەوەینە | ● | all |
+| 13 | تأكيد الحضور | Rsvp | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ◐ | B, E |
+| 14 | يسعدنا أن تشاركونا فرحتنا | We would love to celebrate with you | خۆشحاڵ دەبین بەشداری خۆشیمان بکەن | دێ دلخۆش بین ئەگەر هوین پشکداریێ د شاهیا مە دا بکەن | ◐ | B, E |
+| 15 | رسائل الأهل والأحبة في يوم زفافنا (keepsake) | Wishes from our family and friends | نامەی خێزان و خۆشەویستان لە ڕۆژی هاوسەرگیریماندا | نامێن مالباتێ و هەڤالان د ڕۆژا داوەتا مە دا | ◐ | B, E |
+| 16 | شكرًا لكل من شاركنا فرحتنا (keepsake) | Thank you for sharing our joy | سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری | ● | B, E |
+| 17 | موعد فرحتنا | Save the date | کاتی خۆشیمان | دەمێ شاهیا مە | ◐ | W, V |
+| 18 | نحتفل معكم يوم (before the date) | A celebration on | لەگەڵتان ئاهەنگ دەگێڕین لە ڕۆژی | ئەم دێ دگەل هەوە ئاهەنگێ گێڕین ل ڕۆژا | ○ | W |
+| 19 | معاً دائماً | Together, always | هەمیشە پێکەوە | هەردەم پێکڤە | ● | W |
+| 20 | بداية حكايتنا معاً | Our next chapter / A beautiful beginning | دەستپێکی چیرۆکی پێکەوەمان | دەستپێکا چیرۆکا مە یا پێکڤە | ◐ | W, V |
+| 21 | تكتمل فرحتنا بحضوركم ومشاركتكم أجمل أيامنا. | Your presence will make our day complete. | خۆشیمان بە ئامادەبوون و بەشداریتان لە خۆشترین ڕۆژمان تەواو دەبێت. | شاهیا مە ب ئامادەبوون و پشکداریا هەوە د خۆشترین ڕۆژا مە دا تەمام دبیت. | ◐ | W, V |
+| 22 | حتى نبدأ حكايتنا | Until our next chapter | تا چیرۆکەکەمان دەست پێدەکەین | هەتا ئەم دەست ب چیرۆکا خۆ دکەین | ◐ | W, V |
+| 23 | ننتظر يوم فرحتنا | Counting the days | چاوەڕێی ڕۆژی خۆشیمانین | ئەم چاڤەڕێی ڕۆژا شاهیا خۆینە | ◐ | W, V |
+| 24 | موعد ننتظره معكم | A note for your diary | کاتێک کە لەگەڵتان چاوەڕێی دەکەین | دەمەکێ ئەم دگەل هەوە چاڤەڕێ دکەین | ◐ | W, V |
+| 25 | الساعة (before the time) | At | کاتژمێر | دەمژمێر | ◐ | W, V |
+| 26 | بمشاركة أهلنا وأحبتنا | Together with our families | بە بەشداریی خێزان و خۆشەویستانمان | ب پشکداریا مالبات و هەڤالێن مە | ◐ | W, V |
+| 27 | مكان الاحتفال | The celebration | شوێنی ئاهەنگ | جهێ ئاهەنگێ | ● | W, V |
+| 28 | ننتظر رسالتكم | A letter back to us | چاوەڕێی نامەکەتانین | ئەم چاڤەڕێی نامەیا هەوەینە | ◐ | W, V |
+| 29 | حجزنا لكم مكاناً في فرحتنا. | We have saved a place for you. | شوێنێکمان بۆ ئێوە لە خۆشیماندا گرتووە. | مە جهەک بۆ هەوە د شاهیا خۆ دا گرتییە. | ◐ | W, V |
+| 30 | شكراً من القلب لكل من شاركنا فرحتنا (keepsake) | With heartfelt thanks to everyone who shared our joy | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری | ◐ | W, V |
+| 31 | رسالة صغيرة لبداية جميلة (under the Open button) | A little letter. A beautiful beginning. | نامەیەکی بچووک بۆ دەستپێکێکی جوان | نامەیەکا بچووک بۆ دەستپێکەکا جوان | ◐ | V |
+| 32 | تبدأ حكايتنا بحضوركم. (on the letter) | Our next chapter begins with you. | چیرۆکەکەمان بە ئامادەبوونتان دەست پێدەکات. | چیرۆکا مە ب ئامادەبوونا هەوە دەست پێدکەت. | ◐ | V |
+| 33 | دعوة / زفاف (the poster title, two boxes) | Wedding / Invitation | بانگهێشتنامە / هاوسەرگیری | داخوازنامە / داوەت | ◐ | V |
+| 34 | إلى أهلنا وأحبتنا، | To our dearest family & friends, | بۆ خێزان و خۆشەویستانمان، | بۆ مالبات و هەڤالێن مە، | ◐ | V |
+
+Design names (manifest `title`; they become the designs' Kurdish names in Admin, which the owner can change):
+
+| # | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|
+| 35 | العنابي والدانتيل | Burgundy & Lace | عەنابی و دانتێلا | عەنابی و دانتێل | ○ |
+| 36 | الإسبريسو والعاجي | Espresso & Ivory | ئێسپرێسۆ و عاجی | ئێسپرێسۆ و عاجی | ○ |
+| 37 | زهرة الشتاء | Winter Flower | گوڵی زستان | گولا زڤستانێ | ● |
+| 38 | رسائل الحب العتيقة | Vintage Love Letters | نامە کۆنەکانی خۆشەویستی | نامێن کەڤن یێن ڤیانێ | ◐ |
+
+## Batch 32 — how long a package stays online (30 days, 60 days, 1 year, forever) — ✅ APPROVED (2026-10-16)
+
+The owner now picks per package how long the invitation stays online, and a package with several card shapes lets the
+customer tick one, several or all of the cards (rows 13–14; the approved single-choice help text stays live in Kurdish until row 13 is approved). The packages on a theme page show it
+(«Online for 30 days» … «Online forever»), and the receipt shows «No end date» for a package that never ends.
+The home page's line and first FAQ answer no longer promise only 30 days in Arabic and English. Their approved Kurdish
+said 30 days; rows 10–11 replace it. Approved by the owner and live, rows 1–14 (row 12 in the starter Terms).
+
+| # | Key | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | `common.lifetime.30` | ٣٠ يوماً | 30 days | ٣٠ ڕۆژ | ٣٠ ڕۆژ | ● |
+| 2 | `common.lifetime.60` | ٦٠ يوماً | 60 days | ٦٠ ڕۆژ | ٦٠ ڕۆژ | ● |
+| 3 | `common.lifetime.365` | سنة واحدة | 1 year | ساڵێک | ساڵەک | ● |
+| 4 | `common.lifetime.forever` | للأبد | Forever | بۆ هەمیشە | بۆ هەردەم | ◐ |
+| 5 | `common.onlineFor.30` | متاحة لمدة ٣٠ يوماً | Online for 30 days | بۆ ماوەی ٣٠ ڕۆژ بەردەستە | بۆ ماوێ ٣٠ ڕۆژان بەردەستە | ◐ |
+| 6 | `common.onlineFor.60` | متاحة لمدة ٦٠ يوماً | Online for 60 days | بۆ ماوەی ٦٠ ڕۆژ بەردەستە | بۆ ماوێ ٦٠ ڕۆژان بەردەستە | ◐ |
+| 7 | `common.onlineFor.365` | متاحة لمدة سنة | Online for 1 year | بۆ ماوەی ساڵێک بەردەستە | بۆ ماوێ ساڵەکێ بەردەستە | ◐ |
+| 8 | `common.onlineFor.forever` | متاحة للأبد | Online forever | بۆ هەمیشە بەردەستە | بۆ هەردەم بەردەستە | ◐ |
+| 9 | `common.noEnd` | بلا تاريخ انتهاء | No end date | بێ بەرواری کۆتایی | بێ دیرۆکا دوماهیێ | ◐ |
+| 10 | `home.featureDays` | متاحة ٣٠ يوماً أو سنة أو للأبد حسب الباقة | Online for 30 days, a year or forever, depending on the package | ٣٠ ڕۆژ، ساڵێک یان بۆ هەمیشە بەردەستە، بەپێی پاکێجەکە | ٣٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم بەردەستە، ل دویڤ پاکێجێ | ◐ |
+| 11 | `home.faq1a` | حسب الباقة التي تختارونها: ٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد، من لحظة نشرها. تظهر مدة كل باقة عليها، ويمكنكم التواصل معنا لتمديدها. | It depends on the package you choose: 30 days, 60 days, a year, or forever, counted from the moment it is published. Each package shows how long it lasts, and you can contact us to extend it. | بەپێی ئەو پاکێجەی هەڵیدەبژێرن: ٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە، لە کاتی بڵاوکردنەوەیەوە. ماوەی هەر پاکێجێک لەسەری نووسراوە، و دەتوانن پەیوەندیمان پێوە بکەن بۆ درێژکردنەوەی. | ل دویڤ وی پاکێجێ هوین هەلدبژێرن: ٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم، ژ دەمێ بەلاڤکرنا وێ. ماوێ هەر پاکێجەکێ ل سەر نڤیسییە، و هوین دشێن پەیوەندیێ ب مە بکەن بۆ درێژکرنا وێ. | ◐ |
+| 13 | `store.cardShape.help` | اختر البطاقة العادية أو أحد أشكال هذا التصميم أو أكثر من واحد. تحصل لكل بطاقة تختارها على ملف PDF خاص للطباعة (وللشكل صورة PNG بخلفية شفافة أيضاً)، ونجهّز للمطبعة خط القص حول كل شكل. | Tick the regular card, one of this design's shapes, or several. Each card you tick comes as its own print-ready PDF (a shape also as a transparent PNG), and the print shop gets the cut line around each shape. | کارتە ئاساییەکە، یەکێک لە شێوەکانی ئەم دیزاینە، یان زیاتر لە یەکێک هەڵبژێرە. بۆ هەر کارتێک کە هەڵیدەبژێریت فایلێکی PDFـی تایبەت بۆ چاپ وەردەگریت (بۆ شێوەکانیش وێنەیەکی PNG بە باکگراوندی ڕوون)، و هێڵی بڕینی دەوری هەر شێوەیەک بۆ چاپخانە ئامادە دەکەین. | کارتا ئاسایی، ئێک ژ شێوەیێن ڤی دیزاینی، یان پتر ژ ئێکێ هەلبژێرە. بۆ هەر کارتەکا تو هەلدبژێری دێ فایلەکێ PDF یێ تایبەت بۆ چاپێ وەرگری (بۆ شێوەیان ژی وێنەیەکێ PNG ب پشتەکا ڕوهن)، و ئەم دێ هێلا بڕینێ ل دۆر هەر شێوەیەکێ بۆ چاپخانێ ئامادە کەین. | ◐ |
+| 14 | `store.cardShape.required` | اختر بطاقة واحدة على الأقل. | Choose at least one card. | لانیکەم کارتێک هەڵبژێرە. | کێمترین ئێک کارتێ هەلبژێرە. | ◐ |
+
+
+The starter Terms (`src/server/legal/seed.ts`, only used before the owner publishes their own) now say the invitation stays
+online for its package's time. Their Kurdish line still says 30 days and was left as it is; suggested replacements
+(the live Terms are edited in Admin → Legal):
+
+| # | Where | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|
+| 12 | Terms, the invitation's online time | بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە. | داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن. | ◐ |

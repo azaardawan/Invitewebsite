@@ -10,6 +10,7 @@ export function ExtrasPreview({
   labels,
   watermarked,
   downloads,
+  cards,
 }: {
   /** Where the pictures come from, e.g. `/p/<token>/extra` (draft) or `/r/<token>/extra` (receipt). */
   base: string;
@@ -34,10 +35,28 @@ export function ExtrasPreview({
   watermarked: boolean;
   /** Receipt only: download links per item. */
   downloads?: boolean;
+  /**
+   * The printed cards the customer ticked (the A5 card and/or shapes), each pictured front and back. `label` names a
+   * shape (left out for the A5 card); `ratio` / `backRatio` are width ÷ height. Left out: the A5 card.
+   */
+  cards?: { key: string; label?: string; ratio: number; backRatio: number }[];
 }) {
+  const cardList = cards?.length ? cards : [{ key: 'a5', ratio: 148 / 210, backRatio: 210 / 148 }];
+  // Only the A5 card: the same pictures and addresses as before; with shapes, each card is named and asked for by key.
+  const many = cardList.length > 1 || cardList[0]!.key !== 'a5';
+  const cardItems =
+    featureKeys.includes('print_card') && !downloads
+      ? cardList.flatMap((c) => {
+          const q = many ? `?card=${encodeURIComponent(c.key)}` : '';
+          const name = (side: string) => (c.label ? `${side} · ${c.label}` : side);
+          return [
+            { key: many ? `card-${c.key}` : 'card', label: name(labels.card), src: `${base}/card.preview${q}`, box: 'w-40', style: { aspectRatio: String(c.ratio) } },
+            { key: many ? `card-back-${c.key}` : 'card-back', label: name(labels.cardBack), src: `${base}/cardBack.preview${q}`, box: c.backRatio > 1 ? 'w-56' : 'w-40', style: { aspectRatio: String(c.backRatio) } },
+          ];
+        })
+      : [];
   const items = [
-    featureKeys.includes('print_card') && !downloads ? { key: 'card', label: labels.card, src: `${base}/card.preview`, box: 'aspect-[148/210] w-40' } : null,
-    featureKeys.includes('print_card') && !downloads ? { key: 'card-back', label: labels.cardBack, src: `${base}/cardBack.preview`, box: 'aspect-[210/148] w-56' } : null,
+    ...cardItems,
     featureKeys.includes('story') ? { key: 'story', label: labels.story, src: `${base}/story.preview`, box: 'aspect-[9/16] w-40', png: `${base}/story.png` } : null,
     featureKeys.includes('sticker')
       ? {
@@ -77,7 +96,7 @@ export function ExtrasPreview({
           <li key={i.key} className="flex flex-col items-center gap-2" data-extra={i.key}>
             {/* Rendered on the server (watermarked until paid); a few seconds the first time. */}
             {/* eslint-disable-next-line @next/next/no-img-element -- generated picture */}
-            <img src={i.src} alt={i.label} loading="lazy" className={`${i.box} border border-line bg-paper object-contain shadow-sm`} />
+            <img src={i.src} alt={i.label} loading="lazy" className={`${i.box} border border-line bg-paper object-contain shadow-sm`} style={'style' in i ? i.style : undefined} />
             <span className="text-sm font-medium text-heading">{i.label}</span>
             {downloads ? (
               <span className="flex gap-3 text-xs">

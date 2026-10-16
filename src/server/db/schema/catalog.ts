@@ -1,4 +1,5 @@
 import type { CoverFocus } from '../../../lib/cover-focus';
+import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
   bigint,
@@ -287,6 +288,8 @@ export const packages = pgTable(
     description: jsonb('description_i18n').$type<I18nContent>(),
     /** Whole Iraqi dinars. */
     priceIqd: bigint('price_iqd', { mode: 'number' }).notNull(),
+    /** How long the invitation stays online after publishing: days, or `forever` (src/catalog/lifetime.ts). */
+    lifetime: text('lifetime', { enum: PACKAGE_LIFETIMES }).notNull().default('30'),
     sortOrder: integer('sort_order').notNull().default(0),
     status: packageStatus('status').notNull().default('ACTIVE'),
     ...timestamps,
