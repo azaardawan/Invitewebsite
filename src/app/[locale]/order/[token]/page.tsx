@@ -89,10 +89,11 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
           </div>
           {draft.photos && draft.status === 'DRAFT' ? (
             <PhotoSlots
+              previewUrl={`/p/${token}`}
               base={`/p/${token}/photos`}
               max={draft.photos.max}
               min={draft.photos.min}
-              aspect={draft.photos.aspect}
+              aspects={draft.photos.aspects}
               names={draft.photos.names}
               initial={draft.photos.photos}
               labels={{
@@ -108,6 +109,12 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
                 zoom: t('photos.zoom'),
                 uploading: t('photos.uploading'),
                 photo: t.raw('photos.photo') as string,
+                earlier: t('photos.earlier'),
+                previous: t('photos.previous'),
+                later: t('photos.later'),
+                next: t('photos.next'),
+                inDesign: t('photos.inDesign'),
+                dragHint: t('photos.dragHint'),
                 errors: {
                   tooLarge: t('photos.errors.tooLarge'),
                   unsupportedImage: t('photos.errors.unsupportedImage'),

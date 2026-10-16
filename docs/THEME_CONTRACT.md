@@ -177,7 +177,13 @@ A design can show the customer's own photos: list `photos` in `features` and say
 `photos: { max, min?, aspect?, labels? }`. `max` is 1–20. `min` is how many must be added before the order can be paid
 (default 0). `aspect` is the frame's width ÷ height that you draw them in (default 0.75, 3:4): the customer places
 each photo in that frame on the order form (drag and zoom). `labels` names the first places (`{ ar, en, ckb?, bdn? }`,
-e.g. "Cover photo", "Engagement").
+e.g. "Cover photo", "Engagement"). **A collage** gives each place its own shape with `frames: [{ aspect }, …]` (place i
+uses `frames[i]`, the rest `aspect`): draw place i in exactly that shape, so what the customer framed is what shows.
+
+Photos always fill the places **in order, without gaps**: `props.photos[i]` (its `index` is i) belongs in place i. The
+customer can reorder them. While they adjust a photo, the order page shows your design live beside the frame: it opens
+your design already open (as with reduced motion: skip the entrance when `useReducedMotion()` is true), scrolls to the
+`<Photo>` with that index and redraws as the photo moves, so draw photos only through `<Photo>`.
 
 The theme receives `props.photos`: the photos in order, each `{ src, width, height, focus, label }`. Draw each with
 `<Photo photo={p} className={…} />` from `@/theme-sdk`. Give the frame its size and shape (aspect-ratio, radius, mask);

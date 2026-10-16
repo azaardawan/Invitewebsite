@@ -12,6 +12,7 @@ import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { photoState } from '@/server/storefront/order';
+import { invitationPath } from '@/lib/ids';
 import { receiptFor } from '../data';
 import { customerEditAction } from '../actions';
 
@@ -54,10 +55,11 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
       {photos ? (
         <div className="mt-8">
           <PhotoSlots
+            previewUrl={invitationPath(inv!.slug, inv!.publicId)}
             base={`/r/${encodeURIComponent(token)}/photos`}
             max={photos.max}
             min={photos.min}
-            aspect={photos.aspect}
+            aspects={photos.aspects}
             names={photos.names}
             initial={photos.photos}
             labels={{
@@ -73,7 +75,13 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
               zoom: ts('photos.zoom'),
               uploading: ts('photos.uploading'),
               photo: ts.raw('photos.photo') as string,
-              errors: {
+              earlier: ts('photos.earlier'),
+                previous: ts('photos.previous'),
+                later: ts('photos.later'),
+                next: ts('photos.next'),
+                inDesign: ts('photos.inDesign'),
+                dragHint: ts('photos.dragHint'),
+                errors: {
                 tooLarge: ts('photos.errors.tooLarge'),
                 unsupportedImage: ts('photos.errors.unsupportedImage'),
                 imageTooSmall: ts('photos.errors.imageTooSmall'),

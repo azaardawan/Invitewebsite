@@ -1,6 +1,6 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
-import { and, asc, eq, inArray, like, lt, notInArray } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, like, lt, notInArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { assets, invitationPhotos, invitations, themeVersions } from '@/server/db/schema';
 import { storage, publicMediaUrl } from '@/server/storage';
@@ -22,12 +22,18 @@ export class PhotoError extends Error {
 const PHOTO_PREFIX = 'photos/';
 
 /** The design's photo settings for an invitation (its version's manifest), or null when its package has no photos. */
-export async function photoSpec(db: DbOrTx, inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'>): Promise<Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> | null> {
+export async function photoSpec(
+  db: DbOrTx,
+  inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'>,
+): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[] }) | null> {
   if (!inv.featureKeys.includes('photos')) return null;
   const [v] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const spec = (v?.manifest as ThemeManifest | null)?.photos ?? (v ? manifestByCodeRef(v.codeRef)?.photos : undefined);
   if (!spec) return null;
-  return { max: spec.max, min: spec.min ?? 0, aspect: spec.aspect ?? DEFAULT_PHOTO_ASPECT, labels: spec.labels };
+  const aspect = spec.aspect ?? DEFAULT_PHOTO_ASPECT;
+  // Each place's frame: its own (a collage) or the design's common one.
+  const aspects = Array.from({ length: spec.max }, (_, i) => spec.frames?.[i]?.aspect ?? aspect);
+  return { max: spec.max, min: spec.min ?? 0, aspect, labels: spec.labels, aspects };
 }
 
 export type InvitationPhoto = {
@@ -87,6 +93,10 @@ export async function setPhoto(db: DbOrTx, inv: InvitationRow, position: number,
   const spec = await photoSpec(db, inv);
   if (!spec) throw new PhotoError('notIncluded');
   if (!Number.isInteger(position) || position < 0 || position >= spec.max) throw new PhotoError('position');
+  // Photos fill the places in order: a new one goes in the next free place (at most), never leaving a gap.
+  const count = (await listPhotos(db, inv.id)).length;
+  if (position > count) position = count;
+  if (position >= spec.max) throw new PhotoError('position');
   const img = await processPhoto(input);
   const full = await storeOne(db, img.full);
   const display = await storeOne(db, img.display);
@@ -115,14 +125,46 @@ export async function setPhotoFocus(db: DbOrTx, invitationId: string, position: 
   return normalizeCoverFocus(row.focus);
 }
 
-/** Takes a photo away (its files are deleted). */
+/** Takes a photo away (its files are deleted); the photos after it move up a place, so there is never a gap. */
 export async function removePhoto(db: DbOrTx, invitationId: string, position: number) {
-  const [row] = await db
-    .delete(invitationPhotos)
-    .where(and(eq(invitationPhotos.invitationId, invitationId), eq(invitationPhotos.position, position)))
-    .returning();
-  if (!row) throw new PhotoError('notFound');
+  const row = await db.transaction(async (tx) => {
+    const [gone] = await tx
+      .delete(invitationPhotos)
+      .where(and(eq(invitationPhotos.invitationId, invitationId), eq(invitationPhotos.position, position)))
+      .returning();
+    if (!gone) throw new PhotoError('notFound');
+    await closeGap(tx, invitationId, position);
+    return gone;
+  });
   await deletePhotoFiles(db, [row.assetId, row.displayAssetId]);
+}
+
+/** Moves every photo after `position` up one place (one by one, in order, so places stay unique). */
+export async function closeGap(tx: DbOrTx, invitationId: string, position: number) {
+  const later = await tx
+    .select({ id: invitationPhotos.id, position: invitationPhotos.position })
+    .from(invitationPhotos)
+    .where(and(eq(invitationPhotos.invitationId, invitationId), gt(invitationPhotos.position, position)))
+    .orderBy(asc(invitationPhotos.position));
+  for (const p of later) await tx.update(invitationPhotos).set({ position: p.position - 1 }).where(eq(invitationPhotos.id, p.id));
+}
+
+/** Swaps two photos' places (to put the right photo in the right spot of a collage); each keeps its placement. */
+export async function swapPhotos(db: DbOrTx, invitationId: string, a: number, b: number) {
+  if (a === b) return;
+  await db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(invitationPhotos)
+      .where(and(eq(invitationPhotos.invitationId, invitationId), inArray(invitationPhotos.position, [a, b])))
+      .for('update');
+    const pa = rows.find((r) => r.position === a);
+    const pb = rows.find((r) => r.position === b);
+    if (!pa || !pb) throw new PhotoError('notFound');
+    await tx.update(invitationPhotos).set({ position: -1 }).where(eq(invitationPhotos.id, pa.id));
+    await tx.update(invitationPhotos).set({ position: a }).where(eq(invitationPhotos.id, pb.id));
+    await tx.update(invitationPhotos).set({ position: b }).where(eq(invitationPhotos.id, pa.id));
+  });
 }
 
 /** Deletes every photo of these invitations (privacy retention). Returns how many photos went. */

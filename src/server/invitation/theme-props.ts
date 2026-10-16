@@ -137,9 +137,9 @@ export function resolvePhotos(
     return l ? (l[locale] ?? l.ar) : null;
   };
   if (mode === 'sample') {
-    return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i) }));
+    return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ index: i, src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i) }));
   }
-  return photos.slice(0, spec?.max ?? photos.length).map((p, i) => ({ src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i) }));
+  return photos.slice(0, spec?.max ?? photos.length).map((p, i) => ({ index: i, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i) }));
 }
 
 /** Each yes/no choice: the customer's answer, else the design's default. */

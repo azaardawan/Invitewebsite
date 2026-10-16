@@ -3,7 +3,10 @@
 import { Photo, type ThemeProps } from '@/theme-sdk';
 import styles from './theme.module.css';
 
-/** The customer's first photo on the cover, the others in a gallery below (any number from none to seven). */
+/** Each collage spot's shape (the same as the manifest's `photos.frames`); a wide spot takes the whole row. */
+const COLLAGE = [1.6, 1, 1, 0.75, 0.75, 1.6];
+
+/** The customer's first photo on the cover, the others in a collage below (any number from none to seven). */
 export default function DemoPhotosTheme({ fields, labels, event, photos }: ThemeProps) {
   const [cover, ...rest] = photos;
   return (
@@ -19,8 +22,8 @@ export default function DemoPhotosTheme({ fields, labels, event, photos }: Theme
         {rest.length ? (
           <ul className={styles.gallery} data-demo-gallery={rest.length}>
             {rest.map((p, i) => (
-              <li key={i}>
-                <Photo photo={p} className={styles.thumb} />
+              <li key={i} style={{ gridColumn: COLLAGE[i]! > 1 ? '1 / -1' : undefined }}>
+                <Photo photo={p} className={styles.thumb} style={{ aspectRatio: String(COLLAGE[i]) }} />
                 {p.label ? <span className={styles.caption}>{p.label}</span> : null}
               </li>
             ))}

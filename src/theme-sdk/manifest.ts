@@ -89,14 +89,16 @@ export type ThemeManifest = {
    * The customer's own photos (feature `photos`): the design holds up to `max` (1–20) and needs at least `min`
    * before the order can be paid (default 0). `aspect` is the frame the design shows them in (width ÷ height, e.g. 0.75
    * for 3:4; default 0.75): the customer places each photo in that frame. `labels` names the first photos on the order
-   * form ("The couple", "Engagement"…). The theme reads `props.photos`.
+   * form ("The couple", "Engagement"…). For a collage whose places have different shapes, `frames` gives each place
+   * its own frame (`frames[i].aspect`, the rest use `aspect`), so the customer places each photo in exactly that shape.
+   * Photos always fill the places in order (no gaps): `props.photos[i]` belongs in place i. The theme reads `props.photos`.
    */
   photos?: PhotoSpec;
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
 
-export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[] };
+export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[] };
 
 /** The most photos a design may hold. */
 export const MAX_PHOTOS = 20;
@@ -222,6 +224,7 @@ export const manifestSchema = z
         min: z.number().int().min(0).max(20).optional(),
         aspect: z.number().min(0.4).max(2.5).optional(),
         labels: z.array(themeText).max(20).optional(),
+        frames: z.array(z.object({ aspect: z.number().min(0.4).max(2.5) })).max(20).optional(),
       })
       .optional(),
     internal: z.boolean().optional(),
@@ -255,6 +258,7 @@ export const manifestSchema = z
     if (m.photos && !m.features.includes('photos')) issue('photos are sold with the photos feature: list it in features');
     if (m.photos && (m.photos.min ?? 0) > m.photos.max) issue('photos.min cannot be more than photos.max');
     if (m.photos?.labels && m.photos.labels.length > m.photos.max) issue('photos.labels: more labels than photos.max');
+    if (m.photos?.frames && m.photos.frames.length > m.photos.max) issue('photos.frames: more frames than photos.max');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');

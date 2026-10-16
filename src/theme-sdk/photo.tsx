@@ -11,7 +11,7 @@ import type { ThemePhoto } from './types';
  */
 export function Photo({ photo, className, style, alt, eager = false }: { photo: ThemePhoto; className?: string; style?: CSSProperties; alt?: string; eager?: boolean }) {
   return (
-    <span data-bahja-photo className={className} style={{ display: 'block', overflow: 'hidden', position: 'relative', ...style }}>
+    <span data-bahja-photo={photo.index} className={className} style={{ display: 'block', overflow: 'hidden', position: 'relative', ...style }}>
       {/* eslint-disable-next-line @next/next/no-img-element -- customer photo from the platform */}
       <img
         src={photo.src}

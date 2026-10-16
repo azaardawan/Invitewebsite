@@ -8,7 +8,7 @@ import { MediaError } from '@/server/media/process';
 import { findByPreviewToken } from '@/server/orders/drafts';
 import { receiptTokenHash } from '@/server/orders/tokens';
 import { selfEditState } from '@/server/invitation/customer-edit';
-import { PhotoError, removePhoto, setPhoto, setPhotoFocus } from './photos';
+import { PhotoError, removePhoto, setPhoto, setPhotoFocus, swapPhotos } from './photos';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -38,8 +38,8 @@ export async function publishedForPhotos(db: DbOrTx, receiptToken: string) {
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });
 
 /**
- * One photo place of an invitation: POST a file (multipart `file`) to put a photo there, PATCH `{ x, y, zoom }` to
- * move it in its frame, DELETE to take it away. `published`: a change after publishing, recorded in the audit log.
+ * One photo place of an invitation: POST a file (multipart `file`) to put a photo there (or in the next free place),
+ * PATCH `{ x, y, zoom }` to move it in its frame or `{ swapWith }` to swap places, DELETE to take it away (later ones move up). `published`: a change after publishing, recorded in the audit log.
  */
 export async function handlePhotoRequest(db: DbOrTx, req: Request, inv: InvitationRow | null, positionParam: string, ctx: { ipHash: string | null; published: boolean }) {
   if (!inv) return json({ error: 'notFound' }, 404);
@@ -59,7 +59,13 @@ export async function handlePhotoRequest(db: DbOrTx, req: Request, inv: Invitati
       return json({ photo });
     }
     if (req.method === 'PATCH') {
-      const body = (await req.json().catch(() => null)) as { x?: unknown; y?: unknown; zoom?: unknown } | null;
+      const body = (await req.json().catch(() => null)) as { x?: unknown; y?: unknown; zoom?: unknown; swapWith?: unknown } | null;
+      // `{ swapWith: n }`: this photo and photo n change places.
+      if (typeof body?.swapWith === 'number' && Number.isInteger(body.swapWith) && body.swapWith >= 0) {
+        await swapPhotos(db, inv.id, position, body.swapWith);
+        if (ctx.published) await audit(db, inv.id, 'photo.moved', position);
+        return json({ ok: true });
+      }
       const num = (v: unknown) => (typeof v === 'number' ? v : undefined);
       const focus = await setPhotoFocus(db, inv.id, position, { x: num(body?.x), y: num(body?.y), zoom: num(body?.zoom) });
       return json({ focus });

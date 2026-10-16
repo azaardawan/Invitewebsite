@@ -3,7 +3,7 @@ import { invitationNames } from '@/catalog/fields';
 import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitationPhotos, invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
-import { deletePhotoFiles } from '@/server/photos/photos';
+import { closeGap, deletePhotoFiles } from '@/server/photos/photos';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { fieldDefs } from '@/server/orders/common';
@@ -189,6 +189,7 @@ export async function removeInvitationPhoto(db: DbOrTx, id: string, input: { pos
       .where(and(eq(invitationPhotos.invitationId, id), eq(invitationPhotos.position, input.position)))
       .returning();
     if (!row) throw new InvitationAdminError('notFound');
+    await closeGap(tx, id, input.position);
     await recordAudit(tx, { ...auditActor(actor), action: 'invitation.photo_removed', objectType: 'invitation', objectId: id, before: { position: input.position }, reason });
     return row;
   });

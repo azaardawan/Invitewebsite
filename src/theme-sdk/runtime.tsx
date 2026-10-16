@@ -163,17 +163,29 @@ export function useMusic(): MusicValue {
 
 // ---------------- Motion & time ----------------
 
+/** Platform only (not part of the SDK index): the photo editor shows the design already open, without its entrance. */
+let forcedReducedMotion = false;
+const forcedListeners = new Set<() => void>();
+export function setForcedReducedMotion(on: boolean) {
+  forcedReducedMotion = on;
+  for (const l of forcedListeners) l();
+}
+
 function subscribeReducedMotion(cb: () => void) {
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
   mq.addEventListener('change', cb);
-  return () => mq.removeEventListener('change', cb);
+  forcedListeners.add(cb);
+  return () => {
+    mq.removeEventListener('change', cb);
+    forcedListeners.delete(cb);
+  };
 }
 
 /** True when the visitor asked their device for less motion. Themes must honor it. */
 export function useReducedMotion(): boolean {
   return useSyncExternalStore(
     subscribeReducedMotion,
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => forcedReducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     () => false,
   );
 }

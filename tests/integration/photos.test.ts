@@ -14,7 +14,7 @@ import { invitationRenderData } from '@/server/invitation/load';
 import { buildThemeProps } from '@/server/invitation/theme-props';
 import { removeInvitationPhoto } from '@/server/invitation/admin';
 import { runHousekeeping } from '@/server/housekeeping';
-import { deleteOrphanPhotoFiles, listPhotos, photoSpec, removePhoto, setPhoto, setPhotoFocus } from '@/server/photos/photos';
+import { deleteOrphanPhotoFiles, listPhotos, photoSpec, removePhoto, setPhoto, setPhotoFocus, swapPhotos } from '@/server/photos/photos';
 import { draftForPhotos, handlePhotoRequest } from '@/server/photos/http';
 import { manifestSchema } from '@/theme-sdk/manifest';
 import { randomToken } from '@/lib/crypto';
@@ -103,13 +103,40 @@ describe('customer photos (feature `photos`)', () => {
     expect(await storage().get(full!.storageKey)).toBeNull();
     expect(await db().select().from(assets).where(eq(assets.id, row!.assetId))).toEqual([]);
 
-    await setPhoto(db(), inv, 2, await phonePhoto('#6a8'));
+    // Photos fill the places in order: asking for place 2 with only place 0 taken gives place 1 (never a gap).
+    expect((await setPhoto(db(), inv, 2, await phonePhoto('#6a8'))).position).toBe(1);
     await expect(setPhoto(db(), inv, 3, await phonePhoto())).rejects.toMatchObject({ code: 'position' });
-    expect((await listPhotos(db(), inv.id)).map((p) => p.position)).toEqual([0, 2]);
+    expect((await listPhotos(db(), inv.id)).map((p) => p.position)).toEqual([0, 1]);
 
-    expect(await setPhotoFocus(db(), inv.id, 2, { x: 120, y: 30, zoom: 2 })).toEqual({ x: 100, y: 30, zoom: 2 });
-    await removePhoto(db(), inv.id, 2);
+    expect(await setPhotoFocus(db(), inv.id, 1, { x: 120, y: 30, zoom: 2 })).toEqual({ x: 100, y: 30, zoom: 2 });
+    await removePhoto(db(), inv.id, 1);
     expect((await listPhotos(db(), inv.id)).map((p) => p.position)).toEqual([0]);
+  });
+
+  it('removing a photo moves the later ones up; two photos can swap places, each keeping its placement', async () => {
+    const { inv } = await draft();
+    for (const c of ['#a00', '#0a0', '#00a']) await setPhoto(db(), inv, 2, await phonePhoto(c));
+    const before = await listPhotos(db(), inv.id);
+    expect(before.map((p) => p.position)).toEqual([0, 1, 2]);
+    await setPhotoFocus(db(), inv.id, 0, { x: 10, y: 10, zoom: 1.4 });
+    await swapPhotos(db(), inv.id, 0, 2);
+    const swapped = await listPhotos(db(), inv.id);
+    expect(swapped[0]!.src).toBe(before[2]!.src);
+    expect(swapped[2]).toMatchObject({ src: before[0]!.src, focus: { x: 10, y: 10, zoom: 1.4 } });
+    await removePhoto(db(), inv.id, 0);
+    const after = await listPhotos(db(), inv.id);
+    expect(after.map((p) => [p.position, p.src])).toEqual([
+      [0, swapped[1]!.src],
+      [1, swapped[2]!.src],
+    ]);
+  });
+
+  it('a collage gives each place its own frame', async () => {
+    const r = (o: Parameters<typeof testManifest>[2]) => manifestSchema.safeParse(testManifest('frames-check', 1, { features: ['photos'], fields: [...BASIC_FIELDS], validStates: [{ features: ['photos'], fields: [...BASIC_FIELDS] }], print: undefined, ...o }));
+    expect(r({ photos: { max: 3, frames: [{ aspect: 1.6 }, { aspect: 1 }] } }).success).toBe(true);
+    expect(r({ photos: { max: 1, frames: [{ aspect: 1.6 }, { aspect: 1 }] } }).success).toBe(false);
+    const { inv } = await draft();
+    expect((await photoSpec(db(), inv))?.aspects).toEqual([0.8, 0.8, 0.8]);
   });
 
   it('refuses photos on a package without them, and files that are not photos', async () => {
@@ -124,10 +151,10 @@ describe('customer photos (feature `photos`)', () => {
   it('designs get the photos in order with their names; samples show placeholders for every place', async () => {
     const { inv } = await draft();
     await setPhoto(db(), inv, 1, await phonePhoto());
-    await setPhotoFocus(db(), inv.id, 1, { x: 20, y: 80, zoom: 1.5 });
     const { props } = await invitationRenderData(db(), inv, 'preview');
     expect(props.photos).toHaveLength(1);
-    expect(props.photos[0]).toMatchObject({ width: 1280, focus: { x: 20, y: 80, zoom: 1.5 }, label: 'Cover photo' });
+    // Asked for place 1 on an empty invitation: it takes place 0, the cover.
+    expect(props.photos[0]).toMatchObject({ index: 0, width: 1280, label: 'Cover photo' });
     const sample = buildThemeProps({ mode: 'sample', locale: 'ar', fieldKeys: [], features: ['photos'], values: {}, musicSrc: null, photoSpec: { max: 3, labels: LABELS } });
     expect(sample.photos.map((p) => p.label)).toEqual(['صورة الغلاف', 'الخطوبة', null]);
     const none = buildThemeProps({ mode: 'sample', locale: 'ar', fieldKeys: [], features: [], values: {}, musicSrc: null, photoSpec: { max: 3 } });
@@ -153,11 +180,11 @@ describe('customer photos (feature `photos`)', () => {
     body.append('file', new Blob([new Uint8Array(await phonePhoto())], { type: 'image/jpeg' }), 'p.jpg');
     const post = await handlePhotoRequest(db(), new Request('http://x/p/t/photos/1', { method: 'POST', body }), inv, '1', { ipHash: randomToken(8), published: false });
     expect(post.status).toBe(200);
-    expect(((await post.json()) as { photo: { position: number } }).photo.position).toBe(1);
-    const patch = await handlePhotoRequest(db(), new Request('http://x', { method: 'PATCH', body: JSON.stringify({ x: 10, y: 20, zoom: 1.2 }) }), inv, '1', { ipHash: null, published: false });
+    expect(((await post.json()) as { photo: { position: number } }).photo.position).toBe(0);
+    const patch = await handlePhotoRequest(db(), new Request('http://x', { method: 'PATCH', body: JSON.stringify({ x: 10, y: 20, zoom: 1.2 }) }), inv, '0', { ipHash: null, published: false });
     expect(await patch.json()).toEqual({ focus: { x: 10, y: 20, zoom: 1.2 } });
-    expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, '1', { ipHash: null, published: false })).status).toBe(200);
-    expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, '1', { ipHash: null, published: false })).status).toBe(404);
+    expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, '0', { ipHash: null, published: false })).status).toBe(200);
+    expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, '0', { ipHash: null, published: false })).status).toBe(404);
     expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), null, '1', { ipHash: null, published: false })).status).toBe(404);
     expect((await handlePhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, '../1', { ipHash: null, published: false })).status).toBe(400);
   });

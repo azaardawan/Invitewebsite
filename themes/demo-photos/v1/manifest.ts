@@ -2,7 +2,7 @@ import { defineTheme } from '@/theme-sdk/manifest';
 
 /**
  * Internal demo of the `photos` feature: the customer's own photos, the first on the cover and the rest in a
- * gallery. Never sold; it shows designers how `props.photos` and `<Photo>` work, and the tests use it.
+ * collage whose spots have different shapes (`photos.frames`). Never sold; it shows designers how `props.photos` and `<Photo>` work, and the tests use it.
  */
 export default defineTheme({
   key: 'demo-photos',
@@ -20,6 +20,8 @@ export default defineTheme({
     max: 7,
     min: 1,
     aspect: 0.75,
+    // The cover, then the collage: wide, two squares, two tall, wide.
+    frames: [{ aspect: 0.75 }, { aspect: 1.6 }, { aspect: 1 }, { aspect: 1 }, { aspect: 0.75 }, { aspect: 0.75 }, { aspect: 1.6 }],
     labels: [
       { ar: 'صورة الغلاف', en: 'Cover photo' },
       { ar: 'صورة الخطوبة', en: 'Engagement photo' },

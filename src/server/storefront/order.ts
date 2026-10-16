@@ -77,6 +77,7 @@ export async function photoState(inv: typeof invitations.$inferSelect) {
     max: spec.max,
     min: spec.min,
     aspect: spec.aspect,
+    aspects: spec.aspects,
     names: Array.from({ length: spec.max }, (_, i) => {
       const l = spec.labels?.[i];
       return l ? (l[inv.locale] ?? l.ar) : null;

@@ -143,11 +143,11 @@ export type ThemeProps = {
 };
 
 /**
- * One customer photo: its address (sized for the screen; print designs get the full size), its pixel size,
+ * One customer photo: its place (`index`, the same as in `props.photos`), its address (sized for the screen; print designs get the full size), its pixel size,
  * where the customer placed it in the design's frame (`focus`, as `<Photo>` applies it), and the design's name for
  * that place (manifest `photos.labels`) in the invitation's language, or null.
  */
-export type ThemePhoto = { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; label: string | null };
+export type ThemePhoto = { index: number; src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; label: string | null };
 
 /**
  * The date of birth: its parts, plus `lines`, the date written the way the customer chose on the order
