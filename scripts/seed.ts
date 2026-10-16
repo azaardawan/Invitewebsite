@@ -6,7 +6,7 @@
 import { closeDb, db } from '../src/server/db/client';
 import { seedRbac } from '../src/server/rbac/seed';
 import { seedCatalog } from '../src/server/catalog/seed';
-import { seedLegalDrafts } from '../src/server/legal/seed';
+import { seedLegalDrafts, updateTermsLifetimeLine } from '../src/server/legal/seed';
 import { backfillAccessCodes } from '../src/server/orders/access';
 import { syncThemesFromRegistry } from '../src/server/catalog/themes';
 import { themeManifests } from '../src/theme-registry';
@@ -16,6 +16,8 @@ import { applyOwnerSetups } from '../src/server/catalog/owner-setup';
 try {
   await seedRbac(db());
   await seedCatalog(db());
+  // Before the drafts: an untouched starter draft gets the new sentence first, so its Kurdish is then added as usual.
+  await updateTermsLifetimeLine(db());
   await seedLegalDrafts(db());
   await backfillAccessCodes(db());
   const report = await syncThemesFromRegistry(db(), themeManifests(), { adminId: null, ipHash: null });
