@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
-import { draftByToken } from '@/server/storefront/order';
+import { cardPictures, draftByToken } from '@/server/storefront/order';
 import { Price } from '@/components/storefront/currency';
 import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
@@ -90,6 +90,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
             base={`/p/${token}/extra`}
             featureKeys={draft.featureKeys}
             stickerShape={draft.current.stickerShape}
+            cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale)}
             watermarked
             labels={{
               title: t('extras.title'),

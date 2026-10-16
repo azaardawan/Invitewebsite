@@ -1,4 +1,5 @@
-import { shapeIncluded } from '@/catalog/features';
+import { MAIN_CARD } from '@/catalog/features';
+import { invitationCards } from '@/server/documents/data';
 import { isForever } from '@/catalog/lifetime';
 import { themeNumber } from '@/theme-registry';
 import { INITIALS_MAX, invitationNames, splitInitials } from '@/catalog/fields';
@@ -58,6 +59,8 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const showGuests = inv.featureKeys.includes('rsvp') && can(authz, 'guests.view');
   const canDocs = can(authz, 'documents.generate');
   const hasCard = inv.featureKeys.includes('print_card');
+  // The printed cards the customer ticked (`a5` and/or shapes), one set of files each.
+  const cards = hasCard ? await invitationCards(db(), inv) : [MAIN_CARD];
   const hasKeepsake = inv.featureKeys.includes('keepsake_pdf');
   const delivery = canDocs && (hasCard || hasKeepsake) ? await customerDelivery(db(), inv.id) : null;
   // WhatsApp messages go to the customer in their invitation's language.
@@ -163,23 +166,32 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
               <h3 className="text-sm font-semibold">{t('cardTitle')}</h3>
               {documentAvailable(inv, 'card') ? (
                 <p className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                  <a href={`/admin/api/documents/${inv.id}/card`} className="font-medium text-accent underline">
-                    {t('downloadCard')}
-                  </a>
-                  <a href={`/admin/api/documents/${inv.id}/card?bleed=1`} className="text-accent underline">
-                    {t('downloadCardBleed')}
-                  </a>
-                  {shapeIncluded(inv.featureKeys, inv.cardShape) && !inv.cardCustomKey ? (
-                    <>
-                      <span className="text-muted">{t('cardShapeChosen', { shape: inv.cardShape ?? '' })}</span>
-                      <a href={`/admin/api/documents/${inv.id}/card?png=front`} className="text-accent underline">
-                        {t('downloadShapePng', { side: 'front' })}
-                      </a>
-                      <a href={`/admin/api/documents/${inv.id}/card?png=back`} className="text-accent underline">
-                        {t('downloadShapePng', { side: 'back' })}
-                      </a>
-                    </>
-                  ) : null}
+                  {/* One set of files per printed card the customer ticked (the A5 card and/or shapes); an uploaded card replaces them. */}
+                  {(inv.cardCustomKey ? [MAIN_CARD] : cards).map((c) => {
+                    const q = inv.cardCustomKey || (cards.length === 1 && c === MAIN_CARD) ? '' : `card=${c}`;
+                    const href = (extra = '') => `/admin/api/documents/${inv.id}/card${[q, extra].filter(Boolean).length ? `?${[q, extra].filter(Boolean).join('&')}` : ''}`;
+                    return (
+                      <span key={c} className="flex flex-wrap gap-x-4 gap-y-2" data-admin-card={c}>
+                        {c !== MAIN_CARD || cards.length > 1 ? <span className="text-muted">{t('cardShapeChosen', { shape: c === MAIN_CARD ? 'A5' : c })}</span> : null}
+                        <a href={href()} className="font-medium text-accent underline">
+                          {t('downloadCard')}
+                        </a>
+                        <a href={href('bleed=1')} className="text-accent underline">
+                          {t('downloadCardBleed')}
+                        </a>
+                        {c !== MAIN_CARD && !inv.cardCustomKey ? (
+                          <>
+                            <a href={href('png=front')} className="text-accent underline">
+                              {t('downloadShapePng', { side: 'front' })}
+                            </a>
+                            <a href={href('png=back')} className="text-accent underline">
+                              {t('downloadShapePng', { side: 'back' })}
+                            </a>
+                          </>
+                        ) : null}
+                      </span>
+                    );
+                  })}
                   {!inv.cardCustomKey ? (
                     <a href={`/admin/api/documents/${inv.id}/card?fresh=1`} className="text-muted underline">
                       {t('regenerate')}

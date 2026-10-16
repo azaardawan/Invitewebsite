@@ -274,6 +274,20 @@
       "when": 1792163600993,
       "tag": "0038_package_lifetime",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1792164272871,
+      "tag": "0039_card_choices",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792164280987,
+      "tag": "0040_drop_card_shape",
+      "breakpoints": true
     }
   ]
 }

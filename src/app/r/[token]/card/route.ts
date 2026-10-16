@@ -18,8 +18,11 @@ export async function GET(req: Request, { params }: RouteContext<'/r/[token]/car
   if (ipHash && !(await consumeRateLimit(db(), `card:ip:${ipHash}`, DOWNLOADS_PER_HOUR, 3600))) {
     return new Response('Too many requests', { status: 429, headers: { 'Retry-After': '3600' } });
   }
+  // Which of the customer's cards (`?card=a5|leaf|heart`); left out, their first.
+  const card = new URL(req.url).searchParams.get('card');
+  if (card !== null && !r.invitation.cards.includes(card)) return new Response('Not found', { status: 404 });
   try {
-    const { pdf, fileName } = await ensureDocument(db(), r.invitation.id, 'card');
+    const { pdf, fileName } = await ensureDocument(db(), r.invitation.id, 'card', { card });
     await trackEvent(db(), { name: 'card_download', invitationId: r.invitation.id, orderId: r.orderId });
     return new Response(new Uint8Array(pdf), {
       headers: {

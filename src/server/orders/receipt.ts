@@ -1,5 +1,5 @@
 import 'server-only';
-import { shapeIncluded } from '@/catalog/features';
+import { invitationCardDetails } from '@/server/documents/data';
 import { manifestByCodeRef } from '@/theme-registry';
 import { selfEditState } from '@/server/invitation/customer-edit';
 import { keepsakeReady } from '@/server/documents/delivery';
@@ -38,6 +38,7 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
   const snapshot = row.order.snapshot as OrderSnapshot;
   // Designs without an online invitation (manifest `onlineInvitation: false`) sell files only: no link.
   const onlineInvitation = manifestByCodeRef(snapshot.themeVersion.codeRef)?.onlineInvitation !== false;
+  const cardDetails = await invitationCardDetails(db, row.invitation);
   return {
     /** Internal id, for server-side follow-ups (payment checks); never rendered. */
     orderId: row.order.id,
@@ -54,8 +55,10 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       /** Internal id, for the card download; never rendered. */
       id: row.invitation.id,
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
-      /** The shaped card chosen instead of the card (leaf, heart…), or null. */
-      cardShape: shapeIncluded(row.invitation.featureKeys, row.invitation.cardShape) ? row.invitation.cardShape : null,
+      /** The printed cards the customer gets (`a5` = the card, and/or shapes: leaf, heart…), in order; one file each. */
+      cards: cardDetails.map((c) => c.key),
+      /** Each shaped card's name in the design's languages (the A5 card has none). */
+      cardLabels: Object.fromEntries(cardDetails.filter((c) => c.shape).map((c) => [c.key, c.shape!.label])),
       /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */
       featureKeys: row.invitation.featureKeys,
       stickerShape: row.invitation.stickerShape,

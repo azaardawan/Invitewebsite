@@ -41,7 +41,8 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     const shape = sp.shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
     return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />;
   }
-  const data = await printData(db(), inv, claim.kind);
+  // `card=`: which of the customer's printed cards (the A5 card or a shape they ticked); without it, their first.
+  const data = await printData(db(), inv, claim.kind, { card: typeof sp.card === 'string' ? sp.card : null });
   // `png=1` (shaped cards): only the shape, on a transparent page, for the PNG picture.
   if (data.kind === 'card')
     return (

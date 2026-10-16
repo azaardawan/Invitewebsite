@@ -51,7 +51,8 @@ export async function ensureDocument(
   db: DbOrTx,
   invitationId: string,
   kind: DocumentKind,
-  opts: { actor?: Actor; force?: boolean; render?: PdfRenderer } = {},
+  /** `card`: which of the customer's printed cards (`a5` or a shape key); left out, their first. */
+  opts: { actor?: Actor; force?: boolean; render?: PdfRenderer; card?: string | null } = {},
 ): Promise<{ pdf: Buffer; fileName: string }> {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new DocumentError('notFound');
@@ -64,26 +65,30 @@ export async function ensureDocument(
     if (custom) return { pdf: custom, fileName: `invitation-card-${inv.publicId}.pdf` };
   }
 
-  const data = await printData(db, inv, kind);
-  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null, design: artwork(data) }));
-  const fileName = `${kind === 'card' ? 'invitation-card' : 'keepsake'}-${inv.publicId}.pdf`;
+  const data = await printData(db, inv, kind, { card: opts.card });
+  // A shaped card is its own file (and stored copy), next to the A5 card when the customer wants both.
+  const shapeKey = data.kind === 'card' ? (data.shape?.key ?? null) : null;
+  const variant = shapeKey ?? '';
+  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null, design: artwork(data), ...(shapeKey ? { shape: data.kind === 'card' ? data.shape : null } : {}) }));
+  const fileName = `${kind === 'card' ? (shapeKey ? `invitation-card-${shapeKey}` : 'invitation-card') : 'keepsake'}-${inv.publicId}.pdf`;
 
   const [existing] = await db
     .select()
     .from(generatedDocuments)
-    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[kind])));
+    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[kind]), eq(generatedDocuments.variant, variant)));
   if (existing && existing.sourceHash === sourceHash && !opts.force) {
     const stored = await storage().get(existing.storageKey);
     if (stored) return { pdf: stored, fileName };
   }
 
-  const pdf = await (opts.render ?? renderPdf)(kind, inv.id);
+  const pdf = await (opts.render ?? renderPdf)(kind, inv.id, shapeKey ? { card: shapeKey } : {});
   const storageKey = `documents/${randomUUID()}.pdf`;
   await storage().put(storageKey, pdf, 'application/pdf');
   const messageCount = kind === 'keepsake' && 'messages' in data.props ? data.props.messages.length : null;
   const values = {
     invitationId: inv.id,
     kind: KIND[kind],
+    variant,
     storageKey,
     sourceHash,
     themeVersionId: inv.themeVersionId,
@@ -95,14 +100,14 @@ export async function ensureDocument(
   await db
     .insert(generatedDocuments)
     .values(values)
-    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind], set: values });
+    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind, generatedDocuments.variant], set: values });
   if (opts.actor?.adminId) {
     await recordAudit(db, {
       ...auditActor(opts.actor),
       action: `document.generate`,
       objectType: 'invitation',
       objectId: inv.id,
-      after: { kind: KIND[kind], messageCount, forced: Boolean(opts.force) },
+      after: { kind: KIND[kind], ...(variant ? { card: variant } : {}), messageCount, forced: Boolean(opts.force) },
     });
   }
   if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
@@ -114,10 +119,19 @@ export async function ensureDocument(
  * invitation's cover). Stored and reused while nothing it shows has changed. Null when there is nothing
  * automatic to picture: an uploaded card (the receipt shows a plain PDF tile), or an invitation not live (og).
  */
-export async function ensurePreview(db: DbOrTx, invitationId: string, kind: PreviewKind, render: PreviewRenderer = renderPreview, mayRender?: () => Promise<boolean>): Promise<Buffer | null> {
+export async function ensurePreview(
+  db: DbOrTx,
+  invitationId: string,
+  kind: PreviewKind,
+  render: PreviewRenderer = renderPreview,
+  mayRender?: () => Promise<boolean>,
+  /** For the card: which of the customer's printed cards (`a5` or a shape key); left out, their first. */
+  card?: string | null,
+): Promise<Buffer | null> {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new DocumentError('notFound');
   let sourceHash: string;
+  let variant = '';
   if (kind === 'og') {
     if (!isLive(inv)) return null;
     // What the cover shows (not the reply counts or guest messages, which change all the time).
@@ -129,29 +143,31 @@ export async function ensurePreview(db: DbOrTx, invitationId: string, kind: Prev
     if (!inv.featureKeys.includes(FEATURE[doc])) throw new DocumentError('notIncluded');
     if (!documentAvailable(inv, doc)) throw new DocumentError('notPaid');
     if (doc === 'card' && inv.cardCustomKey) return null;
-    const data = await printData(db, inv, doc);
+    const data = await printData(db, inv, doc, { card });
     const shown = kind === 'cardBack' && data.kind === 'card' ? data.back : data.props;
     const design = data.kind === 'card' ? (kind === 'cardBack' ? data.design.back : data.design.front) ?? undefined : undefined;
-    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown, design }));
+    const shape = data.kind === 'card' ? data.shape : null;
+    variant = shape?.key ?? '';
+    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown, design, ...(shape ? { shape } : {}) }));
   }
   const [existing] = await db
     .select()
     .from(generatedDocuments)
-    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, PREVIEW_KIND[kind])));
+    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, PREVIEW_KIND[kind]), eq(generatedDocuments.variant, variant)));
   if (existing && existing.sourceHash === sourceHash) {
     const stored = await storage().get(existing.storageKey);
     if (stored) return stored;
   }
   // Only a fresh picture costs a browser render; the caller may cap those (a stored one is not counted).
   if (mayRender && !(await mayRender())) throw new DocumentError('rateLimited');
-  const image = await render(kind, inv.id);
+  const image = await render(kind, inv.id, variant ? { card: variant } : {});
   const storageKey = `documents/${randomUUID()}.jpg`;
   await storage().put(storageKey, image, 'image/jpeg');
-  const values = { invitationId: inv.id, kind: PREVIEW_KIND[kind], storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: image.length, generatedBy: null, generatedAt: new Date() };
+  const values = { invitationId: inv.id, kind: PREVIEW_KIND[kind], variant, storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: image.length, generatedBy: null, generatedAt: new Date() };
   await db
     .insert(generatedDocuments)
     .values(values)
-    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind], set: values });
+    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind, generatedDocuments.variant], set: values });
   if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
   return image;
 }
@@ -160,7 +176,7 @@ export async function ensurePreview(db: DbOrTx, invitationId: string, kind: Prev
  * The automatic card with its 3 mm bleed for a print shop (Admin only). Rendered fresh each time,
  * not stored. With an uploaded custom card, that file is returned as is.
  */
-export async function printShopCard(db: DbOrTx, invitationId: string, render: PdfRenderer = renderPdf) {
+export async function printShopCard(db: DbOrTx, invitationId: string, render: PdfRenderer = renderPdf, card?: string | null) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new DocumentError('notFound');
   if (!documentAvailable(inv, 'card')) throw new DocumentError(inv.featureKeys.includes('print_card') ? 'notPaid' : 'notIncluded');
@@ -168,21 +184,23 @@ export async function printShopCard(db: DbOrTx, invitationId: string, render: Pd
     const custom = await storage().get(inv.cardCustomKey);
     if (custom) return { pdf: custom, fileName: `invitation-card-${inv.publicId}.pdf` };
   }
-  return { pdf: await render('cardBleed', inv.id), fileName: `invitation-card-${inv.publicId}-print-shop.pdf` };
+  const data = await printData(db, inv, 'cardBleed', { card });
+  const shapeKey = data.kind === 'card' ? (data.shape?.key ?? null) : null;
+  return { pdf: await render('cardBleed', inv.id, shapeKey ? { card: shapeKey } : {}), fileName: `invitation-card-${shapeKey ? `${shapeKey}-` : ''}${inv.publicId}-print-shop.pdf` };
 }
 
 /**
- * One side of the shaped card the customer chose (leaf, heart…) as a transparent PNG, for print shops that
+ * One side of a shaped card the customer chose (leaf, heart…; `card`, else their first) as a transparent PNG, for print shops that
  * place or resize it themselves. Rendered fresh each time (not stored). Null without a shaped card.
  */
-export async function shapeCardPng(db: DbOrTx, invitationId: string, side: 'front' | 'back', render: ShapePngRenderer = renderShapePng) {
+export async function shapeCardPng(db: DbOrTx, invitationId: string, side: 'front' | 'back', render: ShapePngRenderer = renderShapePng, card?: string | null) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new DocumentError('notFound');
   if (!documentAvailable(inv, 'card')) throw new DocumentError(inv.featureKeys.includes('print_card') ? 'notPaid' : 'notIncluded');
   if (inv.cardCustomKey) return null;
-  const data = await printData(db, inv, 'card');
+  const data = await printData(db, inv, 'card', { card });
   if (data.kind !== 'card' || !data.shape) return null;
-  return { png: await render(side, inv.id), fileName: `invitation-${data.shape.key}-${side}-${inv.publicId}.png` };
+  return { png: await render(side, inv.id, { card: data.shape.key }), fileName: `invitation-${data.shape.key}-${side}-${inv.publicId}.png` };
 }
 
 export const CARD_LIMITS = { message: 300, extraLine: 120, uploadBytes: 15 * 1024 * 1024 } as const;

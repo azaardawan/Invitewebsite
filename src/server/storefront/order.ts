@@ -1,5 +1,5 @@
 import 'server-only';
-import { shapeIncluded } from '@/catalog/features';
+import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
@@ -48,7 +48,7 @@ export async function draftByToken(token: string) {
       signatureSrcs: await signatureUrls(db(), inv),
       colors: inv.colors,
       stickerShape: inv.stickerShape,
-      cardShape: inv.cardShape,
+      cardChoices: inv.cardChoices,
       cardShapes: (row.manifest as ThemeManifest).print?.shapes ?? [],
       bottleSize: inv.bottleSize,
       birthDate: { style: inv.birthDateStyle, digits: inv.birthDateDigits, value: inv.fieldValues.birth_date ?? null },
@@ -78,9 +78,9 @@ export async function orderFormExtras(
     signatureSrcs?: string[];
     colors?: Record<string, string> | null;
     stickerShape?: 'round' | 'square' | 'both';
-    /** The design's shaped cards (manifest `print.shapes`) and the one chosen (null = the card). */
+    /** The design's shaped cards (manifest `print.shapes`) and the cards chosen (`a5` and/or shape keys). */
     cardShapes?: readonly CardShape[];
-    cardShape?: string | null;
+    cardChoices?: readonly string[];
     bottleSize?: BottleSize;
     birthDate?: { style: DateStyle; digits: DigitStyle; value: string | null };
     /** The design's changeable lines (manifest `wording`) and what the customer chose so far. */
@@ -102,7 +102,7 @@ export async function orderFormExtras(
   const shapes = (current.cardShapes ?? []).filter((x) => shapeIncluded(featureKeys, x.key));
   if (shapes.length) {
     extras.cardShape = {
-      current: shapeIncluded(featureKeys, current.cardShape) ? (current.cardShape ?? '') : '',
+      current: chosenCards(featureKeys, current.cardChoices ?? [MAIN_CARD], shapes.map((x) => x.key)),
       options: shapes.map((x) => ({ key: x.key, label: localized(x.label, locale), widthMm: x.widthMm, heightMm: x.heightMm, outline: x.outline })),
     };
   }
@@ -150,4 +150,13 @@ export async function orderFormExtras(
     }
   }
   return extras;
+}
+
+/** The ticked printed cards as ExtrasPreview pictures them: key, the shape's name, and each side's width ÷ height. */
+export function cardPictures(featureKeys: readonly string[], choices: readonly string[] | null | undefined, shapes: readonly CardShape[], locale: Locale) {
+  return chosenCards(featureKeys, choices, shapes.map((x) => x.key)).map((key) => {
+    const s = shapes.find((x) => x.key === key);
+    if (!s) return { key, ratio: 148 / 210, backRatio: 210 / 148 };
+    return { key, label: localized(s.label, locale), ratio: s.widthMm / s.heightMm, backRatio: s.backSideways ? s.heightMm / s.widthMm : s.widthMm / s.heightMm };
+  });
 }

@@ -97,10 +97,10 @@ export const invitations = pgTable(
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
     /**
-     * Shaped cards (`card_leaf` / `card_heart` features): the shape the customer chose instead of the card (a key of the design's
-     * manifest `print.shapes`, e.g. `leaf`); null = the card itself.
+     * The printed cards the customer wants: `a5` (the card itself) and/or the shaped cards the package sells (`card_leaf` /
+     * `card_heart`; keys of the design's manifest `print.shapes`, e.g. `leaf`). One, several or all; read through `chosenCards`.
      */
-    cardShape: text('card_shape'),
+    cardChoices: text('card_choices').array().notNull().default(sql`'{a5}'::text[]`),
     /** Bottle labels (`bottle_label` feature): the bottle size the customer chose (src/catalog/products.ts). */
     bottleSize: text('bottle_size', { enum: ['250', '330', '500', '600'] }).notNull().default('500'),
     /** Newborn: how the customer wants the date of birth written (src/lib/birth-date-format.ts). */

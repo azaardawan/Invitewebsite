@@ -1393,9 +1393,10 @@
     },
     "cardShape": {
       "heading": "Printed card shape",
-      "help": "Choose the regular card or one of this design's shapes. You get a print-ready PDF and a transparent PNG, and the print shop gets the cut line around the shape.",
+      "help": "Tick the regular card, one of this design's shapes, or several. Each card you tick comes as its own print-ready PDF (a shape also as a transparent PNG), and the print shop gets the cut line around each shape.",
       "card": "The card",
-      "size": "{w} × {h} cm"
+      "size": "{w} × {h} cm",
+      "required": "Choose at least one card."
     },
     "stickerShape": {
       "heading": "Sticker shape",

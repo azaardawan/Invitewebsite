@@ -62,7 +62,7 @@ export function contentType(item: ProductItem) {
 }
 
 /** The download name, e.g. `story-ABC123.png`, `stickers-ABC123.pdf`. */
-export function productFileName(item: ProductItem, publicId: string) {
+export function productFileName(item: ProductItem, publicId: string, shape?: string | null) {
   const [what, ext] = item.split('.') as [string, string];
   const base =
     {
@@ -70,7 +70,8 @@ export function productFileName(item: ProductItem, publicId: string) {
       sticker: ext === 'pdf' ? 'stickers-sheet' : 'sticker',
       'sticker-square': ext === 'pdf' ? 'square-stickers-sheet' : 'square-sticker',
       bottle: ext === 'pdf' ? 'bottle-labels-sheet' : 'bottle-label',
-      card: 'card',
+      card: shape ? `card-${shape}` : 'card',
+      cardBack: shape ? `card-${shape}-back` : 'cardBack',
     }[what] ?? what;
   return `${base}-${publicId}.${ext === 'preview' ? (contentType(item) === 'image/png' ? 'png' : 'jpg') : ext}`;
 }
@@ -81,7 +82,15 @@ export function productFileName(item: ProductItem, publicId: string) {
  * renders a clean copy); the files themselves (PNG, PDF sheets) are only given out once paid. `mayRender` is asked
  * only when a fresh file has to be drawn (the costly part): a stored one is handed out without counting.
  */
-export async function ensureProductFile(db: DbOrTx, invitationId: string, item: ProductItem, render: ProductRenderer = renderProduct, mayRender?: () => Promise<boolean>) {
+export async function ensureProductFile(
+  db: DbOrTx,
+  invitationId: string,
+  item: ProductItem,
+  render: ProductRenderer = renderProduct,
+  mayRender?: () => Promise<boolean>,
+  /** For the card's previews: which of the customer's printed cards (`a5` or a shape key); left out, their first. */
+  card?: string | null,
+) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new ProductError('notFound');
   if (!inv.featureKeys.includes(FEATURE[item])) throw new ProductError('notIncluded');
@@ -89,11 +98,13 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   const paid = isPaid(inv);
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
 
+  let variant = '';
   const shown =
     item === 'card.preview' || item === 'cardBack.preview'
       ? await (async () => {
-          const d = await printData(db, inv, 'card');
-          // Each side with what it shows, and the shape (leaf, heart) the customer chose.
+          const d = await printData(db, inv, 'card', { card });
+          variant = d.kind === 'card' ? (d.shape?.key ?? '') : '';
+          // Each side with what it shows, and which card it is (the A5 card or a shape: leaf, heart).
           return d.kind === 'card' ? { props: d.props, design: item === 'card.preview' ? d.design.front : d.design.back, shape: d.shape?.key ?? null } : null;
         })()
       : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
@@ -102,23 +113,23 @@ export async function ensureProductFile(db: DbOrTx, invitationId: string, item: 
   const [existing] = await db
     .select()
     .from(generatedDocuments)
-    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[item])));
+    .where(and(eq(generatedDocuments.invitationId, inv.id), eq(generatedDocuments.kind, KIND[item]), eq(generatedDocuments.variant, variant)));
   if (existing && existing.sourceHash === sourceHash) {
     const stored = await storage().get(existing.storageKey);
-    if (stored) return { data: stored, type: contentType(item), fileName: productFileName(item, inv.publicId) };
+    if (stored) return { data: stored, type: contentType(item), fileName: productFileName(item, inv.publicId, variant || null) };
   }
   if (mayRender && !(await mayRender())) throw new ProductError('rateLimited');
-  const data = await render(item, inv.id, { bottleSize: inv.bottleSize });
+  const data = await render(item, inv.id, { bottleSize: inv.bottleSize, ...(variant ? { card: variant } : {}) });
   const ext = contentType(item) === 'application/pdf' ? 'pdf' : contentType(item) === 'image/png' ? 'png' : 'jpg';
   const storageKey = `documents/${randomUUID()}.${ext}`;
   await storage().put(storageKey, data, contentType(item));
-  const values = { invitationId: inv.id, kind: KIND[item], storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: data.length, generatedBy: null, generatedAt: new Date() };
+  const values = { invitationId: inv.id, kind: KIND[item], variant, storageKey, sourceHash, themeVersionId: inv.themeVersionId, messageCount: null, byteSize: data.length, generatedBy: null, generatedAt: new Date() };
   await db
     .insert(generatedDocuments)
     .values(values)
-    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind], set: values });
+    .onConflictDoUpdate({ target: [generatedDocuments.invitationId, generatedDocuments.kind, generatedDocuments.variant], set: values });
   if (existing && existing.storageKey !== storageKey) await storage().delete(existing.storageKey).catch(() => {});
-  return { data, type: contentType(item), fileName: productFileName(item, inv.publicId) };
+  return { data, type: contentType(item), fileName: productFileName(item, inv.publicId, variant || null) };
 }
 
 /** Which extras an invitation's package includes, in the order shown to the customer. */

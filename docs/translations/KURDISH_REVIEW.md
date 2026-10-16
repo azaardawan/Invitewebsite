@@ -831,7 +831,8 @@ Design names (manifest `title`; they become the designs' Kurdish names in Admin,
 
 ## Batch 32 — how long a package stays online (30 days, 60 days, 1 year, forever) — ⏳ PENDING APPROVAL
 
-The owner now picks per package how long the invitation stays online. The packages on a theme page show it
+The owner now picks per package how long the invitation stays online, and a package with several card shapes lets the
+customer tick one, several or all of the cards (rows 13–14; the old single-choice help text's Kurdish was removed). The packages on a theme page show it
 («Online for 30 days» … «Online forever»), and the receipt shows «No end date» for a package that never ends.
 The home page's line and first FAQ answer no longer promise only 30 days; their approved Kurdish said 30 days, so it
 was removed and those two lines show Arabic until these suggestions are approved.
@@ -849,6 +850,8 @@ was removed and those two lines show Arabic until these suggestions are approved
 | 9 | `common.noEnd` | بلا تاريخ انتهاء | No end date | بێ بەرواری کۆتایی | بێ دیرۆکا دوماهیێ | ◐ |
 | 10 | `home.featureDays` | متاحة ٣٠ يوماً أو سنة أو للأبد حسب الباقة | Online for 30 days, a year or forever, depending on the package | ٣٠ ڕۆژ، ساڵێک یان بۆ هەمیشە بەردەستە، بەپێی پاکێجەکە | ٣٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم بەردەستە، ل دویڤ پاکێجێ | ◐ |
 | 11 | `home.faq1a` | حسب الباقة التي تختارونها: ٣٠ يوماً أو ٦٠ يوماً أو سنة أو للأبد، من لحظة نشرها. تظهر مدة كل باقة عليها، ويمكنكم التواصل معنا لتمديدها. | It depends on the package you choose: 30 days, 60 days, a year, or forever, counted from the moment it is published. Each package shows how long it lasts, and you can contact us to extend it. | بەپێی ئەو پاکێجەی هەڵیدەبژێرن: ٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە، لە کاتی بڵاوکردنەوەیەوە. ماوەی هەر پاکێجێک لەسەری نووسراوە، و دەتوانن پەیوەندیمان پێوە بکەن بۆ درێژکردنەوەی. | ل دویڤ وی پاکێجێ هوین هەلدبژێرن: ٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم، ژ دەمێ بەلاڤکرنا وێ. ماوێ هەر پاکێجەکێ ل سەر نڤیسییە، و هوین دشێن پەیوەندیێ ب مە بکەن بۆ درێژکرنا وێ. | ◐ |
+| 13 | `store.cardShape.help` | اختر البطاقة العادية أو أحد أشكال هذا التصميم أو أكثر من واحد. تحصل لكل بطاقة تختارها على ملف PDF خاص للطباعة (وللشكل صورة PNG بخلفية شفافة أيضاً)، ونجهّز للمطبعة خط القص حول كل شكل. | Tick the regular card, one of this design's shapes, or several. Each card you tick comes as its own print-ready PDF (a shape also as a transparent PNG), and the print shop gets the cut line around each shape. | کارتە ئاساییەکە، یەکێک لە شێوەکانی ئەم دیزاینە، یان زیاتر لە یەکێک هەڵبژێرە. بۆ هەر کارتێک کە هەڵیدەبژێریت فایلێکی PDFـی تایبەت بۆ چاپ وەردەگریت (بۆ شێوەکانیش وێنەیەکی PNG بە باکگراوندی ڕوون)، و هێڵی بڕینی دەوری هەر شێوەیەک بۆ چاپخانە ئامادە دەکەین. | کارتا ئاسایی، ئێک ژ شێوەیێن ڤی دیزاینی، یان پتر ژ ئێکێ هەلبژێرە. بۆ هەر کارتەکا تو هەلدبژێری دێ فایلەکێ PDF یێ تایبەت بۆ چاپێ وەرگری (بۆ شێوەیان ژی وێنەیەکێ PNG ب پشتەکا ڕوهن)، و ئەم دێ هێلا بڕینێ ل دۆر هەر شێوەیەکێ بۆ چاپخانێ ئامادە کەین. | ◐ |
+| 14 | `store.cardShape.required` | اختر بطاقة واحدة على الأقل. | Choose at least one card. | لانیکەم کارتێک هەڵبژێرە. | کێمترین ئێک کارتێ هەلبژێرە. | ◐ |
 
 
 The starter Terms (`src/server/legal/seed.ts`, only used before the owner publishes their own) now say the invitation stays
