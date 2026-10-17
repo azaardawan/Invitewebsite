@@ -59,6 +59,6 @@ export default defineTheme({
     card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#20443b', light: '#00000000' } },
     keepsake: { size: 'A4' },
     // The arch of the inside page as a card of its own (outlines.ts).
-    shapes: [{ key: 'arch', label: { ar: 'قوس', en: 'Arch' }, widthMm: 110, heightMm: 170, outline: ARCH_OUTLINE }],
+    shapes: [{ key: 'arch', label: { ar: 'قوس', en: 'Arch', ckb: 'کەوانە', bdn: 'کەڤان' }, widthMm: 110, heightMm: 170, outline: ARCH_OUTLINE }],
   },
 });

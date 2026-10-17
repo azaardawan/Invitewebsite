@@ -561,9 +561,10 @@ and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ �
 «اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
 And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).
 
-## Batch 23 — date-of-birth format, bottle size, files-only designs — ⏳ PENDING owner approval
+## Batch 23 — date-of-birth format, bottle size, files-only designs — ✅ APPROVED (2026-10-17)
 
-Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Arabic until approved).
+Applied to `ckb.json` / `bdn.json`. The order-form labels of the newborn designs below come from
+`src/server/catalog/kurdish-labels.ts` (their activated versions are frozen).
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -616,11 +617,12 @@ gives Kurdish lists (same order, same count) or approves them in Arabic script.
 Order-form labels in the Swan Garden manifest (#9, `themes/swan-garden/v1/manifest.ts`): «كلمة «بنت»» and the father tick box,
 as for Rosebird Garden and Bluebird Garden above. The design's text (praise, «أكرمنا الله بأجمل العطايا», du'a) stays Arabic.
 
-## Batch 24 — separate terms for newborn invitations (PENDING)
+## Batch 24 — separate terms for newborn invitations — ✅ APPROVED (2026-10-17)
 
 Newborn orders accept their own terms («شروط دعوات المولود», `/legal/terms-newborn`); weddings and the other
 occasions keep the main terms. The text is seeded as a draft in Admin → Legal policies (Arabic and English); it can
-only be published once the Kurdish is in. Sections shared with the main terms reuse their approved Kurdish word for word.
+only be published once the Kurdish is in. The approved Kurdish below is now seeded into that draft (with the
+package online-time sentence, like the Arabic); the owner publishes it in Admin. Sections shared with the main terms reuse their approved Kurdish word for word.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -872,12 +874,11 @@ online for its package's time. Their Kurdish line still says 30 days and was lef
 |---|---|---|---|---|
 | 12 | Terms, the invitation's online time | بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە. | داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن. | ◐ |
 
-## Batch 33 — the four wedding designs v2: families, engagement wording, the arch card — ⏳ AWAITING APPROVAL
+## Batch 33 — the four wedding designs v2: families, engagement wording, the arch card — ✅ APPROVED (2026-10-17)
 
 Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15), version 2.
 Each design now has a section for the two families (the customer types each family's name), and says «engagement»
-instead of «wedding» when it is sold as an engagement. Until these rows are approved, Kurdish invitations show the
-Arabic for these lines. Glossary reused from approved rows: engagement دەستگیرانی / دەزگرانی (section names),
+instead of «wedding» when it is sold as an engagement. Row 17 («قوس») is also used by the graduation designs. Glossary reused from approved rows: engagement دەستگیرانی / دەزگرانی (section names),
 fiancé / fiancée دەستگیرانی کوڕ / کچ, دەزگرانێ کوڕ / دەزگرانا کچ (field labels), family بنەماڵە / مالبات.
 
 | # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |

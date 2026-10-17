@@ -35,8 +35,8 @@ export const STANDARD_FIELDS = {
   person_2_name: { type: 'text', maxLength: 40, label: { ar: 'الاسم الثاني', en: 'Second name', ckb: 'ناوی دووەم', bdn: 'ناڤێ دووێ' } },
   family_names: { type: 'longtext', maxLength: 150, label: { ar: 'أسماء العائلتين', en: 'Family names', ckb: 'ناوی هەردوو بنەماڵە', bdn: 'ناڤێن هەردوو بنەمالان' } },
   /** Each family on its own (e.g. the groom's and the bride's); the theme gives them their own place. */
-  person_1_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العريس', en: "Groom's family" } },
-  person_2_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العروس', en: "Bride's family" } },
+  person_1_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العريس', en: "Groom's family", ckb: 'بنەماڵەی زاوا', bdn: 'مالباتا زاڤای' } },
+  person_2_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العروس', en: "Bride's family", ckb: 'بنەماڵەی بووک', bdn: 'مالباتا بویکێ' } },
   // Graduation.
   /** The degree or achievement being celebrated (e.g. "Bachelor of Engineering"). */
   achievement: { type: 'text', maxLength: 80, label: { ar: 'الشهادة أو التخصص', en: 'Degree or achievement', ckb: 'بڕوانامە یان پسپۆڕی', bdn: 'بڕوانامە یان پسپۆری' } },

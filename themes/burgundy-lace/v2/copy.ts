@@ -3,8 +3,8 @@ import type { InvitationLocale } from '@/theme-sdk';
 /**
  * The design's own lines (from the designer's hand-off). Platform strings (buttons, form, countdown units,
  * errors) come from `props.labels`; the customer's content comes from fields. The Kurdish is the owner's
- * approved wording (docs/translations/KURDISH_REVIEW.md, batch 31). Lines added in v2 (the families, the engagement
- * wording) wait for the owner's Kurdish (batch 33) and show the Arabic until then.
+ * approved wording (docs/translations/KURDISH_REVIEW.md, batch 31; the lines added in v2, the families and the
+ * engagement wording, batch 33).
  */
 const ar = {
   /** Above the names on the closed envelope. */
@@ -74,9 +74,9 @@ const ckb: Copy = {
   presence: 'خۆشحاڵ دەبین بەشداری خۆشیمان بکەن',
   keepsakeSubtitle: 'نامەی خێزان و خۆشەویستان لە ڕۆژی هاوسەرگیریماندا',
   keepsakeClosing: 'سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون',
-  familiesLead: ar.familiesLead,
-  groomFamily: ar.groomFamily,
-  brideFamily: ar.brideFamily,
+  familiesLead: 'بە بەرەکەتی هەردوو بنەماڵە',
+  groomFamily: 'بنەماڵەی زاوا',
+  brideFamily: 'بنەماڵەی بووک',
 };
 
 const bdn: Copy = {
@@ -96,9 +96,9 @@ const bdn: Copy = {
   presence: 'دێ دلخۆش بین ئەگەر هوین پشکداریێ د شاهیا مە دا بکەن',
   keepsakeSubtitle: 'نامێن مالباتێ و هەڤالان د ڕۆژا داوەتا مە دا',
   keepsakeClosing: 'سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری',
-  familiesLead: ar.familiesLead,
-  groomFamily: ar.groomFamily,
-  brideFamily: ar.brideFamily,
+  familiesLead: 'ب بەرەکەتا هەردوو مالباتان',
+  groomFamily: 'مالباتا زاڤای',
+  brideFamily: 'مالباتا بویکێ',
 };
 
 const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb, bdn };
@@ -122,8 +122,24 @@ const ENGAGEMENT: Record<InvitationLocale, Partial<Copy>> = {
     groomFamily: 'The groom-to-be’s family',
     brideFamily: 'The bride-to-be’s family',
   },
-  ckb: arEngagement,
-  bdn: arEngagement,
+  ckb: {
+    wedding: 'بە بۆنەی دەستگیرانیمان',
+    cordially: 'بانگهێشتتان دەکەین بۆ بەشداریکردن\nلە خۆشیی دەستگیرانیمان',
+    invitation: 'بانگهێشتنامەی دەستگیرانی',
+    detailsTitle: 'زانیارییەکانی دەستگیرانی',
+    keepsakeSubtitle: 'نامەی خێزان و خۆشەویستان لە ڕۆژی دەستگیرانیماندا',
+    groomFamily: 'بنەماڵەی دەستگیرانی کوڕ',
+    brideFamily: 'بنەماڵەی دەستگیرانی کچ',
+  },
+  bdn: {
+    wedding: 'ب بۆنا دەزگرانیا مە',
+    cordially: 'مە هوین داخواز کرینە بۆ پشکداریێ\nد شاهیا دەزگرانیا مە دا',
+    invitation: 'داخوازناما دەزگرانیێ',
+    detailsTitle: 'زانیاریێن دەزگرانیێ',
+    keepsakeSubtitle: 'نامێن مالباتێ و هەڤالان د ڕۆژا دەزگرانیا مە دا',
+    groomFamily: 'مالباتا دەزگرانێ کوڕ',
+    brideFamily: 'مالباتا دەزگرانا کچ',
+  },
 };
 
 export function copyFor(locale: InvitationLocale, occasion?: string | null): Copy {

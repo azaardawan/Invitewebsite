@@ -73,7 +73,7 @@ export default defineTheme({
     // Cut lines drawn for this design (outlines.ts): a heart, and a tall arch like the lace card's window.
     shapes: [
       { key: 'heart', label: { ar: 'قلب', en: 'Heart', ckb: 'دڵ', bdn: 'دل' }, widthMm: 150, heightMm: 140, outline: HEART_OUTLINE },
-      { key: 'arch', label: { ar: 'قوس', en: 'Arch' }, widthMm: 110, heightMm: 170, outline: ARCH_OUTLINE },
+      { key: 'arch', label: { ar: 'قوس', en: 'Arch', ckb: 'کەوانە', bdn: 'کەڤان' }, widthMm: 110, heightMm: 170, outline: ARCH_OUTLINE },
     ],
   },
 });

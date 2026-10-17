@@ -9,6 +9,7 @@ import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
 import { localized } from '@/lib/localized';
+import { withKurdishLabel } from '@/server/catalog/kurdish-labels';
 import { signatureUrls } from '@/server/invitation/load';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { listPalettes, themeColorSlots } from '@/server/catalog/palettes';
@@ -144,7 +145,7 @@ export async function orderFormExtras(
     extras.wording = {
       lines: current.wordingLines.map((l) => ({
         key: l.key,
-        label: localized(l.label, locale),
+        label: localized(withKurdishLabel(l.label), locale),
         ar: l.ar,
         versions: l.versions ?? {},
         defaultIn: [...(l.defaultIn ?? [])],
@@ -156,7 +157,7 @@ export async function orderFormExtras(
     };
   }
   if (current.switchDefs?.length) {
-    extras.switches = current.switchDefs.map((d) => ({ key: d.key, label: localized(d.label, locale), on: current.switches?.[d.key] ?? d.default }));
+    extras.switches = current.switchDefs.map((d) => ({ key: d.key, label: localized(withKurdishLabel(d.label), locale), on: current.switches?.[d.key] ?? d.default }));
   }
   if (featureKeys.includes('color_choice')) {
     const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
