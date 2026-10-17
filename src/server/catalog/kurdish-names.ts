@@ -14,6 +14,9 @@ export const KURDISH_NAMES: Record<string, Name> = {
   // Batch 17 — design names
   'علبة الخاتم الزيتونية': { ckb: 'سندوقی ئەڵقەی زەیتوونی', bdn: 'سندوقا ئەنگوستیلا زەیتوونی', approved: true },
   'زاخو بالألوان المائية': { ckb: 'زاخۆ بە ڕەنگی ئاوی', bdn: 'زاخۆ ب ڕەنگێن ئاڤی', approved: true },
+  // Batch 35 — graduation design names
+  'الغار والزهر': { ckb: 'گەڵای غار و گوڵ', bdn: 'بەلگێن غارێ و گول', approved: true },
+  'القوس الذهبي': { ckb: 'کەوانەی زێڕین', bdn: 'کەڤانێ زێڕین', approved: true },
   // Batch 17 — package names
   عادي: { ckb: 'ئاسایی', bdn: 'ئاسایی', approved: true },
   مميز: { ckb: 'تایبەت', bdn: 'تایبەت', approved: true },

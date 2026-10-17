@@ -21,7 +21,7 @@ const allFields = [
 export default defineTheme({
   key: 'laurel-bloom',
   version: 1,
-  title: { ar: 'الغار والزهر', en: 'Laurel & Bloom' },
+  title: { ar: 'الغار والزهر', en: 'Laurel & Bloom', ckb: 'گەڵای غار و گوڵ', bdn: 'بەلگێن غارێ و گول' },
   experience: 'INVITATION',
   sections: ['graduation'],
   fields: [...allFields],
@@ -50,8 +50,8 @@ export default defineTheme({
     aspect: 0.8,
     frames: [{ aspect: 0.8 }, { aspect: 4 / 3 }],
     labels: [
-      { ar: 'صورة التخرّج', en: 'Graduation portrait' },
-      { ar: 'لحظة من الرحلة', en: 'A moment from the journey' },
+      { ar: 'صورة التخرّج', en: 'Graduation portrait', ckb: 'وێنەی دەرچوون', bdn: 'وێنێ دەرچوونێ' },
+      { ar: 'لحظة من الرحلة', en: 'A moment from the journey', ckb: 'ساتێک لە گەشتەکە', bdn: 'دەمەک ژ گەشتێ' },
     ],
   },
   print: {

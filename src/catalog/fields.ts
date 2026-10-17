@@ -39,9 +39,9 @@ export const STANDARD_FIELDS = {
   person_2_family: { type: 'text', maxLength: 60, label: { ar: 'عائلة العروس', en: "Bride's family" } },
   // Graduation.
   /** The degree or achievement being celebrated (e.g. "Bachelor of Engineering"). */
-  achievement: { type: 'text', maxLength: 80, label: { ar: 'الشهادة أو التخصص', en: 'Degree or achievement' } },
+  achievement: { type: 'text', maxLength: 80, label: { ar: 'الشهادة أو التخصص', en: 'Degree or achievement', ckb: 'بڕوانامە یان پسپۆڕی', bdn: 'بڕوانامە یان پسپۆری' } },
   /** Optional: when empty, the theme writes the year of the event (e.g. "Class of 2027"). */
-  class_year: { type: 'text', maxLength: 12, optional: true, label: { ar: 'سنة الدفعة', en: 'Class year' } },
+  class_year: { type: 'text', maxLength: 12, optional: true, label: { ar: 'سنة الدفعة', en: 'Class year', ckb: 'ساڵی دەرچوون', bdn: 'ساڵا دەرچوونێ' } },
   event_date: { type: 'date', label: { ar: 'تاريخ المناسبة', en: 'Event date', ckb: 'بەرواری بۆنە', bdn: 'دیرۆکا ئاهەنگێ' } },
   event_time: { type: 'time', label: { ar: 'وقت المناسبة', en: 'Event time', ckb: 'کاتی بۆنە', bdn: 'دەمێ ئاهەنگێ' } },
   venue_name: { type: 'text', maxLength: 80, label: { ar: 'اسم المكان', en: 'Venue name', ckb: 'ناوی شوێن', bdn: 'ناڤێ جهی' } },

@@ -908,7 +908,7 @@ Not translated (Arabic and English only, like every design's yes/no question): B
 poster's own «WEDDING Invitation».
 
 
-## Batch 34 — customers' own photos in a design — ⏳ PENDING APPROVAL
+## Batch 34 — customers' own photos in a design — ✅ APPROVED (2026-10-17)
 
 Designs can now show the customer's own photos (up to 20). The review page gets a "Your photos" panel and the package
 checklist says how many photos a design holds. Placeholders (`{max}`, `{min}`, `{n}` and the `{max, plural, …}` form) stay as they are.
@@ -949,10 +949,10 @@ Added with the collage editor (the help lines, rows 5–7, were reworded: the ph
 | 27 | `store.photos.inDesign` | شكلها داخل التصميم | How it looks in the design | شێوەی لەناو دیزاینەکەدا | شێوێ وێ د دیزاینێ دا |
 | 28 | `store.photos.dragHint` | اسحبوا الصورة لتحريكها داخل إطارها، وكبّروها بالمؤشر. | Drag the photo to move it in its frame; zoom with the slider. | وێنەکە ڕابکێشن بۆ جوڵاندنی لەناو چوارچێوەکەیدا، و بە سلایدەرەکە گەورەی بکەن. | وێنەی ڕاکێشن دا د چوارچۆڤێ وی دا بلڤینن، و ب سلایدەرێ مەزن بکەن. |
 
-## Batch 35 — two graduation designs: Laurel & Bloom (#17) and Golden Arch (#18) — ⏳ AWAITING APPROVAL
+## Batch 35 — two graduation designs: Laurel & Bloom (#17) and Golden Arch (#18) — ✅ APPROVED (2026-10-17)
 
-The first graduation designs, and two new fields for graduation. Until these rows are approved, Kurdish invitations
-show the Arabic for these lines. Glossary reused from approved rows: graduation دەرچوون (section name), graduate
+The first graduation designs, and two new fields for graduation. Approved by the owner as suggested; live in the two designs, the field library
+and the designs' names, photo places and changeable line. Glossary reused from approved rows: graduation دەرچوون (section name), graduate
 دەرچوو / دەرچووی, joy خۆشی / شاهی, presence ئامادەبوون, celebration ئاهەنگ. A «/» marks a line break in the design.
 
 | # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |

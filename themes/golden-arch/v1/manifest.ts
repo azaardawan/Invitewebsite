@@ -22,7 +22,7 @@ const allFields = [
 export default defineTheme({
   key: 'golden-arch',
   version: 1,
-  title: { ar: 'القوس الذهبي', en: 'Golden Arch' },
+  title: { ar: 'القوس الذهبي', en: 'Golden Arch', ckb: 'کەوانەی زێڕین', bdn: 'کەڤانێ زێڕین' },
   experience: 'INVITATION',
   sections: ['graduation'],
   fields: [...allFields],
@@ -49,8 +49,8 @@ export default defineTheme({
       key: 'followLine',
       label: { ar: 'السطر المكتوب بخط اليد تحت المكان', en: 'Handwritten line under the venue' },
       ar: 'وتكتمل الفرحة بلقائكم',
-      versions: { en: 'Reception to follow!' },
-      defaultIn: ['en'],
+      versions: { en: 'Reception to follow!', ckb: 'خۆشییەکە بە دیدارتان تەواو دەبێت', bdn: 'شاهی ب دیتنا هەوە تەمام دبیت' },
+      defaultIn: ['en', 'ckb', 'bdn'],
       maxLength: 40,
     },
   ],
@@ -58,7 +58,7 @@ export default defineTheme({
   photos: {
     max: 1,
     aspect: 0.8,
-    labels: [{ ar: 'صورة التخرّج', en: 'Graduation portrait' }],
+    labels: [{ ar: 'صورة التخرّج', en: 'Graduation portrait', ckb: 'وێنەی دەرچوون', bdn: 'وێنێ دەرچوونێ' }],
   },
   print: {
     // The poster's deep green on its paper (transparent background).

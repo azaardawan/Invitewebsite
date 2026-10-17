@@ -3,8 +3,8 @@ import type { InvitationLocale } from '@/theme-sdk';
 /**
  * The design's own lines. Platform strings (buttons, form, countdown units, errors) come from `props.labels`; the
  * customer's content comes from fields, and the poster's script line ("Reception to follow!") is the changeable
- * `followLine` (manifest wording). Kurdish waits for the owner's approval (docs/translations/KURDISH_REVIEW.md,
- * batch 35) and shows the Arabic until then.
+ * `followLine` (manifest wording). The Kurdish is the owner's approved
+ * wording (docs/translations/KURDISH_REVIEW.md, batch 35).
  */
 const ar = {
   /** Over the graduate's name on the closed poster. */
@@ -47,7 +47,45 @@ const en: Copy = {
   keepsakeClosing: 'With heartfelt thanks to everyone who shared this day',
 };
 
-const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb: ar, bdn: ar };
+const ckb: Copy = {
+  celebrating: 'ئاهەنگ دەگێڕین بۆ دەرچوونی',
+  classOf: 'دەرچووی ساڵی',
+  portraitLead: 'ساتێکی شانازی',
+  portraitTitle: 'ماندووبوونی ساڵان\nئەمڕۆ گوڵ دەکات',
+  portraitNote: 'بۆ هەموو ئەوانەی باوەڕیان بە خەونەکە هەبوو و هەنگاو بە هەنگاو لەگەڵمان بوون.',
+  countdownLead: 'تا پێکەوە ئاهەنگ دەگێڕین',
+  countdownTitle: 'ڕۆژەکان دەژمێرین',
+  detailsLead: 'کاتەکە لەبیر مەکەن',
+  detailsTitle: 'زانیارییەکانی ئاهەنگ',
+  placeLabel: 'شوێن',
+  replyLead: 'شوێنتان لەناوماندایە',
+  replyTitle: 'دڵنیاکردنەوەی ئامادەبوون',
+  replyIntro: 'خۆشیمان بە ئامادەبوونتان تەواو دەبێت.',
+  guestbook: 'وشەگەلێک بۆ دەرچوو',
+  closing: 'داهاتوو هی تۆیە\nبە متمانەوە بڕۆ پێش',
+  keepsakeClosing: 'لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیی دەرچوونمان بوون',
+};
+
+const bdn: Copy = {
+  celebrating: 'ئەم ئاهەنگێ دگێڕین بۆ دەرچوونا',
+  classOf: 'دەرچوویێ ساڵا',
+  portraitLead: 'دەمەکێ سەربلندیێ',
+  portraitTitle: 'وەستیانا ساڵان\nئەڤرۆ گول ددەت',
+  portraitNote: 'بۆ هەمی ئەوێن باوەری ب خەونێ هەی و گاڤ ب گاڤ دگەل مە بووین.',
+  countdownLead: 'هەتا پێکڤە ئاهەنگێ دگێڕین',
+  countdownTitle: 'ئەم ڕۆژان دهژمێرین',
+  detailsLead: 'دەمی ژبیر نەکەن',
+  detailsTitle: 'زانیاریێن ئاهەنگێ',
+  placeLabel: 'جه',
+  replyLead: 'جهێ هەوە د ناڤبەرا مە دایە',
+  replyTitle: 'پشتڕاستکرنا ئامادەبوونێ',
+  replyIntro: 'شاهیا مە ب ئامادەبوونا هەوە تەمام دبیت.',
+  guestbook: 'پەیڤەک بۆ دەرچووی',
+  closing: 'پاشەڕۆژ یا تەیە\nب باوەری بچە پێش',
+  keepsakeClosing: 'ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا دەرچوونێ دا کری',
+};
+
+const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb, bdn };
 
 export function copyFor(locale: InvitationLocale): Copy {
   return COPY[locale];
