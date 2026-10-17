@@ -46,8 +46,8 @@ const STARTER_SECTIONS: StarterSection[] = [
     fields: [
       { key: 'person_1_name', label: { ar: 'اسم الخطيب', en: "Fiancé's name", ckb: 'ناوی دەستگیرانی کوڕ', bdn: 'ناڤێ دەزگرانێ کوڕ' } },
       { key: 'person_2_name', label: { ar: 'اسم الخطيبة', en: "Fiancée's name", ckb: 'ناوی دەستگیرانی کچ', bdn: 'ناڤێ دەزگرانا کچ' } },
-      { key: 'person_1_family', label: { ar: 'عائلة الخطيب', en: "Fiancé's family" } },
-      { key: 'person_2_family', label: { ar: 'عائلة الخطيبة', en: "Fiancée's family" } },
+      { key: 'person_1_family', label: { ar: 'عائلة الخطيب', en: "Fiancé's family", ckb: 'بنەماڵەی دەستگیرانی کوڕ', bdn: 'مالباتا دەزگرانێ کوڕ' } },
+      { key: 'person_2_family', label: { ar: 'عائلة الخطيبة', en: "Fiancée's family", ckb: 'بنەماڵەی دەستگیرانی کچ', bdn: 'مالباتا دەزگرانا کچ' } },
       { key: 'event_date' },
       { key: 'event_time' },
       { key: 'venue_name' },
@@ -61,6 +61,8 @@ const STARTER_SECTIONS: StarterSection[] = [
     requiredFeatures: [],
     fields: [
       { key: 'person_1_name', label: { ar: 'اسم الخرّيج', en: "Graduate's name", ckb: 'ناوی دەرچوو', bdn: 'ناڤێ دەرچووی' } },
+      { key: 'achievement' },
+      { key: 'class_year' },
       { key: 'event_date' },
       { key: 'event_time' },
       { key: 'venue_name' },

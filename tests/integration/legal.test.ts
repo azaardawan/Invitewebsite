@@ -67,9 +67,11 @@ describe('legal policies', () => {
   });
 
   it('gives newborn invitations their own terms once published; weddings keep the main terms', async () => {
-    // Seeded as a draft (Arabic and English); it can't go live until all four languages are written.
-    expect((await policyAdminView(db(), 'TERMS_NEWBORN')).draft?.content.en).toMatch(/newborn/);
-    await expect(publishDraft(db(), 'TERMS_NEWBORN', actor)).rejects.toMatchObject({ code: 'allLanguages' });
+    // Seeded as a draft in all four languages (Kurdish approved, batch 24) for the owner to review and publish.
+    const seeded = (await policyAdminView(db(), 'TERMS_NEWBORN')).draft?.content;
+    expect(seeded?.en).toMatch(/newborn/);
+    expect(seeded?.ckb).toMatch(/منداڵ/);
+    expect(seeded?.bdn).toMatch(/زاروک/);
 
     await seedCatalog(db());
     const newbornId = (await sectionIdByKey(db(), 'newborn'))!;
@@ -146,6 +148,25 @@ describe('terms: each package has its own online time', () => {
     expect(draft?.content.en).toBe('My own words about how long it stays online.');
     expect((await currentPolicy(db(), 'TERMS'))?.version).toBe(before + 1);
     await discardDraft(db(), 'TERMS', actor);
+  });
+
+  it('adds the approved Kurdish, with the package time, to the seeded newborn draft that has none yet', async () => {
+    await db().execute(sql`ALTER TABLE legal_policy_versions DISABLE TRIGGER legal_policy_versions_frozen`);
+    await db().delete(legalPolicyVersions).where(eq(legalPolicyVersions.type, 'TERMS_NEWBORN'));
+    await db().execute(sql`ALTER TABLE legal_policy_versions ENABLE TRIGGER legal_policy_versions_frozen`);
+    await seedLegalDrafts(db());
+    const seeded = (await policyAdminView(db(), 'TERMS_NEWBORN')).draft!.content;
+    // As on the live site: the Arabic/English draft was seeded (and its sentence updated) before its Kurdish was approved.
+    await saveDraft(db(), 'TERMS_NEWBORN', { ar: seeded.ar, en: seeded.en }, actor);
+    await updateTermsLifetimeLine(db());
+    await seedLegalDrafts(db());
+    const { draft } = await policyAdminView(db(), 'TERMS_NEWBORN');
+    for (const lang of ['ckb', 'bdn'] as const) {
+      expect(draft?.content[lang]).toBeTruthy();
+      expect(draft?.content[lang]).not.toContain(OLD[lang]);
+    }
+    expect(draft?.content.ckb).toContain('٦٠ ڕۆژ');
+    await discardDraft(db(), 'TERMS_NEWBORN', actor);
   });
 });
 

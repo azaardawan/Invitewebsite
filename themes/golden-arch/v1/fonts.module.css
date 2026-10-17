@@ -1,0 +1,69 @@
+/*
+ * Golden Arch typefaces, matched to the owner's poster (its lettering is outlined, so open-licensed faces were chosen
+ * to match it). All SIL Open Font License (fonts/OFL-*.txt).
+ * GA Display: Forum (the name, the date and time). GA Caps: Montserrat (the spaced capitals). GA Script: Pinyon Script
+ * (the script line). GA Arabic: Amiri (names and titles in Arabic and Kurdish). GA Arabic Text: Noto Sans Arabic.
+ * Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'GA Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/forum-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Caps';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/montserrat-latin-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Caps';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/montserrat-latin-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/pinyon-script-latin.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/amiri-arabic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Arabic Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/noto-sans-arabic-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'GA Arabic Text';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/noto-sans-arabic-500.woff2) format('woff2');
+}
+
+.fonts {
+  --ga-display: 'GA Display', 'GA Arabic', Georgia, serif;
+  --ga-caps: 'GA Caps', 'GA Arabic Text', system-ui, sans-serif;
+  --ga-script: 'GA Script', 'GA Arabic', cursive;
+}
+/* Arabic and Kurdish invitations: Amiri for names and titles, Noto Sans Arabic for the spaced lines. */
+.fonts [data-script='arabic'] {
+  --ga-display: 'GA Arabic', serif;
+  --ga-caps: 'GA Arabic Text', sans-serif;
+  --ga-script: 'GA Arabic', serif;
+}

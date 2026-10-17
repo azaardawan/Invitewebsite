@@ -53,7 +53,7 @@ export default defineTheme({
     // The shaped cards (outlines.ts): the ivory cartouche from the envelope (its own artwork, cut on its edge) and a heart.
     shapes: [
       { key: 'heart', label: { ar: 'قلب', en: 'Heart', ckb: 'دڵ', bdn: 'دل' }, widthMm: 150, heightMm: 140, outline: HEART_OUTLINE },
-      { key: 'arch', label: { ar: 'إطار البطاقة', en: 'Cartouche' }, ...CARTOUCHE_SIZE, outline: CARTOUCHE_OUTLINE },
+      { key: 'arch', label: { ar: 'إطار البطاقة', en: 'Cartouche', ckb: 'چوارچێوەی کارت', bdn: 'چوارچۆڤا کارتێ' }, ...CARTOUCHE_SIZE, outline: CARTOUCHE_OUTLINE },
     ],
   },
 });

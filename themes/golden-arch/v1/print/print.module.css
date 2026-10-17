@@ -1,0 +1,400 @@
+/*
+ * Golden Arch print companions: the owner's poster on A5 + 3 mm bleed (paper, roses, the gold arch, the laurel and
+ * the hands, placed as on the poster), its landscape back, the A4 keepsake and the arch card. Physical units only.
+ */
+
+.card,
+.back,
+.keepsake,
+.shape {
+  --ink: #345440;
+  --ink-soft: #4f6b5a;
+  --gold: linear-gradient(135deg, #a67a12 0%, #a87c14 17%, #f2df77 30%, #fff7bc 48%, #dac37e 62%, #935e00 76.5%, #eab30e 96%);
+  color: var(--ink);
+  font-family: var(--ga-display);
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.keepsake *,
+.shape * {
+  box-sizing: border-box;
+}
+.card :is(p, h1),
+.back :is(p, h1),
+.keepsake :is(p, h1),
+.shape :is(p, h1) {
+  margin: 0;
+  font-weight: 400;
+}
+.card img,
+.back img,
+.keepsake img,
+.shape img {
+  display: block;
+  height: auto;
+}
+
+/* ---------------------------------------------------------------- shared type */
+.name {
+  font-size: 30pt;
+  line-height: 1.12;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.name[data-long] {
+  font-size: 21pt;
+}
+[data-script='arabic'] .name {
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+.standing {
+  margin-top: 1.5mm !important;
+  font-family: var(--ga-caps);
+  font-size: 7.5pt;
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+[data-script='arabic'] .standing {
+  font-size: 10pt;
+  letter-spacing: 0;
+}
+.message {
+  max-width: 64mm;
+  margin: 4mm auto 0 !important;
+  font-family: var(--ga-caps);
+  font-weight: 500;
+  font-size: 8pt;
+  line-height: 1.55;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.message[data-long] {
+  font-size: 7pt;
+}
+[data-script='arabic'] .message {
+  font-weight: 400;
+  font-size: 11pt;
+  line-height: 1.8;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.when {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5mm;
+  margin-top: 4mm !important;
+  font-size: 22pt;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+[data-script='arabic'] .when {
+  letter-spacing: 0;
+  font-size: 20pt;
+}
+.bar {
+  width: 0.3mm;
+  height: 0.95em;
+  background: currentColor;
+}
+.venue {
+  max-width: 70mm;
+  margin: 4mm auto 0 !important;
+  font-family: var(--ga-caps);
+  font-size: 9pt;
+  line-height: 1.55;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+[data-script='arabic'] .venue {
+  font-size: 12pt;
+  letter-spacing: 0;
+}
+.follow {
+  margin-top: 4.5mm !important;
+  font-family: var(--ga-script);
+  font-size: 19pt;
+  line-height: 1.35;
+}
+[data-script='arabic'] .follow {
+  font-size: 16pt;
+  line-height: 1.6;
+}
+.extra {
+  margin-top: 2mm !important;
+  font-family: var(--ga-caps);
+  font-size: 8pt;
+}
+.qr {
+  margin: 4mm 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+}
+.qr img {
+  width: 15mm;
+}
+.qr figcaption {
+  font-family: var(--ga-caps);
+  font-size: 6.5pt;
+}
+.rule {
+  display: block;
+  width: 26mm;
+  height: 0.4mm;
+  margin: 4mm auto;
+  background: var(--gold);
+}
+
+/* ---------------------------------------------------------------- A5 card front: the poster */
+.card {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  background: #efeeed url(../assets/paper.webp) center / 100% 100% no-repeat;
+}
+/* the poster's layers in its own proportions (left / top / width as % of the poster) */
+.rosesTop {
+  position: absolute;
+  z-index: 2;
+  left: -14.8%;
+  top: -3.8%;
+  width: 56.3%;
+}
+.rosesBottom {
+  position: absolute;
+  z-index: 2;
+  right: -7%;
+  bottom: -7%;
+  width: 44%;
+}
+.hands {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: -1.5%;
+  width: 33.9%;
+}
+/* the gold arch: 13.9 % / 14.2 % from the sides, 10.8 % / 11 % from top and bottom; a gold line with a clear inside */
+.arch {
+  position: absolute;
+  z-index: 3;
+  left: 13.9%;
+  right: 14.2%;
+  top: 10.8%;
+  bottom: 11%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 9mm 8mm 8mm;
+}
+.arch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.3mm solid transparent;
+  border-radius: 999px 999px 0 0;
+  background: var(--gold) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+.laurel {
+  width: 42%;
+  margin: 1mm auto 3mm;
+}
+
+/* ---------------------------------------------------------------- A5 card back, landscape (216 × 154 mm) */
+.back {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  background: #efeeed url(../assets/paper.webp) center / cover no-repeat;
+}
+.backRoses {
+  position: absolute;
+  right: -6mm;
+  bottom: -10mm;
+  width: 50mm;
+}
+.backSafe {
+  position: absolute;
+  inset: 16mm 40mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.backLaurel {
+  width: 30mm;
+  margin-bottom: 3mm;
+}
+.backTitle {
+  font-family: var(--ga-script);
+  font-size: 36pt;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+[data-script='arabic'] .backTitle {
+  font-family: var(--ga-display);
+  font-size: 28pt;
+  line-height: 1.5;
+}
+.backMessage {
+  max-width: 120mm;
+  margin-top: 2mm !important;
+  font-family: var(--ga-caps);
+  font-size: 11pt;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.backName {
+  font-size: 18pt;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+[data-script='arabic'] .backName {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.backSignature {
+  max-height: 22mm;
+  max-width: 60mm;
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+.keepsake {
+  background: #efeeed;
+}
+.keepsakeFrame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.cover {
+  position: relative;
+  height: 297mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+  padding: 40mm 34mm;
+  overflow: hidden;
+  break-after: page;
+  background: url(../assets/paper.webp) center / cover no-repeat;
+}
+.coverRosesTop {
+  position: absolute;
+  left: -30mm;
+  top: -12mm;
+  width: 118mm;
+}
+.coverRosesBottom {
+  position: absolute;
+  right: -14mm;
+  bottom: -20mm;
+  width: 92mm;
+}
+.coverLaurel {
+  position: relative;
+  width: 60mm;
+}
+.coverTitle {
+  position: relative;
+  font-family: var(--ga-script);
+  font-size: 40pt;
+  line-height: 1.3;
+}
+[data-script='arabic'] .coverTitle {
+  font-family: var(--ga-display);
+  font-size: 32pt;
+}
+.coverDate {
+  position: relative;
+  font-family: var(--ga-caps);
+  font-size: 11pt;
+  letter-spacing: 0.14em;
+}
+.messages {
+  padding: 26mm 28mm;
+}
+.note {
+  break-inside: avoid;
+  padding: 6mm 0;
+  border-bottom: 0.3mm solid rgb(184 138 36 / 0.45);
+  text-align: start;
+}
+.note p {
+  font-family: var(--ga-caps);
+  font-size: 11.5pt;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.note footer {
+  margin-top: 2mm;
+  font-family: var(--ga-script);
+  font-size: 16pt;
+  color: #8a6a1c;
+}
+.empty,
+.closing {
+  margin-top: 12mm !important;
+  font-family: var(--ga-script);
+  font-size: 20pt;
+}
+[data-script='arabic'] :is(.empty, .closing, .note footer) {
+  font-family: var(--ga-display);
+  font-size: 15pt;
+}
+
+/* ---------------------------------------------------------------- the arch card */
+.shape {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.shapeArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.shapeContent {
+  position: absolute;
+  inset: 12mm 12mm 16mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.shapeLaurel {
+  width: 38mm;
+  margin-bottom: 3mm;
+}
+.shapeName {
+  font-size: 26pt;
+}
+.shapeWhen {
+  font-size: 19pt;
+}

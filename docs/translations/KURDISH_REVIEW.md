@@ -561,9 +561,10 @@ and the new details: «اسم المولود» (ناوی منداڵ / ناڤێ �
 «اسم الأب» (ناوی باوک / ناڤێ بابی), «تاريخ الولادة» (بەرواری لەدایکبوون / دیرۆکا ژدایکبوونێ), «عبارة قصيرة» (ڕستەیەکی کورت / ڕستەیەکا کورت).
 And its two groups (subsections): «ولد» (کوڕ / کوڕ) and «بنت» (کچ / کچ).
 
-## Batch 23 — date-of-birth format, bottle size, files-only designs — ⏳ PENDING owner approval
+## Batch 23 — date-of-birth format, bottle size, files-only designs — ✅ APPROVED (2026-10-17)
 
-Suggestions only; not yet in `ckb.json` / `bdn.json` (the site falls back to Arabic until approved).
+Applied to `ckb.json` / `bdn.json`. The order-form labels of the newborn designs below come from
+`src/server/catalog/kurdish-labels.ts` (their activated versions are frozen).
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -616,11 +617,12 @@ gives Kurdish lists (same order, same count) or approves them in Arabic script.
 Order-form labels in the Swan Garden manifest (#9, `themes/swan-garden/v1/manifest.ts`): «كلمة «بنت»» and the father tick box,
 as for Rosebird Garden and Bluebird Garden above. The design's text (praise, «أكرمنا الله بأجمل العطايا», du'a) stays Arabic.
 
-## Batch 24 — separate terms for newborn invitations (PENDING)
+## Batch 24 — separate terms for newborn invitations — ✅ APPROVED (2026-10-17)
 
 Newborn orders accept their own terms («شروط دعوات المولود», `/legal/terms-newborn`); weddings and the other
 occasions keep the main terms. The text is seeded as a draft in Admin → Legal policies (Arabic and English); it can
-only be published once the Kurdish is in. Sections shared with the main terms reuse their approved Kurdish word for word.
+only be published once the Kurdish is in. The approved Kurdish below is now seeded into that draft (with the
+package online-time sentence, like the Arabic); the owner publishes it in Admin. Sections shared with the main terms reuse their approved Kurdish word for word.
 
 | # | Key | Arabic | English | Sorani (ckb) | Badini (bdn) | Conf. |
 |---|---|---|---|---|---|---|
@@ -872,12 +874,11 @@ online for its package's time. Their Kurdish line still says 30 days and was lef
 |---|---|---|---|---|
 | 12 | Terms, the invitation's online time | بانگهێشتنامەکە بە درێژایی ماوەی پاکێجەکە (٣٠ ڕۆژ، ٦٠ ڕۆژ، ساڵێک یان بۆ هەمیشە) لە بەرواری بڵاوکردنەوەوە بڵاو دەمێنێتەوە، پاشان پەیامێکی کۆتاییهاتنی بانگهێشتنامەکە بۆ سەردانکەران دەردەکەوێت. دەکرێت بە ڕێککەوتن لەگەڵمان درێژ بکرێتەوە. | داخوازنامە ب درێژاهیا ماوێ پاکێجێ (٣٠ ڕۆژان، ٦٠ ڕۆژان، ساڵەکێ یان بۆ هەردەم) ژ دیرۆکا بەلاڤکرنێ بەلاڤکری دمینیت، پاشان نامەیەک بۆ سەرەدانکەران دیار دبیت کو داخوازنامە ب دوماهی هاتیە. دبیت ب ڕێککەفتنێ دگەل مە بهێتە درێژکرن. | ◐ |
 
-## Batch 33 — the four wedding designs v2: families, engagement wording, the arch card — ⏳ AWAITING APPROVAL
+## Batch 33 — the four wedding designs v2: families, engagement wording, the arch card — ✅ APPROVED (2026-10-17)
 
 Burgundy & Lace (B, #12), Espresso & Ivory (E, #13), Winter Flower (W, #14) and Vintage Love Letters (V, #15), version 2.
 Each design now has a section for the two families (the customer types each family's name), and says «engagement»
-instead of «wedding» when it is sold as an engagement. Until these rows are approved, Kurdish invitations show the
-Arabic for these lines. Glossary reused from approved rows: engagement دەستگیرانی / دەزگرانی (section names),
+instead of «wedding» when it is sold as an engagement. Row 17 («قوس») is also used by the graduation designs. Glossary reused from approved rows: engagement دەستگیرانی / دەزگرانی (section names),
 fiancé / fiancée دەستگیرانی کوڕ / کچ, دەزگرانێ کوڕ / دەزگرانا کچ (field labels), family بنەماڵە / مالبات.
 
 | # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
@@ -908,7 +909,7 @@ Not translated (Arabic and English only, like every design's yes/no question): B
 poster's own «WEDDING Invitation».
 
 
-## Batch 34 — customers' own photos in a design — ⏳ PENDING APPROVAL
+## Batch 34 — customers' own photos in a design — ✅ APPROVED (2026-10-17)
 
 Designs can now show the customer's own photos (up to 20). The review page gets a "Your photos" panel and the package
 checklist says how many photos a design holds. Placeholders (`{max}`, `{min}`, `{n}` and the `{max, plural, …}` form) stay as they are.
@@ -948,3 +949,54 @@ Added with the collage editor (the help lines, rows 5–7, were reworded: the ph
 | 26 | `store.photos.next` | الصورة التالية | Next photo | وێنەی دواتر | وێنێ پشتی |
 | 27 | `store.photos.inDesign` | شكلها داخل التصميم | How it looks in the design | شێوەی لەناو دیزاینەکەدا | شێوێ وێ د دیزاینێ دا |
 | 28 | `store.photos.dragHint` | اسحبوا الصورة لتحريكها داخل إطارها، وكبّروها بالمؤشر. | Drag the photo to move it in its frame; zoom with the slider. | وێنەکە ڕابکێشن بۆ جوڵاندنی لەناو چوارچێوەکەیدا، و بە سلایدەرەکە گەورەی بکەن. | وێنەی ڕاکێشن دا د چوارچۆڤێ وی دا بلڤینن، و ب سلایدەرێ مەزن بکەن. |
+
+## Batch 35 — two graduation designs: Laurel & Bloom (#17) and Golden Arch (#18) — ✅ APPROVED (2026-10-17)
+
+The first graduation designs, and two new fields for graduation. Approved by the owner as suggested; live in the two designs, the field library
+and the designs' names, photo places and changeable line. Glossary reused from approved rows: graduation دەرچوون (section name), graduate
+دەرچوو / دەرچووی, joy خۆشی / شاهی, presence ئامادەبوون, celebration ئاهەنگ. A «/» marks a line break in the design.
+
+| # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | Field library: `achievement` | الشهادة أو التخصص | Degree or achievement | بڕوانامە یان پسپۆڕی | بڕوانامە یان پسپۆری | ◐ |
+| 2 | Field library: `class_year` | سنة الدفعة | Class year | ساڵی دەرچوون | ساڵا دەرچوونێ | ◐ |
+| 3 | Design name #17 | الغار والزهر | Laurel & Bloom | گەڵای غار و گوڵ | بەلگێن غارێ و گول | ◐ |
+| 4 | Design name #18 | القوس الذهبي | Golden Arch | کەوانەی زێڕین | کەڤانێ زێڕین | ● |
+| 5 | #17, #18 | دفعة | Class of | دەرچووی ساڵی | دەرچوویێ ساڵا | ◐ |
+| 6 | #17 poster | ندعوكم لمشاركتنا فرحة التخرّج | You’re invited to celebrate | بانگهێشتتان دەکەین بۆ بەشداریکردن لە خۆشیی دەرچوونمان | مە هوین داخواز کرینە بۆ پشکداریێ د شاهیا دەرچوونێ دا | ◐ |
+| 7 | #17 poster title | فرحة التخرّج / وبداية الحكاية | Graduation / Celebration | خۆشیی دەرچوون / و دەستپێکی چیرۆکێک | شاهیا دەرچوونێ / و دەستپێکا چیرۆکەکێ | ◐ |
+| 8 | #17 | تفاصيل الاحتفال | The celebration | زانیارییەکانی ئاهەنگ | زانیاریێن ئاهەنگێ | ● |
+| 9 | #17 | تأكيد الحضور | Kindly reply | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ● |
+| 10 | #17 | فصل جديد من الحكاية | A new chapter | بەشێکی نوێ لە چیرۆکەکە | پشکەکا نوو ژ چیرۆکێ | ◐ |
+| 11 | #17 | جذورٌ من الأحلام / وبداياتٌ تزهر | Rooted in dreams. / Ready to bloom. | ڕەگێک لە خەونەکان / و دەستپێکێک کە گوڵ دەکات | ڕەهەک ژ خەونان / و دەستپێکەک کو گول ددەت | ◐ |
+| 12 | #17 | لكل ليلة سهر، ولكل إنجاز صغير، ولكل من كان جزءاً من هذه الرحلة. تكتمل فرحة هذا اليوم بمشاركتكم. | For every late night, every small victory… | بۆ هەموو شەونخوونییەک، بۆ هەموو سەرکەوتنێکی بچووک، و بۆ هەموو ئەوانەی بەشێک بوون لەم گەشتە. خۆشیی ئەم ڕۆژە بە بەشداریتان تەواو دەبێت. | بۆ هەمی شەڤبێداریەکێ، بۆ هەمی سەرکەفتنەکا بچووک، و بۆ هەمی ئەوێن پشکەک ژ ڤێ گەشتێ بووین. شاهیا ڤێ ڕۆژێ ب پشکداریا هەوە تەمام دبیت. | ◐ |
+| 13 | #17, #18 | حتى نحتفل معاً | The celebration begins in / Until we celebrate | تا پێکەوە ئاهەنگ دەگێڕین | هەتا پێکڤە ئاهەنگێ دگێڕین | ◐ |
+| 14 | #17 | نعدّ الأيام لفرحتنا | Counting the days | ڕۆژەکان دەژمێرین بۆ خۆشیمان | ئەم ڕۆژان دهژمێرین بۆ شاهیا خۆ | ◐ |
+| 15 | #17 | احفظوا هذا الموعد | Save a little space in your diary | ئەم کاتە لەبیر مەکەن | ڤێ دەمی ژبیر نەکەن | ◐ |
+| 16 | #17 | يوم يستحق أن نحتفل به | A day to remember | ڕۆژێک کە شایەنی ئاهەنگە | ڕۆژەک کو هێژای ئاهەنگێیە | ◐ |
+| 17 | #17 | الساعة | The time | کاتژمێر | دەمژمێر | ● |
+| 18 | #17 | مكان الاحتفال | The place | شوێنی ئاهەنگ | جهێ ئاهەنگێ | ● |
+| 19 | #17 | أجمل ما في هذا الإنجاز أن نشاركه معكم. | The best part of this milestone is sharing it with you. | جوانترین شتی ئەم دەستکەوتە ئەوەیە لەگەڵ ئێوەی بەش بکەین. | جوانترین تشتێ ڤێ دەستکەفتێ ئەوە کو دگەل هەوە پارڤە بکەین. | ◐ |
+| 20 | #17, #18 | مكانكم بيننا | A place for you | شوێنتان لەناوماندایە | جهێ هەوە د ناڤبەرا مە دایە | ◐ |
+| 21 | #17 | شاركونا الفرحة | Celebrate with us | بەشداری خۆشیمان بن | پشکداریێ د شاهیا مە دا بکەن | ◐ |
+| 22 | #17, #18 | تكتمل فرحتنا بحضوركم. / تكتمل الفرحة بحضوركم. | It wouldn’t be the same without you. | خۆشیمان بە ئامادەبوونتان تەواو دەبێت. | شاهیا مە ب ئامادەبوونا هەوە تەمام دبیت. | ● |
+| 23 | #17 | كلمات لبداية جديدة | Words for the next chapter | وشەگەلێک بۆ دەستپێکێکی نوێ | پەیڤەک بۆ دەستپێکەکا نوو | ◐ |
+| 24 | #17 | بكل الامتنان والفرح | With gratitude & great excitement | بە هەموو سوپاس و خۆشییەکەوە | ب هەمی سوپاس و شاهیێ ڤە | ◐ |
+| 25 | #17 | لأحلام أكبر / وبدايات أجمل | Here’s to / what comes next. | بۆ خەونی گەورەتر / و دەستپێکی جوانتر | بۆ خەونێن مەزنتر / و دەستپێکێن جوانتر | ◐ |
+| 26 | #17, #18 keepsake | شكراً من القلب لكل من شاركنا فرحة التخرّج | With heartfelt thanks to everyone who shared this day | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیی دەرچوونمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا دەرچوونێ دا کری | ◐ |
+| 27 | #18 closed poster | نحتفل بتخرّج | Celebrating the graduation of | ئاهەنگ دەگێڕین بۆ دەرچوونی | ئەم ئاهەنگێ دگێڕین بۆ دەرچوونا | ◐ |
+| 28 | #18 | لحظة فخر | A proud moment | ساتێکی شانازی | دەمەکێ سەربلندیێ | ◐ |
+| 29 | #18 | تعب السنين / يزهر اليوم | Years of work, / in full bloom | ماندووبوونی ساڵان / ئەمڕۆ گوڵ دەکات | وەستیانا ساڵان / ئەڤرۆ گول ددەت | ◐ |
+| 30 | #18 | لكل من آمن بالحلم، ورافق الطريق خطوة بخطوة. | For everyone who believed in the dream and walked the road with us. | بۆ هەموو ئەوانەی باوەڕیان بە خەونەکە هەبوو و هەنگاو بە هەنگاو لەگەڵمان بوون. | بۆ هەمی ئەوێن باوەری ب خەونێ هەی و گاڤ ب گاڤ دگەل مە بووین. | ◐ |
+| 31 | #18 | نعدّ الأيام | Counting the days | ڕۆژەکان دەژمێرین | ئەم ڕۆژان دهژمێرین | ● |
+| 32 | #18 | احفظوا الموعد | Save the date | کاتەکە لەبیر مەکەن | دەمی ژبیر نەکەن | ◐ |
+| 33 | #18 | المكان | The place | شوێن | جه | ● |
+| 34 | #18 | كلمات للخرّيج | Words for the graduate | وشەگەلێک بۆ دەرچوو | پەیڤەک بۆ دەرچووی | ◐ |
+| 35 | #18 | المستقبل لك / فانطلق بثقة | The future / belongs to you | داهاتوو هی تۆیە / بە متمانەوە بڕۆ پێش | پاشەڕۆژ یا تەیە / ب باوەری بچە پێش | ◐ |
+| 36 | #18 wording `followLine` (customer can change) | وتكتمل الفرحة بلقائكم | Reception to follow! | خۆشییەکە بە دیدارتان تەواو دەبێت | شاهی ب دیتنا هەوە تەمام دبیت | ◐ |
+| 37 | #17, #18 photo place (order form) | صورة التخرّج | Graduation portrait | وێنەی دەرچوون | وێنێ دەرچوونێ | ● |
+| 38 | #17 photo place (order form) | لحظة من الرحلة | A moment from the journey | ساتێک لە گەشتەکە | دەمەک ژ گەشتێ | ◐ |
+| 39 | #17 under the second photo | لحظة من رحلة لا تُنسى | A little piece of the journey. | ساتێک لە گەشتێکی لەبیرنەکراو | دەمەک ژ گەشتەکا ژبیرنەبوویی | ◐ |
+
+Not translated (Arabic and English only): the label of #18's changeable line («السطر المكتوب بخط اليد تحت المكان»).
+Countdown units, buttons and the guest form come from the platform's approved strings.

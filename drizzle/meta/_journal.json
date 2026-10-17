@@ -302,6 +302,13 @@
       "when": 1792185752849,
       "tag": "0042_invitation_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1792214846640,
+      "tag": "0043_graduation_fields",
+      "breakpoints": true
     }
   ]
 }

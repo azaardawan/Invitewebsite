@@ -1,0 +1,40 @@
+/*
+ * Laurel & Bloom typefaces, from the designer's hand-off (docs/themes/laurel-bloom/). All SIL Open Font License.
+ * LB Display / LB Italic: Playfair Display. LB Script: Ballet ("Class of"). LB Arabic: Amiri (covers Kurdish too).
+ * Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'LB Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-display.woff) format('woff');
+}
+@font-face {
+  font-family: 'LB Italic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-italic.woff) format('woff');
+}
+@font-face {
+  font-family: 'LB Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-script.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'LB Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-arabic.woff) format('woff');
+}
+
+.fonts {
+  --gl-serif: 'LB Display', Georgia, serif;
+  --gl-italic: 'LB Italic', Georgia, serif;
+  --gl-ar: 'LB Arabic', serif;
+}

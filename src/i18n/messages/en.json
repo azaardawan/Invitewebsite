@@ -1098,6 +1098,7 @@
   },
   "invitationSamples": {
     "short": {
+      "achievement": "Bachelor of Engineering",
       "person_1_name": "Ali",
       "person_2_name": "Noor",
       "family_names": "The Al-Husseini and Al-Karkhi families",
@@ -1111,6 +1112,7 @@
       "baby_quote": "Our little star has arrived"
     },
     "long": {
+      "achievement": "Master of Science in Software Engineering and Information Systems",
       "person_1_name": "Abdulrahman",
       "person_2_name": "Fatima Al-Zahraa",
       "family_names": "The families of Abdulrahman Al-Husseini and Mohammed Al-Karkhi",
