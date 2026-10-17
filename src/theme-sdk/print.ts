@@ -9,7 +9,7 @@
  */
 import type { FieldKey } from '@/catalog/fields';
 import type { ThemeBorderSpec } from './border';
-import type { BirthDateParts, EventDateParts, InvitationLocale } from './types';
+import type { BirthDateParts, EventDateParts, InvitationLocale, ThemePhoto } from './types';
 
 /** Localized platform strings a print design may show. Never hard-code text. */
 export type PrintLabels = {
@@ -43,6 +43,8 @@ type PrintBase = {
   border: ThemeBorderSpec | null;
   /** The customer's signatures (packages with `signature`, when included): none, one or two. */
   signatures: { src: string }[];
+  /** The customer's photos (packages with `photos`), full size for print; draw with `<Photo>`. Placeholders in samples. */
+  photos: ThemePhoto[];
   /** The theme's colour slots with the customer's chosen colours (also set as `--bahja-color-<key>`). */
   colors: Record<string, string>;
   /** Newborn: the date of birth in the invitation's language, or null. */

@@ -13,10 +13,13 @@ export type {
   GuestAttendance,
   GuestResponseInput,
   GuestbookMessage,
+  ThemePhoto,
 } from './types';
 export { hasFeature, formatNumber } from './types';
 export { ThemeBorder, Signature } from './border';
+export { Photo } from './photo';
 export type { ThemeBorderSpec, BorderKind } from './border';
+export type { PhotoSpec } from './manifest';
 export type { PrintCardProps, PrintCardBackProps, PrintShapeProps, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';

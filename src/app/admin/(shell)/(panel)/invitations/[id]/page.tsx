@@ -1,5 +1,6 @@
 import { MAIN_CARD } from '@/catalog/features';
 import { invitationCards } from '@/server/documents/data';
+import { listPhotos } from '@/server/photos/photos';
 import { isForever } from '@/catalog/lifetime';
 import { themeNumber } from '@/theme-registry';
 import { INITIALS_MAX, invitationNames, splitInitials } from '@/catalog/fields';
@@ -27,6 +28,7 @@ import {
   cardOptionsAction,
   editInvitationAction,
   extendInvitationAction,
+  removePhotoAction,
   removeCustomCardAction,
   guestMessageStatusAction,
   guestbookVisibilityAction,
@@ -69,6 +71,9 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const withReceiptLines = (text: string) =>
     delivery ? `${text}\n${tr('receiptLinkLine', { url: delivery.receiptUrl })}\n${tr('accessCodeLine', { code: delivery.accessCode })}` : text;
   const canModerate = can(authz, 'guests.moderate');
+  // The customer's photos (packages with `photos`): looked at here, and taken off when unsuitable.
+  const photos = inv.featureKeys.includes('photos') ? await listPhotos(db(), inv.id) : null;
+  const canEdit = can(authz, 'invitations.edit');
   const [fields, tracks, guests, counts] = await Promise.all([
     orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
     activeMusicTracks(db()),
@@ -153,6 +158,38 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
           </p>
         ))}
       </Card>
+
+      {photos ? (
+        <Card className="space-y-3">
+          <h2 className="font-semibold">{t('photosTitle', { count: photos.length })}</h2>
+          {photos.length ? (
+            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {photos.map((p) => (
+                <li key={p.position} className="space-y-2" data-admin-photo={p.position}>
+                  <a href={p.fullSrc} target="_blank" rel="noopener" className="block overflow-hidden rounded-md border border-line">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the customer's photo */}
+                    <img src={p.src} alt={t('photoN', { n: p.position + 1 })} className="aspect-[3/4] w-full object-cover" loading="lazy" />
+                  </a>
+                  <p className="text-xs text-muted">{t('photoN', { n: p.position + 1 })}</p>
+                  {canEdit ? (
+                    <details>
+                      <summary className="cursor-pointer text-xs text-danger">{t('photoRemove')}</summary>
+                      <ActionForm action={removePhotoAction} confirmMessage={t('photoRemoveConfirm')} className="mt-2 space-y-2">
+                        <input type="hidden" name="id" value={inv.id} />
+                        <input type="hidden" name="position" value={p.position} />
+                        {reason}
+                        <SubmitButton tone="danger">{t('photoRemove')}</SubmitButton>
+                      </ActionForm>
+                    </details>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">{t('photosNone')}</p>
+          )}
+        </Card>
+      ) : null}
 
       {canDocs && (hasCard || hasKeepsake) ? (
         <Card className="space-y-5">

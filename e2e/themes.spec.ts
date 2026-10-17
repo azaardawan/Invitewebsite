@@ -99,6 +99,10 @@ test('every theme renders every designed state correctly', async ({ page }, test
       await expect(page.getByRole('button', { name: ar.invitation.submit }), `${ref} state ${i + 1}: guest form`).toHaveCount(has('rsvp') ? 1 : 0);
       // A theme with the signature feature shows the (sample) signature with <Signature>, and only then.
       await expect(page.locator('[data-bahja-signature]'), `${ref} state ${i + 1}: signature`).toHaveCount(has('signature') ? 1 : 0);
+      // A theme with photos shows the sample photos with <Photo> (at most its manifest's photos.max), and only then.
+      const photoCount = await page.locator('[data-bahja-photo]').count();
+      if (has('photos')) expect(photoCount, `${ref} state ${i + 1}: photos`).toBeGreaterThan(0);
+      expect(photoCount, `${ref} state ${i + 1}: photos`).toBeLessThanOrEqual(has('photos') ? (m.photos?.max ?? 0) : 0);
       if (has('rsvp')) {
         // Empty submit shows validation; nothing is saved in sample mode.
         await page.getByRole('button', { name: ar.invitation.submit }).click();

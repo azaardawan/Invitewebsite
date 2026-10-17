@@ -134,7 +134,20 @@ export type ThemeProps = {
   wording: Readonly<Record<string, string>>;
   /** The design's yes/no choices (manifest `switches`), by key: the customer's answer or the default. */
   switches: Readonly<Record<string, boolean>>;
+  /**
+   * The customer's own photos (packages with `photos`), in order, at most the manifest's `photos.max`. There may be
+   * fewer than the design holds (even none): show what is there and leave the rest out. Samples show placeholder
+   * pictures for every place. Draw each with `<Photo photo={…} />`, which keeps the customer's placement in the frame.
+   */
+  photos: ThemePhoto[];
 };
+
+/**
+ * One customer photo: its place (`index`, the same as in `props.photos`), its address (sized for the screen; print designs get the full size), its pixel size,
+ * where the customer placed it in the design's frame (`focus`, as `<Photo>` applies it), and the design's name for
+ * that place (manifest `photos.labels`) in the invitation's language, or null.
+ */
+export type ThemePhoto = { index: number; src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; label: string | null };
 
 /**
  * The date of birth: its parts, plus `lines`, the date written the way the customer chose on the order

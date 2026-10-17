@@ -72,7 +72,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
             description: p.description ? localized(p.description, locale) : null,
             priceIqd: p.priceIqd,
             onlineFor: common(`onlineFor.${p.lifetime}`),
-            features: p.featureKeys.filter(isFeatureKey).map((f) => t(`features.${f}`)),
+            features: p.featureKeys.filter(isFeatureKey).map((f) => (f === 'photos' && th.manifest.photos ? t('photosUpTo', { max: th.manifest.photos.max }) : t(`features.${f}`))),
             details: packageDetailLines(fieldLabels, p.fieldKeys, detailWords),
           }))}
         />
