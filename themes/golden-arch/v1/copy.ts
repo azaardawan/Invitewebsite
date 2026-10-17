@@ -4,7 +4,7 @@ import type { InvitationLocale } from '@/theme-sdk';
  * The design's own lines. Platform strings (buttons, form, countdown units, errors) come from `props.labels`; the
  * customer's content comes from fields, and the poster's script line ("Reception to follow!") is the changeable
  * `followLine` (manifest wording). Kurdish waits for the owner's approval (docs/translations/KURDISH_REVIEW.md,
- * batch 34) and shows the Arabic until then.
+ * batch 35) and shows the Arabic until then.
  */
 const ar = {
   /** Over the graduate's name on the closed poster. */

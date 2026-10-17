@@ -9,6 +9,7 @@ import { Price } from '@/components/storefront/currency';
 import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
 import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
+import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
@@ -44,11 +45,11 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
         <div className="flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start">
           {draft.onlineInvitation ? (
             <div className="w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
-              <iframe src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
+              <iframe data-order-preview src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
             </div>
           ) : (
             <>
-              <iframe src={previewSrc} title={t('filesPreview')} className="block aspect-[9/16] w-full max-w-[380px] rounded-[18px] bg-surface shadow-[0_30px_60px_rgb(58_21_32/0.18)]" />
+              <iframe data-order-preview src={previewSrc} title={t('filesPreview')} className="block aspect-[9/16] w-full max-w-[380px] rounded-[18px] bg-surface shadow-[0_30px_60px_rgb(58_21_32/0.18)]" />
               <p className="max-w-[380px] text-center text-sm text-muted">{t('filesOnlyHint')}</p>
             </>
           )}
@@ -86,6 +87,44 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               </span>
             </div>
           </div>
+          {draft.photos && draft.status === 'DRAFT' ? (
+            <PhotoSlots
+              previewUrl={`/p/${token}`}
+              base={`/p/${token}/photos`}
+              max={draft.photos.max}
+              min={draft.photos.min}
+              aspects={draft.photos.aspects}
+              names={draft.photos.names}
+              initial={draft.photos.photos}
+              labels={{
+                title: t('photos.title'),
+                help: draft.photos.min ? t('photos.helpMin', { max: draft.photos.max, min: draft.photos.min }) : t('photos.help', { max: draft.photos.max }),
+                count: t.raw('photos.count') as string,
+                add: t('photos.add'),
+                addMany: t('photos.addMany'),
+                replace: t('photos.replace'),
+                remove: t('photos.remove'),
+                adjust: t('photos.adjust'),
+                done: t('photos.done'),
+                zoom: t('photos.zoom'),
+                uploading: t('photos.uploading'),
+                photo: t.raw('photos.photo') as string,
+                earlier: t('photos.earlier'),
+                previous: t('photos.previous'),
+                later: t('photos.later'),
+                next: t('photos.next'),
+                inDesign: t('photos.inDesign'),
+                dragHint: t('photos.dragHint'),
+                errors: {
+                  tooLarge: t('photos.errors.tooLarge'),
+                  unsupportedImage: t('photos.errors.unsupportedImage'),
+                  imageTooSmall: t('photos.errors.imageTooSmall'),
+                  rateLimited: t('photos.errors.rateLimited'),
+                  generic: t('photos.errors.generic'),
+                },
+              }}
+            />
+          ) : null}
           <ExtrasPreview
             base={`/p/${token}/extra`}
             featureKeys={draft.featureKeys}

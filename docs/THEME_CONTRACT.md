@@ -171,6 +171,28 @@ the box, **transparent outside the shape**, with the text well inside it. The pl
 (`?bleed=1` / print-shop download), and makes a transparent 300 dpi PNG of each side. Admin → Themes previews every
 shape (with or without the cut line).
 
+### Customer photos (`photos`)
+
+A design can show the customer's own photos: list `photos` in `features` and say how many it holds in the manifest,
+`photos: { max, min?, aspect?, labels? }`. `max` is 1–20. `min` is how many must be added before the order can be paid
+(default 0). `aspect` is the frame's width ÷ height that you draw them in (default 0.75, 3:4): the customer places
+each photo in that frame on the order form (drag and zoom). `labels` names the first places (`{ ar, en, ckb?, bdn? }`,
+e.g. "Cover photo", "Engagement"). **A collage** gives each place its own shape with `frames: [{ aspect }, …]` (place i
+uses `frames[i]`, the rest `aspect`): draw place i in exactly that shape, so what the customer framed is what shows.
+
+Photos always fill the places **in order, without gaps**: `props.photos[i]` (its `index` is i) belongs in place i. The
+customer can reorder them. While they adjust a photo, the order page shows your design live beside the frame: it opens
+your design already open (as with reduced motion: skip the entrance when `useReducedMotion()` is true), scrolls to the
+`<Photo>` with that index and redraws as the photo moves, so draw photos only through `<Photo>`.
+
+The theme receives `props.photos`: the photos in order, each `{ src, width, height, focus, label }`. Draw each with
+`<Photo photo={p} className={…} />` from `@/theme-sdk`. Give the frame its size and shape (aspect-ratio, radius, mask);
+the photo covers it the way the customer placed it. It loads lazily: pass `eager` for the photo on the cover.
+
+**There may be fewer photos than `max`, even none** (a package without `photos`, or a customer who added only some).
+Show what is there; never leave empty frames. Samples show placeholder pictures for every place. Print companions get
+the same list in full size (`props.photos` on the card and keepsake). See `themes/demo-photos/v1` (internal, #16).
+
 ### Newborn extras drawn by the design
 
 A newborn design may ship its own `print/Story.tsx`, `print/Sticker.tsx` and/or `print/Bottle.tsx`

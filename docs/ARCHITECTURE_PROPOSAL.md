@@ -623,6 +623,10 @@ The owner plans a section where people **add pictures and messages**, for exampl
    Payments, orders, publication, expiry, packages, audit and analytics stay shared, so a new format reuses the whole commerce and lifecycle core.
 2. **Guest contributions generalize guest responses.** `guest_responses` (name, attendance, message) is the V1 case. Pictures would be added as attachments linked to a response through the `assets` table, with a per-item moderation status. They would not be stored in new columns on the invitation.
 3. **Field types are open-ended.** The Field Library's `type` list can gain `image`/`gallery` for owner-provided photos without changing how fields, packages or validation work.
+   *(Built 2026-10-16 as the `photos` feature instead of a field type: the customer's photos on the review page, up to
+   the design's `photos.max` (≤ 20), each in two re-encoded WebP sizes without metadata, in `invitation_photos`. Changeable
+   before checkout, and after publishing with `self_edit`; Admin can remove one (audited). Deleted 12 months after the
+   invitation ends, or 30 days after an unpaid preview expires. See THEME_CONTRACT "Customer photos".)*
 4. **Storage is already external.** All media goes to object storage (R2) behind the CDN, never into database rows.
 5. **What that future build must add, since user uploads change the risk profile:**
    - an upload pipeline: type/size checks, re-encoding, EXIF/location stripping, and possibly malware scanning;

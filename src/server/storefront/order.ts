@@ -3,7 +3,8 @@ import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
+import { invitations, packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
+import { listPhotos, photoSpec } from '@/server/photos/photos';
 import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
@@ -62,6 +63,26 @@ export async function draftByToken(token: string) {
     /** False for a design sold only as files (no online invitation). */
     onlineInvitation: manifestByCodeRef(row.codeRef)?.onlineInvitation !== false,
     pkg: { id: row.pkg.id, name: row.pkg.name, priceIqd: row.pkg.priceIqd, lifetime: row.pkg.lifetime },
+    /** The design's photo places and the customer's photos so far (packages with `photos`), or null. */
+    photos: await photoState(inv),
+  };
+}
+
+/** A design's photo places (how many, their frame and names in the invitation's language) and the photos so far. */
+export async function photoState(inv: typeof invitations.$inferSelect) {
+  const spec = await photoSpec(db(), inv);
+  if (!spec) return null;
+  const list = await listPhotos(db(), inv.id);
+  return {
+    max: spec.max,
+    min: spec.min,
+    aspect: spec.aspect,
+    aspects: spec.aspects,
+    names: Array.from({ length: spec.max }, (_, i) => {
+      const l = spec.labels?.[i];
+      return l ? (l[inv.locale] ?? l.ar) : null;
+    }),
+    photos: list.map((p) => ({ position: p.position, src: p.src, width: p.width, height: p.height, focus: p.focus })),
   };
 }
 

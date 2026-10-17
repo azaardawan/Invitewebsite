@@ -12,6 +12,7 @@ import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
 import { occasionKey, signatureUrls } from '@/server/invitation/load';
+import { listPhotos } from '@/server/photos/photos';
 import type { RenderKind } from './tokens';
 import type { CardOptions } from '@/server/db/schema';
 import type { ThemeProps } from '@/theme-sdk/types';
@@ -84,6 +85,9 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     wording: inv.wording,
     switchDefs: (version!.manifest as ThemeManifest | null)?.switches ?? manifest?.switches ?? [],
     switches: inv.switches,
+    // Printed: the full size of each photo.
+    photos: inv.featureKeys.includes('photos') ? (await listPhotos(db, inv.id)).map((p) => ({ ...p, src: p.fullSrc })) : [],
+    photoSpec: (version!.manifest as ThemeManifest | null)?.photos ?? manifest?.photos ?? null,
   });
 
   if (kind === 'card' || kind === 'cardBleed') {
@@ -132,6 +136,7 @@ function printBase(theme: ThemeProps) {
     wording: theme.wording,
     switches: theme.switches,
     occasion: theme.occasion,
+    photos: theme.photos,
   };
   return { base, cardBackTitle };
 }

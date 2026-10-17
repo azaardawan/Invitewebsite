@@ -1,4 +1,4 @@
-# Golden Arch (graduation, #17)
+# Golden Arch (graduation, #18)
 
 Built from the owner's poster (Canva, "Green and White Elegant Wedding Invitation", graduation version), rendered here as
 `poster.webp`. The poster's text is outlined, so its artwork was taken out as layers and its lettering matched with

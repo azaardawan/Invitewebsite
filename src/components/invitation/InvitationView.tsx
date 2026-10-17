@@ -3,6 +3,7 @@ import type { ThemeProps, GuestResponseInput, GuestSubmitResult } from '@/theme-
 import { ThemeHost } from '@/theme-registry/loaders.generated';
 import { InvitationRuntime } from '@/theme-sdk/runtime';
 import { ThemeErrorBoundary } from './ThemeErrorBoundary';
+import { LiveThemeHost } from './LiveThemeHost';
 import styles from './platform.module.css';
 import { WatermarkLayer, type WatermarkText } from '@/components/print/watermark';
 
@@ -47,7 +48,8 @@ export function InvitationView({
         style={Object.fromEntries(Object.entries(props.colors).map(([k, v]) => [`--bahja-color-${k}`, v])) as React.CSSProperties}
       >
         <ThemeErrorBoundary codeRef={codeRef} message={errorText.message} retry={errorText.retry}>
-          <ThemeHost codeRef={codeRef} {...props} />
+          {/* Designs with the customer's photos follow the photo editor live; others render as they are. */}
+          {props.features.includes('photos') ? <LiveThemeHost codeRef={codeRef} props={props} /> : <ThemeHost codeRef={codeRef} {...props} />}
         </ThemeErrorBoundary>
       </div>
       {ribbon ? (

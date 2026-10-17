@@ -9,3 +9,4 @@ export * from './documents';
 export * from './legal';
 export * from './analytics';
 export * from './translations';
+export * from './photos';

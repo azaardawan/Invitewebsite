@@ -3,7 +3,7 @@ import type { InvitationLocale } from '@/theme-sdk';
 /**
  * The design's own lines (from the designer's hand-off, docs/themes/laurel-bloom/). Platform strings (buttons, form,
  * countdown units, errors) come from `props.labels`; the customer's content comes from fields. Kurdish waits for the
- * owner's approval (docs/translations/KURDISH_REVIEW.md, batch 34) and shows the Arabic until then.
+ * owner's approval (docs/translations/KURDISH_REVIEW.md, batch 35) and shows the Arabic until then.
  */
 const ar = {
   invited: 'ندعوكم لمشاركتنا فرحة التخرّج',

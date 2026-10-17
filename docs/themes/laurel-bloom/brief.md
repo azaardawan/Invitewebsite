@@ -1,4 +1,4 @@
-# Laurel & Bloom (graduation, #16)
+# Laurel & Bloom (graduation, #17)
 
 The designer's finished prototype (`designer-readme.md`, `ASSET_NOTICES.md`), ported to the theme contract:
 CSS Modules, `ThemeProps`, `GuestFormSlot`, `useCountdown`, the platform border (the botanical corner), print

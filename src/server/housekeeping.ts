@@ -5,6 +5,7 @@ import { analyticsEvents, generatedDocuments, guestResponses, invitations } from
 import { pruneRateLimits } from '@/server/rate-limit';
 import { storage } from '@/server/storage';
 import { ensureDocument } from '@/server/documents/documents';
+import { deleteOrphanPhotoFiles, deletePhotosOf } from '@/server/photos/photos';
 
 /** Guest replies and keepsakes are deleted this long after an invitation ends (privacy policy). */
 export const GUEST_DATA_RETENTION_DAYS = 365;
@@ -13,7 +14,8 @@ const DAY = 86_400_000;
 /**
  * Daily cleanup, safe to run any number of times:
  * - prepares the keepsake of invitations that ended in the last 7 days (so it is ready to download);
- * - deletes guest replies and keepsake PDFs 12 months after an invitation ended;
+ * - deletes guest replies, keepsake PDFs and the customer's photos 12 months after an invitation ended (photos of
+ *   orders never paid: 30 days after their preview link expired);
  * - deletes raw analytics events older than 13 months;
  * - deletes the watermarked previews of orders left unpaid for a week;
  * - drops old rate-limit counters.
@@ -41,6 +43,14 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
     const gone = await db.delete(guestResponses).where(inArray(guestResponses.invitationId, oldIds)).returning({ id: guestResponses.id });
     repliesDeleted = gone.length;
   }
+
+  // The customer's photos: with the guest data, 12 months after the invitation ended; and those of orders never
+  // paid, 30 days after their preview link expired. Then any photo file no invitation uses.
+  const unpaid = await db
+    .select({ id: invitations.id })
+    .from(invitations)
+    .where(and(inArray(invitations.status, ['DRAFT', 'AWAITING_PAYMENT']), lt(invitations.previewExpiresAt, new Date(now.getTime() - 30 * DAY))));
+  const photosDeleted = (await deletePhotosOf(db, [...oldIds, ...unpaid.map((r) => r.id)])) + (await deleteOrphanPhotoFiles(db, now));
 
   // Keepsakes of invitations that just ended: generate once so the customer's download is instant.
   let keepsakesPrepared = 0;
@@ -88,5 +98,5 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   if (stale.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, stale.map((d) => d.id)));
 
   await pruneRateLimits(db, now);
-  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length };
+  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted };
 }

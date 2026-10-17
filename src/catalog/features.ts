@@ -27,6 +27,8 @@ export const FEATURES = {
   self_edit: { requires: [], requiresFields: [] },
   /** The customer draws their own signature when ordering; the theme shows it where its designer placed it. */
   signature: { requires: [], requiresFields: [] },
+  /** The customer adds their own photos (as many as the design holds, manifest `photos`); the design shows them. */
+  photos: { requires: [], requiresFields: [] },
   /** The customer picks one of the colour sets the owner made for the theme (themes declare colour slots). */
   color_choice: { requires: [], requiresFields: [] },
   /** An Instagram story picture (1080 × 1920 PNG) on the owner's story artwork. */
