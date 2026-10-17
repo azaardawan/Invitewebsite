@@ -6,7 +6,7 @@ import { ARCH_OUTLINE } from './outlines';
  * gold arch, the gold laurel with the cap, line-drawn hands throwing their caps). Opening: the gold arch draws itself
  * around the graduate's name while the flowers bloom in from the corners and the caps fly. Then the website: the
  * portrait arch, the countdown, the day, the reply card and the guest messages. The portrait arch holds the laurel and
- * the year until photographs can be added. Poster: docs/themes/golden-arch/.
+ * the year when there is no photograph (feature `photos`). Poster: docs/themes/golden-arch/.
  */
 const allFields = [
   'person_1_name',
@@ -26,7 +26,7 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['graduation'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'photos'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     {
@@ -39,7 +39,7 @@ export default defineTheme({
     },
     // The complete design: + messages to the graduate, the keepsake PDF and the arch-shaped card.
     {
-      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'photos'],
       fields: [...allFields],
     },
   ],
@@ -54,6 +54,12 @@ export default defineTheme({
       maxLength: 40,
     },
   ],
+  // The customer's photo (feature `photos`): the graduation portrait in the gold portrait arch.
+  photos: {
+    max: 1,
+    aspect: 0.8,
+    labels: [{ ar: 'صورة التخرّج', en: 'Graduation portrait' }],
+  },
   print: {
     // The poster's deep green on its paper (transparent background).
     card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#345440', light: '#00000000' } },

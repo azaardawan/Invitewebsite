@@ -993,6 +993,9 @@ show the Arabic for these lines. Glossary reused from approved rows: graduation 
 | 34 | #18 | كلمات للخرّيج | Words for the graduate | وشەگەلێک بۆ دەرچوو | پەیڤەک بۆ دەرچووی | ◐ |
 | 35 | #18 | المستقبل لك / فانطلق بثقة | The future / belongs to you | داهاتوو هی تۆیە / بە متمانەوە بڕۆ پێش | پاشەڕۆژ یا تەیە / ب باوەری بچە پێش | ◐ |
 | 36 | #18 wording `followLine` (customer can change) | وتكتمل الفرحة بلقائكم | Reception to follow! | خۆشییەکە بە دیدارتان تەواو دەبێت | شاهی ب دیتنا هەوە تەمام دبیت | ◐ |
+| 37 | #17, #18 photo place (order form) | صورة التخرّج | Graduation portrait | وێنەی دەرچوون | وێنێ دەرچوونێ | ● |
+| 38 | #17 photo place (order form) | لحظة من الرحلة | A moment from the journey | ساتێک لە گەشتەکە | دەمەک ژ گەشتێ | ◐ |
+| 39 | #17 under the second photo | لحظة من رحلة لا تُنسى | A little piece of the journey. | ساتێک لە گەشتێکی لەبیرنەکراو | دەمەک ژ گەشتەکا ژبیرنەبوویی | ◐ |
 
 Not translated (Arabic and English only): the label of #18's changeable line («السطر المكتوب بخط اليد تحت المكان»).
 Countdown units, buttons and the guest form come from the platform's approved strings.

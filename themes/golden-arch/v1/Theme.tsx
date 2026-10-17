@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
   GuestFormSlot,
+  Photo,
   ThemeBorder,
   formatNumber,
   hasFeature,
@@ -51,7 +52,7 @@ function numericDate(iso: string | undefined, locale: ThemeProps['locale']): str
 /* eslint-disable @next/next/no-img-element -- the poster's layered artwork, moved by the opening */
 
 export default function GoldenArch(props: ThemeProps) {
-  const { locale, dir, lang, fields, labels, event, mapUrl, wording } = props;
+  const { locale, dir, lang, fields, labels, event, mapUrl, wording, photos } = props;
   const t = copyFor(locale);
   const reduced = useReducedMotion();
   const music = useMusic();
@@ -153,13 +154,18 @@ export default function GoldenArch(props: ThemeProps) {
           <section className={c('ga-portrait')}>
             <p className={c('ga-caps', 'ga-eyebrow')}>{t.portraitLead}</p>
             <h2 className={c('ga-title', 'ga-lines')}>{t.portraitTitle}</h2>
-            {/* The portrait arch. Until the graduate's photograph can be added (a later package), it holds the laurel
-                and the year; the photograph then fills the same arch. */}
+            {/* The portrait arch: the graduate's photograph (photos[0]), or without one the laurel and the year. */}
             <figure className={c('ga-frame')}>
-              <div className={c('ga-frame-inner')} aria-hidden="true">
-                <img src={laurel.src} alt="" />
-                {year ? <span className={c('ga-frame-year')}>{year}</span> : null}
-              </div>
+              {photos[0] ? (
+                <div className={c('ga-frame-inner', 'ga-frame-photo')}>
+                  <Photo photo={photos[0]} className={c('ga-photo')} />
+                </div>
+              ) : (
+                <div className={c('ga-frame-inner')} aria-hidden="true">
+                  <img src={laurel.src} alt="" />
+                  {year ? <span className={c('ga-frame-year')}>{year}</span> : null}
+                </div>
+              )}
               {name || fields.achievement ? (
                 <figcaption>
                   {name ? <span className={c('ga-frame-name')}>{name}</span> : null}

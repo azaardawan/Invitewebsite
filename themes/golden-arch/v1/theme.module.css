@@ -744,3 +744,14 @@
 #frame .root[data-script='arabic'] .ga-standing {
   font-size: clamp(13px, 3.4cqw, 16px);
 }
+
+/* The graduate's photograph inside the gold portrait arch (4:5, the arch's own top). */
+#frame .ga-frame-photo {
+  position: relative;
+  overflow: hidden;
+}
+#frame .ga-photo {
+  position: absolute !important;
+  inset: 0;
+  border-radius: inherit;
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
   GuestFormSlot,
+  Photo,
   ThemeBorder,
   formatNumber,
   hasFeature,
@@ -43,7 +44,7 @@ const c = (...names: (string | false | null | undefined)[]) =>
 /* eslint-disable @next/next/no-img-element -- the design's layered artwork */
 
 export default function LaurelBloom(props: ThemeProps) {
-  const { locale, dir, lang, fields, labels, event, mapUrl } = props;
+  const { locale, dir, lang, fields, labels, event, mapUrl, photos } = props;
   const t = copyFor(locale);
   const reduced = useReducedMotion();
   const music = useMusic();
@@ -149,14 +150,17 @@ export default function LaurelBloom(props: ThemeProps) {
               <div className={c('gl-bridge')} aria-hidden="true" />
               <p className={c('gl-eyebrow')}>{t.newChapter}</p>
               <h2 className={c('lb-lines')}>{t.storyTitle}</h2>
-              {/* The arched portrait frame. Until the graduate's photograph can be added (a later package), it holds the
-                  year and the cap; the photograph then fills the same arch. */}
+              {/* The arched portrait frame: the graduate's photograph (photos[0]), or without one the year and the cap. */}
               <figure className={c('gl-portrait-frame')}>
                 <div className={c('gl-portrait-mat')}>
-                  <div className={c('gl-photo-placeholder')} aria-hidden="true">
-                    {year ? <span className={c('gl-portrait-year')}>{year}</span> : null}
-                    <img src={cap.src} alt="" />
-                  </div>
+                  {photos[0] ? (
+                    <Photo photo={photos[0]} className={c('gl-portrait')} />
+                  ) : (
+                    <div className={c('gl-photo-placeholder')} aria-hidden="true">
+                      {year ? <span className={c('gl-portrait-year')}>{year}</span> : null}
+                      <img src={cap.src} alt="" />
+                    </div>
+                  )}
                 </div>
                 {name || year ? (
                   <figcaption>
@@ -171,6 +175,12 @@ export default function LaurelBloom(props: ThemeProps) {
                 ) : null}
               </figure>
               <img className={c('gl-portrait-flowers')} src={roses.src} alt="" aria-hidden="true" />
+              {photos[1] ? (
+                <figure className={c('gl-second-photo')}>
+                  <Photo photo={photos[1]} className={c('lb-second-frame')} />
+                  <figcaption>{t.memories}</figcaption>
+                </figure>
+              ) : null}
               <p className={c('gl-story-copy')}>{t.storyCopy}</p>
             </section>
 

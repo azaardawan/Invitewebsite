@@ -5,7 +5,7 @@ import { ARCH_OUTLINE } from './outlines';
  * Laurel & Bloom: a graduation invitation on soft grey paper in deep green. A gatefold poster with engraved botanical
  * corners and ivory roses opens onto an arched inside page with the cap, the graduate's name and degree; the website
  * unfolds below it (portrait arch, countdown, the day, the reply card and the guest messages). Design hand-off:
- * docs/themes/laurel-bloom/. The portrait arch holds the year and the cap until photographs can be added.
+ * docs/themes/laurel-bloom/. The graduate's portrait (feature `photos`) fills the portrait arch; without it the arch holds the year and the cap.
  */
 const allFields = [
   'person_1_name',
@@ -25,7 +25,7 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['graduation'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'photos'],
   // The designer's Normal / VIP / VVIP packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     // Normal: the invitation with its music, countdown and the printed card; no guest form.
@@ -40,10 +40,20 @@ export default defineTheme({
     },
     // VVIP: + messages to the graduate, the keepsake PDF and the arched printed card.
     {
-      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'photos'],
       fields: [...allFields],
     },
   ],
+  // The customer's photos (feature `photos`): the graduation portrait in the arch, and a second moment as a tilted print.
+  photos: {
+    max: 2,
+    aspect: 0.8,
+    frames: [{ aspect: 0.8 }, { aspect: 4 / 3 }],
+    labels: [
+      { ar: 'صورة التخرّج', en: 'Graduation portrait' },
+      { ar: 'لحظة من الرحلة', en: 'A moment from the journey' },
+    ],
+  },
   print: {
     // Deep green on the grey paper (transparent background).
     card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#20443b', light: '#00000000' } },

@@ -14,6 +14,8 @@ const ar = {
   reply: 'تأكيد الحضور',
   newChapter: 'فصل جديد من الحكاية',
   storyTitle: 'جذورٌ من الأحلام\nوبداياتٌ تزهر',
+  /** Under the second photograph. */
+  memories: 'لحظة من رحلة لا تُنسى',
   storyCopy: 'لكل ليلة سهر، ولكل إنجاز صغير، ولكل من كان جزءاً من هذه الرحلة. تكتمل فرحة هذا اليوم بمشاركتكم.',
   countdownLabel: 'حتى نحتفل معاً',
   countdownTitle: 'نعدّ الأيام لفرحتنا',
@@ -42,6 +44,7 @@ const en: Copy = {
   reply: 'Kindly reply',
   newChapter: 'A NEW CHAPTER',
   storyTitle: 'Rooted in dreams.\nReady to bloom.',
+  memories: 'A little piece of the journey.',
   storyCopy: 'For every late night, every small victory, and everyone who helped along the way. This moment is ours to celebrate.',
   countdownLabel: 'THE CELEBRATION BEGINS IN',
   countdownTitle: 'Counting the days',
