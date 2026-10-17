@@ -61,6 +61,8 @@ const STARTER_SECTIONS: StarterSection[] = [
     requiredFeatures: [],
     fields: [
       { key: 'person_1_name', label: { ar: 'اسم الخرّيج', en: "Graduate's name", ckb: 'ناوی دەرچوو', bdn: 'ناڤێ دەرچووی' } },
+      { key: 'achievement' },
+      { key: 'class_year' },
       { key: 'event_date' },
       { key: 'event_time' },
       { key: 'venue_name' },

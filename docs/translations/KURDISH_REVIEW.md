@@ -906,3 +906,51 @@ fiancé / fiancée دەستگیرانی کوڕ / کچ, دەزگرانێ کوڕ /
 Not translated (Arabic and English only, like every design's yes/no question): Burgundy's switch «الأحرف الأولى من اسمينا
 على ختم الشمع (بدل الوردة)». The Vintage poster's «ENGAGEMENT» band is English lettering in every language, like the
 poster's own «WEDDING Invitation».
+
+## Batch 34 — two graduation designs: Laurel & Bloom (#16) and Golden Arch (#17) — ⏳ AWAITING APPROVAL
+
+The first graduation designs, and two new fields for graduation. Until these rows are approved, Kurdish invitations
+show the Arabic for these lines. Glossary reused from approved rows: graduation دەرچوون (section name), graduate
+دەرچوو / دەرچووی, joy خۆشی / شاهی, presence ئامادەبوون, celebration ئاهەنگ. A «/» marks a line break in the design.
+
+| # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | Field library: `achievement` | الشهادة أو التخصص | Degree or achievement | بڕوانامە یان پسپۆڕی | بڕوانامە یان پسپۆری | ◐ |
+| 2 | Field library: `class_year` | سنة الدفعة | Class year | ساڵی دەرچوون | ساڵا دەرچوونێ | ◐ |
+| 3 | Design name #16 | الغار والزهر | Laurel & Bloom | گەڵای غار و گوڵ | بەلگێن غارێ و گول | ◐ |
+| 4 | Design name #17 | القوس الذهبي | Golden Arch | کەوانەی زێڕین | کەڤانێ زێڕین | ● |
+| 5 | #16, #17 | دفعة | Class of | دەرچووی ساڵی | دەرچوویێ ساڵا | ◐ |
+| 6 | #16 poster | ندعوكم لمشاركتنا فرحة التخرّج | You’re invited to celebrate | بانگهێشتتان دەکەین بۆ بەشداریکردن لە خۆشیی دەرچوونمان | مە هوین داخواز کرینە بۆ پشکداریێ د شاهیا دەرچوونێ دا | ◐ |
+| 7 | #16 poster title | فرحة التخرّج / وبداية الحكاية | Graduation / Celebration | خۆشیی دەرچوون / و دەستپێکی چیرۆکێک | شاهیا دەرچوونێ / و دەستپێکا چیرۆکەکێ | ◐ |
+| 8 | #16 | تفاصيل الاحتفال | The celebration | زانیارییەکانی ئاهەنگ | زانیاریێن ئاهەنگێ | ● |
+| 9 | #16 | تأكيد الحضور | Kindly reply | دڵنیاکردنەوەی ئامادەبوون | پشتڕاستکرنا ئامادەبوونێ | ● |
+| 10 | #16 | فصل جديد من الحكاية | A new chapter | بەشێکی نوێ لە چیرۆکەکە | پشکەکا نوو ژ چیرۆکێ | ◐ |
+| 11 | #16 | جذورٌ من الأحلام / وبداياتٌ تزهر | Rooted in dreams. / Ready to bloom. | ڕەگێک لە خەونەکان / و دەستپێکێک کە گوڵ دەکات | ڕەهەک ژ خەونان / و دەستپێکەک کو گول ددەت | ◐ |
+| 12 | #16 | لكل ليلة سهر، ولكل إنجاز صغير، ولكل من كان جزءاً من هذه الرحلة. تكتمل فرحة هذا اليوم بمشاركتكم. | For every late night, every small victory… | بۆ هەموو شەونخوونییەک، بۆ هەموو سەرکەوتنێکی بچووک، و بۆ هەموو ئەوانەی بەشێک بوون لەم گەشتە. خۆشیی ئەم ڕۆژە بە بەشداریتان تەواو دەبێت. | بۆ هەمی شەڤبێداریەکێ، بۆ هەمی سەرکەفتنەکا بچووک، و بۆ هەمی ئەوێن پشکەک ژ ڤێ گەشتێ بووین. شاهیا ڤێ ڕۆژێ ب پشکداریا هەوە تەمام دبیت. | ◐ |
+| 13 | #16, #17 | حتى نحتفل معاً | The celebration begins in / Until we celebrate | تا پێکەوە ئاهەنگ دەگێڕین | هەتا پێکڤە ئاهەنگێ دگێڕین | ◐ |
+| 14 | #16 | نعدّ الأيام لفرحتنا | Counting the days | ڕۆژەکان دەژمێرین بۆ خۆشیمان | ئەم ڕۆژان دهژمێرین بۆ شاهیا خۆ | ◐ |
+| 15 | #16 | احفظوا هذا الموعد | Save a little space in your diary | ئەم کاتە لەبیر مەکەن | ڤێ دەمی ژبیر نەکەن | ◐ |
+| 16 | #16 | يوم يستحق أن نحتفل به | A day to remember | ڕۆژێک کە شایەنی ئاهەنگە | ڕۆژەک کو هێژای ئاهەنگێیە | ◐ |
+| 17 | #16 | الساعة | The time | کاتژمێر | دەمژمێر | ● |
+| 18 | #16 | مكان الاحتفال | The place | شوێنی ئاهەنگ | جهێ ئاهەنگێ | ● |
+| 19 | #16 | أجمل ما في هذا الإنجاز أن نشاركه معكم. | The best part of this milestone is sharing it with you. | جوانترین شتی ئەم دەستکەوتە ئەوەیە لەگەڵ ئێوەی بەش بکەین. | جوانترین تشتێ ڤێ دەستکەفتێ ئەوە کو دگەل هەوە پارڤە بکەین. | ◐ |
+| 20 | #16, #17 | مكانكم بيننا | A place for you | شوێنتان لەناوماندایە | جهێ هەوە د ناڤبەرا مە دایە | ◐ |
+| 21 | #16 | شاركونا الفرحة | Celebrate with us | بەشداری خۆشیمان بن | پشکداریێ د شاهیا مە دا بکەن | ◐ |
+| 22 | #16, #17 | تكتمل فرحتنا بحضوركم. / تكتمل الفرحة بحضوركم. | It wouldn’t be the same without you. | خۆشیمان بە ئامادەبوونتان تەواو دەبێت. | شاهیا مە ب ئامادەبوونا هەوە تەمام دبیت. | ● |
+| 23 | #16 | كلمات لبداية جديدة | Words for the next chapter | وشەگەلێک بۆ دەستپێکێکی نوێ | پەیڤەک بۆ دەستپێکەکا نوو | ◐ |
+| 24 | #16 | بكل الامتنان والفرح | With gratitude & great excitement | بە هەموو سوپاس و خۆشییەکەوە | ب هەمی سوپاس و شاهیێ ڤە | ◐ |
+| 25 | #16 | لأحلام أكبر / وبدايات أجمل | Here’s to / what comes next. | بۆ خەونی گەورەتر / و دەستپێکی جوانتر | بۆ خەونێن مەزنتر / و دەستپێکێن جوانتر | ◐ |
+| 26 | #16, #17 keepsake | شكراً من القلب لكل من شاركنا فرحة التخرّج | With heartfelt thanks to everyone who shared this day | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیی دەرچوونمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا دەرچوونێ دا کری | ◐ |
+| 27 | #17 closed poster | نحتفل بتخرّج | Celebrating the graduation of | ئاهەنگ دەگێڕین بۆ دەرچوونی | ئەم ئاهەنگێ دگێڕین بۆ دەرچوونا | ◐ |
+| 28 | #17 | لحظة فخر | A proud moment | ساتێکی شانازی | دەمەکێ سەربلندیێ | ◐ |
+| 29 | #17 | تعب السنين / يزهر اليوم | Years of work, / in full bloom | ماندووبوونی ساڵان / ئەمڕۆ گوڵ دەکات | وەستیانا ساڵان / ئەڤرۆ گول ددەت | ◐ |
+| 30 | #17 | لكل من آمن بالحلم، ورافق الطريق خطوة بخطوة. | For everyone who believed in the dream and walked the road with us. | بۆ هەموو ئەوانەی باوەڕیان بە خەونەکە هەبوو و هەنگاو بە هەنگاو لەگەڵمان بوون. | بۆ هەمی ئەوێن باوەری ب خەونێ هەی و گاڤ ب گاڤ دگەل مە بووین. | ◐ |
+| 31 | #17 | نعدّ الأيام | Counting the days | ڕۆژەکان دەژمێرین | ئەم ڕۆژان دهژمێرین | ● |
+| 32 | #17 | احفظوا الموعد | Save the date | کاتەکە لەبیر مەکەن | دەمی ژبیر نەکەن | ◐ |
+| 33 | #17 | المكان | The place | شوێن | جه | ● |
+| 34 | #17 | كلمات للخرّيج | Words for the graduate | وشەگەلێک بۆ دەرچوو | پەیڤەک بۆ دەرچووی | ◐ |
+| 35 | #17 | المستقبل لك / فانطلق بثقة | The future / belongs to you | داهاتوو هی تۆیە / بە متمانەوە بڕۆ پێش | پاشەڕۆژ یا تەیە / ب باوەری بچە پێش | ◐ |
+| 36 | #17 wording `followLine` (customer can change) | وتكتمل الفرحة بلقائكم | Reception to follow! | خۆشییەکە بە دیدارتان تەواو دەبێت | شاهی ب دیتنا هەوە تەمام دبیت | ◐ |
+
+Not translated (Arabic and English only): the label of #17's changeable line («السطر المكتوب بخط اليد تحت المكان»).
+Countdown units, buttons and the guest form come from the platform's approved strings.
