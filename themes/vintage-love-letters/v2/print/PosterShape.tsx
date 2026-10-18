@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
-import p from "./poster.module.css";
+import type { CSSProperties, ReactNode } from 'react';
+import p from './poster.module.css';
 
 /** One line, or a block of lines, of a poster's text (frames.ts). */
 export type Slot = {
@@ -8,18 +8,13 @@ export type Slot = {
   w: number;
   size: number;
   color: string;
-  font: "serif" | "script";
+  font: 'serif' | 'script';
   track?: number;
   upper?: boolean;
   lines?: number;
   gap?: number;
 };
-export type Box = readonly [
-  left: number,
-  top: number,
-  width: number,
-  height: number,
-];
+export type Box = readonly [left: number, top: number, width: number, height: number];
 export type Frame = {
   art: string;
   widthMm: number;
@@ -34,8 +29,8 @@ const ARABIC = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/;
 /** Rough width of a line in ems, by font: enough to shrink a long name or line to its place on the poster. */
 function ems(text: string, slot: Slot, arabic: boolean) {
   const n = Array.from(text).length;
-  if (arabic) return n * (slot.font === "script" ? 0.5 : 0.48);
-  if (slot.font === "script") return n * 0.56;
+  if (arabic) return n * (slot.font === 'script' ? 0.5 : 0.48);
+  if (slot.font === 'script') return n * 0.56;
   return n * ((slot.upper ? 0.68 : 0.47) + (slot.track ?? 0) / slot.size);
 }
 
@@ -54,23 +49,13 @@ export function boxStyle([left, top, width, height]: Box): CSSProperties {
  * its width. A block wraps within its width around the middle of the poster's lines; longer text than the poster's
  * gets smaller so it keeps to about the same height and never reaches the lines around it.
  */
-export function SlotText({
-  frame,
-  role,
-  text,
-  className,
-}: {
-  frame: Frame;
-  role: string;
-  text: string | null | undefined;
-  className?: string;
-}) {
+export function SlotText({ frame, role, text, className }: { frame: Frame; role: string; text: string | null | undefined; className?: string }) {
   const slot = frame.slots[role];
   if (!slot || !text) return null;
   const arabic = ARABIC.test(text);
   const widthMm = (slot.w / 100) * frame.widthMm;
   const lines = slot.lines ?? 1;
-  const base = slot.size * (arabic ? (slot.font === "script" ? 0.8 : 0.86) : 1);
+  const base = slot.size * (arabic ? (slot.font === 'script' ? 0.8 : 0.86) : 1);
   const est = ems(text, slot, arabic) * base;
   const gapMm = ((slot.gap ?? 0) / 100) * frame.heightMm;
   let size = base;
@@ -81,13 +66,11 @@ export function SlotText({
   } else {
     // as many lines as the text needs at a size, kept within ~1.2 × the poster's block (lines shrink with the size)
     const room = lines * gapMm * 1.2;
-    const height = (k: number) =>
-      Math.ceil((est * k) / (widthMm * 0.92)) * gapMm * k;
+    const height = (k: number) => Math.ceil((est * k) / (widthMm * 0.92)) * gapMm * k;
     let k = 1;
     while (k > 0.5 && height(k) > room) k -= 0.03;
     size *= k;
-    const middle =
-      (slot.y / 100) * frame.heightMm + ((lines - 1) * gapMm) / 2 - base * 0.32;
+    const middle = (slot.y / 100) * frame.heightMm + ((lines - 1) * gapMm) / 2 - base * 0.32;
     top = middle - height(k) / 2;
   }
   const lineMm = lines > 1 ? gapMm * (size / base) : size * 1.3;
@@ -99,14 +82,10 @@ export function SlotText({
     fontSize: `${size}mm`,
     lineHeight: `${lineMm}mm`,
     letterSpacing: !arabic && slot.track ? `${slot.track}mm` : undefined,
-    textTransform: !arabic && slot.upper ? "uppercase" : undefined,
+    textTransform: !arabic && slot.upper ? 'uppercase' : undefined,
   };
   return (
-    <p
-      className={`${p.slot} ${p[slot.font]} ${lines > 1 ? p.block : p.line} ${className ?? ""}`}
-      data-arabic={arabic ? "" : undefined}
-      style={style}
-    >
+    <p className={`${p.slot} ${p[slot.font]} ${lines > 1 ? p.block : p.line} ${className ?? ''}`} data-arabic={arabic ? '' : undefined} style={style}>
       {text}
     </p>
   );
@@ -137,19 +116,10 @@ export function PosterFront({
 }
 
 /** The team's extra line, under the lowest line of the poster's text, in that line's style. */
-export function ExtraLine({
-  frame,
-  text,
-}: {
-  frame: Frame;
-  text: string | null;
-}) {
+export function ExtraLine({ frame, text }: { frame: Frame; text: string | null }) {
   if (!text) return null;
   const last = Object.values(frame.slots).reduce((a, b) => (b.y > a.y ? b : a));
-  const below =
-    last.y +
-    ((last.lines ?? 1) - 1) * (last.gap ?? 0) +
-    (last.size * 1.9 * 100) / frame.heightMm;
+  const below = last.y + ((last.lines ?? 1) - 1) * (last.gap ?? 0) + (last.size * 1.9 * 100) / frame.heightMm;
   const slot: Slot = {
     ...last,
     y: below,
@@ -158,13 +128,7 @@ export function ExtraLine({
     upper: false,
     track: 0,
   };
-  return (
-    <SlotText
-      frame={{ ...frame, slots: { extra: slot } }}
-      role="extra"
-      text={text}
-    />
-  );
+  return <SlotText frame={{ ...frame, slots: { extra: slot } }} role="extra" text={text} />;
 }
 
 /**
@@ -195,10 +159,7 @@ export function PosterBack({
       <div className={p.back} style={{ color: ink }}>
         <h1 className={p.title}>{title}</h1>
         {message ? (
-          <p
-            className={p.message}
-            data-long={message.length > 180 ? "" : undefined}
-          >
+          <p className={p.message} data-long={message.length > 180 ? '' : undefined}>
             {message}
           </p>
         ) : null}

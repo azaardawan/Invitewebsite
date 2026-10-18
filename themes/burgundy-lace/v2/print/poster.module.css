@@ -4,10 +4,10 @@
  */
 
 .poster {
-  --serif: "BL Serif", Georgia, serif;
-  --script: "BL Ceremony", "BL Script", serif;
-  --ar-serif: "BL Serif", serif;
-  --ar-script: "BL Ruqaa", "BL Serif", serif;
+  --serif: 'BL Serif', Georgia, serif;
+  --script: 'BL Ceremony', 'BL Script', serif;
+  --ar-serif: 'BL Serif', serif;
+  --ar-script: 'BL Ruqaa', 'BL Serif', serif;
   position: relative;
   width: 100%;
   height: 100%;
@@ -75,7 +75,7 @@
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
-[data-script="arabic"] .title {
+[data-script='arabic'] .title {
   font-family: var(--ar-script);
   font-size: 38pt;
   line-height: 1.5;
@@ -88,7 +88,7 @@
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
-[data-script="arabic"] .message {
+[data-script='arabic'] .message {
   font-family: var(--ar-serif);
   font-style: normal;
   font-size: 17pt;
@@ -102,7 +102,7 @@
   font-size: 26pt;
   line-height: 1.3;
 }
-[data-script="arabic"] .backNames {
+[data-script='arabic'] .backNames {
   font-family: var(--ar-script);
   font-size: 22pt;
 }
