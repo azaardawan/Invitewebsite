@@ -1,0 +1,122 @@
+/*
+ * The printed frames (Shape.tsx, PosterShape.tsx): the owner's poster artwork filling the card's box, and the
+ * customer's text where the poster had its own. Positions and sizes come from frames.ts (mm and % of the card).
+ */
+
+.poster {
+  --serif: "EI Serif", Georgia, serif;
+  --script: "EI Ceremony", "EI Script", serif;
+  --ar-serif: "EI Serif", serif;
+  --ar-script: "EI Ruqaa", "EI Serif", serif;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.poster * {
+  box-sizing: border-box;
+}
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.slot {
+  position: absolute;
+  margin: 0;
+  font-weight: 400;
+}
+.line {
+  white-space: nowrap;
+}
+.block {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.serif {
+  font-family: var(--serif);
+}
+.script {
+  font-family: var(--script);
+}
+.slot[data-arabic].serif {
+  font-family: var(--ar-serif);
+}
+.slot[data-arabic].script {
+  font-family: var(--ar-script);
+}
+.box {
+  position: absolute;
+}
+
+/* ---------------------------------------------------------------- back */
+.back {
+  position: absolute;
+  inset: 16% 17% 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7mm;
+  font-family: var(--serif);
+}
+.back > * {
+  margin: 0;
+  font-weight: 400;
+}
+.title {
+  font-family: var(--script);
+  font-size: 46pt;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+[data-script="arabic"] .title {
+  font-family: var(--ar-script);
+  font-size: 38pt;
+  line-height: 1.5;
+}
+.message {
+  font-size: 17pt;
+  line-height: 1.6;
+  font-style: italic;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+[data-script="arabic"] .message {
+  font-family: var(--ar-serif);
+  font-style: normal;
+  font-size: 17pt;
+  line-height: 1.8;
+}
+.message[data-long] {
+  font-size: 13pt;
+}
+.backNames {
+  font-family: var(--script);
+  font-size: 26pt;
+  line-height: 1.3;
+}
+[data-script="arabic"] .backNames {
+  font-family: var(--ar-script);
+  font-size: 22pt;
+}
+.qr {
+  margin: 2mm 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+}
+.qr img {
+  width: 24mm;
+  height: 24mm;
+}
+.qr figcaption {
+  font-size: 9pt;
+}

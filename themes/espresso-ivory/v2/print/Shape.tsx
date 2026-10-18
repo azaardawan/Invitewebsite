@@ -1,79 +1,72 @@
-import type { PrintShapeProps } from '@/theme-sdk';
-import fonts from '../fonts.module.css';
-import { copyFor } from '../copy';
-import { isLong } from '../names';
-import paper from '../assets/espresso-paper.webp';
-import p from './shape.module.css';
+import type { PrintShapeProps } from "@/theme-sdk";
+import fonts from "../fonts.module.css";
+import { copyFor } from "../copy";
+import crest from "../assets/frame-crest.svg";
+import crestBack from "../assets/frame-crest-back.svg";
+import { FRAMES } from "./frames";
+import { ExtraLine, PosterBack, PosterFront } from "./PosterShape";
+import p from "./poster.module.css";
 
 /**
- * The shaped cards (manifest `print.shapes`). The cartouche (`arch`) is the ivory card from the envelope itself, cut on
- * its own edge, with a fine gold rule inside it: the names on the front, the customer's words on the back. The heart:
- * espresso paper inside a double gold rule with the names and the gold seal (front), ivory with the customer's words
- * and the QR code (back). Transparent outside the shape.
+ * The printed frame (manifest `print.shapes`): the owner's poster, an ivory crest with the bouquet and the gold seal.
+ * Front: the couple's names, the message, the date, time and place where the poster has its own. Back: the crest alone,
+ * with the customer's title and message, the names and the QR code.
  */
-export default function Shape({ shape, side, widthMm, heightMm, outline, locale, dir, lang, fields, event, labels, title, message, qrDataUrl, extraLine, occasion }: PrintShapeProps) {
+export default function Shape({
+  side,
+  locale,
+  dir,
+  lang,
+  fields,
+  event,
+  labels,
+  title,
+  message,
+  qrDataUrl,
+  extraLine,
+  occasion,
+}: PrintShapeProps) {
+  const frame = FRAMES.arch;
   const t = copyFor(locale, occasion);
   const n1 = fields.person_1_name;
   const n2 = fields.person_2_name;
-  const date = event.date ? `${event.date.day} ${event.date.month} ${event.date.year}` : null;
-  const front = side === 'front';
-  const kind = shape === 'arch' ? 'cartouche' : 'heart';
-  const clip = `ei-${kind}-${side}`;
-  // rules that follow the cut line, `mm` inside it
-  const inset = (mm: number) => `translate(${mm} ${mm}) scale(${(widthMm - 2 * mm) / widthMm} ${(heightMm - 2 * mm) / heightMm})`;
-  const names = (
-    <h1 className={p.names} data-long={isLong(n1, n2) ? '' : undefined}>
-      {n1 ? <span>{n1}</span> : null}
-      {n1 && n2 ? <em>{labels.and}</em> : null}
-      {n2 ? <span>{n2}</span> : null}
-    </h1>
-  );
+  const date = event.date
+    ? `${event.date.day} ${event.date.month} ${event.date.year}`
+    : null;
   return (
-    <div className={`${fonts.fonts} ${p.shape} ${p[kind]} ${front ? p.front : p.back}`} dir={dir} lang={lang} data-script={locale === 'en' ? 'latin' : 'arabic'}>
-      <svg className={p.art} viewBox={`0 0 ${widthMm} ${heightMm}`} preserveAspectRatio="none" aria-hidden="true">
-        {kind === 'heart' && front ? (
-          <>
-            <clipPath id={clip}>
-              <path d={outline} />
-            </clipPath>
-            <image href={paper.src} x="0" y="0" width={widthMm} height={heightMm} preserveAspectRatio="xMidYMid slice" clipPath={`url(#${clip})`} />
-          </>
-        ) : kind === 'heart' ? (
-          <path d={outline} className={p.ground} />
-        ) : null}
-        <path d={outline} transform={inset(kind === 'heart' ? 4 : 7)} className={p.ruleOuter} vectorEffect="non-scaling-stroke" />
-        {kind === 'heart' ? <path d={outline} transform={inset(5.6)} className={p.ruleInner} vectorEffect="non-scaling-stroke" /> : null}
-      </svg>
-      {front ? (
-        <div className={p.content}>
-          <p className={p.kicker}>{t.invitation}</p>
-          {names}
-          <div className={p.rule} aria-hidden="true">
-            <span />
-          </div>
-          {date ? <p className={p.date}>{date}</p> : null}
-          {kind === 'cartouche' && event.time ? <p className={p.time}>{event.time}</p> : null}
-          {kind === 'cartouche' && fields.venue_name ? <p className={p.venue}>{fields.venue_name}</p> : null}
-          {extraLine ? <p className={p.extra}>{extraLine}</p> : null}
-          {kind === 'heart' ? <span className={p.seal} aria-hidden="true" /> : null}
-        </div>
+    <div
+      className={`${fonts.fonts} ${p.poster}`}
+      dir={dir}
+      lang={lang}
+      data-script={locale === "en" ? "latin" : "arabic"}
+    >
+      {side === "front" ? (
+        <PosterFront
+          frame={frame}
+          art={crest.src}
+          lines={{
+            kicker: t.wedding,
+            name1: n1,
+            and: n1 && n2 ? labels.and : null,
+            name2: n2,
+            message: fields.invitation_message || t.presence,
+            date,
+            time: event.time,
+            venue: fields.venue_name,
+          }}
+        >
+          <ExtraLine frame={frame} text={extraLine} />
+        </PosterFront>
       ) : (
-        <div className={p.content}>
-          <h1 className={p.title}>{title}</h1>
-          {message ? (
-            <p className={p.message} data-long={message.length > 150 ? '' : undefined}>
-              {message}
-            </p>
-          ) : null}
-          <p className={p.backNames}>{[n1, n2].filter(Boolean).join(` ${labels.and} `)}</p>
-          {qrDataUrl ? (
-            <figure className={p.qr}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}
-              <img src={qrDataUrl} alt="" />
-              <figcaption>{labels.scanToOpen}</figcaption>
-            </figure>
-          ) : null}
-        </div>
+        <PosterBack
+          art={crestBack.src}
+          ink="#38271f"
+          title={title}
+          message={message}
+          names={[n1, n2].filter(Boolean).join(` ${labels.and} `)}
+          qrDataUrl={qrDataUrl}
+          scanToOpen={labels.scanToOpen}
+        />
       )}
     </div>
   );

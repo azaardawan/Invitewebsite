@@ -51,19 +51,27 @@ export function isPlatformFeature(key: string) {
 export type FeatureKey = keyof typeof FEATURES;
 
 /**
- * Shaped printed cards: each shape a design can offer (manifest `print.shapes[].key`) and the feature that sells
- * it, so a package can include the leaf, the heart, both or neither.
+ * Shaped printed cards: each kind of shape a design can offer (manifest `print.shapes[].key`) and the feature that sells
+ * it, so a package can include the leaf, the heart, both or neither. A design may offer several frames of one kind as
+ * `<kind>-<name>` (e.g. `arch-oval`, `arch-plaque`): the kind's feature sells them all and the customer picks.
  */
 export const CARD_SHAPE_FEATURES = { leaf: 'card_leaf', heart: 'card_heart', arch: 'card_arch' } as const satisfies Record<string, FeatureKey>;
 export type CardShapeKey = keyof typeof CARD_SHAPE_FEATURES;
 
-export function isCardShapeKey(value: string): value is CardShapeKey {
-  return Object.hasOwn(CARD_SHAPE_FEATURES, value);
+/** The feature that sells a shape (`arch` and `arch-oval` → `card_arch`), or null for an unknown key. */
+export function shapeFeature(key: string): FeatureKey | null {
+  const kind = key.split('-')[0]!;
+  return Object.hasOwn(CARD_SHAPE_FEATURES, kind) ? CARD_SHAPE_FEATURES[kind as CardShapeKey] : null;
+}
+
+export function isCardShapeKey(value: string): boolean {
+  return shapeFeature(value) !== null;
 }
 
 /** Whether a package's features include the given shape (an unknown shape is never included). */
 export function shapeIncluded(featureKeys: readonly string[], shape: string | null | undefined): boolean {
-  return !!shape && isCardShapeKey(shape) && featureKeys.includes(CARD_SHAPE_FEATURES[shape]);
+  const feature = shape ? shapeFeature(shape) : null;
+  return !!feature && featureKeys.includes(feature);
 }
 
 /** The regular (A5) card among the cards a customer picks; a design's shapes never use this key. */

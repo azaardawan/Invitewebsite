@@ -375,11 +375,14 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
       const r = manifestSchema.safeParse(m);
       return r.success ? [] : r.error.issues.map((i) => i.message);
     };
-    expect(issues(['print_card', 'card_leaf'], [])).toContain('card_leaf requires a "leaf" shape in print.shapes');
+    expect(issues(['print_card', 'card_leaf'], [])).toContain('card_leaf requires a "leaf" (or "leaf-…") shape in print.shapes');
     expect(issues(['print_card', 'card_leaf'], [LEAF, HEART])).toContain('print.shapes "heart" is sold with the card_heart feature: list it in features');
-    expect(issues(['print_card'], [{ ...LEAF, key: 'star' }])).toContain('print.shapes keys must be one of: leaf, heart, arch');
+    expect(issues(['print_card'], [{ ...LEAF, key: 'star' }])).toContain('print.shapes keys must be one of: leaf, heart, arch (or one of them followed by "-name")');
     expect(issues(['print_card', 'card_leaf', 'card_heart'], [LEAF, HEART])).toEqual([]);
-    expect(issues(['print_card', 'card_arch'], [])).toContain('card_arch requires a "arch" shape in print.shapes');
+    expect(issues(['print_card', 'card_arch'], [])).toContain('card_arch requires a "arch" (or "arch-…") shape in print.shapes');
     expect(issues(['print_card', 'card_heart', 'card_arch'], [HEART, { ...LEAF, key: 'arch' }])).toEqual([]);
+    // Several frames of one kind, all sold by its feature.
+    expect(issues(['print_card', 'card_arch'], [{ ...LEAF, key: 'arch-oval' }, { ...LEAF, key: 'arch-plaque' }])).toEqual([]);
+    expect(issues(['print_card'], [{ ...LEAF, key: 'arch-oval' }])).toContain('print.shapes "arch" is sold with the card_arch feature: list it in features');
   });
 });

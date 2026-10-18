@@ -1000,3 +1000,18 @@ and the designs' names, photo places and changeable line. Glossary reused from a
 
 Not translated (Arabic and English only): the label of #18's changeable line («السطر المكتوب بخط اليد تحت المكان»).
 Countdown units, buttons and the guest form come from the platform's approved strings.
+
+## Batch 36 — the printed frames from the owner's posters — ⏳ AWAITING APPROVAL
+
+The owner's posters replace the heart and arch printed cards: Burgundy & Lace (cut corners, rounded corners), Winter Flower
+(oval, wavy frame, rounded corners) and Laurel & Bloom (oval, rounded corners); Espresso & Ivory and Vintage Love Letters
+have one frame each, named «إطار البطاقة» (already approved, batch 33 row 18). The customer picks the frame by these names
+on the order form; until approved, Kurdish orders show the Arabic. Everything written on the frames reuses each design's
+approved lines.
+
+| # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |
+|---|---|---|---|---|---|---|
+| 1 | Frame name (Burgundy & Lace) | إطار مشطوف الزوايا | Cut corners | چوارچێوەی گۆشە بڕاو | چوارچۆڤا قولنچ بڕی | ◐ |
+| 2 | Frame name (Burgundy, Winter Flower, Laurel & Bloom) | إطار بزوايا مقوّسة | Rounded corners | چوارچێوەی گۆشە خڕ | چوارچۆڤا قولنچ گروڤەر | ◐ |
+| 3 | Frame name (Winter Flower, Laurel & Bloom) | بيضاوي | Oval | هێلکەیی | هێکەیی | ◐ |
+| 4 | Frame name (Winter Flower) | إطار متموّج | Wavy frame | چوارچێوەی شەپۆلی | چوارچۆڤا پێلی | ◐ |
