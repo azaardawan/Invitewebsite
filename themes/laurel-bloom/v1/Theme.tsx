@@ -25,10 +25,10 @@ import cap from './assets/graduation-cap.webp';
 import fonts from './fonts.module.css';
 import s from './theme.module.css';
 
-/** closed → opening (the gatefold panels swing open, the inside page and the website unfold below) → open. */
+/** closed → opening (the cover lifts, the gatefold doors swing open, the inside page and the website unfold) → open. */
 type Phase = 'closed' | 'opening' | 'open';
 
-/** From the designer's prototype: the panels and the arch settle in 2.2 seconds. */
+/** The doors swing open in 1.6 s; the inside page has settled by 2.2 s. */
 const OPENING_MS = 2200;
 const REDUCED_MS = 100;
 
@@ -102,6 +102,15 @@ export default function LaurelBloom(props: ThemeProps) {
               <img src={corner.src} alt="" className={c('gl-fold-corner', 'gl-tr')} />
               <img src={corner.src} alt="" className={c('gl-fold-corner', 'gl-br')} />
             </div>
+          </div>
+          {/* the cover over the closed doors: the invitation line, the cap on a paper medallion across the seam, the name */}
+          <div className={c('lb-cover')} aria-hidden="true">
+            <p className={c('gl-eyebrow')}>{t.invited}</p>
+            <span className={c('lb-medallion')}>
+              <img src={cap.src} alt="" />
+            </span>
+            {name ? <p className={c('lb-cover-name')}>{name}</p> : null}
+            {classLine}
           </div>
           <img className={c('gl-hero-flower', 'gl-hero-flower-top')} src={roses.src} alt="" aria-hidden="true" />
           <img className={c('gl-hero-flower', 'gl-hero-flower-bottom')} src={spray.src} alt="" aria-hidden="true" />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { manifestSchema, matchesValidState, type ThemeManifest } from '@/theme-sdk/manifest';
-import { featureDependencyProblems } from '@/catalog/features';
+import { featureDependencyProblems, shapeFeature, shapeIncluded } from '@/catalog/features';
 
 const base: ThemeManifest = {
   key: 'rose-garden',
@@ -60,5 +60,16 @@ describe('theme manifest validation', () => {
   it('reports feature dependencies', () => {
     expect(featureDependencyProblems(['keepsake_pdf'], [])).toEqual(['keepsake_pdf requires feature congratulations']);
     expect(featureDependencyProblems(['map'], [])).toEqual(['map requires field venue_map_url']);
+  });
+});
+
+describe('shaped card kinds', () => {
+  it('sells every frame of a kind with that kind\'s feature', () => {
+    expect(shapeFeature('arch')).toBe('card_arch');
+    expect(shapeFeature('arch-oval')).toBe('card_arch');
+    expect(shapeFeature('star')).toBeNull();
+    expect(shapeIncluded(['print_card', 'card_arch'], 'arch-plaque')).toBe(true);
+    expect(shapeIncluded(['print_card', 'card_heart'], 'arch-plaque')).toBe(false);
+    expect(shapeIncluded(['card_arch'], 'archway')).toBe(false);
   });
 });

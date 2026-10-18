@@ -1,5 +1,5 @@
 import { defineTheme } from '@/theme-sdk/manifest';
-import { ARCH_OUTLINE } from './outlines';
+import { FRAMES } from './print/frames';
 
 /**
  * Laurel & Bloom: a graduation invitation on soft grey paper in deep green. A gatefold poster with engraved botanical
@@ -38,7 +38,7 @@ export default defineTheme({
       features: ['music', 'countdown', 'map', 'rsvp', 'print_card'],
       fields: [...allFields],
     },
-    // VVIP: + messages to the graduate, the keepsake PDF and the arched printed card.
+    // VVIP: + messages to the graduate, the keepsake PDF and the printed frames.
     {
       features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'photos'],
       fields: [...allFields],
@@ -58,7 +58,10 @@ export default defineTheme({
     // Deep green on the grey paper (transparent background).
     card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#20443b', light: '#00000000' } },
     keepsake: { size: 'A4' },
-    // The arch of the inside page as a card of its own (outlines.ts).
-    shapes: [{ key: 'arch', label: { ar: 'قوس', en: 'Arch', ckb: 'کەوانە', bdn: 'کەڤان' }, widthMm: 110, heightMm: 170, outline: ARCH_OUTLINE }],
+    // The owner's posters as printed frames (print/frames.ts): an oval and rounded corners, with the cap and the flowers.
+    shapes: [
+      { key: 'arch-oval', label: { ar: 'بيضاوي', en: 'Oval' }, widthMm: FRAMES['arch-oval'].widthMm, heightMm: FRAMES['arch-oval'].heightMm, outline: FRAMES['arch-oval'].outline },
+      { key: 'arch-corners', label: { ar: 'إطار بزوايا مقوّسة', en: 'Rounded corners' }, widthMm: FRAMES['arch-corners'].widthMm, heightMm: FRAMES['arch-corners'].heightMm, outline: FRAMES['arch-corners'].outline },
+    ],
   },
 });

@@ -1,80 +1,81 @@
 import type { PrintShapeProps } from '@/theme-sdk';
 import fonts from '../fonts.module.css';
-import { copyFor } from '../copy';
+import { copyFor, posterBand } from '../copy';
 import { stripScale } from '../names';
-import paper from '../assets/paper.webp';
-import rose from '../assets/rose.webp';
-import seal from '../assets/wax-seal.webp';
-import p from './shape.module.css';
+import wavy from '../assets/frame-wavy.svg';
+import wavyBack from '../assets/frame-wavy-back.svg';
+import { FRAMES } from './frames';
+import { ExtraLine, PosterBack, PosterFront, boxStyle } from './PosterShape';
+import p from './poster.module.css';
+
+/** The red band over the poster's «WEDDING» (an engagement): the title's box, its band part (% of the card). */
+const BAND = [23.15, 21.31, 53.6, 11.88] as const;
 
 /**
- * The shaped cards (manifest `print.shapes`): a heart and a tall arch cut from the poster's lined letter paper, inside
- * a double wine rule that follows the cut line. Front: the rose, the names on the poster's two red strips, the date
- * and the wax seal; back: the customer's title and message, the names and the QR code.
+ * The printed frame (manifest `print.shapes`): the owner's poster on wavy letter paper, its «WEDDING Invitation» title
+ * (with the engagement band when sold as one), the couple's names on the two red strips, the message, the date, time
+ * and place. Back: the frame alone, with the customer's title and message, the names and the QR code.
  */
-export default function Shape({ shape, side, widthMm: w, heightMm: h, outline, locale, dir, lang, fields, event, labels, title, message, qrDataUrl, extraLine, occasion }: PrintShapeProps) {
+export default function Shape({ side, locale, dir, lang, fields, event, labels, title, message, qrDataUrl, extraLine, occasion }: PrintShapeProps) {
+  const frame = FRAMES.arch;
   const t = copyFor(locale, occasion);
   const n1 = fields.person_1_name;
   const n2 = fields.person_2_name;
-  const front = side === 'front';
-  const kind = shape === 'arch' ? 'arch' : 'heart';
-  const clip = `vl-${kind}-${side}`;
-  const inset = (mm: number) => `translate(${mm} ${mm}) scale(${(w - 2 * mm) / w} ${(h - 2 * mm) / h})`;
+  const date = event.date ? `${event.date.day} ${event.date.month} ${event.date.year}` : null;
+  const band = posterBand(occasion);
   return (
-    <div className={`${fonts.fonts} ${p.shape} ${p[kind]} ${front ? p.front : p.back}`} dir={dir} lang={lang} data-script={locale === 'en' ? 'latin' : 'arabic'}>
-      <svg className={p.art} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
-        <clipPath id={clip}>
-          <path d={outline} />
-        </clipPath>
-        <path d={outline} className={p.ground} />
-        {/* the paper is drawn larger, from its lower left, so its curled upper-right corner falls outside the card */}
-        <g clipPath={`url(#${clip})`}>
-          <image href={paper.src} x="0" y={-h * 0.3} width={w * 1.3} height={h * 1.3} preserveAspectRatio="xMinYMax slice" />
-        </g>
-        <path d={outline} transform={inset(3.5)} className={p.rule} vectorEffect="non-scaling-stroke" />
-        <path d={outline} transform={inset(5)} className={p.ruleInner} vectorEffect="non-scaling-stroke" />
-      </svg>
-      {/* eslint-disable-next-line @next/next/no-img-element -- print artwork */}
-      {front ? <img className={p.rose} src={rose.src} alt="" /> : null}
-      {front ? (
-        <div className={p.content}>
-          <p className={p.kicker}>{t.letterLove}</p>
-          <div className={p.strips} dir="ltr">
-            {n1 ? (
-              <p className={`${p.strip} ${p.stripOne}`}>
-                <span style={{ fontSize: `${stripScale(n1)}em` }}>{n1}</span>
-              </p>
-            ) : null}
-            {n2 ? (
-              <p className={`${p.strip} ${p.stripTwo}`}>
-                <span style={{ fontSize: `${stripScale(n2)}em` }}>{n2}</span>
-              </p>
-            ) : null}
-          </div>
-          {event.date ? <p className={p.date}>{event.date.full}</p> : null}
-          {kind === 'arch' && event.time ? <p className={p.small}>{event.time}</p> : null}
-          {kind === 'arch' && fields.venue_name ? <p className={p.small}>{fields.venue_name}</p> : null}
-          {extraLine ? <p className={p.small}>{extraLine}</p> : null}
-          {/* eslint-disable-next-line @next/next/no-img-element -- print artwork */}
-          <img className={p.seal} src={seal.src} alt="" />
-        </div>
-      ) : (
-        <div className={p.content}>
-          <h1 className={p.title}>{title}</h1>
-          {message ? (
-            <p className={p.message} data-long={message.length > 150 ? '' : undefined}>
-              {message}
+    <div className={`${fonts.fonts} ${p.poster}`} dir={dir} lang={lang} data-script={locale === 'en' ? 'latin' : 'arabic'}>
+      {side === 'front' ? (
+        <PosterFront
+          frame={frame}
+          art={wavy.src}
+          lines={{
+            kicker: t.dear,
+            message: fields.invitation_message || t.presence,
+            date,
+            time: event.time,
+            venue: fields.venue_name,
+          }}
+        >
+          {band ? (
+            <p className={`${p.box} ${p.band}`} style={boxStyle(BAND)}>
+              {band}
             </p>
           ) : null}
-          <p className={p.backNames}>{[n1, n2].filter(Boolean).join(` ${labels.and} `)}</p>
-          {qrDataUrl ? (
-            <figure className={p.qr}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}
-              <img src={qrDataUrl} alt="" />
-              <figcaption>{labels.scanToOpen}</figcaption>
-            </figure>
+          {n1 ? (
+            <p
+              className={`${p.box} ${p.strip}`}
+              style={{
+                ...boxStyle(frame.boxes.strip1),
+                fontSize: `${6 * stripScale(n1)}mm`,
+              }}
+            >
+              {n1}
+            </p>
           ) : null}
-        </div>
+          {n2 ? (
+            <p
+              className={`${p.box} ${p.strip} ${p.stripTwo}`}
+              style={{
+                ...boxStyle(frame.boxes.strip2),
+                fontSize: `${6 * stripScale(n2)}mm`,
+              }}
+            >
+              {n2}
+            </p>
+          ) : null}
+          <ExtraLine frame={frame} text={extraLine} />
+        </PosterFront>
+      ) : (
+        <PosterBack
+          art={wavyBack.src}
+          ink="#78291f"
+          title={title}
+          message={message}
+          names={[n1, n2].filter(Boolean).join(` ${labels.and} `)}
+          qrDataUrl={qrDataUrl}
+          scanToOpen={labels.scanToOpen}
+        />
       )}
     </div>
   );

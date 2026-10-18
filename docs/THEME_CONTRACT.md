@@ -158,7 +158,9 @@ A design may offer shaped printed cards next to the A5 card. On the order form t
 all** of the cards the package sells (the A5 card and/or its shapes; `invitations.card_choices`, read through
 `chosenCards`), and gets each ticked card as its own files (PDF; a shape also as PNGs), asked for with `?card=a5|leaf|heart|arch`.
 Each shape is sold by its own feature, so a package can offer any of them or none: `leaf` by `card_leaf`, `heart` by `card_heart`,
-`arch` (a tall card with a rounded top, or the design's own framed shape) by `card_arch` (all need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`). A design lists the feature of every shape it
+`arch` (a tall card with a rounded top, or the design's own framed shape) by `card_arch` (all need `print_card`; `CARD_SHAPE_FEATURES` in `src/catalog/features.ts`).
+A design may offer several shapes of one kind as `<kind>-<name>` keys (e.g. `arch-oval`, `arch-corners`: several framed
+posters), all sold by that kind's feature (`shapeFeature`); the customer ticks the ones they want. A design lists the feature of every shape it
 draws, and draws every shape whose feature it lists. Declare them in the manifest
 `print.shapes: [{ key, label: {ar, en, ckb?, bdn?}, widthMm, heightMm, outline }]`: `outline` is the cut line, an SVG path in
 millimetres (absolute `M`/`L`/`C`/`Q`/`Z`, origin top-left of the `widthMm` × `heightMm` box), usually traced from the

@@ -189,30 +189,103 @@
 }
 
 /*
- * The opening. The wording belongs to the inside page, so it no longer stays printed on the cover while the paper
- * panels swing open beneath it: it steps back as the panels part, then settles onto the arched inside page once they
- * are clear of it. The panels' movement is unchanged.
+ * The opening. The gatefold is a cover of its own: closed, the two paper doors carry only a small cover over their
+ * seam (the invitation line, the cap on a paper medallion, the graduate's name and year) and the inside page's wording
+ * waits under them. Tapped, the cover lifts away, the doors swing open on their hinges, slowly and staying in sight as
+ * they turn, and the inside page's wording rises into place as they clear it. Nothing disappears only to come back.
  */
-#frame .root[data-phase='opening'] .gl-hero-copy {
-  animation: lb-copy-turn 1.4s cubic-bezier(0.3, 0, 0.2, 1) both;
+#frame .gl-fold {
+  z-index: 6;
+  transition:
+    transform 1.6s cubic-bezier(0.5, 0.05, 0.22, 1),
+    opacity 0.5s 1.15s ease;
 }
-@keyframes lb-copy-turn {
-  0% {
+#frame .gl-fold-face::before {
+  /* a little shade that deepens as each door turns away from the light */
+  transition: background-color 1.6s ease;
+}
+#frame .root:not([data-phase='closed']) .gl-fold-left {
+  transform: rotateY(-82deg);
+  opacity: 0;
+}
+#frame .root:not([data-phase='closed']) .gl-fold-right {
+  transform: rotateY(82deg);
+  opacity: 0;
+}
+#frame .root:not([data-phase='closed']) .gl-fold-face {
+  filter: brightness(0.9);
+  transition: filter 1.4s ease;
+}
+#frame .lb-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.2cqw;
+  padding: 0 14%;
+  text-align: center;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.9s cubic-bezier(0.3, 0, 0.2, 1);
+}
+#frame .lb-medallion {
+  display: grid;
+  place-items: center;
+  width: clamp(104px, 30cqw, 190px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--gl-paper);
+  border: 1px solid var(--gl-line);
+  box-shadow:
+    0 0 0 6px var(--gl-paper),
+    0 0 0 7px #7d94867a,
+    0 10px 24px -14px #20443b88;
+}
+#frame .lb-medallion img {
+  width: 66%;
+}
+#frame .lb-cover-name {
+  margin: 0;
+  font-size: clamp(27px, 7cqw, 52px);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+#frame .lb-cover .gl-class {
+  margin: 0;
+}
+#frame .root[data-script='arabic'] .lb-cover-name {
+  font-family: var(--gl-ar);
+}
+#frame .root:not([data-phase='closed']) .lb-cover {
+  opacity: 0;
+  transform: translateY(-1.5cqw) scale(0.97);
+}
+/* the inside page's wording: under the closed doors, rising into place as they open */
+#frame .gl-hero-copy {
+  z-index: 1;
+}
+#frame .root[data-phase='closed'] .gl-hero-copy {
+  visibility: hidden;
+}
+#frame .root[data-phase='opening'] .gl-hero-copy {
+  animation: lb-rise 1.5s 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes lb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(3.5cqw);
+  }
+  to {
     opacity: 1;
     transform: none;
   }
-  10% {
-    opacity: 0;
-    transform: translateY(4px) scale(0.985);
-  }
-  30% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
+}
+#frame .root.reduced .lb-cover {
+  transition: none;
 }
 #frame .root.reduced[data-phase='opening'] .gl-hero-copy {
   animation: none;
