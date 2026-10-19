@@ -300,6 +300,7 @@
       },
       "features": {
         "music": "Music",
+        "custom_music": "Customer uploads their own song (2 minutes)",
         "countdown": "Countdown",
         "map": "Map button",
         "rsvp": "Guest form (name + attendance)",
@@ -758,6 +759,10 @@
       "order": "Order",
       "music": "Song",
       "noMusic": "No music",
+      "customSong": "The customer's own song",
+      "customSongHelp": "It plays instead of the design's song ({design}). The customer confirmed they may use it.",
+      "customSongRemove": "Remove the customer's song",
+      "customSongRemoveConfirm": "Remove the customer's song? Its file is deleted and the design's song plays again.",
       "reason": "Reason (shown in the audit log)",
       "extendTitle": "Extend",
       "extendDays": "Add days",
@@ -1267,6 +1272,7 @@
     "popular": "Most chosen",
     "features": {
       "music": "Background music that loops",
+      "custom_music": "Your own song (up to 2 minutes)",
       "countdown": "Countdown to the day",
       "map": "Venue location on the map",
       "rsvp": "Guest attendance replies",
@@ -1467,6 +1473,34 @@
         "imageTooSmall": "This photo is too small. Please choose a larger one.",
         "rateLimited": "Too many uploads for now. Please try again in a while.",
         "generic": "The photo couldn't be saved. Please try again."
+      }
+    },
+    "song": {
+      "title": "Your own song",
+      "help": "Add a song or a video from your phone; we use its sound. Up to 2 minutes play, starting where you choose. Without one, the design's song plays.",
+      "helpPublished": "Change the song your guests hear. Up to 2 minutes play, starting where you choose.",
+      "designSong": "The design's own song plays for now.",
+      "noSong": "No song added yet.",
+      "yours": "Your song",
+      "choose": "Choose a song or video",
+      "change": "Choose another song",
+      "remove": "Remove it and use the design's song",
+      "start": "Where the song starts",
+      "range": "Plays from {from} to {to}",
+      "firstPart": "The first 2 minutes will be used.",
+      "listen": "Listen",
+      "stop": "Stop",
+      "confirm": "I confirm I have the right to use this song or video in my invitation, and I am responsible for it (see the Terms).",
+      "save": "Use this song",
+      "cancel": "Cancel",
+      "uploading": "Sending… {percent}%",
+      "preparing": "Preparing your song…",
+      "errors": {
+        "tooLarge": "This file is too large (100 MB at most). Choose a shorter video or the song file itself.",
+        "unsupportedAudio": "We could not read any sound in this file. Choose another song or video.",
+        "confirm": "Please tick the box to confirm you may use this song.",
+        "rateLimited": "Too many songs sent for now. Please try again in an hour.",
+        "generic": "The song could not be saved. Please try again."
       }
     },
     "photosUpTo": "{max, plural, one {Your own photo in the design} other {Up to # of your own photos}}"

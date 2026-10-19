@@ -510,3 +510,110 @@ export async function updateTermsLifetimeLine(db: DbOrTx) {
   }
 }
 
+
+/**
+ * Lines added to the published policies when customers could add their own song (or a video's sound) and photos
+ * (owner request, 2026-10-19): who is responsible for them, our permission to use them, that we may remove them, and
+ * how long they are kept. Each goes after (or before) an exact sentence or heading of the starter text, or at the end
+ * when the owner reworded it. Kurdish is added only once the owner approves it (KURDISH_REVIEW.md batch 37): until
+ * then that language is left as it is.
+ */
+type PolicyAddition = { after?: string; before?: string; text: string };
+const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent, PolicyAddition | null> }[] = [
+  {
+    types: ['TERMS', 'TERMS_NEWBORN'],
+    lines: {
+      ar: {
+        before: '## الملكية',
+        text: `## الأغاني والفيديوهات والصور التي تضيفها
+- إذا كانت باقتك تتيح إضافة أغنيتك الخاصة (أو فيديو نستخدم صوته) أو صورك الخاصة، فإنك تؤكد أنك تملكها أو لديك إذن باستخدامها في دعوتك، وأنك المسؤول عنها.
+- تبقى ملكاً لك، وتمنحنا الإذن بحفظها وتحويلها وعرضها في دعوتك وملفاتها فقط. نقصّ الأغنية إلى دقيقتين، ولا نبيع ما ترفعه ولا نعيد استخدامه.
+- لا ترفع ما لا يحق لك مشاركته، ولا أي محتوى مسيء أو مخالف للقانون. يحق لنا حذف أي أغنية أو صورة في أي وقت إذا خالفت ذلك أو اعترض عليها صاحب حقوقها، وتعود عندها أغنية التصميم، ولا يترتب على ذلك حق في استرداد المبلغ.
+- إذا طالب أحد بهجه بشيء بسبب ما رفعته، فأنت المسؤول عن ذلك.
+- تُحذف مع بقية بيانات دعوتك الشخصية (راجع سياسة الخصوصية).`,
+      },
+      en: {
+        before: '## Ownership',
+        text: `## Songs, videos and photos you add
+- If your package lets you add your own song (or a video whose sound we use) or your own photos, you confirm that you own them or have permission to use them in your invitation, and that you are responsible for them.
+- They stay yours. You allow us to store, convert and show them in your invitation and its files only. We cut a song to 2 minutes, and we never sell or reuse what you upload.
+- Do not upload anything you have no right to share, or anything offensive or unlawful. We may remove any song or photo at any time if it breaks this rule or if its rights holder objects; the design's song then plays again, and this gives no right to a refund.
+- If anyone makes a claim against Bahja because of something you uploaded, you are responsible for it.
+- They are deleted with your invitation's other personal data (see the Privacy policy).`,
+      },
+      ckb: null,
+      bdn: null,
+    },
+  },
+  {
+    types: ['PRIVACY'],
+    lines: {
+      ar: {
+        after: '- من الضيوف (إذا كانت الميزة مفعّلة): الاسم، والحضور أو الاعتذار، ورسالة التهنئة.',
+        text: '- إذا تضمنتها باقتك: الصور والأغنية (أو الفيديو) التي تضيفها. نحتفظ فقط بما تحتاجه الدعوة (صور بحجم مناسب وأغنية مقصوصة إلى دقيقتين) ونحذف بياناتها المخفية مثل الموقع.',
+      },
+      en: {
+        after: '- From guests (when the feature is included): their name, whether they will attend, and their congratulation message.',
+        text: '- If your package includes them: the photos and the song (or video) you add. We keep only what the invitation needs (photos at a suitable size, a song cut to 2 minutes) and remove their hidden details such as location.',
+      },
+      ckb: null,
+      bdn: null,
+    },
+  },
+  {
+    types: ['PRIVACY'],
+    lines: {
+      ar: {
+        after: '- ردود الضيوف وملف الذكرى: حتى ١٢ شهراً بعد انتهاء الدعوة.',
+        text: '- صورك وأغنيتك الخاصة: حتى ١٢ شهراً بعد انتهاء الدعوة، وللطلبات التي لم تُدفع: ٣٠ يوماً بعد انتهاء رابط المعاينة.',
+      },
+      en: {
+        after: '- Guest replies and the keepsake: up to 12 months after the invitation ends.',
+        text: '- Your photos and your own song: up to 12 months after the invitation ends; for orders never paid, 30 days after the preview link expires.',
+      },
+      ckb: null,
+      bdn: null,
+    },
+  },
+];
+
+/** The content with the upload lines added in every language that has them and doesn't yet; null when nothing changes. */
+export function withUploadLines(type: PolicyType, content: LegalContent): LegalContent | null {
+  let changed = false;
+  const next = { ...content };
+  for (const { types, lines } of UPLOAD_ADDITIONS) {
+    if (!types.includes(type)) continue;
+    for (const lang of ['ar', 'en', 'ckb', 'bdn'] as const) {
+      const add = lines[lang];
+      const text = next[lang];
+      if (!add || !text || text.includes(add.text)) continue;
+      if (add.after && text.includes(add.after)) next[lang] = text.replace(add.after, `${add.after}\n${add.text}`);
+      else if (add.before && text.includes(add.before)) next[lang] = text.replace(add.before, `${add.text}\n\n${add.before}`);
+      else next[lang] = `${text.trimEnd()}\n\n${add.text}`;
+      changed = true;
+    }
+  }
+  return changed ? next : null;
+}
+
+/**
+ * Adds the upload lines (above) to the terms and the privacy policy. Runs with every seed and changes nothing once a
+ * line is there, so it never repeats or touches the owner's own wording. A draft in progress gets the lines (the owner
+ * publishes it); otherwise a new version with only these lines added is published, as the system (audited).
+ */
+export async function updatePoliciesForUploads(db: DbOrTx) {
+  const actor = { adminId: null, ipHash: null };
+  for (const type of ['TERMS', 'TERMS_NEWBORN', 'PRIVACY'] as const) {
+    const { draft } = await policyAdminView(db, type);
+    if (draft) {
+      const next = withUploadLines(type, draft.content);
+      if (next) await saveDraft(db, type, next, actor);
+      continue;
+    }
+    const current = await currentPolicy(db, type);
+    const next = current && withUploadLines(type, current.content);
+    if (!next) continue;
+    await saveDraft(db, type, next, actor);
+    await publishDraft(db, type, actor);
+  }
+}

@@ -627,6 +627,13 @@ The owner plans a section where people **add pictures and messages**, for exampl
    the design's `photos.max` (≤ 20), each in two re-encoded WebP sizes without metadata, in `invitation_photos`. Changeable
    before checkout, and after publishing with `self_edit`; Admin can remove one (audited). Deleted 12 months after the
    invitation ends, or 30 days after an unpaid preview expires. See THEME_CONTRACT "Customer photos".)*
+   *(Built 2026-10-19: the `custom_music` platform feature. The customer uploads a song or a video (≤ 100 MB, streamed to
+   a temporary file); ffmpeg, with only plain audio/video formats allowed and no playlists or network protocols, keeps
+   its sound from the start they pick, cut to 2 minutes with a fade, as a tag-free 128 kbit/s MP3 under `songs/`
+   (`invitations.custom_music_asset_id`). It replaces the design's song while set. The upload requires the customer's
+   rights confirmation, which is audited. Admin can remove it with a reason (audited), and housekeeping deletes it
+   with the photos. The Terms and Privacy policy gained the matching lines (`updatePoliciesForUploads`).
+   Linking a YouTube video is deliberately not offered: downloading breaks YouTube's terms and is blocked from servers.)*
 4. **Storage is already external.** All media goes to object storage (R2) behind the CDN, never into database rows.
 5. **What that future build must add, since user uploads change the risk profile:**
    - an upload pipeline: type/size checks, re-encoding, EXIF/location stripping, and possibly malware scanning;

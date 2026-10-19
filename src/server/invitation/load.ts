@@ -8,6 +8,7 @@ import { themeBorder } from '@/server/catalog/border';
 import { buildThemeProps } from './theme-props';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
+import { customSong } from '@/server/music/custom';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -22,6 +23,8 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
         .innerJoin(assets, eq(assets.id, musicTracks.assetId))
         .where(eq(musicTracks.id, inv.musicTrackId))
     : [];
+  // The customer's own song (packages with `custom_music`) replaces the design's.
+  const own = await customSong(db, inv);
   return {
     codeRef: version!.codeRef,
     props: buildThemeProps({
@@ -30,7 +33,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       fieldKeys: inv.fieldKeys,
       features: inv.featureKeys,
       values: inv.fieldValues,
-      musicSrc: music ? publicMediaUrl(music.key) : null,
+      musicSrc: own?.src ?? (music ? publicMediaUrl(music.key) : null),
       border: await themeBorder(db, inv.themeId),
       guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
       attendance: mode === 'live' && inv.publicAttendance && inv.featureKeys.includes('rsvp') ? await attendanceCounts(db, inv.id) : null,

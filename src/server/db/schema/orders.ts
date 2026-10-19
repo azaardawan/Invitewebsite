@@ -119,6 +119,11 @@ export const invitations = pgTable(
     signatureAssetId: uuid('signature_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** A second signature, when the customer chose two (e.g. both of the couple). */
     signature2AssetId: uuid('signature2_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /**
+     * The customer's own song (packages with `custom_music`): their upload cut to 2 minutes (src/server/music/custom.ts).
+     * While set it plays instead of the design's song; null = the design's song.
+     */
+    customMusicAssetId: uuid('custom_music_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */

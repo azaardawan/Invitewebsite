@@ -10,6 +10,7 @@ import {
   extendInvitation,
   InvitationAdminError,
   removeInvitationPhoto,
+  removeInvitationSong,
   setInvitationPublished,
   updateInvitationValues,
 } from '@/server/invitation/admin';
@@ -158,6 +159,17 @@ export async function attendanceVisibilityAction(_: ActionState, form: FormData)
   await setPublicAttendance(db(), id.data, form.get('public') === 'true', { type: 'ADMIN', adminId: user.id, ipHash: (await requestContext()).ipHash });
   revalidatePath(`/admin/invitations/${id.data}`);
   return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+export async function removeSongAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  try {
+    const id = ids(form);
+    await removeInvitationSong(db(), id, { reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+    return done(id);
+  } catch (e) {
+    return fail(e);
+  }
 }
 
 export async function removePhotoAction(_: ActionState, form: FormData): Promise<ActionState> {

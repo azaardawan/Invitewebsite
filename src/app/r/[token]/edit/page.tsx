@@ -11,7 +11,9 @@ import { orderFields } from '@/server/storefront/catalog';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
-import { photoState } from '@/server/storefront/order';
+import { SongUpload } from '@/components/storefront/order/SongUpload';
+import { songLabels } from '@/components/storefront/order/song-labels';
+import { photoState, songState } from '@/server/storefront/order';
 import { invitationPath } from '@/lib/ids';
 import { receiptFor } from '../data';
 import { customerEditAction } from '../actions';
@@ -45,6 +47,8 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
   const minDate = existingDate && existingDate < today ? existingDate : today;
   // The customer's photos (packages with `photos`): changed here too, saved one by one.
   const photos = await photoState(inv!);
+  // …and their own song (packages with `custom_music`).
+  const song = await songState(inv!);
   const ts = await getTranslations({ locale, namespace: 'store' });
 
   return (
@@ -90,6 +94,11 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
               },
             }}
           />
+        </div>
+      ) : null}
+      {song ? (
+        <div className="mt-8">
+          <SongUpload base={`/r/${encodeURIComponent(token)}/music`} initial={song.song} hasDesignSong={song.hasDesignSong} labels={songLabels(ts, true)} />
         </div>
       ) : null}
       <div className="mt-8">
