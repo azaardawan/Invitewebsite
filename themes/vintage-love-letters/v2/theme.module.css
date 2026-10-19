@@ -173,7 +173,7 @@
 #frame .root[data-script=arabic] .vp-countdown-ticket span {font-family:var(--vl-ar);font-size:clamp(15px,4cqw,20px)}
 #frame .root[data-script=arabic] .vp-date-stamp span {font-family:var(--vl-ar);font-size:clamp(11px,2.8cqw,14px)}
 #frame .root[data-script=arabic] .vp-ending-copy h2 {font-size:clamp(31px,8.6cqw,44px)!important;line-height:1.5!important}
-#frame .root[data-script=arabic] .vp-ending-names {direction:ltr}
+#frame .root[data-script=arabic] .vp-ending-names {direction:rtl}
 #frame .vp-welcome,
 #frame .vp-details {background-size:210% auto;background-position:50% 50%}
 #frame .vp-reply-paper:before {background-size:220% auto;background-position:50% 50%}
