@@ -1016,13 +1016,12 @@ approved lines.
 | 3 | Frame name (Winter Flower, Laurel & Bloom) | بيضاوي | Oval | هێلکەیی | هێکەیی | ◐ |
 | 4 | Frame name (Winter Flower) | إطار متموّج | Wavy frame | چوارچێوەی شەپۆلی | چوارچۆڤا پێلی | ◐ |
 
-## Batch 37 — the customer's own song, and the new lines in the Terms and Privacy policy — ⏳ AWAITING APPROVAL
+## Batch 37 — the customer's own song, and the new lines in the Terms and Privacy policy — ✅ APPROVED (2026-10-19)
 
 Packages with **Your own song** (`custom_music`) let the customer upload a song or a video; its sound plays (2 minutes at
 most, from where they choose) instead of the design's song. Rows 1–25 are the order page and the receipt's edit page;
 until approved, Kurdish visitors see the Arabic. Rows 26–33 are the new lines of the Terms (wedding and newborn) and the
-Privacy policy: the Arabic and English are already published by the deploy's seed (`updatePoliciesForUploads`); the
-Kurdish policies keep their current text until these rows are approved, then a new version with them is published.
+Privacy policy, published in all four languages by the deploy's seed (`updatePoliciesForUploads`).
 "Song" is گۆرانی in Sorani and ستران in Badini.
 
 | # | Where | Arabic | English | Suggested Sorani (ckb) | Suggested Badini (bdn) | Conf. |

@@ -431,6 +431,11 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
   },
 };
 
+/** The starter text of a policy (for tests and checks). */
+export function draftContent(type: PolicyType): LegalContent {
+  return DRAFTS[type];
+}
+
 export async function seedLegalDrafts(db: DbOrTx) {
   for (const [type, content] of Object.entries(DRAFTS) as [PolicyType, LegalContent][]) {
     const rows = await db.select().from(legalPolicyVersions).where(eq(legalPolicyVersions.type, type));
@@ -515,8 +520,7 @@ export async function updateTermsLifetimeLine(db: DbOrTx) {
  * Lines added to the published policies when customers could add their own song (or a video's sound) and photos
  * (owner request, 2026-10-19): who is responsible for them, our permission to use them, that we may remove them, and
  * how long they are kept. Each goes after (or before) an exact sentence or heading of the starter text, or at the end
- * when the owner reworded it. Kurdish is added only once the owner approves it (KURDISH_REVIEW.md batch 37): until
- * then that language is left as it is.
+ * when the owner reworded it. Kurdish approved by the owner (KURDISH_REVIEW.md batch 37, 2026-10-19).
  */
 type PolicyAddition = { after?: string; before?: string; text: string };
 const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent, PolicyAddition | null> }[] = [
@@ -541,8 +545,24 @@ const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent,
 - If anyone makes a claim against Bahja because of something you uploaded, you are responsible for it.
 - They are deleted with your invitation's other personal data (see the Privacy policy).`,
       },
-      ckb: null,
-      bdn: null,
+      ckb: {
+        before: "## خاوەندارێتی",
+        text: `## ئەو گۆرانی و ڤیدیۆ و وێنانەی زیادیان دەکەیت
+- ئەگەر پاکێجەکەت ڕێگە بدات گۆرانی تایبەتی خۆت (یان ڤیدیۆیەک کە دەنگەکەی بەکاردەهێنین) یان وێنەکانی خۆت زیاد بکەیت، پشتڕاستی دەکەیتەوە کە خاوەنیانیت یان مۆڵەتی بەکارهێنانیانت لە بانگهێشتنامەکەتدا هەیە، و تۆ بەرپرسیاریت لێیان.
+- هەر موڵکی خۆتن. ڕێگەمان پێدەدەیت تەنها لە بانگهێشتنامەکەت و فایلەکانیدا هەڵیانبگرین، بیانگۆڕین و پیشانیان بدەین. گۆرانی تا دوو خولەک کورت دەکەینەوە، و هەرگیز ئەوەی بارت کردووە نافرۆشین و دووبارە بەکاری ناهێنینەوە.
+- هیچ شتێک بار مەکە کە مافی هاوبەشکردنیت نییە، یان ناوەڕۆکی سووکایەتیئامێز یان نایاسایی. مافی ئەوەمان هەیە هەر کاتێک هەر گۆرانی یان وێنەیەک بسڕینەوە ئەگەر پێچەوانەی ئەمە بێت یان خاوەنی مافەکەی ناڕەزایی دەربڕێت؛ ئەوکات گۆرانی دیزاینەکە دووبارە لێدەدرێتەوە، و ئەمە مافی گەڕاندنەوەی پارە نادات.
+- ئەگەر کەسێک داوایەک لە بەهجە بکات بەهۆی شتێکەوە کە تۆ بارت کردووە، تۆ بەرپرسیاریت لێی.
+- لەگەڵ زانیارییە کەسییەکانی تری بانگهێشتنامەکەتدا دەسڕدرێنەوە (سەیری سیاسەتی تایبەتمەندی بکە).`,
+      },
+      bdn: {
+        before: "## خودانداری",
+        text: `## ئەو ستران و ڤیدیۆ و وێنێن تو زێدە دکەی
+- ئەگەر پاکێجا تە ڕێ بدەت تو سترانا خۆ یا تایبەت (یان ڤیدیۆیەکێ کو ئەم دەنگێ وێ بکاردئینین) یان وێنێن خۆ زێدە بکەی، تو پشتڕاست دکەی کو تو خودانێ وانی یان مۆلەتا بکارئینانا وان د داخوازناما خۆ دا هەیە، و تو بەرپرسیاری ژ وان.
+- ئەو هەر یێن تە نە. تو ڕێ ددەیە مە بتنێ د داخوازناما تە و فایلێن وێ دا وان هەلگرین، بگوهۆڕین و نیشان بدەین. ئەم سترانێ هەتا دوو خولەکان کورت دکەین، و ئەم چ جاران وێ یا تە بارکری نافرۆشین و دووبارە بکار نائینین.
+- چ تشتان بار نەکە یێن مافێ تە نەبیت بەلاڤ بکەی، یان ناڤەروکا ڕێزشکێن یان نەیاسایی. مافێ مە هەیە هەر دەمەکێ هەر سترانەکێ یان وێنەکێ ژێببەین ئەگەر ڤێ یەکێ بشکێنیت یان خودانێ مافێ وێ نەڕازیبوونێ دیار بکەت؛ هینگێ سترانا دیزاینێ دووبارە دهێتە لێدان، و ئەڤە چ مافێ ڤەگەڕاندنا پارەی نادەت.
+- ئەگەر ئێک داخوازیەکێ ژ بەهجە بکەت ژ بەر تشتەکێ تە بارکری، تو بەرپرسیاری ژێ.
+- دگەل زانیاریێن دی یێن کەسی یێن داخوازناما تە دهێنە ژێبرن (سەحکە سیاسەتا تایبەتمەندیێ).`,
+      },
     },
   },
   {
@@ -556,8 +576,14 @@ const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent,
         after: '- From guests (when the feature is included): their name, whether they will attend, and their congratulation message.',
         text: '- If your package includes them: the photos and the song (or video) you add. We keep only what the invitation needs (photos at a suitable size, a song cut to 2 minutes) and remove their hidden details such as location.',
       },
-      ckb: null,
-      bdn: null,
+      ckb: {
+        after: "- لە میوانەکان (ئەگەر تایبەتمەندییەکە چالاک بێت): ناو، ئامادەبوون یان نەهاتن، و نامەی پیرۆزبایی.",
+        text: "- ئەگەر پاکێجەکەت تێیدا بێت: ئەو وێنە و گۆرانییە (یان ڤیدیۆیە) کە زیادی دەکەیت. تەنها ئەوەی بانگهێشتنامەکە پێویستیەتی هەڵدەگرین (وێنە بە قەبارەیەکی گونجاو، گۆرانییەک کە تا دوو خولەک کورت کراوەتەوە) و زانیارییە شاراوەکانیان وەک شوێن دەسڕینەوە.",
+      },
+      bdn: {
+        after: "- ژ مێڤانان (ئەگەر تایبەتمەندی چالاک بیت): ناڤ، ئامادەبوون یان نەهاتن، و نامەیا پیرۆزباهیێ.",
+        text: "- ئەگەر پاکێجا تە ئەو تێدا هەبن: ئەو وێنە و سترانا (یان ڤیدیۆیا) تو زێدە دکەی. ئەم بتنێ وێ هەلدگرین یا داخوازنامە پێدڤی پێ هەی (وێنە ب قەبارەکا گونجای، سترانەک هەتا دوو خولەکان کورتکری) و زانیاریێن وان یێن ڤەشارتی وەکی جهی ژێدبەین.",
+      },
     },
   },
   {
@@ -571,8 +597,14 @@ const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent,
         after: '- Guest replies and the keepsake: up to 12 months after the invitation ends.',
         text: '- Your photos and your own song: up to 12 months after the invitation ends; for orders never paid, 30 days after the preview link expires.',
       },
-      ckb: null,
-      bdn: null,
+      ckb: {
+        after: "- وەڵامی میوانەکان و فایلی یادگاری: تا ١٢ مانگ دوای کۆتاییهاتنی بانگهێشتنامەکە.",
+        text: "- وێنەکانت و گۆرانی تایبەتی خۆت: تا ١٢ مانگ دوای کۆتاییهاتنی بانگهێشتنامەکە؛ بۆ داواکارییەکانی کە پارەیان نەدراوە، ٣٠ ڕۆژ دوای بەسەرچوونی بەستەری پێشبینین.",
+      },
+      bdn: {
+        after: "- بەرسڤێن مێڤانان و فایلا بیرهاتنێ: هەتا ١٢ هەیڤان پشتی ب دوماهی هاتنا داخوازنامێ.",
+        text: "- وێنێن تە و سترانا تە یا تایبەت: هەتا ١٢ هەیڤان پشتی ب دوماهیهاتنا داخوازنامێ؛ بۆ وان داخوازیێن پارە بۆ نەهاتییە دان، ٣٠ ڕۆژان پشتی ب دوماهیهاتنا لینکا پێشدیتنێ.",
+      },
     },
   },
 ];

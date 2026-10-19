@@ -168,11 +168,13 @@ describe('customer’s own song (feature `custom_music`)', () => {
 describe('policies for customers’ songs and photos', () => {
   const terms = { ar: 'مقدمة\n\n## الملكية\n- نص', en: 'Intro\n\n## Ownership\n- Text', ckb: 'ckb', bdn: 'bdn' };
 
-  it('adds the section before Ownership once, leaving unapproved Kurdish as it is', () => {
+  it('adds the section before Ownership once, in all four languages', () => {
     const next = withUploadLines('TERMS', terms)!;
     expect(next.en).toMatch(/## Songs, videos and photos you add[\s\S]*\n\n## Ownership/);
     expect(next.ar).toMatch(/## الأغاني والفيديوهات والصور التي تضيفها[\s\S]*\n\n## الملكية/);
-    expect(next.ckb).toBe('ckb');
+    // Reworded Kurdish (no Ownership heading here): the section goes at the end.
+    expect(next.ckb).toMatch(/^ckb\n\n## ئەو گۆرانی و ڤیدیۆ و وێنانەی زیادیان دەکەیت/);
+    expect(next.bdn).toMatch(/^bdn\n\n## ئەو ستران و ڤیدیۆ و وێنێن تو زێدە دکەی/);
     expect(withUploadLines('TERMS', next)).toBeNull();
   });
 
@@ -188,5 +190,18 @@ describe('policies for customers’ songs and photos', () => {
     expect(next.en.trimEnd().endsWith('30 days after the preview link expires.')).toBe(true);
     expect(next.ar).toContain('صورك وأغنيتك الخاصة');
     expect(withUploadLines('REFUND', privacy)).toBeNull();
+  });
+
+  it('places the Kurdish lines after the matching sentences of the starter policies', async () => {
+    const { draftContent } = await import('@/server/legal/seed');
+    const terms = withUploadLines('TERMS', draftContent('TERMS'))!;
+    expect(terms.ckb).toMatch(/## ئەو گۆرانی و ڤیدیۆ و وێنانەی زیادیان دەکەیت[\s\S]*\n\n## خاوەندارێتی/);
+    expect(terms.bdn).toMatch(/## ئەو ستران و ڤیدیۆ و وێنێن تو زێدە دکەی[\s\S]*\n\n## خودانداری/);
+    const privacy = withUploadLines('PRIVACY', draftContent('PRIVACY'))!;
+    for (const lang of ['ar', 'en', 'ckb', 'bdn'] as const) {
+      // Both lines sit inside the policy (not appended at the end, after "Your rights").
+      expect(privacy[lang]!.trimEnd().split('\n').at(-1)).toBe(draftContent('PRIVACY')[lang]!.trimEnd().split('\n').at(-1));
+      expect(privacy[lang]!.length).toBeGreaterThan(draftContent('PRIVACY')[lang]!.length + 100);
+    }
   });
 });
