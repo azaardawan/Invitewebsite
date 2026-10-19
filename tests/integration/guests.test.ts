@@ -86,7 +86,9 @@ describe('guest responses', () => {
   it('rate-limits one visitor', async () => {
     const inv = await published();
     const ipHash = randomToken(8);
-    const send = () => submitGuestResponse(db(), { invitationId: inv.id, response: { name: 'سارة', attendance: 'ATTENDING' }, ipHash, clientToken: randomToken(24) });
+    // One clock for every reply, so the burst never straddles the start of a new hour (the limit is per hour).
+    const now = new Date();
+    const send = () => submitGuestResponse(db(), { invitationId: inv.id, response: { name: 'سارة', attendance: 'ATTENDING' }, ipHash, clientToken: randomToken(24) }, now);
     for (let i = 0; i < GUEST_RATE_LIMITS.perIpPerHour; i++) expect(await send()).toEqual({ ok: true });
     expect(await send()).toEqual({ ok: false, error: 'rateLimited' });
   });
