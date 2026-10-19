@@ -61,6 +61,8 @@ const schema = z.object({
   CALLMEBOT_API_KEY: z.preprocess((v) => (typeof v === 'string' ? v.trim() || undefined : v), z.string().min(3).optional()).catch(undefined),
   /** Chromium used to render PDFs; defaults to Playwright's bundled browser (the Docker image sets /usr/bin/chromium). */
   CHROMIUM_PATH: z.string().optional(),
+  /** ffmpeg, which turns customers' songs and videos into MP3 (the Docker image installs it); defaults to `ffmpeg` on the PATH. */
+  FFMPEG_PATH: z.string().optional(),
   /** Where the PDF renderer reaches this app's print pages; defaults to http://127.0.0.1:$PORT. */
   PRINT_ORIGIN: z.url().optional(),
   /** Shared secret for the scheduled reconciliation call (`POST /api/cron/reconcile-payments`). */

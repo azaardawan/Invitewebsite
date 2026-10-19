@@ -1,6 +1,7 @@
 import { MAIN_CARD } from '@/catalog/features';
 import { invitationCards } from '@/server/documents/data';
 import { listPhotos } from '@/server/photos/photos';
+import { customSong } from '@/server/music/custom';
 import { isForever } from '@/catalog/lifetime';
 import { themeNumber } from '@/theme-registry';
 import { INITIALS_MAX, invitationNames, splitInitials } from '@/catalog/fields';
@@ -29,6 +30,7 @@ import {
   editInvitationAction,
   extendInvitationAction,
   removePhotoAction,
+  removeSongAction,
   removeCustomCardAction,
   guestMessageStatusAction,
   guestbookVisibilityAction,
@@ -74,6 +76,8 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   // The customer's photos (packages with `photos`): looked at here, and taken off when unsuitable.
   const photos = inv.featureKeys.includes('photos') ? await listPhotos(db(), inv.id) : null;
   const canEdit = can(authz, 'invitations.edit');
+  // The customer's own song (packages with `custom_music`): it plays instead of the design's; taken off on a complaint.
+  const song = await customSong(db(), inv);
   const [fields, tracks, guests, counts] = await Promise.all([
     orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
     activeMusicTracks(db()),
@@ -142,8 +146,24 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
         </p>
         <p>
           <span className="text-muted">{t('music')}: </span>
-          {row.music?.title ?? t('noMusic')}
+          {song ? t('customSong') : (row.music?.title ?? t('noMusic'))}
         </p>
+        {song ? (
+          <div className="space-y-2" data-admin-song>
+            <audio controls preload="none" src={song.src} className="w-full max-w-md" />
+            <p className="text-xs text-muted">{t('customSongHelp', { design: row.music?.title ?? t('noMusic') })}</p>
+            {canEdit ? (
+              <details>
+                <summary className="cursor-pointer text-xs text-danger">{t('customSongRemove')}</summary>
+                <ActionForm action={removeSongAction} confirmMessage={t('customSongRemoveConfirm')} className="mt-2 space-y-2">
+                  <input type="hidden" name="id" value={inv.id} />
+                  {reason}
+                  <SubmitButton tone="danger">{t('customSongRemove')}</SubmitButton>
+                </ActionForm>
+              </details>
+            ) : null}
+          </div>
+        ) : null}
         {row.orders.map((o) => (
           <p key={o.id}>
             <span className="text-muted">{t('order')}: </span>

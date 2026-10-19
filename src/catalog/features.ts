@@ -7,6 +7,8 @@ import type { FieldKey } from './fields';
  */
 export const FEATURES = {
   music: { requires: [], requiresFields: [] },
+  /** The customer uploads their own song (or a video, whose sound is used); the first 2 minutes replace the design's song. */
+  custom_music: { requires: ['music'], requiresFields: [] },
   countdown: { requires: [], requiresFields: ['event_date'] },
   map: { requires: [], requiresFields: ['venue_map_url'] },
   /** Guest form: name + attending / not attending. */
@@ -43,7 +45,7 @@ export const FEATURES = {
  * Features handled entirely by the platform: any theme can be sold with them,
  * so they are never listed in a theme's manifest.
  */
-export const PLATFORM_FEATURES = ['self_edit', 'story', 'sticker', 'bottle_label'] as const satisfies readonly (keyof typeof FEATURES)[];
+export const PLATFORM_FEATURES = ['self_edit', 'custom_music', 'story', 'sticker', 'bottle_label'] as const satisfies readonly (keyof typeof FEATURES)[];
 export function isPlatformFeature(key: string) {
   return (PLATFORM_FEATURES as readonly string[]).includes(key);
 }

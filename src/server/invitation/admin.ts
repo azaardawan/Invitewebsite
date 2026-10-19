@@ -4,6 +4,7 @@ import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitationPhotos, invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
 import { closeGap, deletePhotoFiles } from '@/server/photos/photos';
+import { deleteSongFiles } from '@/server/music/custom';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { fieldDefs } from '@/server/orders/common';
@@ -196,3 +197,19 @@ export async function removeInvitationPhoto(db: DbOrTx, id: string, input: { pos
   await deletePhotoFiles(db, [removed.assetId, removed.displayAssetId]);
 }
 
+
+/**
+ * Takes the customer's own song off an invitation (e.g. a copyright complaint or an unsuitable song): the design's
+ * song plays again and the file is deleted. Needs a reason; audited.
+ */
+export async function removeInvitationSong(db: DbOrTx, id: string, input: { reason: string }, actor: Actor) {
+  const reason = requireReason(input.reason);
+  const assetId = await db.transaction(async (tx) => {
+    const inv = await lockFor(tx, id);
+    if (!inv.customMusicAssetId) throw new InvitationAdminError('notFound');
+    await tx.update(invitations).set({ customMusicAssetId: null, version: inv.version + 1 }).where(eq(invitations.id, id));
+    await recordAudit(tx, { ...auditActor(actor), action: 'invitation.custom_music_removed', objectType: 'invitation', objectId: id, reason });
+    return inv.customMusicAssetId;
+  });
+  await deleteSongFiles(db, [assetId]);
+}

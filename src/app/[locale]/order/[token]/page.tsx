@@ -10,6 +10,8 @@ import { CheckoutForm } from '@/components/storefront/order/CheckoutForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
 import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
+import { SongUpload } from '@/components/storefront/order/SongUpload';
+import { songLabels } from '@/components/storefront/order/song-labels';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
@@ -124,6 +126,9 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
                 },
               }}
             />
+          ) : null}
+          {draft.song && draft.status === 'DRAFT' && draft.onlineInvitation ? (
+            <SongUpload base={`/p/${token}/music`} initial={draft.song.song} hasDesignSong={draft.song.hasDesignSong} labels={songLabels(t)} />
           ) : null}
           <ExtrasPreview
             base={`/p/${token}/extra`}

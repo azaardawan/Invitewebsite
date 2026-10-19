@@ -14,9 +14,9 @@ RUN pnpm build
 FROM base AS run
 ENV NODE_ENV=production
 # Headless Chromium renders the printable card and keepsake PDFs (src/server/documents).
-# Noto supplies fallback glyphs; themes embed their own fonts.
+# Noto supplies fallback glyphs; themes embed their own fonts. ffmpeg turns customers' songs and videos into MP3.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends chromium fonts-noto-core \
+  && apt-get install -y --no-install-recommends chromium fonts-noto-core ffmpeg \
   && rm -rf /var/lib/apt/lists/*
 ENV CHROMIUM_PATH=/usr/bin/chromium
 COPY --from=build /app /app

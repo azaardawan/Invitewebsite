@@ -1,4 +1,5 @@
 import 'server-only';
+import { customMusicIncluded, customSong } from '@/server/music/custom';
 import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
@@ -66,7 +67,14 @@ export async function draftByToken(token: string) {
     pkg: { id: row.pkg.id, name: row.pkg.name, priceIqd: row.pkg.priceIqd, lifetime: row.pkg.lifetime },
     /** The design's photo places and the customer's photos so far (packages with `photos`), or null. */
     photos: await photoState(inv),
+    song: await songState(inv),
   };
+}
+
+/** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */
+export async function songState(inv: typeof invitations.$inferSelect) {
+  if (!customMusicIncluded(inv)) return null;
+  return { song: await customSong(db(), inv), hasDesignSong: Boolean(inv.musicTrackId) };
 }
 
 /** A design's photo places (how many, their frame and names in the invitation's language) and the photos so far. */

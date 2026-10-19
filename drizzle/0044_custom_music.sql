@@ -1,0 +1,2 @@
+ALTER TABLE "invitations" ADD COLUMN "custom_music_asset_id" uuid;--> statement-breakpoint
+ALTER TABLE "invitations" ADD CONSTRAINT "invitations_custom_music_asset_id_assets_id_fk" FOREIGN KEY ("custom_music_asset_id") REFERENCES "public"."assets"("id") ON DELETE set null ON UPDATE no action;

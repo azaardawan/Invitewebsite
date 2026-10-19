@@ -431,6 +431,11 @@ const DRAFTS: Record<PolicyType, LegalContent> = {
   },
 };
 
+/** The starter text of a policy (for tests and checks). */
+export function draftContent(type: PolicyType): LegalContent {
+  return DRAFTS[type];
+}
+
 export async function seedLegalDrafts(db: DbOrTx) {
   for (const [type, content] of Object.entries(DRAFTS) as [PolicyType, LegalContent][]) {
     const rows = await db.select().from(legalPolicyVersions).where(eq(legalPolicyVersions.type, type));
@@ -510,3 +515,137 @@ export async function updateTermsLifetimeLine(db: DbOrTx) {
   }
 }
 
+
+/**
+ * Lines added to the published policies when customers could add their own song (or a video's sound) and photos
+ * (owner request, 2026-10-19): who is responsible for them, our permission to use them, that we may remove them, and
+ * how long they are kept. Each goes after (or before) an exact sentence or heading of the starter text, or at the end
+ * when the owner reworded it. Kurdish approved by the owner (KURDISH_REVIEW.md batch 37, 2026-10-19).
+ */
+type PolicyAddition = { after?: string; before?: string; text: string };
+const UPLOAD_ADDITIONS: { types: PolicyType[]; lines: Record<keyof LegalContent, PolicyAddition | null> }[] = [
+  {
+    types: ['TERMS', 'TERMS_NEWBORN'],
+    lines: {
+      ar: {
+        before: '## الملكية',
+        text: `## الأغاني والفيديوهات والصور التي تضيفها
+- إذا كانت باقتك تتيح إضافة أغنيتك الخاصة (أو فيديو نستخدم صوته) أو صورك الخاصة، فإنك تؤكد أنك تملكها أو لديك إذن باستخدامها في دعوتك، وأنك المسؤول عنها.
+- تبقى ملكاً لك، وتمنحنا الإذن بحفظها وتحويلها وعرضها في دعوتك وملفاتها فقط. نقصّ الأغنية إلى دقيقتين، ولا نبيع ما ترفعه ولا نعيد استخدامه.
+- لا ترفع ما لا يحق لك مشاركته، ولا أي محتوى مسيء أو مخالف للقانون. يحق لنا حذف أي أغنية أو صورة في أي وقت إذا خالفت ذلك أو اعترض عليها صاحب حقوقها، وتعود عندها أغنية التصميم، ولا يترتب على ذلك حق في استرداد المبلغ.
+- إذا طالب أحد بهجه بشيء بسبب ما رفعته، فأنت المسؤول عن ذلك.
+- تُحذف مع بقية بيانات دعوتك الشخصية (راجع سياسة الخصوصية).`,
+      },
+      en: {
+        before: '## Ownership',
+        text: `## Songs, videos and photos you add
+- If your package lets you add your own song (or a video whose sound we use) or your own photos, you confirm that you own them or have permission to use them in your invitation, and that you are responsible for them.
+- They stay yours. You allow us to store, convert and show them in your invitation and its files only. We cut a song to 2 minutes, and we never sell or reuse what you upload.
+- Do not upload anything you have no right to share, or anything offensive or unlawful. We may remove any song or photo at any time if it breaks this rule or if its rights holder objects; the design's song then plays again, and this gives no right to a refund.
+- If anyone makes a claim against Bahja because of something you uploaded, you are responsible for it.
+- They are deleted with your invitation's other personal data (see the Privacy policy).`,
+      },
+      ckb: {
+        before: "## خاوەندارێتی",
+        text: `## ئەو گۆرانی و ڤیدیۆ و وێنانەی زیادیان دەکەیت
+- ئەگەر پاکێجەکەت ڕێگە بدات گۆرانی تایبەتی خۆت (یان ڤیدیۆیەک کە دەنگەکەی بەکاردەهێنین) یان وێنەکانی خۆت زیاد بکەیت، پشتڕاستی دەکەیتەوە کە خاوەنیانیت یان مۆڵەتی بەکارهێنانیانت لە بانگهێشتنامەکەتدا هەیە، و تۆ بەرپرسیاریت لێیان.
+- هەر موڵکی خۆتن. ڕێگەمان پێدەدەیت تەنها لە بانگهێشتنامەکەت و فایلەکانیدا هەڵیانبگرین، بیانگۆڕین و پیشانیان بدەین. گۆرانی تا دوو خولەک کورت دەکەینەوە، و هەرگیز ئەوەی بارت کردووە نافرۆشین و دووبارە بەکاری ناهێنینەوە.
+- هیچ شتێک بار مەکە کە مافی هاوبەشکردنیت نییە، یان ناوەڕۆکی سووکایەتیئامێز یان نایاسایی. مافی ئەوەمان هەیە هەر کاتێک هەر گۆرانی یان وێنەیەک بسڕینەوە ئەگەر پێچەوانەی ئەمە بێت یان خاوەنی مافەکەی ناڕەزایی دەربڕێت؛ ئەوکات گۆرانی دیزاینەکە دووبارە لێدەدرێتەوە، و ئەمە مافی گەڕاندنەوەی پارە نادات.
+- ئەگەر کەسێک داوایەک لە بەهجە بکات بەهۆی شتێکەوە کە تۆ بارت کردووە، تۆ بەرپرسیاریت لێی.
+- لەگەڵ زانیارییە کەسییەکانی تری بانگهێشتنامەکەتدا دەسڕدرێنەوە (سەیری سیاسەتی تایبەتمەندی بکە).`,
+      },
+      bdn: {
+        before: "## خودانداری",
+        text: `## ئەو ستران و ڤیدیۆ و وێنێن تو زێدە دکەی
+- ئەگەر پاکێجا تە ڕێ بدەت تو سترانا خۆ یا تایبەت (یان ڤیدیۆیەکێ کو ئەم دەنگێ وێ بکاردئینین) یان وێنێن خۆ زێدە بکەی، تو پشتڕاست دکەی کو تو خودانێ وانی یان مۆلەتا بکارئینانا وان د داخوازناما خۆ دا هەیە، و تو بەرپرسیاری ژ وان.
+- ئەو هەر یێن تە نە. تو ڕێ ددەیە مە بتنێ د داخوازناما تە و فایلێن وێ دا وان هەلگرین، بگوهۆڕین و نیشان بدەین. ئەم سترانێ هەتا دوو خولەکان کورت دکەین، و ئەم چ جاران وێ یا تە بارکری نافرۆشین و دووبارە بکار نائینین.
+- چ تشتان بار نەکە یێن مافێ تە نەبیت بەلاڤ بکەی، یان ناڤەروکا ڕێزشکێن یان نەیاسایی. مافێ مە هەیە هەر دەمەکێ هەر سترانەکێ یان وێنەکێ ژێببەین ئەگەر ڤێ یەکێ بشکێنیت یان خودانێ مافێ وێ نەڕازیبوونێ دیار بکەت؛ هینگێ سترانا دیزاینێ دووبارە دهێتە لێدان، و ئەڤە چ مافێ ڤەگەڕاندنا پارەی نادەت.
+- ئەگەر ئێک داخوازیەکێ ژ بەهجە بکەت ژ بەر تشتەکێ تە بارکری، تو بەرپرسیاری ژێ.
+- دگەل زانیاریێن دی یێن کەسی یێن داخوازناما تە دهێنە ژێبرن (سەحکە سیاسەتا تایبەتمەندیێ).`,
+      },
+    },
+  },
+  {
+    types: ['PRIVACY'],
+    lines: {
+      ar: {
+        after: '- من الضيوف (إذا كانت الميزة مفعّلة): الاسم، والحضور أو الاعتذار، ورسالة التهنئة.',
+        text: '- إذا تضمنتها باقتك: الصور والأغنية (أو الفيديو) التي تضيفها. نحتفظ فقط بما تحتاجه الدعوة (صور بحجم مناسب وأغنية مقصوصة إلى دقيقتين) ونحذف بياناتها المخفية مثل الموقع.',
+      },
+      en: {
+        after: '- From guests (when the feature is included): their name, whether they will attend, and their congratulation message.',
+        text: '- If your package includes them: the photos and the song (or video) you add. We keep only what the invitation needs (photos at a suitable size, a song cut to 2 minutes) and remove their hidden details such as location.',
+      },
+      ckb: {
+        after: "- لە میوانەکان (ئەگەر تایبەتمەندییەکە چالاک بێت): ناو، ئامادەبوون یان نەهاتن، و نامەی پیرۆزبایی.",
+        text: "- ئەگەر پاکێجەکەت تێیدا بێت: ئەو وێنە و گۆرانییە (یان ڤیدیۆیە) کە زیادی دەکەیت. تەنها ئەوەی بانگهێشتنامەکە پێویستیەتی هەڵدەگرین (وێنە بە قەبارەیەکی گونجاو، گۆرانییەک کە تا دوو خولەک کورت کراوەتەوە) و زانیارییە شاراوەکانیان وەک شوێن دەسڕینەوە.",
+      },
+      bdn: {
+        after: "- ژ مێڤانان (ئەگەر تایبەتمەندی چالاک بیت): ناڤ، ئامادەبوون یان نەهاتن، و نامەیا پیرۆزباهیێ.",
+        text: "- ئەگەر پاکێجا تە ئەو تێدا هەبن: ئەو وێنە و سترانا (یان ڤیدیۆیا) تو زێدە دکەی. ئەم بتنێ وێ هەلدگرین یا داخوازنامە پێدڤی پێ هەی (وێنە ب قەبارەکا گونجای، سترانەک هەتا دوو خولەکان کورتکری) و زانیاریێن وان یێن ڤەشارتی وەکی جهی ژێدبەین.",
+      },
+    },
+  },
+  {
+    types: ['PRIVACY'],
+    lines: {
+      ar: {
+        after: '- ردود الضيوف وملف الذكرى: حتى ١٢ شهراً بعد انتهاء الدعوة.',
+        text: '- صورك وأغنيتك الخاصة: حتى ١٢ شهراً بعد انتهاء الدعوة، وللطلبات التي لم تُدفع: ٣٠ يوماً بعد انتهاء رابط المعاينة.',
+      },
+      en: {
+        after: '- Guest replies and the keepsake: up to 12 months after the invitation ends.',
+        text: '- Your photos and your own song: up to 12 months after the invitation ends; for orders never paid, 30 days after the preview link expires.',
+      },
+      ckb: {
+        after: "- وەڵامی میوانەکان و فایلی یادگاری: تا ١٢ مانگ دوای کۆتاییهاتنی بانگهێشتنامەکە.",
+        text: "- وێنەکانت و گۆرانی تایبەتی خۆت: تا ١٢ مانگ دوای کۆتاییهاتنی بانگهێشتنامەکە؛ بۆ داواکارییەکانی کە پارەیان نەدراوە، ٣٠ ڕۆژ دوای بەسەرچوونی بەستەری پێشبینین.",
+      },
+      bdn: {
+        after: "- بەرسڤێن مێڤانان و فایلا بیرهاتنێ: هەتا ١٢ هەیڤان پشتی ب دوماهی هاتنا داخوازنامێ.",
+        text: "- وێنێن تە و سترانا تە یا تایبەت: هەتا ١٢ هەیڤان پشتی ب دوماهیهاتنا داخوازنامێ؛ بۆ وان داخوازیێن پارە بۆ نەهاتییە دان، ٣٠ ڕۆژان پشتی ب دوماهیهاتنا لینکا پێشدیتنێ.",
+      },
+    },
+  },
+];
+
+/** The content with the upload lines added in every language that has them and doesn't yet; null when nothing changes. */
+export function withUploadLines(type: PolicyType, content: LegalContent): LegalContent | null {
+  let changed = false;
+  const next = { ...content };
+  for (const { types, lines } of UPLOAD_ADDITIONS) {
+    if (!types.includes(type)) continue;
+    for (const lang of ['ar', 'en', 'ckb', 'bdn'] as const) {
+      const add = lines[lang];
+      const text = next[lang];
+      if (!add || !text || text.includes(add.text)) continue;
+      if (add.after && text.includes(add.after)) next[lang] = text.replace(add.after, `${add.after}\n${add.text}`);
+      else if (add.before && text.includes(add.before)) next[lang] = text.replace(add.before, `${add.text}\n\n${add.before}`);
+      else next[lang] = `${text.trimEnd()}\n\n${add.text}`;
+      changed = true;
+    }
+  }
+  return changed ? next : null;
+}
+
+/**
+ * Adds the upload lines (above) to the terms and the privacy policy. Runs with every seed and changes nothing once a
+ * line is there, so it never repeats or touches the owner's own wording. A draft in progress gets the lines (the owner
+ * publishes it); otherwise a new version with only these lines added is published, as the system (audited).
+ */
+export async function updatePoliciesForUploads(db: DbOrTx) {
+  const actor = { adminId: null, ipHash: null };
+  for (const type of ['TERMS', 'TERMS_NEWBORN', 'PRIVACY'] as const) {
+    const { draft } = await policyAdminView(db, type);
+    if (draft) {
+      const next = withUploadLines(type, draft.content);
+      if (next) await saveDraft(db, type, next, actor);
+      continue;
+    }
+    const current = await currentPolicy(db, type);
+    const next = current && withUploadLines(type, current.content);
+    if (!next) continue;
+    await saveDraft(db, type, next, actor);
+    await publishDraft(db, type, actor);
+  }
+}
