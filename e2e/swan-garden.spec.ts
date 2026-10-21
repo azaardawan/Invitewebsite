@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -28,7 +28,7 @@ test("Swan Garden: the fixed wording, «بنت» and the date; files download", 
   expect((await request.get(`/r/${paid.receiptToken}/card`)).status()).toBe(200);
 
   // No birth-order choice on this design; the father tick box is there, off by default.
-  await page.goto('/themes/swan-garden/order');
+  await openOrderForm(page, 'swan-garden');
   await expect(page.getByRole('radiogroup', { name: /ترتيب/ })).toHaveCount(0);
   await expect(page.getByRole('checkbox', { name: /إظهار اسم الأب/ })).not.toBeChecked();
 });

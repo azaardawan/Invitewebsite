@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
 import { PDFDocument } from 'pdf-lib';
 import sharp from 'sharp';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm } from './helpers';
 
 const fixture = (paid: boolean) =>
   JSON.parse(
@@ -33,7 +33,7 @@ test('newborn extras: watermarked previews before paying, clean files to downloa
   // The occasion lists its designs under Boy and Girl; one from the Girl group starts with "girl" chosen.
   await page.goto('/occasions/newborn');
   await expect(page.getByRole('heading', { name: 'بنت', exact: true })).toBeVisible();
-  await page.goto('/themes/demo-newborn/order');
+  await openOrderForm(page, 'demo-newborn');
   await expect(page.getByRole('radiogroup', { name: 'ولد أم بنت' }).getByRole('radio', { name: 'بنت' })).toBeChecked();
 
   // The order form: the baby's details, boy or girl (changed to boy), and the sticker shape.

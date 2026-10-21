@@ -1,4 +1,5 @@
 import 'server-only';
+import type { SignatureStrokes } from '@/lib/signature-strokes';
 import { sampleNames, type SampleNameLists } from '@/catalog/sample-names';
 import type { ThemeBorderSpec } from '@/theme-sdk/border';
 import type { FeatureKey } from '@/catalog/features';
@@ -61,6 +62,8 @@ export function buildThemeProps(input: {
   attendance?: { attending: number; notAttending: number } | null;
   /** URLs of the customer's signature images (none, one or two), when they included them. */
   signatureSrcs?: readonly string[];
+  /** How each signature was drawn (same order); given only where the design should draw them again. */
+  signatureStrokes?: readonly (SignatureStrokes | null)[];
   /** The theme's colour slots (manifest) and the customer's chosen colours (or none = defaults). */
   colorSlots?: readonly { key: string; default: string }[];
   colors?: Record<string, string> | null;
@@ -109,7 +112,7 @@ export function buildThemeProps(input: {
         ? sampleGuestbook(input.locale)
         : (input.guestbook ?? null),
     attendance: features.includes('rsvp') ? (input.attendance ?? null) : null,
-    signatures: !features.includes('signature') ? [] : input.mode === 'sample' ? [{ src: SAMPLE_SIGNATURE }] : (input.signatureSrcs ?? []).map((src) => ({ src })),
+    signatures: !features.includes('signature') ? [] : input.mode === 'sample' ? [{ src: SAMPLE_SIGNATURE }] : (input.signatureSrcs ?? []).map((src, i) => (input.signatureStrokes ? { src, strokes: input.signatureStrokes[i] ?? null } : { src })),
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
     occasion: input.occasion ?? null,

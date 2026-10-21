@@ -41,6 +41,9 @@ test('the customer signs, picks colours and writes the back of the card when ord
   await page.getByRole('button', { name: 'مسح والمحاولة من جديد' }).first().click();
   await sign('التوقيع الأول');
   await sign('التوقيع الثاني');
+  // How each was drawn goes with it, so the invitation can draw it again.
+  await expect(page.locator('input[name=signatureStrokes]')).toHaveCount(1);
+  await expect(page.locator('input[name=signature2Strokes]')).toHaveCount(1);
 
   // Back of the printed card.
   await page.getByLabel('العنوان الكبير').fill('شكراً لكم');
@@ -53,6 +56,10 @@ test('the customer signs, picks colours and writes the back of the card when ord
   const frame = page.frameLocator('iframe');
   await frame.getByRole('button', { name: 'افتح الدعوة' }).click().catch(() => {});
   await expect(frame.locator('[data-bahja-signature] img')).toHaveCount(2);
+  // Each signature draws itself (as the customer drew it) once it is on screen, then stays.
+  await frame.locator('[data-bahja-signature]').scrollIntoViewIfNeeded();
+  await expect(frame.locator('[data-bahja-signature-drawing="done"]')).toHaveCount(2, { timeout: 15_000 });
+  await expect(frame.locator('[data-bahja-signature-drawing] svg')).toHaveCount(0);
   const bg = await frame.locator('[data-bahja-theme]').evaluate((el) => getComputedStyle(el).getPropertyValue('--bahja-color-background').trim());
   expect(bg).toBe('#6e1f33');
 
@@ -62,4 +69,18 @@ test('the customer signs, picks colours and writes the back of the card when ord
   await expect(page.getByLabel('العنوان الكبير')).toHaveValue('شكراً لكم');
   await expect(page.locator('input[name=palette]:checked')).not.toHaveValue('');
   await testInfo.attach('order-form.png', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
+});
+
+test('a package is always chosen by the customer, who is told they preview before paying', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
+  const { packageId } = extrasTheme();
+  // The order form without a package sends the customer to the packages.
+  await page.goto('/themes/demo-wedding/order');
+  await expect(page).toHaveURL(/\/themes\/demo-wedding#packages$/);
+  const packages = page.locator('#packages');
+  await expect(packages.locator('[data-preview-before-pay]')).toContainText('عاينوا دعوتكم قبل الدفع');
+  // Nothing is chosen for them: no package is marked until they pick one.
+  await expect(packages.locator('[data-selected=true]')).toHaveCount(0);
+  await packages.locator(`a[href*="pkg=${packageId}"]`).click();
+  await expect(page).toHaveURL(new RegExp(`/themes/demo-wedding/order\\?pkg=${packageId}`));
 });

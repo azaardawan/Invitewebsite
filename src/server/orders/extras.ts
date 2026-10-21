@@ -4,6 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, themePalettes, type CardOptions } from '@/server/db/schema';
 import { storeSignature } from '@/server/media/assets';
+import { parseSignatureStrokes } from '@/lib/signature-strokes';
 import { MediaError } from '@/server/media/process';
 import { isBottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES } from '@/lib/birth-date-format';
@@ -37,6 +38,9 @@ export type OrderExtras = {
   cardBack?: { title: string; message: string };
   signature?: string;
   signature2?: string;
+  /** How each new signature was drawn (JSON from the pad); ignored unless that signature is new. */
+  signatureStrokes?: string;
+  signature2Strokes?: string;
   paletteId?: string;
   stickerShape?: string;
   cardChoices?: string[];
@@ -55,7 +59,8 @@ function cleanLine(text: string) {
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
 export async function extrasUpdate(
   db: DbOrTx,
-  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> & {
+  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> &
+    Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes'>> & {
     fieldKeys?: readonly string[];
     /** For `wording`: the design's changeable lines, what is stored now, and the invitation's language. */
     wordingLines?: readonly WordingLine[];
@@ -70,7 +75,22 @@ export async function extrasUpdate(
   extras: OrderExtras,
 ) {
   const set: Partial<
-    Pick<InvitationRow, 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors' | 'stickerShape' | 'cardChoices' | 'bottleSize' | 'birthDateStyle' | 'birthDateDigits' | 'wording' | 'switches'>
+    Pick<
+      InvitationRow,
+      | 'cardOptions'
+      | 'signatureAssetId'
+      | 'signature2AssetId'
+      | 'signatureStrokes'
+      | 'signature2Strokes'
+      | 'colors'
+      | 'stickerShape'
+      | 'cardChoices'
+      | 'bottleSize'
+      | 'birthDateStyle'
+      | 'birthDateDigits'
+      | 'wording'
+      | 'switches'
+    >
   > = {};
   const errors: Record<string, string> = {};
 
@@ -87,15 +107,19 @@ export async function extrasUpdate(
     set.cardOptions = next;
   }
 
-  for (const [input, column] of [
-    [extras.signature, 'signatureAssetId'],
-    [extras.signature2, 'signature2AssetId'],
+  for (const [input, column, strokesColumn, strokes] of [
+    [extras.signature, 'signatureAssetId', 'signatureStrokes', extras.signatureStrokes],
+    [extras.signature2, 'signature2AssetId', 'signature2Strokes', extras.signature2Strokes],
   ] as const) {
     if (input === undefined || input === 'keep' || !inv.featureKeys.includes('signature')) continue;
-    if (input === 'none' || input === '') set[column] = null;
-    else {
+    if (input === 'none' || input === '') {
+      set[column] = null;
+      set[strokesColumn] = null;
+    } else {
       try {
         set[column] = (await storeSignature(db, input))?.id ?? null;
+        // How it was drawn, for the invitation to draw it again (a bad recording just means it appears).
+        set[strokesColumn] = set[column] ? parseSignatureStrokes(strokes) : null;
       } catch (e) {
         if (!(e instanceof MediaError)) throw e;
         errors.signature = 'invalid';
@@ -107,7 +131,9 @@ export async function extrasUpdate(
   const second = set.signature2AssetId !== undefined ? set.signature2AssetId : inv.signature2AssetId;
   if (!first && second) {
     set.signatureAssetId = second;
+    set.signatureStrokes = set.signature2Strokes !== undefined ? set.signature2Strokes : (inv.signature2Strokes ?? null);
     set.signature2AssetId = null;
+    set.signature2Strokes = null;
   }
 
   if (extras.paletteId !== undefined && inv.featureKeys.includes('color_choice')) {

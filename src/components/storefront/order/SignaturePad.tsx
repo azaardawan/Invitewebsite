@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SIGNATURE_LINE_WIDTH, STROKE_LIMITS } from '@/lib/signature-strokes';
 
 type Labels = {
   heading: string;
@@ -20,7 +21,8 @@ type Labels = {
 /**
  * The customer chooses one signature or two (e.g. both of the couple), draws each with a finger or mouse,
  * can clear and try again as often as they like, and chooses whether to include them. Sends `signature`
- * and `signature2`, each a PNG data URL, `keep` (unchanged) or `none`.
+ * and `signature2`, each a PNG data URL, `keep` (unchanged) or `none`, and with a new drawing how it was drawn
+ * (`signatureStrokes` / `signature2Strokes`, see signature-strokes.ts) so the invitation can draw it again.
  */
 export function SignaturePad({ current, labels, error }: { current: string[]; labels: Labels; error?: string }) {
   const [count, setCount] = useState<1 | 2>(current.length === 2 ? 2 : 1);
@@ -60,7 +62,11 @@ function Pad({ name, current, include, label, labels }: { name: string; current:
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
+  // How it is being drawn: strokes of `x, y, ms` from the first touch.
+  const strokes = useRef<number[][]>([]);
+  const t0 = useRef<number | null>(null);
   const [drawn, setDrawn] = useState<string | null>(null);
+  const [recording, setRecording] = useState('');
   const [redraw, setRedraw] = useState(!current);
 
   const setup = useCallback(() => {
@@ -73,7 +79,7 @@ function Pad({ name, current, include, label, labels }: { name: string; current:
     ctx.scale(ratio, ratio);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 2.6;
+    ctx.lineWidth = SIGNATURE_LINE_WIDTH;
     ctx.strokeStyle = '#1d1d1f';
   }, []);
   useEffect(() => {
@@ -84,10 +90,25 @@ function Pad({ name, current, include, label, labels }: { name: string; current:
     const r = e.currentTarget.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
+  const record = (p: { x: number; y: number }, force = false) => {
+    const stroke = strokes.current.at(-1);
+    if (!stroke) return;
+    const n = stroke.length;
+    // Points a pixel or two apart add nothing to the drawing.
+    if (!force && n && Math.hypot(p.x - stroke[n - 3]!, p.y - stroke[n - 2]!) < 1.5) return;
+    if (strokes.current.reduce((sum, s) => sum + s.length / 3, 0) >= STROKE_LIMITS.points) return;
+    const t = Math.round(performance.now() - (t0.current ?? performance.now()));
+    stroke.push(Math.round(p.x * 10) / 10, Math.round(p.y * 10) / 10, t);
+  };
   const start = (e: React.PointerEvent<HTMLCanvasElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     drawing.current = true;
     last.current = point(e);
+    t0.current ??= performance.now();
+    if (strokes.current.length < STROKE_LIMITS.strokes) {
+      strokes.current.push([]);
+      record(last.current, true);
+    }
   };
   const move = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!drawing.current || !last.current) return;
@@ -101,17 +122,24 @@ function Pad({ name, current, include, label, labels }: { name: string; current:
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     last.current = p;
+    record(p);
   };
   const end = () => {
     if (!drawing.current) return;
     drawing.current = false;
+    if (last.current) record(last.current, true);
     last.current = null;
     setDrawn(canvas.current!.toDataURL('image/png'));
+    const c = canvas.current!;
+    setRecording(JSON.stringify({ w: c.clientWidth, h: c.clientHeight, s: strokes.current.filter((st) => st.length) }));
   };
   const clear = () => {
     const c = canvas.current!;
     c.getContext('2d')!.clearRect(0, 0, c.width, c.height);
+    strokes.current = [];
+    t0.current = null;
     setDrawn(null);
+    setRecording('');
   };
 
   const value = !include ? 'none' : redraw ? (drawn ?? (current ? 'keep' : 'none')) : 'keep';
@@ -119,6 +147,7 @@ function Pad({ name, current, include, label, labels }: { name: string; current:
   return (
     <div className="flex flex-col gap-2">
       <input type="hidden" name={name} value={value} />
+      {value.startsWith('data:') && recording ? <input type="hidden" name={`${name}Strokes`} value={recording} /> : null}
       {redraw ? (
         <>
           <canvas

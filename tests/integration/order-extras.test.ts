@@ -386,3 +386,42 @@ describe('shaped printed cards (card_leaf, card_heart)', () => {
     expect(issues(['print_card'], [{ ...LEAF, key: 'arch-oval' }])).toContain('print.shapes "arch" is sold with the card_arch feature: list it in features');
   });
 });
+
+describe('signature drawn again (strokes)', () => {
+  // A short "signature": two strokes, the second after a long pause.
+  const OTHER = STROKE.replace('M20 150', 'M60 110');
+  const strokes = { w: 600, h: 200, s: [[20, 150, 0, 120, 60, 120, 220, 60, 240, 320, 150, 400], [400, 150, 3000, 560, 60, 3300]] };
+
+  it('keeps how a new signature was drawn, for the online invitation only', async () => {
+    const d = await draft({ signature: await pngDataUrl(STROKE), signatureStrokes: JSON.stringify(strokes) });
+    const inv = await row(d.invitationId);
+    expect(inv.signatureStrokes).toEqual(strokes);
+    // The invitation (and its preview) draw it again…
+    const live = await invitationRenderData(db(), inv, 'preview', { drawSignatures: true });
+    expect(live.props.signatures[0]).toMatchObject({ strokes });
+    // …pictures and print show it finished.
+    expect((await invitationRenderData(db(), inv, 'live')).props.signatures[0]).not.toHaveProperty('strokes');
+    const card = await printData(db(), inv, 'card');
+    expect(card.kind === 'card' && card.back.signatures[0]).not.toHaveProperty('strokes');
+
+    // Keeping the signature keeps its strokes; a bad recording is dropped (the signature then just appears).
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: 'keep' } });
+    expect((await row(inv.id)).signatureStrokes).toEqual(strokes);
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: await pngDataUrl(OTHER), signatureStrokes: '{"w":1,"h":1,"s":[[1,2]]}' } });
+    expect((await row(inv.id)).signatureStrokes).toBeNull();
+    // An older signature without strokes appears (fades in) on the invitation.
+    expect((await invitationRenderData(db(), await row(inv.id), 'preview', { drawSignatures: true })).props.signatures[0]).toMatchObject({ strokes: null });
+
+    // Removing the signature removes its strokes.
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: await pngDataUrl(STROKE), signatureStrokes: JSON.stringify(strokes) } });
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: 'none' } });
+    expect((await row(inv.id)).signatureStrokes).toBeNull();
+  });
+
+  it('a lone second signature moves to first with its strokes', async () => {
+    const d = await draft({ signature: 'none', signature2: await pngDataUrl(OTHER), signature2Strokes: JSON.stringify(strokes) });
+    const inv = await row(d.invitationId);
+    expect(inv.signatureStrokes).toEqual(strokes);
+    expect(inv.signature2Strokes).toBeNull();
+  });
+});

@@ -129,7 +129,7 @@ export function ThemeCarousel({
               <Link href={`/themes/${t.key}#preview`} className="inline-flex h-11 items-center rounded-full border border-accent px-5 text-sm font-medium text-accent">
                 {labels.preview}
               </Link>
-              <Link href={`/themes/${t.key}/order`} className="inline-flex h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
+              <Link href={`/themes/${t.key}#packages`} className="inline-flex h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
                 {labels.choose}
               </Link>
             </div>

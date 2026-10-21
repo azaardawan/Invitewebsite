@@ -11,8 +11,10 @@ product spec's §74 business rules override assumptions.
 - Every admin page **and** server action calls `requireAdmin({ permission })`. Never rely on hiding UI.
 - Important admin actions write to `audit_logs` via `recordAudit`, inside the same transaction as the change.
 - Never put secrets (password hashes, TOTP secrets, tokens) in audit `before`/`after` values.
-- User-visible text goes in `src/i18n/messages/{ar,en}.json`. **Never write Kurdish (ckb/bdn)
-  translations directly.** Add suggestions to `docs/translations/KURDISH_REVIEW.md` for owner approval.
+- User-visible text goes in `src/i18n/messages/{ar,en,ckb,bdn}.json`. **Kurdish (ckb/bdn) is approved automatically**
+  (owner rule, 2026-10-20): write the Sorani and Badini directly, never wait for the owner, and list every new Kurdish
+  text in a `docs/translations/KURDISH_REVIEW.md` batch marked "✅ AUTO-APPROVED"; the owner checks and corrects them
+  in Admin → Translations.
 - Schema change: edit `src/server/db/schema`, run `pnpm db:generate`, commit the SQL in `drizzle/`.
   Custom SQL (triggers, grants) goes in `pnpm drizzle-kit generate --custom` migrations.
 - Before pushing: `pnpm lint && pnpm typecheck && pnpm i18n:check && pnpm test && pnpm build`,

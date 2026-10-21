@@ -74,6 +74,11 @@ export type PrintCardBackProps = PrintBase & {
   title: string;
   /** Smaller text under it; null when the customer left it empty. */
   message: string | null;
+  /**
+   * The same QR code as the front's (or null). Most designs print it on the front; a design whose front needs the
+   * room prints it here instead (and leaves it off its front).
+   */
+  qrDataUrl: string | null;
 };
 
 /**

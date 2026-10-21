@@ -59,7 +59,7 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
     const msgs = invitationMessages(isLocale(r.locale) ? r.locale : 'ar');
     return <InvitationEnded title={msgs.endedTitle} body={msgs.endedBody} brand={msgs.brand} />;
   }
-  const { codeRef, props } = await invitationRenderData(db(), r.invitation, 'live');
+  const { codeRef, props } = await invitationRenderData(db(), r.invitation, 'live', { drawSignatures: true });
   // Designs without an online invitation are files only (manifest `onlineInvitation: false`).
   if (manifestByCodeRef(codeRef)?.onlineInvitation === false) notFound();
   const msgs = invitationMessages(r.invitation.locale);
