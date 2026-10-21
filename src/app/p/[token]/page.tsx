@@ -23,7 +23,7 @@ export default async function PersonalPreviewPage({ params }: PageProps<'/p/[tok
       </main>
     );
   }
-  const { codeRef, props } = await invitationRenderData(db(), inv, 'preview');
+  const { codeRef, props } = await invitationRenderData(db(), inv, 'preview', { drawSignatures: true });
   const filesOnly = manifestByCodeRef(codeRef)?.onlineInvitation === false;
   const { print } = msgs as unknown as { print: { watermark: string; watermarkNote: string } };
   return (

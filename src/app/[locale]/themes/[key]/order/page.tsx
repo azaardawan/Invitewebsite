@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Link } from '@/i18n/navigation';
+import { Link, redirect } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
 import { storefrontTheme } from '@/server/storefront/catalog';
@@ -24,7 +24,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   const { pkg: pkgParam, occasion: occasionParam } = await searchParams;
   // A design sold in several occasions: the one the customer came from, or they choose on the form.
   const occasion = th.occasions.length > 1 ? th.occasions.find((o) => o.key === occasionParam) : undefined;
-  const pkg = th.packages.find((p) => p.id === pkgParam) ?? th.packages[0]!;
+  // The customer always chooses a package first: without one (or an unknown one) they go back to the packages.
+  const pkg = th.packages.find((p) => p.id === pkgParam);
+  if (!pkg) {
+    redirect({ href: `/themes/${th.key}${occasion ? `?occasion=${occasion.key}` : ''}#packages`, locale });
+    return null;
+  }
   // A newborn design from the Boy or Girl group starts with that gender chosen (the customer can change it).
   const gender = th.section.key === 'newborn' && (th.subsectionKey === 'boy' || th.subsectionKey === 'girl') ? th.subsectionKey : undefined;
   const t = await getTranslations('store');
@@ -48,7 +53,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           </span>
           {th.manifest.onlineInvitation !== false ? <span className="text-sm text-muted" data-online-for>{common(`onlineFor.${pkg.lifetime}`)}</span> : null}
         </div>
-        <Link href={`/themes/${th.key}#preview`} className="shrink-0 text-sm font-medium text-accent underline underline-offset-4">
+        <Link href={`/themes/${th.key}${occasion ? `?occasion=${occasion.key}` : ''}#packages`} className="shrink-0 text-sm font-medium text-accent underline underline-offset-4">
           {t('changePackage')}
         </Link>
       </div>

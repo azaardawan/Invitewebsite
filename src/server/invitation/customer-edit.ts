@@ -38,7 +38,7 @@ export type CustomerEditResult =
  */
 export async function customerEditInvitation(
   db: DbOrTx,
-  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null; signature?: string; signature2?: string },
+  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null; signature?: string; signature2?: string; signatureStrokes?: string; signature2Strokes?: string },
   now = new Date(),
 ): Promise<CustomerEditResult> {
   if (input.ipHash && !(await consumeRateLimit(db, `self-edit:${input.ipHash}`, 20, 3600, now))) return { ok: false, error: 'rateLimited' };
@@ -63,7 +63,7 @@ export async function customerEditInvitation(
     // Signatures can be redrawn too (packages with `signature`): same pads as the order form.
     let signatures;
     try {
-      signatures = await extrasUpdate(tx, inv!, { signature: input.signature, signature2: input.signature2 });
+      signatures = await extrasUpdate(tx, inv!, { signature: input.signature, signature2: input.signature2, signatureStrokes: input.signatureStrokes, signature2Strokes: input.signature2Strokes });
     } catch (e) {
       if (e instanceof OrderError) return { ok: false, error: 'invalidFields', fieldErrors: e.fieldErrors } as const;
       throw e;

@@ -1,8 +1,12 @@
+import type { SignatureStrokes } from '@/lib/signature-strokes';
+import { DrawnSignature } from './signature-drawing';
+
 /**
  * One border per theme, shared by the invitation, the printable card and every
  * keepsake page so all three look like one set. The theme passes its own
  * artwork as `fallback`; the owner can replace it in Admin (then `border` is
- * set). No hooks: usable in client themes and server print companions.
+ * set). No hooks here: usable in client themes and server print companions (the drawn signature is
+ * a client component, used only on the online invitation).
  */
 
 /**
@@ -68,16 +72,22 @@ export function ThemeBorder({ border, fallback, medium }: { border: ThemeBorderS
  * The customer's signature(s), where the theme's design places them: one, or two side by side. Renders
  * nothing without any (or when the package has no signature). Each image is dark ink on transparent;
  * `className` styles each image (size; on a dark design e.g. `filter: invert(1)`). Works in the
- * invitation and in print companions.
+ * invitation and in print companions. On the online invitation each signature draws itself as the customer
+ * drew it when it comes into view (the platform passes how it was drawn); print always shows it finished.
  */
-export function Signature({ signatures, className, alt = '' }: { signatures: readonly { src: string }[]; className?: string; alt?: string }) {
+export function Signature({ signatures, className, alt = '' }: { signatures: readonly { src: string; strokes?: SignatureStrokes | null }[]; className?: string; alt?: string }) {
   if (!signatures.length) return null;
   return (
     <span data-bahja-signature={signatures.length} style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5em' }}>
-      {signatures.map((s, i) => (
-        // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
-        <img key={i} src={s.src} alt={alt} className={className} style={{ maxWidth: signatures.length > 1 ? 'calc(50% - 0.75em)' : undefined }} />
-      ))}
+      {signatures.map((s, i) => {
+        const maxWidth = signatures.length > 1 ? 'calc(50% - 0.75em)' : undefined;
+        return s.strokes !== undefined ? (
+          <DrawnSignature key={i} src={s.src} strokes={s.strokes} alt={alt} className={className} style={{ maxWidth }} />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- customer image from the platform
+          <img key={i} src={s.src} alt={alt} className={className} style={{ maxWidth }} />
+        );
+      })}
     </span>
   );
 }

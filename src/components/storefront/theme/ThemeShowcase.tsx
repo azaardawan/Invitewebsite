@@ -41,6 +41,8 @@ export function ThemeShowcase({
 }) {
   const t = useTranslations('store');
   const [pkg, setPkg] = useState(defaultPackageId ?? packages[0]?.id);
+  // The preview starts on a package, but none is marked chosen until the customer picks one.
+  const [picked, setPicked] = useState(Boolean(defaultPackageId));
   const [names, setNames] = useState<'short' | 'long'>('short');
   const src = `/t/${lang}/${themeKey}?${new URLSearchParams({ ...(pkg ? { pkg } : {}), names, ...(occasion ? { occasion } : {}) })}`;
 
@@ -88,20 +90,34 @@ export function ThemeShowcase({
         </div>
       </div>
 
-      <section aria-labelledby="packages-title" className="flex flex-col gap-5">
+      <section id="packages" aria-labelledby="packages-title" className="flex scroll-mt-6 flex-col gap-5">
         <h2 id="packages-title" className="font-display text-[32px] font-bold text-heading lg:text-[44px]">
           {t('packagesTitle')}
         </h2>
+        {/* Customers decide with confidence: they see their real invitation before paying anything. */}
+        <div data-preview-before-pay className="flex items-start gap-3 rounded-[22px] border border-accent/40 bg-accent/5 px-5 py-4">
+          <svg aria-hidden width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6e1f33" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span className="flex flex-col gap-0.5">
+            <span className="font-semibold text-heading">{t('previewBeforePay')}</span>
+            <span className="text-sm leading-relaxed text-muted">{filesOnly ? t('previewBeforePayFiles') : t('previewBeforePayHelp')}</span>
+          </span>
+        </div>
         <ul className="flex flex-col gap-4">
           {packages.map((p) => {
-            const selected = p.id === pkg;
+            const selected = picked && p.id === pkg;
             return (
               <li key={p.id}>
                 <div
                   data-selected={selected}
                   className="flex flex-col gap-4 rounded-[26px] border border-line bg-surface p-5 transition data-[selected=true]:border-accent data-[selected=true]:shadow-[0_14px_30px_rgb(110_31_51/0.12)] lg:p-7"
                 >
-                  <button type="button" onClick={() => setPkg(p.id)} aria-pressed={selected} className="flex items-start justify-between gap-4 text-start">
+                  <button type="button" onClick={() => {
+                      setPkg(p.id);
+                      setPicked(true);
+                    }} aria-pressed={selected} className="flex items-start justify-between gap-4 text-start">
                     <span className="flex flex-col gap-1">
                       <span className="text-xl font-semibold text-heading">{p.name}</span>
                       {p.description ? <span className="text-sm leading-relaxed text-muted">{p.description}</span> : null}

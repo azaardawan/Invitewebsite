@@ -1,3 +1,4 @@
+import type { SignatureStrokes } from '../../../lib/signature-strokes';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
@@ -119,6 +120,9 @@ export const invitations = pgTable(
     signatureAssetId: uuid('signature_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** A second signature, when the customer chose two (e.g. both of the couple). */
     signature2AssetId: uuid('signature2_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /** How each signature was drawn (src/lib/signature-strokes.ts), so the invitation draws it again; null = appears. */
+    signatureStrokes: jsonb('signature_strokes').$type<SignatureStrokes>(),
+    signature2Strokes: jsonb('signature2_strokes').$type<SignatureStrokes>(),
     /**
      * The customer's own song (packages with `custom_music`): their upload cut to 2 minutes (src/server/music/custom.ts).
      * While set it plays instead of the design's song; null = the design's song.

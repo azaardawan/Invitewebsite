@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -61,7 +61,7 @@ test('Embroidered Garden is files only: story, card, stickers and bottle label, 
   expect((await request.get(paid.path)).status()).toBe(404);
 
   // The order form: the design's own lines are Arabic by default; Kurdish orders are offered «کوڕی».
-  await page.goto('/themes/embroidered-garden/order');
+  await openOrderForm(page, 'embroidered-garden');
   const sonOf = page.getByRole('radiogroup', { name: 'كلمة «بن»' });
   await expect(sonOf.getByRole('radio').first()).toBeChecked();
   await expect(sonOf.getByText('کوڕی')).toHaveCount(0);

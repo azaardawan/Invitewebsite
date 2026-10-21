@@ -170,7 +170,7 @@ export async function cardData(
   }
   const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
   // The back: the customer's big title (or a default) and smaller message.
-  const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null };
+  const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null, qrDataUrl };
   const page: PageSpec =
     kind === 'card'
       ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }

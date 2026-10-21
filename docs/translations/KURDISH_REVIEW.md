@@ -1059,3 +1059,20 @@ Privacy policy, published in all four languages by the deploy's seed (`updatePol
 | 31 | Terms | - تُحذف مع بقية بيانات دعوتك الشخصية (راجع سياسة الخصوصية). | - They are deleted with your invitation's other personal data (see the Privacy policy). | - لەگەڵ زانیارییە کەسییەکانی تری بانگهێشتنامەکەتدا دەسڕدرێنەوە (سەیری سیاسەتی تایبەتمەندی بکە). | - دگەل زانیاریێن دی یێن کەسی یێن داخوازناما تە دهێنە ژێبرن (سەحکە سیاسەتا تایبەتمەندیێ). | ◐ |
 | 32 | Privacy: what we collect | - إذا تضمنتها باقتك: الصور والأغنية (أو الفيديو) التي تضيفها. نحتفظ فقط بما تحتاجه الدعوة (صور بحجم مناسب وأغنية مقصوصة إلى دقيقتين) ونحذف بياناتها المخفية مثل الموقع. | - If your package includes them: the photos and the song (or video) you add. We keep only what the invitation needs (photos at a suitable size, a song cut to 2 minutes) and remove their hidden details such as location. | - ئەگەر پاکێجەکەت تێیدا بێت: ئەو وێنە و گۆرانییە (یان ڤیدیۆیە) کە زیادی دەکەیت. تەنها ئەوەی بانگهێشتنامەکە پێویستیەتی هەڵدەگرین (وێنە بە قەبارەیەکی گونجاو، گۆرانییەک کە تا دوو خولەک کورت کراوەتەوە) و زانیارییە شاراوەکانیان وەک شوێن دەسڕینەوە. | - ئەگەر پاکێجا تە ئەو تێدا هەبن: ئەو وێنە و سترانا (یان ڤیدیۆیا) تو زێدە دکەی. ئەم بتنێ وێ هەلدگرین یا داخوازنامە پێدڤی پێ هەی (وێنە ب قەبارەکا گونجای، سترانەک هەتا دوو خولەکان کورتکری) و زانیاریێن وان یێن ڤەشارتی وەکی جهی ژێدبەین. | ◐ |
 | 33 | Privacy: how long we keep it | - صورك وأغنيتك الخاصة: حتى ١٢ شهراً بعد انتهاء الدعوة، وللطلبات التي لم تُدفع: ٣٠ يوماً بعد انتهاء رابط المعاينة. | - Your photos and your own song: up to 12 months after the invitation ends; for orders never paid, 30 days after the preview link expires. | - وێنەکانت و گۆرانی تایبەتی خۆت: تا ١٢ مانگ دوای کۆتاییهاتنی بانگهێشتنامەکە؛ بۆ داواکارییەکانی کە پارەیان نەدراوە، ٣٠ ڕۆژ دوای بەسەرچوونی بەستەری پێشبینین. | - وێنێن تە و سترانا تە یا تایبەت: هەتا ١٢ هەیڤان پشتی ب دوماهیهاتنا داخوازنامێ؛ بۆ وان داخوازیێن پارە بۆ نەهاتییە دان، ٣٠ ڕۆژان پشتی ب دوماهیهاتنا لینکا پێشدیتنێ. | ◐ |
+
+## Batch 38 — preview before paying, sample texts — ✅ AUTO-APPROVED (2026-10-21, owner checks in Admin → Translations)
+
+From now on Kurdish is written directly and approved automatically (owner rule, 2026-10-20); each batch lists what was
+added so the owner can check it in Admin → Translations.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Package choice: notice | عاينوا دعوتكم قبل الدفع | Preview your invitation before you pay | پێش پارەدان بانگهێشتنامەکەتان ببینن | بەری پارەدانێ داخوازناما خۆ ببینن |
+| 2 | Package choice: notice text | املؤوا تفاصيلكم وشاهدوا دعوتكم الحقيقية، ولا تدفعون إلا بعد أن تعجبكم. | Fill in your details and see your real invitation. You only pay once you are happy with it. | زانیارییەکانتان پڕ بکەنەوە و بانگهێشتنامە ڕاستەقینەکەتان ببینن؛ تەنها دوای ئەوەی پێتان خۆش بوو پارە دەدەن. | زانیاریێن خۆ پڕ بکەن و داخوازناما خۆ یا ڕاستەقینە ببینن؛ هوین بتنێ پشتی کو حەز ژێ کر پارەی ددەن. |
+| 3 | Package choice: notice text (files-only designs) | املؤوا تفاصيلكم وشاهدوا تصاميمكم الحقيقية، ولا تدفعون إلا بعد أن تعجبكم. | Fill in your details and see your real designs. You only pay once you are happy with them. | زانیارییەکانتان پڕ بکەنەوە و دیزاینە ڕاستەقینەکانتان ببینن؛ تەنها دوای ئەوەی پێتان خۆش بوو پارە دەدەن. | زانیاریێن خۆ پڕ بکەن و دیزاینێن خۆ یێن ڕاستەقینە ببینن؛ هوین بتنێ پشتی کو حەز ژێ کر پارەی ددەن. |
+| 4 | Graduation sample (short) | بكالوريوس الهندسة | Bachelor of Engineering | بەکالۆریۆسی ئەندازیاری | بەکالۆریۆسا ئەندازیاریێ |
+| 5 | Graduation sample (long) | ماجستير في هندسة البرمجيات وأنظمة المعلومات | Master's in Software Engineering and Information Systems | ماستەر لە ئەندازیاری نەرمەکاڵا و سیستەمەکانی زانیاری | ماستەر د ئەندازیاریا نەرمەکاڵا و سیستەمێن زانیاریێ دا |
+| 6 | Sample names in previews (`invitationSamples.names.*`, both dialects) | Arabic names | — | Kurdish names: ئاری، ئاراس، ژیار… / ژیلا، ڤیان، ئەڤین… / عەلی، ئەحمەد، کاروان… (see ckb.json) | same lists (bdn.json) |
+
+Batch 36 (printed frame names) is still open: those names live in the designs' manifests, and the activated versions
+are frozen, so they need a new design version (the wedding themes chat).

@@ -10,11 +10,16 @@ import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
 import { customSong } from '@/server/music/custom';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
+import type { SignatureStrokes } from '@/lib/signature-strokes';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
-/** What the renderer needs for a stored invitation: its exact theme version and contract props. */
-export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode: InvitationMode) {
+/**
+ * What the renderer needs for a stored invitation: its exact theme version and contract props. `drawSignatures`:
+ * the signatures come with how they were drawn, so the design draws them again (the online invitation and its
+ * preview only; pictures and print always show them finished).
+ */
+export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode: InvitationMode, opts: { drawSignatures?: boolean } = {}) {
   const [version] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
   const [music] = inv.musicTrackId
     ? await db
@@ -38,6 +43,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
       attendance: mode === 'live' && inv.publicAttendance && inv.featureKeys.includes('rsvp') ? await attendanceCounts(db, inv.id) : null,
       signatureSrcs: await signatureUrls(db, inv),
+      signatureStrokes: opts.drawSignatures ? signatureStrokesOf(inv) : undefined,
       colorSlots: (version!.manifest as ThemeManifest).colors?.slots ?? [],
       colors: inv.colors,
       occasion: await occasionKey(db, inv.sectionId),
@@ -70,6 +76,13 @@ export async function publicGuestbook(db: DbOrTx, invitationId: string) {
   return rows.map((r) => ({ guestName: r.guestName, message: r.message! }));
 }
 
+
+/** How each present signature was drawn, in the same order as signatureUrls (null when not recorded). */
+export function signatureStrokesOf(inv: Pick<InvitationRow, 'signatureAssetId' | 'signature2AssetId' | 'signatureStrokes' | 'signature2Strokes'>) {
+  return [inv.signatureAssetId ? (inv.signatureStrokes ?? null) : undefined, inv.signature2AssetId ? (inv.signature2Strokes ?? null) : undefined].filter(
+    (s): s is SignatureStrokes | null => s !== undefined,
+  );
+}
 
 /** Public URLs of an invitation's signature images, first then second (missing ones left out). */
 export async function signatureUrls(db: DbOrTx, inv: Pick<InvitationRow, 'signatureAssetId' | 'signature2AssetId'>) {

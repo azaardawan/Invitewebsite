@@ -1,3 +1,4 @@
+import type { SignatureStrokes } from '@/lib/signature-strokes';
 import type { FeatureKey } from '@/catalog/features';
 import type { ThemeBorderSpec } from './border';
 import type { FieldKey } from '@/catalog/fields';
@@ -108,9 +109,10 @@ export type ThemeProps = {
    * The customer's drawn signatures (packages with `signature`, when they chose to include them): one,
    * or two side by side (e.g. both of the couple), as the customer chose. Empty when none. Show them
    * where the design has its signature spot with `<Signature signatures={props.signatures} />` (dark ink,
-   * transparent background). Samples and previews show an example signature.
+   * transparent background). Samples and previews show an example signature. On the online invitation
+   * `strokes` (how the customer drew it) lets `<Signature>` draw it again; themes never read it themselves.
    */
-  signatures: { src: string }[];
+  signatures: { src: string; strokes?: SignatureStrokes | null }[];
   /**
    * The theme's colour slots (manifest `colors`) with the customer's chosen colour set, or the
    * defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme,

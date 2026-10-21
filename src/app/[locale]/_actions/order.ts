@@ -47,6 +47,8 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('cb.title') || form.has('cb.message')) extras.cardBack = { title: str(form, 'cb.title'), message: str(form, 'cb.message') };
   if (form.has('signature')) extras.signature = str(form, 'signature');
   if (form.has('signature2')) extras.signature2 = str(form, 'signature2');
+  if (form.has('signatureStrokes')) extras.signatureStrokes = str(form, 'signatureStrokes');
+  if (form.has('signature2Strokes')) extras.signature2Strokes = str(form, 'signature2Strokes');
   if (form.has('palette')) extras.paletteId = str(form, 'palette');
   if (form.has('stickerShape')) extras.stickerShape = str(form, 'stickerShape');
   // Ticked cards (several allowed); the hidden `cardChoicesSent` tells "none ticked" from "no such section".

@@ -37,3 +37,14 @@ export function makeMp3(seconds = 3): Buffer {
   const frame = Buffer.concat([header, Buffer.alloc(417 - 4)]);
   return Buffer.concat(Array.from({ length: Math.ceil((seconds * 44100) / 1152) }, () => frame));
 }
+
+/**
+ * Opens a design's order form the way a customer must: from the design page, choosing a package (the first one,
+ * or the one whose link `pkg` matches). `query` keeps e.g. `occasion=engagement`.
+ */
+export async function openOrderForm(page: Page, themeKey: string, query = '', pkg?: string) {
+  await page.goto(`/themes/${themeKey}${query ? `?${query}` : ''}#packages`);
+  const links = page.locator(`#packages a[href*="/themes/${themeKey}/order?pkg=${pkg ?? ''}"]`);
+  await links.first().click();
+  await expect(page).toHaveURL(new RegExp(`/themes/${themeKey}/order\\?pkg=`));
+}

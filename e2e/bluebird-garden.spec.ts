@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -30,7 +30,7 @@ test('Bluebird Garden: birth-order choice, father on the extras by choice, every
   expect((await request.get(`/r/${paid.receiptToken}/card`)).status()).toBe(200);
 
   // The order form: four fixed birth-order choices (no own text) and the father tick box, off by default.
-  await page.goto('/themes/bluebird-garden/order');
+  await openOrderForm(page, 'bluebird-garden');
   const birthOrder = page.getByRole('radiogroup', { name: 'ترتيب المولود' });
   await expect(birthOrder.getByRole('radio')).toHaveCount(4);
   await expect(birthOrder.getByRole('radio').first()).toBeChecked();

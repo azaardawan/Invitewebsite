@@ -71,7 +71,7 @@ export async function TopPicks({ picks }: { picks: TopPick[] }) {
                   </p>
                 </div>
                 <div className="flex justify-center">
-                  <Link href={`/themes/${p.key}/order`} className="inline-flex h-10 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
+                  <Link href={`/themes/${p.key}#packages`} className="inline-flex h-10 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
                     {t('choose')}
                   </Link>
                 </div>

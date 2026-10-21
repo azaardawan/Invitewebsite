@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -25,6 +25,6 @@ test("Rosebird Garden: the girl's wording, «بنت» and a feminine birth order
   expect((await request.get(`/r/${paid.receiptToken}/extra/story.png`)).status()).toBe(200);
   expect((await request.get(`/r/${paid.receiptToken}/card`)).status()).toBe(200);
 
-  await page.goto('/themes/rosebird-garden/order');
+  await openOrderForm(page, 'rosebird-garden');
   await expect(page.getByRole('radiogroup', { name: 'ترتيب المولودة' }).getByRole('radio')).toHaveCount(4);
 });

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL, signInAsNewOwner } from './helpers';
+import { E2E_DATABASE_URL, signInAsNewOwner, openOrderForm } from './helpers';
 
 test('one design in wedding and engagement: shown in both, once in combined lists, the customer picks the occasion', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
@@ -29,12 +29,12 @@ test('one design in wedding and engagement: shown in both, once in combined list
   await page.goto('/occasions/engagement');
   await page.locator('main li', { hasText: 'زاخو بالألوان المائية' }).getByRole('link').first().click();
   await expect(page).toHaveURL(/occasion=engagement/);
-  await page.goto('/themes/zaxo-watercolor/order?occasion=engagement');
+  await openOrderForm(page, 'zaxo-watercolor', 'occasion=engagement');
   await expect(page.getByText('خطوبة').first()).toBeVisible();
   await expect(page.getByRole('group', { name: 'لأي مناسبة هذه الدعوة؟' })).toHaveCount(0);
 
   // Without an occasion the form asks, and won't continue until one is chosen.
-  await page.goto('/themes/zaxo-watercolor/order');
+  await openOrderForm(page, 'zaxo-watercolor');
   const question = page.getByRole('group', { name: 'لأي مناسبة هذه الدعوة؟' });
   await expect(question).toBeVisible();
   await expect(question.getByText('زفاف')).toBeVisible();
@@ -46,6 +46,6 @@ test('one design in wedding and engagement: shown in both, once in combined list
   await also.getByLabel('خطوبة').uncheck();
   await also.locator('xpath=ancestor::form').getByRole('button', { name: 'حفظ' }).click();
   await expect(also.getByLabel('خطوبة')).not.toBeChecked();
-  await page.goto('/themes/zaxo-watercolor/order');
+  await openOrderForm(page, 'zaxo-watercolor');
   await expect(page.getByRole('group', { name: 'لأي مناسبة هذه الدعوة؟' })).toHaveCount(0);
 });
