@@ -108,6 +108,12 @@ and stored in R2 under `documents/`. Customers download the card from their rece
 Admin → Invitations → an invitation has **Download printable card** and **Download keepsake PDF**
 (with **Regenerate**). Nothing to configure.
 
+## If a merge doesn't deploy
+
+Railway deploys every push to `main`. If a push arrives while Railway's builds are paused (an
+outage), it is dropped, not queued. Open the website service, then **⋯ → Deploy latest commit**, or
+push any new commit to `main`.
+
 ## Backups
 
 Turn on Railway Postgres backups and know how to restore: see `backups.md` (includes the restore drill).
