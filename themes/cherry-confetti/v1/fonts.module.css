@@ -1,0 +1,45 @@
+/*
+ * Cherry Confetti typefaces. The design was drawn in Georgia; on the phone it uses Gelasio (Georgia's metrics), with
+ * Pinyon Script for the name, Montserrat for the small capitals and Amiri for Arabic and Kurdish. All SIL Open Font
+ * License (fonts/OFL-*.txt). Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'CC Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'CC Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif-italic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'CC Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/script.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'CC Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/sans.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'CC Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/arabic.woff2) format('woff2');
+}
+
+.fonts {
+  font-family: 'CC Serif', Georgia, serif;
+}
