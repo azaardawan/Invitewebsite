@@ -194,6 +194,8 @@
     "attendanceTitle": "بەرسڤێن مێڤانان",
     "attendingCount": "دێ ئامادە بن",
     "notAttendingCount": "ئامادە نابن",
+    "guestComing": "دێ ئامادە بیت",
+    "guestNotComing": "ئامادە نابیت",
     "itsABoy": "کوڕە",
     "itsAGirl": "کچە",
     "bornOn": "دیرۆکا ژدایکبوونێ"
@@ -334,6 +336,9 @@
     "attendancePublic": "هەر کەسێ لینکا داخوازنامێ هەبیت (ل سەر فۆرما بەرسڤێ دیار دبیت)",
     "attendanceComing": "دێ ئامادە بن: {count}",
     "attendanceNotComing": "ئامادە نابن: {count}",
+    "repliesList": "کێ بەرسڤ دایە ({count})",
+    "replyComing": "دێ ئامادە بیت",
+    "replyNotComing": "ئامادە نابیت",
     "cardBackSave": "پاراستنا پشتا کارتێ",
     "flipCard": "کارتێ وەرگێڕە"
   },

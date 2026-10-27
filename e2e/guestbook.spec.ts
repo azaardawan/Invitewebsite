@@ -63,6 +63,11 @@ test('guest messages stay private until the customer shows them under the invita
   // The reply count is on the receipt; the customer shows it to everyone too.
   await expect(page.locator('#attendance').getByText('سيحضر: ١')).toBeVisible();
   await expect(page.locator('#attendance').getByText('لن يحضر: ٠')).toBeVisible();
+  // …and each reply, coming or not, with the guest's message beside it.
+  const reply = page.locator('[data-guest-replies] [data-guest-reply="ATTENDING"]');
+  await expect(reply).toContainText('سارة');
+  await expect(reply).toContainText('سيحضر');
+  await expect(reply).toContainText('ألف مبروك يا أحلى عروسين');
   await page.getByLabel('كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)').check();
   await expect(page.locator('#attendance').getByText('✓ تم الحفظ.')).toBeVisible();
 

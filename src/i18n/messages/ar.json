@@ -1097,6 +1097,8 @@
     "attendanceTitle": "ردود الضيوف",
     "attendingCount": "سيحضرون",
     "notAttendingCount": "لن يحضروا",
+    "guestComing": "حضور",
+    "guestNotComing": "اعتذار",
     "itsABoy": "إنه ولد",
     "itsAGirl": "إنها بنت",
     "bornOn": "تاريخ الولادة"
@@ -1237,6 +1239,9 @@
     "attendancePublic": "كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)",
     "attendanceComing": "سيحضر: {count}",
     "attendanceNotComing": "لن يحضر: {count}",
+    "repliesList": "من ردّ ({count})",
+    "replyComing": "سيحضر",
+    "replyNotComing": "لن يحضر",
     "cardBackSave": "حفظ ظهر البطاقة",
     "flipCard": "اقلب البطاقة"
   },

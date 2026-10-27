@@ -1097,6 +1097,8 @@
     "attendanceTitle": "Guest replies",
     "attendingCount": "Coming",
     "notAttendingCount": "Not coming",
+    "guestComing": "Coming",
+    "guestNotComing": "Not coming",
     "itsABoy": "It's a boy",
     "itsAGirl": "It's a girl",
     "bornOn": "Born on"
@@ -1237,6 +1239,9 @@
     "attendancePublic": "Everyone with the invitation link (shown above the reply form)",
     "attendanceComing": "Coming: {count}",
     "attendanceNotComing": "Not coming: {count}",
+    "repliesList": "Who replied ({count})",
+    "replyComing": "Coming",
+    "replyNotComing": "Not coming",
     "cardBackSave": "Save the back of the card",
     "flipCard": "Turn the card over"
   },

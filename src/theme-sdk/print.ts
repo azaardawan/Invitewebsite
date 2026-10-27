@@ -104,7 +104,12 @@ export type PrintShapeProps = PrintBase & {
   message: string | null;
 };
 
-export type KeepsakeMessage = { guestName: string; message: string };
+/**
+ * One guest message. `guestName` is the line to print under it: the guest's name and whether they are coming
+ * ("Sara · Coming"), so the couple sees it in every design. `name` and `attending` are the two parts, for a design
+ * that shows them its own way.
+ */
+export type KeepsakeMessage = { guestName: string; message: string; name: string; attending: boolean };
 
 export type KeepsakeProps = PrintBase & {
   /** Visible messages in the order received. Can be empty or run to several hundred. */

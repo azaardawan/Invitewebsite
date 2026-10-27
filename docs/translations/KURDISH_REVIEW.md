@@ -1230,3 +1230,13 @@ manifest; once a version is activated they are frozen, so a correction there nee
 | 143 | #22 Blush Floral: `posterLabel` | دعوة إلى حفلة عيد ميلاد {name} | An invitation to {name}’s birthday party | بانگهێشتنامە بۆ ئاهەنگی ڕۆژی لەدایکبوونی {name} | داخوازنامە بۆ ئاهەنگا ڕۆژا ژدایکبوونا {name} |
 | 144 | #22 Blush Floral: photo label 1 | الصورة الأولى | First photo | وێنەی یەکەم | وێنێ ئێکێ |
 | 145 | #22 Blush Floral: photo label 2 | الصورة الثانية | Second photo | وێنەی دووەم | وێنێ دوویێ |
+
+## Batch 39 — coming or not beside each guest's message — ✅ AUTO-APPROVED (2026-10-27, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Keepsake, beside the guest's name | حضور | Coming | ئامادە دەبێت | دێ ئامادە بیت |
+| 2 | Keepsake, beside the guest's name | اعتذار | Not coming | ئامادە نابێت | ئامادە نابیت |
+| 3 | Receipt: list of replies (keep `{count}`) | من ردّ ({count}) | Who replied ({count}) | کێ وەڵامی داوەتەوە ({count}) | کێ بەرسڤ دایە ({count}) |
+| 4 | Receipt: a reply | سيحضر | Coming | ئامادە دەبێت | دێ ئامادە بیت |
+| 5 | Receipt: a reply | لن يحضر | Not coming | ئامادە نابێت | ئامادە نابیت |
