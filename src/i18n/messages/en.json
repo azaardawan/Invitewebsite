@@ -96,7 +96,8 @@
     "topTitle": "Our top picks",
     "topSubtitle": "The designs our customers love most.",
     "bestSeller": "Best seller",
-    "topPick": "Top pick"
+    "topPick": "Top pick",
+    "swipeHint": "Swipe to browse the designs"
   },
   "footer": {
     "rights": "© {year} Bahja. All rights reserved.",

@@ -1240,3 +1240,9 @@ manifest; once a version is activated they are frozen, so a correction there nee
 | 3 | Receipt: list of replies (keep `{count}`) | من ردّ ({count}) | Who replied ({count}) | کێ وەڵامی داوەتەوە ({count}) | کێ بەرسڤ دایە ({count}) |
 | 4 | Receipt: a reply | سيحضر | Coming | ئامادە دەبێت | دێ ئامادە بیت |
 | 5 | Receipt: a reply | لن يحضر | Not coming | ئامادە نابێت | ئامادە نابیت |
+
+## Batch 40 — homepage designs row — ✅ AUTO-APPROVED (2026-10-27, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Under the moving row of designs | اسحبوا لتتصفحوا التصاميم | Swipe to browse the designs | ڕایبکێشن بۆ بینینی دیزاینەکان | ڕابکێشن دا دیزاینان ببینن |
