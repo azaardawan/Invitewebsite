@@ -9,11 +9,15 @@ function designOnSale() {
   });
 }
 
+// A phone, but run with the desktop project: it puts the demo design on sale, which the desktop catalog test
+// (run before this file) needs still unconfigured; the phone projects all run before the desktop one.
+test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
 const offset = (page: Page) =>
   page.locator('[data-design-row] > div').evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).m41);
 
 test('the homepage designs drift on their own in an endless row, pause while swiped and open on a tap', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile-390', 'runs once, on a phone');
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(90_000);
   designOnSale();
   await page.goto('/');
@@ -60,7 +64,7 @@ test('the homepage designs drift on their own in an endless row, pause while swi
 });
 
 test('no drift for visitors who asked for less motion', async ({ browser }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile-390', 'runs once, on a phone');
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
   const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto('/');
