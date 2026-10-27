@@ -13,7 +13,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('home');
-  const [sections, themes, top] = await Promise.all([storefrontSections(), storefrontThemes({ limit: 12 }), storefrontTopPicks()]);
+  const [sections, themes, top] = await Promise.all([storefrontSections(), storefrontThemes(), storefrontTopPicks()]);
 
   // What search engines show for the site: its name (بهجه, also known as Bahja) and its logo.
   const site = (process.env.APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
@@ -53,7 +53,8 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
         <div className="mt-8 lg:mt-12">
           {themes.length ? (
             <ThemeCarousel
-              themes={themes.map((th) => ({
+              // Every design on sale, the owner's top picks first.
+              themes={[...themes].sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)).map((th) => ({
                 key: th.key,
                 name: localized(th.name, locale),
                 section: occasionsLabel(th.occasions, locale),
@@ -62,7 +63,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
                 minPriceIqd: th.minPriceIqd,
                 rank: th.rank,
               }))}
-              labels={{ prev: t('prev'), next: t('next'), preview: t('preview'), choose: t('choose'), from: t('from'), bestSeller: t('bestSeller'), topPick: t('topPick') }}
+              labels={{ bestSeller: t('bestSeller'), topPick: t('topPick'), hint: t('swipeHint') }}
             />
           ) : (
             <p className="px-6 text-center text-muted">{t('noThemes')}</p>

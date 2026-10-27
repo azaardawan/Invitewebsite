@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from '@/i18n/navigation';
-import { Price } from '../currency';
 import { RankBadge } from '../RankBadge';
 import { coverImageStyle, type CoverFocus } from '@/lib/cover-focus';
 
@@ -18,132 +17,219 @@ export type CarouselTheme = {
 
 const TINTS = ['bg-[#efe2ea]', 'bg-blush', 'bg-paper', 'bg-sand', 'bg-[#efd0c8]'];
 
-/**
- * Sideways theme carousel (owner request): native swipe with snap points, so
- * it glides under the finger; arrows and dots move smoothly; the card in
- * focus comes forward. Works right-to-left and left-to-right.
- */
-export function ThemeCarousel({
-  themes,
-  labels,
-}: {
-  themes: CarouselTheme[];
-  labels: { prev: string; next: string; preview: string; choose: string; from: string; bestSeller: string; topPick: string };
-}) {
-  const track = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
+/** Gentle drift, in pixels per second. */
+const DRIFT = 22;
+/** The drift comes back this long after the visitor lets go. */
+const RESUME_MS = 2500;
+/** Moving less than this is a tap (opens the design), more is a swipe. */
+const TAP_PX = 8;
 
-  const step = useCallback(() => {
-    const el = track.current;
-    const first = el?.children[0] as HTMLElement | undefined;
-    if (!el || !first) return 1;
-    const gap = parseFloat(getComputedStyle(el).columnGap || '0') || 0;
-    return first.offsetWidth + gap;
-  }, []);
+/**
+ * The homepage's designs (owner request, 2026-10-27): rounded cards in one endless row that drifts slowly on its
+ * own and loops without a seam. Visitors swipe it freely either way (with momentum); the drift pauses while they
+ * do and comes back a moment after. Tapping a card opens the design. The row is drawn in copies side by side and
+ * moved with a transform, so the loop never shows a jump; only the first copy is read out and reachable by
+ * keyboard. No drift for visitors who asked for less motion, or while it is off screen.
+ */
+export function ThemeCarousel({ themes, labels }: { themes: CarouselTheme[]; labels: { bestSeller: string; topPick: string; hint: string } }) {
+  const viewport = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  // Enough copies to fill the widest screen with room to loop.
+  const copies = Math.max(3, Math.ceil(12 / Math.max(1, themes.length)) + 2);
 
   useEffect(() => {
-    const el = track.current;
-    if (!el) return;
-    let frame = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setActive(Math.round(Math.abs(el.scrollLeft) / step())));
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(frame);
-    };
-  }, [step]);
+    const view = viewport.current;
+    const row = track.current;
+    if (!view || !row) return;
+    // The row itself is laid out left to right; the page's language decides which way it drifts.
+    const rtl = getComputedStyle(view.parentElement ?? view).direction === 'rtl';
+    // In Arabic and Kurdish the row drifts to the right (new designs come in from the left), as the page reads.
+    const driftSign = rtl ? -1 : 1;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  const go = (i: number) => {
-    const el = track.current;
-    if (!el) return;
-    const target = Math.max(0, Math.min(themes.length - 1, i));
-    const rtl = getComputedStyle(el).direction === 'rtl';
-    el.scrollTo({ left: (rtl ? -1 : 1) * target * step() });
-  };
+    let setWidth = 1;
+    const measure = () => {
+      const first = row.children[0] as HTMLElement | undefined;
+      const second = row.children[themes.length] as HTMLElement | undefined;
+      setWidth = first && second ? Math.abs(second.offsetLeft - first.offsetLeft) : row.scrollWidth / copies;
+    };
+    measure();
+    const resize = new ResizeObserver(measure);
+    resize.observe(row);
+
+    // `offset`: how far the row has moved, kept within one copy so it loops.
+    let offset = 0;
+    let velocity = 0;
+    let dragging = false;
+    let pointer: { id: number; x: number; y: number; at: number; startX: number; moved: boolean; horizontal: boolean | null } | null = null;
+    let resumeAt = 0;
+    let visible = true;
+    let last = performance.now();
+    let frame = 0;
+
+    const render = () => {
+      offset = ((offset % setWidth) + setWidth) % setWidth;
+      // Within one copy either way, the copies after it keep the screen full; the loop point looks the same.
+      row.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    };
+
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - last) / 1000;
+      last = now;
+      if (!dragging) {
+        if (Math.abs(velocity) > 5) {
+          // Momentum after a swipe, slowing down like a native scroll.
+          offset += velocity * dt;
+          velocity *= Math.pow(0.04, dt);
+        } else {
+          velocity = 0;
+          if (visible && !reduced.matches && now >= resumeAt && !document.hidden) offset += driftSign * DRIFT * dt;
+        }
+      }
+      render();
+      frame = requestAnimationFrame(tick);
+    };
+
+    const hold = () => {
+      resumeAt = Number.POSITIVE_INFINITY;
+    };
+    const release = () => {
+      resumeAt = performance.now() + RESUME_MS;
+    };
+
+    const down = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pointer = { id: e.pointerId, x: e.clientX, y: e.clientY, at: performance.now(), startX: e.clientX, moved: false, horizontal: null };
+      velocity = 0;
+      hold();
+    };
+    const move = (e: PointerEvent) => {
+      if (!pointer || e.pointerId !== pointer.id) return;
+      const dx = e.clientX - pointer.x;
+      const dy = e.clientY - pointer.y;
+      // Decide once whether this is a sideways swipe (ours) or the page scrolling up and down (the browser's).
+      if (pointer.horizontal === null && Math.hypot(dx, dy) > 4) pointer.horizontal = Math.abs(dx) > Math.abs(dy);
+      if (!pointer.horizontal) return;
+      if (!dragging) {
+        dragging = true;
+        view.setPointerCapture(e.pointerId);
+      }
+      const now = performance.now();
+      offset -= dx;
+      velocity = (-dx / Math.max(1, now - pointer.at)) * 1000;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      pointer.at = now;
+      if (Math.abs(e.clientX - pointer.startX) > TAP_PX) pointer.moved = true;
+    };
+    const up = (e: PointerEvent) => {
+      if (!pointer || e.pointerId !== pointer.id) return;
+      // A pause before letting go means no fling.
+      if (performance.now() - pointer.at > 80) velocity = 0;
+      dragging = false;
+      release();
+      if (!pointer.moved) pointer = null;
+    };
+    // A swipe that ends on a card must not open it.
+    const click = (e: MouseEvent) => {
+      if (pointer?.moved) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      pointer = null;
+    };
+    const wheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      offset += e.deltaX;
+      velocity = 0;
+      release();
+    };
+    // Keyboard: a focused card is brought into view and the row waits.
+    const focus = (e: FocusEvent) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>('[data-carousel-card]');
+      if (!card) return;
+      hold();
+      const box = view.getBoundingClientRect();
+      const r = card.getBoundingClientRect();
+      if (r.left < box.left) offset -= box.left - r.left + 24;
+      else if (r.right > box.right) offset += r.right - box.right + 24;
+    };
+    const blur = () => release();
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = Boolean(entry?.isIntersecting);
+    });
+    io.observe(view);
+
+    view.addEventListener('pointerdown', down);
+    view.addEventListener('pointermove', move);
+    view.addEventListener('pointerup', up);
+    view.addEventListener('pointercancel', up);
+    view.addEventListener('click', click, true);
+    view.addEventListener('wheel', wheel, { passive: false });
+    view.addEventListener('focusin', focus);
+    view.addEventListener('focusout', blur);
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+      resize.disconnect();
+      io.disconnect();
+      view.removeEventListener('pointerdown', down);
+      view.removeEventListener('pointermove', move);
+      view.removeEventListener('pointerup', up);
+      view.removeEventListener('pointercancel', up);
+      view.removeEventListener('click', click, true);
+      view.removeEventListener('wheel', wheel);
+      view.removeEventListener('focusin', focus);
+      view.removeEventListener('focusout', blur);
+    };
+  }, [themes.length, copies]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-end gap-2 px-6 lg:px-[110px]">
-        <button
-          type="button"
-          onClick={() => go(active - 1)}
-          disabled={active === 0}
-          aria-label={labels.prev}
-          className="flex size-11 items-center justify-center rounded-full border border-accent text-accent transition disabled:opacity-30 lg:size-14"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden className="rtl:rotate-0 ltr:rotate-180">
-            <path d="M9 6l6 6-6 6" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          onClick={() => go(active + 1)}
-          disabled={active >= themes.length - 1}
-          aria-label={labels.next}
-          className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-ink transition disabled:opacity-30 lg:size-14"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden className="rtl:rotate-0 ltr:rotate-180">
-            <path d="M15 6l-6 6 6 6" />
-          </svg>
-        </button>
-      </div>
-
-      <div
-        ref={track}
-        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-[calc(50%-128px)] pt-2 pb-5 lg:gap-8 lg:px-[110px]"
-      >
-        {themes.map((t, i) => (
-          <article
-            key={t.key}
-            data-active={i === active}
-            className="flex w-[256px] shrink-0 snap-center flex-col gap-4 transition duration-700 ease-[cubic-bezier(.2,.7,.2,1)] data-[active=false]:scale-[.92] data-[active=false]:opacity-60 lg:w-[300px] lg:snap-start lg:data-[active=false]:scale-100 lg:data-[active=false]:opacity-100"
-          >
-            <Link
-              href={`/themes/${t.key}`}
-              aria-label={t.name}
-              className={`relative block h-[340px] overflow-hidden rounded-t-[128px] rounded-b-[18px] lg:h-[400px] lg:rounded-t-[150px] ${TINTS[i % TINTS.length]}`}
-            >
-              <RankBadge rank={t.rank} labels={labels} className="absolute bottom-3 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2" />
-              {t.coverUrl ? (
-                // Covers are already optimized WebP from the upload pipeline.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={t.coverUrl} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" className="size-full object-cover" style={coverImageStyle(t.coverFocus)} />
-              ) : null}
-            </Link>
-            <div className="flex flex-col gap-1 text-center lg:text-start">
-              <h3 className="text-lg font-semibold">{t.name}</h3>
-              <p className="text-sm text-muted">
-                {t.section}
-                {t.minPriceIqd ? (
-                  <>
-                    {' · '}
-                    {labels.from} <Price iqd={t.minPriceIqd} />
-                  </>
-                ) : null}
-              </p>
-            </div>
-            <div className="flex justify-center gap-2 lg:justify-start">
-              <Link href={`/themes/${t.key}#preview`} className="inline-flex h-11 items-center rounded-full border border-accent px-5 text-sm font-medium text-accent">
-                {labels.preview}
+    <div className="flex flex-col gap-5">
+      {/* Laid out left to right in every language (so the copies line up from the left edge); the drift direction
+          follows the page's language instead. */}
+      <div ref={viewport} dir="ltr" className="relative cursor-grab touch-pan-y overflow-hidden py-3 select-none active:cursor-grabbing" data-design-row>
+        <div ref={track} className="flex w-max gap-4 will-change-transform lg:gap-7">
+          {Array.from({ length: copies }, (_, copy) =>
+            themes.map((t, i) => (
+              <Link
+                key={`${copy}-${t.key}`}
+                href={`/themes/${t.key}`}
+                draggable={false}
+                aria-hidden={copy > 0 ? true : undefined}
+                tabIndex={copy > 0 ? -1 : undefined}
+                data-carousel-card={copy === 0 ? t.key : undefined}
+                className="group flex w-[148px] shrink-0 flex-col gap-2.5 outline-none sm:w-[190px] lg:w-[236px]"
+              >
+                <span
+                  className={`relative block aspect-[5/7] overflow-hidden rounded-[18px] shadow-[0_14px_30px_rgb(58_21_32/0.16)] ring-1 ring-black/5 transition duration-300 group-focus-visible:ring-2 group-focus-visible:ring-accent lg:rounded-[24px] ${TINTS[i % TINTS.length]}`}
+                >
+                  {t.coverUrl ? (
+                    // Covers are already optimized WebP from the upload pipeline.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={t.coverUrl}
+                      alt=""
+                      draggable={false}
+                      loading={copy === 0 && i < 4 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      className="pointer-events-none size-full object-cover"
+                      style={coverImageStyle(t.coverFocus)}
+                    />
+                  ) : null}
+                  <RankBadge rank={t.rank} labels={labels} className="absolute bottom-2.5 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2" />
+                </span>
+                <span className="truncate text-center text-sm font-medium text-heading" dir="auto">
+                  {t.name}
+                </span>
               </Link>
-              <Link href={`/themes/${t.key}#packages`} className="inline-flex h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
-                {labels.choose}
-              </Link>
-            </div>
-          </article>
-        ))}
+            )),
+          )}
+        </div>
       </div>
-
-      <div className="flex justify-center gap-1">
-        {themes.map((t, i) => (
-          <button key={t.key} type="button" onClick={() => go(i)} aria-label={t.name} aria-current={i === active} className="flex h-6 w-9 items-center justify-center">
-            <span className={`block h-2 rounded-full transition-all duration-500 ${i === active ? 'w-6 bg-accent' : 'w-2 bg-[#d9bdb4]'}`} />
-          </button>
-        ))}
-      </div>
+      <p className="text-center text-sm text-muted">{labels.hint}</p>
     </div>
   );
 }

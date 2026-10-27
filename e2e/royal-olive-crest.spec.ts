@@ -99,8 +99,14 @@ test('a package with several shapes: the customer ticks one, several or all of t
 
   // Going back keeps the ticks; unticking the card leaves just the two shapes.
   await page.getByRole('link', { name: /تعديل/ }).first().click();
+  await page.waitForLoadState('networkidle');
   for (const c of ['a5', 'leaf', 'heart']) await expect(choices.locator(`input[value=${c}]`)).toBeChecked();
-  await choices.locator('input[value=a5]').uncheck({ force: true });
+  // The form can still be re-drawn just after the page opens (which brings the ticks back): untick until it stays.
+  await expect(async () => {
+    await choices.locator('input[value=a5]').uncheck({ force: true });
+    await page.waitForTimeout(300);
+    await expect(choices.locator('input[value=a5]')).not.toBeChecked();
+  }).toPass({ timeout: 15_000 });
   await page.getByRole('button', { name: /اعرض المعاينة|حفظ/ }).first().click();
   await expect(page).toHaveURL(/\/order\//);
   await expect(page.locator('[data-extra=card-leaf]')).toBeVisible();
