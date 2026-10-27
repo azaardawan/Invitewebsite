@@ -140,7 +140,9 @@ animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/the
 - `labels` (`date`, `time`, `venue`, `and`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
 - the card gets `qrDataUrl` (null when `print.card.qr` is false or the team hid it) and `extraLine`
   (one line the team added, or null); the keepsake gets the visible
-  `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`).
+  `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`). Print each
+  message's `guestName` under it: it already says whether the guest is coming ("Sara · Coming"), which the couple
+  must see; `name` and `attending` are there for a design that shows them its own way.
 
 The platform sets `@page` from the manifest: the card page is the trim size plus `bleedMm` on every
 side (A5 + 3 mm = 154 × 216 mm) so the card's root fills exactly that box; the customer's PDF is exactly

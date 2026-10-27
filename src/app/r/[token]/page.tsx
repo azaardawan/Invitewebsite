@@ -21,6 +21,7 @@ import { receiptFor } from './data';
 import { attendanceAction, cardBackAction, guestbookAction, payAction } from './actions';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { attendanceCounts } from '@/server/guests/attendance';
+import { listGuestResponses } from '@/server/guests/responses';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
 
 /**
@@ -85,6 +86,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   // Have the WhatsApp link-preview picture ready before the customer shares the invitation.
   if (paid && r.invitation.live && r.invitation.onlineInvitation) after(() => ensurePreview(db(), r!.invitation.id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
   const replies = paid && r.invitation.hasRsvp ? await attendanceCounts(db(), r.invitation.id) : null;
+  // Who replied, coming or not, with their message (hidden messages left out), newest first.
+  const replyList = replies ? (await listGuestResponses(db(), r.invitation.id)).reverse() : [];
   const num = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ar-IQ');
   // The two PDFs side by side at the end: the card, and the keepsake from publication (it grows as guests write).
   const files = paid
@@ -244,6 +247,32 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
             <li>{t('attendanceComing', { count: num.format(replies.attending) })}</li>
             <li className="text-muted">{t('attendanceNotComing', { count: num.format(replies.notAttending) })}</li>
           </ul>
+          {replyList.length ? (
+            <details open={replyList.length <= 30} className="rounded-xl border border-line bg-paper px-4 py-3" data-guest-replies>
+              <summary className="cursor-pointer text-sm font-medium">{t('repliesList', { count: num.format(replyList.length) })}</summary>
+              <ul className="mt-3 divide-y divide-line">
+                {replyList.map((g) => (
+                  <li key={g.id} className="flex flex-col gap-1 py-2" data-guest-reply={g.attendance}>
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium" dir="auto">
+                        {g.guestName}
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${g.attendance === 'ATTENDING' ? 'bg-accent/10 text-accent' : 'bg-line/60 text-muted'}`}
+                      >
+                        {g.attendance === 'ATTENDING' ? t('replyComing') : t('replyNotComing')}
+                      </span>
+                    </span>
+                    {g.message && g.messageStatus === 'VISIBLE' ? (
+                      <p className="text-sm whitespace-pre-line text-muted" dir="auto">
+                        {g.message}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
           <p className="text-sm text-muted">{t('attendanceHelp')}</p>
           <GuestbookChoice
             name="attendanceVisibility"

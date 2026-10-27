@@ -158,12 +158,17 @@ describe('keepsake', () => {
 
     // Several guests writing from one shared phone all appear, in order.
     const phone = randomToken(24);
-    for (const [name, message] of [['أحمد', 'مبروك'], ['ليلى', 'بالرفاه والبنين'], ['Omar', 'Congratulations!']]) {
-      await submitGuestResponse(db(), { invitationId: inv.id, response: { name: name!, attendance: 'ATTENDING', message }, ipHash: randomToken(8), clientToken: phone });
+    for (const [name, message, attendance] of [['أحمد', 'مبروك', 'ATTENDING'], ['ليلى', 'بالرفاه والبنين', 'NOT_ATTENDING'], ['Omar', 'Congratulations!', 'ATTENDING']] as const) {
+      await submitGuestResponse(db(), { invitationId: inv.id, response: { name, attendance, message }, ipHash: randomToken(8), clientToken: phone });
     }
     const [row] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
     const keepsake = await printData(db(), row!, 'keepsake');
-    expect('messages' in keepsake.props && keepsake.props.messages.map((m) => m.guestName)).toEqual(['سارة', 'أحمد', 'ليلى', 'Omar']);
+    const messages = 'messages' in keepsake.props ? keepsake.props.messages : [];
+    expect(messages.map((m) => m.name)).toEqual(['سارة', 'أحمد', 'ليلى', 'Omar']);
+    // Whether each guest is coming is printed with their name (in the invitation's language), so the couple sees it.
+    expect(messages.map((m) => m.attending)).toEqual([true, true, false, true]);
+    const [coming, notComing] = row!.locale === 'en' ? ['Coming', 'Not coming'] : ['حضور', 'اعتذار'];
+    expect(messages.map((m) => m.guestName)).toEqual([`سارة · ${coming}`, `أحمد · ${coming}`, `ليلى · ${notComing}`, `Omar · ${coming}`]);
   });
 });
 

@@ -10,7 +10,8 @@ import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
-import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
+import type { KeepsakeMessage, KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
+import type { Locale } from '@/i18n/config';
 import { occasionKey, signatureUrls } from '@/server/invitation/load';
 import { listPhotos } from '@/server/photos/photos';
 import type { RenderKind } from './tokens';
@@ -35,12 +36,18 @@ export function invitationUrl(inv: Pick<InvitationRow, 'slug' | 'publicId'>): st
   return `${env().APP_URL.replace(/\/$/, '')}${invitationPath(inv.slug, inv.publicId)}`;
 }
 
-export async function visibleMessages(db: DbOrTx, invitationId: string) {
-  return db
-    .select({ guestName: guestResponses.guestName, message: guestResponses.message })
+export async function visibleMessages(db: DbOrTx, invitationId: string, locale: Locale): Promise<KeepsakeMessage[]> {
+  const rows = (await db
+    .select({ name: guestResponses.guestName, message: guestResponses.message, attendance: guestResponses.attendance })
     .from(guestResponses)
     .where(and(eq(guestResponses.invitationId, invitationId), eq(guestResponses.messageStatus, 'VISIBLE'), isNotNull(guestResponses.message)))
-    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id)) as Promise<{ guestName: string; message: string }[]>;
+    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id))) as { name: string; message: string; attendance: 'ATTENDING' | 'NOT_ATTENDING' }[];
+  // Whether each guest is coming, printed beside their name so the couple sees it with the message.
+  const labels = invitationMessages(locale) as unknown as { guestComing: string; guestNotComing: string };
+  return rows.map((r) => {
+    const attending = r.attendance === 'ATTENDING';
+    return { name: r.name, message: r.message, attending, guestName: `${r.name} · ${attending ? labels.guestComing : labels.guestNotComing}` };
+  });
 }
 
 /** The design's shaped cards (manifest `print.shapes`), from the invitation's version, else the registry. */
@@ -103,7 +110,7 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape)) };
   }
   const { base } = printBase(theme);
-  const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id) };
+  const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id, inv.locale) };
   return { codeRef, kind: 'keepsake' as const, props, page: { width: '210mm', height: '297mm', margin: '0', cropMm: 0 } satisfies PageSpec };
 }
 

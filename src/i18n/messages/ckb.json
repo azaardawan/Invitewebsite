@@ -169,6 +169,8 @@
     "attendanceTitle": "وەڵامی میوانەکان",
     "attendingCount": "ئامادە دەبن",
     "notAttendingCount": "ئامادە نابن",
+    "guestComing": "ئامادە دەبێت",
+    "guestNotComing": "ئامادە نابێت",
     "itsABoy": "کوڕە",
     "itsAGirl": "کچە",
     "bornOn": "بەرواری لەدایکبوون"
@@ -309,6 +311,9 @@
     "attendancePublic": "هەرکەسێک بەستەری بانگهێشتنامەکەی هەبێت (لە سەرووی فۆرمی وەڵامدانەوە دەردەکەوێت)",
     "attendanceComing": "ئامادە دەبن: {count}",
     "attendanceNotComing": "ئامادە نابن: {count}",
+    "repliesList": "کێ وەڵامی داوەتەوە ({count})",
+    "replyComing": "ئامادە دەبێت",
+    "replyNotComing": "ئامادە نابێت",
     "cardBackSave": "پاشەکەوتکردنی پشتی کارتەکە",
     "flipCard": "کارتەکە وەربگێڕە"
   },
