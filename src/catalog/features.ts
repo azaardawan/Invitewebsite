@@ -39,13 +39,19 @@ export const FEATURES = {
   sticker: { requires: [], requiresFields: [] },
   /** A label that wraps around a water bottle: a print-ready A4 sheet (PDF) and one label (PNG). */
   bottle_label: { requires: [], requiresFields: [] },
+  /** Photo collage, A3 poster with three of the customer's photos (src/catalog/collages.ts). */
+  collage_polaroids: { requires: [], requiresFields: [] },
+  /** Photo collage, an Instagram story with four of the customer's photos. */
+  collage_story: { requires: [], requiresFields: [] },
+  /** Photo collage, a photo wall (4 × 6 print) with nine of the customer's photos. */
+  collage_wall: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 /**
  * Features handled entirely by the platform: any theme can be sold with them,
  * so they are never listed in a theme's manifest.
  */
-export const PLATFORM_FEATURES = ['self_edit', 'custom_music', 'story', 'sticker', 'bottle_label'] as const satisfies readonly (keyof typeof FEATURES)[];
+export const PLATFORM_FEATURES = ['self_edit', 'custom_music', 'story', 'sticker', 'bottle_label', 'collage_polaroids', 'collage_story', 'collage_wall'] as const satisfies readonly (keyof typeof FEATURES)[];
 export function isPlatformFeature(key: string) {
   return (PLATFORM_FEATURES as readonly string[]).includes(key);
 }

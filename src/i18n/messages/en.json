@@ -317,7 +317,10 @@
         "story": "Instagram story picture",
         "sticker": "Chocolate stickers (round or square)",
         "bottle_label": "Water bottle label",
-        "photos": "Customer adds their own photos"
+        "photos": "Customer adds their own photos",
+        "collage_polaroids": "Photo collage: poster (3 photos)",
+        "collage_story": "Photo collage: story (4 photos)",
+        "collage_wall": "Photo collage: photo wall (9 photos)"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -1091,7 +1094,15 @@
       "keepsakeEmpty": "No messages yet.",
       "cardBackTitle": "With love",
       "watermark": "Bahja · PREVIEW",
-      "watermarkNote": "Preview: this watermark is removed after purchase"
+      "watermarkNote": "Preview: this watermark is removed after purchase",
+      "collage": {
+        "headingTop": "Happy",
+        "headingBottom": "Birthday",
+        "kicker": "HAPPY",
+        "title": "Birthday!",
+        "caption": "HAPPY BIRTHDAY",
+        "wish": "Wishing you endless joy and true happiness every single day!"
+      }
     },
     "guestbookTitle": "Messages from our guests",
     "guestbookEmpty": "Be the first to write a congratulation.",
@@ -1297,7 +1308,10 @@
       "story": "An Instagram story picture to share",
       "sticker": "Chocolate stickers, round or square, ready to print",
       "bottle_label": "A label that wraps around water bottles, ready to print",
-      "photos": "Your own photos in the design"
+      "photos": "Your own photos in the design",
+      "collage_polaroids": "A photo collage poster (A3) with three of your photos",
+      "collage_story": "A photo collage for your Instagram story, with four of your photos",
+      "collage_wall": "A photo wall collage with nine of your photos, ready to print (4 × 6)"
     },
     "orderTitle": "Your invitation details",
     "orderSubtitle": "Write the names and details exactly as you want guests to see them. You'll see a preview before paying.",
@@ -1420,7 +1434,11 @@
       "sticker": "Chocolate sticker",
       "bottle": "Water bottle label",
       "downloadPng": "Picture (PNG)",
-      "downloadSheet": "Print sheet (PDF)"
+      "downloadSheet": "Print sheet (PDF)",
+      "collagePolaroids": "Collage poster",
+      "collageStory": "Story collage",
+      "collageWall": "Photo wall",
+      "downloadJpg": "Picture (JPG)"
     },
     "cardShape": {
       "heading": "Printed card shape",
@@ -1482,7 +1500,8 @@
         "imageTooSmall": "This photo is too small. Please choose a larger one.",
         "rateLimited": "Too many uploads for now. Please try again in a while.",
         "generic": "The photo couldn't be saved. Please try again."
-      }
+      },
+      "collageHelp": "They also fill your photo collages, in the same order."
     },
     "song": {
       "title": "Your own song",

@@ -11,11 +11,11 @@ export type DocumentKind = 'card' | 'keepsake';
 export type RenderKind = DocumentKind | 'cardBleed' | 'og' | ProductView;
 
 /**
- * Newborn extras on the print page: the story picture, one sticker / bottle label, or a print-ready A4 sheet
- * of them. Watermarked until the invitation is paid.
+ * Extras on the print page: the newborn story picture, one sticker / bottle label, a print-ready A4 sheet of them, or
+ * a photo collage. Watermarked until the invitation is paid.
  */
-export type ProductView = 'story' | 'sticker' | 'stickerSheet' | 'bottle' | 'bottleSheet';
-export const PRODUCT_VIEWS: readonly ProductView[] = ['story', 'sticker', 'stickerSheet', 'bottle', 'bottleSheet'];
+export type ProductView = 'story' | 'sticker' | 'stickerSheet' | 'bottle' | 'bottleSheet' | 'collagePolaroids' | 'collageStory' | 'collageWall';
+export const PRODUCT_VIEWS: readonly ProductView[] = ['story', 'sticker', 'stickerSheet', 'bottle', 'bottleSheet', 'collagePolaroids', 'collageStory', 'collageWall'];
 const RENDER_KINDS: readonly string[] = ['card', 'cardBleed', 'keepsake', 'og', ...PRODUCT_VIEWS];
 
 const sign = (payload: string) => createHmac('sha256', secretKey('TOKEN_SECRET')).update(`print:${payload}`).digest('base64url');

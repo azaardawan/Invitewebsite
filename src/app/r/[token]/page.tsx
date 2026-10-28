@@ -310,6 +310,10 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               bottle: tStore('extras.bottle'),
               downloadPng: tStore('extras.downloadPng'),
               downloadSheet: tStore('extras.downloadSheet'),
+              collagePolaroids: tStore('extras.collagePolaroids'),
+              collageStory: tStore('extras.collageStory'),
+              collageWall: tStore('extras.collageWall'),
+              downloadJpg: tStore('extras.downloadJpg'),
             }}
           />
         </div>

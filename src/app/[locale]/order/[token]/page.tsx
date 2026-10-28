@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { includedCollages } from '@/catalog/collages';
 import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
@@ -100,7 +101,13 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               initial={draft.photos.photos}
               labels={{
                 title: t('photos.title'),
-                help: draft.photos.min ? t('photos.helpMin', { max: draft.photos.max, min: draft.photos.min }) : t('photos.help', { max: draft.photos.max }),
+                help: [
+                  draft.photos.min ? t('photos.helpMin', { max: draft.photos.max, min: draft.photos.min }) : t('photos.help', { max: draft.photos.max }),
+                  // Photo collages take the same photos (src/catalog/collages.ts).
+                  includedCollages(draft.featureKeys).length ? t('photos.collageHelp') : '',
+                ]
+                  .filter(Boolean)
+                  .join(' '),
                 count: t.raw('photos.count') as string,
                 add: t('photos.add'),
                 addMany: t('photos.addMany'),
@@ -148,6 +155,10 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               bottle: t('extras.bottle'),
               downloadPng: t('extras.downloadPng'),
               downloadSheet: t('extras.downloadSheet'),
+              collagePolaroids: t('extras.collagePolaroids'),
+              collageStory: t('extras.collageStory'),
+              collageWall: t('extras.collageWall'),
+              downloadJpg: t('extras.downloadJpg'),
             }}
           />
           <section aria-labelledby="contact-title" className="flex flex-col gap-4">

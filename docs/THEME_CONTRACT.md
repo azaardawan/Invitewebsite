@@ -209,6 +209,18 @@ a CSS size container (story 1080 × 1920 px, sticker 40 mm, bottle label in the 
 The platform adds the watermark before payment, the cut lines and the A4 sheets.
 See `themes/embroidered-garden/v1/`.
 
+### Photo collages
+
+Photo collages are platform features any design can be sold with: `collage_polaroids` (an A3 poster, 3 photos),
+`collage_story` (an Instagram story, 4 photos) and `collage_wall` (a photo wall printed 4 × 6, 9 photos);
+`src/catalog/collages.ts`. A package chooses which ones it sells, so the cheaper ones can have fewer photos. The
+customer's photos fill every collage of their package (the order form asks for as many as the largest collage holds;
+the design itself still shows only its own `photos.max`). The SDK's `<Collage>` draws them on the owner's artwork, with
+the lettering («Happy Birthday», the name, the message) in the invitation's language. A design that wants its own
+typefaces on them ships `print/Collage.tsx` (a server component) that renders `<Collage {...props} fonts={…} />` with a
+Latin and an Arabic set (`script`, `display`, `body`) inside its fonts class; the registry picks it up. The platform
+adds the watermark before payment and makes the JPG pictures. See `themes/blush-floral/v2/print/Collage.tsx`.
+
 ## 7. Preview and review
 
 - Admin → Themes → theme → **Preview**: pick a package or state, language, name length and width.

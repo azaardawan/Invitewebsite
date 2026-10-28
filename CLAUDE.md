@@ -43,6 +43,10 @@ product spec's §74 business rules override assumptions.
 - Customer songs (`custom_music`, a platform feature that needs `music`): the upload (audio or video) is converted by
   ffmpeg to a 2-minute MP3 (`src/server/media/song.ts`, `src/server/music/*`) and plays instead of the design's song.
   The customer must confirm their rights (audited). Personal data: deleted with the photos.
+- Photo collages (`collage_polaroids` / `collage_story` / `collage_wall`, platform features, `src/catalog/collages.ts`): the
+  customer's photos fill each collage of their package (the order form asks for the largest one's count), drawn by the SDK's
+  `<Collage>` (`src/theme-sdk/collage.tsx`), in the design's typefaces when it has `print/Collage.tsx` (THEME_CONTRACT §6).
+  Watermarked previews before payment; the JPGs only once paid.
 - A manifest with `onlineInvitation: false` is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
 - `pnpm db:seed` is idempotent and runs on every deploy: permissions/roles, field library, starter

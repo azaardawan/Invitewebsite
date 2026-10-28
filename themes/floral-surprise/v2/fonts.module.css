@@ -1,0 +1,67 @@
+/*
+ * Floral Surprise typefaces. The design was drawn in Georgia; on the phone it uses Gelasio (Georgia's metrics), with
+ * Pinyon Script for the name, Montserrat for the small capitals. Arabic and Kurdish (every letter of both): Noto Naskh Arabic
+ * for the text, Mirza for the headings and Aref Ruqaa for the greeting and the names. All SIL Open Font License
+ * (fonts/OFL-*.txt). Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'FS Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif-italic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/script.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/sans.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/body-arabic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Arabic';
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: swap;
+  src: url(./fonts/body-arabic-bold.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Arabic Heading';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(./fonts/heading-arabic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'FS Ruqaa';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(./fonts/ruqaa-bold.woff2) format('woff2');
+}
+
+.fonts {
+  font-family: 'FS Serif', 'FS Arabic', Georgia, serif;
+}
