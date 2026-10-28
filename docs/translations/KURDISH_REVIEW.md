@@ -1425,3 +1425,11 @@ photo collages) are in `src/i18n/messages`.
 | 167 | Platform: `invitation.print.collage.caption` | عيد ميلاد سعيد | HAPPY BIRTHDAY | ڕۆژی لەدایکبوونت پیرۆز | ڕۆژا ژدایکبوونا تە پیرۆز |
 | 168 | Platform: `invitation.print.collage.wish` | أتمنى لك فرحاً لا ينتهي وسعادة حقيقية في كل يوم! | Wishing you endless joy and true happiness every single day! | خۆشییەکی بێ کۆتایی و بەختەوەرییەکی ڕاستەقینەت بۆ دەخوازم لە هەموو ڕۆژێکدا! | دلخۆشیەکا بێ دوماهی و بەختەوەریەکا ڕاستەقینە بۆ تە دخوازم د هەمی ڕۆژان دا! |
 | 169 | Platform: `store.photos.collageHelp` | وتملأ صورُكم أيضاً كولاجات الصور بالترتيب نفسه. | They also fill your photo collages, in the same order. | هەمان وێنەکان بە هەمان ڕیز کۆلاژەکانی وێنەش پڕ دەکەنەوە. | هەمان وێنە ب هەمان ڕیزێ کۆلاژێن وێنەیان ژی پڕ دکەن. |
+
+## Batch 42 — the birthday invitations' printed poster (#22, #23, #24) — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+The printed poster's name on the order form (manifest `print.shapes[].label`, feature `card_arch`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #22 Blush Floral v2, #23 Cherry Confetti Party, #24 Pink Ribbon Party: shape `arch-poster` | بوستر | Poster | پۆستەر | پۆستەر |

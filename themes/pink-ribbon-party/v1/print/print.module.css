@@ -1,13 +1,14 @@
 /*
- * pink-ribbon-party print companions: the A5 card's front (the poster on A5 + 3 mm bleed) and its landscape back.
- * Physical units only.
+ * pink-ribbon-party print companions: the A5 card (the poster on A5 + 3 mm bleed, and its landscape back) and the
+ * printed poster (Shape.tsx, the other designs' poster size). Physical units only.
  */
 
 .card,
-.back {
+.back,
+.shape {
   --ink: #920d25;
-  --soft: #ebaaa9;
   --title: #920d25;
+  --soft: #ebaaa9;
   position: relative;
   overflow: hidden;
   color: var(--ink);
@@ -20,16 +21,18 @@
   print-color-adjust: exact;
 }
 .card *,
-.back * {
+.back *,
+.shape * {
   box-sizing: border-box;
 }
 .card :is(p, h1),
-.back :is(p, h1) {
+.back :is(p, h1),
+.shape :is(p, h1) {
   margin: 0;
   font-weight: 400;
 }
 
-/* ---------------------------------------------------------------- front: the poster covers the trimmed A5 */
+/* ---------------------------------------------------------------- A5 front: the poster covers the trimmed A5 */
 .card {
   width: 154mm;
   height: 216mm;
@@ -44,125 +47,117 @@
   object-fit: cover;
 }
 
-/* ---------------------------------------------------------------- back */
+/* ---------------------------------------------------------------- A5 back: one centred column */
 .back {
   width: 216mm;
   height: 154mm;
 }
-.deco {
+.column,
+.posterColumn {
   position: absolute;
-  display: block;
-  background: #920d25;
-  -webkit-mask: center / contain no-repeat;
-  mask: center / contain no-repeat;
-}
-.soft {
-  background: #ebaaa9;
-}
-.deco-candle-bow {
-  -webkit-mask-image: url(../assets/deco/candle-bow.webp);
-  mask-image: url(../assets/deco/candle-bow.webp);
-  aspect-ratio: 353 / 1000;
-}
-.deco-bouquet {
-  -webkit-mask-image: url(../assets/deco/bouquet.webp);
-  mask-image: url(../assets/deco/bouquet.webp);
-  aspect-ratio: 988 / 1000;
-}
-.at-start {
-  bottom: 12mm;
-  inset-inline-start: 13mm;
-  height: 96mm;
-}
-.at-end {
-  top: 10mm;
-  inset-inline-end: 12mm;
-  width: 40mm;
-  opacity: 0.9;
-}
-.backSafe {
-  position: absolute;
-  top: 18mm;
-  bottom: 18mm;
-  left: 58mm;
-  right: 58mm;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4mm;
+  gap: 4.5mm;
 }
-.backTitle {
+.column {
+  inset: 14mm 40mm;
+}
+.mark {
+  display: block;
+  width: 16mm;
+  height: auto;
+}
+
+/* ---------------------------------------------------------------- the printed poster */
+.shape {
+  width: 100%;
+  height: 100%;
+}
+.fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.posterColumn {
+  inset: 17% 16% 13%;
+  gap: 6mm;
+}
+
+/* ---------------------------------------------------------------- the words */
+.title {
   color: var(--title);
   font-family: 'PR Script', 'PR Ruqaa', serif;
-  font-size: 46pt;
-  line-height: 1.1;
+  font-size: 44pt;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
-.backTitle[data-long] {
-  font-size: 32pt;
+.title[data-long] {
+  font-size: 30pt;
 }
-.backMessage {
-  max-width: 92mm;
+.message {
+  max-width: 120mm;
   font-size: 14pt;
   font-style: italic;
   line-height: 1.55;
   white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
-.backMessage[data-long] {
+.message[data-long] {
   font-size: 11.5pt;
 }
-.sparkle {
-  width: 4.5mm;
-  fill: var(--soft);
-}
-.backName {
+.name {
   color: var(--title);
   font-family: 'PR Script', 'PR Ruqaa', serif;
-  font-size: 26pt;
-  line-height: 1.2;
+  font-size: 24pt;
+  line-height: 1.25;
 }
 .signature {
-  width: 70mm;
-  height: 20mm;
+  width: 64mm;
+  height: 18mm;
   filter: none;
 }
 .qr {
-  position: absolute;
-  bottom: 12mm;
-  inset-inline-end: 14mm;
-  margin: 0;
+  margin: 1mm 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5mm;
-  width: 26mm;
 }
 .qr img {
   display: block;
-  width: 22mm;
-  height: 22mm;
+  width: 24mm;
+  height: 24mm;
 }
 .qr figcaption {
   font-family: 'PR Sans', 'PR Arabic', sans-serif;
-  font-size: 6.5pt;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 7pt;
+  letter-spacing: 0.06em;
 }
 
 /* ---------------------------------------------------------------- Arabic and Kurdish: Aref Ruqaa for the script, never spaced out */
-[data-script='arabic'] .backTitle,
-[data-script='arabic'] .backName {
+[data-script='arabic'] .title,
+[data-script='arabic'] .name {
   font-family: 'PR Ruqaa', serif;
   font-weight: 700;
 }
-[data-script='arabic'] .backTitle {
+[data-script='arabic'] .title {
   font-size: 36pt;
   line-height: 1.5;
 }
-[data-script='arabic'] .backTitle[data-long] {
-  font-size: 24pt;
+[data-script='arabic'] .title[data-long] {
+  font-size: 26pt;
 }
-[data-script='arabic'] .backMessage {
+[data-script='arabic'] .name {
+  font-size: 22pt;
+}
+[data-script='arabic'] .message {
   font-style: normal;
   line-height: 1.8;
 }
