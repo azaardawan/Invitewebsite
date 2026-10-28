@@ -23,7 +23,8 @@ const LABEL_KEYS = [
   'countdownSeconds', 'eventStarted', 'openMap', 'date', 'time', 'venue', 'guestFormTitle', 'guestName',
   'attendanceQuestion', 'attending', 'notAttending', 'message', 'submit', 'sending', 'sent', 'sentPreview',
   'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
-  'attendanceTitle', 'attendingCount', 'notAttendingCount', 'itsABoy', 'itsAGirl', 'bornOn',
+  'attendanceTitle', 'attendingCount', 'notAttendingCount', 'itsABoy', 'itsAGirl', 'bornOn', 'partySize', 'partyFewer',
+  'partyMore',
 ] as const satisfies readonly (keyof ThemeLabels)[];
 
 /**

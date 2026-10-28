@@ -1246,3 +1246,13 @@ manifest; once a version is activated they are frozen, so a correction there nee
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | Under the moving row of designs | اسحبوا لتتصفحوا التصاميم | Swipe to browse the designs | ڕایبکێشن بۆ بینینی دیزاینەکان | ڕابکێشن دا دیزاینان ببینن |
+
+## Batch 41 — how many people a guest replies for — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Guest form, under the name (`invitation.partySize`) | عدد الأشخاص | How many of you? | ژمارەی کەسەکان | هژمارا کەسان |
+| 2 | Its − button, read out (`invitation.partyFewer`) | شخص أقل | One fewer | کەسێک کەمتر | کەسەک کێمتر |
+| 3 | Its + button, read out (`invitation.partyMore`) | شخص إضافي | One more | کەسێک زیاتر | کەسەک پتر |
+| 4 | Keepsake, after a guest's name when more than one (`invitation.guestParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |
+| 5 | Couple's receipt, beside a reply (`receipt.replyParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |

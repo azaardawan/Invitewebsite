@@ -262,6 +262,11 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                       >
                         {g.attendance === 'ATTENDING' ? t('replyComing') : t('replyNotComing')}
                       </span>
+                      {g.partySize > 1 ? (
+                        <span className="text-xs font-semibold text-muted" data-guest-party={g.partySize}>
+                          {t('replyParty', { count: num.format(g.partySize) })}
+                        </span>
+                      ) : null}
                     </span>
                     {g.message && g.messageStatus === 'VISIBLE' ? (
                       <p className="text-sm whitespace-pre-line text-muted" dir="auto">

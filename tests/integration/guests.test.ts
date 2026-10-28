@@ -5,6 +5,7 @@ import { auditLogs, guestResponses, invitations } from '@/server/db/schema';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
+import { attendanceCounts } from '@/server/guests/attendance';
 import { GUEST_RATE_LIMITS, guestResponseCounts, listGuestResponses, setGuestMessageStatus, submitGuestResponse } from '@/server/guests/responses';
 import { randomToken } from '@/lib/crypto';
 import { activeTheme, weddingValues } from '../fixtures';
@@ -25,7 +26,7 @@ async function published(packageId = shop.full.id) {
   return inv!;
 }
 
-const submit = (invitationId: string, response: { name: string; attendance: 'ATTENDING' | 'NOT_ATTENDING' | null; message?: string }, clientToken = randomToken(24)) =>
+const submit = (invitationId: string, response: { name: string; attendance: 'ATTENDING' | 'NOT_ATTENDING' | null; message?: string; partySize?: number }, clientToken = randomToken(24)) =>
   submitGuestResponse(db(), { invitationId, response, ipHash: randomToken(8), clientToken });
 
 describe('guest responses', () => {
@@ -47,6 +48,30 @@ describe('guest responses', () => {
     expect(rows.every((r) => r.message === null)).toBe(true);
     expect(rows.every((r) => r.clientTokenHash !== phone)).toBe(true);
     expect(await guestResponseCounts(db(), inv.id)).toEqual({ attending: 2, notAttending: 1 });
+  });
+
+  it('a reply can be for several people (a family with one link); the totals count people', async () => {
+    const inv = await published();
+    const phone = randomToken(24);
+    expect(await submit(inv.id, { name: 'عائلة أحمد', attendance: 'ATTENDING', partySize: 5 }, phone)).toEqual({ ok: true });
+    expect(await submit(inv.id, { name: 'سارة', attendance: 'ATTENDING' })).toEqual({ ok: true }); // left out: one person
+    expect(await submit(inv.id, { name: 'بيت علي', attendance: 'NOT_ATTENDING', partySize: 3 })).toEqual({ ok: true });
+    expect(await guestResponseCounts(db(), inv.id)).toEqual({ attending: 6, notAttending: 3 });
+    expect(await attendanceCounts(db(), inv.id)).toEqual({ attending: 6, notAttending: 3 });
+    // A correction changes the number too.
+    expect(await submit(inv.id, { name: 'عائلة أحمد', attendance: 'ATTENDING', partySize: 4 }, phone)).toEqual({ ok: true });
+    expect(await attendanceCounts(db(), inv.id)).toEqual({ attending: 5, notAttending: 3 });
+    const rows = await listGuestResponses(db(), inv.id);
+    expect(rows.map((r) => [r.guestName, r.partySize])).toEqual([
+      ['عائلة أحمد', 4],
+      ['سارة', 1],
+      ['بيت علي', 3],
+    ]);
+    // Nothing outside 1–20 people, and whole numbers only.
+    for (const partySize of [0, -1, 21, 2.5, Number.NaN]) {
+      expect(await submit(inv.id, { name: 'خطأ', attendance: 'ATTENDING', partySize })).toEqual({ ok: false, error: 'invalid' });
+    }
+    expect(await submit(inv.id, { name: 'عشرون', attendance: 'ATTENDING', partySize: 20 })).toEqual({ ok: true });
   });
 
   it('rejects missing or too-long values', async () => {

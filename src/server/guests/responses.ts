@@ -47,7 +47,11 @@ export async function submitGuestResponse(
   const name = String(input.response.name ?? '').trim();
   const message = withMessage ? String(input.response.message ?? '').trim() : '';
   const attendance = input.response.attendance;
+  const partySize = input.response.partySize ?? 1;
   if (
+    !Number.isInteger(partySize) ||
+    partySize < 1 ||
+    partySize > GUEST_LIMITS.party ||
     !name ||
     name.length > GUEST_LIMITS.name ||
     (attendance !== 'ATTENDING' && attendance !== 'NOT_ATTENDING') ||
@@ -68,6 +72,7 @@ export async function submitGuestResponse(
     invitationId: inv.id,
     guestName: name,
     attendance,
+    partySize,
     message: withMessage ? message : null,
     ipHash: input.ipHash,
     // Same phone + same name = a correction (updates the earlier reply); another name on a shared phone is a new reply.
@@ -79,7 +84,7 @@ export async function submitGuestResponse(
     .onConflictDoUpdate({
       target: [guestResponses.invitationId, guestResponses.clientTokenHash],
       // A corrected message is visible again only if it wasn't hidden by the team.
-      set: { guestName: values.guestName, attendance: values.attendance, message: values.message, ipHash: values.ipHash, updatedAt: now },
+      set: { guestName: values.guestName, attendance: values.attendance, partySize: values.partySize, message: values.message, ipHash: values.ipHash, updatedAt: now },
     });
   await trackEvent(db, { name: 'guest_reply', invitationId: inv.id, occurredAt: now });
   return { ok: true };
@@ -92,8 +97,9 @@ export async function listGuestResponses(db: DbOrTx, invitationId: string) {
 export async function guestResponseCounts(db: DbOrTx, invitationId: string) {
   const [row] = await db
     .select({
-      attending: sql<number>`count(*) filter (where ${guestResponses.attendance} = 'ATTENDING')::int`,
-      notAttending: sql<number>`count(*) filter (where ${guestResponses.attendance} = 'NOT_ATTENDING')::int`,
+      // People, not replies: one reply can be for a whole family.
+      attending: sql<number>`coalesce(sum(${guestResponses.partySize}) filter (where ${guestResponses.attendance} = 'ATTENDING'), 0)::int`,
+      notAttending: sql<number>`coalesce(sum(${guestResponses.partySize}) filter (where ${guestResponses.attendance} = 'NOT_ATTENDING'), 0)::int`,
     })
     .from(guestResponses)
     .where(eq(guestResponses.invitationId, invitationId));

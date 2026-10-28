@@ -174,7 +174,11 @@
     "guestNotComing": "ئامادە نابێت",
     "itsABoy": "کوڕە",
     "itsAGirl": "کچە",
-    "bornOn": "بەرواری لەدایکبوون"
+    "bornOn": "بەرواری لەدایکبوون",
+    "partySize": "ژمارەی کەسەکان",
+    "partyFewer": "کەسێک کەمتر",
+    "partyMore": "کەسێک زیاتر",
+    "guestParty": "{count} کەس"
   },
   "invitationSamples": {
     "short": {
@@ -316,7 +320,8 @@
     "replyComing": "ئامادە دەبێت",
     "replyNotComing": "ئامادە نابێت",
     "cardBackSave": "پاشەکەوتکردنی پشتی کارتەکە",
-    "flipCard": "کارتەکە وەربگێڕە"
+    "flipCard": "کارتەکە وەربگێڕە",
+    "replyParty": "{count} کەس"
   },
   "nav": {
     "home": "سەرەکی",

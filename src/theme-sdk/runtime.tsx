@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { formatNumber, GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationLocale, type InvitationMode, type ThemeLabels } from './types';
 
@@ -361,6 +362,88 @@ function AttendanceSummary({ counts, labels, locale }: { counts: { attending: nu
   );
 }
 
+/**
+ * "How many of you?" with − and +: a family that got one link answers once for everyone (owner request,
+ * 2026-10-28). Drawn by the platform under every design's name field (see `usePartyHost`), in the design's own
+ * font and colours.
+ */
+function PartySize({ value, onChange, labels, locale }: { value: number; onChange: (n: number) => void; labels: ThemeLabels; locale: InvitationLocale }) {
+  const button = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '2.2em',
+    height: '2.2em',
+    minHeight: 0,
+    padding: 0,
+    margin: 0,
+    border: '1px solid currentColor',
+    borderRadius: '999px',
+    background: 'transparent',
+    color: 'inherit',
+    font: 'inherit',
+    fontSize: '1.15em',
+    lineHeight: 1,
+    cursor: 'pointer',
+  } as const;
+  return (
+    <div role="group" aria-label={labels.partySize} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75em', margin: '0.6em 0' }}>
+      <span>{labels.partySize}</span>
+      {/* − 1 + reads the same way in every language. */}
+      <span dir="ltr" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.7em' }}>
+        <button type="button" aria-label={labels.partyFewer} disabled={value <= 1} onClick={() => onChange(value - 1)} style={{ ...button, opacity: value <= 1 ? 0.35 : 1 }}>
+          −
+        </button>
+        <output aria-live="polite" data-bahja-party-size={value} style={{ minWidth: '1.6em', textAlign: 'center', fontWeight: 700, fontSize: '1.2em' }}>
+          {formatNumber(value, locale)}
+        </output>
+        <button
+          type="button"
+          aria-label={labels.partyMore}
+          disabled={value >= GUEST_LIMITS.party}
+          onClick={() => onChange(value + 1)}
+          style={{ ...button, opacity: value >= GUEST_LIMITS.party ? 0.35 : 1 }}
+        >
+          +
+        </button>
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Where the party-size control goes: a box placed right after the design's name field (`input[name=name]`, or the
+ * label around it), so every design, frozen versions included, gets it without changes. Follows the form if the
+ * design redraws it; gone while the form isn't shown (after sending, say).
+ */
+function usePartyHost(area: HTMLElement | null) {
+  const [host, setHost] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!area) return;
+    const box = document.createElement('div');
+    box.setAttribute('data-bahja-party', '');
+    const place = () => {
+      const input = area.querySelector<HTMLInputElement>('input[name="name"]');
+      if (!input) {
+        box.remove();
+        setHost(null);
+        return;
+      }
+      const anchor = input.closest('label') ?? input;
+      if (anchor.nextElementSibling !== box) anchor.after(box);
+      setHost(box);
+    };
+    place();
+    const watch = new MutationObserver(place);
+    watch.observe(area, { childList: true, subtree: true });
+    return () => {
+      watch.disconnect();
+      box.remove();
+    };
+  }, [area]);
+  return host;
+}
+
 export function GuestFormSlot({ render, summary = true }: { render: (form: GuestFormApi) => ReactNode; summary?: boolean }) {
   const { guest, labels, mode } = useRuntime();
   const [status, setStatus] = useState<GuestFormApi['status']>('idle');
@@ -370,6 +453,9 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
   const router = useRouter();
   const [bot] = useState(() => new TurnstileHandle());
   const botKey = isPreview ? null : (guest.turnstileSiteKey ?? null);
+  const [party, setParty] = useState(1);
+  const [area, setArea] = useState<HTMLDivElement | null>(null);
+  const partyHost = usePartyHost(area);
 
   const submit = useCallback(
     async (input: GuestResponseInput) => {
@@ -395,7 +481,8 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
         return;
       }
       const captcha = botKey ? await bot.take() : undefined;
-      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined }, captcha).catch(
+      const partySize = input.partySize ?? party;
+      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined, partySize }, captcha).catch(
         () => ({ ok: false, error: 'failed' }) as const,
       );
       if (result.ok) {
@@ -408,14 +495,18 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
         setError(labels.errorGeneric);
       }
     },
-    [guest, labels, isPreview, bot, botKey, router],
+    [guest, labels, isPreview, bot, botKey, router, party],
   );
 
   if (!guest.enabled) return null;
   return (
     <>
       {summary && guest.attendance ? <AttendanceSummary counts={guest.attendance} labels={labels} locale={guest.locale ?? 'ar'} /> : null}
-      {render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}
+      {/* `display: contents`: the design lays its form out as if this box weren't there. */}
+      <div ref={setArea} style={{ display: 'contents' }}>
+        {render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}
+      </div>
+      {partyHost ? createPortal(<PartySize value={party} onChange={setParty} labels={labels} locale={guest.locale ?? 'ar'} />, partyHost) : null}
       {botKey ? <TurnstileBox handle={bot} siteKey={botKey} /> : null}
     </>
   );
