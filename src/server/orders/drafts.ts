@@ -13,7 +13,7 @@ import { newPreviewToken, previewTokenHash } from './tokens';
 import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
 import { extrasUpdate, type OrderExtras } from './extras';
-import { occasionSectionId, themeOccasions } from '@/server/catalog/occasions';
+import { occasionSectionId, placeOptionalIn, themeOccasions } from '@/server/catalog/occasions';
 
 /** `occasion`: which occasion (section key) the invitation is for, for a design sold in several. */
 export type DraftInput = { themeKey: string; packageId: string; locale: Locale; values: Record<string, unknown>; extras?: OrderExtras; occasion?: string };
@@ -22,15 +22,19 @@ export type DraftInput = { themeKey: string; packageId: string; locale: Locale; 
 export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestContext, now = new Date()) {
   if (ctx.ipHash && !(await consumeRateLimit(db, `draft:${ctx.ipHash}`, 30, 3600, now))) throw new OrderError('rateLimited');
   const p = await loadPurchasable(db, input.themeKey, input.packageId);
-  const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now);
   // A design sold in several occasions needs to know which one this is; one occasion needs nothing.
   const occasions = await themeOccasions(db, p.theme.id, p.theme.sectionId);
   let sectionId = p.theme.sectionId;
+  let occasionMissing = false;
   if (occasions.length > 1) {
     const chosen = input.occasion && occasions.includes(input.occasion) ? await occasionSectionId(db, p.theme.id, p.theme.sectionId, input.occasion) : null;
-    if (!chosen) throw new OrderError('invalidFields', { ...(result.ok ? {} : result.errors), occasion: 'required' });
-    sectionId = chosen;
+    if (chosen) sectionId = chosen;
+    else occasionMissing = true;
   }
+  // A birthday's place is the customer's choice.
+  const optionalPlace = !occasionMissing && (await placeOptionalIn(db, sectionId));
+  const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now, { optionalPlace });
+  if (occasionMissing) throw new OrderError('invalidFields', { ...(result.ok ? {} : result.errors), occasion: 'required' });
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
   // Card back, signature and colour set (only what the package includes).
   const extra = await extrasUpdate(
@@ -112,7 +116,9 @@ export async function updateDraft(
     if (!draft) throw new OrderError('previewExpired');
     const [locked] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
-    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now);
+    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now, {
+      optionalPlace: await placeOptionalIn(tx, locked!.sectionId),
+    });
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
     const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
     const extra = await extrasUpdate(

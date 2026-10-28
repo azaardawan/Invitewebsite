@@ -1,0 +1,38 @@
+/*
+ * Blush Floral typefaces. The design was drawn in Georgia; on the phone it uses Gelasio (Georgia's metrics), with
+ * Montserrat for the small capitals and Amiri for Arabic and Kurdish. All SIL Open Font License (fonts/OFL-*.txt).
+ * Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'BF Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'BF Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/serif-italic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'BF Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/sans.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'BF Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/arabic.woff2) format('woff2');
+}
+
+.fonts {
+  font-family: 'BF Serif', 'BF Arabic', Georgia, serif;
+}

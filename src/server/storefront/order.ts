@@ -1,4 +1,5 @@
 import 'server-only';
+import { isPlaceOptional } from '@/catalog/fields';
 import { customMusicIncluded, customSong } from '@/server/music/custom';
 import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
@@ -43,6 +44,8 @@ export async function draftByToken(token: string) {
     termsSlug: POLICY_SLUGS[await termsPolicyFor(db(), section?.key)] as 'terms' | 'terms-newborn',
     locale: inv.locale,
     values: inv.fieldValues,
+    /** A birthday: the place is the customer's choice on the form. */
+    optionalPlace: isPlaceOptional(section?.key),
     featureKeys: inv.featureKeys,
     fields: await orderFields(inv.themeId, inv.sectionId, inv.fieldKeys),
     themeId: inv.themeId,

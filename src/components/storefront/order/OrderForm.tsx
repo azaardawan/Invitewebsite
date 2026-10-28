@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
-import { fieldOptions, INITIALS_MAX, isOptionalField, splitInitials } from '@/catalog/fields';
+import { fieldOptions, INITIALS_MAX, isOptionalField, PLACE_FIELDS, PLACE_TOGGLE, placeChosen, splitInitials } from '@/catalog/fields';
 
 export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
 
@@ -63,6 +63,7 @@ export function OrderForm({
   submitLabel,
   extras = {},
   occasions,
+  optionalPlace = false,
 }: {
   action: (prev: State, form: FormData) => Promise<State>;
   hidden: Record<string, string>;
@@ -74,6 +75,8 @@ export function OrderForm({
   extras?: OrderFormExtras;
   /** For a design sold in several occasions when the customer hasn't picked one yet: which one is it? */
   occasions?: { key: string; label: string }[];
+  /** A birthday: the place (venue, map link) is behind "add the place", off unless the customer ticks it. */
+  optionalPlace?: boolean;
 }) {
   const t = useTranslations('store');
   const [state, formAction, pending] = useActionState(action, {});
@@ -81,6 +84,9 @@ export function OrderForm({
   const errors = state.fieldErrors ?? {};
   // The invitation's language, as chosen below: the wording section offers the design's version in it.
   const [lang, setLang] = useState<Locale>(invitationLocale);
+  const isPlace = (key: string) => optionalPlace && (PLACE_FIELDS as readonly string[]).includes(key);
+  const [placeOn, setPlaceOn] = useState(() => placeChosen(values));
+  const firstPlace = fields.find((f) => isPlace(f.key))?.key;
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
@@ -116,6 +122,15 @@ export function OrderForm({
       ) : null}
 
       {fields.map((f) => {
+        // The place toggle sits where the place fields begin; unticked, they are not shown or sent.
+        const toggle =
+          f.key === firstPlace ? (
+            <label key={PLACE_TOGGLE} className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-[15px] font-medium text-heading" data-place-toggle>
+              <input type="checkbox" name={`f.${PLACE_TOGGLE}`} value="1" checked={placeOn} onChange={(e) => setPlaceOn(e.target.checked)} className="size-5 accent-[var(--color-accent)]" />
+              {t('addPlace')}
+            </label>
+          ) : null;
+        if (isPlace(f.key) && !placeOn) return toggle;
         const id = `f-${f.key}`;
         const err = errors[f.key];
         const optional = isOptionalField(f.key);
@@ -129,7 +144,7 @@ export function OrderForm({
           'aria-describedby': err ? `${id}-err` : hinted ? `${id}-hint` : undefined,
           className: inputCls,
         } as const;
-        return (
+        const field = (
           <div key={f.key} className="flex flex-col gap-2">
             <label htmlFor={f.type === 'initials' ? undefined : id} id={`${id}-label`} className="text-[15px] font-medium text-heading">
               {f.label}
@@ -194,6 +209,14 @@ export function OrderForm({
               <p id={`${id}-hint`} className="text-sm text-muted">{t('sealInitialsHint')}</p>
             ) : null}
           </div>
+        );
+        return toggle ? (
+          <div key={f.key} className="flex flex-col gap-6">
+            {toggle}
+            {field}
+          </div>
+        ) : (
+          field
         );
       })}
 

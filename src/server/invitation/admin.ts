@@ -3,6 +3,7 @@ import { invitationNames } from '@/catalog/fields';
 import { and, desc, eq, gt, ilike, lte, or, sql, type SQL } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitationPhotos, invitations, musicTracks, orders, packages, sections, themes } from '@/server/db/schema';
+import { placeOptionalIn } from '@/server/catalog/occasions';
 import { closeGap, deletePhotoFiles } from '@/server/photos/photos';
 import { deleteSongFiles } from '@/server/music/custom';
 import { recordAudit } from '@/server/audit/audit';
@@ -92,7 +93,9 @@ export async function updateInvitationValues(
     const existingDate = inv.fieldValues.event_date;
     const unchangedPastDate = typeof existingDate === 'string' && input.values.event_date === existingDate;
     const validateAt = unchangedPastDate ? new Date(`${existingDate}T00:00:00Z`) : now;
-    const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys), validateAt < now ? validateAt : now);
+    const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys), validateAt < now ? validateAt : now, {
+      optionalPlace: await placeOptionalIn(tx, inv.sectionId),
+    });
     if (!result.ok) throw new InvitationAdminError('invalidFields', result.errors);
     const slug = slugFromNames(invitationNames(result.values));
     await tx.update(invitations).set({ fieldValues: result.values, slug, version: inv.version + 1 }).where(eq(invitations.id, id));

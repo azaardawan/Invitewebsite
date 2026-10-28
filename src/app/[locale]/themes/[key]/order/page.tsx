@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link, redirect } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
+import { isPlaceOptional } from '@/catalog/fields';
 import type { Locale } from '@/i18n/config';
 import { storefrontTheme } from '@/server/storefront/catalog';
 import { orderFormExtras } from '@/server/storefront/order';
@@ -63,6 +64,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           action={startOrderAction}
           hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale, ...(occasion ? { occasion: occasion.key } : {}) }}
           occasions={th.occasions.length > 1 && !occasion ? th.occasions.map((o) => ({ key: o.key, label: localized(o.name, locale) })) : undefined}
+          optionalPlace={isPlaceOptional(occasion?.key ?? (th.occasions.length > 1 ? undefined : th.section.key))}
           fields={th.fields.filter((f) => pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale) }))}
           initialValues={gender ? { baby_gender: gender } : undefined}
           invitationLocale={locale}

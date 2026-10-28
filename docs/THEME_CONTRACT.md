@@ -56,7 +56,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 |---|---|
 | `mode` | `sample` / `preview` / `live` |
 | `locale`, `dir`, `lang` | Invitation language (independent of the website language) |
-| `fields` | Only the fields the package includes. Absent means don't render it. |
+| `fields` | Only the fields the package includes. Absent means don't render it. A birthday's place (`venue_name`, `venue_map_url`) is the customer's choice (off unless they tick "add the place"): a design with a place must look right without it, leaving out its whole place box, not only the text. |
 | `features` | Only the features the package includes. Use `hasFeature(props, 'map')`. |
 | `labels` | Every UI string a theme may show, including `and` (the word between two names). **Never hard-code text**, not even "&". |
 | `event.startsAt` / `event.date` / `event.time` | Countdown target (Baghdad time) and localized date/time parts |

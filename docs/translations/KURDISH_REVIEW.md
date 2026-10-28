@@ -1256,3 +1256,9 @@ manifest; once a version is activated they are frozen, so a correction there nee
 | 3 | Its + button, read out (`invitation.partyMore`) | شخص إضافي | One more | کەسێک زیاتر | کەسەک پتر |
 | 4 | Keepsake, after a guest's name when more than one (`invitation.guestParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |
 | 5 | Couple's receipt, beside a reply (`receipt.replyParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |
+
+## Batch 42 — a birthday's place is optional — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Order form, the tick box before the place (`store.addPlace`) | إضافة مكان الحفل | Add the place of the celebration | زیادکردنی شوێنی ئاهەنگ | زێدەکرنا جهێ ئاهەنگێ |

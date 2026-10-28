@@ -1518,7 +1518,8 @@
         "generic": "The song could not be saved. Please try again."
       }
     },
-    "photosUpTo": "{max, plural, one {Your own photo in the design} other {Up to # of your own photos}}"
+    "photosUpTo": "{max, plural, one {Your own photo in the design} other {Up to # of your own photos}}",
+    "addPlace": "Add the place of the celebration"
   },
   "contact": {
     "title": "Contact us",

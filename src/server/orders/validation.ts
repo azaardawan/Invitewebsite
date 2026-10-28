@@ -1,7 +1,7 @@
 import 'server-only';
 import { safeMapUrl } from '@/lib/invitation-format';
 import { normalizePhone, toAsciiDigits } from '@/lib/phone';
-import { fieldOptions, INITIALS_MAX, isOptionalField, joinInitials, splitInitials } from '@/catalog/fields';
+import { fieldOptions, INITIALS_MAX, isOptionalField, joinInitials, PLACE_FIELDS, placeChosen, splitInitials } from '@/catalog/fields';
 
 export type FieldError =
   | 'required'
@@ -38,19 +38,23 @@ function cleanText(value: string, multiline: boolean): string | null {
  * Server-side validation of customer-entered invitation fields. Every field the
  * package includes is required (except the Field Library's optional ones, which
  * may stay empty); anything else is dropped. Never trust the form.
+ * `optionalPlace` (a birthday): the place fields count only when the customer chose to add the place
+ * (`placeChosen`); otherwise they are left out entirely.
  */
 export function validateFieldValues(
   input: Record<string, unknown>,
   fieldKeys: readonly string[],
   defs: ReadonlyMap<string, FieldDef>,
   now = new Date(),
+  opts: { optionalPlace?: boolean } = {},
 ): { ok: true; values: Record<string, string> } | { ok: false; errors: Record<string, FieldError> } {
   const values: Record<string, string> = {};
   const errors: Record<string, FieldError> = {};
+  const keys = opts.optionalPlace && !placeChosen(input) ? fieldKeys.filter((k) => !(PLACE_FIELDS as readonly string[]).includes(k)) : fieldKeys;
   const today = baghdadToday(now);
   const latest = baghdadToday(new Date(now.getTime() + MAX_DAYS_AHEAD * 86400_000));
 
-  for (const key of fieldKeys) {
+  for (const key of keys) {
     const def = defs.get(key);
     const raw = input[key];
     if (typeof raw !== 'string' || raw.trim() === '') {

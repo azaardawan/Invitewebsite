@@ -4,6 +4,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
 import { customers, invitations, orderStatusHistory, orders, sections, themes } from '@/server/db/schema';
+import { placeOptionalIn } from '@/server/catalog/occasions';
 import { recordAudit } from '@/server/audit/audit';
 import type { RequestContext } from '@/server/auth/request-context';
 import { consumeRateLimit } from '@/server/rate-limit';
@@ -80,7 +81,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     if (p.version.id !== inv!.themeVersionId || !sameSet(p.pkg.fieldKeys, inv!.fieldKeys) || !sameSet(p.pkg.featureKeys, inv!.featureKeys)) {
       throw new OrderError('packageChanged');
     }
-    const fields = validateFieldValues(inv!.fieldValues, inv!.fieldKeys, p.defs, now);
+    const fields = validateFieldValues(inv!.fieldValues, inv!.fieldKeys, p.defs, now, { optionalPlace: await placeOptionalIn(tx, inv!.sectionId) });
     if (!fields.ok) throw new OrderError('invalidFields', fields.errors);
     // A design that needs photos (manifest `photos.min`) is not ordered without them.
     const photos = await photoSpec(tx, inv!);
