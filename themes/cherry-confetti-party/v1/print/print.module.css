@@ -1,0 +1,172 @@
+/*
+ * cherry-confetti-party print companions: the A5 card's front (the poster on A5 + 3 mm bleed) and its landscape back.
+ * Physical units only.
+ */
+
+.card,
+.back {
+  --ink: #fff7f2;
+  --soft: #e8b5a8;
+  --title: #fff7f2;
+  position: relative;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: 'CC Serif', 'CC Arabic', Georgia, serif;
+  text-align: center;
+  background: #470000;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back * {
+  box-sizing: border-box;
+}
+.card :is(p, h1),
+.back :is(p, h1) {
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------- front: the poster covers the trimmed A5 */
+.card {
+  width: 154mm;
+  height: 216mm;
+}
+.poster {
+  position: absolute;
+  top: 3mm;
+  left: 3mm;
+  display: block;
+  width: 148mm;
+  height: 210mm;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------- back */
+.back {
+  width: 216mm;
+  height: 154mm;
+}
+.deco {
+  position: absolute;
+  display: block;
+  background: #fff7f2;
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+.soft {
+  background: #e8b5a8;
+}
+.deco-candelabra {
+  -webkit-mask-image: url(../assets/deco/candelabra.webp);
+  mask-image: url(../assets/deco/candelabra.webp);
+  aspect-ratio: 434 / 1000;
+}
+.deco-bouquet {
+  -webkit-mask-image: url(../assets/deco/bouquet.webp);
+  mask-image: url(../assets/deco/bouquet.webp);
+  aspect-ratio: 988 / 1000;
+}
+.at-start {
+  bottom: 12mm;
+  inset-inline-start: 13mm;
+  height: 96mm;
+}
+.at-end {
+  top: 10mm;
+  inset-inline-end: 12mm;
+  width: 40mm;
+  opacity: 0.9;
+}
+.backSafe {
+  position: absolute;
+  top: 18mm;
+  bottom: 18mm;
+  left: 58mm;
+  right: 58mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.backTitle {
+  color: var(--title);
+  font-family: 'CC Script', 'CC Ruqaa', serif;
+  font-size: 46pt;
+  line-height: 1.1;
+}
+.backTitle[data-long] {
+  font-size: 32pt;
+}
+.backMessage {
+  max-width: 92mm;
+  font-size: 14pt;
+  font-style: italic;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+.backMessage[data-long] {
+  font-size: 11.5pt;
+}
+.sparkle {
+  width: 4.5mm;
+  fill: var(--soft);
+}
+.backName {
+  color: var(--title);
+  font-family: 'CC Script', 'CC Ruqaa', serif;
+  font-size: 26pt;
+  line-height: 1.2;
+}
+.signature {
+  width: 70mm;
+  height: 20mm;
+  filter: invert(1) brightness(1.6);
+}
+.qr {
+  position: absolute;
+  bottom: 12mm;
+  inset-inline-end: 14mm;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5mm;
+  width: 26mm;
+}
+.qr img {
+  display: block;
+  width: 22mm;
+  height: 22mm;
+  padding: 1.5mm;
+  border-radius: 1.5mm;
+  background: #fff7f2;
+}
+.qr figcaption {
+  font-family: 'CC Sans', 'CC Arabic', sans-serif;
+  font-size: 6.5pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------- Arabic and Kurdish: Aref Ruqaa for the script, never spaced out */
+[data-script='arabic'] .backTitle,
+[data-script='arabic'] .backName {
+  font-family: 'CC Ruqaa', serif;
+  font-weight: 700;
+}
+[data-script='arabic'] .backTitle {
+  font-size: 36pt;
+  line-height: 1.5;
+}
+[data-script='arabic'] .backTitle[data-long] {
+  font-size: 24pt;
+}
+[data-script='arabic'] .backMessage {
+  font-style: normal;
+  line-height: 1.8;
+}
+[data-script='arabic'] .qr figcaption {
+  letter-spacing: 0;
+}

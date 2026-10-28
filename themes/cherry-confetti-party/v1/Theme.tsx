@@ -19,6 +19,7 @@ import {
 import { BOW_BORDER } from './border';
 import { copyFor, type Copy } from './copy';
 import { DURATION, PIECE_INK, createRenderer, frameLayout, particles, ribbons, stars, type Layout } from './motion';
+import { PosterLine, posterDetails } from './poster';
 import { Scene } from './Scene';
 import bow from './assets/bow.svg';
 import cakeArt from './assets/cake.svg';
@@ -37,33 +38,6 @@ const c = (...names: (string | false | null | undefined)[]) =>
     .map((n) => s[n] ?? n)
     .join(' ');
 const sceneClass = (...names: string[]) => c(...names);
-
-const ARABIC = /[؀-ۿ]/;
-const SVG_X = 148.875;
-
-/** One line of the poster's lettering: centred, shrunk to fit its width, in the design's script or serif (Arabic and Kurdish:
- * Aref Ruqaa for the script lines, Noto Naskh for the others; never spaced out, which would break the letters apart). */
-function PosterLine({ text, y, size, max, kind, track = 0 }: { text: string; y: number; size: number; max: number; kind: 'script' | 'serif'; track?: number }) {
-  const arabic = ARABIC.test(text);
-  const n = Math.max(1, Array.from(text).length);
-  const em = arabic ? (kind === 'script' ? 0.48 : 0.5) : kind === 'script' ? 0.44 : 0.66 + track / size;
-  const fitted = Math.min(arabic ? size * (kind === 'script' ? 0.9 : 1.25) : size, max / (n * em));
-  return (
-    <text
-      x={SVG_X}
-      y={y}
-      textAnchor="middle"
-      fill={PIECE_INK}
-      fontSize={fitted}
-      fontFamily={arabic ? (kind === 'script' ? "'CC Ruqaa', serif" : "'CC Arabic', serif") : kind === 'script' ? "'CC Script', serif" : "'CC Serif', Georgia, serif"}
-      fontWeight={arabic && kind === 'serif' ? 600 : undefined}
-      letterSpacing={arabic ? 0 : track}
-      direction={arabic ? 'rtl' : 'ltr'}
-    >
-      {kind === 'serif' && !arabic ? text.toUpperCase() : text}
-    </text>
-  );
-}
 
 function Sprig({ className }: { className?: string }) {
   return (
@@ -120,7 +94,7 @@ export default function CherryConfettiParty(props: ThemeProps) {
   const shownPhotos = hasFeature(props, 'photos') ? photos.slice(0, 2) : [];
   const script = locale === 'en' ? 'latin' : 'arabic';
   // The poster's date line, as the designer's «SUN | 07 | 7 PM».
-  const details = date ? [date.weekday, `${date.day} ${date.month}`, event.time].filter(Boolean).join('  |  ') : t.posterSoon;
+  const details = posterDetails(date, event.time, t.posterSoon);
 
   // The poster's frame of reference: the stage's width and the screen's height (as the designer's page).
   const layoutRef = useRef<Layout>(frameLayout());

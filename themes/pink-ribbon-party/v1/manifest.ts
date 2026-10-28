@@ -19,16 +19,23 @@ export default defineTheme({
   fields: [...allFields],
   // A birthday is not always held somewhere in particular: the customer may leave the place (and its map link) empty.
   optionalFields: ['venue_name', 'venue_map_url'],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos', 'print_card'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     { features: ['countdown', 'map'], fields: [...allFields] },
+    // The printed card alone (the poster on A5, the QR code on its back), without the place.
+    { features: ['countdown', 'print_card'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
     // A package without the place at all.
     { features: ['countdown'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
     { features: ['music', 'countdown', 'map', 'rsvp', 'signature'], fields: [...allFields] },
     // The complete design: + the guests' wishes and the customer's photos.
-    { features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'], fields: [...allFields] },
+    { features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos', 'print_card'], fields: [...allFields] },
   ],
+  // The printed card (feature `print_card`): the poster on A5, the customer's lines set on it; the QR code on the back.
+  print: {
+    // The ribbon's red on the paper (transparent background).
+    card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#920d25', light: '#00000000' } },
+  },
   // The customer's photos (feature `photos`): two keepsake prints under the cake.
   photos: {
     max: 2,
