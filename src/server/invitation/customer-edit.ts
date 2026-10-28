@@ -58,7 +58,7 @@ export async function customerEditInvitation(
     const existingDate = inv!.fieldValues.event_date;
     const keepsPastDate = typeof existingDate === 'string' && input.values.event_date === existingDate;
     const validateAt = keepsPastDate && new Date(`${existingDate}T00:00:00Z`) < now ? new Date(`${existingDate}T00:00:00Z`) : now;
-    const result = validateFieldValues(input.values, inv!.fieldKeys, await fieldDefs(tx, inv!.fieldKeys), validateAt, {
+    const result = validateFieldValues(input.values, inv!.fieldKeys, await fieldDefs(tx, inv!.fieldKeys, inv!.themeVersionId), validateAt, {
       optionalPlace: await placeOptionalIn(tx, inv!.sectionId),
     });
     if (!result.ok) return { ok: false, error: 'invalidFields', fieldErrors: result.errors } as const;

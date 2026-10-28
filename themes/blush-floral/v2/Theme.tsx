@@ -19,6 +19,7 @@ import {
 import { ROSETTE_BORDER } from './border';
 import { copyFor, type Copy } from './copy';
 import { DURATION, SPEED, createRenderer, petals, stageHeight, type DrawOptions, type LineBox, type LineKey } from './motion';
+import { PosterLine, lineBox, posterDetails, posterLines } from './poster';
 import { Scene } from './Scene';
 import cake from './assets/cake.webp';
 import fonts from './fonts.module.css';
@@ -36,66 +37,6 @@ const c = (...names: (string | false | null | undefined)[]) =>
     .map((n) => s[n] ?? n)
     .join(' ');
 const sceneClass = (...names: string[]) => c(...names);
-
-const ARABIC = /[؀-ۿ]/;
-const SVG_X = 148.875;
-
-/** One line of the poster: the designer's serif, in capitals (or italic lower case), tracked. */
-type LineSpec = { text: string; y: number; size: number; max: number; fill: string; track: number; italic?: boolean; opacity?: number };
-
-/** How large a line is drawn: shrunk to fit its width (an estimate per script, as the poster is drawn before fonts load). */
-function fit({ text, size, max, track, italic }: LineSpec) {
-  const arabic = ARABIC.test(text);
-  const n = Math.max(1, Array.from(text).length);
-  const em = arabic ? 0.52 : (italic ? 0.46 : 0.72) + track / size;
-  return { arabic, size: Math.min(arabic ? size * 1.25 : size, max / (n * em)) };
-}
-
-/** One of the invitation's lines on the poster, behind the wipe that writes it (motion.ts moves `wipe-<key>`). */
-function PosterLine({ p, k, spec }: { p: string; k: LineKey; spec: LineSpec }) {
-  const { arabic, size } = fit(spec);
-  return (
-    <>
-      <defs>
-        <clipPath id={`${p}clip-${k}`} clipPathUnits="userSpaceOnUse">
-          <rect id={`${p}wipe-${k}`} x={0} y={0} width={0} height={0} />
-        </clipPath>
-      </defs>
-      <text
-        x={SVG_X}
-        y={spec.y}
-        textAnchor="middle"
-        fill={spec.fill}
-        fillOpacity={spec.opacity}
-        fontSize={size}
-        fontFamily={arabic ? "'BF Arabic', serif" : "'BF Serif', Georgia, serif"}
-        fontStyle={spec.italic && !arabic ? 'italic' : undefined}
-        letterSpacing={arabic ? 0 : spec.track}
-        direction={arabic ? 'rtl' : 'ltr'}
-        clipPath={`url(#${p}clip-${k})`}
-      >
-        {spec.italic || arabic ? spec.text : spec.text.toUpperCase()}
-      </text>
-    </>
-  );
-}
-
-/** The wipe's box for a line: around its baseline, as wide as the line may be, in its reading direction. */
-const lineBox = (spec: LineSpec): LineBox => {
-  const { arabic, size } = fit(spec);
-  return { y: spec.y, height: size * 1.2, max: spec.max, rtl: arabic };
-};
-
-/** The poster's lettering (positions from the designer's artwork, in poster units). */
-function posterLines(t: Copy, posterName: string, details: string, venue: string): Record<LineKey, LineSpec> {
-  return {
-    eyebrow: { text: t.posterEyebrow, y: 21, size: 8.4, max: 170, fill: '#bc7630', track: 3, italic: true },
-    name: { text: posterName, y: 35.7, size: 9.4, max: 160, fill: '#bc7630', track: 1.6, opacity: 0.8 },
-    party: { text: t.posterParty, y: 345.4, size: 12, max: 140, fill: '#bc7630', track: 4.5, opacity: 0.8 },
-    details: { text: details, y: 377.6, size: 12.5, max: 220, fill: '#be2026', track: 1.4 },
-    address: { text: venue, y: 385.6, size: 6.6, max: 180, fill: '#be2026', track: 1.6, italic: true },
-  };
-}
 
 function Sprig({ className }: { className?: string }) {
   return (
@@ -125,6 +66,11 @@ function Sparkle({ className }: { className?: string }) {
       <path d="M0-12Q1.5-1.5 10 0Q1.5 1.5 0 12Q-1.5 1.5-10 0Q-1.5-1.5 0-12Z" />
     </svg>
   );
+}
+
+/** One of the designer's drawings (assets/deco), placed in a corner of its section; `soft` takes the lighter ink. */
+function Deco({ name, at, soft, motion }: { name: string; at: string; soft?: boolean; motion?: 'sway' | 'float' }) {
+  return <span className={c('deco', `deco-${name}`, `d-${at}`, soft && 'deco-soft', motion)} aria-hidden="true" />;
 }
 
 /** Two-line copy (written with \n in copy.ts). */
@@ -158,16 +104,14 @@ export default function BlushFloral(props: ThemeProps) {
   const date = event.date;
   const showCountdown = hasFeature(props, 'countdown') && event.startsAt !== null;
   const showMap = hasFeature(props, 'map') && mapUrl !== null;
-  // A birthday's place is the customer's choice (owner, 2026-10-28): without one, no place box at all.
-  const hasPlace = venue !== '' || showMap;
   const showForm = hasFeature(props, 'rsvp');
   const showSignature = hasFeature(props, 'signature') && props.signatures.length > 0;
   const shownPhotos = hasFeature(props, 'photos') ? photos.slice(0, 2) : [];
 
   // The poster's lettering: «You are invited to», «ROSIE’S», «SUN | 07 | 7 PM», the place.
-  const details = date ? [date.weekday, date.day, event.time].filter(Boolean).join('  |  ') : t.posterSoon;
-  const posterName = name ? t.posterName.replace('{name}', name) : '';
-  const specs = posterLines(t, posterName, details, venue);
+  const details = posterDetails(date, event.time, t.posterSoon);
+  const local = locale !== 'en';
+  const specs = posterLines(t, name, details, venue, local);
   // The wipes' boxes, for the renderer (kept in a ref: the opening reads the latest without restarting).
   const boxes = Object.fromEntries((Object.keys(specs) as LineKey[]).map((k) => [k, lineBox(specs[k])])) as Record<LineKey, LineBox>;
   const boxesRef = useRef(boxes);
@@ -287,7 +231,7 @@ export default function BlushFloral(props: ThemeProps) {
 
   return (
     <div id={s.frame} className={`${fonts.fonts} ${s.page}`}>
-      <article className={c('root', reduced && 'reduced')} lang={lang} dir={dir} data-phase={phase}>
+      <article className={c('root', reduced && 'reduced')} lang={lang} dir={dir} data-script={local ? 'arabic' : 'latin'} data-phase={phase}>
         <section className={c('hero')} aria-label={fill(t.posterLabel)}>
           <div ref={stageRef} className={c('poster-stage', closed && 'is-idle')}>
             <Scene
@@ -298,6 +242,8 @@ export default function BlushFloral(props: ThemeProps) {
               slots={{
                 'text-eyebrow': <PosterLine p={p} k="eyebrow" spec={specs.eyebrow} />,
                 'text-name': <PosterLine p={p} k="name" spec={specs.name} />,
+                // Arabic and Kurdish: the greeting in their own calligraphy instead of the drawn English «Birthday».
+                ...(local ? { 'text-title': <PosterLine p={p} k="title" spec={specs.title} /> } : {}),
                 'text-party': <PosterLine p={p} k="party" spec={specs.party} />,
                 'text-details': <PosterLine p={p} k="details" spec={specs.details} />,
                 'text-address': <PosterLine p={p} k="address" spec={specs.address} />,
@@ -338,6 +284,8 @@ export default function BlushFloral(props: ThemeProps) {
 
         <div className={c('website-content')} hidden={!opened} inert={!opened}>
           <section id={`${p}the-party`} className={c('intro', 'section', 'reveal')}>
+            <Deco name="peony" at="top-start" motion="sway" />
+            <Deco name="balloons" at="side-end" soft motion="float" />
             <Sprig className={c('botanical', 'intro-left')} />
             <Sprig className={c('botanical', 'intro-right')} />
             <div className={c('flourish')} aria-hidden="true">
@@ -363,7 +311,7 @@ export default function BlushFloral(props: ThemeProps) {
               <h2 id={`${p}details-title`}>
                 {t.detailsTitle} <em>{t.detailsEm}</em>
               </h2>
-              <div className={c('detail-grid', !hasPlace && 'single')}>
+              <div className={c('detail-grid', !(venue || showMap) && 'detail-grid-single')}>
                 {date ? (
                   <div className={c('date-cell')}>
                     <p className={c('eyebrow')}>{date.weekday}</p>
@@ -374,7 +322,7 @@ export default function BlushFloral(props: ThemeProps) {
                     {event.time ? <span className={c('fine-print')}>{event.time}</span> : null}
                   </div>
                 ) : null}
-                {hasPlace ? (
+                {venue || showMap ? (
                   <div className={c('venue-cell')}>
                     <Rosette className={c('small-rosette')} />
                     <p className={c('eyebrow')}>{t.thePlace}</p>
@@ -429,6 +377,8 @@ export default function BlushFloral(props: ThemeProps) {
 
           {/* The customer's own note, signed in their hand: the signature draws itself when the guest scrolls to it. */}
           <section className={c('note', 'section', 'reveal')} aria-labelledby={`${p}note-title`}>
+            <Deco name="peony-small" at="top-end" motion="sway" />
+            <Deco name="ribbon" at="bottom-start" soft />
             <Sparkle className={c('floating-spark', 'one', 'twinkle')} />
             <p id={`${p}note-title`} className={c('eyebrow')}>
               {t.noteEyebrow}
@@ -474,6 +424,7 @@ export default function BlushFloral(props: ThemeProps) {
           ) : null}
 
           <footer className={c('footer', 'section')}>
+            <Deco name="balloons" at="bottom-end" soft motion="float" />
             <ThemeBorder border={props.border} fallback={ROSETTE_BORDER} medium="screen" />
             <Sprig className={c('botanical', 'footer-botanical')} />
             <Sparkle className={c('twinkle', 'footer-star')} />
@@ -507,6 +458,8 @@ function Countdown({ startsAt, t, labels, locale }: { startsAt: string | null; t
   ];
   return (
     <section className={c('countdown', 'section', 'reveal')}>
+      <Deco name="candelabra" at="bottom-start" motion="sway" />
+      <Deco name="candle-bow" at="bottom-end" />
       <Sparkle className={c('floating-spark', 'one', 'twinkle')} />
       <Sparkle className={c('floating-spark', 'two', 'twinkle')} />
       <p className={c('eyebrow')}>{t.untilWe}</p>

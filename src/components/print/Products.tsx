@@ -7,6 +7,8 @@ import { FONTS, JUSTIFY, type ArtworkSide, type PrintLook } from './ArtworkCard'
 import { TINT, mix } from './look';
 import { BOTTLE_GAP_MM, BOTTLE_SIZES, bottlesPerSheet, type BottleSize } from '@/catalog/products';
 import type { PrintExtraProps } from '@/theme-sdk/print';
+import type { PrintCollageProps } from '@/theme-sdk/collage';
+import type { InvitationLocale } from '@/theme-sdk/types';
 import { WatermarkLayer } from './watermark';
 export { tintedLook } from './look';
 
@@ -37,6 +39,9 @@ export type ProductData = {
   watermark: boolean;
   /** For a design that draws its own extras (print/Story.tsx …): its code and what it is given. */
   theme: { codeRef: string; props: Omit<PrintExtraProps, 'shape' | 'size'> } | null;
+  locale: InvitationLocale;
+  /** Photo collages: the customer's photos (full size) and the lines written on them. */
+  collage: Pick<PrintCollageProps, 'photos' | 'name' | 'message' | 'date' | 'text'>;
 };
 
 /** A bottle label's size in mm. */

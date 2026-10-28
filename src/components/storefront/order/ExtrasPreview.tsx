@@ -1,6 +1,13 @@
+/** The photo collages (src/catalog/collages.ts), each pictured in its own proportions. */
+const COLLAGE_ITEMS = [
+  { key: 'polaroids', feature: 'collage_polaroids', label: 'collagePolaroids', box: 'aspect-[842/1190] w-44' },
+  { key: 'story', feature: 'collage_story', label: 'collageStory', box: 'aspect-[9/16] w-40' },
+  { key: 'wall', feature: 'collage_wall', label: 'collageWall', box: 'aspect-[2/3] w-44' },
+] as const;
+
 /**
  * Pictures of what the package's extras will look like with the customer's own details (printable card,
- * Instagram story, chocolate sticker, bottle label). Before payment they come watermarked from the server; a
+ * Instagram story, chocolate sticker, bottle label, photo collages). Before payment they come watermarked from the server; a
  * note says the watermark goes away after purchase. After payment (receipt) the same pictures are clean.
  */
 export function ExtrasPreview({
@@ -28,6 +35,11 @@ export function ExtrasPreview({
     bottle: string;
     downloadPng: string;
     downloadSheet: string;
+    /** Photo collages (packages with `collage_*`), and their download link. */
+    collagePolaroids: string;
+    collageStory: string;
+    collageWall: string;
+    downloadJpg: string;
     /** The two shapes' names, to tell the sets apart when both were chosen. */
     round?: string;
     square?: string;
@@ -79,6 +91,13 @@ export function ExtrasPreview({
         }
       : null,
     featureKeys.includes('bottle_label') ? { key: 'bottle', label: labels.bottle, src: `${base}/bottle.preview`, box: 'aspect-[215/55] w-72', png: `${base}/bottle.png`, sheet: `${base}/bottle.pdf` } : null,
+    ...COLLAGE_ITEMS.filter((c) => featureKeys.includes(c.feature)).map((c) => ({
+      key: `collage-${c.key}`,
+      label: labels[c.label],
+      src: `${base}/collage-${c.key}.preview`,
+      box: c.box,
+      jpg: `${base}/collage-${c.key}.jpg`,
+    })),
   ].filter((i): i is NonNullable<typeof i> => i !== null);
   if (!items.length) return null;
   return (
@@ -103,6 +122,11 @@ export function ExtrasPreview({
                 {'png' in i && i.png ? (
                   <a href={i.png} download className="font-medium text-accent underline">
                     {labels.downloadPng}
+                  </a>
+                ) : null}
+                {'jpg' in i && i.jpg ? (
+                  <a href={i.jpg} download className="font-medium text-accent underline">
+                    {labels.downloadJpg}
                   </a>
                 ) : null}
                 {'sheet' in i && i.sheet ? (

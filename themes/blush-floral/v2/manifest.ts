@@ -7,8 +7,6 @@ import { defineTheme } from '@/theme-sdk/manifest';
  * ribbons. Then the website: the details and the map, the countdown, the cake, their photos, a note from them signed
  * in their own hand (feature `signature`: it draws itself when the guest scrolls to it), the reply card with the
  * guests' wishes, and a closing. From the designer's «Blush Floral» package (its motion engine is motion.ts).
- * v2 (2026-10-28): a birthday's place is the customer's choice; without one the place box is left out and the date
- * stands alone.
  */
 const allFields = ['person_1_name', 'event_date', 'event_time', 'venue_name', 'venue_map_url', 'invitation_message'] as const;
 
@@ -19,16 +17,35 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['birthday'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'],
+  // A birthday is not always held somewhere in particular: the customer may leave the place (and its map link) empty.
+  optionalFields: ['venue_name', 'venue_map_url'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos', 'print_card', 'card_arch'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     { features: ['countdown', 'map'], fields: [...allFields] },
-    // No place: the customer left "add the place" off.
-    { features: ['music', 'countdown', 'rsvp'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
+    // The printed card alone (the poster on A5, the QR code on its back), without the place.
+    { features: ['countdown', 'print_card', 'card_arch'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
+    // A package without the place at all.
+    { features: ['countdown'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
     { features: ['music', 'countdown', 'map', 'rsvp', 'signature'], fields: [...allFields] },
     // The complete design: + the guests' wishes and the customer's photos.
-    { features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'], fields: [...allFields] },
+    { features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos', 'print_card', 'card_arch'], fields: [...allFields] },
   ],
+  // The printed card (feature `print_card`): the poster on A5, the customer's lines set on it; the QR code on the back.
+  print: {
+    // The design's brown ink on the paper (transparent background).
+    card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#734126', light: '#00000000' } },
+    // The printed poster (feature `card_arch`): the poster drawn taller, in the other designs' poster size, rounded corners.
+    shapes: [
+      {
+        key: 'arch-poster',
+        label: { ar: 'بوستر', en: 'Poster', ckb: 'پۆستەر', bdn: 'پۆستەر' },
+        widthMm: 175.2,
+        heightMm: 271.2,
+        outline: 'M6 0 L169.2 0 Q175.2 0 175.2 6 L175.2 265.2 Q175.2 271.2 169.2 271.2 L6 271.2 Q0 271.2 0 265.2 L0 6 Q0 0 6 0 Z',
+      },
+    ],
+  },
   // The customer's photos (feature `photos`): two keepsake prints under the cake.
   photos: {
     max: 2,

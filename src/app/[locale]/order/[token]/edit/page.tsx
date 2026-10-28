@@ -39,7 +39,7 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
         <OrderForm
           action={editDraftAction}
           hidden={{ token, siteLocale: locale }}
-          fields={draft.fields.map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale) }))}
+          fields={draft.fields.map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale), optional: f.optional }))}
           initialValues={draft.values}
           optionalPlace={draft.optionalPlace}
           invitationLocale={draft.locale}

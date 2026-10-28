@@ -6,7 +6,8 @@ import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
 import { fieldOptions, INITIALS_MAX, isOptionalField, PLACE_FIELDS, PLACE_TOGGLE, placeChosen, splitInitials } from '@/catalog/fields';
 
-export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string };
+/** `optional`: the customer may leave it empty in this design (the Field Library's optional fields and the design's own). */
+export type OrderFormField = { key: string; type: string; maxLength: number | null; label: string; optional?: boolean };
 
 /** Optional sections, each present only when the package includes it. */
 export type OrderFormExtras = {
@@ -133,7 +134,7 @@ export function OrderForm({
         if (isPlace(f.key) && !placeOn) return toggle;
         const id = `f-${f.key}`;
         const err = errors[f.key];
-        const optional = isOptionalField(f.key);
+        const optional = f.optional ?? isOptionalField(f.key);
         const hinted = f.type === 'date' || f.key === 'venue_map_url' || f.key === 'seal_initials';
         const common = {
           id,

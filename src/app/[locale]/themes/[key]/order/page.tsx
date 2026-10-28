@@ -65,7 +65,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale, ...(occasion ? { occasion: occasion.key } : {}) }}
           occasions={th.occasions.length > 1 && !occasion ? th.occasions.map((o) => ({ key: o.key, label: localized(o.name, locale) })) : undefined}
           optionalPlace={isPlaceOptional(occasion?.key ?? (th.occasions.length > 1 ? undefined : th.section.key))}
-          fields={th.fields.filter((f) => pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale) }))}
+          fields={th.fields.filter((f) => pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale), optional: f.optional }))}
           initialValues={gender ? { baby_gender: gender } : undefined}
           invitationLocale={locale}
           minDate={baghdadToday()}

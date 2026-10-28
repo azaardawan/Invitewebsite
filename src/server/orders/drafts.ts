@@ -116,7 +116,7 @@ export async function updateDraft(
     if (!draft) throw new OrderError('previewExpired');
     const [locked] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
-    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now, {
+    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys, locked!.themeVersionId), now, {
       optionalPlace: await placeOptionalIn(tx, locked!.sectionId),
     });
     if (!result.ok) throw new OrderError('invalidFields', result.errors);

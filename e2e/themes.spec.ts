@@ -45,8 +45,8 @@ async function renderAndCheck(page: Page, url: string, width: number, shot: stri
 
 test('every theme renders every designed state correctly', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'runs once; widths are set explicitly');
-  // Every version is drawn in every state, language and width, so the budget grows with the catalogue.
-  test.setTimeout(Math.max(10 * 60_000, generatedManifests.length * 30_000));
+  // About twelve seconds per designed state (every language and width, the opening, the checks), so the budget grows with the catalogue.
+  test.setTimeout(Math.max(10 * 60_000, generatedManifests.reduce((n, m) => n + m.validStates.length, 0) * 12_000));
   await signInAsNewOwner(page);
 
   for (const m of generatedManifests) {

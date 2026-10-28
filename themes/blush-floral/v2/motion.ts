@@ -12,10 +12,12 @@ export const SETTLE_DURATION = 1.05;
 export const DURATION = 10;
 
 /** The invitation's lines on the poster, and when (designer time) each is written. */
-export type LineKey = 'name' | 'eyebrow' | 'party' | 'details' | 'address';
+export type LineKey = 'name' | 'eyebrow' | 'title' | 'party' | 'details' | 'address';
 export const LINE_TIMES: Record<LineKey, readonly [number, number]> = {
   eyebrow: [0.18, 1.12],
   name: [1.3, 0.68],
+  // Arabic and Kurdish: the greeting written in place of the drawn «Birthday» (in the same time).
+  title: [2.02, 2.75],
   party: [4.79, 0.52],
   details: [5.31, 0.68],
   address: [6.02, 0.63],

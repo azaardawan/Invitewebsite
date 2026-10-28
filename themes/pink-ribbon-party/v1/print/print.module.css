@@ -1,0 +1,166 @@
+/*
+ * pink-ribbon-party print companions: the A5 card (the poster on A5 + 3 mm bleed, and its landscape back) and the
+ * printed poster (Shape.tsx, the other designs' poster size). Physical units only.
+ */
+
+.card,
+.back,
+.shape {
+  --ink: #920d25;
+  --title: #920d25;
+  --soft: #ebaaa9;
+  position: relative;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: 'PR Serif', 'PR Arabic', Georgia, serif;
+  text-align: center;
+  background:
+    url(../assets/paper.webp) center / cover no-repeat,
+    #fefbf2;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.shape * {
+  box-sizing: border-box;
+}
+.card :is(p, h1),
+.back :is(p, h1),
+.shape :is(p, h1) {
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------- A5 front: the poster covers the trimmed A5 */
+.card {
+  width: 154mm;
+  height: 216mm;
+}
+.poster {
+  position: absolute;
+  top: 3mm;
+  left: 3mm;
+  display: block;
+  width: 148mm;
+  height: 210mm;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------- A5 back: one centred column */
+.back {
+  width: 216mm;
+  height: 154mm;
+}
+.column,
+.posterColumn {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4.5mm;
+}
+.column {
+  inset: 14mm 40mm;
+}
+.mark {
+  display: block;
+  width: 16mm;
+  height: auto;
+}
+
+/* ---------------------------------------------------------------- the printed poster */
+.shape {
+  width: 100%;
+  height: 100%;
+}
+.fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.posterColumn {
+  inset: 17% 16% 13%;
+  gap: 6mm;
+}
+
+/* ---------------------------------------------------------------- the words */
+.title {
+  color: var(--title);
+  font-family: 'PR Script', 'PR Ruqaa', serif;
+  font-size: 44pt;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.title[data-long] {
+  font-size: 30pt;
+}
+.message {
+  max-width: 120mm;
+  font-size: 14pt;
+  font-style: italic;
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.message[data-long] {
+  font-size: 11.5pt;
+}
+.name {
+  color: var(--title);
+  font-family: 'PR Script', 'PR Ruqaa', serif;
+  font-size: 24pt;
+  line-height: 1.25;
+}
+.signature {
+  width: 64mm;
+  height: 18mm;
+  filter: none;
+}
+.qr {
+  margin: 1mm 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5mm;
+}
+.qr img {
+  display: block;
+  width: 24mm;
+  height: 24mm;
+}
+.qr figcaption {
+  font-family: 'PR Sans', 'PR Arabic', sans-serif;
+  font-size: 7pt;
+  letter-spacing: 0.06em;
+}
+
+/* ---------------------------------------------------------------- Arabic and Kurdish: Aref Ruqaa for the script, never spaced out */
+[data-script='arabic'] .title,
+[data-script='arabic'] .name {
+  font-family: 'PR Ruqaa', serif;
+  font-weight: 700;
+}
+[data-script='arabic'] .title {
+  font-size: 36pt;
+  line-height: 1.5;
+}
+[data-script='arabic'] .title[data-long] {
+  font-size: 26pt;
+}
+[data-script='arabic'] .name {
+  font-size: 22pt;
+}
+[data-script='arabic'] .message {
+  font-style: normal;
+  line-height: 1.8;
+}
+[data-script='arabic'] .qr figcaption {
+  letter-spacing: 0;
+}

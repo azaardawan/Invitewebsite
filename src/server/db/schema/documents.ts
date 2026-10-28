@@ -27,6 +27,13 @@ export const documentKind = pgEnum('document_kind', [
   'STICKER_SQUARE_PREVIEW',
   // The card's back before payment (watermarked), next to CARD_DRAFT_PREVIEW (its front).
   'CARD_BACK_DRAFT_PREVIEW',
+  // Photo collages (src/catalog/collages.ts): the picture to download and its preview.
+  'COLLAGE_POLAROIDS_JPG',
+  'COLLAGE_POLAROIDS_PREVIEW',
+  'COLLAGE_STORY_JPG',
+  'COLLAGE_STORY_PREVIEW',
+  'COLLAGE_WALL_JPG',
+  'COLLAGE_WALL_PREVIEW',
 ]);
 
 /**

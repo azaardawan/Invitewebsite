@@ -342,14 +342,6 @@
 #frame .root .venue-cell {
   align-self: center;
 }
-/* No place (a birthday's place is optional): the date stands alone, centred. */
-#frame .root .detail-grid.single {
-  grid-template-columns: 1fr;
-}
-#frame .root .detail-grid.single .date-cell {
-  border: 0;
-  padding: 0;
-}
 #frame .root .small-rosette {
   color: var(--rose);
   width: 65px;
@@ -1057,4 +1049,189 @@
   #frame .root .note-copy {
     font-size: 19px;
   }
+}
+
+/*
+ * Arabic and Kurdish: Noto Naskh for the text, Mirza for the headings and Aref Ruqaa for the names and the greeting.
+ * Never spaced out or slanted: spacing breaks Arabic letters apart, and Arabic has no italic (the browser would fake one).
+ */
+#frame .root[data-script='arabic'] {
+  --serif: 'BF Arabic', 'BF Serif', serif;
+  --sans: 'BF Arabic', 'BF Sans', sans-serif;
+}
+#frame .root[data-script='arabic'] * {
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}
+#frame .root[data-script='arabic'] :is(h1, h2, h3) {
+  font-family: 'BF Arabic Heading', 'BF Arabic', serif;
+  line-height: 1.4;
+}
+#frame .root[data-script='arabic'] :is(h1 em, h2 em, h3 em, .footer-name, .signature) {
+  font-family: 'BF Ruqaa', 'BF Arabic', serif;
+}
+#frame .root[data-script='arabic'] .eyebrow {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/*
+ * Decorations (v2): the designer's drawings (from the owner's sheets), coloured in the design's own inks with a mask,
+ * behind the text. They sway or float gently; with reduced motion they stay still (the rule above stops every animation).
+ */
+#frame .root {
+  --deco-ink: #c23852;
+  --deco-soft: #f0a4c2;
+}
+#frame .root .section,
+#frame .root .footer {
+  isolation: isolate;
+}
+#frame .root .deco {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  background: var(--deco-ink);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+  transform: rotate(var(--tilt, 0deg));
+}
+#frame .root .deco-soft {
+  background: var(--deco-soft);
+}
+#frame .root .deco-bouquet {
+  -webkit-mask-image: url(./assets/deco/bouquet.webp);
+  mask-image: url(./assets/deco/bouquet.webp);
+  aspect-ratio: 477 / 483;
+}
+#frame .root .deco-candelabra {
+  -webkit-mask-image: url(./assets/deco/candelabra.webp);
+  mask-image: url(./assets/deco/candelabra.webp);
+  aspect-ratio: 278 / 640;
+}
+#frame .root .deco-candle-bow {
+  -webkit-mask-image: url(./assets/deco/candle-bow.webp);
+  mask-image: url(./assets/deco/candle-bow.webp);
+  aspect-ratio: 226 / 640;
+}
+#frame .root .deco-balloons {
+  -webkit-mask-image: url(./assets/deco/balloons.webp);
+  mask-image: url(./assets/deco/balloons.webp);
+  aspect-ratio: 199 / 640;
+}
+#frame .root .deco-ribbon {
+  -webkit-mask-image: url(./assets/deco/ribbon.webp);
+  mask-image: url(./assets/deco/ribbon.webp);
+  aspect-ratio: 515 / 538;
+}
+/* The watercolour peonies keep their own colours. */
+#frame .root .deco-peony,
+#frame .root .deco-peony-small {
+  background: url(./assets/deco/peony.webp) center / contain no-repeat;
+  -webkit-mask: none;
+  mask: none;
+  aspect-ratio: 640 / 588;
+}
+#frame .root .deco-peony-small {
+  background-image: url(./assets/deco/peony-small.webp);
+  aspect-ratio: 640 / 532;
+}
+#frame .root .sway {
+  transform-origin: 50% 100%;
+  animation: deco-sway 6s ease-in-out infinite;
+}
+#frame .root .float {
+  animation: deco-float 7s ease-in-out infinite;
+}
+@keyframes deco-sway {
+  0%,
+  100% {
+    transform: rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: rotate(calc(var(--tilt, 0deg) + 4deg));
+  }
+}
+@keyframes deco-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translateY(-12px) rotate(var(--tilt, 0deg));
+  }
+}
+/* Where each one sits: a corner of its section, never over the text on a phone. */
+#frame .root .d-top-start {
+  top: 6px;
+  inset-inline-start: -12px;
+  width: 128px;
+  --tilt: -8deg;
+}
+#frame .root .d-top-end {
+  top: 26px;
+  inset-inline-end: -4px;
+  width: 112px;
+  --tilt: 6deg;
+}
+#frame .root .d-side-end {
+  top: 64px;
+  inset-inline-end: 6px;
+  width: 58px;
+}
+#frame .root .d-side-start {
+  top: 64px;
+  inset-inline-start: 6px;
+  width: 58px;
+}
+#frame .root .d-bottom-start {
+  bottom: 14px;
+  inset-inline-start: -4px;
+  width: 84px;
+}
+#frame .root .d-bottom-end {
+  bottom: 18px;
+  inset-inline-end: 2px;
+  width: 64px;
+  --tilt: 4deg;
+}
+#frame .root .d-under {
+  position: relative;
+  z-index: 0;
+  margin: 26px auto 0;
+  width: 86px;
+}
+@media (min-width: 701px) {
+  #frame .root .d-top-start {
+    width: 190px;
+  }
+  #frame .root .d-top-end {
+    width: 170px;
+  }
+  #frame .root .d-side-end,
+  #frame .root .d-side-start {
+    width: 86px;
+  }
+  #frame .root .d-bottom-start {
+    width: 130px;
+  }
+  #frame .root .d-bottom-end {
+    width: 100px;
+  }
+}
+/* The intro's small corner drawings give way to the new ones. */
+#frame .root .intro-left,
+#frame .root .intro-right {
+  display: none;
+}
+
+/* No place given (the venue is optional): the date's card alone, centred. */
+#frame .root .detail-grid-single {
+  grid-template-columns: 1fr;
+}
+#frame .root .detail-grid-single .date-cell {
+  border: 0;
+  padding: 0;
 }

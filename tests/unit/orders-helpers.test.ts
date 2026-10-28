@@ -99,6 +99,17 @@ describe('invitation field validation', () => {
     expect(r.ok || r.errors).toEqual({ person_1_name: 'required' });
   });
 
+  it('a design may let the customer leave a field empty (its optionalFields, e.g. the venue of a birthday)', () => {
+    const withVenue = new Map(defs).set('venue_name', { type: 'text', maxLength: 80 });
+    const keysWithVenue = [...keys, 'venue_name'];
+    expect(validateFieldValues({ ...good, venue_name: '' }, keysWithVenue, withVenue, now)).toEqual({ ok: false, errors: { venue_name: 'required' } });
+    const optional = new Map(withVenue).set('venue_name', { type: 'text', maxLength: 80, optional: true });
+    const empty = validateFieldValues({ ...good, venue_name: '' }, keysWithVenue, optional, now);
+    expect(empty.ok).toBe(true);
+    if (empty.ok) expect(empty.values).not.toHaveProperty('venue_name');
+    expect(validateFieldValues({ ...good, venue_name: 'x'.repeat(81) }, keysWithVenue, optional, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+  });
+
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {
     const withSeal = new Map(defs).set('seal_initials', { type: 'initials', maxLength: 3 });
     const empty = validateFieldValues({ ...good, seal_initials: '' }, [...keys, 'seal_initials'], withSeal, now);
