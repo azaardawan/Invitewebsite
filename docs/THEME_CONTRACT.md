@@ -42,8 +42,10 @@ themes/<key>/v<N>/
   (no own text: only the offered choices).
 - `switches`: yes/no questions for the customer on the order form, each `{ key, label: {ar, en}, default }`
   (e.g. "show the father's name on the stickers"). The theme reads `props.switches[key]` (always filled).
-- `onlineInvitation: false` marks a **files-only** design (e.g. a newborn set: story, card, stickers,
-  bottle label). It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
+- Every design has an online invitation, newborn designs included (owner, 2026-10-28): a newborn invitation shows
+  the baby's name, the date of birth (`birthDate`) and the design's wording, with music and the guest form, and no
+  venue, time, map or countdown. `onlineInvitation: false` marks a **files-only** design (story, card, stickers,
+  bottle label), only when the owner asks for one. It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
   and the storefront shows it as a picture, not in a phone frame. `Theme.tsx` is then only the preview.
 
 ## 3. What the theme receives: `ThemeProps`

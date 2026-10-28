@@ -55,7 +55,9 @@ Date: 2026-09-30
 
 **Revision 4 changes (newborn, 2026-10-11):**
 - Designs can be **files only** (manifest `onlineInvitation: false`): story, A5 card, chocolate stickers and
-  bottle label, with no online invitation, link or QR.
+  bottle label, with no online invitation, link or QR. **Changed 2026-10-28 (owner):** every design, newborn
+  included, now has an online invitation; the five newborn designs got one in a new version (Bluebird v3,
+  Rosebird v3, Embroidered v3, Swan v2, Pearl v2). The flag stays for an exception the owner asks for.
 - A newborn design may draw its own extras (`print/Story|Sticker|Bottle.tsx`); otherwise the platform draws them.
 - On the order form the customer chooses how the date of birth is written (Gregorian, numeric, Hijri or both;
   Arabic-Indic or Western digits) and the water-bottle size (250 / 330 / 500 / 600 ml).

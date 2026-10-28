@@ -59,3 +59,13 @@ The A5 card's back (landscape, `print/CardBack.tsx`): the front's linen with its
 
 ## Version 2 (2026-10-13)
 v1 is activated and frozen. `v2` keeps the baby's name clear of the lines and art around it (short names with tall letters/tails, long English names) and wraps a long father line on round stickers. Make it current in Admin (Themes → the design → Versions → Make current); orders already placed keep v1.
+
+## Online invitation (v3, 2026-10-28)
+
+The owner changed their mind: newborn designs get an online invitation too. `v3` adds one, built from this
+design's own artwork: a cover with the baby's name, the date of birth and the open button; tapping it starts the
+music while the artwork parts and the story composition settles in; then the date of birth, the guest form with
+congratulations, the guests' messages and the name again (`Theme.tsx`, `cover.tsx`, `invitation.module.css`,
+`border.ts`). No venue, time, map or countdown. The files (story, card, stickers, bottle label) are unchanged. If
+something doesn't fit, the owner may replace this invitation with another.
+

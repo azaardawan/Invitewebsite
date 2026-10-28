@@ -39,3 +39,13 @@ own word), shown in green as in the design; the father's name on the stickers an
 | A5 card back (landscape) | title in pink glass, message, the baby's name; linen, flowers, bell sprigs |
 | Stickers 40 mm | name (+ father if ticked), swans, pond, flowers; round has a rose ring |
 | Bottle label | name (+ father if ticked), a swan with a bow at each end facing the name, pond, flowers |
+
+## Online invitation (v2, 2026-10-28)
+
+The owner changed their mind: newborn designs get an online invitation too. `v2` adds one, built from this
+design's own artwork: a cover with the baby's name, the date of birth and the open button; tapping it starts the
+music while the artwork parts and the story composition settles in; then the date of birth, the guest form with
+congratulations, the guests' messages and the name again (`Theme.tsx`, `cover.tsx`, `invitation.module.css`,
+`border.ts`). No venue, time, map or countdown. The files (story, card, stickers, bottle label) are unchanged. If
+something doesn't fit, the owner may replace this invitation with another.
+
