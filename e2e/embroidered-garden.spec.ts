@@ -6,7 +6,8 @@ type Made = { previewToken: string; receiptToken: string | null; invitationId: s
 
 function order(env: Record<string, string>): Made {
   const out = execFileSync('pnpm', ['-s', 'exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-files-order.ts'], {
-    env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL, ...env },
+    // v2 is the files-only version (v3 adds the online invitation): it keeps the files-only path tested.
+    env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL, VERSION: '2', ...env },
   }).toString();
   return JSON.parse(out.trim().split('\n').at(-1)!);
 }

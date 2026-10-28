@@ -1,16 +1,17 @@
 /**
- * E2E/dev fixture: puts a files-only newborn design (THEME, default Embroidered Garden) on sale in the newborn
- * Boy group with a package of every file (card, story, sticker, bottle label), then creates an order. Env: NAME,
- * FATHER, INV_LANG, DATE_STYLE, DIGITS, SHAPE, BOTTLE, W_SONOF, W_ORDER, FATHER_ON_EXTRAS=1; PAID=1 pays it.
+ * E2E/dev fixture: puts a newborn design (THEME, default Embroidered Garden) on sale in the newborn Boy group with
+ * a package of every file (card, story, sticker, bottle label), then creates an order. Env: NAME, FATHER, INV_LANG,
+ * DATE_STYLE, DIGITS, SHAPE, BOTTLE, W_SONOF, W_ORDER, FATHER_ON_EXTRAS=1; PAID=1 pays it; VERSION=<n> sells that
+ * version of the design (e.g. a files-only one) instead of its newest.
  * Prints { previewToken, receiptToken, invitationId, path }.
  */
 import { and, eq } from 'drizzle-orm';
 import sharp from 'sharp';
 import { closeDb, db } from '../../src/server/db/client';
-import { invitations, subsections, themes } from '../../src/server/db/schema';
+import { invitations, subsections, themeVersions, themes } from '../../src/server/db/schema';
 import { invitationPath } from '../../src/lib/ids';
 import { createPackage } from '../../src/server/catalog/packages';
-import { transitionTheme, updateThemeSettings, packagesWithShape } from '../../src/server/catalog/themes';
+import { setCurrentVersion, transitionTheme, updateThemeSettings, packagesWithShape } from '../../src/server/catalog/themes';
 import { storeImage } from '../../src/server/media/assets';
 import { createDraft } from '../../src/server/orders/drafts';
 import { createOrder } from '../../src/server/orders/checkout';
@@ -34,6 +35,11 @@ try {
   const packageId = existing?.id ?? (await createPackage(db(), t.id, { name: { ar: 'الكاملة', en: 'Complete' }, priceIqd: 25000, fieldKeys: [...FIELDS], featureKeys: [...FEATURES] }, actor)).id;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
   if (t.status !== 'ACTIVE') await transitionTheme(db(), t.id, 'ACTIVE', actor);
+  if (process.env.VERSION) {
+    const [v] = await db().select().from(themeVersions).where(and(eq(themeVersions.themeId, t.id), eq(themeVersions.version, Number(process.env.VERSION))));
+    if (!v) throw new Error(`${themeKey}@${process.env.VERSION} not registered`);
+    if (v.id !== t.currentVersionId) await setCurrentVersion(db(), t.id, v.id, actor);
+  }
 
   const e = process.env;
   const born = new Date(Date.now() - 6 * 86400_000).toISOString().slice(0, 10);

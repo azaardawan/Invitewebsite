@@ -38,6 +38,14 @@ export function makeMp3(seconds = 3): Buffer {
   return Buffer.concat(Array.from({ length: Math.ceil((seconds * 44100) / 1152) }, () => frame));
 }
 
+/** Opens a customer's personal preview (`/p/<token>`) and taps "Open invitation", as a guest would. */
+export async function openPreview(page: Page, previewToken: string) {
+  await page.goto(`/p/${previewToken}`);
+  const open = page.getByRole('button', { name: /افتح الدعوة|Open invitation/ });
+  await open.click();
+  await expect(open).toHaveCount(0, { timeout: 6_000 });
+}
+
 /**
  * Opens a design's order form the way a customer must: from the design page, choosing a package (the first one,
  * or the one whose link `pkg` matches). `query` keeps e.g. `occasion=engagement`.
