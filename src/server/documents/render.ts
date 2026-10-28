@@ -125,6 +125,8 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) =
  * outside its shape), one bottle label PNG (300 dpi) and the print-ready A4 sheets (PDF). Previews: smaller
  * JPEGs (the sticker a PNG). The print page draws the watermark itself until the invitation is paid.
  * `sticker-square.*`: the square set when the customer chose both shapes (`sticker.*` is then the round one).
+ * Photo collages (`collage-*`): a JPG at print size (the poster A3 at about 220 dpi, the story 1080 × 1920, the photo
+ * wall 1200 × 1800) and a smaller preview, each drawn in its artwork's own box.
  */
 export type ProductItem =
   | 'story.png'
@@ -139,7 +141,13 @@ export type ProductItem =
   | 'sticker.preview'
   | 'bottle.preview'
   | 'card.preview'
-  | 'cardBack.preview';
+  | 'cardBack.preview'
+  | 'collage-polaroids.jpg'
+  | 'collage-polaroids.preview'
+  | 'collage-story.jpg'
+  | 'collage-story.preview'
+  | 'collage-wall.jpg'
+  | 'collage-wall.preview';
 export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize } & CardPick) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
@@ -155,6 +163,12 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square
   'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
   // The A5 back is landscape (a shaped card's back is pictured at its own size, below).
   'cardBack.preview': { view: 'cardBack', width: mmPx(210), height: mmPx(148), scale: 1.2, type: 'jpeg' },
+  'collage-polaroids.jpg': { view: 'collagePolaroids', width: 842, height: 1190, scale: 3, type: 'jpeg' },
+  'collage-polaroids.preview': { view: 'collagePolaroids', width: 842, height: 1190, scale: 0.6, type: 'jpeg' },
+  'collage-story.jpg': { view: 'collageStory', width: 810, height: 1440, scale: 4 / 3, type: 'jpeg' },
+  'collage-story.preview': { view: 'collageStory', width: 810, height: 1440, scale: 0.5, type: 'jpeg' },
+  'collage-wall.jpg': { view: 'collageWall', width: 567, height: 850, scale: 1200 / 567, type: 'jpeg' },
+  'collage-wall.preview': { view: 'collageWall', width: 567, height: 850, scale: 0.8, type: 'jpeg' },
 };
 
 export const renderProduct: ProductRenderer = async (item, invitationId, opts = {}) => {

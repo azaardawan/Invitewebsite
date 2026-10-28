@@ -18,6 +18,8 @@ export type {
 export { hasFeature, formatNumber } from './types';
 export { ThemeBorder, Signature } from './border';
 export { Photo } from './photo';
+export { Collage, COLLAGES } from './collage';
+export type { CollageKind, CollageText, CollageFonts, PrintCollageProps } from './collage';
 export type { ThemeBorderSpec, BorderKind } from './border';
 export type { PhotoSpec } from './manifest';
 export type { PrintCardProps, PrintCardBackProps, PrintShapeProps, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';

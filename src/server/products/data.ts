@@ -7,6 +7,10 @@ import { DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
 import { defaultLook, themeArtwork, type ResolvedArtwork } from '@/server/catalog/card-design';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { invitationRenderData } from '@/server/invitation/load';
+import { listPhotos } from '@/server/photos/photos';
+import { includedCollages } from '@/catalog/collages';
+import type { CollageText } from '@/theme-sdk/collage';
+import type { ThemePhoto } from '@/theme-sdk/types';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -23,9 +27,9 @@ export function isPaid(inv: Pick<InvitationRow, 'status' | 'publishedAt'>) {
 export function productDataFrom(
   props: ThemeProps,
   design: Pick<ResolvedArtwork, 'story' | 'sticker' | 'bottle' | 'look'>,
-  opts: { stickerShape: 'round' | 'square'; bottleSize?: BottleSize; watermark: boolean; codeRef?: string },
+  opts: { stickerShape: 'round' | 'square'; bottleSize?: BottleSize; watermark: boolean; codeRef?: string; collagePhotos?: ThemePhoto[] },
 ): ProductData {
-  const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string } };
+  const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string; collage: CollageText } };
   const f = props.fields;
   const gender = f.baby_gender === 'boy' || f.baby_gender === 'girl' ? f.baby_gender : null;
   return {
@@ -43,6 +47,14 @@ export function productDataFrom(
     stickerShape: opts.stickerShape,
     bottleSize: opts.bottleSize ?? DEFAULT_BOTTLE_SIZE,
     watermark: opts.watermark,
+    locale: props.locale,
+    collage: {
+      photos: opts.collagePhotos ?? [],
+      name: f.person_1_name ?? f.baby_name ?? null,
+      message: f.invitation_message?.trim() || null,
+      date: props.event.date ? `${props.event.date.day} ${props.event.date.month}` : (props.birthDate?.lines[0] ?? null),
+      text: msgs.print.collage,
+    },
     theme: opts.codeRef
       ? {
           codeRef: opts.codeRef,
@@ -68,5 +80,9 @@ export function productDataFrom(
 export async function productData(db: DbOrTx, inv: InvitationRow, opts: { stickerShape?: 'round' | 'square' } = {}): Promise<ProductData> {
   const { codeRef, props } = await invitationRenderData(db, inv, 'live');
   const stickerShape = opts.stickerShape ?? (inv.stickerShape === 'both' ? 'round' : inv.stickerShape);
-  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef });
+  // Collages: the customer's photos at full size, for print (only when the package has a collage).
+  const collagePhotos = includedCollages(inv.featureKeys).length
+    ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null }))
+    : [];
+  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos });
 }

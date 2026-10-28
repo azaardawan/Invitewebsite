@@ -26,6 +26,12 @@ const KIND = {
   'sticker-square.png': 'STICKER_SQUARE_PNG',
   'sticker-square.pdf': 'STICKER_SQUARE_PDF',
   'sticker-square.preview': 'STICKER_SQUARE_PREVIEW',
+  'collage-polaroids.jpg': 'COLLAGE_POLAROIDS_JPG',
+  'collage-polaroids.preview': 'COLLAGE_POLAROIDS_PREVIEW',
+  'collage-story.jpg': 'COLLAGE_STORY_JPG',
+  'collage-story.preview': 'COLLAGE_STORY_PREVIEW',
+  'collage-wall.jpg': 'COLLAGE_WALL_JPG',
+  'collage-wall.preview': 'COLLAGE_WALL_PREVIEW',
 } as const satisfies Record<ProductItem, string>;
 
 const FEATURE: Record<ProductItem, string> = {
@@ -42,6 +48,12 @@ const FEATURE: Record<ProductItem, string> = {
   'sticker-square.png': 'sticker',
   'sticker-square.pdf': 'sticker',
   'sticker-square.preview': 'sticker',
+  'collage-polaroids.jpg': 'collage_polaroids',
+  'collage-polaroids.preview': 'collage_polaroids',
+  'collage-story.jpg': 'collage_story',
+  'collage-story.preview': 'collage_story',
+  'collage-wall.jpg': 'collage_wall',
+  'collage-wall.preview': 'collage_wall',
 };
 
 /** The square sticker set exists only when the customer chose both shapes. */
@@ -134,5 +146,5 @@ export async function ensureProductFile(
 
 /** Which extras an invitation's package includes, in the order shown to the customer. */
 export function includedProducts(inv: Pick<typeof invitations.$inferSelect, 'featureKeys'>) {
-  return (['story', 'sticker', 'bottle_label'] as const).filter((f) => inv.featureKeys.includes(f));
+  return (['story', 'sticker', 'bottle_label', 'collage_polaroids', 'collage_story', 'collage_wall'] as const).filter((f) => inv.featureKeys.includes(f));
 }

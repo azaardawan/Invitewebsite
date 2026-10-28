@@ -2,6 +2,7 @@ import 'server-only';
 import { and, asc, eq, inArray, or } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { sections, themeExtraSections } from '@/server/db/schema';
+import { isPlaceOptional } from '@/catalog/fields';
 
 /**
  * A design's occasions (section keys): its main one first, then any others it is also sold in (Admin →
@@ -22,4 +23,11 @@ export async function occasionSectionId(db: DbOrTx, themeId: string, mainSection
   if (!(await themeOccasions(db, themeId, mainSectionId)).includes(key)) return null;
   const [s] = await db.select({ id: sections.id }).from(sections).where(eq(sections.key, key));
   return s?.id ?? null;
+}
+
+/** Whether the place is the customer's choice for an invitation in this section (a birthday: `isPlaceOptional`). */
+export async function placeOptionalIn(db: DbOrTx, sectionId: string | null) {
+  if (!sectionId) return false;
+  const [s] = await db.select({ key: sections.key }).from(sections).where(eq(sections.id, sectionId));
+  return isPlaceOptional(s?.key);
 }

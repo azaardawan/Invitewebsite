@@ -75,9 +75,39 @@ describe('invitation field validation', () => {
     expect(r.values).not.toHaveProperty('injected');
   });
 
+  it("a birthday's place is the customer's choice: left off, it is dropped; ticked, it is required", () => {
+    const withPlace = new Map(defs).set('venue_name', { type: 'text', maxLength: 80 });
+    const placeKeys = [...withPlace.keys()];
+    const noPlace = { ...good, venue_map_url: '' };
+    // Off (nothing ticked, nothing filled): no error, and no place stored.
+    const off = validateFieldValues(noPlace, placeKeys, withPlace, now, { optionalPlace: true });
+    expect(off.ok).toBe(true);
+    if (off.ok) expect(Object.keys(off.values).filter((k) => k.startsWith('venue'))).toEqual([]);
+    // Ticked but empty: the place fields are required.
+    const ticked = validateFieldValues({ ...noPlace, __place: '1' }, placeKeys, withPlace, now, { optionalPlace: true });
+    expect(ticked.ok || ticked.errors).toEqual({ venue_name: 'required', venue_map_url: 'required' });
+    // Stored values with a place (an edit, or checkout) count as chosen.
+    const stored = validateFieldValues({ ...good, venue_name: 'Garden Hall' }, placeKeys, withPlace, now, { optionalPlace: true });
+    expect(stored.ok && stored.values.venue_name).toBe('Garden Hall');
+    // Not a birthday: the place is required as before.
+    const other = validateFieldValues(noPlace, placeKeys, withPlace, now);
+    expect(other.ok || other.errors).toEqual({ venue_name: 'required', venue_map_url: 'required' });
+  });
+
   it('every package field is required', () => {
     const r = validateFieldValues({ ...good, person_1_name: '   ' }, keys, defs, now);
     expect(r.ok || r.errors).toEqual({ person_1_name: 'required' });
+  });
+
+  it('a design may let the customer leave a field empty (its optionalFields, e.g. the venue of a birthday)', () => {
+    const withVenue = new Map(defs).set('venue_name', { type: 'text', maxLength: 80 });
+    const keysWithVenue = [...keys, 'venue_name'];
+    expect(validateFieldValues({ ...good, venue_name: '' }, keysWithVenue, withVenue, now)).toEqual({ ok: false, errors: { venue_name: 'required' } });
+    const optional = new Map(withVenue).set('venue_name', { type: 'text', maxLength: 80, optional: true });
+    const empty = validateFieldValues({ ...good, venue_name: '' }, keysWithVenue, optional, now);
+    expect(empty.ok).toBe(true);
+    if (empty.ok) expect(empty.values).not.toHaveProperty('venue_name');
+    expect(validateFieldValues({ ...good, venue_name: 'x'.repeat(81) }, keysWithVenue, optional, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {

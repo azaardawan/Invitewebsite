@@ -103,6 +103,26 @@ export function isFieldKey(value: string): value is FieldKey {
 /** Absolute upper bound for any admin-configured text length. */
 export const MAX_TEXT_LENGTH = 1000;
 
+/**
+ * The place of the celebration. For a birthday it is the customer's choice (owner, 2026-10-28): off by default; ticking
+ * "add the place" on the order form shows these fields (required, unless the design lets them stay empty with
+ * `optionalFields`). Left off, the invitation and the cards have no
+ * place at all. The form ticks it with `f.__place=1`; stored values have it whenever a place field is filled.
+ */
+export const PLACE_FIELDS = ['venue_name', 'venue_map_url'] as const satisfies readonly FieldKey[];
+export const PLACE_TOGGLE = '__place';
+const OPTIONAL_PLACE_OCCASIONS = ['birthday'];
+
+/** Whether the place is the customer's choice for this occasion (section key). */
+export function isPlaceOptional(occasionKey: string | null | undefined): boolean {
+  return !!occasionKey && OPTIONAL_PLACE_OCCASIONS.includes(occasionKey);
+}
+
+/** Whether a form or stored values include the place: ticked, or any place field filled. */
+export function placeChosen(values: Record<string, unknown>): boolean {
+  return values[PLACE_TOGGLE] === '1' || PLACE_FIELDS.some((k) => typeof values[k] === 'string' && (values[k] as string).trim() !== '');
+}
+
 /** Whether the customer may leave this field empty. */
 export function isOptionalField(key: string): boolean {
   return isFieldKey(key) && (STANDARD_FIELDS[key] as FieldSpec).optional === true;

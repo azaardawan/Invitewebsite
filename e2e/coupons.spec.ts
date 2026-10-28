@@ -27,6 +27,8 @@ test('the owner makes a 100% coupon and orders an invitation for free', async ({
   await customer.locator('#f-person_1_name').fill('ليلى');
   await customer.locator('#f-event_date').fill(date);
   await customer.locator('#f-event_time').fill('19:30');
+  // A birthday (the demo design): the place is the customer's choice, off until ticked.
+  await customer.getByRole('checkbox', { name: 'إضافة مكان الحفل' }).check();
   await customer.locator('#f-venue_name').fill('قاعة الرافدين');
   await customer.getByRole('button', { name: 'اعرض المعاينة' }).click();
   await expect(customer).toHaveURL(/\/order\/[\w-]+$/);

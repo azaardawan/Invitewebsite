@@ -8,8 +8,9 @@ import { ImageUpload } from './ImageUpload';
 /** The storefront's cover frames, so the owner sees each one while placing the picture. */
 const FRAMES = [
   { key: 'grid', w: 3, h: 4.4, round: 'rounded-t-[999px] rounded-b-[10px]' },
+  // The homepage's moving row of designs: rounded cards, 5 : 7 (ThemeCarousel).
+  { key: 'home', w: 5, h: 7, round: 'rounded-[12px]' },
   { key: 'top', w: 3, h: 4, round: 'rounded-t-[999px] rounded-b-[10px]' },
-  { key: 'home', w: 256, h: 340, round: 'rounded-t-[42%] rounded-b-[10px]' },
 ] as const;
 
 const EDITOR_WIDTH = 240;

@@ -3,6 +3,7 @@ import { BottleLabel, BottleSheet, PRODUCT_SIZES, StickerSheet, StoryPage, Stick
 import type { ProductView } from '@/server/documents/tokens';
 import { printComponents } from '@/theme-registry/print.generated';
 import type { PrintExtraProps } from '@/theme-sdk/print';
+import { COLLAGES, Collage, type CollageKind, type PrintCollageProps } from '@/theme-sdk/collage';
 
 const BASE = 'html,body{margin:0;padding:0;background:transparent}';
 
@@ -22,6 +23,9 @@ export async function ProductPages({ view, data }: { view: ProductView; data: Pr
     stickerSheet: 'A4',
     bottle: `${bottle.width}mm ${bottle.height}mm`,
     bottleSheet: 'A4 landscape',
+    collagePolaroids: `${COLLAGE_BOX.polaroids.width}px ${COLLAGE_BOX.polaroids.height}px`,
+    collageStory: `${COLLAGE_BOX.story.width}px ${COLLAGE_BOX.story.height}px`,
+    collageWall: `${COLLAGE_BOX.wall.width}px ${COLLAGE_BOX.wall.height}px`,
   };
   const own = await themeExtras(data);
   return (
@@ -32,11 +36,37 @@ export async function ProductPages({ view, data }: { view: ProductView; data: Pr
       {view === 'stickerSheet' ? <StickerSheet d={data} sticker={own.sticker ? (d) => <OwnExtra d={d} item="sticker" Draw={own.sticker!} cutLine /> : undefined} /> : null}
       {view === 'bottle' ? own.bottle ? <OwnExtra d={data} item="bottle" Draw={own.bottle} /> : <BottleLabel d={data} /> : null}
       {view === 'bottleSheet' ? <BottleSheet d={data} label={own.bottle ? (d) => <OwnExtra d={d} item="bottle" Draw={own.bottle!} cutLine /> : undefined} /> : null}
+      {view in COLLAGE_VIEWS ? <CollagePage d={data} kind={COLLAGE_VIEWS[view as keyof typeof COLLAGE_VIEWS]} Draw={await themeCollage(data)} /> : null}
     </>
   );
 }
 
 type Draw = React.ComponentType<PrintExtraProps>;
+
+const COLLAGE_VIEWS = { collagePolaroids: 'polaroids', collageStory: 'story', collageWall: 'wall' } as const satisfies Partial<Record<ProductView, CollageKind>>;
+/** Each collage's page: its artwork's box in whole CSS px (render.ts pictures it at print size). */
+const COLLAGE_BOX = {
+  polaroids: { width: 842, height: 1190 },
+  story: { width: COLLAGES.story.width, height: COLLAGES.story.height },
+  wall: { width: 567, height: 850 },
+} as const satisfies Record<CollageKind, { width: number; height: number }>;
+
+/** The design's own collage (print/Collage.tsx: `<Collage>` in its fonts), or null for the platform's. */
+async function themeCollage(d: ProductData): Promise<React.ComponentType<PrintCollageProps> | null> {
+  const load = d.theme ? printComponents[d.theme.codeRef]?.collage : undefined;
+  return load ? (await load()).default : null;
+}
+
+/** A photo collage in its box, with the watermark before payment. */
+function CollagePage({ d, kind, Draw }: { d: ProductData; kind: CollageKind; Draw: React.ComponentType<PrintCollageProps> | null }) {
+  const props: PrintCollageProps = { kind, locale: d.locale, dir: d.dir, lang: d.lang, ...d.collage };
+  return (
+    <div dir={d.dir} lang={d.lang} data-extra={`collage-${kind}`} style={{ position: 'relative', width: `${COLLAGE_BOX[kind].width}px`, height: `${COLLAGE_BOX[kind].height}px`, overflow: 'hidden' }}>
+      {Draw ? <Draw {...props} /> : <Collage {...props} />}
+      {d.watermark ? <Watermark labels={d.labels} /> : null}
+    </div>
+  );
+}
 
 /** The design's own extras, for those without owner artwork in Admin. */
 async function themeExtras(d: ProductData): Promise<Partial<Record<Extra, Draw>>> {

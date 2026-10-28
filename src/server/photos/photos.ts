@@ -9,6 +9,7 @@ import { normalizeCoverFocus, type CoverFocus } from '@/lib/cover-focus';
 import { manifestByCodeRef } from '@/theme-registry';
 import { DEFAULT_PHOTO_ASPECT, type PhotoSpec, type ThemeManifest } from '@/theme-sdk/manifest';
 import { processPhoto } from '@/server/media/process';
+import { collagePhotoCount } from '@/catalog/collages';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -21,20 +22,32 @@ export class PhotoError extends Error {
 /** Where customer photo files are stored: their own folder, so nothing else ever shares or reuses them. */
 const PHOTO_PREFIX = 'photos/';
 
-/** The design's photo settings for an invitation (its version's manifest), or null when its package has no photos. */
+/**
+ * The photo places of an invitation: the design's (its version's manifest, packages with `photos`), and as many as the
+ * package's largest collage holds (src/catalog/collages.ts), whichever is more; null when there are none. Places past
+ * the design's own take the collages' frame (4:5) and no name.
+ */
 export async function photoSpec(
   db: DbOrTx,
   inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'>,
 ): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[] }) | null> {
-  if (!inv.featureKeys.includes('photos')) return null;
-  const [v] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
-  const spec = (v?.manifest as ThemeManifest | null)?.photos ?? (v ? manifestByCodeRef(v.codeRef)?.photos : undefined);
-  if (!spec) return null;
-  const aspect = spec.aspect ?? DEFAULT_PHOTO_ASPECT;
-  // Each place's frame: its own (a collage) or the design's common one.
-  const aspects = Array.from({ length: spec.max }, (_, i) => spec.frames?.[i]?.aspect ?? aspect);
-  return { max: spec.max, min: spec.min ?? 0, aspect, labels: spec.labels, aspects };
+  const collage = collagePhotoCount(inv.featureKeys);
+  let spec: PhotoSpec | undefined;
+  if (inv.featureKeys.includes('photos')) {
+    const [v] = await db.select({ codeRef: themeVersions.codeRef, manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
+    spec = (v?.manifest as ThemeManifest | null)?.photos ?? (v ? manifestByCodeRef(v.codeRef)?.photos : undefined);
+  }
+  if (!spec && !collage) return null;
+  const own = spec?.max ?? 0;
+  const max = Math.max(own, collage);
+  const aspect = spec?.aspect ?? (spec ? DEFAULT_PHOTO_ASPECT : COLLAGE_PHOTO_ASPECT);
+  // Each place's frame: its own (a collage design), the design's common one, or the collages' past the design's places.
+  const aspects = Array.from({ length: max }, (_, i) => (i < own ? (spec?.frames?.[i]?.aspect ?? aspect) : COLLAGE_PHOTO_ASPECT));
+  return { max, min: spec?.min ?? 0, aspect, labels: spec?.labels, aspects };
 }
+
+/** The frame photos past the design's own places are shown in on the order form (the collages crop each to its place). */
+const COLLAGE_PHOTO_ASPECT = 0.8;
 
 export type InvitationPhoto = {
   position: number;

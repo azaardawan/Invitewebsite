@@ -1256,3 +1256,196 @@ manifest; once a version is activated they are frozen, so a correction there nee
 | 3 | Its + button, read out (`invitation.partyMore`) | شخص إضافي | One more | کەسێک زیاتر | کەسەک پتر |
 | 4 | Keepsake, after a guest's name when more than one (`invitation.guestParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |
 | 5 | Couple's receipt, beside a reply (`receipt.replyParty`) | العدد {count} | {count} people | {count} کەس | {count} کەس |
+
+## Batch 42 — a birthday's place is optional — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Order form, the tick box before the place (`store.addPlace`) | إضافة مكان الحفل | Add the place of the celebration | زیادکردنی شوێنی ئاهەنگ | زێدەکرنا جهێ ئاهەنگێ |
+
+## Batch 43 — birthday designs v2 (#19–#22), Cherry Confetti Party (#23), Pink Ribbon Party (#24), photo collages — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+The birthday designs' wording was rewritten to read naturally (owner request: «too robotic»), so v2 of #19–#22 lists
+every line that changed. #23 and #24 are the own-party invitations of #19 and #20; their other lines are Blush Floral
+v2's (rows above). The design lines live in each design's `copy.ts` (frozen once activated); the platform lines (the
+photo collages) are in `src/i18n/messages`.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #19 Cherry Confetti v2: `hintLine` | عندي لك مفاجأة صغيرة | A little surprise, just for you | سوپرایزێکی بچووکم بۆت هەیە | سوپرایزەکا بچووک بۆ تە هەیە |
+| 2 | #19 Cherry Confetti v2: `hintTap` | اضغط لتفتحها | Tap to open | دەست بنێ بۆ کردنەوە | دەستێ بدە بۆ ڤەکرنێ |
+| 3 | #19 Cherry Confetti v2: `posterEyebrow` | إلى أغلى الناس | A little surprise for | بۆ خۆشەویستترین کەس | بۆ خۆشتڤیترین کەسی |
+| 4 | #19 Cherry Confetti v2: `posterDay` | يومك الحلو | Your special day | ڕۆژە شیرینەکەت | ڕۆژا تە یا شرین |
+| 5 | #19 Cherry Confetti v2: `posterDress` | كل عام وأنت بخير | A day just for you | ساڵانێکی پڕ لە خۆشی | هەمی ساڵ تو ب خێر بی |
+| 6 | #19 Cherry Confetti v2: `more` | وهذه ليست كل المفاجأة | A little more birthday magic | سوپرایزەکە هێشتا تەواو نەبووە | سوپرایز هێشتا ب دوماهی نەهاتیە |
+| 7 | #19 Cherry Confetti v2: `justForYou` | خصيصاً لك | Just for you | تایبەت بۆ تۆ | تایبەت بۆ تە |
+| 8 | #19 Cherry Confetti v2: `introCopy` | أتمنى أن تكون سنتك الجديدة مليئة بالضحك والمفاجآت الحلوة، / وأن تحمل لك كل ما تتمناه. | Here’s to laughter that lasts, sweet surprises, / and a year with a little more magic. | هیوادارم ساڵە نوێیەکەت پڕ بێت لە پێکەنین و سوپرایزی شیرین، / و هەموو ئەوەی ئاواتی پێ دەخوازیت بۆت بهێنێت. | هیڤیدارم ساڵا تە یا نوو تژی کەنی و سوپرایزێن شرین بیت، / و هەمی ئەوێ تو دخوازی بۆ تە بینیت. |
+| 9 | #19 Cherry Confetti v2: `introSign` | وكل عام وأنت بألف خير. | Happy, happy birthday. | هەزار ساڵی تر بە خۆشی. | هەزار ساڵێن دی ب خێر. |
+| 10 | #19 Cherry Confetti v2: `wishEyebrow` | لحظة الأمنية | A small birthday ritual | ساتی ئاوات | دەمێ هیڤیێ |
+| 11 | #19 Cherry Confetti v2: `wishTitle` | لحظة هادئة… | Close your eyes. | ساتێکی ئارام… | دەمەکێ ئارام… |
+| 12 | #19 Cherry Confetti v2: `wishTitleEm` | وأمنية من القلب. | Make a wish. | و ئاواتێک لە دڵەوە. | و هیڤیەک ژ دلی. |
+| 13 | #19 Cherry Confetti v2: `wishInstruction` | أمنية في القلب، / وشمعة تنتظر أن تُطفأ. | Keep a little wish to yourself, / then let the candlelight carry it. | ئاواتێک لە دڵدا، / و مۆمێک چاوەڕێی کوژاندنەوەیە. | هیڤیەک د دلی دا، / و مۆمەک ل هیڤیا ڤەمراندنێ. |
+| 14 | #19 Cherry Confetti v2: `makeWish` | إطفاء الشمعة | Make a birthday wish | کوژاندنەوەی مۆمەکە | ڤەمراندنا مۆمێ |
+| 15 | #19 Cherry Confetti v2: `wishMade` | وصلت الأمنية | A wish, just for you | ئاواتەکە گەیشت | هیڤی گەهشت |
+| 16 | #19 Cherry Confetti v2: `wishMadeTitle` | إن شاء الله | May lovely things | بە هیوای خوا | ب هیڤیا خودێ |
+| 17 | #19 Cherry Confetti v2: `wishMadeEm` | تتحقق كل أمنياتك. | find their way to you. | هەموو ئاواتەکانت دێنە دی. | هەمی هیڤیێن تە دێ ب جه هێن. |
+| 18 | #19 Cherry Confetti v2: `wishMadeCopy` | سنة فيها مغامرات جديدة وراحة بال، / وأسباب كثيرة للابتسامة. | New adventures. Peaceful moments. / And so many reasons to smile. | ساڵێک پڕ لە سەرکێشیی نوێ و ئاسوودەیی، / و هۆکاری زۆر بۆ زەردەخەنە. | ساڵەک تژی سەربۆرێن نوو و ئارامی، / و گەلەک ئەگەرێن کەنیێ. |
+| 19 | #19 Cherry Confetti v2: `relight` | أمنية ثانية؟ | One more little wish | ئاواتێکی تر؟ | هیڤیەکا دی؟ |
+| 20 | #19 Cherry Confetti v2: `candle` | شمعة عيد الميلاد تنتظر الأمنية | A birthday candle, waiting for a wish | مۆمێکی ڕۆژی لەدایکبوون، چاوەڕێی ئاواتێکە | مۆمەکا ڕۆژا ژدایکبوونێ، ل هیڤیا هیڤیەکێ |
+| 21 | #19 Cherry Confetti v2: `candleOut` | انطفأت الشمعة، والأمنية في الطريق. | The birthday candle is out. Your birthday wish is made. | مۆمەکە کوژایەوە. ئاواتەکەت خواسترا. | مۆم ڤەمری. هیڤیا تە هاتە خواستن. |
+| 22 | #19 Cherry Confetti v2: `dayToCelebrate` | يوم الاحتفال | A day to celebrate | ڕۆژی ئاهەنگ | ڕۆژا ئاهەنگێ |
+| 23 | #19 Cherry Confetti v2: `letterEyebrow` | لسنتك الجديدة | For the year ahead | بۆ ساڵە نوێیەکەت | بۆ ساڵا تە یا نوو |
+| 24 | #19 Cherry Confetti v2: `letterTitle` | فرح أكثر، / وضحك أكثر، | More joy. / More wonder. | خۆشیی زیاتر، / پێکەنینی زیاتر، | دلخۆشیا پتر، / کەنیا پتر، |
+| 25 | #19 Cherry Confetti v2: `letterTitleEm` | وكل ما يسعدك أكثر. | More of what you love. | و هەموو ئەوەی دڵخۆشت دەکات زیاتر. | و هەمی ئەوێ تە دلخۆش دکەت پتر. |
+| 26 | #19 Cherry Confetti v2: `message` | أتمنى لك يوماً حلواً مثلك، مليئاً بالمفاجآت الجميلة والضحك وكل ما يسعدك. كل عام وأنت بخير. | Wishing you a day full of sweet surprises, happy moments, and all the things you love. | ڕۆژێکی شیرین وەک خۆتت بۆ دەخوازم، پڕ لە سوپرایزی جوان و پێکەنین و هەموو ئەوەی دڵخۆشت دەکات. ساڵانێکی پڕ لە خۆشی. | ڕۆژەکا شرین وەکی تە بۆ تە دخوازم، تژی سوپرایزێن جوان و کەنی و هەمی ئەوێ تە دلخۆش دکەت. هەمی ساڵ تو ب خێر بی. |
+| 27 | #19 Cherry Confetti v2: `letterSign` | مع كل الحب. | With the warmest birthday wishes. | بە هەموو خۆشەویستییەوە. | ب هەمی ڤیانێ. |
+| 28 | #19 Cherry Confetti v2: `footerCopy` | كل الحب لك اليوم وكل يوم، / وعقبال المية سنة. | A little love. A little sparkle. / A whole day to celebrate you. | هەموو خۆشەویستییەک بۆ تۆ ئەمڕۆ و هەموو ڕۆژێک، / و بە هیوای سەد ساڵی تر. | هەمی ڤیان بۆ تە ئەڤرۆ و هەمی ڕۆژان، / و ب هیڤیا سەد ساڵێن دی. |
+| 29 | #19 Cherry Confetti v2: `replay` | المفاجأة من جديد | Watch the surprise again | سوپرایزەکە لە سەرەتاوە | سوپرایز ژ دەستپێکێ |
+| 30 | #19 Cherry Confetti v2: `posterLabel` | مفاجأة عيد ميلاد لـ{name} | A birthday surprise for {name} | سوپرایزێکی ڕۆژی لەدایکبوون بۆ {name} | سوپرایزەکا ڕۆژا ژدایکبوونێ بۆ {name} |
+| 31 | #19 Cherry Confetti v2: `memoriesEyebrow` | لحظات حلوة | Little moments | ساتە شیرینەکان | دەمێن شرین |
+| 32 | #19 Cherry Confetti v2: `memoriesTitle` | من أحلى | Some of my favourite | هەندێک لە جوانترین | هندەک ژ جوانترین |
+| 33 | #19 Cherry Confetti v2: `memoriesEm` | ذكرياتنا معاً. | memories with you. | یادگارییەکانمان پێکەوە. | بیرهاتنێن مە پێکڤە. |
+| 34 | #19 Cherry Confetti v2: photo label 1 | الصورة الأولى | First photo | وێنەی یەکەم | وێنێ ئێکێ |
+| 35 | #19 Cherry Confetti v2: photo label 2 | الصورة الثانية | Second photo | وێنەی دووەم | وێنێ دوویێ |
+| 36 | #19 Cherry Confetti v2: photo label 3 | الصورة الثالثة | Third photo | وێنەی سێیەم | وێنێ سێیێ |
+| 37 | #20 Pink Ribbon v2: `hintLine` | عندي لك مفاجأة صغيرة | A little surprise, just for you | سوپرایزێکی بچووکم بۆت هەیە | سوپرایزەکا بچووک بۆ تە هەیە |
+| 38 | #20 Pink Ribbon v2: `hintTap` | اضغط لتفتحها | Tap to open | دەست بنێ بۆ کردنەوە | دەستێ بدە بۆ ڤەکرنێ |
+| 39 | #20 Pink Ribbon v2: `posterDay` | يومك الحلو | Your special day | ڕۆژە شیرینەکەت | ڕۆژا تە یا شرین |
+| 40 | #20 Pink Ribbon v2: `posterDress` | بكل الحب، لك أنت | With love, just for you | بە خۆشەویستییەوە، تەنها بۆ تۆ | ب ڤیان، بتنێ بۆ تە |
+| 41 | #20 Pink Ribbon v2: `more` | وهذه ليست كل المفاجأة | A little more birthday magic | سوپرایزەکە هێشتا تەواو نەبووە | سوپرایز هێشتا ب دوماهی نەهاتیە |
+| 42 | #20 Pink Ribbon v2: `justForYou` | خصيصاً لك | Just for you | تایبەت بۆ تۆ | تایبەت بۆ تە |
+| 43 | #20 Pink Ribbon v2: `introCopy` | أتمنى أن تكون سنتك الجديدة مليئة بالضحك والمفاجآت الحلوة، / وأن تحمل لك كل ما تتمناه. | Here’s to laughter that lasts, sweet surprises, / and a year with a little more magic. | هیوادارم ساڵە نوێیەکەت پڕ بێت لە پێکەنین و سوپرایزی شیرین، / و هەموو ئەوەی ئاواتی پێ دەخوازیت بۆت بهێنێت. | هیڤیدارم ساڵا تە یا نوو تژی کەنی و سوپرایزێن شرین بیت، / و هەمی ئەوێ تو دخوازی بۆ تە بینیت. |
+| 44 | #20 Pink Ribbon v2: `introSign` | وكل عام وأنت بألف خير. | Happy, happy birthday. | هەزار ساڵی تر بە خۆشی. | هەزار ساڵێن دی ب خێر. |
+| 45 | #20 Pink Ribbon v2: `wishEyebrow` | لحظة الأمنية | A small birthday ritual | ساتی ئاوات | دەمێ هیڤیێ |
+| 46 | #20 Pink Ribbon v2: `wishTitle` | لحظة هادئة… | Close your eyes. | ساتێکی ئارام… | دەمەکێ ئارام… |
+| 47 | #20 Pink Ribbon v2: `wishTitleEm` | وأمنية من القلب. | Make a wish. | و ئاواتێک لە دڵەوە. | و هیڤیەک ژ دلی. |
+| 48 | #20 Pink Ribbon v2: `wishInstruction` | أمنية في القلب، / وشمعة تنتظر أن تُطفأ. | Keep a little wish to yourself, / then let the candlelight carry it. | ئاواتێک لە دڵدا، / و مۆمێک چاوەڕێی کوژاندنەوەیە. | هیڤیەک د دلی دا، / و مۆمەک ل هیڤیا ڤەمراندنێ. |
+| 49 | #20 Pink Ribbon v2: `makeWish` | إطفاء الشمعة | Make a birthday wish | کوژاندنەوەی مۆمەکە | ڤەمراندنا مۆمێ |
+| 50 | #20 Pink Ribbon v2: `wishMade` | وصلت الأمنية | A wish, just for you | ئاواتەکە گەیشت | هیڤی گەهشت |
+| 51 | #20 Pink Ribbon v2: `wishMadeTitle` | إن شاء الله | May lovely things | بە هیوای خوا | ب هیڤیا خودێ |
+| 52 | #20 Pink Ribbon v2: `wishMadeEm` | تتحقق كل أمنياتك. | find their way to you. | هەموو ئاواتەکانت دێنە دی. | هەمی هیڤیێن تە دێ ب جه هێن. |
+| 53 | #20 Pink Ribbon v2: `wishMadeCopy` | سنة فيها مغامرات جديدة وراحة بال، / وأسباب كثيرة للابتسامة. | New adventures. Peaceful moments. / And so many reasons to smile. | ساڵێک پڕ لە سەرکێشیی نوێ و ئاسوودەیی، / و هۆکاری زۆر بۆ زەردەخەنە. | ساڵەک تژی سەربۆرێن نوو و ئارامی، / و گەلەک ئەگەرێن کەنیێ. |
+| 54 | #20 Pink Ribbon v2: `relight` | أمنية ثانية؟ | One more little wish | ئاواتێکی تر؟ | هیڤیەکا دی؟ |
+| 55 | #20 Pink Ribbon v2: `candle` | شمعة عيد الميلاد تنتظر الأمنية | A birthday candle, waiting for a wish | مۆمێکی ڕۆژی لەدایکبوون، چاوەڕێی ئاواتێکە | مۆمەکا ڕۆژا ژدایکبوونێ، ل هیڤیا هیڤیەکێ |
+| 56 | #20 Pink Ribbon v2: `candleOut` | انطفأت الشمعة، والأمنية في الطريق. | The birthday candle is out. Your birthday wish is made. | مۆمەکە کوژایەوە. ئاواتەکەت خواسترا. | مۆم ڤەمری. هیڤیا تە هاتە خواستن. |
+| 57 | #20 Pink Ribbon v2: `dayToCelebrate` | يوم الاحتفال | A day to celebrate | ڕۆژی ئاهەنگ | ڕۆژا ئاهەنگێ |
+| 58 | #20 Pink Ribbon v2: `letterEyebrow` | لسنتك الجديدة | For the year ahead | بۆ ساڵە نوێیەکەت | بۆ ساڵا تە یا نوو |
+| 59 | #20 Pink Ribbon v2: `letterTitle` | فرح أكثر، / وضحك أكثر، | More joy. / More wonder. | خۆشیی زیاتر، / پێکەنینی زیاتر، | دلخۆشیا پتر، / کەنیا پتر، |
+| 60 | #20 Pink Ribbon v2: `letterTitleEm` | وكل ما يسعدك أكثر. | More of what you love. | و هەموو ئەوەی دڵخۆشت دەکات زیاتر. | و هەمی ئەوێ تە دلخۆش دکەت پتر. |
+| 61 | #20 Pink Ribbon v2: `message` | أتمنى لك يوماً حلواً مثلك، مليئاً بالمفاجآت الجميلة والضحك وكل ما يسعدك. كل عام وأنت بخير. | Wishing you a day full of sweet surprises, happy moments, and all the things you love. | ڕۆژێکی شیرین وەک خۆتت بۆ دەخوازم، پڕ لە سوپرایزی جوان و پێکەنین و هەموو ئەوەی دڵخۆشت دەکات. ساڵانێکی پڕ لە خۆشی. | ڕۆژەکا شرین وەکی تە بۆ تە دخوازم، تژی سوپرایزێن جوان و کەنی و هەمی ئەوێ تە دلخۆش دکەت. هەمی ساڵ تو ب خێر بی. |
+| 62 | #20 Pink Ribbon v2: `letterSign` | مع كل الحب. | With the warmest birthday wishes. | بە هەموو خۆشەویستییەوە. | ب هەمی ڤیانێ. |
+| 63 | #20 Pink Ribbon v2: `footerCopy` | كل الحب لك اليوم وكل يوم، / وعقبال المية سنة. | A little love. A little sparkle. / A whole day to celebrate you. | هەموو خۆشەویستییەک بۆ تۆ ئەمڕۆ و هەموو ڕۆژێک، / و بە هیوای سەد ساڵی تر. | هەمی ڤیان بۆ تە ئەڤرۆ و هەمی ڕۆژان، / و ب هیڤیا سەد ساڵێن دی. |
+| 64 | #20 Pink Ribbon v2: `replay` | المفاجأة من جديد | Watch the surprise again | سوپرایزەکە لە سەرەتاوە | سوپرایز ژ دەستپێکێ |
+| 65 | #20 Pink Ribbon v2: `posterLabel` | مفاجأة عيد ميلاد لـ{name} | A birthday surprise for {name} | سوپرایزێکی ڕۆژی لەدایکبوون بۆ {name} | سوپرایزەکا ڕۆژا ژدایکبوونێ بۆ {name} |
+| 66 | #20 Pink Ribbon v2: `posterHappy` | عيد ميلاد سعيد | Happy Birthday | ڕۆژی لەدایکبوونت پیرۆز | ڕۆژا ژدایکبوونا تە پیرۆز |
+| 67 | #20 Pink Ribbon v2: `memoriesEyebrow` | لحظات حلوة | Little moments | ساتە شیرینەکان | دەمێن شرین |
+| 68 | #20 Pink Ribbon v2: `memoriesTitle` | من أحلى | Some of my favourite | هەندێک لە جوانترین | هندەک ژ جوانترین |
+| 69 | #20 Pink Ribbon v2: `memoriesEm` | ذكرياتنا معاً. | memories with you. | یادگارییەکانمان پێکەوە. | بیرهاتنێن مە پێکڤە. |
+| 70 | #20 Pink Ribbon v2: photo label 1 | الصورة الأولى | First photo | وێنەی یەکەم | وێنێ ئێکێ |
+| 71 | #20 Pink Ribbon v2: photo label 2 | الصورة الثانية | Second photo | وێنەی دووەم | وێنێ دوویێ |
+| 72 | #20 Pink Ribbon v2: photo label 3 | الصورة الثالثة | Third photo | وێنەی سێیەم | وێنێ سێیێ |
+| 73 | #21 Floral Surprise v2: `hintLine` | عندي لك مفاجأة صغيرة | A little surprise, just for you | سوپرایزێکی بچووکم بۆت هەیە | سوپرایزەکا بچووک بۆ تە هەیە |
+| 74 | #21 Floral Surprise v2: `hintTap` | اضغط لتفتحها | Tap to open | دەست بنێ بۆ کردنەوە | دەستێ بدە بۆ ڤەکرنێ |
+| 75 | #21 Floral Surprise v2: `posterParty` | مع كل الحب | With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ |
+| 76 | #21 Floral Surprise v2: `posterDay` | يومك الحلو | Your special day | ڕۆژە شیرینەکەت | ڕۆژا تە یا شرین |
+| 77 | #21 Floral Surprise v2: `posterDress` | كل عام وأنت بخير | A day just for you | ساڵانێکی پڕ لە خۆشی | هەمی ساڵ تو ب خێر بی |
+| 78 | #21 Floral Surprise v2: `more` | وهذه ليست كل المفاجأة | A little more birthday magic | سوپرایزەکە هێشتا تەواو نەبووە | سوپرایز هێشتا ب دوماهی نەهاتیە |
+| 79 | #21 Floral Surprise v2: `justForYou` | خصيصاً لك | Just for you | تایبەت بۆ تۆ | تایبەت بۆ تە |
+| 80 | #21 Floral Surprise v2: `introCopy` | أتمنى أن تكون سنتك الجديدة مليئة بالضحك والمفاجآت الحلوة، / وأن تحمل لك كل ما تتمناه. | Here’s to laughter that lasts, sweet surprises, / and a year with a little more magic. | هیوادارم ساڵە نوێیەکەت پڕ بێت لە پێکەنین و سوپرایزی شیرین، / و هەموو ئەوەی ئاواتی پێ دەخوازیت بۆت بهێنێت. | هیڤیدارم ساڵا تە یا نوو تژی کەنی و سوپرایزێن شرین بیت، / و هەمی ئەوێ تو دخوازی بۆ تە بینیت. |
+| 81 | #21 Floral Surprise v2: `introSign` | وكل عام وأنت بألف خير. | Happy, happy birthday. | هەزار ساڵی تر بە خۆشی. | هەزار ساڵێن دی ب خێر. |
+| 82 | #21 Floral Surprise v2: `wishEyebrow` | لحظة الأمنية | A small birthday ritual | ساتی ئاوات | دەمێ هیڤیێ |
+| 83 | #21 Floral Surprise v2: `wishTitle` | لحظة هادئة… | Close your eyes. | ساتێکی ئارام… | دەمەکێ ئارام… |
+| 84 | #21 Floral Surprise v2: `wishTitleEm` | وأمنية من القلب. | Make a wish. | و ئاواتێک لە دڵەوە. | و هیڤیەک ژ دلی. |
+| 85 | #21 Floral Surprise v2: `wishInstruction` | أمنية في القلب، / وشمعة تنتظر أن تُطفأ. | Keep a little wish to yourself, / then let the candlelight carry it. | ئاواتێک لە دڵدا، / و مۆمێک چاوەڕێی کوژاندنەوەیە. | هیڤیەک د دلی دا، / و مۆمەک ل هیڤیا ڤەمراندنێ. |
+| 86 | #21 Floral Surprise v2: `makeWish` | إطفاء الشمعة | Make a birthday wish | کوژاندنەوەی مۆمەکە | ڤەمراندنا مۆمێ |
+| 87 | #21 Floral Surprise v2: `wishMade` | وصلت الأمنية | A wish, just for you | ئاواتەکە گەیشت | هیڤی گەهشت |
+| 88 | #21 Floral Surprise v2: `wishMadeTitle` | إن شاء الله | May lovely things | بە هیوای خوا | ب هیڤیا خودێ |
+| 89 | #21 Floral Surprise v2: `wishMadeEm` | تتحقق كل أمنياتك. | find their way to you. | هەموو ئاواتەکانت دێنە دی. | هەمی هیڤیێن تە دێ ب جه هێن. |
+| 90 | #21 Floral Surprise v2: `wishMadeCopy` | سنة فيها مغامرات جديدة وراحة بال، / وأسباب كثيرة للابتسامة. | New adventures. Peaceful moments. / And so many reasons to smile. | ساڵێک پڕ لە سەرکێشیی نوێ و ئاسوودەیی، / و هۆکاری زۆر بۆ زەردەخەنە. | ساڵەک تژی سەربۆرێن نوو و ئارامی، / و گەلەک ئەگەرێن کەنیێ. |
+| 91 | #21 Floral Surprise v2: `relight` | أمنية ثانية؟ | One more little wish | ئاواتێکی تر؟ | هیڤیەکا دی؟ |
+| 92 | #21 Floral Surprise v2: `candle` | شمعة عيد الميلاد تنتظر الأمنية | A birthday candle, waiting for a wish | مۆمێکی ڕۆژی لەدایکبوون، چاوەڕێی ئاواتێکە | مۆمەکا ڕۆژا ژدایکبوونێ، ل هیڤیا هیڤیەکێ |
+| 93 | #21 Floral Surprise v2: `candleOut` | انطفأت الشمعة، والأمنية في الطريق. | The birthday candle is out. Your birthday wish is made. | مۆمەکە کوژایەوە. ئاواتەکەت خواسترا. | مۆم ڤەمری. هیڤیا تە هاتە خواستن. |
+| 94 | #21 Floral Surprise v2: `dayToCelebrate` | يوم الاحتفال | A day to celebrate | ڕۆژی ئاهەنگ | ڕۆژا ئاهەنگێ |
+| 95 | #21 Floral Surprise v2: `letterEyebrow` | لسنتك الجديدة | For the year ahead | بۆ ساڵە نوێیەکەت | بۆ ساڵا تە یا نوو |
+| 96 | #21 Floral Surprise v2: `letterTitle` | فرح أكثر، / وضحك أكثر، | More joy. / More wonder. | خۆشیی زیاتر، / پێکەنینی زیاتر، | دلخۆشیا پتر، / کەنیا پتر، |
+| 97 | #21 Floral Surprise v2: `letterTitleEm` | وكل ما يسعدك أكثر. | More of what you love. | و هەموو ئەوەی دڵخۆشت دەکات زیاتر. | و هەمی ئەوێ تە دلخۆش دکەت پتر. |
+| 98 | #21 Floral Surprise v2: `message` | أتمنى لك عيد ميلاد جميلاً مثل باقة ورد، حلواً مثل أول قطعة من الكيكة، ومليئاً بلحظات لا تُنسى. | Wishing you a birthday as lovely as a bouquet, as sweet as the first slice of cake, and full of moments you’ll want to keep. | ڕۆژی لەدایکبوونێکی جوان وەک چەپکە گوڵێکت بۆ دەخوازم، شیرین وەک یەکەم پارچەی کێک، و پڕ لە ساتی لەبیرنەکراو. | ڕۆژا ژدایکبوونەکا جوان وەکی چەپکە گولەکێ بۆ تە دخوازم، شرین وەکی ئێکەمین پارچا کێکێ، و تژی دەمێن ژبیرنەبوویی. |
+| 99 | #21 Floral Surprise v2: `letterSign` | مع كل الحب. | With the warmest birthday wishes. | بە هەموو خۆشەویستییەوە. | ب هەمی ڤیانێ. |
+| 100 | #21 Floral Surprise v2: `footerCopy` | كل الحب لك اليوم وكل يوم، / وعقبال المية سنة. | A little love. A little sparkle. / A whole day to celebrate you. | هەموو خۆشەویستییەک بۆ تۆ ئەمڕۆ و هەموو ڕۆژێک، / و بە هیوای سەد ساڵی تر. | هەمی ڤیان بۆ تە ئەڤرۆ و هەمی ڕۆژان، / و ب هیڤیا سەد ساڵێن دی. |
+| 101 | #21 Floral Surprise v2: `replay` | المفاجأة من جديد | Watch the surprise again | سوپرایزەکە لە سەرەتاوە | سوپرایز ژ دەستپێکێ |
+| 102 | #21 Floral Surprise v2: `posterLabel` | مفاجأة عيد ميلاد لـ{name} | A birthday surprise for {name} | سوپرایزێکی ڕۆژی لەدایکبوون بۆ {name} | سوپرایزەکا ڕۆژا ژدایکبوونێ بۆ {name} |
+| 103 | #21 Floral Surprise v2: `posterHappy` | عيد ميلاد سعيد | Happy Birthday | ڕۆژی لەدایکبوونت پیرۆز | ڕۆژا ژدایکبوونا تە پیرۆز |
+| 104 | #21 Floral Surprise v2: `memoriesEyebrow` | لحظات حلوة | Little moments | ساتە شیرینەکان | دەمێن شرین |
+| 105 | #21 Floral Surprise v2: `memoriesTitle` | من أحلى | Some of my favourite | هەندێک لە جوانترین | هندەک ژ جوانترین |
+| 106 | #21 Floral Surprise v2: `memoriesEm` | ذكرياتنا معاً. | memories with you. | یادگارییەکانمان پێکەوە. | بیرهاتنێن مە پێکڤە. |
+| 107 | #21 Floral Surprise v2: photo label 1 | الصورة الأولى | First photo | وێنەی یەکەم | وێنێ ئێکێ |
+| 108 | #21 Floral Surprise v2: photo label 2 | الصورة الثانية | Second photo | وێنەی دووەم | وێنێ دوویێ |
+| 109 | #21 Floral Surprise v2: photo label 3 | الصورة الثالثة | Third photo | وێنەی سێیەم | وێنێ سێیێ |
+| 110 | #22 Blush Floral v2: `hintTap` | اضغط لفتح الدعوة | Tap to open | دەست بنێ بۆ کردنەوەی بانگهێشتنامەکە | دەستێ بدە بۆ ڤەکرنا داخوازنامێ |
+| 111 | #22 Blush Floral v2: `posterEyebrow` | يسعدنا دعوتكم إلى | You are invited to | بە خۆشحاڵییەوە بانگهێشتتان دەکەین بۆ | ب دلخۆشی ڤە داخوازا هەوە دکەین بۆ |
+| 112 | #22 Blush Floral v2: `posterName` |  | {name}’s |  |  |
+| 113 | #22 Blush Floral v2: `posterParty` | {name} | Party | {name} | {name} |
+| 114 | #22 Blush Floral v2: `more` | تفاصيل الحفلة | The celebration | وردەکارییەکانی ئاهەنگ | هوویرکاریێن ئاهەنگێ |
+| 115 | #22 Blush Floral v2: `invited` | دعوة خاصة | You’re invited | بانگهێشتنێکی تایبەت | داخوازەکا تایبەت |
+| 116 | #22 Blush Floral v2: `introTitle` | حفلة صغيرة، | A little celebration. | ئاهەنگێکی بچووک، | ئاهەنگەکا بچووک، |
+| 117 | #22 Blush Floral v2: `introEm` | وفرحتها تكتمل بكم. | In full bloom. | و خۆشییەکەی بە ئێوە تەواو دەبێت. | و دلخۆشیا وێ ب هەوە تمام دبیت. |
+| 118 | #22 Blush Floral v2: `introCopy` | سنة جديدة من العمر، / ونحب أن نحتفل بها معكم. | Another year to gather, make a wish, / and fill the evening with lovely memories. | ساڵێکی نوێی تەمەن، / و حەز دەکەین پێکەوە ئاهەنگی بۆ بگێڕین. | ساڵەکا نوو یا ژیانێ، / و دخوازین پێکڤە ئاهەنگێ بۆ بگێڕین. |
+| 119 | #22 Blush Floral v2: `introSign` | بانتظاركم لنحتفل مع {name}. | Come celebrate with {name}. | چاوەڕێتانین بۆ ئاهەنگ لەگەڵ {name}. | ل هیڤیا هەوە نە بۆ ئاهەنگێ دگەل {name}. |
+| 120 | #22 Blush Floral v2: `detailsTitle` | موعدنا | All the | کات | دەم |
+| 121 | #22 Blush Floral v2: `detailsEm` | ومكان اللقاء. | lovely details. | و شوێنی دیدار. | و جهێ دیتنێ. |
+| 122 | #22 Blush Floral v2: `gathering` | نجتمع مع الأحبة / ونحتفل معاً. | A birthday gathering / with our favourite people. | لەگەڵ خۆشەویستان کۆدەبینەوە / و پێکەوە ئاهەنگ دەگێڕین. | دگەل خۆشتڤیان کۆم دبین / و پێکڤە ئاهەنگێ دگێڕین. |
+| 123 | #22 Blush Floral v2: `untilWe` | باقي على الحفلة | Until we celebrate | ماوە بۆ ئاهەنگ | مایە بۆ ئاهەنگێ |
+| 124 | #22 Blush Floral v2: `soonTitle` | العدّ التنازلي | Something lovely | ژماردنی پێچەوانە | ژمارتنا بەرەڤاژی |
+| 125 | #22 Blush Floral v2: `soonEm` | بدأ! | is on the way. | دەستی پێکرد! | دەست پێکر! |
+| 126 | #22 Blush Floral v2: `wishCaption` | لكل شمعة أمنية | A wish for every candle | بۆ هەر مۆمێک ئاواتێک | بۆ هەر مۆمەکێ هیڤیەک |
+| 127 | #22 Blush Floral v2: `wishEyebrow` | ورد وشموع وأحلى صحبة | Flowers, candles & good company | گوڵ و مۆم و خۆشترین هاوڕێیەتی | گول و مۆم و خۆشترین هەڤالینی |
+| 128 | #22 Blush Floral v2: `wishTitle` | أحضروا معكم الفرحة، | Bring a little joy. | خۆشی لەگەڵ خۆتان بهێنن، | دلخۆشیێ دگەل خۆ بینن، |
+| 129 | #22 Blush Floral v2: `wishEm` | والكيكة علينا! | We’ll save you a slice. | کێکەکە لەسەر ئێمە! | کێک ل سەر مە! |
+| 130 | #22 Blush Floral v2: `wishCopy` | نطفئ الشموع، ونتمنّى الأماني، ونحتفل بسنة جديدة مع أحلى الناس. | A moment for birthday wishes, a toast to the year ahead, and the people who make every celebration sweeter. | مۆمەکان دەکوژێنینەوە، ئاوات دەخوازین، و ساڵێکی نوێ لەگەڵ خۆشترین کەسەکان ئاهەنگ دەگێڕین. | مۆمان ڤەدمرینین، هیڤیان دخوازین، و ساڵەکا نوو دگەل خۆشترین کەسان ئاهەنگێ دگێڕین. |
+| 131 | #22 Blush Floral v2: `wishLink` | أكّدوا حضوركم | Be part of the celebration | هاتنتان پشتڕاست بکەنەوە | هاتنا خۆ پشتڕاست بکەن |
+| 132 | #22 Blush Floral v2: `photo1` | ذكرى حلوة | A little moment, a lovely memory. | یادگارییەکی شیرین | بیرهاتنەکا شرین |
+| 133 | #22 Blush Floral v2: `photo2` | والأجمل لم يأتِ بعد. | And so many more to come. | و جوانترینیان هێشتا نەهاتووە. | و یا جوانتر هێشتا نەهاتیە. |
+| 134 | #22 Blush Floral v2: `noteEyebrow` | كلمة من القلب | A little note | چەند وشەیەک لە دڵەوە | چەند پەیڤەک ژ دلی |
+| 135 | #22 Blush Floral v2: `noteDefault` | وجودكم أجمل هدية. تعالوا نحتفل معاً بالكيكة والشموع والضحكات، فالحفلة لا تحلو من دونكم. | I would love to celebrate with you. Come for cake, candles and good company — it wouldn’t be the same without you. | بوونتان جوانترین دیارییە. وەرن با پێکەوە بە کێک و مۆم و پێکەنین ئاهەنگ بگێڕین، ئاهەنگەکە بەبێ ئێوە خۆش نابێت. | هەبوونا هەوە جوانترین دیاریە. وەرن بلا پێکڤە ب کێک و مۆم و کەنی ئاهەنگێ بگێڕین، ئاهەنگ بێ هەوە خۆش نابیت. |
+| 136 | #22 Blush Floral v2: `replyEyebrow` | تأكيد الحضور | A little note back | پشتڕاستکردنەوەی هاتن | پشتڕاستکرنا هاتنێ |
+| 137 | #22 Blush Floral v2: `replyTitle` | هل ستكونون | Will you | ئایا | ئەرێ هوین دێ |
+| 138 | #22 Blush Floral v2: `replyEm` | معنا؟ | join us? | لەگەڵمان دەبن؟ | دگەل مە بن؟ |
+| 139 | #22 Blush Floral v2: `replyCopy` | حضوركم يكمّل فرحتنا. | Your presence would make it all the lovelier. | ئامادەبوونتان خۆشییەکەمان تەواو دەکات. | ئامادەبوونا هەوە دلخۆشیا مە تمام دکەت. |
+| 140 | #22 Blush Floral v2: `guestbook` | تهاني الأحبة | Birthday wishes | پیرۆزبایی خۆشەویستان | پیرۆزباهیێن خۆشتڤیان |
+| 141 | #22 Blush Floral v2: `footerEyebrow` | مع كل الحب | With love | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ |
+| 142 | #22 Blush Floral v2: `footerCopy` | بانتظاركم. | Here’s to another beautiful year. | چاوەڕێتانین. | ل هیڤیا هەوە نە. |
+| 143 | #22 Blush Floral v2: `replay` | الدعوة من جديد | Watch it unfold again | بانگهێشتنامەکە لە سەرەتاوە | داخوازنامە ژ دەستپێکێ |
+| 144 | #22 Blush Floral v2: `posterTitle` | حفلة عيد ميلاد | Birthday | ئاهەنگی ڕۆژی لەدایکبوونی | ئاهەنگا ڕۆژا ژدایکبوونا |
+| 145 | #23 design name | حفلة كونفيتي الكرز | Cherry Confetti Party | ئاهەنگی کۆنفێتی گێلاس | ئاهەنگا کۆنفێتی گێلاسێ |
+| 146 | #23 Cherry Confetti Party: `hintLine` | دعوة خاصة لكم | You are invited | بانگهێشتنێکی تایبەت بۆ ئێوە | داخوازەکا تایبەت بۆ هەوە |
+| 147 | #23 Cherry Confetti Party: `posterBig` | حفلة عيد ميلاد | {name}’s | ئاهەنگی ڕۆژی لەدایکبوونی | ئاهەنگا ڕۆژا ژدایکبوونا |
+| 148 | #23 Cherry Confetti Party: `posterSmall` | {name} | Birthday Party | {name} | {name} |
+| 149 | #24 design name | حفلة الشريطة الوردية | Pink Ribbon Party | ئاهەنگی پاپیۆنی پەمەیی | ئاهەنگا پاپیۆنا پەمبەیی |
+| 150 | #24 Pink Ribbon Party: `posterName` | {name} | {name}’s party | {name} | {name} |
+| 151 | #24 Pink Ribbon Party: `hintLine` | دعوة خاصة لكم | You are invited | بانگهێشتنێکی تایبەت بۆ ئێوە | داخوازەکا تایبەت بۆ هەوە |
+| 152 | #24 Pink Ribbon Party: `posterHappy` | حفلة عيد ميلاد | Birthday | ئاهەنگی ڕۆژی لەدایکبوونی | ئاهەنگا ڕۆژا ژدایکبوونا |
+| 153 | Platform: `admin.catalog.features.collage_polaroids` | كولاج صور: بوستر (٣ صور) | Photo collage: poster (3 photos) | کۆلاژی وێنە: پۆستەر (٣ وێنە) | کۆلاژا وێنەیان: پۆستەر (٣ وێنە) |
+| 154 | Platform: `admin.catalog.features.collage_story` | كولاج صور: ستوري (٤ صور) | Photo collage: story (4 photos) | کۆلاژی وێنە: ستۆری (٤ وێنە) | کۆلاژا وێنەیان: ستۆری (٤ وێنە) |
+| 155 | Platform: `admin.catalog.features.collage_wall` | كولاج صور: جدار صور (٩ صور) | Photo collage: photo wall (9 photos) | کۆلاژی وێنە: دیواری وێنە (٩ وێنە) | کۆلاژا وێنەیان: دیوارێ وێنەیان (٩ وێنە) |
+| 156 | Platform: `store.features.collage_polaroids` | بوستر كولاج (A3) بثلاث من صوركم | A photo collage poster (A3) with three of your photos | پۆستەرێکی کۆلاژ (A3) بە سێ لە وێنەکانتان | پۆستەرەکێ کۆلاژێ (A3) ب سێ ژ وێنێن هەوە |
+| 157 | Platform: `store.features.collage_story` | كولاج لستوري إنستغرام بأربع من صوركم | A photo collage for your Instagram story, with four of your photos | کۆلاژێک بۆ ستۆری ئینستاگرام بە چوار لە وێنەکانتان | کۆلاژەک بۆ ستۆریا ئینستاگرامێ ب چار ژ وێنێن هەوە |
+| 158 | Platform: `store.features.collage_wall` | جدار صور بتسع من صوركم، جاهز للطباعة (4 × 6) | A photo wall collage with nine of your photos, ready to print (4 × 6) | دیوارێکی وێنە بە نۆ لە وێنەکانتان، ئامادە بۆ چاپ (4 × 6) | دیوارەکێ وێنەیان ب نەهـ ژ وێنێن هەوە، ئامادە بۆ چاپێ (4 × 6) |
+| 159 | Platform: `store.extras.collagePolaroids` | بوستر الكولاج | Collage poster | پۆستەری کۆلاژ | پۆستەرێ کۆلاژێ |
+| 160 | Platform: `store.extras.collageStory` | كولاج الستوري | Story collage | کۆلاژی ستۆری | کۆلاژا ستۆریێ |
+| 161 | Platform: `store.extras.collageWall` | جدار الصور | Photo wall | دیواری وێنە | دیوارێ وێنەیان |
+| 162 | Platform: `store.extras.downloadJpg` | صورة (JPG) | Picture (JPG) | وێنە (JPG) | وێنە (JPG) |
+| 163 | Platform: `invitation.print.collage.headingTop` | عيد ميلاد | Happy | ڕۆژی لەدایکبوونت | ڕۆژا ژدایکبوونا تە |
+| 164 | Platform: `invitation.print.collage.headingBottom` | سعيد | Birthday | پیرۆز | پیرۆز |
+| 165 | Platform: `invitation.print.collage.kicker` | عيد ميلاد | HAPPY | ڕۆژی لەدایکبوونت | ڕۆژا ژدایکبوونا تە |
+| 166 | Platform: `invitation.print.collage.title` | سعيد! | Birthday! | پیرۆز! | پیرۆز! |
+| 167 | Platform: `invitation.print.collage.caption` | عيد ميلاد سعيد | HAPPY BIRTHDAY | ڕۆژی لەدایکبوونت پیرۆز | ڕۆژا ژدایکبوونا تە پیرۆز |
+| 168 | Platform: `invitation.print.collage.wish` | أتمنى لك فرحاً لا ينتهي وسعادة حقيقية في كل يوم! | Wishing you endless joy and true happiness every single day! | خۆشییەکی بێ کۆتایی و بەختەوەرییەکی ڕاستەقینەت بۆ دەخوازم لە هەموو ڕۆژێکدا! | دلخۆشیەکا بێ دوماهی و بەختەوەریەکا ڕاستەقینە بۆ تە دخوازم د هەمی ڕۆژان دا! |
+| 169 | Platform: `store.photos.collageHelp` | وتملأ صورُكم أيضاً كولاجات الصور بالترتيب نفسه. | They also fill your photo collages, in the same order. | هەمان وێنەکان بە هەمان ڕیز کۆلاژەکانی وێنەش پڕ دەکەنەوە. | هەمان وێنە ب هەمان ڕیزێ کۆلاژێن وێنەیان ژی پڕ دکەن. |
+
+## Batch 44 — the birthday invitations' printed poster (#22, #23, #24) — ✅ AUTO-APPROVED (2026-10-28, owner checks in Admin → Translations)
+
+The printed poster's name on the order form (manifest `print.shapes[].label`, feature `card_arch`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #22 Blush Floral v2, #23 Cherry Confetti Party, #24 Pink Ribbon Party: shape `arch-poster` | بوستر | Poster | پۆستەر | پۆستەر |

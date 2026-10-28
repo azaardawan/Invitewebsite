@@ -28,6 +28,8 @@ themes/<key>/v<N>/
 - **`validStates`**: example package combinations the designer drew (previewed and tested). The complete
   theme must be one of them. Admin builds packages from **any** combination of the theme's `features`
   and `fields` (dependencies checked), so the theme must render correctly with any subset.
+- `optionalFields`: fields of the design the customer may leave empty (besides the Field Library's optional ones),
+  e.g. a birthday's venue. Every other field the package includes is required; the design must look right without them.
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.
@@ -56,7 +58,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 |---|---|
 | `mode` | `sample` / `preview` / `live` |
 | `locale`, `dir`, `lang` | Invitation language (independent of the website language) |
-| `fields` | Only the fields the package includes. Absent means don't render it. |
+| `fields` | Only the fields the package includes. Absent means don't render it. A birthday's place (`venue_name`, `venue_map_url`) is the customer's choice (off unless they tick "add the place"): a design with a place must look right without it, leaving out its whole place box, not only the text. |
 | `features` | Only the features the package includes. Use `hasFeature(props, 'map')`. |
 | `labels` | Every UI string a theme may show, including `and` (the word between two names). **Never hard-code text**, not even "&". |
 | `event.startsAt` / `event.date` / `event.time` | Countdown target (Baghdad time) and localized date/time parts |
@@ -211,6 +213,18 @@ a CSS size container (story 1080 × 1920 px, sticker 40 mm, bottle label in the 
 (use `lines`), `labels`, `shape` (`round`/`square`; the platform clips the round one) and `size`.
 The platform adds the watermark before payment, the cut lines and the A4 sheets.
 See `themes/embroidered-garden/v1/`.
+
+### Photo collages
+
+Photo collages are platform features any design can be sold with: `collage_polaroids` (an A3 poster, 3 photos),
+`collage_story` (an Instagram story, 4 photos) and `collage_wall` (a photo wall printed 4 × 6, 9 photos);
+`src/catalog/collages.ts`. A package chooses which ones it sells, so the cheaper ones can have fewer photos. The
+customer's photos fill every collage of their package (the order form asks for as many as the largest collage holds;
+the design itself still shows only its own `photos.max`). The SDK's `<Collage>` draws them on the owner's artwork, with
+the lettering («Happy Birthday», the name, the message) in the invitation's language. A design that wants its own
+typefaces on them ships `print/Collage.tsx` (a server component) that renders `<Collage {...props} fonts={…} />` with a
+Latin and an Arabic set (`script`, `display`, `body`) inside its fonts class; the registry picks it up. The platform
+adds the watermark before payment and makes the JPG pictures. See `themes/blush-floral/v2/print/Collage.tsx`.
 
 ## 7. Preview and review
 

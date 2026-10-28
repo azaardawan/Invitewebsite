@@ -1,0 +1,1237 @@
+/* Generated from the designer's stylesheet (unused rules dropped), scoped to the theme. */
+#frame .root {
+  --paper: #fff9f2;
+  --pink: #ffd2db;
+  --rose: #d31c5b;
+  --copper: #bc7630;
+  --ink: #734126;
+  --line: #d5b599;
+  --soft: #fff0ee;
+  --serif: 'BF Serif', 'BF Arabic', Georgia, serif;
+  --sans: 'BF Sans', 'BF Arabic', Arial, sans-serif;
+  color-scheme: light;
+}
+#frame .root {
+  overflow-x: clip;
+}
+#frame .root {
+  scrollbar-gutter: stable;
+}
+#frame .root .poster-stage:not(.is-idle) {
+  min-height: 0;
+}
+#frame .root * {
+  box-sizing: border-box;
+}
+#frame .root {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+#frame .root {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper) url(./assets/paper.svg) center top/650px auto;
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.65;
+}
+#frame .root button,
+#frame .root input,
+#frame .root select,
+#frame .root textarea {
+  font: inherit;
+}
+#frame .root button,
+#frame .root a,
+#frame .root input,
+#frame .root select,
+#frame .root textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+#frame .root button,
+#frame .root a {
+  color: inherit;
+}
+#frame .root button {
+  cursor: pointer;
+}
+#frame .root a {
+  text-decoration: none;
+}
+#frame .root button:disabled {
+  cursor: default;
+}
+#frame .root button {
+  border: 0;
+  background: none;
+}
+#frame .root h1,
+#frame .root h2,
+#frame .root h3,
+#frame .root p {
+  margin: 0;
+}
+#frame .root h1,
+#frame .root h2,
+#frame .root h3 {
+  font-weight: 400;
+  line-height: 1.12;
+}
+#frame .root h1 {
+  font-size: clamp(40px, 5.5vw, 72px);
+  letter-spacing: -2px;
+}
+#frame .root h2 {
+  font-size: clamp(34px, 4.4vw, 54px);
+  letter-spacing: -1.25px;
+}
+#frame .root h3 {
+  font-size: 27px;
+}
+#frame .root h1 em,
+#frame .root h2 em {
+  font-weight: 400;
+  color: #9b4f35;
+}
+#frame .root p {
+  margin-top: 18px;
+}
+#frame .root img {
+  display: block;
+  max-width: 100%;
+}
+#frame .root svg {
+  display: block;
+}
+#frame .root [hidden] {
+  display: none !important;
+}
+#frame .root .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+#frame .root .section {
+  width: min(1080px, 100%);
+  margin-inline: auto;
+  padding: 100px 64px;
+  position: relative;
+}
+#frame .root .eyebrow {
+  font: 11px/1.5 var(--sans);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+#frame .root .fine-print {
+  font: 12px/1.6 var(--sans);
+  color: #805b45;
+}
+#frame .root .signature {
+  font-size: 24px;
+  font-style: italic;
+}
+#frame .root .twinkle {
+  fill: #d79d6d;
+  stroke: #a86331;
+  stroke-width: 0.8;
+  animation: twinkle 2.8s steps(1, end) infinite;
+  transform-origin: center;
+}
+#frame .root .twinkle:nth-of-type(2) {
+  animation-delay: -1.2s;
+}
+#frame .root .twinkle:nth-of-type(3) {
+  animation-delay: -0.6s;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: rotate(-5deg) scale(0.94);
+  }
+  24% {
+    opacity: 0.5;
+    transform: rotate(4deg) scale(0.8);
+  }
+  45% {
+    opacity: 1;
+    transform: rotate(-2deg) scale(1.13);
+  }
+  70% {
+    opacity: 0.8;
+    transform: rotate(3deg) scale(1);
+  }
+}
+#frame .root .hero {
+  position: relative;
+  background: var(--paper);
+}
+#frame .root .poster-stage {
+  height: 100svh;
+  min-height: 540px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--paper) url(./assets/paper.svg) center/650px auto;
+}
+#frame .root .poster-stage > svg {
+  height: 100%;
+  width: 100%;
+  max-width: 820px;
+  margin: auto;
+  overflow: visible;
+}
+#frame .root .open-invitation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+#frame .root .open-hint {
+  position: absolute;
+  left: 50%;
+  top: 61%;
+  transform: translateX(-50%);
+  font: 10px/1.4 var(--sans);
+  letter-spacing: 2.7px;
+  text-transform: uppercase;
+  color: #7c4d2d;
+}
+#frame .root .is-idle [id$='invitation-seal'] {
+  filter: drop-shadow(0 2px 3px #bc763014);
+}
+#frame .root .hero-caption {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 28px 20px 32px;
+  font: 10px var(--sans);
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  background: linear-gradient(var(--paper), #fff9f200);
+}
+#frame .root .hero-caption span {
+  font-size: 22px;
+}
+#frame .root .intro {
+  padding-top: 75px;
+  padding-bottom: 95px;
+  text-align: center;
+  isolation: isolate;
+}
+#frame .root .intro:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -8vw -50px;
+  background: radial-gradient(ellipse at 50% 50%, #ffd2db55, transparent 68%);
+}
+#frame .root .flourish {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  align-items: center;
+  margin-bottom: 35px;
+}
+#frame .root .flourish i {
+  height: 1px;
+  width: 45px;
+  background: #c8977180;
+}
+#frame .root .flourish svg {
+  width: 22px;
+  height: 27px;
+}
+#frame .root .intro h1 {
+  margin-top: 22px;
+}
+#frame .root .intro-copy {
+  font-size: 20px;
+  line-height: 1.6;
+  margin-top: 30px;
+}
+#frame .root .intro .signature {
+  margin-top: 25px;
+}
+#frame .root .botanical {
+  position: absolute;
+  width: 105px;
+  height: 240px;
+  color: var(--rose);
+  pointer-events: none;
+}
+#frame .root .intro-left {
+  left: -5px;
+  top: 190px;
+  transform: rotate(-12deg);
+}
+#frame .root .intro-right {
+  right: -5px;
+  top: 75px;
+  transform: scaleX(-1) rotate(-12deg);
+}
+#frame .root .details {
+  padding-top: 28px;
+  padding-bottom: 30px;
+}
+#frame .root .stationery {
+  position: relative;
+  border: 1px solid #c58c685c;
+  background: linear-gradient(140deg, #fff9f2ee, #fff1eeee);
+  padding: 52px 48px 22px;
+  border-radius: 45% 45% 3px 3px/35px 35px 3px 3px;
+  box-shadow: 0 12px 24px -23px #73412640;
+}
+#frame .root .stationery:before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 9px;
+  border: 1px solid #d6b39766;
+  border-radius: inherit;
+}
+#frame .root .stationery-number {
+  display: block;
+  font: 9px var(--sans);
+  letter-spacing: 2px;
+  text-align: center;
+}
+#frame .root .stationery h2 {
+  font-size: 42px;
+  text-align: center;
+  margin-top: 24px;
+}
+#frame .root .detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  margin: 44px auto 35px;
+  text-align: center;
+}
+#frame .root .date-cell {
+  border-right: 1px solid #c58c685c;
+  padding-right: 36px;
+}
+#frame .root .date-cell .eyebrow {
+  margin-top: 8px;
+}
+#frame .root .date-number {
+  display: block;
+  font-size: 108px;
+  line-height: 1.05;
+  color: #9f6339;
+  letter-spacing: -7px;
+  margin-right: 7px;
+}
+#frame .root .date-cell p:not(.eyebrow) {
+  margin-top: 7px;
+  font-size: 18px;
+}
+#frame .root .date-cell .fine-print {
+  display: block;
+  margin-top: 15px;
+}
+#frame .root .venue-cell {
+  align-self: center;
+}
+#frame .root .small-rosette {
+  color: var(--rose);
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 18px;
+}
+#frame .root .venue-cell .eyebrow {
+  margin: 0 0 12px;
+}
+#frame .root .venue-cell p:not(.eyebrow) {
+  font-size: 16px;
+  margin-top: 12px;
+}
+#frame .root .venue-cell .fine-print {
+  display: block;
+  margin-top: 12px;
+}
+#frame .root .paper-note {
+  padding: 20px 0 3px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-top: 1px solid #d6b39766;
+  font: 10px/1.6 var(--sans);
+  letter-spacing: 0.3px;
+}
+#frame .root .countdown {
+  text-align: center;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  max-width: 900px;
+}
+#frame .root .countdown h2 {
+  margin-top: 18px;
+}
+#frame .root .countdown p:not(.eyebrow) {
+  font-size: 16px;
+}
+#frame .root .countdown-grid {
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+  margin-top: 30px;
+}
+#frame .root .countdown-grid strong {
+  font-size: clamp(42px, 6vw, 70px);
+  font-weight: 400;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+#frame .root .countdown-grid span {
+  display: block;
+  font: 9px var(--sans);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+#frame .root .floating-spark {
+  width: 28px;
+  height: 36px;
+  position: absolute;
+  top: 80px;
+  pointer-events: none;
+}
+#frame .root .floating-spark.one {
+  left: 9%;
+}
+#frame .root .floating-spark.two {
+  right: 10%;
+  top: 190px;
+  width: 22px;
+}
+#frame .root .loop-ribbon {
+  width: min(100%, 580px);
+  margin: 25px auto 0;
+  fill: none;
+  stroke: #c67276;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+#frame .root .wishes {
+  display: grid;
+  grid-template-columns: 0.85fr 1fr;
+  gap: 75px;
+  align-items: center;
+  padding-top: 30px;
+  padding-bottom: 95px;
+}
+#frame .root .wish-art {
+  position: relative;
+  padding: 32px 35px 20px;
+  background: linear-gradient(140deg, #ffd2db6b, #fff9f2);
+  border-radius: 50% 50% 8px 8px;
+  border: 1px solid #d5b5995c;
+}
+#frame .root .wish-art img {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+}
+#frame .root .tiny-caption {
+  display: block;
+  text-align: center;
+  font: 9px var(--sans);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 20px;
+}
+#frame .root .wish-spark {
+  width: 34px;
+  height: 40px;
+  position: absolute;
+  right: 12px;
+  top: 95px;
+}
+#frame .root .wish-copy h2 {
+  font-size: clamp(32px, 3.6vw, 46px);
+  margin-top: 18px;
+}
+#frame .root .wish-copy p:not(.eyebrow) {
+  font-size: 17px;
+  max-width: 430px;
+}
+#frame .root .text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  border-bottom: 1px solid #b67a5477;
+  padding: 12px 0;
+  margin-top: 20px;
+  font: 12px var(--sans);
+}
+#frame .root .text-link span {
+  font-size: 18px;
+}
+#frame .root .memory-gallery:empty {
+  display: none;
+}
+#frame .root .memory-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 35px;
+  max-width: 860px;
+  margin: 0 auto 90px;
+  padding: 0 30px;
+}
+#frame .root .memory-gallery figure {
+  margin: 0;
+  padding: 14px;
+  background: #fffdfa;
+  box-shadow: 0 8px 20px #73412612;
+  border: 1px solid #ead5c5;
+  transform: rotate(-2deg);
+}
+#frame .root .memory-gallery figure:nth-child(2) {
+  transform: rotate(2deg);
+}
+#frame .root .memory-gallery img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+#frame .root .memory-gallery figcaption {
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+  margin: 16px 0 5px;
+}
+#frame .root .rsvp {
+  padding-top: 20px;
+  padding-bottom: 70px;
+  max-width: 930px;
+}
+#frame .root .rsvp-card {
+  position: relative;
+  border: 1px solid #d31c5b44;
+  padding: 70px 60px 45px;
+  background: linear-gradient(155deg, #fff2f0ee, #ffd2db77);
+  border-radius: 14px 80px 14px 14px;
+  text-align: center;
+}
+#frame .root .rsvp-card:after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  inset: 10px;
+  border: 1px solid #d31c5b22;
+  border-radius: 8px 68px 8px 8px;
+}
+#frame .root .rsvp-flower {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  top: -43px;
+  left: calc(50% - 45px);
+  color: var(--rose);
+}
+#frame .root .rsvp h2 {
+  margin-top: 16px;
+}
+#frame .root .rsvp > p {
+  font-size: 17px;
+}
+#frame .root .rsvp form {
+  position: relative;
+  z-index: 1;
+  text-align: left;
+  margin-top: 38px;
+}
+#frame .root .rsvp label {
+  display: block;
+  font: 12px/1.5 var(--sans);
+  color: #75462e;
+}
+#frame .root .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+#frame .root input,
+#frame .root select,
+#frame .root textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #ba8a6d;
+  background: #fff9f299;
+  border-radius: 3px 3px 0 0;
+  padding: 13px 12px;
+  margin-top: 8px;
+  color: #5c3828;
+  font: 15px/1.5 var(--serif);
+  min-width: 0;
+}
+#frame .root textarea {
+  resize: vertical;
+}
+#frame .root input:focus,
+#frame .root select:focus,
+#frame .root textarea:focus {
+  outline: 2px solid #a95869;
+  outline-offset: 2px;
+}
+#frame .root ::placeholder {
+  color: #896b5b;
+  opacity: 1;
+}
+#frame .root .primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  background: #7d3e32;
+  color: var(--paper);
+  padding: 15px 25px;
+  margin: 25px auto 12px;
+  font: 12px var(--sans);
+  border-radius: 2px;
+  min-height: 46px;
+}
+#frame .root .primary-button:hover {
+  background: #673327;
+}
+#frame .root .rsvp .fine-print {
+  text-align: center;
+}
+#frame .root .rsvp-status {
+  font-size: 15px;
+  text-align: center;
+  line-height: 1.6;
+}
+#frame .root .footer {
+  text-align: center;
+  padding-top: 35px;
+  padding-bottom: 70px;
+  isolation: isolate;
+}
+#frame .root .footer:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -100px -10vw 0;
+  background: radial-gradient(ellipse at 50% 80%, #ffd2db55, transparent 70%);
+}
+#frame .root .footer-name {
+  font-size: 80px;
+  line-height: 1.15;
+  font-style: italic;
+  color: #a56135;
+  margin-top: 15px;
+}
+#frame .root .footer p:not(.eyebrow, .footer-name) {
+  font-size: 17px;
+  margin-top: 14px;
+}
+#frame .root .footer-botanical {
+  bottom: 18px;
+  left: 7%;
+  height: 230px;
+  width: 108px;
+  transform: rotate(15deg);
+}
+#frame .root .footer-star {
+  position: absolute;
+  right: 16%;
+  top: 96px;
+  width: 35px;
+  height: 43px;
+}
+#frame .root .footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 25px;
+  margin-top: 34px;
+  font: 11px var(--sans);
+}
+#frame .root .footer-links button,
+#frame .root .footer-links a {
+  padding: 8px 0;
+  border-bottom: 1px solid #ad7a5960;
+}
+#frame .root .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
+}
+#frame .root .reveal.is-seen {
+  opacity: 1;
+  transform: none;
+}
+#frame .root.motion-paused .twinkle {
+  animation-play-state: paused;
+}
+@media (min-width: 1200px) {
+  #frame .root .poster-stage {
+    max-height: 1000px;
+  }
+  #frame .root .poster-stage > svg {
+    max-width: 760px;
+  }
+}
+@media (max-width: 700px) {
+  #frame .root {
+    font-size: 16px;
+  }
+  #frame .root .section {
+    padding-inline: 28px;
+  }
+  #frame .root .poster-stage {
+    min-height: 500px;
+  }
+  #frame .root .intro {
+    padding-top: 55px;
+    padding-bottom: 70px;
+  }
+  #frame .root .intro h1 {
+    font-size: 42px;
+    letter-spacing: -1.4px;
+  }
+  #frame .root .intro-copy {
+    font-size: 18px;
+    padding: 0 14px;
+  }
+  #frame .root .intro .signature {
+    font-size: 21px;
+  }
+  #frame .root .intro-left {
+    width: 64px;
+    height: 160px;
+    top: 230px;
+    left: -15px;
+    opacity: 0.9;
+  }
+  #frame .root .intro-right {
+    width: 63px;
+    height: 160px;
+    right: -17px;
+    top: 80px;
+  }
+  #frame .root .stationery {
+    padding: 42px 22px 20px;
+    border-radius: 45% 45% 3px 3px/23px 23px 3px 3px;
+  }
+  #frame .root .stationery h2 {
+    font-size: 32px;
+  }
+  #frame .root .stationery-number {
+    font-size: 8px;
+  }
+  #frame .root .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin: 30px 10px;
+  }
+  #frame .root .date-cell {
+    border-right: 0;
+    border-bottom: 1px solid #c58c685c;
+    padding: 0 0 28px;
+  }
+  #frame .root .date-number {
+    font-size: 90px;
+  }
+  #frame .root .venue-cell h3 {
+    font-size: 25px;
+  }
+  #frame .root .small-rosette {
+    width: 55px;
+    height: 55px;
+    margin-bottom: 10px;
+  }
+  #frame .root .paper-note {
+    display: block;
+    text-align: center;
+    font-size: 9px;
+  }
+  #frame .root .paper-note span {
+    display: block;
+    margin: 4px;
+  }
+  #frame .root .countdown {
+    padding-top: 60px;
+    padding-bottom: 35px;
+  }
+  #frame .root .countdown h2 {
+    font-size: 35px;
+  }
+  #frame .root .countdown .eyebrow {
+    font-size: 9px;
+  }
+  #frame .root .floating-spark.one {
+    left: 7%;
+    top: 130px;
+    width: 17px;
+  }
+  #frame .root .floating-spark.two {
+    right: 6%;
+    top: 220px;
+    width: 17px;
+  }
+  #frame .root .countdown-grid {
+    gap: 20px;
+  }
+  #frame .root .countdown-grid strong {
+    font-size: 42px;
+  }
+  #frame .root .countdown-grid span {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  #frame .root .wishes {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding-top: 15px;
+    padding-bottom: 70px;
+  }
+  #frame .root .wish-art {
+    max-width: 265px;
+    margin: auto;
+    width: 100%;
+    padding: 25px 30px 20px;
+  }
+  #frame .root .wish-art img {
+    height: 255px;
+  }
+  #frame .root .wish-copy {
+    text-align: center;
+    padding: 0 10px;
+  }
+  #frame .root .wish-copy h2 {
+    font-size: 35px;
+  }
+  #frame .root .wish-copy .eyebrow {
+    font-size: 9px;
+    letter-spacing: 1.7px;
+  }
+  #frame .root .wish-copy p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  #frame .root .rsvp {
+    padding-top: 15px;
+    padding-bottom: 50px;
+  }
+  #frame .root .rsvp-card {
+    padding: 55px 23px 30px;
+    border-radius: 10px 55px 10px 10px;
+  }
+  #frame .root .rsvp-card:after {
+    inset: 7px;
+    border-radius: 5px 47px 5px 5px;
+  }
+  #frame .root .rsvp-flower {
+    width: 80px;
+    height: 80px;
+    top: -39px;
+    left: calc(50% - 40px);
+  }
+  #frame .root .rsvp h2 {
+    font-size: 34px;
+  }
+  #frame .root .rsvp-card > p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  #frame .root .form-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  #frame .root .rsvp form {
+    margin-top: 25px;
+  }
+  #frame .root .primary-button {
+    width: 100%;
+  }
+  #frame .root .memory-gallery {
+    gap: 20px;
+    padding: 0 25px;
+    margin-bottom: 60px;
+  }
+  #frame .root .memory-gallery figure {
+    padding: 8px;
+  }
+  #frame .root .memory-gallery figcaption {
+    font-size: 12px;
+  }
+  #frame .root .footer {
+    padding-top: 25px;
+    padding-bottom: 55px;
+  }
+  #frame .root .footer-name {
+    font-size: 65px;
+  }
+  #frame .root .footer-botanical {
+    left: -15px;
+    bottom: 25px;
+    width: 75px;
+    height: 170px;
+    opacity: 0.8;
+  }
+  #frame .root .footer-star {
+    right: 12%;
+    top: 95px;
+    width: 24px;
+  }
+  #frame .root .footer-links {
+    gap: 6px 16px;
+    margin-inline: 10px;
+    font-size: 10px;
+  }
+  #frame .root .hero-caption {
+    font-size: 9px;
+    padding: 20px;
+  }
+  #frame .root .eyebrow {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #frame .root {
+    scroll-behavior: auto;
+  }
+  #frame .root *,
+  #frame .root *:before,
+  #frame .root *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+  #frame .root .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The port: the stage's height is set by the opening (motion.ts), the poster keeps its own proportions. */
+#frame .root .poster-stage {
+  min-height: 0;
+}
+/* The tap: the bow seal glows as it lifts (the scene itself is drawn by motion.ts). */
+#frame .root[data-phase='opening'] .poster-stage > svg {
+  animation: seal-lift 0.5s ease-out;
+}
+@keyframes seal-lift {
+  from {
+    filter: drop-shadow(0 0 6px #ffd2db);
+  }
+  to {
+    filter: drop-shadow(0 0 0 #ffd2db00);
+  }
+}
+#frame .root .footer-name,
+#frame .root .venue-cell h3 {
+  overflow-wrap: anywhere;
+}
+#frame .root .details .text-link {
+  margin-top: 18px;
+}
+
+/* The note from the birthday person, signed in their own hand (the signature draws itself when it scrolls into view). */
+#frame .root .note {
+  max-width: 760px;
+  text-align: center;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  isolation: isolate;
+}
+#frame .root .note:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -6vw;
+  background: radial-gradient(ellipse at 50% 55%, #ffd2db55, transparent 66%);
+}
+#frame .root .note .floating-spark.one {
+  top: 30px;
+  right: 14%;
+}
+#frame .root .note-copy {
+  margin: 26px auto 0;
+  max-width: 560px;
+  font-size: 22px;
+  line-height: 1.6;
+  font-style: italic;
+  color: #6b3d27;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+#frame .root .note-signature {
+  margin: 30px auto 0;
+  max-width: 300px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #c58c685c;
+}
+#frame .root .note-signature img,
+#frame .root .note-signature svg {
+  max-height: 120px;
+  opacity: 0.88;
+}
+#frame .root .note-name {
+  margin-top: 14px;
+  font: 11px/1.5 var(--sans);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #a56135;
+}
+
+/* The reply card: platform form messages and the guests' wishes. */
+#frame .root .rsvp form {
+  text-align: start;
+}
+#frame .root .rsvp form > label {
+  margin-bottom: 8px;
+}
+#frame .root .form-error {
+  display: block;
+  margin-top: 6px;
+  font: 12px/1.5 var(--sans);
+  color: #b0123f;
+}
+#frame .root .counter {
+  display: block;
+  margin-top: 4px;
+  font: 11px var(--sans);
+  color: #805b45;
+  text-align: end;
+}
+#frame .root .rsvp-status p {
+  margin-top: 26px;
+}
+#frame .root .guestbook {
+  position: relative;
+  z-index: 1;
+  margin-top: 46px;
+  padding-top: 28px;
+  border-top: 1px solid #d31c5b22;
+}
+#frame .root .guestbook-note {
+  margin: 18px auto 0;
+  max-width: 520px;
+  padding: 18px 20px;
+  background: #fff9f2cc;
+  border: 1px solid #ead5c5;
+  border-radius: 3px;
+}
+#frame .root .guestbook-note blockquote {
+  margin: 0;
+  font-style: italic;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+#frame .root .guestbook-note figcaption {
+  margin-top: 8px;
+  font: 11px var(--sans);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+#frame .root .memory-photo {
+  aspect-ratio: 4 / 5;
+}
+@media (max-width: 700px) {
+  #frame .root .note-copy {
+    font-size: 19px;
+  }
+}
+
+/*
+ * Arabic and Kurdish: Noto Naskh for the text, Mirza for the headings and Aref Ruqaa for the names and the greeting.
+ * Never spaced out or slanted: spacing breaks Arabic letters apart, and Arabic has no italic (the browser would fake one).
+ */
+#frame .root[data-script='arabic'] {
+  --serif: 'BF Arabic', 'BF Serif', serif;
+  --sans: 'BF Arabic', 'BF Sans', sans-serif;
+}
+#frame .root[data-script='arabic'] * {
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}
+#frame .root[data-script='arabic'] :is(h1, h2, h3) {
+  font-family: 'BF Arabic Heading', 'BF Arabic', serif;
+  line-height: 1.4;
+}
+#frame .root[data-script='arabic'] :is(h1 em, h2 em, h3 em, .footer-name, .signature) {
+  font-family: 'BF Ruqaa', 'BF Arabic', serif;
+}
+#frame .root[data-script='arabic'] .eyebrow {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/*
+ * Decorations (v2): the designer's drawings (from the owner's sheets), coloured in the design's own inks with a mask,
+ * behind the text. They sway or float gently; with reduced motion they stay still (the rule above stops every animation).
+ */
+#frame .root {
+  --deco-ink: #c23852;
+  --deco-soft: #f0a4c2;
+}
+#frame .root .section,
+#frame .root .footer {
+  isolation: isolate;
+}
+#frame .root .deco {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  background: var(--deco-ink);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+  transform: rotate(var(--tilt, 0deg));
+}
+#frame .root .deco-soft {
+  background: var(--deco-soft);
+}
+#frame .root .deco-bouquet {
+  -webkit-mask-image: url(./assets/deco/bouquet.webp);
+  mask-image: url(./assets/deco/bouquet.webp);
+  aspect-ratio: 477 / 483;
+}
+#frame .root .deco-candelabra {
+  -webkit-mask-image: url(./assets/deco/candelabra.webp);
+  mask-image: url(./assets/deco/candelabra.webp);
+  aspect-ratio: 278 / 640;
+}
+#frame .root .deco-candle-bow {
+  -webkit-mask-image: url(./assets/deco/candle-bow.webp);
+  mask-image: url(./assets/deco/candle-bow.webp);
+  aspect-ratio: 226 / 640;
+}
+#frame .root .deco-balloons {
+  -webkit-mask-image: url(./assets/deco/balloons.webp);
+  mask-image: url(./assets/deco/balloons.webp);
+  aspect-ratio: 199 / 640;
+}
+#frame .root .deco-ribbon {
+  -webkit-mask-image: url(./assets/deco/ribbon.webp);
+  mask-image: url(./assets/deco/ribbon.webp);
+  aspect-ratio: 515 / 538;
+}
+/* The watercolour peonies keep their own colours. */
+#frame .root .deco-peony,
+#frame .root .deco-peony-small {
+  background: url(./assets/deco/peony.webp) center / contain no-repeat;
+  -webkit-mask: none;
+  mask: none;
+  aspect-ratio: 640 / 588;
+}
+#frame .root .deco-peony-small {
+  background-image: url(./assets/deco/peony-small.webp);
+  aspect-ratio: 640 / 532;
+}
+#frame .root .sway {
+  transform-origin: 50% 100%;
+  animation: deco-sway 6s ease-in-out infinite;
+}
+#frame .root .float {
+  animation: deco-float 7s ease-in-out infinite;
+}
+@keyframes deco-sway {
+  0%,
+  100% {
+    transform: rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: rotate(calc(var(--tilt, 0deg) + 4deg));
+  }
+}
+@keyframes deco-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translateY(-12px) rotate(var(--tilt, 0deg));
+  }
+}
+/* Where each one sits: a corner of its section, never over the text on a phone. */
+#frame .root .d-top-start {
+  top: 6px;
+  inset-inline-start: -12px;
+  width: 128px;
+  --tilt: -8deg;
+}
+#frame .root .d-top-end {
+  top: 26px;
+  inset-inline-end: -4px;
+  width: 112px;
+  --tilt: 6deg;
+}
+#frame .root .d-side-end {
+  top: 64px;
+  inset-inline-end: 6px;
+  width: 58px;
+}
+#frame .root .d-side-start {
+  top: 64px;
+  inset-inline-start: 6px;
+  width: 58px;
+}
+#frame .root .d-bottom-start {
+  bottom: 14px;
+  inset-inline-start: -4px;
+  width: 84px;
+}
+#frame .root .d-bottom-end {
+  bottom: 18px;
+  inset-inline-end: 2px;
+  width: 64px;
+  --tilt: 4deg;
+}
+#frame .root .d-under {
+  position: relative;
+  z-index: 0;
+  margin: 26px auto 0;
+  width: 86px;
+}
+@media (min-width: 701px) {
+  #frame .root .d-top-start {
+    width: 190px;
+  }
+  #frame .root .d-top-end {
+    width: 170px;
+  }
+  #frame .root .d-side-end,
+  #frame .root .d-side-start {
+    width: 86px;
+  }
+  #frame .root .d-bottom-start {
+    width: 130px;
+  }
+  #frame .root .d-bottom-end {
+    width: 100px;
+  }
+}
+/* The intro's small corner drawings give way to the new ones. */
+#frame .root .intro-left,
+#frame .root .intro-right {
+  display: none;
+}
+
+/* No place given (the venue is optional): the date's card alone, centred. */
+#frame .root .detail-grid-single {
+  grid-template-columns: 1fr;
+}
+#frame .root .detail-grid-single .date-cell {
+  border: 0;
+  padding: 0;
+}
