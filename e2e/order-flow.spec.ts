@@ -31,6 +31,8 @@ test('a customer orders an invitation from the storefront', async ({ page, reque
   await page.locator('#f-person_1_name').fill('سارة');
   await page.locator('#f-event_date').fill(date);
   await page.locator('#f-event_time').fill('19:30');
+  // A birthday (the demo design): the place is the customer's choice, off until ticked.
+  await page.getByRole('checkbox', { name: 'إضافة مكان الحفل' }).check();
   await page.locator('#f-venue_name').fill('قاعة الرافدين');
   await page.getByRole('button', { name: 'اعرض المعاينة' }).click();
   await expect(page).toHaveURL(/\/order\/[\w-]+$/);
