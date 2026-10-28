@@ -25,3 +25,13 @@ their own word); the date of birth (format on the order form); the father's name
 ## Type
 - Name: Marhey Bold, stitched in dusty rose (as #6, in pink; owner).
 - Small text: Noto Sans Arabic (all Kurdish letters).
+
+## Online invitation (v2, 2026-10-28)
+
+The owner changed their mind: newborn designs get an online invitation too. `v2` adds one, built from this
+design's own artwork: a cover with the baby's name, the date of birth and the open button; tapping it starts the
+music while the artwork parts and the story composition settles in; then the date of birth, the guest form with
+congratulations, the guests' messages and the name again (`Theme.tsx`, `cover.tsx`, `invitation.module.css`,
+`border.ts`). No venue, time, map or countdown. The files (story, card, stickers, bottle label) are unchanged. If
+something doesn't fit, the owner may replace this invitation with another.
+

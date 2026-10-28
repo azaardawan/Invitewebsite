@@ -45,6 +45,10 @@ export type ThemeLabels = {
   attendingCount: string;
   /** Label under the number of guests not coming. */
   notAttendingCount: string;
+  /** The platform's "how many of you" control under the guest form's name: its label and its two buttons. */
+  partySize: string;
+  partyFewer: string;
+  partyMore: string;
   /** Word between two names ("و" / "&"), in the invitation's language. */
   and: string;
   /** Newborn: "It's a boy" / "It's a girl" (for `fields.baby_gender` = `boy` / `girl`). */
@@ -164,10 +168,15 @@ export function hasFeature(props: Pick<ThemeProps, 'features'>, feature: Feature
 }
 
 /** Guest form limits, shared by the theme runtime and the server. */
-export const GUEST_LIMITS = { name: 80, message: 500 } as const;
+/** `party`: the most people one reply can be for. */
+export const GUEST_LIMITS = { name: 80, message: 500, party: 20 } as const;
 
 export type GuestAttendance = 'ATTENDING' | 'NOT_ATTENDING';
-export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string };
+/**
+ * `partySize`: how many people the reply is for (1 when left out). Themes don't need to send it: the platform adds a
+ * "how many of you" control under the form's name field and fills it in.
+ */
+export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string; partySize?: number };
 export type GuestSubmitResult = { ok: true } | { ok: false; error: 'invalid' | 'rateLimited' | 'closed' | 'failed' };
 
 /** Numbers in the invitation's script: Arabic-Indic digits for Arabic and Kurdish, Western for English. */

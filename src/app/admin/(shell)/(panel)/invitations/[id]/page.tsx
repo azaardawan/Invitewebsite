@@ -391,6 +391,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                   <tr>
                     <th className="p-2 text-start font-normal">{t('guestName')}</th>
                     <th className="p-2 text-start font-normal">{t('guestAttendance')}</th>
+                    <th className="p-2 text-start font-normal">{t('guestParty')}</th>
                     <th className="p-2 text-start font-normal">{t('guestMessage')}</th>
                     <th className="p-2 text-start font-normal">{t('guestAt')}</th>
                   </tr>
@@ -402,6 +403,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
                         {g.guestName}
                       </td>
                       <td className="p-2">{g.attendance === 'ATTENDING' ? t('attending') : t('notAttending')}</td>
+                      <td className="p-2 tabular-nums">{g.partySize}</td>
                       <td className="max-w-md p-2">
                         {g.message ? (
                           <div className="space-y-2">

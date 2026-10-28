@@ -1,15 +1,18 @@
 import 'server-only';
-import { count, eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { guestResponses, invitations } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 
 export type AttendanceCounts = { attending: number; notAttending: number };
 
-/** How many guests answered "coming" and "not coming" (one answer per guest; a changed answer counts once). */
+/**
+ * How many people are coming and not coming: each reply counts for the people it was sent for (a family answering
+ * once counts as all of them); a changed answer counts once.
+ */
 export async function attendanceCounts(db: DbOrTx, invitationId: string): Promise<AttendanceCounts> {
   const rows = await db
-    .select({ attendance: guestResponses.attendance, n: count() })
+    .select({ attendance: guestResponses.attendance, n: sql<number>`sum(${guestResponses.partySize})::int` })
     .from(guestResponses)
     .where(eq(guestResponses.invitationId, invitationId))
     .groupBy(guestResponses.attendance);

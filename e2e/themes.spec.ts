@@ -45,7 +45,8 @@ async function renderAndCheck(page: Page, url: string, width: number, shot: stri
 
 test('every theme renders every designed state correctly', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'runs once; widths are set explicitly');
-  test.setTimeout(10 * 60_000);
+  // Every version is drawn in every state, language and width, so the budget grows with the catalogue.
+  test.setTimeout(Math.max(10 * 60_000, generatedManifests.length * 30_000));
   await signInAsNewOwner(page);
 
   for (const m of generatedManifests) {

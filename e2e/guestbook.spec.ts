@@ -25,6 +25,16 @@ test('guest messages stay private until the customer shows them under the invita
   await guest.getByRole('radio', { name: 'سأحضر' }).check();
   await guest.getByLabel('الاسم', { exact: true }).fill('سارة');
   await guest.getByLabel('رسالة تهنئة').fill('ألف مبروك يا أحلى عروسين');
+  // She answers for her family of three: the platform's − 1 + sits right under the name, in the design's style.
+  const party = guest.getByRole('group', { name: 'عدد الأشخاص' });
+  await expect(party.locator('output')).toHaveText('١');
+  await expect(party.getByRole('button', { name: 'شخص أقل' })).toBeDisabled();
+  await party.getByRole('button', { name: 'شخص إضافي' }).click();
+  await party.getByRole('button', { name: 'شخص إضافي' }).click();
+  await party.getByRole('button', { name: 'شخص إضافي' }).click();
+  await party.getByRole('button', { name: 'شخص أقل' }).click();
+  await expect(party.locator('output')).toHaveText('٣');
+  await testInfo.attach('party-size.png', { body: await guest.locator('form').first().screenshot(), contentType: 'image/png' });
   await guest.getByRole('button', { name: 'إرسال' }).click();
   await expect(guest.getByRole('status')).toBeVisible();
   await expect(guest.getByRole('heading', { name: 'رسائل الضيوف' })).toHaveCount(0);
@@ -61,12 +71,14 @@ test('guest messages stay private until the customer shows them under the invita
   expect(ogImage.headers()['content-type']).toBe('image/jpeg');
 
   // The reply count is on the receipt; the customer shows it to everyone too.
-  await expect(page.locator('#attendance').getByText('سيحضر: ١')).toBeVisible();
+  // People, not replies: Sara answered for three.
+  await expect(page.locator('#attendance').getByText('سيحضر: ٣')).toBeVisible();
   await expect(page.locator('#attendance').getByText('لن يحضر: ٠')).toBeVisible();
   // …and each reply, coming or not, with the guest's message beside it.
   const reply = page.locator('[data-guest-replies] [data-guest-reply="ATTENDING"]');
   await expect(reply).toContainText('سارة');
   await expect(reply).toContainText('سيحضر');
+  await expect(reply.locator('[data-guest-party="3"]')).toHaveText('العدد ٣');
   await expect(reply).toContainText('ألف مبروك يا أحلى عروسين');
   await page.getByLabel('كل من لديه رابط الدعوة (يظهر فوق نموذج الرد)').check();
   await expect(page.locator('#attendance').getByText('✓ تم الحفظ.')).toBeVisible();
@@ -75,7 +87,7 @@ test('guest messages stay private until the customer shows them under the invita
   const next = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await openInvitation(next);
   const replies = next.getByRole('region', { name: 'ردود الضيوف' });
-  await expect(replies).toContainText('١');
+  await expect(replies).toContainText('٣');
   await expect(replies).toContainText('سيحضرون');
   await expect(replies).toContainText('لن يحضروا');
   await expect(next.getByRole('heading', { name: 'رسائل الضيوف' })).toBeVisible();

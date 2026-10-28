@@ -857,7 +857,8 @@
       "photoN": "الصورة {n}",
       "photosNone": "لم تُضَف صور بعد.",
       "photoRemove": "احذف هذه الصورة",
-      "photoRemoveConfirm": "هل تريد حذف هذه الصورة من الدعوة؟ تُحذف نهائياً ولا يمكن استرجاعها."
+      "photoRemoveConfirm": "هل تريد حذف هذه الصورة من الدعوة؟ تُحذف نهائياً ولا يمكن استرجاعها.",
+      "guestParty": "العدد"
     },
     "legal": {
       "heading": "السياسات القانونية",
@@ -1102,7 +1103,11 @@
     "guestNotComing": "اعتذار",
     "itsABoy": "إنه ولد",
     "itsAGirl": "إنها بنت",
-    "bornOn": "تاريخ الولادة"
+    "bornOn": "تاريخ الولادة",
+    "partySize": "عدد الأشخاص",
+    "partyFewer": "شخص أقل",
+    "partyMore": "شخص إضافي",
+    "guestParty": "العدد {count}"
   },
   "invitationSamples": {
     "short": {
@@ -1244,7 +1249,8 @@
     "replyComing": "سيحضر",
     "replyNotComing": "لن يحضر",
     "cardBackSave": "حفظ ظهر البطاقة",
-    "flipCard": "اقلب البطاقة"
+    "flipCard": "اقلب البطاقة",
+    "replyParty": "العدد {count}"
   },
   "nav": {
     "home": "الرئيسية",

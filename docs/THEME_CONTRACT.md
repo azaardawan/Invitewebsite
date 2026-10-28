@@ -42,8 +42,10 @@ themes/<key>/v<N>/
   (no own text: only the offered choices).
 - `switches`: yes/no questions for the customer on the order form, each `{ key, label: {ar, en}, default }`
   (e.g. "show the father's name on the stickers"). The theme reads `props.switches[key]` (always filled).
-- `onlineInvitation: false` marks a **files-only** design (e.g. a newborn set: story, card, stickers,
-  bottle label). It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
+- Every design has an online invitation, newborn designs included (owner, 2026-10-28): a newborn invitation shows
+  the baby's name, the date of birth (`birthDate`) and the design's wording, with music and the guest form, and no
+  venue, time, map or countdown. `onlineInvitation: false` marks a **files-only** design (story, card, stickers,
+  bottle label), only when the owner asks for one. It has no online invitation: no `/i/` page (404), no link or QR on the receipt or card,
   and the storefront shows it as a picture, not in a phone frame. `Theme.tsx` is then only the preview.
 
 ## 3. What the theme receives: `ThemeProps`
@@ -61,7 +63,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `mapUrl` | A safe map link or null |
 | `music` | `{ src }` or null |
 | `guestbook` | Guest messages to show **under the invitation**, newest first (`{ guestName, message }[]`, possibly empty) when the customer made them public; `null` when they stay private (keepsake only) or the package has no messages. Render nothing when null; show `labels.guestbookEmpty` when empty. Samples are filled in previews. |
-| `attendance` | How many guests replied coming / not coming (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
+| `attendance` | How many people are coming / not coming (each reply counts for the people it was sent for) (`{ attending, notAttending }`) when the customer chose to show it; `null` otherwise. `GuestFormSlot` already draws it above the form in the theme's own font and colours (`labels.attendanceTitle`, `attendingCount`, `notAttendingCount`); a theme that draws its own passes `summary={false}` to `GuestFormSlot`. |
 | `signatures` | The customer's drawn signatures (`{ src }[]`, dark ink on transparent) for packages with `signature`, when they chose to include them: **one, or two** side by side (the customer chooses, e.g. both of the couple). Empty otherwise. Place them where your design has its signature spot with `<Signature signatures={props.signatures} className={…} />` (renders nothing when empty; one or two images side by side; on a dark design invert them with CSS). Leave room for two. Samples show one example signature. On the online invitation `<Signature>` draws each signature again as the customer drew it (stroke by stroke, 1–3 s) when it comes into view, then shows the picture; reduced motion and print show it finished. Always use `<Signature>` (never an `<img>` of `src`) so this works, and keep `className` to size/colour (it styles the drawing too). Only list `signature` in the manifest when the design has that spot. |
 | `colors` | The theme's colour slots (manifest `colors.slots`) with the customer's chosen colour set or the defaults. The platform also sets them as CSS variables `--bahja-color-<key>` around the theme (and around print companions), so CSS writes `var(--bahja-color-accent, #c9a45c)`. Required for `color_choice`; the owner makes the colour sets in Admin. |
 | `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. Print companions get it too (`occasion` in their props). |
@@ -74,7 +76,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | API | Use |
 |---|---|
 | `useMusic()` | `start()` from the "Open invitation" tap (phones block autoplay otherwise). A design whose song should only begin when the opening ends calls `prime()` from the tap (unlocks sound silently) and `start()` later. `start()` fades the song in. `toggle()` for the music button; `playing`, `available`. **Music always loops.** It pauses automatically when the phone locks. |
-| `GuestFormSlot` | Headless guest form. The theme designs it; the platform validates, submits and stores. Nothing is saved in sample/preview. Renders nothing when the package lacks `rsvp`. |
+| `GuestFormSlot` | Headless guest form. The theme designs it; the platform validates, submits and stores. Nothing is saved in sample/preview. Renders nothing when the package lacks `rsvp`. The platform adds a "how many of you" control (− 1 +, `labels.partySize`) right after the form's name field: keep the name an `<input name="name">` (alone or inside its `<label>`) and leave room under it; the count is sent with `submit` for you. |
 | `useCountdown(startsAt)` | Live countdown (shared 1-second clock) |
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
 | `formatNumber(n, locale)` | Arabic-Indic digits for Arabic/Kurdish |
@@ -141,8 +143,9 @@ animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/the
 - the card gets `qrDataUrl` (null when `print.card.qr` is false or the team hid it) and `extraLine`
   (one line the team added, or null); the keepsake gets the visible
   `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`). Print each
-  message's `guestName` under it: it already says whether the guest is coming ("Sara · Coming"), which the couple
-  must see; `name` and `attending` are there for a design that shows them its own way.
+  message's `guestName` under it: it already says whether the guest is coming and, for more than one person, how many
+  ("Sara · Coming · 4 people"), which the couple must see; `name`, `attending` and `partySize` are there for a
+  design that shows them its own way.
 
 The platform sets `@page` from the manifest: the card page is the trim size plus `bleedMm` on every
 side (A5 + 3 mm = 154 × 216 mm) so the card's root fills exactly that box; the customer's PDF is exactly

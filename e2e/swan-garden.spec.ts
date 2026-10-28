@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL, openOrderForm } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm, openPreview } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -16,7 +16,8 @@ test("Swan Garden: the fixed wording, «بنت» and the date; files download", 
   test.setTimeout(240_000);
 
   const draft = order({ NAME: 'ريم', FATHER: 'عبدالله' });
-  await page.goto(`/p/${draft.previewToken}`);
+  // Since its online invitation: the preview opens like the guests' invitation (cover, then the design).
+  await openPreview(page, draft.previewToken);
   await expect(page.getByText('بنت عبدالله')).toBeVisible();
   await expect(page.getByText(/بأجمل العطايا/)).toBeVisible();
   await expect(page.getByText(/قرة عينٍ لنا/)).toBeVisible();

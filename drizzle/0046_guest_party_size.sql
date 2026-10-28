@@ -1,0 +1,2 @@
+ALTER TABLE "guest_responses" ADD COLUMN "party_size" smallint DEFAULT 1 NOT NULL;--> statement-breakpoint
+ALTER TABLE "guest_responses" ADD CONSTRAINT "guest_responses_party_size" CHECK ("guest_responses"."party_size" between 1 and 20);

@@ -16,7 +16,7 @@ import { occasionKey, signatureUrls } from '@/server/invitation/load';
 import { listPhotos } from '@/server/photos/photos';
 import type { RenderKind } from './tokens';
 import type { CardOptions } from '@/server/db/schema';
-import type { ThemeProps } from '@/theme-sdk/types';
+import { formatNumber, type ThemeProps } from '@/theme-sdk/types';
 import { defaultLook, themeArtwork, type ResolvedCardDesign } from '@/server/catalog/card-design';
 import type { ExtrasLook } from '@/server/db/schema';
 import { tintedLook } from '@/components/print/look';
@@ -38,15 +38,16 @@ export function invitationUrl(inv: Pick<InvitationRow, 'slug' | 'publicId'>): st
 
 export async function visibleMessages(db: DbOrTx, invitationId: string, locale: Locale): Promise<KeepsakeMessage[]> {
   const rows = (await db
-    .select({ name: guestResponses.guestName, message: guestResponses.message, attendance: guestResponses.attendance })
+    .select({ name: guestResponses.guestName, message: guestResponses.message, attendance: guestResponses.attendance, partySize: guestResponses.partySize })
     .from(guestResponses)
     .where(and(eq(guestResponses.invitationId, invitationId), eq(guestResponses.messageStatus, 'VISIBLE'), isNotNull(guestResponses.message)))
-    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id))) as { name: string; message: string; attendance: 'ATTENDING' | 'NOT_ATTENDING' }[];
-  // Whether each guest is coming, printed beside their name so the couple sees it with the message.
-  const labels = invitationMessages(locale) as unknown as { guestComing: string; guestNotComing: string };
+    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id))) as { name: string; message: string; attendance: 'ATTENDING' | 'NOT_ATTENDING'; partySize: number }[];
+  // Whether each guest is coming (and how many of them), printed beside their name so the couple sees it with the message.
+  const labels = invitationMessages(locale) as unknown as { guestComing: string; guestNotComing: string; guestParty: string };
   return rows.map((r) => {
     const attending = r.attendance === 'ATTENDING';
-    return { name: r.name, message: r.message, attending, guestName: `${r.name} · ${attending ? labels.guestComing : labels.guestNotComing}` };
+    const party = r.partySize > 1 ? ` · ${labels.guestParty.replace('{count}', formatNumber(r.partySize, locale))}` : '';
+    return { name: r.name, message: r.message, attending, partySize: r.partySize, guestName: `${r.name} · ${attending ? labels.guestComing : labels.guestNotComing}${party}` };
   });
 }
 

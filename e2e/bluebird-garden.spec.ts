@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test } from '@playwright/test';
-import { E2E_DATABASE_URL, openOrderForm } from './helpers';
+import { E2E_DATABASE_URL, openOrderForm, openPreview } from './helpers';
 
 type Made = { previewToken: string; receiptToken: string | null; invitationId: string; path: string };
 
@@ -17,10 +17,12 @@ test('Bluebird Garden: birth-order choice, father on the extras by choice, every
 
   // The chosen birth order is printed; the father is off the stickers unless the customer ticks it.
   const draft = order({ NAME: 'فارس', FATHER: 'عبدالله', W_ORDER: 'opt:1' });
-  await page.goto(`/p/${draft.previewToken}`);
-  await expect(page.getByText('فارس')).toBeVisible();
+  // Since its online invitation: the preview opens like the guests' invitation (cover, then the design).
+  await openPreview(page, draft.previewToken);
+  await expect(page.getByText('فارس').first()).toBeVisible();
   await expect(page.getByText(/الله ثالث أفراح/)).toBeVisible();
-  await expect(page.getByText('تُزال هذه العلامة بعد الشراء')).toBeVisible();
+  // An online invitation's preview carries the preview ribbon, not the files' watermark.
+  await expect(page.locator('[data-bahja-watermark]')).toHaveCount(0);
   expect((await request.get(`/i/${draft.path.slice(3)}`)).status()).toBe(404);
 
   const paid = order({ NAME: 'Faris', FATHER: 'Abdullah', INV_LANG: 'en', SHAPE: 'both', FATHER_ON_EXTRAS: '1', PAID: '1' });

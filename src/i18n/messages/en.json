@@ -857,7 +857,8 @@
       "photoN": "Photo {n}",
       "photosNone": "No photos added yet.",
       "photoRemove": "Remove this photo",
-      "photoRemoveConfirm": "Remove this photo from the invitation? It is deleted and cannot be brought back."
+      "photoRemoveConfirm": "Remove this photo from the invitation? It is deleted and cannot be brought back.",
+      "guestParty": "People"
     },
     "legal": {
       "heading": "Legal policies",
@@ -1102,7 +1103,11 @@
     "guestNotComing": "Not coming",
     "itsABoy": "It's a boy",
     "itsAGirl": "It's a girl",
-    "bornOn": "Born on"
+    "bornOn": "Born on",
+    "partySize": "How many of you?",
+    "partyFewer": "One fewer",
+    "partyMore": "One more",
+    "guestParty": "{count} people"
   },
   "invitationSamples": {
     "short": {
@@ -1244,7 +1249,8 @@
     "replyComing": "Coming",
     "replyNotComing": "Not coming",
     "cardBackSave": "Save the back of the card",
-    "flipCard": "Turn the card over"
+    "flipCard": "Turn the card over",
+    "replyParty": "{count} people"
   },
   "nav": {
     "home": "Home",

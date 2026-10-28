@@ -17,6 +17,7 @@ const inputSchema = z.object({
   name: z.string().max(500),
   attendance: z.enum(['ATTENDING', 'NOT_ATTENDING']).nullable(),
   message: z.string().max(5000).optional(),
+  partySize: z.number().optional(),
 });
 
 /** Public guest form submission, bound to one invitation id by the invitation page. */
