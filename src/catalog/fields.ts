@@ -105,7 +105,8 @@ export const MAX_TEXT_LENGTH = 1000;
 
 /**
  * The place of the celebration. For a birthday it is the customer's choice (owner, 2026-10-28): off by default; ticking
- * "add the place" on the order form shows these fields (then required). Left off, the invitation and the cards have no
+ * "add the place" on the order form shows these fields (required, unless the design lets them stay empty with
+ * `optionalFields`). Left off, the invitation and the cards have no
  * place at all. The form ticks it with `f.__place=1`; stored values have it whenever a place field is filled.
  */
 export const PLACE_FIELDS = ['venue_name', 'venue_map_url'] as const satisfies readonly FieldKey[];

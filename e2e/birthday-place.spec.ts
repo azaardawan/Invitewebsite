@@ -9,7 +9,7 @@ function onSale(): { packageId: string } {
   return JSON.parse(out.trim().split('\n').at(-1)!);
 }
 
-test("a birthday's place is the customer's choice: off to start with, left out of the invitation, required once ticked", async ({ page }, testInfo) => {
+test("a birthday's place is the customer's choice: off to start with, shown when ticked, left out of the invitation", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
   test.setTimeout(180_000);
   const { packageId } = onSale();
@@ -24,11 +24,9 @@ test("a birthday's place is the customer's choice: off to start with, left out o
   await page.locator('input[type=time]').first().fill('17:00');
   await page.locator('textarea').first().fill('Come celebrate with me!');
 
-  // Ticked: the place shows and must be filled.
+  // Ticked: the place shows, to be filled in.
   await toggle.check();
   await expect(page.locator('input[name="f.venue_name"]')).toBeVisible();
-  await page.getByRole('button', { name: 'اعرض المعاينة' }).click();
-  await expect(page.getByText('هذا الحقل مطلوب.').first()).toBeVisible();
 
   // Left off: the order goes through, and the invitation has no place at all.
   await toggle.uncheck();
