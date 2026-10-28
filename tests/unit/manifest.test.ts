@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { manifestSchema, matchesValidState, type ThemeManifest } from '@/theme-sdk/manifest';
+import { fieldIsOptional, manifestSchema, matchesValidState, type ThemeManifest } from '@/theme-sdk/manifest';
 import { featureDependencyProblems, shapeFeature, shapeIncluded } from '@/catalog/features';
 
 const base: ThemeManifest = {
@@ -49,6 +49,15 @@ describe('theme manifest validation', () => {
     );
     expect(problems({ ...base, key: 'Rose Garden' }).length).toBeGreaterThan(0);
     expect(problems({ ...base, fields: [...base.fields, 'not_a_field'] }).length).toBeGreaterThan(0);
+  });
+
+  it('lets a design list fields the customer may leave empty, only among its own fields', () => {
+    expect(problems({ ...base, optionalFields: ['venue_map_url'] })).toEqual([]);
+    expect(problems({ ...base, optionalFields: ['venue_name'] })).toContain('optionalFields lists venue_name, which is not one of fields');
+    expect(fieldIsOptional({ optionalFields: ['venue_map_url'] }, 'venue_map_url')).toBe(true);
+    expect(fieldIsOptional({ optionalFields: ['venue_map_url'] }, 'event_date')).toBe(false);
+    // The Field Library's optional fields stay optional in every design.
+    expect(fieldIsOptional(null, 'seal_initials')).toBe(true);
   });
 
   it('matches package shapes exactly, ignoring order', () => {

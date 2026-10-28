@@ -320,7 +320,7 @@ export default function CherryConfettiParty(props: ThemeProps) {
               <h2 id={`${p}details-title`}>
                 {t.detailsTitle} <em>{t.detailsEm}</em>
               </h2>
-              <div className={c('detail-grid')}>
+              <div className={c('detail-grid', !(venue || showMap) && 'detail-grid-single')}>
                 {date ? (
                   <div className={c('date-cell')}>
                     <p className={c('eyebrow')}>{date.weekday}</p>
@@ -331,17 +331,19 @@ export default function CherryConfettiParty(props: ThemeProps) {
                     {event.time ? <span className={c('fine-print')}>{event.time}</span> : null}
                   </div>
                 ) : null}
-                <div className={c('venue-cell')}>
-                  <Sprig className={c('small-rosette')} />
-                  <p className={c('eyebrow')}>{t.thePlace}</p>
-                  {venue ? <h3 dir="auto">{venue}</h3> : null}
-                  <p>{lines(t.gathering)}</p>
-                  {showMap ? (
-                    <a className={c('text-link')} href={mapUrl} target="_blank" rel="noopener noreferrer">
-                      {labels.openMap} <span aria-hidden="true">↗</span>
-                    </a>
-                  ) : null}
-                </div>
+                {venue || showMap ? (
+                  <div className={c('venue-cell')}>
+                    <Sprig className={c('small-rosette')} />
+                    <p className={c('eyebrow')}>{t.thePlace}</p>
+                    {venue ? <h3 dir="auto">{venue}</h3> : null}
+                    <p>{lines(t.gathering)}</p>
+                    {showMap ? (
+                      <a className={c('text-link')} href={mapUrl} target="_blank" rel="noopener noreferrer">
+                        {labels.openMap} <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             </div>
           </section>

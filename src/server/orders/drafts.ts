@@ -112,7 +112,7 @@ export async function updateDraft(
     if (!draft) throw new OrderError('previewExpired');
     const [locked] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
-    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys), now);
+    const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys, locked!.themeVersionId), now);
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
     const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
     const extra = await extrasUpdate(

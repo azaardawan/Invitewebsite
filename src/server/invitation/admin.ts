@@ -92,7 +92,7 @@ export async function updateInvitationValues(
     const existingDate = inv.fieldValues.event_date;
     const unchangedPastDate = typeof existingDate === 'string' && input.values.event_date === existingDate;
     const validateAt = unchangedPastDate ? new Date(`${existingDate}T00:00:00Z`) : now;
-    const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys), validateAt < now ? validateAt : now);
+    const result = validateFieldValues(input.values, inv.fieldKeys, await fieldDefs(tx, inv.fieldKeys, inv.themeVersionId), validateAt < now ? validateAt : now);
     if (!result.ok) throw new InvitationAdminError('invalidFields', result.errors);
     const slug = slugFromNames(invitationNames(result.values));
     await tx.update(invitations).set({ fieldValues: result.values, slug, version: inv.version + 1 }).where(eq(invitations.id, id));

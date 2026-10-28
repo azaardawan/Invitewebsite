@@ -331,7 +331,7 @@ export default function FloralSurprise(props: ThemeProps) {
               <Sparkle className={c('twinkle')} />
               <i />
             </div>
-            <p className={c('eyebrow')}>{day ? `${day} · ${t.justForYou}` : `${t.posterDay} · ${t.justForYou}`}</p>
+            <p className={c('eyebrow')}>{t.justForYou}</p>
             <h1>
               {t.introTitle}
               <br />
@@ -392,7 +392,7 @@ export default function FloralSurprise(props: ThemeProps) {
               <span className={c('eyebrow')}>{event.date ? event.date.month : t.dayToCelebrate}</span>
               <span className={c('keepsake-number')}>{dayNumber ?? '✧'}</span>
               <Rosette className={c('small-rosette')} />
-              <span className={c('eyebrow')}>{day ?? t.posterDay}</span>
+              <span className={c('eyebrow')}>{event.date ? event.date.weekday : t.posterDay}</span>
             </div>
             <div className={c('letter-copy')}>
               <p className={c('eyebrow')}>{t.letterEyebrow}</p>

@@ -28,6 +28,8 @@ themes/<key>/v<N>/
 - **`validStates`**: example package combinations the designer drew (previewed and tested). The complete
   theme must be one of them. Admin builds packages from **any** combination of the theme's `features`
   and `fields` (dependencies checked), so the theme must render correctly with any subset.
+- `optionalFields`: fields of the design the customer may leave empty (besides the Field Library's optional ones),
+  e.g. a birthday's venue. Every other field the package includes is required; the design must look right without them.
 - `print` companions are required when `print_card` / `keepsake_pdf` are listed, and the registry
   generator fails if the declared `print/Card.tsx` / `print/Keepsake.tsx` file is missing.
 - `internal: true` marks a demo theme that can never be sold outside development.

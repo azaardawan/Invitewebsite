@@ -17,10 +17,14 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['birthday'],
   fields: [...allFields],
+  // A birthday is not always held somewhere in particular: the customer may leave the place (and its map link) empty.
+  optionalFields: ['venue_name', 'venue_map_url'],
   features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     { features: ['countdown', 'map'], fields: [...allFields] },
+    // A package without the place at all.
+    { features: ['countdown'], fields: ['person_1_name', 'event_date', 'event_time', 'invitation_message'] },
     { features: ['music', 'countdown', 'map', 'rsvp', 'signature'], fields: [...allFields] },
     // The complete design: + the guests' wishes and the customer's photos.
     { features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'signature', 'photos'], fields: [...allFields] },

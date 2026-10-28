@@ -2067,3 +2067,12 @@
   background: #e8b5a8;
   color: #470000;
 }
+
+/* No place given (the venue is optional): the date's card alone, centred. */
+#frame .root .detail-grid-single {
+  grid-template-columns: 1fr;
+}
+#frame .root .detail-grid-single .date-cell {
+  border: 0;
+  padding: 0;
+}

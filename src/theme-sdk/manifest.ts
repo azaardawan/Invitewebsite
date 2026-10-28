@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CARD_SHAPE_FEATURES, FEATURE_KEYS, featureDependencyProblems, isCardShapeKey, isPlatformFeature, shapeFeature, type FeatureKey } from '@/catalog/features';
-import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
+import { FIELD_KEYS, isOptionalField, type FieldKey } from '@/catalog/fields';
 
 /** A shaped printed card a design offers (manifest `print.shapes`). */
 /** A design's own text in Arabic and English, plus the owner-approved Kurdish when there is one (else Arabic shows). */
@@ -34,6 +34,11 @@ export type ThemeManifest = {
   sections: string[];
   /** Every field the complete theme renders. */
   fields: FieldKey[];
+  /**
+   * Fields the customer may leave empty in this design (besides the Field Library's optional ones), e.g. the venue of a
+   * birthday that is not held anywhere in particular. The design must look right without them.
+   */
+  optionalFields?: FieldKey[];
   /** Every feature the complete theme supports. */
   features: FeatureKey[];
   /**
@@ -155,6 +160,7 @@ export const manifestSchema = z
     experience: z.literal('INVITATION'),
     sections: z.array(z.string().regex(/^[a-z][a-z0-9-]*$/)).min(1),
     fields: z.array(fieldKey).min(1),
+    optionalFields: z.array(fieldKey).optional(),
     features: z.array(featureKey),
     validStates: z.array(z.object({ features: z.array(featureKey), fields: z.array(fieldKey).min(1) })).min(1).max(10),
     print: z
@@ -233,6 +239,7 @@ export const manifestSchema = z
     const issue = (message: string) => ctx.addIssue({ code: 'custom', message });
     if (new Set(m.fields).size !== m.fields.length) issue('fields contain duplicates');
     if (new Set(m.features).size !== m.features.length) issue('features contain duplicates');
+    for (const f of m.optionalFields ?? []) if (!m.fields.includes(f)) issue(`optionalFields lists ${f}, which is not one of fields`);
     for (const [i, s] of m.validStates.entries()) {
       for (const f of s.features) if (!m.features.includes(f)) issue(`validStates[${i}] uses undeclared feature ${f}`);
       for (const f of s.fields) if (!m.fields.includes(f)) issue(`validStates[${i}] uses undeclared field ${f}`);
@@ -294,6 +301,11 @@ export function matchesValidState(
   fields: readonly string[],
 ): boolean {
   return manifest.validStates.some((s) => sameSet(s.features, features) && sameSet(s.fields, fields));
+}
+
+/** Whether the customer may leave a field empty in this design: the Field Library's optional fields and the design's own. */
+export function fieldIsOptional(manifest: Pick<ThemeManifest, 'optionalFields'> | null | undefined, key: string): boolean {
+  return isOptionalField(key) || (manifest?.optionalFields ?? []).includes(key as FieldKey);
 }
 
 export function codeRef(m: Pick<ThemeManifest, 'key' | 'version'>) {

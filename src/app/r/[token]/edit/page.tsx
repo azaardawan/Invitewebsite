@@ -106,7 +106,7 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
           <OrderForm
             action={customerEditAction.bind(null, token)}
             hidden={{}}
-            fields={fields.map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale) }))}
+            fields={fields.map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale), optional: f.optional }))}
             initialValues={inv!.fieldValues as Record<string, string>}
             invitationLocale={inv!.locale}
             minDate={minDate}

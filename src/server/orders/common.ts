@@ -3,6 +3,7 @@ import { and, eq, inArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { fieldDefinitions, sections, themeVersions, themes } from '@/server/db/schema';
 import { packagesWithShape } from '@/server/catalog/themes';
+import { fieldIsOptional, type ThemeManifest } from '@/theme-sdk/manifest';
 import type { FieldDef } from './validation';
 
 export class OrderError extends Error {
@@ -43,13 +44,16 @@ export async function loadPurchasable(db: DbOrTx, themeKey: string, packageId: s
   }
   const pkg = (await packagesWithShape(db, row.theme.id)).find((p) => p.id === packageId && p.status === 'ACTIVE');
   if (!pkg) throw new OrderError('notAvailable');
-  return { ...row, pkg, defs: await fieldDefs(db, pkg.fieldKeys) };
+  return { ...row, pkg, defs: await fieldDefs(db, pkg.fieldKeys, row.version.id) };
 }
 
-export async function fieldDefs(db: DbOrTx, keys: readonly string[]): Promise<Map<string, FieldDef>> {
+/** The fields' definitions for validation; with a design version, the fields that design lets the customer leave empty. */
+export async function fieldDefs(db: DbOrTx, keys: readonly string[], themeVersionId?: string): Promise<Map<string, FieldDef>> {
   if (!keys.length) return new Map();
   const rows = await db.select().from(fieldDefinitions).where(and(inArray(fieldDefinitions.key, [...keys])));
-  return new Map(rows.map((r) => [r.key, { type: r.type, maxLength: r.maxLength }]));
+  const [version] = themeVersionId ? await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, themeVersionId)) : [];
+  const manifest = version?.manifest as ThemeManifest | null | undefined;
+  return new Map(rows.map((r) => [r.key, { type: r.type, maxLength: r.maxLength, optional: fieldIsOptional(manifest, r.key) }]));
 }
 
 export function sameSet(a: readonly string[], b: readonly string[]) {

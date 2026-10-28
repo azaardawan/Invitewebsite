@@ -17,7 +17,8 @@ export type FieldError =
   | 'invalidChoice'
   | 'birthTooFar';
 
-export type FieldDef = { type: string; maxLength: number | null };
+/** A field as validated: its type, its length limit, and whether this design lets the customer leave it empty. */
+export type FieldDef = { type: string; maxLength: number | null; optional?: boolean };
 
 const DEFAULT_MAX = { text: 80, longtext: 500 } as const;
 const MAX_DAYS_AHEAD = 730;
@@ -36,8 +37,9 @@ function cleanText(value: string, multiline: boolean): string | null {
 
 /**
  * Server-side validation of customer-entered invitation fields. Every field the
- * package includes is required (except the Field Library's optional ones, which
- * may stay empty); anything else is dropped. Never trust the form.
+ * package includes is required (except the Field Library's optional ones and the
+ * design's own `optionalFields`, which may stay empty); anything else is dropped.
+ * Never trust the form.
  */
 export function validateFieldValues(
   input: Record<string, unknown>,
@@ -54,7 +56,7 @@ export function validateFieldValues(
     const def = defs.get(key);
     const raw = input[key];
     if (typeof raw !== 'string' || raw.trim() === '') {
-      if (!isOptionalField(key)) errors[key] = 'required';
+      if (!isOptionalField(key) && !def?.optional) errors[key] = 'required';
       continue;
     }
     switch (def?.type) {
@@ -74,7 +76,7 @@ export function validateFieldValues(
         const b = cleanText(second, false) ?? '';
         if (Array.from(a).length > INITIALS_MAX || Array.from(b).length > INITIALS_MAX) errors[key] = 'tooLong';
         else if (joinInitials(a, b)) values[key] = joinInitials(a, b);
-        else if (!isOptionalField(key)) errors[key] = 'required';
+        else if (!isOptionalField(key) && !def?.optional) errors[key] = 'required';
         break;
       }
       case 'date': {

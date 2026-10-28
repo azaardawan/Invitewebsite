@@ -5,7 +5,7 @@ import { db } from '@/server/db/client';
 import { assets, fieldDefinitions, packages, sectionDefaultFields, sections, subsections, themeExtraSections, themeFields, themeVersions, themes, type I18nContent } from '@/server/db/schema';
 import { packagesWithShape } from '@/server/catalog/themes';
 import { publicMediaUrl } from '@/server/storage';
-import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { fieldIsOptional, type ThemeManifest } from '@/theme-sdk/manifest';
 import { getSettings } from '@/server/settings/service';
 
 /**
@@ -196,7 +196,21 @@ export async function orderFields(themeId: string, sectionId: string | null, key
     .leftJoin(themeFields, and(eq(themeFields.fieldKey, fieldDefinitions.key), eq(themeFields.themeId, themeId)))
     .leftJoin(sectionDefaultFields, and(eq(sectionDefaultFields.fieldKey, fieldDefinitions.key), sectionId ? eq(sectionDefaultFields.sectionId, sectionId) : sql`false`))
     .where(inArray(fieldDefinitions.key, [...keys]));
+  // Which may stay empty: the Field Library's optional fields and the design's own (its current version's `optionalFields`).
+  const [version] = await db()
+    .select({ manifest: themeVersions.manifest })
+    .from(themes)
+    .innerJoin(themeVersions, eq(themeVersions.id, themes.currentVersionId))
+    .where(eq(themes.id, themeId));
+  const manifest = version?.manifest as ThemeManifest | null | undefined;
   return rows
-    .map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: (f.themeLabel ?? f.sectionLabel ?? f.label) as I18nContent, order: f.order ?? 999 }))
+    .map((f) => ({
+      key: f.key,
+      type: f.type,
+      maxLength: f.maxLength,
+      label: (f.themeLabel ?? f.sectionLabel ?? f.label) as I18nContent,
+      order: f.order ?? 999,
+      optional: fieldIsOptional(manifest, f.key),
+    }))
     .sort((a, b) => a.order - b.order);
 }
