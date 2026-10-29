@@ -27,6 +27,11 @@ async function paidOrder(locale: 'ar' | 'en' = 'ar') {
   return o;
 }
 
+/** Runs the job until nothing is left: other tests' paid orders wait too, and each run takes the 20 oldest. */
+async function deliverAll(opts: Parameters<typeof deliverPaidOrders>[1]) {
+  while ((await deliverPaidOrders(db(), opts)).delivered > 0);
+}
+
 function recorder() {
   const sent: { to: string; lang: string; name: string; params: string[] }[] = [];
   const send: WhatsAppSender = async (to, lang, t) => {
@@ -42,7 +47,7 @@ describe('after payment, the customer gets their links on WhatsApp', () => {
   it('sends their page and the invitation link once, and draws the link-preview picture', async () => {
     const o = await paidOrder();
     const r = recorder();
-    await deliverPaidOrders(db(), { send: r.send, warm: r.warm, enabled: true });
+    await deliverAll({ send: r.send, warm: r.warm, enabled: true });
     const mine = r.sent.filter((m) => m.params.some((p) => p.includes(o.receiptToken)));
     expect(mine).toEqual([{ to: '+9647701234567', lang: 'ar', name: 'bahja_customer_page', params: ['حسين', `http://localhost:3000/r/${o.receiptToken}`] }]);
     const [order] = await db().select().from(orders).where(eq(orders.id, o.orderId));
@@ -54,21 +59,21 @@ describe('after payment, the customer gets their links on WhatsApp', () => {
 
     // A second run (or another replica) never sends again.
     const again = recorder();
-    await deliverPaidOrders(db(), { send: again.send, warm: again.warm, enabled: true });
+    await deliverAll({ send: again.send, warm: again.warm, enabled: true });
     expect(again.sent.filter((m) => m.params.some((p) => p.includes(o.receiptToken)))).toHaveLength(0);
   });
 
   it('English invitations get the English templates', async () => {
     const o = await paidOrder('en');
     const r = recorder();
-    await deliverPaidOrders(db(), { send: r.send, warm: r.warm, enabled: true });
+    await deliverAll({ send: r.send, warm: r.warm, enabled: true });
     expect(r.sent.find((m) => m.params.some((p) => p.includes(o.receiptToken)))?.lang).toBe('en');
   });
 
   it('without WhatsApp set up nothing is sent, but the order still counts as delivered', async () => {
     const o = await paidOrder();
     const r = recorder();
-    await deliverPaidOrders(db(), { send: r.send, warm: r.warm, enabled: false });
+    await deliverAll({ send: r.send, warm: r.warm, enabled: false });
     expect(r.sent).toHaveLength(0);
     const [order] = await db().select().from(orders).where(eq(orders.id, o.orderId));
     expect(order!.deliveredAt).not.toBeNull();
