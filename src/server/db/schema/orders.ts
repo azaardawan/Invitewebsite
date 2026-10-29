@@ -204,6 +204,11 @@ export const orders = pgTable(
     /** Client-generated key: a double-tapped "Pay" returns the same order. */
     idempotencyKey: text('idempotency_key').notNull().unique(),
     paidAt: timestamp('paid_at', { withTimezone: true }),
+    /**
+     * When the after-payment delivery ran (the customer's WhatsApp messages with their page and their invitation
+     * link, and the link-preview picture): set once, so a message is never sent twice.
+     */
+    deliveredAt: timestamp('delivered_at', { withTimezone: true }),
     ...timestamps,
   },
   (t) => [

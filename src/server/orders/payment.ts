@@ -5,6 +5,7 @@ import type { DbOrTx } from '@/server/db/client';
 import { invitations, invoiceCounters, orderStatusHistory, orders } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { notifyOwner, paidOrderMessage } from '@/server/notify/owner';
+import { deliverSoon } from '@/server/scheduler';
 import { themeNumber } from '@/theme-registry';
 import { lifetimeExpiry } from '@/catalog/lifetime';
 import { OrderError } from './common';
@@ -88,6 +89,8 @@ export async function markOrderPaid(db: DbOrTx, orderId: string, source: Payment
   });
   // The owner's WhatsApp notice, sent after the payment is saved; it never holds up or breaks the order.
   if (notice) void notifyOwner(notice);
+  // The customer's links on WhatsApp and the link-preview picture, right away (src/server/notify/customer.ts).
+  if (!result.alreadyPaid) deliverSoon();
   return result;
 }
 

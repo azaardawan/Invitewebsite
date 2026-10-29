@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { PDFDocument } from 'pdf-lib';
 import type { DbOrTx } from '@/server/db/client';
-import { generatedDocuments, invitations, type CardOptions } from '@/server/db/schema';
+import { assets, generatedDocuments, invitations, themes, type CardOptions } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, type Actor } from '@/server/catalog/common';
 import { storage } from '@/server/storage';
@@ -278,3 +278,35 @@ export async function removeCustomCard(db: DbOrTx, invitationId: string, actor: 
   await storage().delete(inv.cardCustomKey).catch(() => {});
 }
 
+
+/**
+ * The link-preview picture without waiting: the drawn one when it is ready and up to date, else null (the caller
+ * draws it in the background). Drawing it takes several seconds, and WhatsApp gives up long before that.
+ */
+export async function storedOgPreview(db: DbOrTx, invitationId: string) {
+  return ensurePreview(db, invitationId, 'og', renderPreview, async () => false).catch((e) => {
+    if (e instanceof DocumentError && e.code === 'rateLimited') return null;
+    throw e;
+  });
+}
+
+/**
+ * While the real picture is being drawn: the design's cover, on a 1200 × 630 card in the invitation's paper colour,
+ * so a link shared at that moment still shows a picture. Null without a cover.
+ */
+export async function ogFallback(db: DbOrTx, invitationId: string) {
+  const [row] = await db
+    .select({ key: assets.storageKey })
+    .from(invitations)
+    .innerJoin(themes, eq(themes.id, invitations.themeId))
+    .innerJoin(assets, eq(assets.id, themes.coverAssetId))
+    .where(eq(invitations.id, invitationId));
+  const cover = row ? await storage().get(row.key) : null;
+  if (!cover) return null;
+  const sharp = (await import('sharp')).default;
+  const art = await sharp(cover).resize({ height: 630, width: 1200, fit: 'inside' }).toBuffer();
+  return sharp({ create: { width: 1200, height: 630, channels: 3, background: '#f7efe9' } })
+    .composite([{ input: art, gravity: 'center' }])
+    .jpeg({ quality: 82 })
+    .toBuffer();
+}

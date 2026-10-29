@@ -6,10 +6,11 @@ import { keepsakeReady } from '@/server/documents/delivery';
 import { documentAvailable } from '@/server/documents/documents';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, orders } from '@/server/db/schema';
+import { assets, invitations, orders, themes } from '@/server/db/schema';
 import { invitationPath } from '@/lib/ids';
 import { receiptTokenHash , accessCodeFor, formatAccessCode } from './tokens';
 import { isLive } from './payment';
+import { publicMediaUrl } from '@/server/storage';
 
 export type OrderSnapshot = {
   theme: { key: string; name: { ar: string; en: string; ckb?: string | null; bdn?: string | null } };
@@ -30,9 +31,11 @@ export type OrderSnapshot = {
 export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
   if (!token || token.length > 100) return null;
   const [row] = await db
-    .select({ order: orders, invitation: invitations })
+    .select({ order: orders, invitation: invitations, coverKey: assets.storageKey })
     .from(orders)
     .innerJoin(invitations, eq(invitations.id, orders.invitationId))
+    .innerJoin(themes, eq(themes.id, invitations.themeId))
+    .leftJoin(assets, eq(assets.id, themes.coverAssetId))
     .where(eq(orders.receiptTokenHash, receiptTokenHash(token)));
   if (!row) return null;
   const snapshot = row.order.snapshot as OrderSnapshot;
@@ -79,6 +82,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       publishedAt: row.invitation.publishedAt,
       expiresAt: row.invitation.expiresAt,
       onlineInvitation,
+      /** The design's cover picture, for the page's header. */
+      coverUrl: row.coverKey ? publicMediaUrl(row.coverKey) : null,
       path: row.invitation.publishedAt && onlineInvitation ? invitationPath(row.invitation.slug, row.invitation.publicId) : null,
     },
   };
