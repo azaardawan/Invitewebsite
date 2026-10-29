@@ -59,6 +59,16 @@ const schema = z.object({
    */
   OWNER_WHATSAPP_PHONE: z.preprocess(normalizePhone, z.string().regex(/^\d{8,15}$/).optional()).catch(undefined),
   CALLMEBOT_API_KEY: z.preprocess((v) => (typeof v === 'string' ? v.trim() || undefined : v), z.string().min(3).optional()).catch(undefined),
+  /**
+   * WhatsApp messages to the customer once they have paid (WhatsApp Business Cloud API, Meta): their private page and the
+   * link to send their guests, as two approved templates (docs/WHATSAPP_SETUP.md). Token and phone-number id both set = on.
+   */
+  WHATSAPP_ACCESS_TOKEN: z.preprocess((v) => (typeof v === 'string' ? v.trim() || undefined : v), z.string().min(20).optional()).catch(undefined),
+  WHATSAPP_PHONE_NUMBER_ID: z.preprocess((v) => (typeof v === 'string' ? v.trim() || undefined : v), z.string().regex(/^\d{6,20}$/).optional()).catch(undefined),
+  /** The two templates' names in WhatsApp Manager (both in Arabic and English). */
+  WHATSAPP_TEMPLATE_PAGE: z.string().min(1).default('bahja_customer_page'),
+  WHATSAPP_TEMPLATE_INVITATION: z.string().min(1).default('bahja_invitation_link'),
+  WHATSAPP_API_VERSION: z.string().regex(/^v\d+\.\d+$/).default('v21.0'),
   /** Chromium used to render PDFs; defaults to Playwright's bundled browser (the Docker image sets /usr/bin/chromium). */
   CHROMIUM_PATH: z.string().optional(),
   /** ffmpeg, which turns customers' songs and videos into MP3 (the Docker image installs it); defaults to `ffmpeg` on the PATH. */

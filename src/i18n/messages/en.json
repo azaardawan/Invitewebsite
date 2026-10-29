@@ -1261,7 +1261,19 @@
     "replyNotComing": "Not coming",
     "cardBackSave": "Save the back of the card",
     "flipCard": "Turn the card over",
-    "replyParty": "{count} people"
+    "replyParty": "{count} people",
+    "navLabel": "Page sections",
+    "navInvitation": "Invitation",
+    "navEdit": "Edit",
+    "navReplies": "Replies",
+    "navGuestbook": "Messages",
+    "navFiles": "Print files",
+    "navExtras": "Designs",
+    "navDetails": "Order details",
+    "detailsTitle": "Order details",
+    "heroPaid": "Everything for your celebration is here: the invitation link for your guests, printable cards, edits and replies.",
+    "heroPending": "Your order is saved. Once paid, everything arrives here straight away.",
+    "invitationPictureAlt": "The invitation picture, as it shows when shared"
   },
   "nav": {
     "home": "Home",

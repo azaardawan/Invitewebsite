@@ -1,5 +1,6 @@
 'use server';
 
+import { after } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
@@ -17,7 +18,7 @@ import {
 import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
 import { setPublicGuestbook } from '@/server/guests/guestbook';
 import { setPublicAttendance } from '@/server/guests/attendance';
-import { DocumentError, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
+import { DocumentError, ensurePreview, removeCustomCard, updateCardOptions } from '@/server/documents/documents';
 import type { ActionState } from './state';
 import { fieldValuesFromForm } from '@/catalog/fields';
 
@@ -50,6 +51,8 @@ export async function editInvitationAction(_: ActionState, form: FormData): Prom
     const id = ids(form);
     const values = fieldValuesFromForm(form);
     await updateInvitationValues(db(), id, { values, expectedVersion: Number(form.get('version')), reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+    // The link-preview picture shows the names and date: draw it again now, so the next share is right at once.
+    after(() => ensurePreview(db(), id, 'og').then(() => undefined, (e) => console.error('[og] warm-up failed', e)));
     return done(id);
   } catch (e) {
     return fail(e);

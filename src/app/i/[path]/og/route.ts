@@ -3,7 +3,8 @@ import { db } from '@/server/db/client';
 import { clientIpFrom, hashIp } from '@/server/auth/request-context';
 import { consumeRateLimit, rateLimited } from '@/server/rate-limit';
 import { resolvePublicInvitation } from '@/server/invitation/public';
-import { ensurePreview } from '@/server/documents/documents';
+import { after } from 'next/server';
+import { ensurePreview, ogFallback, storedOgPreview } from '@/server/documents/documents';
 
 /**
  * The picture WhatsApp (and other apps) show when an invitation link is shared: the invitation's own
@@ -19,12 +20,22 @@ export async function GET(_req: Request, { params }: RouteContext<'/i/[path]/og'
   const r = await resolvePublicInvitation(path);
   if (r.state === 'missing' && missKey) await consumeRateLimit(db(), missKey, 30, 3600);
   if (r.state !== 'live') return new Response('Not found', { status: 404 });
-  const image = await ensurePreview(db(), r.invitation.id, 'og').catch((e) => {
+  const id = r.invitation.id;
+  // Answer at once: WhatsApp waits only a few seconds, and drawing the picture takes longer. Until it is drawn (it
+  // normally is, right after payment and after each edit), the design's cover stands in, briefly cached.
+  const image = await storedOgPreview(db(), id).catch((e) => {
     console.error('[og] preview failed', e);
     return null;
   });
-  if (!image) return new Response('Not found', { status: 404 });
+  if (image) return jpeg(image, 600);
+  after(() => ensurePreview(db(), id, 'og').then(() => undefined, (e) => console.error('[og] preview failed', e)));
+  const cover = await ogFallback(db(), id).catch(() => null);
+  if (!cover) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
+  return jpeg(cover, 60);
+}
+
+function jpeg(image: Buffer, maxAge: number) {
   return new Response(new Uint8Array(image), {
-    headers: { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=600', 'X-Robots-Tag': 'noindex' },
+    headers: { 'Content-Type': 'image/jpeg', 'Content-Length': String(image.length), 'Cache-Control': `public, max-age=${maxAge}`, 'X-Robots-Tag': 'noindex' },
   });
 }

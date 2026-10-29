@@ -1449,3 +1449,22 @@ The printed poster's name on the order form (manifest `print.shapes[].label`, fe
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #22 Blush Floral v2, #23 Cherry Confetti Party, #24 Pink Ribbon Party: shape `arch-poster` | بوستر | Poster | پۆستەر | پۆستەر |
+
+## Batch 45 — the customer's page after paying — ✅ AUTO-APPROVED (2026-10-29, owner checks in Admin → Translations)
+
+The redesigned receipt page (`/r/…`): the header, the row of section chips and the shared-link picture.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Platform: `receipt.navLabel` | أقسام الصفحة | Page sections | بەشەکانی پەڕە | پشکێن پەرێ |
+| 2 | Platform: `receipt.navInvitation` | الدعوة | Invitation | بانگهێشت | داخوازنامە |
+| 3 | Platform: `receipt.navEdit` | التعديل | Edit | دەستکاری | دەستکاری |
+| 4 | Platform: `receipt.navReplies` | الردود | Replies | وەڵامەکان | بەرسڤ |
+| 5 | Platform: `receipt.navGuestbook` | الرسائل | Messages | نامەکان | نامە |
+| 6 | Platform: `receipt.navFiles` | ملفات الطباعة | Print files | فایلەکانی چاپ | فایلێن چاپێ |
+| 7 | Platform: `receipt.navExtras` | التصاميم | Designs | دیزاینەکان | دیزاین |
+| 8 | Platform: `receipt.navDetails` | تفاصيل الطلب | Order details | وردەکاریی داواکاری | هویرگۆشیێن داخوازێ |
+| 9 | Platform: `receipt.detailsTitle` | تفاصيل الطلب | Order details | وردەکاریی داواکاری | هویرگۆشیێن داخوازێ |
+| 10 | Platform: `receipt.heroPaid` | كل ما يخص مناسبتك هنا: رابط الدعوة لضيوفك، والبطاقات للطباعة، والتعديل والردود. | Everything for your celebration is here: the invitation link for your guests, printable cards, edits and replies. | هەموو شتێکی بۆنەکەت لێرەیە: بەستەری بانگهێشت بۆ میوانەکانت، کارتەکانی چاپ، دەستکاری و وەڵامەکان. | هەمی تشتێن بۆنا تە ل ڤێرێنە: لینکا داخوازنامێ بۆ میڤانێن تە، کارتێن چاپێ، دەستکاری و بەرسڤ. |
+| 11 | Platform: `receipt.heroPending` | طلبك محفوظ. بعد الدفع يصلك كل شيء هنا مباشرة. | Your order is saved. Once paid, everything arrives here straight away. | داواکارییەکەت پاشەکەوت کرا. دوای پارەدان هەموو شتێک یەکسەر لێرە دەگات. | داخوازا تە هاتە پاشەکەفتکرن. پشتی پارەدانێ هەمی تشت دێ یەکسەر ل ڤێرێ گەهیت. |
+| 12 | Platform: `receipt.invitationPictureAlt` | صورة الدعوة كما تظهر عند المشاركة | The invitation picture, as it shows when shared | وێنەی بانگهێشت وەک لە کاتی ناردندا دەردەکەوێت | وێنێ داخوازنامێ وەکی د دەمێ هنارتنێ دا دیار دبیت |

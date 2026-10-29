@@ -1261,7 +1261,19 @@
     "replyNotComing": "لن يحضر",
     "cardBackSave": "حفظ ظهر البطاقة",
     "flipCard": "اقلب البطاقة",
-    "replyParty": "العدد {count}"
+    "replyParty": "العدد {count}",
+    "navLabel": "أقسام الصفحة",
+    "navInvitation": "الدعوة",
+    "navEdit": "التعديل",
+    "navReplies": "الردود",
+    "navGuestbook": "الرسائل",
+    "navFiles": "ملفات الطباعة",
+    "navExtras": "التصاميم",
+    "navDetails": "تفاصيل الطلب",
+    "detailsTitle": "تفاصيل الطلب",
+    "heroPaid": "كل ما يخص مناسبتك هنا: رابط الدعوة لضيوفك، والبطاقات للطباعة، والتعديل والردود.",
+    "heroPending": "طلبك محفوظ. بعد الدفع يصلك كل شيء هنا مباشرة.",
+    "invitationPictureAlt": "صورة الدعوة كما تظهر عند المشاركة"
   },
   "nav": {
     "home": "الرئيسية",
