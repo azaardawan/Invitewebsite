@@ -769,7 +769,6 @@
       "customSongRemoveConfirm": "Remove the customer's song? Its file is deleted and the design's song plays again.",
       "reason": "Reason (shown in the audit log)",
       "extendTitle": "Extend",
-      "extendDays": "Add days",
       "extend": "Extend",
       "unpublishTitle": "Take down",
       "unpublish": "Take the invitation down",
@@ -840,7 +839,7 @@
         "notUnpublished": "This invitation is not taken down.",
         "invalidFields": "Please fix the highlighted details.",
         "reason": "Please write a reason (5–500 characters).",
-        "days": "Choose between 1 and 365 days.",
+        "days": "Enter a whole number: up to 100 years (1,200 months or 36,500 days).",
         "music": "Choose an active song.",
         "forever": "This invitation never ends, so there is nothing to extend."
       },
@@ -861,7 +860,15 @@
       "photosNone": "No photos added yet.",
       "photoRemove": "Remove this photo",
       "photoRemoveConfirm": "Remove this photo from the invitation? It is deleted and cannot be brought back.",
-      "guestParty": "People"
+      "guestParty": "People",
+      "extendAmount": "How many",
+      "extendUnit": "Of",
+      "extendUnits": {
+        "days": "Days",
+        "months": "Months",
+        "years": "Years"
+      },
+      "extendHelp": "The invitation is online until {until}. The time is added to that date, or to today if it has already ended."
     },
     "legal": {
       "heading": "Legal policies",

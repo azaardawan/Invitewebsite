@@ -60,7 +60,7 @@ describe('package online time (30 days, 60 days, 1 year, forever)', () => {
     const { inv } = await paidInvitation(new Date());
     expect(isForever(inv.expiresAt)).toBe(true);
     expect(isLive(inv, new Date('2120-01-01T00:00:00Z'))).toBe(true);
-    await expect(extendInvitation(db(), inv.id, { days: 7, reason: 'customer asked for more' }, shop.actor)).rejects.toMatchObject({ code: 'forever' });
+    await expect(extendInvitation(db(), inv.id, { amount: 7, unit: 'days', reason: 'customer asked for more' }, shop.actor)).rejects.toMatchObject({ code: 'forever' });
   });
 
   it('the time is the package’s at checkout; a paid order keeps its own', async () => {

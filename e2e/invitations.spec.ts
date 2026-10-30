@@ -57,6 +57,8 @@ test('public invitation: canonical URL, redirects, OG, noindex, and admin take-d
 
   await page.reload();
   const extend = page.locator('form', { has: page.getByRole('button', { name: 'تمديد' }) });
+  await extend.getByLabel('العدد').fill('2');
+  await extend.getByLabel('المدة').selectOption('years');
   await extend.getByLabel('السبب (يظهر في سجل التدقيق)').fill('Wedding moved a week');
   await extend.getByRole('button', { name: 'تمديد' }).click();
   await expect(extend.getByText('تم الحفظ.')).toBeVisible();

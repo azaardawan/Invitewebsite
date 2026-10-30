@@ -9,6 +9,7 @@ import { requestContext } from '@/server/auth/request-context';
 import {
   changeInvitationMusic,
   extendInvitation,
+  type ExtendUnit,
   InvitationAdminError,
   removeInvitationPhoto,
   removeInvitationSong,
@@ -63,7 +64,7 @@ export async function extendInvitationAction(_: ActionState, form: FormData): Pr
   const { user } = await requireAdmin({ permission: 'invitations.extend' });
   try {
     const id = ids(form);
-    await extendInvitation(db(), id, { days: Number(form.get('days')), reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+    await extendInvitation(db(), id, { amount: Number(form.get('amount')), unit: String(form.get('unit')) as ExtendUnit, reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
     return done(id);
   } catch (e) {
     return fail(e);

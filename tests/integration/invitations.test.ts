@@ -86,14 +86,27 @@ describe('admin invitation management', () => {
 
   it('extends from the current end, or from now if already ended', async () => {
     const inv = await published();
-    const { expiresAt } = await extendInvitation(db(), inv.id, { days: 10, reason }, shop.actor);
+    const { expiresAt } = await extendInvitation(db(), inv.id, { amount: 10, unit: 'days', reason }, shop.actor);
     expect(expiresAt.getTime()).toBe(inv.expiresAt!.getTime() + 10 * 86400_000);
     await db().update(invitations).set({ expiresAt: new Date(Date.now() - 5 * 86400_000) }).where(eq(invitations.id, inv.id));
     const now = new Date();
-    const again = await extendInvitation(db(), inv.id, { days: 3, reason }, shop.actor, now);
+    const again = await extendInvitation(db(), inv.id, { amount: 3, unit: 'days', reason }, shop.actor, now);
     expect(again.expiresAt.getTime()).toBe(now.getTime() + 3 * 86400_000);
-    await expect(extendInvitation(db(), inv.id, { days: 0, reason }, shop.actor)).rejects.toMatchObject({ code: 'days' });
+    await expect(extendInvitation(db(), inv.id, { amount: 0, unit: 'days', reason }, shop.actor)).rejects.toMatchObject({ code: 'days' });
     expect(await actions(inv.id)).toContain('invitation.extended');
+  });
+
+  it('extends by any number of months or years, on the calendar; refuses more than 100 years', async () => {
+    const inv = await published();
+    await db().update(invitations).set({ expiresAt: new Date('2027-01-31T12:00:00Z') }).where(eq(invitations.id, inv.id));
+    const now = new Date('2026-12-01T00:00:00Z');
+    const m = await extendInvitation(db(), inv.id, { amount: 1, unit: 'months', reason }, shop.actor, now);
+    expect(m.expiresAt.toISOString()).toBe('2027-02-28T12:00:00.000Z');
+    const y = await extendInvitation(db(), inv.id, { amount: 5, unit: 'years', reason }, shop.actor, now);
+    expect(y.expiresAt.toISOString()).toBe('2032-02-28T12:00:00.000Z');
+    await expect(extendInvitation(db(), inv.id, { amount: 101, unit: 'years', reason }, shop.actor, now)).rejects.toMatchObject({ code: 'days' });
+    await expect(extendInvitation(db(), inv.id, { amount: 1.5, unit: 'months', reason }, shop.actor, now)).rejects.toMatchObject({ code: 'days' });
+    await expect(extendInvitation(db(), inv.id, { amount: 1, unit: 'weeks' as 'days', reason }, shop.actor, now)).rejects.toMatchObject({ code: 'days' });
   });
 
   it('unpublishes and republishes, keeping the dates', async () => {

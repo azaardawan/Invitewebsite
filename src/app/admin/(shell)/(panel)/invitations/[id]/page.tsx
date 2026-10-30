@@ -13,7 +13,7 @@ import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
 import { env } from '@/server/env';
-import { activeMusicTracks, getInvitation, invitationState } from '@/server/invitation/admin';
+import { activeMusicTracks, EXTEND_MAX, EXTEND_UNITS, getInvitation, invitationState } from '@/server/invitation/admin';
 import { guestResponseCounts, listGuestResponses } from '@/server/guests/responses';
 import { documentAvailable } from '@/server/documents/documents';
 import { customerDelivery, keepsakeReady, whatsappLink } from '@/server/documents/delivery';
@@ -438,15 +438,20 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
 
       {published && !isForever(inv.expiresAt) && can(authz, 'invitations.extend') ? (
         <Card>
-          <h2 className="mb-3 font-semibold">{t('extendTitle')}</h2>
-          <ActionForm action={extendInvitationAction} className="grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end">
+          <h2 className="mb-1 font-semibold">{t('extendTitle')}</h2>
+          <p className="mb-3 text-sm text-muted">{t('extendHelp', { until: date(inv.expiresAt) })}</p>
+          <ActionForm action={extendInvitationAction} className="grid gap-3 sm:grid-cols-[6rem_8rem_1fr_auto] sm:items-end">
             <input type="hidden" name="id" value={inv.id} />
             <label className="block">
-              <span className="mb-1 block text-sm">{t('extendDays')}</span>
-              <select name="days" defaultValue="7" className={input}>
-                {[3, 7, 14, 30].map((d) => (
-                  <option key={d} value={d}>
-                    {d}
+              <span className="mb-1 block text-sm">{t('extendAmount')}</span>
+              <input name="amount" type="number" inputMode="numeric" min={1} max={EXTEND_MAX.days} step={1} defaultValue={1} required className={input} dir="ltr" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm">{t('extendUnit')}</span>
+              <select name="unit" defaultValue="months" className={input}>
+                {EXTEND_UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {t(`extendUnits.${u}`)}
                   </option>
                 ))}
               </select>
