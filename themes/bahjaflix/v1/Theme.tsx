@@ -130,7 +130,8 @@ export default function Bahjaflix(props: ThemeProps) {
   const places = withPhotos ? (editing ? Math.max(props.photoPlaces, photos.length) : photos.length) : 0;
   const names = [fields.person_1_name, fields.person_2_name].filter((n): n is string => Boolean(n?.trim()));
   const couple = names.join(` ${labels.and} `);
-  const story = fields.invitation_message?.trim() || (mode === 'sample' ? t.sampleStory : '');
+  // Samples tell the design's own example story (the platform's sample message is an invitation's).
+  const story = mode === 'sample' ? t.sampleStory : (fields.invitation_message?.trim() ?? '');
   const sample = (i: number) => (mode === 'sample' ? t.samples[i % t.samples.length] : undefined);
   const titleOf = (p: ThemePhoto | undefined, i: number) => p?.title ?? sample(i)?.[0] ?? null;
   const captionOf = (p: ThemePhoto | undefined, i: number) => p?.caption ?? sample(i)?.[1] ?? null;
@@ -220,7 +221,7 @@ export default function Bahjaflix(props: ThemeProps) {
             )}
           </div>
           <div className={s.shade} aria-hidden />
-          <div className={s.ribbon} aria-hidden dir="ltr">
+          <div className={s.ribbon} aria-hidden>
             <small>TOP</small>
             <b>01</b>
           </div>

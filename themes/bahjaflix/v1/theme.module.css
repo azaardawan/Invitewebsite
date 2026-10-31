@@ -633,6 +633,23 @@
 }
 
 /* ---------- The editor: every place, nothing moving ---------- */
+/* On a phone the video's place sits above the title, so both can be tapped. */
+@media (max-width: 899px) {
+  .editing .hero {
+    aspect-ratio: auto;
+  }
+  .editing .reel {
+    position: relative;
+    aspect-ratio: 16 / 10;
+  }
+  .editing .shade {
+    display: none;
+  }
+  .editing .info {
+    position: relative;
+    padding-top: 14px;
+  }
+}
 .editing .track {
   flex-wrap: wrap;
   overflow: visible;

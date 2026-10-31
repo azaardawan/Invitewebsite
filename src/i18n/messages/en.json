@@ -320,7 +320,9 @@
         "photos": "Customer adds their own photos",
         "collage_polaroids": "Photo collage: poster (3 photos)",
         "collage_story": "Photo collage: story (4 photos)",
-        "collage_wall": "Photo collage: photo wall (9 photos)"
+        "collage_wall": "Photo collage: photo wall (9 photos)",
+        "video": "Customer’s video (one minute)",
+        "couple_poster": "Couple posters (landscape and portrait A3)"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -495,7 +497,10 @@
           }
         },
         "lifetime": "How long the invitation stays online",
-        "lifetimeHint": "Counted from when the invitation is paid and published. Orders already paid keep their own end date."
+        "lifetimeHint": "Counted from when the invitation is paid and published. Orders already paid keep their own end date.",
+        "photoLimit": "Photos in this package",
+        "photoLimitHint": "Leave empty for all of the design’s places ({max}).",
+        "photoCount": "{n} photos"
       },
       "errors": {
         "invalid": "Please check the fields.",
@@ -1336,7 +1341,9 @@
       "photos": "Your own photos in the design",
       "collage_polaroids": "A photo collage poster (A3) with three of your photos",
       "collage_story": "A photo collage for your Instagram story, with four of your photos",
-      "collage_wall": "A photo wall collage with nine of your photos, ready to print (4 × 6)"
+      "collage_wall": "A photo wall collage with nine of your photos, ready to print (4 × 6)",
+      "video": "Your own video at the top of the page (up to a minute)",
+      "couple_poster": "Two posters to print (landscape and portrait) in your design"
     },
     "orderTitle": "Your invitation details",
     "orderSubtitle": "Write the names and details exactly as you want guests to see them. You'll see a preview before paying.",
@@ -1463,7 +1470,9 @@
       "collagePolaroids": "Collage poster",
       "collageStory": "Story collage",
       "collageWall": "Photo wall",
-      "downloadJpg": "Picture (JPG)"
+      "downloadJpg": "Picture (JPG)",
+      "posterLandscape": "Landscape poster",
+      "posterPortrait": "Portrait poster"
     },
     "cardShape": {
       "heading": "Printed card shape",
@@ -1557,7 +1566,49 @@
       }
     },
     "photosUpTo": "{max, plural, one {Your own photo in the design} other {Up to # of your own photos}}",
-    "addPlace": "Add the place of the celebration"
+    "addPlace": "Add the place of the celebration",
+    "template": {
+      "title": "Fill in your design",
+      "subtitle": "This is your design itself. Tap any text to write it, any frame to add a photo or the video. Everything is saved as you go, and you can change it later.",
+      "orderSubtitle": "Choose the page’s language, then continue: next you fill the design itself with your texts, photos and video.",
+      "hint": "Tap any text to write it, any frame to add a photo or the video",
+      "texts": "Texts",
+      "photos": "Photos",
+      "video": "Video",
+      "preview": "Preview",
+      "save": "Save and continue",
+      "finish": "Done",
+      "saved": "Saved",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "done": "Done",
+      "next": "Next",
+      "back": "Back",
+      "textPlaceholder": "Write it here",
+      "addPhoto": "Add a photo",
+      "choosePhoto": "Choose a photo",
+      "frameTitle": "Place the photo in its frame",
+      "frameHint": "What is inside the frame is exactly what your page shows. Drag the photo to move it, and zoom in if you like.",
+      "frameCaption": "How it will look",
+      "uploading": "Uploading…",
+      "wordsTitle": "The photo’s title and words",
+      "photoTitle": "Title",
+      "photoCaption": "A few words (shown when the photo is opened)",
+      "reframe": "Adjust the frame",
+      "videoTitle": "Video",
+      "videoHint": "One video plays at the top of your page. Up to a minute (longer ones are cut), files up to 100 MB.",
+      "chooseVideo": "Choose a video",
+      "replaceVideo": "Change the video",
+      "removeVideo": "Remove the video",
+      "converting": "Preparing your video… this can take a minute.",
+      "missing": "Still missing: {list}",
+      "errors": {
+        "tooLarge": "This file is too large (100 MB at most). Choose a shorter video.",
+        "unsupportedVideo": "We couldn’t read this video. Choose another one.",
+        "tooLong": "This text is too long.",
+        "invalidText": "This text can’t be saved. Try another."
+      }
+    }
   },
   "contact": {
     "title": "Contact us",

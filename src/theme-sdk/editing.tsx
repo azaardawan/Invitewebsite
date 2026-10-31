@@ -38,6 +38,9 @@ function ask(request: EditRequest) {
   if (window.parent !== window) window.parent.postMessage(request, window.location.origin);
 }
 
+/** Fills its place exactly. */
+const FILL: CSSProperties = { position: 'absolute', inset: 0, width: '100%', height: '100%' };
+
 /** The editor's outline around something the customer can fill. */
 const OUTLINE: CSSProperties = { outline: '2px dashed rgba(255,255,255,.75)', outlineOffset: 3, cursor: 'pointer', borderRadius: 4 };
 
@@ -120,12 +123,21 @@ export function PhotoSlot({
     e.stopPropagation();
     ask({ type: 'bahja:edit', kind: 'photo', index });
   };
+  // The place itself takes the design's frame (className/style); the photo, or the empty frame, fills it.
   return (
-    <span data-bahja-photo-slot={index} role="button" tabIndex={0} onClickCapture={open} onKeyDown={(e) => e.key === 'Enter' && open(e as unknown as MouseEvent)} style={{ display: 'block', cursor: 'pointer' }}>
+    <span
+      data-bahja-photo-slot={index}
+      role="button"
+      tabIndex={0}
+      onClickCapture={open}
+      onKeyDown={(e) => e.key === 'Enter' && open(e as unknown as MouseEvent)}
+      className={className}
+      style={{ display: 'block', position: 'relative', overflow: 'hidden', cursor: 'pointer', ...style }}
+    >
       {photo ? (
-        <Photo photo={photo} className={className} style={style} eager={eager} />
+        <Photo photo={photo} style={FILL} eager={eager} />
       ) : (
-        <span className={className} style={{ ...style, display: 'grid', placeItems: 'center', position: 'relative', background: 'rgba(255,255,255,.06)', border: '2px dashed rgba(255,255,255,.45)', color: 'rgba(255,255,255,.85)', textAlign: 'center' }}>
+        <span style={{ ...FILL, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,.06)', border: '2px dashed rgba(255,255,255,.45)', color: 'rgba(255,255,255,.85)', textAlign: 'center' }}>
           <span style={{ display: 'grid', gap: 6, justifyItems: 'center', fontSize: 13, padding: 8 }}>
             <span aria-hidden style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid currentColor', display: 'grid', placeItems: 'center', fontSize: 26, lineHeight: 1 }}>+</span>
             {label ? <span>{label}</span> : null}
@@ -172,9 +184,19 @@ export function VideoSlot({
     ask({ type: 'bahja:edit', kind: 'video' });
   };
   return (
-    <span data-bahja-video-slot role="button" tabIndex={0} onClickCapture={open} onKeyDown={(e) => e.key === 'Enter' && open(e as unknown as MouseEvent)} style={{ display: 'contents', cursor: 'pointer' }}>
-      {player ?? (
-        <span className={className} style={{ ...style, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,.06)', border: '2px dashed rgba(255,255,255,.45)', color: 'rgba(255,255,255,.9)' }}>
+    <span
+      data-bahja-video-slot
+      role="button"
+      tabIndex={0}
+      onClickCapture={open}
+      onKeyDown={(e) => e.key === 'Enter' && open(e as unknown as MouseEvent)}
+      className={className}
+      style={{ display: 'block', position: 'relative', overflow: 'hidden', cursor: 'pointer', ...style }}
+    >
+      {video ? (
+        <video style={{ ...FILL, objectFit: 'cover' }} src={video.src} poster={video.poster} width={video.width} height={video.height} preload="metadata" {...media} />
+      ) : (
+        <span style={{ ...FILL, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,.06)', border: '2px dashed rgba(255,255,255,.45)', color: 'rgba(255,255,255,.9)' }}>
           <span style={{ display: 'grid', gap: 8, justifyItems: 'center', fontSize: 14, padding: 8, textAlign: 'center' }}>
             <span aria-hidden style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid currentColor', display: 'grid', placeItems: 'center', fontSize: 22 }}>▶</span>
             {label ? <span>{label}</span> : null}
