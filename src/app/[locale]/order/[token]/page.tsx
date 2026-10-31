@@ -186,6 +186,8 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               collagePolaroids: t('extras.collagePolaroids'),
               collageStory: t('extras.collageStory'),
               collageWall: t('extras.collageWall'),
+              posterLandscape: t('extras.posterLandscape'),
+              posterPortrait: t('extras.posterPortrait'),
               downloadJpg: t('extras.downloadJpg'),
             }}
           />

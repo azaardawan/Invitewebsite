@@ -112,7 +112,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   const names = [v.person_1_name, v.person_2_name].filter(Boolean).join(' ♡ ') || v.baby_name || '';
   const rawDate = v.event_date || v.birth_date || '';
   const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? date(new Date(`${rawDate}T12:00:00Z`)) : '';
-  const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_'));
+  const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_') || k === 'couple_poster');
   // The sections a paid customer jumps between (a sticky row of chips; each section scrolls into place below it).
   const nav = paid
     ? ([
@@ -407,6 +407,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 collagePolaroids: tStore('extras.collagePolaroids'),
                 collageStory: tStore('extras.collageStory'),
                 collageWall: tStore('extras.collageWall'),
+                posterLandscape: tStore('extras.posterLandscape'),
+                posterPortrait: tStore('extras.posterPortrait'),
                 downloadJpg: tStore('extras.downloadJpg'),
               }}
             />

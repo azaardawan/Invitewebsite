@@ -126,7 +126,8 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) =
  * JPEGs (the sticker a PNG). The print page draws the watermark itself until the invitation is paid.
  * `sticker-square.*`: the square set when the customer chose both shapes (`sticker.*` is then the round one).
  * Photo collages (`collage-*`): a JPG at print size (the poster A3 at about 220 dpi, the story 1080 × 1920, the photo
- * wall 1200 × 1800) and a smaller preview, each drawn in its artwork's own box.
+ * wall 1200 × 1800) and a smaller preview, each drawn in its artwork's own box. Couple posters (`poster-*`): A3 landscape
+ * and portrait JPGs drawn by the design (print/Poster.tsx), and their previews.
  */
 export type ProductItem =
   | 'story.png'
@@ -147,7 +148,11 @@ export type ProductItem =
   | 'collage-story.jpg'
   | 'collage-story.preview'
   | 'collage-wall.jpg'
-  | 'collage-wall.preview';
+  | 'collage-wall.preview'
+  | 'poster-landscape.jpg'
+  | 'poster-landscape.preview'
+  | 'poster-portrait.jpg'
+  | 'poster-portrait.preview';
 export type ProductRenderer = (item: ProductItem, invitationId: string, opts?: { bottleSize?: BottleSize } & CardPick) => Promise<Buffer>;
 
 const mmPx = (mm: number) => Math.round(mm * PX_PER_MM);
@@ -169,6 +174,11 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square
   'collage-story.preview': { view: 'collageStory', width: 810, height: 1440, scale: 0.5, type: 'jpeg' },
   'collage-wall.jpg': { view: 'collageWall', width: 567, height: 850, scale: 1200 / 567, type: 'jpeg' },
   'collage-wall.preview': { view: 'collageWall', width: 567, height: 850, scale: 0.8, type: 'jpeg' },
+  // The couple posters: A3 at about 220 dpi (3570 × 2526), and a smaller preview.
+  'poster-landscape.jpg': { view: 'posterLandscape', width: 1190, height: 842, scale: 3, type: 'jpeg' },
+  'poster-landscape.preview': { view: 'posterLandscape', width: 1190, height: 842, scale: 0.6, type: 'jpeg' },
+  'poster-portrait.jpg': { view: 'posterPortrait', width: 842, height: 1190, scale: 3, type: 'jpeg' },
+  'poster-portrait.preview': { view: 'posterPortrait', width: 842, height: 1190, scale: 0.6, type: 'jpeg' },
 };
 
 export const renderProduct: ProductRenderer = async (item, invitationId, opts = {}) => {

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
@@ -157,4 +157,13 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await expect(page.getByRole('dialog')).toContainText('Sea, sun and us.');
   await expect(page.getByRole('dialog')).toContainText('Dara & Ava');
   await page.screenshot({ path: testInfo.outputPath('preview-photo.png') });
+
+  // The posters (landscape and portrait): watermarked pictures before payment, never the files themselves.
+  for (const o of ['landscape', 'portrait'] as const) {
+    const res = await page.request.get(`/p/${previewToken}/extra/poster-${o}.preview`);
+    expect(res.status(), `poster-${o}`).toBe(200);
+    expect(res.headers()['content-type']).toBe('image/jpeg');
+    writeFileSync(testInfo.outputPath(`poster-${o}.jpg`), await res.body());
+  }
+  expect((await page.request.get(`/p/${previewToken}/extra/poster-landscape.jpg`)).status()).toBe(404);
 });

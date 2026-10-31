@@ -1,6 +1,6 @@
 /**
- * E2E fixture: puts the BAHJAFLIX couples design on sale (allowed in development) with a package of photos (up to 9)
- * and the video, then creates an empty draft, as a customer does before filling the design in place. Prints
+ * E2E fixture: puts the BAHJAFLIX couples design on sale (allowed in development) with a package of photos (up to 9),
+ * the video and the posters, then creates an empty draft, as a customer does before filling the design in place. Prints
  * { previewToken, packageId }.
  */
 import { eq } from 'drizzle-orm';
@@ -24,7 +24,7 @@ try {
   const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.photoLimit === 9);
   const packageId =
     existing?.id ??
-    (await createPackage(db(), t.id, { name: { ar: 'تسع صور وفيديو', en: 'Nine photos and a video' }, priceIqd: 35000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 9 }, actor)).id;
+    (await createPackage(db(), t.id, { name: { ar: 'تسع صور وفيديو وملصقان', en: 'Nine photos, a video and posters' }, priceIqd: 35000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video', 'couple_poster'], photoLimit: 9 }, actor)).id;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
   if (t.status !== 'ACTIVE') await transitionTheme(db(), t.id, 'ACTIVE', actor);
   const d = await createDraft(db(), { themeKey: 'bahjaflix', packageId, locale: 'en', values: {} }, { ipHash: randomToken(8), userAgent: 'e2e' });

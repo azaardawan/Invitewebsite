@@ -39,6 +39,9 @@ export function ExtrasPreview({
     collagePolaroids: string;
     collageStory: string;
     collageWall: string;
+    /** Couple posters (packages with `couple_poster`). */
+    posterLandscape: string;
+    posterPortrait: string;
     downloadJpg: string;
     /** The two shapes' names, to tell the sets apart when both were chosen. */
     round?: string;
@@ -98,6 +101,15 @@ export function ExtrasPreview({
       box: c.box,
       jpg: `${base}/collage-${c.key}.jpg`,
     })),
+    ...(featureKeys.includes('couple_poster')
+      ? (['landscape', 'portrait'] as const).map((o) => ({
+          key: `poster-${o}`,
+          label: o === 'landscape' ? labels.posterLandscape : labels.posterPortrait,
+          src: `${base}/poster-${o}.preview`,
+          box: o === 'landscape' ? 'aspect-[1190/842] w-72' : 'aspect-[842/1190] w-44',
+          jpg: `${base}/poster-${o}.jpg`,
+        }))
+      : []),
   ].filter((i): i is NonNullable<typeof i> => i !== null);
   if (!items.length) return null;
   return (
