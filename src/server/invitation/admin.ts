@@ -112,18 +112,50 @@ export async function updateInvitationValues(
   });
 }
 
-/** Extends a published invitation by whole days from its current end (or from now, if it already ended). */
-export async function extendInvitation(db: DbOrTx, id: string, input: { days: number; reason: string }, actor: Actor, now = new Date()) {
+export const EXTEND_UNITS = ['days', 'months', 'years'] as const;
+export type ExtendUnit = (typeof EXTEND_UNITS)[number];
+/** The most Admin can add in one go, per unit (100 years either way). */
+export const EXTEND_MAX: Record<ExtendUnit, number> = { days: 36_500, months: 1_200, years: 100 };
+
+/** `from` plus whole days, or calendar months/years (31 Jan + 1 month = 28/29 Feb, never 3 Mar). */
+export function addPeriod(from: Date, amount: number, unit: ExtendUnit) {
+  if (unit === 'days') return new Date(from.getTime() + amount * 86400_000);
+  const months = unit === 'years' ? amount * 12 : amount;
+  const d = new Date(from);
+  const day = d.getUTCDate();
+  d.setUTCDate(1);
+  d.setUTCMonth(d.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  d.setUTCDate(Math.min(day, lastDay));
+  return d;
+}
+
+/**
+ * Extends a published invitation by any number of days, months or years (owner, 2026-10-30) from its current end,
+ * or from now if it already ended.
+ */
+export async function extendInvitation(db: DbOrTx, id: string, input: { amount: number; unit: ExtendUnit; reason: string }, actor: Actor, now = new Date()) {
   const reason = requireReason(input.reason);
-  if (!Number.isInteger(input.days) || input.days < 1 || input.days > 365) throw new InvitationAdminError('days');
+  if (!EXTEND_UNITS.includes(input.unit) || !Number.isInteger(input.amount) || input.amount < 1 || input.amount > EXTEND_MAX[input.unit]) {
+    throw new InvitationAdminError('days');
+  }
   return db.transaction(async (tx) => {
     const inv = await lockFor(tx, id);
     if (!inv.publishedAt || !inv.expiresAt) throw new InvitationAdminError('notPublished');
     if (isForever(inv.expiresAt)) throw new InvitationAdminError('forever');
     const from = inv.expiresAt > now ? inv.expiresAt : now;
-    const expiresAt = new Date(from.getTime() + input.days * 86400_000);
+    const expiresAt = addPeriod(from, input.amount, input.unit);
+    if (isForever(expiresAt)) throw new InvitationAdminError('days');
     await tx.update(invitations).set({ expiresAt, version: inv.version + 1 }).where(eq(invitations.id, id));
-    await recordAudit(tx, { ...auditActor(actor), action: 'invitation.extended', objectType: 'invitation', objectId: id, before: { expiresAt: inv.expiresAt }, after: { expiresAt, days: input.days }, reason });
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: 'invitation.extended',
+      objectType: 'invitation',
+      objectId: id,
+      before: { expiresAt: inv.expiresAt },
+      after: { expiresAt, amount: input.amount, unit: input.unit },
+      reason,
+    });
     return { expiresAt };
   });
 }
