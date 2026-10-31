@@ -79,8 +79,10 @@ export function buildThemeProps(input: {
   switchDefs?: readonly DesignSwitch[];
   switches?: Record<string, boolean> | null;
   /** The customer's photos in order (packages with `photos`), and the design's photo settings (for samples and names). */
-  photos?: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number } }[];
+  photos?: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; title?: string | null; caption?: string | null }[];
   photoSpec?: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null;
+  /** The customer's own video (packages with `video`), or null. */
+  video?: { src: string; poster: string; width: number; height: number } | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -121,6 +123,8 @@ export function buildThemeProps(input: {
     wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
     switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),
     photos: resolvePhotos(features, input.mode, input.locale, input.photos ?? [], input.photoSpec ?? null),
+    photoPlaces: features.includes('photos') ? (input.photoSpec?.max ?? 0) : 0,
+    video: !features.includes('video') ? null : input.mode === 'sample' ? null : (input.video ?? null),
   };
 }
 
@@ -132,7 +136,7 @@ export function resolvePhotos(
   features: readonly string[],
   mode: InvitationMode,
   locale: Locale,
-  photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number } }[],
+  photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; title?: string | null; caption?: string | null }[],
   spec: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null,
 ): ThemeProps['photos'] {
   if (!features.includes('photos')) return [];
@@ -141,9 +145,11 @@ export function resolvePhotos(
     return l ? (l[locale] ?? l.ar) : null;
   };
   if (mode === 'sample') {
-    return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ index: i, src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i) }));
+    return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ index: i, src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i), title: null, caption: null }));
   }
-  return photos.slice(0, spec?.max ?? photos.length).map((p, i) => ({ index: i, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i) }));
+  return photos
+    .slice(0, spec?.max ?? photos.length)
+    .map((p, i) => ({ index: i, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i), title: p.title ?? null, caption: p.caption ?? null }));
 }
 
 /** Each yes/no choice: the customer's answer, else the design's default. */

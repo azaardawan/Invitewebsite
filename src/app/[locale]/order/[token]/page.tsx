@@ -13,6 +13,9 @@ import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { SongUpload } from '@/components/storefront/order/SongUpload';
 import { songLabels } from '@/components/storefront/order/song-labels';
+import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
+import { posterLabels, templateLabels } from '@/components/storefront/order/template-labels';
+import { PosterEditor } from '@/components/storefront/order/PosterEditor';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
@@ -21,8 +24,9 @@ export const dynamicParams = true;
 export const metadata: Metadata = { robots: { index: false, follow: false }, referrer: 'no-referrer' };
 
 /** Review: the customer's real invitation in its theme, then contact details and confirmation. */
-export default async function ReviewPage({ params }: PageProps<'/[locale]/order/[token]'>) {
+export default async function ReviewPage({ params, searchParams }: PageProps<'/[locale]/order/[token]'>) {
   const { locale, token } = (await params) as { locale: Locale; token: string };
+  const { step } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations('store');
   const common = await getTranslations('common');
@@ -38,14 +42,56 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
     );
   }
   const previewSrc = `/p/${token}`;
+  // A template design is filled in place: the design itself, editable, instead of the phone preview and photo list.
+  const template = draft.template && draft.status === 'DRAFT' && draft.photos ? { ...draft.template, photos: draft.photos } : null;
+  // With the posters (couple_poster) the order goes: the page itself, then the posters (`?step=posters`), then checkout.
+  const posters = template && draft.featureKeys.includes('couple_poster') ? template.posters : null;
+  const posterStep = Boolean(posters) && step === 'posters';
+  const editor = posterStep ? null : template;
+  const showCheckout = !posters || posterStep;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 pt-10 lg:px-10 lg:pt-16">
+    <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 lg:px-10 lg:pt-16">
       <div className="mx-auto max-w-[640px] lg:mx-0">
         <OrderSteps current={1} />
       </div>
-      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-20">
-        <div className="flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start">
+      {editor ? (
+        <div className="mt-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="font-display text-[32px] leading-[1.3] font-bold text-heading lg:text-[44px]">{t('template.title')}</h1>
+            <p className="text-[15px] leading-relaxed text-muted">{t('template.subtitle')}</p>
+          </div>
+          <TemplateEditor
+            base={`/p/${token}`}
+            designUrl={`/p/${token}?edit=1`}
+            previewUrl={previewSrc}
+            continueHref={posters ? '?step=posters' : '#checkout'}
+            texts={editor.texts}
+            photos={editor.photos.photos}
+            maxPhotos={editor.photos.max}
+            aspects={editor.photos.aspects}
+            names={editor.photos.names}
+            video={editor.video}
+            videoIncluded={editor.videoIncluded}
+            labels={templateLabels(t)}
+          />
+        </div>
+      ) : null}
+      {posterStep && posters && template ? (
+        <div className="mt-8">
+          <PosterEditor
+            base={`/p/${token}`}
+            photos={template.photos.photos.map((p) => ({ index: p.position, src: p.src, focus: p.focus }))}
+            still={posters.still}
+            initial={posters.choices}
+            backHref="?"
+            continueHref="#checkout"
+            labels={posterLabels(t)}
+          />
+        </div>
+      ) : null}
+      <div className={`mt-8 grid gap-12 lg:gap-20 ${template ? 'mx-auto max-w-[760px]' : 'lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)]'}`}>
+        <div className={`flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start ${template ? 'hidden' : ''}`}>
           {draft.onlineInvitation ? (
             <div className="w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
               <iframe data-order-preview src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
@@ -57,7 +103,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
             </>
           )}
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium text-accent">
-            {draft.status === 'DRAFT' ? (
+            {draft.status === 'DRAFT' && !draft.template ? (
               <Link href={`/order/${token}/edit`} className="underline underline-offset-4">
                 {t('edit')}
               </Link>
@@ -71,10 +117,12 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
         </div>
 
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('reviewTitle')}</h1>
-            <p className="text-[15px] leading-relaxed text-muted">{t('reviewSubtitle')}</p>
-          </div>
+          {template ? null : (
+            <div className="flex flex-col gap-2">
+              <h1 className="font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('reviewTitle')}</h1>
+              <p className="text-[15px] leading-relaxed text-muted">{t('reviewSubtitle')}</p>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-4 rounded-[22px] border border-line bg-paper px-5 py-4">
             <div className="flex flex-col">
               <span className="text-xs text-muted">{t('packageLabel')}</span>
@@ -90,7 +138,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               </span>
             </div>
           </div>
-          {draft.photos && draft.status === 'DRAFT' ? (
+          {draft.photos && draft.status === 'DRAFT' && !template ? (
             <PhotoSlots
               previewUrl={`/p/${token}`}
               base={`/p/${token}/photos`}
@@ -139,7 +187,8 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
           ) : null}
           <ExtrasPreview
             base={`/p/${token}/extra`}
-            featureKeys={draft.featureKeys}
+            // The posters have their own step (above) in a template design.
+            featureKeys={posters ? draft.featureKeys.filter((k) => k !== 'couple_poster') : draft.featureKeys}
             stickerShape={draft.current.stickerShape}
             cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale)}
             watermarked
@@ -158,10 +207,13 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               collagePolaroids: t('extras.collagePolaroids'),
               collageStory: t('extras.collageStory'),
               collageWall: t('extras.collageWall'),
+              posterLandscape: t('extras.posterLandscape'),
+              posterPortrait: t('extras.posterPortrait'),
               downloadJpg: t('extras.downloadJpg'),
             }}
           />
-          <section aria-labelledby="contact-title" className="flex flex-col gap-4">
+          {showCheckout ? (
+          <section id="checkout" aria-labelledby="contact-title" className="flex scroll-mt-6 flex-col gap-4">
             <div>
               <h2 id="contact-title" className="text-xl font-semibold text-heading">
                 {t('contactTitle')}
@@ -176,6 +228,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               termsSlug={draft.termsSlug}
             />
           </section>
+          ) : null}
         </div>
       </div>
     </div>

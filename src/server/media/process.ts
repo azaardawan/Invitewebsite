@@ -3,7 +3,7 @@ import sharp, { type Metadata } from 'sharp';
 import { parseBuffer } from 'music-metadata';
 
 export class MediaError extends Error {
-  constructor(public readonly code: 'tooLarge' | 'unsupportedImage' | 'unsupportedAudio' | 'imageTooSmall' | 'audioTooLong') {
+  constructor(public readonly code: 'tooLarge' | 'unsupportedImage' | 'unsupportedAudio' | 'unsupportedVideo' | 'imageTooSmall' | 'audioTooLong') {
     super(code);
   }
 }

@@ -99,6 +99,13 @@ export type ThemeManifest = {
    * Photos always fill the places in order (no gaps): `props.photos[i]` belongs in place i. The theme reads `props.photos`.
    */
   photos?: PhotoSpec;
+  /**
+   * `template`: the customer fills the design in place (owner, 2026-10-31): after choosing a package they get the design
+   * itself, empty, and tap each text to type it and each frame to add its photo or video; no order form. The design draws
+   * its texts with `<EditableText>`, its photos with `<Photo>` (empty frames with `<PhotoSlot>`) and its video with
+   * `<VideoSlot>`, which become editable there (see docs/THEME_CONTRACT.md, "Template designs").
+   */
+  editor?: 'template';
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
@@ -218,7 +225,7 @@ export const manifestSchema = z
           maxLength: z.number().int().min(1).max(120),
         }),
       )
-      .max(6)
+      .max(10)
       .optional(),
     switches: z
       .array(z.object({ key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/), label: z.object({ ar: z.string().min(1), en: z.string().min(1) }), default: z.boolean() }))
@@ -233,6 +240,7 @@ export const manifestSchema = z
         frames: z.array(z.object({ aspect: z.number().min(0.4).max(2.5) })).max(20).optional(),
       })
       .optional(),
+    editor: z.literal('template').optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {

@@ -14,7 +14,7 @@ const outFile = path.join(root, 'src/theme-registry/generated.ts');
 const loadersFile = path.join(root, 'src/theme-registry/loaders.generated.tsx');
 const printFile = path.join(root, 'src/theme-registry/print.generated.ts');
 
-const entries: { key: string; version: number; importPath: string; card: boolean; cardBack: boolean; keepsake: boolean; shape: boolean; story: boolean; sticker: boolean; bottle: boolean; collage: boolean }[] = [];
+const entries: { key: string; version: number; importPath: string; card: boolean; cardBack: boolean; keepsake: boolean; shape: boolean; story: boolean; sticker: boolean; bottle: boolean; collage: boolean; poster: boolean }[] = [];
 
 /**
  * Theme Contract rule 11: a theme must never style the rest of the site.
@@ -83,7 +83,9 @@ for (const key of existsSync(themesDir) ? readdirSync(themesDir).sort() : []) {
     // Optional: the design's own newborn extras. Without them the platform draws them (or the owner's artwork).
     const has = (file: string) => existsSync(path.join(themeDir, dirent.name, `print/${file}.tsx`));
     // Optional: the design's photo collages in its own fonts (print/Collage.tsx renders the SDK's <Collage>).
-    const extras = { story: has('Story'), sticker: has('Sticker'), bottle: has('Bottle'), collage: has('Collage') };
+    const extras = { story: has('Story'), sticker: has('Sticker'), bottle: has('Bottle'), collage: has('Collage'), poster: has('CouplePoster') };
+    // The couple posters (feature couple_poster) are the design's own: print/Poster.tsx draws both (print/Poster.tsx is something else in older designs).
+    if (parsed.data.features.includes('couple_poster') && !extras.poster) errors.push(`themes/${key}/${dirent.name}: feature couple_poster needs print/CouplePoster.tsx`);
     entries.push({ key, version: parsed.data.version, importPath: `../../themes/${key}/${dirent.name}/manifest`, card, cardBack, keepsake, shape, ...extras });
   }
 }
@@ -153,6 +155,7 @@ import 'server-only';
 import type { ComponentType } from 'react';
 import type { KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintExtraProps, PrintShapeProps } from '@/theme-sdk/print';
 import type { PrintCollageProps } from '@/theme-sdk/collage';
+import type { PrintPosterProps } from '@/theme-sdk/poster';
 
 type Loader<P> = () => Promise<{ default: ComponentType<P> }>;
 export type PrintLoaders = {
@@ -164,6 +167,7 @@ export type PrintLoaders = {
   sticker?: Loader<PrintExtraProps>;
   bottle?: Loader<PrintExtraProps>;
   collage?: Loader<PrintCollageProps>;
+  poster?: Loader<PrintPosterProps>;
 };
 
 export const printComponents: Record<string, PrintLoaders> = {
@@ -179,6 +183,7 @@ ${entries
       e.sticker ? `sticker: () => import('${dir}/print/Sticker')` : '',
       e.bottle ? `bottle: () => import('${dir}/print/Bottle')` : '',
       e.collage ? `collage: () => import('${dir}/print/Collage')` : '',
+      e.poster ? `poster: () => import('${dir}/print/CouplePoster')` : '',
     ].filter(Boolean);
     return `  '${e.key}@${e.version}': { ${parts.join(', ')} },`;
   })

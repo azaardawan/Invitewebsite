@@ -11,6 +11,11 @@ import { listPhotos } from '@/server/photos/photos';
 import { includedCollages } from '@/catalog/collages';
 import type { CollageText } from '@/theme-sdk/collage';
 import type { ThemePhoto } from '@/theme-sdk/types';
+import type { PrintPosterProps } from '@/theme-sdk/poster';
+import { customerVideo } from '@/server/video/video';
+import { resolvePoster, type PosterOrientation, type PosterPick } from '@/lib/poster-choices';
+import { getSettings } from '@/server/settings/service';
+import { env } from '@/server/env';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -27,7 +32,15 @@ export function isPaid(inv: Pick<InvitationRow, 'status' | 'publishedAt'>) {
 export function productDataFrom(
   props: ThemeProps,
   design: Pick<ResolvedArtwork, 'story' | 'sticker' | 'bottle' | 'look'>,
-  opts: { stickerShape: 'round' | 'square'; bottleSize?: BottleSize; watermark: boolean; codeRef?: string; collagePhotos?: ThemePhoto[] },
+  opts: {
+    stickerShape: 'round' | 'square';
+    bottleSize?: BottleSize;
+    watermark: boolean;
+    codeRef?: string;
+    collagePhotos?: ThemePhoto[];
+    /** Couple posters: the photos at full size, the video's still and Bahja's details for the bottom. */
+    poster?: { photos: ThemePhoto[]; still: string | null; contact: PrintPosterProps['contact']; picks: Record<PosterOrientation, PosterPick<ThemePhoto>> };
+  },
 ): ProductData {
   const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string; collage: CollageText } };
   const f = props.fields;
@@ -55,6 +68,9 @@ export function productDataFrom(
       date: props.event.date ? `${props.event.date.day} ${props.event.date.month}` : (props.birthDate?.lines[0] ?? null),
       text: msgs.print.collage,
     },
+    poster: opts.poster
+      ? { locale: props.locale, dir: props.dir, lang: props.lang, fields: props.fields, wording: props.wording, labels: { and: props.labels.and }, ...opts.poster }
+      : null,
     theme: opts.codeRef
       ? {
           codeRef: opts.codeRef,
@@ -82,7 +98,33 @@ export async function productData(db: DbOrTx, inv: InvitationRow, opts: { sticke
   const stickerShape = opts.stickerShape ?? (inv.stickerShape === 'both' ? 'round' : inv.stickerShape);
   // Collages: the customer's photos at full size, for print (only when the package has a collage).
   const collagePhotos = includedCollages(inv.featureKeys).length
-    ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null }))
+    ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }))
     : [];
-  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos });
+  // Couple posters: the photos at full size, the video's still, and Bahja's details for the bottom.
+  const poster = inv.featureKeys.includes('couple_poster') ? await posterData(db, inv) : undefined;
+  return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos, poster });
+}
+
+/** The posters' pictures (full size), the video's still, the customer's choices for each poster, and Bahja's details. */
+async function posterData(db: DbOrTx, inv: InvitationRow) {
+  const photos = (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }));
+  const still = (await customerVideo(db, inv))?.poster ?? null;
+  const picks = {
+    landscape: resolvePoster(inv.posterChoices.landscape, photos, Boolean(still), 'landscape'),
+    portrait: resolvePoster(inv.posterChoices.portrait, photos, Boolean(still), 'portrait'),
+  };
+  return { photos, still, picks, contact: await posterContact(db) };
+}
+
+/** Bahja's details at the bottom of the posters: the website (from APP_URL), the WhatsApp number (or the phone) and Instagram. */
+export async function posterContact(db: DbOrTx): Promise<PrintPosterProps['contact']> {
+  const { payment, contact } = await getSettings(db);
+  const number = payment.whatsapp ?? contact.phone;
+  return { website: new URL(env().APP_URL).host.replace(/^www\./, ''), phone: number ? spacedPhone(number) : null, instagram: contact.instagram ? `@${contact.instagram}` : null };
+}
+
+/** +9647701234567 → +964 770 123 4567 (easier to read on a poster). */
+export function spacedPhone(e164: string): string {
+  const m = /^\+964(\d{3})(\d{3})(\d{4})$/.exec(e164);
+  return m ? `+964 ${m[1]} ${m[2]} ${m[3]}` : e164;
 }

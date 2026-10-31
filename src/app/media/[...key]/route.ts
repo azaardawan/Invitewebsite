@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { env } from '@/server/env';
 import { isValidStorageKey, storage } from '@/server/storage';
 
-const TYPES: Record<string, string> = { webp: 'image/webp', mp3: 'audio/mpeg' };
+const TYPES: Record<string, string> = { webp: 'image/webp', mp3: 'audio/mpeg', mp4: 'video/mp4', jpg: 'image/jpeg' };
 
 /**
  * Serves locally stored media in development only. In staging/production
@@ -13,7 +13,9 @@ export async function GET(_req: Request, ctx: RouteContext<'/media/[...key]'>) {
   const { key: parts } = await ctx.params;
   const key = parts.join('/');
   const ext = key.split('.').pop() ?? '';
-  if (env().STORAGE_DRIVER !== 'local' || !isValidStorageKey(key) || !TYPES[ext]) {
+  // JPEGs here are only a video's still: the extras' JPEGs (documents/) are private.
+  const privateFile = ext === 'jpg' && !key.startsWith('videos/');
+  if (env().STORAGE_DRIVER !== 'local' || !isValidStorageKey(key) || !TYPES[ext] || privateFile) {
     return new NextResponse(null, { status: 404 });
   }
   const body = await storage().get(key);

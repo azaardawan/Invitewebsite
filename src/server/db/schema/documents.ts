@@ -34,6 +34,11 @@ export const documentKind = pgEnum('document_kind', [
   'COLLAGE_STORY_PREVIEW',
   'COLLAGE_WALL_JPG',
   'COLLAGE_WALL_PREVIEW',
+  // A design's printable posters (feature `couple_poster`): landscape and portrait, the picture and its preview.
+  'POSTER_LANDSCAPE_JPG',
+  'POSTER_LANDSCAPE_PREVIEW',
+  'POSTER_PORTRAIT_JPG',
+  'POSTER_PORTRAIT_PREVIEW',
 ]);
 
 /**

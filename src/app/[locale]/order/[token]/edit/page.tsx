@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Link } from '@/i18n/navigation';
+import { Link, redirect } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
 import { draftByToken, orderFormExtras } from '@/server/storefront/order';
@@ -27,6 +27,11 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
         </Link>
       </div>
     );
+  }
+  // A template design is edited in place, on the review page itself.
+  if (draft.template) {
+    redirect({ href: `/order/${token}`, locale });
+    return null;
   }
   return (
     <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">

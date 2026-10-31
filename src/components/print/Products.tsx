@@ -7,6 +7,7 @@ import { FONTS, JUSTIFY, type ArtworkSide, type PrintLook } from './ArtworkCard'
 import { TINT, mix } from './look';
 import { BOTTLE_GAP_MM, BOTTLE_SIZES, bottlesPerSheet, type BottleSize } from '@/catalog/products';
 import type { PrintExtraProps } from '@/theme-sdk/print';
+import type { PrintPosterProps } from '@/theme-sdk/poster';
 import type { PrintCollageProps } from '@/theme-sdk/collage';
 import type { InvitationLocale } from '@/theme-sdk/types';
 import { WatermarkLayer } from './watermark';
@@ -42,6 +43,8 @@ export type ProductData = {
   locale: InvitationLocale;
   /** Photo collages: the customer's photos (full size) and the lines written on them. */
   collage: Pick<PrintCollageProps, 'photos' | 'name' | 'message' | 'date' | 'text'>;
+  /** Couple posters (packages with `couple_poster`): what the design's print/Poster.tsx draws, or null. */
+  poster: (Omit<PrintPosterProps, 'orientation' | 'size' | 'main' | 'row'> & { picks: Record<PrintPosterProps['orientation'], Pick<PrintPosterProps, 'main' | 'row'>> }) | null;
 };
 
 /** A bottle label's size in mm. */

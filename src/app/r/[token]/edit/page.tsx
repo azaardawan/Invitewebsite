@@ -5,7 +5,11 @@ import { signatureUrls } from '@/server/invitation/load';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { isLocale, type Locale } from '@/i18n/config';
 import { db } from '@/server/db/client';
-import { invitations } from '@/server/db/schema';
+import { invitations, themeVersions } from '@/server/db/schema';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
+import { posterLabels, templateLabels } from '@/components/storefront/order/template-labels';
+import { PosterEditor } from '@/components/storefront/order/PosterEditor';
 import { localized } from '@/server/catalog/common';
 import { orderFields } from '@/server/storefront/catalog';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
@@ -13,15 +17,16 @@ import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { SongUpload } from '@/components/storefront/order/SongUpload';
 import { songLabels } from '@/components/storefront/order/song-labels';
-import { photoState, songState } from '@/server/storefront/order';
+import { photoState, songState, templateState } from '@/server/storefront/order';
 import { invitationPath } from '@/lib/ids';
 import { receiptFor } from '../data';
 import { placeOptionalIn } from '@/server/catalog/occasions';
 import { customerEditAction } from '../actions';
 
 /** The customer changes their published invitation (packages with `self_edit`), from their private receipt. */
-export default async function CustomerEditPage({ params }: PageProps<'/r/[token]/edit'>) {
+export default async function CustomerEditPage({ params, searchParams }: PageProps<'/r/[token]/edit'>) {
   const { token } = await params;
+  const { step } = await searchParams;
   const r = await receiptFor(token);
   if (!r || r.status !== 'PAID' || !r.invitation.selfEdit.included) notFound();
   const locale: Locale = isLocale(r.snapshot.invitation.locale) ? r.snapshot.invitation.locale : 'ar';
@@ -51,6 +56,52 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
   // …and their own song (packages with `custom_music`).
   const song = await songState(inv!);
   const ts = await getTranslations({ locale, namespace: 'store' });
+
+  // A template design: changed in place, like it was filled while ordering (texts, photos and video, saved one by one).
+  const [version] = await db().select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv!.themeVersionId));
+  const manifest = version?.manifest as ThemeManifest | undefined;
+  if (manifest?.editor === 'template' && photos) {
+    const template = await templateState(inv!, manifest);
+    const live = invitationPath(inv!.slug, inv!.publicId);
+    const receipt = `/r/${encodeURIComponent(token)}`;
+    // With the posters: the page first, then the posters' step, as while ordering.
+    if (template.posters && step === 'posters') {
+      return (
+        <main className="mx-auto max-w-[1200px] px-4 py-10">
+          <p className="mb-6">{back}</p>
+          <PosterEditor
+            base={receipt}
+            photos={photos.photos.map((p) => ({ index: p.position, src: p.src, focus: p.focus }))}
+            still={template.posters.still}
+            initial={template.posters.choices}
+            backHref="?"
+            continueHref={`${receipt}#extras`}
+            labels={posterLabels(ts, true)}
+          />
+        </main>
+      );
+    }
+    return (
+      <main className="mx-auto max-w-[1200px] px-4 py-10">
+        <p className="mb-6">{back}</p>
+        <h1 className="mb-4 text-xl font-semibold">{t('editTitle')}</h1>
+        <TemplateEditor
+          base={`/r/${encodeURIComponent(token)}`}
+          designUrl={`${live}?edit=1`}
+          previewUrl={live}
+          continueHref={template.posters ? '?step=posters' : `${receipt}#edit`}
+          texts={template.texts}
+          photos={photos.photos}
+          maxPhotos={photos.max}
+          aspects={photos.aspects}
+          names={photos.names}
+          video={template.video}
+          videoIncluded={template.videoIncluded}
+          labels={templateLabels(ts, !template.posters)}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">

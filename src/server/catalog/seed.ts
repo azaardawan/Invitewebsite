@@ -96,6 +96,18 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'girl', name: { ar: 'بنت', en: 'Girl', ckb: 'کچ', bdn: 'کچ' } },
     ],
   },
+  {
+    // Not an invitation (owner, 2026-10-31): a couple's own page of photos and one video, like a streaming
+    // service's film page (BAHJAFLIX), filled in on the design itself. No date, place or guest form.
+    key: 'couples',
+    name: { ar: 'للأزواج', en: 'Couples', ckb: 'بۆ هاوسەران', bdn: 'بۆ هەڤژینان' },
+    requiredFeatures: ['photos', 'video'],
+    fields: [
+      { key: 'person_1_name', label: { ar: 'اسمه', en: 'His name', ckb: 'ناوی ئەو (پیاو)', bdn: 'ناڤێ وی' } },
+      { key: 'person_2_name', label: { ar: 'اسمها', en: 'Her name', ckb: 'ناوی ئەو (ئافرەت)', bdn: 'ناڤێ وێ' } },
+      { key: 'invitation_message', label: { ar: 'قصتكما', en: 'Your story', ckb: 'چیرۆکەکەتان', bdn: 'چیرۆکا هەوە' } },
+    ],
+  },
 ];
 
 export async function seedCatalog(db: DbOrTx) {

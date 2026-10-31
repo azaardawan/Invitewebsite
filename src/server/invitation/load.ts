@@ -9,6 +9,7 @@ import { buildThemeProps } from './theme-props';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
 import { customSong } from '@/server/music/custom';
+import { customerVideo } from '@/server/video/video';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import type { SignatureStrokes } from '@/lib/signature-strokes';
 
@@ -53,9 +54,15 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       switchDefs: (version!.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
       photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id) : [],
-      photoSpec: (version!.manifest as ThemeManifest).photos ?? null,
+      photoSpec: limitedPhotoSpec((version!.manifest as ThemeManifest).photos ?? null, inv.photoLimit),
+      video: await customerVideo(db, inv),
     }),
   };
+}
+
+/** The design's photo settings with the package's limit applied (the package may sell fewer photos). */
+function limitedPhotoSpec(spec: ThemeManifest['photos'] | null, limit: number | null) {
+  return spec && limit != null ? { ...spec, max: Math.min(spec.max, limit) } : spec;
 }
 
 /** The section key of the occasion an invitation is for (e.g. `wedding`), or null. */

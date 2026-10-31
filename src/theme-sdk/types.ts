@@ -146,14 +146,37 @@ export type ThemeProps = {
    * pictures for every place. Draw each with `<Photo photo={…} />`, which keeps the customer's placement in the frame.
    */
   photos: ThemePhoto[];
+  /**
+   * How many photo places this invitation has (its package may sell fewer than the design's `photos.max`); 0 without
+   * `photos`. Template designs show that many frames in the editor; elsewhere draw only `photos`.
+   */
+  photoPlaces: number;
+  /**
+   * The customer's own video (packages with `video`): an MP4 of at most a minute and a still from it (`poster`), or
+   * null (none added yet, samples, or a package without it). Play it with `<VideoSlot>` from `@/theme-sdk`.
+   */
+  video: ThemeVideo | null;
 };
+
+/** The customer's video: where it is, its still, and its pixel size. */
+export type ThemeVideo = { src: string; poster: string; width: number; height: number };
 
 /**
  * One customer photo: its place (`index`, the same as in `props.photos`), its address (sized for the screen; print designs get the full size), its pixel size,
  * where the customer placed it in the design's frame (`focus`, as `<Photo>` applies it), and the design's name for
  * that place (manifest `photos.labels`) in the invitation's language, or null.
  */
-export type ThemePhoto = { index: number; src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; label: string | null };
+export type ThemePhoto = {
+  index: number;
+  src: string;
+  width: number;
+  height: number;
+  focus: { x: number; y: number; zoom: number };
+  label: string | null;
+  /** The customer's own title and few words for this photo (template designs), or null. */
+  title: string | null;
+  caption: string | null;
+};
 
 /**
  * The date of birth: its parts, plus `lines`, the date written the way the customer chose on the order

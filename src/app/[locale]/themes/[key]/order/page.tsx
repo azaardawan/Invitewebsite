@@ -35,12 +35,15 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   const gender = th.section.key === 'newborn' && (th.subsectionKey === 'boy' || th.subsectionKey === 'girl') ? th.subsectionKey : undefined;
   const t = await getTranslations('store');
   const common = await getTranslations('common');
+  // A template design: its texts, photos and video are filled in place on the next step; here only the language.
+  const template = th.manifest.editor === 'template';
+  const extras = await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: template ? undefined : th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes }, pkg.fieldKeys);
 
   return (
     <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">
       <OrderSteps current={0} />
       <h1 className="mt-8 font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('orderTitle')}</h1>
-      <p className="mt-2 text-[15px] leading-relaxed text-muted">{t('orderSubtitle')}</p>
+      <p className="mt-2 text-[15px] leading-relaxed text-muted">{template ? t('template.orderSubtitle') : t('orderSubtitle')}</p>
 
       <div className="mt-8 flex items-center justify-between gap-4 rounded-[22px] border border-line bg-paper px-5 py-4">
         <div className="flex flex-col">
@@ -65,12 +68,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale, ...(occasion ? { occasion: occasion.key } : {}) }}
           occasions={th.occasions.length > 1 && !occasion ? th.occasions.map((o) => ({ key: o.key, label: localized(o.name, locale) })) : undefined}
           optionalPlace={isPlaceOptional(occasion?.key ?? (th.occasions.length > 1 ? undefined : th.section.key))}
-          fields={th.fields.filter((f) => pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale), optional: f.optional }))}
+          fields={th.fields.filter((f) => !template && pkg.fieldKeys.includes(f.key)).map((f) => ({ key: f.key, type: f.type, maxLength: f.maxLength, label: localized(f.label, locale), optional: f.optional }))}
           initialValues={gender ? { baby_gender: gender } : undefined}
           invitationLocale={locale}
           minDate={baghdadToday()}
           submitLabel={t('continue')}
-          extras={await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes }, pkg.fieldKeys)}
+          extras={extras}
         />
       </div>
     </div>

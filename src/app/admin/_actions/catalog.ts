@@ -355,6 +355,8 @@ function packageFields(form: FormData) {
     description: readI18n(form, 'description'),
     priceIqd: Number(String(form.get('priceIqd') ?? '').replace(/[,\s٬]/g, '')),
     lifetime: (form.get('lifetime') ?? undefined) as PackageInput['lifetime'],
+    // Empty = as many photos as the design holds.
+    photoLimit: form.has('photoLimit') ? (String(form.get('photoLimit') ?? '').trim() === '' ? null : Number(form.get('photoLimit'))) : undefined,
   };
 }
 

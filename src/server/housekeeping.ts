@@ -7,6 +7,7 @@ import { storage } from '@/server/storage';
 import { ensureDocument } from '@/server/documents/documents';
 import { deleteOrphanPhotoFiles, deletePhotosOf } from '@/server/photos/photos';
 import { deleteCustomSongsOf, deleteOrphanSongFiles } from '@/server/music/custom';
+import { deleteOrphanVideoFiles, deleteVideosOf } from '@/server/video/video';
 
 /** Guest replies and keepsakes are deleted this long after an invitation ends (privacy policy). */
 export const GUEST_DATA_RETENTION_DAYS = 365;
@@ -54,6 +55,8 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   const photosDeleted = (await deletePhotosOf(db, [...oldIds, ...unpaid.map((r) => r.id)])) + (await deleteOrphanPhotoFiles(db, now));
   // The customer's own songs go with them.
   const songsDeleted = (await deleteCustomSongsOf(db, [...oldIds, ...unpaid.map((r) => r.id)])) + (await deleteOrphanSongFiles(db, now));
+  // And their videos (packages with `video`).
+  const videosDeleted = (await deleteVideosOf(db, [...oldIds, ...unpaid.map((r) => r.id)])) + (await deleteOrphanVideoFiles(db, now));
 
   // Keepsakes of invitations that just ended: generate once so the customer's download is instant.
   let keepsakesPrepared = 0;
@@ -101,5 +104,5 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   if (stale.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, stale.map((d) => d.id)));
 
   await pruneRateLimits(db, now);
-  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted };
+  return { repliesDeleted, keepsakesDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted, videosDeleted };
 }

@@ -4,6 +4,7 @@ import type { ProductView } from '@/server/documents/tokens';
 import { printComponents } from '@/theme-registry/print.generated';
 import type { PrintExtraProps } from '@/theme-sdk/print';
 import { COLLAGES, Collage, type CollageKind, type PrintCollageProps } from '@/theme-sdk/collage';
+import { POSTER_SIZES, type PrintPosterProps } from '@/theme-sdk/poster';
 
 const BASE = 'html,body{margin:0;padding:0;background:transparent}';
 
@@ -26,6 +27,8 @@ export async function ProductPages({ view, data }: { view: ProductView; data: Pr
     collagePolaroids: `${COLLAGE_BOX.polaroids.width}px ${COLLAGE_BOX.polaroids.height}px`,
     collageStory: `${COLLAGE_BOX.story.width}px ${COLLAGE_BOX.story.height}px`,
     collageWall: `${COLLAGE_BOX.wall.width}px ${COLLAGE_BOX.wall.height}px`,
+    posterLandscape: `${POSTER_SIZES.landscape.width}px ${POSTER_SIZES.landscape.height}px`,
+    posterPortrait: `${POSTER_SIZES.portrait.width}px ${POSTER_SIZES.portrait.height}px`,
   };
   const own = await themeExtras(data);
   return (
@@ -36,6 +39,7 @@ export async function ProductPages({ view, data }: { view: ProductView; data: Pr
       {view === 'stickerSheet' ? <StickerSheet d={data} sticker={own.sticker ? (d) => <OwnExtra d={d} item="sticker" Draw={own.sticker!} cutLine /> : undefined} /> : null}
       {view === 'bottle' ? own.bottle ? <OwnExtra d={data} item="bottle" Draw={own.bottle} /> : <BottleLabel d={data} /> : null}
       {view === 'bottleSheet' ? <BottleSheet d={data} label={own.bottle ? (d) => <OwnExtra d={d} item="bottle" Draw={own.bottle!} cutLine /> : undefined} /> : null}
+      {view === 'posterLandscape' || view === 'posterPortrait' ? <PosterPage d={data} orientation={view === 'posterLandscape' ? 'landscape' : 'portrait'} /> : null}
       {view in COLLAGE_VIEWS ? <CollagePage d={data} kind={COLLAGE_VIEWS[view as keyof typeof COLLAGE_VIEWS]} Draw={await themeCollage(data)} /> : null}
     </>
   );
@@ -63,6 +67,20 @@ function CollagePage({ d, kind, Draw }: { d: ProductData; kind: CollageKind; Dra
   return (
     <div dir={d.dir} lang={d.lang} data-extra={`collage-${kind}`} style={{ position: 'relative', width: `${COLLAGE_BOX[kind].width}px`, height: `${COLLAGE_BOX[kind].height}px`, overflow: 'hidden' }}>
       {Draw ? <Draw {...props} /> : <Collage {...props} />}
+      {d.watermark ? <Watermark labels={d.labels} /> : null}
+    </div>
+  );
+}
+
+/** A couple poster, drawn by the design (print/Poster.tsx) in its box, with the watermark before payment. */
+async function PosterPage({ d, orientation }: { d: ProductData; orientation: PrintPosterProps['orientation'] }) {
+  const load = d.theme ? printComponents[d.theme.codeRef]?.poster : undefined;
+  if (!load || !d.poster) return null;
+  const Draw = (await load()).default;
+  const size = POSTER_SIZES[orientation];
+  return (
+    <div dir={d.dir} lang={d.lang} data-extra={`poster-${orientation}`} style={{ position: 'relative', width: `${size.width}px`, height: `${size.height}px`, overflow: 'hidden' }}>
+      <Draw {...d.poster} {...d.poster.picks[orientation]} orientation={orientation} size={size} />
       {d.watermark ? <Watermark labels={d.labels} /> : null}
     </div>
   );

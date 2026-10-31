@@ -29,7 +29,7 @@ const PHOTO_PREFIX = 'photos/';
  */
 export async function photoSpec(
   db: DbOrTx,
-  inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'>,
+  inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'> & Partial<Pick<InvitationRow, 'photoLimit'>>,
 ): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[] }) | null> {
   const collage = collagePhotoCount(inv.featureKeys);
   let spec: PhotoSpec | undefined;
@@ -38,12 +38,13 @@ export async function photoSpec(
     spec = (v?.manifest as ThemeManifest | null)?.photos ?? (v ? manifestByCodeRef(v.codeRef)?.photos : undefined);
   }
   if (!spec && !collage) return null;
-  const own = spec?.max ?? 0;
+  // The package may sell fewer photos than the design holds (packages.photo_limit, copied to the invitation).
+  const own = Math.min(spec?.max ?? 0, inv.photoLimit ?? Infinity);
   const max = Math.max(own, collage);
   const aspect = spec?.aspect ?? (spec ? DEFAULT_PHOTO_ASPECT : COLLAGE_PHOTO_ASPECT);
   // Each place's frame: its own (a collage design), the design's common one, or the collages' past the design's places.
   const aspects = Array.from({ length: max }, (_, i) => (i < own ? (spec?.frames?.[i]?.aspect ?? aspect) : COLLAGE_PHOTO_ASPECT));
-  return { max, min: spec?.min ?? 0, aspect, labels: spec?.labels, aspects };
+  return { max, min: Math.min(spec?.min ?? 0, own), aspect, labels: spec?.labels, aspects };
 }
 
 /** The frame photos past the design's own places are shown in on the order form (the collages crop each to its place). */
@@ -58,6 +59,9 @@ export type InvitationPhoto = {
   width: number;
   height: number;
   focus: CoverFocus;
+  /** The customer's own title and few words for it (template designs), or null. */
+  title: string | null;
+  caption: string | null;
 };
 
 /** An invitation's photos in the design's order. */
@@ -77,7 +81,27 @@ export async function listPhotos(db: DbOrTx, invitationId: string): Promise<Invi
     width: r.display.width ?? 0,
     height: r.display.height ?? 0,
     focus: normalizeCoverFocus(r.photo.focus),
+    title: r.photo.title,
+    caption: r.photo.caption,
   }));
+}
+
+/** Longest title and words a customer can give a photo. */
+export const PHOTO_TEXT_LIMITS = { title: 40, caption: 240 } as const;
+
+/** The customer's title and few words for a photo ('' clears them); text only, trimmed and cut to the limits. */
+export async function setPhotoText(db: DbOrTx, invitationId: string, position: number, text: { title?: string; caption?: string }) {
+  const clean = (v: string | undefined, max: number) => (v === undefined ? undefined : v.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').trim().slice(0, max) || null);
+  const set: { title?: string | null; caption?: string | null } = {};
+  if (text.title !== undefined) set.title = clean(text.title, PHOTO_TEXT_LIMITS.title);
+  if (text.caption !== undefined) set.caption = clean(text.caption, PHOTO_TEXT_LIMITS.caption);
+  if (!Object.keys(set).length) return;
+  const [row] = await db
+    .update(invitationPhotos)
+    .set(set)
+    .where(and(eq(invitationPhotos.invitationId, invitationId), eq(invitationPhotos.position, position)))
+    .returning({ id: invitationPhotos.id });
+  if (!row) throw new PhotoError('notFound');
 }
 
 async function storeOne(db: DbOrTx, img: { data: Buffer; width: number; height: number }) {

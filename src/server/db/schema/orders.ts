@@ -1,3 +1,4 @@
+import type { PosterChoices } from '../../../lib/poster-choices';
 import type { SignatureStrokes } from '../../../lib/signature-strokes';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
@@ -94,6 +95,8 @@ export const invitations = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     /** The package's online time, copied when the draft is made and again at checkout; used when it is published. */
     lifetime: text('lifetime', { enum: PACKAGE_LIFETIMES }).notNull().default('30'),
+    /** The package's photo limit (null = the design's), copied with the online time so a paid order keeps its own. */
+    photoLimit: integer('photo_limit'),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),
@@ -112,6 +115,11 @@ export const invitations = pgTable(
     wording: jsonb('wording').$type<Record<string, string>>().notNull().default({}),
     /** The design's yes/no choices (manifest `switches`) the customer answered, by key; absent = the default. */
     switches: jsonb('switches').$type<Record<string, boolean>>().notNull().default({}),
+    /**
+     * Couple posters (`couple_poster`): the customer's choices per poster, by orientation: `main` the big picture (a photo
+     * place, or -1 for the video's still) and, on the landscape one, `row` the photo places in its row. Absent = defaults.
+     */
+    posterChoices: jsonb('poster_choices').$type<PosterChoices>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */
@@ -128,6 +136,12 @@ export const invitations = pgTable(
      * While set it plays instead of the design's song; null = the design's song.
      */
     customMusicAssetId: uuid('custom_music_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /**
+     * The customer's own video (packages with `video`): their upload converted to a phone-friendly MP4 of at most a
+     * minute, and a still from it shown until it plays (src/server/video/video.ts). Personal data: deleted with the photos.
+     */
+    videoAssetId: uuid('video_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    videoPosterAssetId: uuid('video_poster_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */

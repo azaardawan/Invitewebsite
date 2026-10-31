@@ -14,14 +14,17 @@ export type {
   GuestResponseInput,
   GuestbookMessage,
   ThemePhoto,
+  ThemeVideo,
 } from './types';
 export { hasFeature, formatNumber } from './types';
 export { ThemeBorder, Signature } from './border';
 export { Photo } from './photo';
+export { EditableText, PhotoSlot, VideoSlot, useTemplateEditing } from './editing';
 export { Collage, COLLAGES } from './collage';
 export type { CollageKind, CollageText, CollageFonts, PrintCollageProps } from './collage';
 export type { ThemeBorderSpec, BorderKind } from './border';
 export type { PhotoSpec } from './manifest';
+export type { PrintPosterProps } from './poster';
 export type { PrintCardProps, PrintCardBackProps, PrintShapeProps, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';

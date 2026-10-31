@@ -1,0 +1,1146 @@
+/*
+ * BAHJAFLIX. One page that is a streaming app's title page: a phone layout (a big video card, rows to swipe, a bottom
+ * bar) and, from 900 px, a computer layout (a side rail, a split hero, rows paging with arrows and growing on hover).
+ * In the editor (.editing) every place is shown and nothing moves.
+ */
+.page {
+  --red: #e50914;
+  --gold: #f5b335;
+  --gap: 12px;
+  position: relative;
+  min-height: 100dvh;
+  background: #000;
+  color: #fff;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+:where(.page) button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+:where(.page) h1,
+:where(.page) h2,
+:where(.page) h3,
+:where(.page) p {
+  margin: 0;
+}
+
+.logo {
+  display: inline-flex;
+  color: var(--red);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  user-select: none;
+}
+.logo > span {
+  display: inline-block;
+  transform-origin: 50% 0;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 0.35);
+}
+.B {
+  display: inline-block;
+  color: var(--red);
+  font-weight: 900;
+  line-height: 1;
+  transform: scaleX(0.8);
+}
+
+/* ---------- Opening ---------- */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 48px;
+  background: #000;
+  overflow: hidden;
+}
+.introZoom {
+  display: grid;
+  place-items: center;
+}
+.introLogo {
+  font-size: clamp(64px, 17vw, 150px);
+  transform: scaleX(0.8);
+}
+.introLogo > span {
+  opacity: 0;
+  filter: blur(10px);
+  animation: letter 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 30px;
+  border-radius: 6px;
+  background: #fff;
+  color: #000 !important;
+  font-size: 18px;
+  font-weight: 800;
+  opacity: 0;
+  animation: rise 0.6s 0.7s ease-out forwards;
+}
+.open svg {
+  width: 22px;
+  height: 22px;
+}
+.streaks {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, #e50914 0 3px, #8a0610 3px 7px, #ff4b55 7px 9px, #2a0004 9px 15px);
+  mix-blend-mode: screen;
+}
+.going .introZoom {
+  animation: zoom 1.1s cubic-bezier(0.7, 0, 0.9, 0.4) forwards;
+}
+.going .streaks {
+  animation: streaks 0.9s 0.45s ease-in forwards;
+}
+.going {
+  animation: introOut 0.5s 1.35s forwards;
+}
+.reduced .intro .introLogo > span,
+.reduced .open {
+  animation: none;
+  opacity: 1;
+  filter: none;
+}
+.reduced .going,
+.reduced .going .introZoom,
+.reduced .going .streaks {
+  animation: introOut 0.1s forwards;
+}
+@keyframes letter {
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes zoom {
+  to {
+    transform: scale(24);
+    filter: brightness(2.4);
+  }
+}
+@keyframes streaks {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2) scaleY(3);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(3) scaleY(3);
+  }
+}
+@keyframes introOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ---------- Phone: top bar ---------- */
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 12px;
+  padding-inline-start: 16px;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.92), rgb(0 0 0 / 0.6) 70%, transparent);
+}
+.logoBox {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #141414;
+  box-shadow: 0 0 0 1px #222 inset;
+}
+.logoBox .B {
+  font-size: 28px;
+}
+.chips {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-inline-end: 16px;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex: none;
+  border: 1.5px solid rgb(255 255 255 / 0.55) !important;
+  border-radius: 999px;
+  padding: 6px 16px !important;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* ---------- Phone: the video card ---------- */
+.heroWrap {
+  padding: 6px 16px 0;
+}
+.hero {
+  position: relative;
+  aspect-ratio: 4 / 5.3;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 22px 50px rgb(0 0 0 / 0.8);
+  isolation: isolate;
+}
+.reel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.reelMedia {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+.reelEmpty {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, #3a0a0e, #000 70%);
+}
+.kenburns {
+  animation: kb 16s linear infinite alternate;
+}
+.reduced .kenburns {
+  animation: none;
+}
+@keyframes kb {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.14) translate(1.5%, 1%);
+  }
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.95) 0%, rgb(0 0 0 / 0.55) 34%, transparent 60%);
+}
+.ribbon {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  inset-inline-start: 14px;
+  width: 46px;
+  padding: 8px 0 14px;
+  background: var(--red);
+  text-align: center;
+  font-weight: 900;
+  line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%);
+  pointer-events: none;
+}
+.ribbon small {
+  display: block;
+  font-size: 11px;
+}
+.ribbon b {
+  display: block;
+  font-size: 20px;
+  margin-top: 2px;
+}
+.tag {
+  display: none;
+}
+.info {
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0;
+  padding: 0 16px 16px;
+  text-align: center;
+}
+.brand {
+  display: none;
+}
+.sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  font-weight: 800;
+  color: #ddd;
+}
+.sub .B {
+  font-size: 20px;
+  letter-spacing: 0;
+}
+.title {
+  font-family: 'BF Script', 'BF Sans', serif;
+  font-weight: 700;
+  font-size: clamp(38px, 12vw, 52px);
+  line-height: 1.2;
+  margin: 4px 0;
+  text-shadow: 0 3px 18px rgb(0 0 0 / 0.7);
+  overflow-wrap: anywhere;
+}
+.rank,
+.synopsis,
+.green,
+.when,
+.meta {
+  display: none;
+}
+.star {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.star em {
+  font-style: normal;
+  color: var(--gold);
+  font-weight: 700;
+}
+.star i {
+  display: none;
+}
+.btns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 10px;
+}
+.btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px !important;
+  border-radius: 6px !important;
+  font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.play {
+  background: #fff !important;
+  color: #000 !important;
+}
+.play:disabled {
+  opacity: 0.6;
+}
+.more {
+  background: rgb(109 109 110 / 0.6) !important;
+  backdrop-filter: blur(10px);
+}
+.moreLong {
+  display: none;
+}
+
+.storyEdit {
+  display: grid;
+  gap: 6px;
+  padding: 20px 20px 0;
+  font-size: 14px;
+  color: #aaa;
+}
+.storyEdit p {
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ---------- Phone: rows ---------- */
+.rows {
+  padding-bottom: 110px;
+}
+.row {
+  margin-top: 26px;
+}
+.rowTitle {
+  font-size: 19px;
+  font-weight: 700;
+  padding: 0 20px;
+  margin-bottom: 12px !important;
+}
+.slider {
+  position: relative;
+}
+.track {
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 0 20px 4px;
+  scroll-padding: 0 20px;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+.card {
+  position: relative;
+  flex: 0 0 38%;
+  scroll-snap-align: start;
+  outline-offset: 3px;
+}
+.wide .card {
+  flex-basis: 66%;
+}
+.card[role='button'] {
+  cursor: pointer;
+}
+.pic {
+  position: relative;
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #222;
+}
+.tall .pic {
+  aspect-ratio: 2 / 3;
+}
+.wide .pic {
+  aspect-ratio: 1.6;
+}
+.img {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.bm {
+  position: absolute;
+  z-index: 1;
+  top: 7px;
+  inset-inline-start: 9px;
+  color: var(--red);
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+  transform: scaleX(0.8);
+  text-shadow: 0 2px 6px rgb(0 0 0 / 0.4);
+  pointer-events: none;
+}
+.cap {
+  display: none;
+}
+/* The hover panel is for computers only (see below); on a phone the title sits under the card. */
+.peek {
+  display: none;
+}
+.nm {
+  display: block;
+  margin-top: 7px;
+  min-height: 1.4em;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e5e5e5;
+}
+.arrow {
+  display: none !important;
+}
+
+/* ---------- Phone: bottom bar ---------- */
+.tabs {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 10px max(20px, env(safe-area-inset-bottom));
+  background: rgb(0 0 0 / 0.85);
+  backdrop-filter: blur(20px);
+}
+.tabs button {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 40px;
+  color: #8c8c8c !important;
+}
+.tabs button.on {
+  color: #fff !important;
+}
+.tabs svg {
+  width: 26px;
+  height: 26px;
+}
+.rail {
+  display: none;
+}
+
+/* ---------- The photo view (phone: the whole screen) ---------- */
+.viewWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgb(0 0 0 / 0.85);
+  animation: veil 0.3s ease-out;
+}
+.view {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #000;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: sheetUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.still,
+.still .view {
+  animation: none;
+}
+.viewPhoto {
+  display: grid;
+  place-items: center;
+  background: #0a0a0a;
+  margin-top: 56px;
+}
+.viewPhoto img {
+  display: block;
+  max-width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+}
+.grab {
+  display: block;
+  width: 42px;
+  height: 5px;
+  border-radius: 3px;
+  background: #555;
+  margin: 14px auto 0;
+}
+.viewText {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 14px 22px 60px;
+}
+.viewText .bm {
+  position: static;
+  font-size: 22px;
+  justify-self: start;
+}
+.viewText h3 {
+  font-family: 'BF Script', 'BF Sans', serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.viewText p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #e3e3e3;
+  white-space: pre-line;
+}
+.viewCast {
+  margin-top: 6px;
+  color: #999;
+  font-size: 15px;
+}
+.viewCast b {
+  color: var(--gold);
+}
+.x {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  inset-inline-end: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  background: rgb(30 30 30 / 0.85) !important;
+  display: grid !important;
+  place-items: center;
+}
+.x svg {
+  width: 20px;
+  height: 20px;
+}
+@keyframes veil {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.player {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: #000;
+}
+.playerVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  background: #000;
+}
+
+/* ---------- The editor: every place, nothing moving ---------- */
+/* On a phone the video's place sits above the title, so both can be tapped. */
+@media (max-width: 899px) {
+  .editing .hero {
+    aspect-ratio: auto;
+  }
+  .editing .reel {
+    position: relative;
+    aspect-ratio: 16 / 10;
+  }
+  .editing .shade {
+    display: none;
+  }
+  .editing .info {
+    position: relative;
+    padding-top: 14px;
+  }
+}
+.editing .track {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+.editing .card {
+  flex-basis: calc((100% - 2 * var(--gap)) / 3);
+}
+.editing .wide .card {
+  flex-basis: calc((100% - var(--gap)) / 2);
+}
+.editing .tabs,
+.editing .rail {
+  display: none;
+}
+.editing .rows {
+  padding-bottom: 40px;
+}
+
+/* ---------- Computer ---------- */
+@media (min-width: 900px) {
+  .page {
+    --pad: 4%;
+    --gap: 0.5vw;
+  }
+  .appbar,
+  .tabs,
+  .storyEdit,
+  .nm,
+  .grab {
+    display: none;
+  }
+
+  /* Side rail: icons; their names slide out on hover. */
+  .rail {
+    position: fixed;
+    z-index: 40;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 30px;
+    background: linear-gradient(to left, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.55) 70%, transparent);
+    transition:
+      width 0.35s cubic-bezier(0.3, 0, 0.2, 1),
+      background 0.35s;
+    overflow: hidden;
+  }
+  .ltr .rail {
+    background: linear-gradient(to right, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.55) 70%, transparent);
+  }
+  .rail:hover,
+  .rail:focus-within {
+    width: 230px;
+  }
+  .rail button {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 22px;
+    width: 100%;
+    padding-inline-start: 31px !important;
+    color: #b3b3b3 !important;
+    font-size: 17px;
+    white-space: nowrap;
+    text-align: start;
+  }
+  .rail button svg {
+    flex: none;
+    width: 22px;
+    height: 22px;
+  }
+  .rail button span {
+    opacity: 0;
+    transform: translateX(10px);
+    transition: 0.3s;
+  }
+  .rail:hover button span,
+  .rail:focus-within button span {
+    opacity: 1;
+    transform: none;
+  }
+  .rail button.on {
+    color: #fff !important;
+  }
+  .rail button.on::after {
+    content: '';
+    position: absolute;
+    top: 30px;
+    inset-inline-start: 29px;
+    width: 26px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--red);
+  }
+
+  /* Hero: the video on one side, the title on a black fade. */
+  .heroWrap {
+    padding: 0;
+  }
+  .hero {
+    aspect-ratio: auto;
+    height: 84vh;
+    min-height: 600px;
+    border-radius: 0;
+    box-shadow: none;
+    background: #000;
+  }
+  .reel {
+    inset: 0;
+    inset-inline-start: auto;
+    width: 68%;
+  }
+  .shade {
+    background:
+      linear-gradient(to left, #000 0%, #000 33%, rgb(0 0 0 / 0.85) 40%, rgb(30 30 30 / 0.45) 52%, transparent 66%),
+      linear-gradient(to top, #000 0%, rgb(0 0 0 / 0.4) 14%, transparent 30%);
+  }
+  .ltr .shade {
+    background:
+      linear-gradient(to right, #000 0%, #000 33%, rgb(0 0 0 / 0.85) 40%, rgb(30 30 30 / 0.45) 52%, transparent 66%),
+      linear-gradient(to top, #000 0%, rgb(0 0 0 / 0.4) 14%, transparent 30%);
+  }
+  .editing .shade {
+    background: linear-gradient(to left, #000 0%, #000 33%, transparent 33.5%);
+  }
+  .editing.ltr .shade {
+    background: linear-gradient(to right, #000 0%, #000 33%, transparent 33.5%);
+  }
+  .ribbon {
+    inset-inline-start: auto;
+    inset-inline-end: 6%;
+    width: 92px;
+    padding: 16px 0 26px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.4);
+  }
+  .ribbon small {
+    font-size: 24px;
+  }
+  .ribbon b {
+    font-size: 46px;
+    margin-top: 4px;
+  }
+  .tag {
+    display: block;
+    position: absolute;
+    z-index: 3;
+    inset-inline-end: 0;
+    bottom: 16%;
+    background: #000;
+    padding: 12px 34px 12px 26px;
+    font-size: 20px;
+    font-weight: 700;
+    border-inline-start: 4px solid var(--red);
+  }
+  .info {
+    inset: 9% auto auto;
+    inset-inline-start: 120px;
+    width: min(46%, 640px);
+    padding: 0;
+    text-align: start;
+  }
+  .editing .info {
+    inset-inline-start: 40px;
+    width: 31%;
+  }
+  .brand {
+    display: inline-flex;
+    font-size: clamp(56px, 6vw, 92px);
+    transform: scaleX(0.82);
+    transform-origin: right;
+  }
+  .ltr .brand {
+    transform-origin: left;
+  }
+  .sub {
+    display: flex;
+    gap: 12px;
+    margin: 10px 0 20px;
+    font-size: 15px;
+    letter-spacing: 0.45em;
+  }
+  .sub .B {
+    font-size: 26px;
+  }
+  .title {
+    font-size: clamp(56px, 6.4vw, 104px);
+    line-height: 1.15;
+  }
+  .editing .title {
+    font-size: clamp(40px, 4.4vw, 64px);
+  }
+  .rank {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+    font-size: 21px;
+    font-weight: 700;
+  }
+  .chipTop {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--red);
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+  }
+  .chipTop b {
+    display: block;
+    font-size: 11px;
+  }
+  .synopsis {
+    display: block;
+    font-size: 18px;
+    line-height: 1.75;
+    color: #ececec;
+    max-width: 620px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .editing .synopsis {
+    display: block;
+    font-size: 16px;
+  }
+  .star {
+    margin: 16px 0 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .star i {
+    display: inline;
+    font-style: normal;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-inline-start: 10px;
+  }
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+  }
+  .btn {
+    gap: 12px;
+    height: 52px;
+    padding: 0 30px !important;
+    font-size: 19px;
+  }
+  .btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  .play:hover {
+    background: rgb(255 255 255 / 0.78) !important;
+  }
+  .moreLong {
+    display: inline;
+  }
+  .moreShort {
+    display: none;
+  }
+  .meta {
+    display: inline-flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .green {
+    display: inline;
+    color: #46d369;
+    font-weight: 800;
+  }
+  .when {
+    display: inline;
+    color: #e5e5e5;
+    font-size: 18px;
+  }
+
+  /* Rows that page with arrows and grow on hover. */
+  .rows {
+    position: relative;
+    z-index: 5;
+    margin-top: -8vh;
+    padding: 0 0 80px;
+    padding-inline-start: 84px;
+  }
+  .editing .rows {
+    margin-top: 2vh;
+    padding-inline-start: 0;
+  }
+  .row {
+    margin: 0 0 3.2vw;
+  }
+  .rowTitle {
+    padding: 0 var(--pad);
+    font-size: clamp(18px, 1.7vw, 28px);
+    font-weight: 800;
+    margin-bottom: 0.7vw !important;
+  }
+  .slider {
+    overflow-x: clip;
+    overflow-y: visible;
+    padding: 0 var(--pad);
+  }
+  .track {
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+    transform: translateX(calc(var(--sign) * var(--shift) * (100% + var(--gap)) / var(--n)));
+    transition: transform 0.9s cubic-bezier(0.5, 0, 0.1, 1);
+  }
+  .still {
+    transition: none;
+  }
+  .card {
+    flex: 0 0 calc((100% - (var(--n) - 1) * var(--gap)) / var(--n)) !important;
+    transition: transform 0.35s cubic-bezier(0.3, 0, 0.2, 1);
+  }
+  .tall .pic {
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.85);
+    border-radius: 4px;
+  }
+  .wide .pic {
+    border-radius: 4px;
+  }
+  .bm {
+    font-size: clamp(16px, 1.7vw, 28px);
+    top: 8px;
+    inset-inline-start: 10px;
+  }
+  .cap {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    inset: auto 0 0;
+    padding: 30px 12px 10px;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.85), transparent);
+    font-size: clamp(12px, 0.95vw, 16px);
+    font-weight: 700;
+    pointer-events: none;
+  }
+  .peek {
+    display: block;
+    position: absolute;
+    inset: 100% 0 auto;
+    padding: 10px 12px 12px;
+    background: #181818;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 14px 24px rgb(0 0 0 / 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: none;
+  }
+  .peek b {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .moreText {
+    display: block;
+    font-size: 10px;
+    color: #bbb;
+    line-height: 1.5;
+  }
+  .moreCast {
+    display: block;
+    font-size: 9.5px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .page:not(.editing) .card[role='button']:hover {
+    z-index: 20;
+    transform: scale(1.4) translateY(-16%);
+    transition-delay: 0.25s;
+  }
+  .page:not(.editing) .card[role='button']:hover > .more {
+    opacity: 1;
+    transition-delay: 0.3s;
+  }
+  .reduced .card[role='button']:hover {
+    transform: none !important;
+  }
+  .card.first {
+    transform-origin: right center;
+  }
+  .ltr .card.first {
+    transform-origin: left center;
+  }
+  .arrow {
+    display: grid !important;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 30;
+    width: calc(var(--pad) - 0.3vw);
+    place-items: center;
+    background: rgb(20 20 20 / 0.5) !important;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .arrow svg {
+    width: 2.2vw;
+  }
+  .row:hover .arrow,
+  .arrow:focus-visible {
+    opacity: 1;
+  }
+  .next {
+    inset-inline-end: 0;
+  }
+  .prev {
+    inset-inline-start: 0;
+  }
+  .ltr .arrow svg {
+    transform: none;
+  }
+  .page:not(.ltr) .arrow svg {
+    transform: scaleX(-1);
+  }
+  .prev svg {
+    rotate: 180deg;
+  }
+  .editing .track {
+    transform: none;
+  }
+  .editing .card {
+    flex-basis: calc((100% - 5 * var(--gap)) / 6) !important;
+  }
+  .editing .wide .card {
+    flex-basis: calc((100% - 3 * var(--gap)) / 4) !important;
+  }
+
+  /* The photo view: a card over the page. */
+  .view {
+    inset: 5vh 0 auto;
+    margin: 0 auto;
+    width: min(1100px, 86vw);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    background: #141414;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.7);
+    animation: grow 0.45s cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+  .viewPhoto {
+    margin: 0;
+    height: 86vh;
+    background: #000;
+  }
+  .viewPhoto img {
+    max-height: 100%;
+  }
+  .viewText {
+    align-content: center;
+    gap: 16px;
+    padding: 56px 40px;
+  }
+  .viewText .bm {
+    font-size: 28px;
+  }
+  .viewText h3 {
+    font-size: 52px;
+    line-height: 1.2;
+  }
+  .viewText p {
+    font-size: 19px;
+  }
+  .viewCast {
+    font-size: 18px;
+  }
+  .x {
+    top: 14px;
+    width: 42px;
+    height: 42px;
+  }
+  @keyframes grow {
+    from {
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+  }
+}

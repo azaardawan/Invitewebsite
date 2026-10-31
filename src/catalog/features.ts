@@ -45,6 +45,10 @@ export const FEATURES = {
   collage_story: { requires: [], requiresFields: [] },
   /** Photo collage, a photo wall (4 × 6 print) with nine of the customer's photos. */
   collage_wall: { requires: [], requiresFields: [] },
+  /** The customer adds one short video of their own (up to a minute, converted for phones); the design plays it at the top. */
+  video: { requires: [], requiresFields: [] },
+  /** The design's printable posters (landscape and portrait, A3), with the customer's photo and the shop's contact details. */
+  couple_poster: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 /**
