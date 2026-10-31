@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { POSTER_ROW_MAX, VIDEO_STILL, resolvePoster, type PosterChoices, type PosterOrientation } from '@/lib/poster-choices';
 import { coverImageStyle, type CoverFocus } from '@/lib/cover-focus';
 
@@ -54,7 +54,8 @@ export function PosterEditor({
   const [stamp, setStamp] = useState<Record<PosterOrientation, number>>({ landscape: 0, portrait: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const timer = useRef(0);
+  /** The latest choice not saved yet (several taps in a row are saved, and drawn, once). */
+  const [pending, setPending] = useState<{ next: PosterChoices; which: PosterOrientation } | null>(null);
 
   const pick = resolvePoster(choices[orientation], photos, Boolean(still), orientation);
   const mainIndex = pick.main ? pick.main.index : still ? VIDEO_STILL : null;
@@ -70,14 +71,19 @@ export function PosterEditor({
     setStamp((s) => ({ ...s, [which]: Date.now() }));
   }
 
-  // Several taps in a row are saved (and drawn) once.
   function change(next: PosterChoices) {
     setChoices(next);
-    const which = orientation;
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => void save(next, which), 700);
+    setPending({ next, which: orientation });
   }
-  useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (!pending) return;
+    const id = window.setTimeout(() => {
+      setPending(null);
+      void save(pending.next, pending.which);
+    }, 700);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- save only reads state setters and `base`
+  }, [pending]);
 
   const setMain = (main: number) => change({ ...choices, [orientation]: { ...choices[orientation], main } });
   const toggleRow = (index: number) => {
