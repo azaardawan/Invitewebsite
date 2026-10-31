@@ -27,7 +27,7 @@ export const experienceType = pgEnum('experience_type', ['INVITATION']);
 export const themeStatus = pgEnum('theme_status', ['DEVELOPMENT', 'READY_FOR_REVIEW', 'ACTIVE', 'ARCHIVED']);
 export const packageStatus = pgEnum('package_status', ['ACTIVE', 'ARCHIVED']);
 export const musicStatus = pgEnum('music_status', ['ACTIVE', 'ARCHIVED']);
-export const assetKind = pgEnum('asset_kind', ['IMAGE', 'AUDIO']);
+export const assetKind = pgEnum('asset_kind', ['IMAGE', 'AUDIO', 'VIDEO']);
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -290,6 +290,11 @@ export const packages = pgTable(
     priceIqd: bigint('price_iqd', { mode: 'number' }).notNull(),
     /** How long the invitation stays online after publishing: days, or `forever` (src/catalog/lifetime.ts). */
     lifetime: text('lifetime', { enum: PACKAGE_LIFETIMES }).notNull().default('30'),
+    /**
+     * How many of their own photos the customer may add (packages with `photos`), at most the design's `photos.max`;
+     * null = as many as the design holds. The customer may add fewer (owner, 2026-10-31).
+     */
+    photoLimit: integer('photo_limit'),
     sortOrder: integer('sort_order').notNull().default(0),
     status: packageStatus('status').notNull().default('ACTIVE'),
     ...timestamps,
@@ -297,6 +302,7 @@ export const packages = pgTable(
   (t) => [
     index('packages_theme_idx').on(t.themeId, t.status, t.sortOrder),
     check('packages_price_range', sql`${t.priceIqd} > 0 and ${t.priceIqd} <= 100000000`),
+    check('packages_photo_limit_range', sql`${t.photoLimit} is null or (${t.photoLimit} >= 1 and ${t.photoLimit} <= 50)`),
   ],
 );
 

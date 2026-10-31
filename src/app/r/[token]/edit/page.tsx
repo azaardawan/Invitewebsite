@@ -5,7 +5,10 @@ import { signatureUrls } from '@/server/invitation/load';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { isLocale, type Locale } from '@/i18n/config';
 import { db } from '@/server/db/client';
-import { invitations } from '@/server/db/schema';
+import { invitations, themeVersions } from '@/server/db/schema';
+import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
+import { templateLabels } from '@/components/storefront/order/template-labels';
 import { localized } from '@/server/catalog/common';
 import { orderFields } from '@/server/storefront/catalog';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
@@ -13,7 +16,7 @@ import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { SongUpload } from '@/components/storefront/order/SongUpload';
 import { songLabels } from '@/components/storefront/order/song-labels';
-import { photoState, songState } from '@/server/storefront/order';
+import { photoState, songState, templateState } from '@/server/storefront/order';
 import { invitationPath } from '@/lib/ids';
 import { receiptFor } from '../data';
 import { placeOptionalIn } from '@/server/catalog/occasions';
@@ -51,6 +54,34 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
   // …and their own song (packages with `custom_music`).
   const song = await songState(inv!);
   const ts = await getTranslations({ locale, namespace: 'store' });
+
+  // A template design: changed in place, like it was filled while ordering (texts, photos and video, saved one by one).
+  const [version] = await db().select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv!.themeVersionId));
+  const manifest = version?.manifest as ThemeManifest | undefined;
+  if (manifest?.editor === 'template' && photos) {
+    const template = await templateState(inv!, manifest);
+    const live = invitationPath(inv!.slug, inv!.publicId);
+    return (
+      <main className="mx-auto max-w-[1200px] px-4 py-10">
+        <p className="mb-6">{back}</p>
+        <h1 className="mb-4 text-xl font-semibold">{t('editTitle')}</h1>
+        <TemplateEditor
+          base={`/r/${encodeURIComponent(token)}`}
+          designUrl={`${live}?edit=1`}
+          previewUrl={live}
+          continueHref={`/r/${encodeURIComponent(token)}#edit`}
+          texts={template.texts}
+          photos={photos.photos}
+          maxPhotos={photos.max}
+          aspects={photos.aspects}
+          names={photos.names}
+          video={template.video}
+          videoIncluded={template.videoIncluded}
+          labels={templateLabels(ts, true)}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">

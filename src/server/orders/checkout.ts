@@ -87,7 +87,9 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     const photos = await photoSpec(tx, inv!);
     if (photos && photos.min > 0 && (await listPhotos(tx, inv!.id)).length < photos.min) throw new OrderError('photosMissing');
     // Like the price, the online time is the package's at checkout (the owner may have changed it since the draft).
-    if (inv!.lifetime !== p.pkg.lifetime) await tx.update(invitations).set({ lifetime: p.pkg.lifetime }).where(eq(invitations.id, inv!.id));
+    if (inv!.lifetime !== p.pkg.lifetime || inv!.photoLimit !== p.pkg.photoLimit) {
+      await tx.update(invitations).set({ lifetime: p.pkg.lifetime, photoLimit: p.pkg.photoLimit }).where(eq(invitations.id, inv!.id));
+    }
 
     const [customer] = await tx
       .insert(customers)

@@ -33,7 +33,9 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
   }
   // A birthday's place is the customer's choice.
   const optionalPlace = !occasionMissing && (await placeOptionalIn(db, sectionId));
-  const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now, { optionalPlace });
+  // A template design is filled in place after this step: its texts may all still be empty (checkout needs them).
+  const partial = (p.version.manifest as ThemeManifest).editor === 'template';
+  const result = validateFieldValues(input.values, p.pkg.fieldKeys, p.defs, now, { optionalPlace, partial });
   if (occasionMissing) throw new OrderError('invalidFields', { ...(result.ok ? {} : result.errors), occasion: 'required' });
   if (!result.ok) throw new OrderError('invalidFields', result.errors);
   // Card back, signature and colour set (only what the package includes).
@@ -73,6 +75,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
         fieldKeys: p.pkg.fieldKeys,
         featureKeys: p.pkg.featureKeys,
         lifetime: p.pkg.lifetime,
+        photoLimit: p.pkg.photoLimit,
         musicTrackId: p.theme.musicTrackId,
         ...extra,
         previewTokenHash: previewTokenHash(token),
@@ -116,11 +119,12 @@ export async function updateDraft(
     if (!draft) throw new OrderError('previewExpired');
     const [locked] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
     if (locked!.status !== 'DRAFT') throw new OrderError('locked');
+    const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
     const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys, locked!.themeVersionId), now, {
       optionalPlace: await placeOptionalIn(tx, locked!.sectionId),
+      partial: (version?.manifest as ThemeManifest | undefined)?.editor === 'template',
     });
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
-    const [version] = await tx.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, locked!.themeVersionId));
     const extra = await extrasUpdate(
       tx,
       {

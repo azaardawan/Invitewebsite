@@ -82,7 +82,7 @@ export async function productData(db: DbOrTx, inv: InvitationRow, opts: { sticke
   const stickerShape = opts.stickerShape ?? (inv.stickerShape === 'both' ? 'round' : inv.stickerShape);
   // Collages: the customer's photos at full size, for print (only when the package has a collage).
   const collagePhotos = includedCollages(inv.featureKeys).length
-    ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null }))
+    ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }))
     : [];
   return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos });
 }

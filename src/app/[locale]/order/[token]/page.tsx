@@ -13,6 +13,8 @@ import { ExtrasPreview } from '@/components/storefront/order/ExtrasPreview';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { SongUpload } from '@/components/storefront/order/SongUpload';
 import { songLabels } from '@/components/storefront/order/song-labels';
+import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
+import { templateLabels } from '@/components/storefront/order/template-labels';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { placeOrderAction } from '../../_actions/order';
 
@@ -38,14 +40,38 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
     );
   }
   const previewSrc = `/p/${token}`;
+  // A template design is filled in place: the design itself, editable, instead of the phone preview and photo list.
+  const editor = draft.template && draft.status === 'DRAFT' && draft.photos ? { ...draft.template, photos: draft.photos } : null;
 
   return (
-    <div className="mx-auto max-w-[1200px] px-6 pt-10 lg:px-10 lg:pt-16">
+    <div className="mx-auto max-w-[1200px] px-4 pt-10 sm:px-6 lg:px-10 lg:pt-16">
       <div className="mx-auto max-w-[640px] lg:mx-0">
         <OrderSteps current={1} />
       </div>
-      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-20">
-        <div className="flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start">
+      {editor ? (
+        <div className="mt-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="font-display text-[32px] leading-[1.3] font-bold text-heading lg:text-[44px]">{t('template.title')}</h1>
+            <p className="text-[15px] leading-relaxed text-muted">{t('template.subtitle')}</p>
+          </div>
+          <TemplateEditor
+            base={`/p/${token}`}
+            designUrl={`/p/${token}?edit=1`}
+            previewUrl={previewSrc}
+            continueHref="#checkout"
+            texts={editor.texts}
+            photos={editor.photos.photos}
+            maxPhotos={editor.photos.max}
+            aspects={editor.photos.aspects}
+            names={editor.photos.names}
+            video={editor.video}
+            videoIncluded={editor.videoIncluded}
+            labels={templateLabels(t)}
+          />
+        </div>
+      ) : null}
+      <div className={`mt-8 grid gap-12 lg:gap-20 ${editor ? 'mx-auto max-w-[760px]' : 'lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)]'}`}>
+        <div className={`flex flex-col items-center gap-4 lg:sticky lg:top-6 lg:self-start ${editor ? 'hidden' : ''}`}>
           {draft.onlineInvitation ? (
             <div className="w-full max-w-[380px] rounded-[44px] bg-heading p-3 shadow-[0_30px_60px_rgb(58_21_32/0.25)]">
               <iframe data-order-preview src={previewSrc} title={t('reviewTitle')} className="block h-[640px] w-full rounded-[34px] bg-surface lg:h-[700px]" />
@@ -57,7 +83,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
             </>
           )}
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium text-accent">
-            {draft.status === 'DRAFT' ? (
+            {draft.status === 'DRAFT' && !draft.template ? (
               <Link href={`/order/${token}/edit`} className="underline underline-offset-4">
                 {t('edit')}
               </Link>
@@ -71,10 +97,12 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
         </div>
 
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('reviewTitle')}</h1>
-            <p className="text-[15px] leading-relaxed text-muted">{t('reviewSubtitle')}</p>
-          </div>
+          {editor ? null : (
+            <div className="flex flex-col gap-2">
+              <h1 className="font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('reviewTitle')}</h1>
+              <p className="text-[15px] leading-relaxed text-muted">{t('reviewSubtitle')}</p>
+            </div>
+          )}
           <div className="flex items-center justify-between gap-4 rounded-[22px] border border-line bg-paper px-5 py-4">
             <div className="flex flex-col">
               <span className="text-xs text-muted">{t('packageLabel')}</span>
@@ -90,7 +118,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               </span>
             </div>
           </div>
-          {draft.photos && draft.status === 'DRAFT' ? (
+          {draft.photos && draft.status === 'DRAFT' && !editor ? (
             <PhotoSlots
               previewUrl={`/p/${token}`}
               base={`/p/${token}/photos`}
@@ -161,7 +189,7 @@ export default async function ReviewPage({ params }: PageProps<'/[locale]/order/
               downloadJpg: t('extras.downloadJpg'),
             }}
           />
-          <section aria-labelledby="contact-title" className="flex flex-col gap-4">
+          <section id="checkout" aria-labelledby="contact-title" className="flex scroll-mt-6 flex-col gap-4">
             <div>
               <h2 id="contact-title" className="text-xl font-semibold text-heading">
                 {t('contactTitle')}

@@ -1,5 +1,5 @@
 import 'server-only';
-import { isPlaceOptional } from '@/catalog/fields';
+import { isOptionalField, isPlaceOptional } from '@/catalog/fields';
 import { customMusicIncluded, customSong } from '@/server/music/custom';
 import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
@@ -7,6 +7,8 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { invitations, packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { listPhotos, photoSpec } from '@/server/photos/photos';
+import { customerVideo, videoIncluded } from '@/server/video/video';
+import { wordingDefault } from '@/theme-sdk/manifest';
 import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
@@ -71,7 +73,45 @@ export async function draftByToken(token: string) {
     /** The design's photo places and the customer's photos so far (packages with `photos`), or null. */
     photos: await photoState(inv),
     song: await songState(inv),
+    /** A template design (manifest `editor: 'template'`): what the customer fills in place, or null for the order form. */
+    template: (row.manifest as ThemeManifest).editor === 'template' ? await templateState(inv, row.manifest as ThemeManifest) : null,
   };
+}
+
+/** Longest text the template editor offers for a field without its own limit (as validation.ts). */
+const TEXT_MAX = { text: 80, longtext: 500 } as const;
+
+/**
+ * What a template design's editor needs: the texts the customer writes in place (the package's text fields, then the
+ * design's wording lines) with their current values, and the video (packages with `video`).
+ */
+export async function templateState(inv: typeof invitations.$inferSelect, manifest: ThemeManifest) {
+  const locale = inv.locale as Locale;
+  const fields = await orderFields(inv.themeId, inv.sectionId, inv.fieldKeys);
+  const texts = [
+    ...fields
+      .filter((f) => f.type === 'text' || f.type === 'longtext')
+      .map((f) => ({
+        key: `field:${f.key}`,
+        label: localized(f.label, locale),
+        required: !f.optional && !isOptionalField(f.key),
+        maxLength: f.maxLength ?? TEXT_MAX[f.type as 'text' | 'longtext'],
+        multiline: f.type === 'longtext',
+        value: inv.fieldValues[f.key] ?? '',
+      })),
+    ...(manifest.wording ?? [])
+      .filter((w) => w.custom !== false)
+      .map((w) => ({
+        key: `wording:${w.key}`,
+        label: localized(w.label, locale),
+        required: false,
+        maxLength: w.maxLength,
+        multiline: false,
+        value: inv.wording[w.key] ?? wordingDefault(w, locale),
+      })),
+  ];
+  const included = videoIncluded(inv);
+  return { texts, videoIncluded: included, video: included ? await customerVideo(db(), inv) : null };
 }
 
 /** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */
@@ -94,7 +134,7 @@ export async function photoState(inv: typeof invitations.$inferSelect) {
       const l = spec.labels?.[i];
       return l ? (l[inv.locale] ?? l.ar) : null;
     }),
-    photos: list.map((p) => ({ position: p.position, src: p.src, width: p.width, height: p.height, focus: p.focus })),
+    photos: list.map((p) => ({ position: p.position, src: p.src, width: p.width, height: p.height, focus: p.focus, title: p.title, caption: p.caption })),
   };
 }
 

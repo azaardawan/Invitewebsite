@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { CoverFocus } from '../../../lib/cover-focus';
 import { assets } from './catalog';
 import { invitations } from './orders';
@@ -24,6 +24,9 @@ export const invitationPhotos = pgTable(
       .notNull()
       .references(() => assets.id, { onDelete: 'restrict' }),
     focus: jsonb('focus').$type<CoverFocus>().notNull().default({ x: 50, y: 50, zoom: 1 }),
+    /** The customer's own title and few words for this photo (template designs show them when it is opened); null = none. */
+    title: text('title'),
+    caption: text('caption'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('invitation_photos_position_idx').on(t.invitationId, t.position), index('invitation_photos_asset_idx').on(t.assetId)],

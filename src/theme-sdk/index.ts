@@ -14,10 +14,12 @@ export type {
   GuestResponseInput,
   GuestbookMessage,
   ThemePhoto,
+  ThemeVideo,
 } from './types';
 export { hasFeature, formatNumber } from './types';
 export { ThemeBorder, Signature } from './border';
 export { Photo } from './photo';
+export { EditableText, PhotoSlot, VideoSlot, useTemplateEditing } from './editing';
 export { Collage, COLLAGES } from './collage';
 export type { CollageKind, CollageText, CollageFonts, PrintCollageProps } from './collage';
 export type { ThemeBorderSpec, BorderKind } from './border';

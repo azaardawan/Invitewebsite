@@ -356,8 +356,6 @@ function Editor({
   onLoaded: () => void;
   busy: boolean;
 }) {
-  const frame = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ x: number; y: number; start: CoverFocus } | null>(null);
   const focus = photo.focus;
   const src = `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}photoEdit=1&photo=${photo.position}`;
 
@@ -378,14 +376,6 @@ function Editor({
     };
   }, [photo.position]);
 
-  // How far the photo overflows the frame after zoom: dragging that many pixels moves it end to end.
-  function overflowOf(start: CoverFocus) {
-    const box = frame.current?.getBoundingClientRect();
-    if (!box || !photo.width || !photo.height) return { x: 0, y: 0 };
-    const s = Math.max(box.width / photo.width, box.height / photo.height);
-    return { x: start.zoom * photo.width * s - box.width, y: start.zoom * photo.height * s - box.height };
-  }
-
   return (
     <div role="dialog" aria-modal="true" aria-label={`${labels.adjust}: ${name}`} className="fixed inset-0 z-50 flex flex-col bg-surface lg:flex-row" data-photo-editor-dialog>
       <div className="flex min-h-0 flex-1 flex-col bg-paper lg:order-2">
@@ -399,55 +389,7 @@ function Editor({
             {labels.done}
           </button>
         </div>
-        <div className="mx-auto w-full max-w-[260px]" data-photo-editor>
-          <div
-            ref={frame}
-            className="relative cursor-grab touch-none overflow-hidden rounded-xl border-2 border-accent bg-paper active:cursor-grabbing"
-            style={{ aspectRatio: String(aspect) }}
-            onPointerDown={(e) => {
-              e.currentTarget.setPointerCapture(e.pointerId);
-              drag.current = { x: e.clientX, y: e.clientY, start: focus };
-            }}
-            onPointerMove={(e) => {
-              const d = drag.current;
-              if (!d) return;
-              const o = overflowOf(d.start);
-              onFocus(
-                normalizeCoverFocus({
-                  ...d.start,
-                  x: o.x > 1 ? d.start.x - ((e.clientX - d.x) / o.x) * 100 : d.start.x,
-                  y: o.y > 1 ? d.start.y - ((e.clientY - d.y) / o.y) * 100 : d.start.y,
-                }),
-              );
-            }}
-            onPointerUp={() => {
-              if (drag.current) onCommit(focus);
-              drag.current = null;
-            }}
-            onPointerCancel={() => (drag.current = null)}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- the customer's own photo */}
-            <img src={photo.src} alt="" draggable={false} className="pointer-events-none size-full object-cover select-none" style={coverImageStyle(focus)} />
-            {busy ? <Busy text={labels.uploading} /> : null}
-          </div>
-          <p className="mt-2 text-center text-xs text-muted">{labels.dragHint}</p>
-        </div>
-        <label className="flex items-center gap-2 text-sm">
-          <span>{labels.zoom}</span>
-          <input
-            type="range"
-            min={1}
-            max={COVER_ZOOM_MAX}
-            step={0.01}
-            value={focus.zoom}
-            dir="ltr"
-            className="w-full accent-[var(--color-accent)]"
-            aria-label={labels.zoom}
-            onChange={(e) => onFocus(normalizeCoverFocus({ ...focus, zoom: Number(e.target.value) }))}
-            onPointerUp={() => onCommit(focus)}
-            onKeyUp={() => onCommit(focus)}
-          />
-        </label>
+        <PhotoFramer photo={photo} aspect={aspect} focus={focus} onFocus={onFocus} onCommit={onCommit} busy={busy} labels={labels} />
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-medium">
           <button type="button" className="text-accent underline disabled:opacity-40" disabled={!hasPrevious} onClick={() => onGo(photo.position - 1)}>
             {labels.previous}
@@ -471,5 +413,120 @@ function Editor({
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * A photo in exactly the frame it will have in the design (`aspect`, width ÷ height), the way the design shows it:
+ * drag it to move it, slider (or mouse wheel) to zoom. `onFocus` follows every move; `onCommit` when the finger lifts.
+ */
+export function PhotoFramer({
+  photo,
+  aspect,
+  focus,
+  onFocus,
+  onCommit,
+  busy,
+  labels,
+  caption,
+}: {
+  photo: { src: string; width: number; height: number };
+  aspect: number;
+  focus: CoverFocus;
+  onFocus: (f: CoverFocus) => void;
+  onCommit: (f: CoverFocus) => void;
+  busy: boolean;
+  labels: { dragHint: string; zoom: string; uploading: string };
+  /** A word on the frame itself (e.g. "How it will look"). */
+  caption?: string;
+}) {
+  const frame = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; start: CoverFocus } | null>(null);
+  const latest = useRef(focus);
+  useEffect(() => {
+    latest.current = focus;
+  });
+
+  // How far the photo overflows the frame after zoom: dragging that many pixels moves it end to end.
+  function overflowOf(start: CoverFocus) {
+    const box = frame.current?.getBoundingClientRect();
+    if (!box || !photo.width || !photo.height) return { x: 0, y: 0 };
+    const s = Math.max(box.width / photo.width, box.height / photo.height);
+    return { x: start.zoom * photo.width * s - box.width, y: start.zoom * photo.height * s - box.height };
+  }
+
+  // A wheel zooms the photo (desktop), committed once the wheel rests.
+  useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    let timer = 0;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const next = normalizeCoverFocus({ ...latest.current, zoom: latest.current.zoom - e.deltaY / 500 });
+      onFocus(next);
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => onCommit(next), 300);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      window.clearTimeout(timer);
+    };
+  }, [onFocus, onCommit]);
+
+  return (
+    <>
+      <div className="mx-auto w-full" style={{ maxWidth: aspect >= 1 ? 340 : 240 }} data-photo-editor>
+        <div
+          ref={frame}
+          className="relative cursor-grab touch-none overflow-hidden rounded-xl border-2 border-accent bg-paper active:cursor-grabbing"
+          style={{ aspectRatio: String(aspect) }}
+          data-photo-frame={aspect}
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture(e.pointerId);
+            drag.current = { x: e.clientX, y: e.clientY, start: focus };
+          }}
+          onPointerMove={(e) => {
+            const d = drag.current;
+            if (!d) return;
+            const o = overflowOf(d.start);
+            onFocus(
+              normalizeCoverFocus({
+                ...d.start,
+                x: o.x > 1 ? d.start.x - ((e.clientX - d.x) / o.x) * 100 : d.start.x,
+                y: o.y > 1 ? d.start.y - ((e.clientY - d.y) / o.y) * 100 : d.start.y,
+              }),
+            );
+          }}
+          onPointerUp={() => {
+            if (drag.current) onCommit(latest.current);
+            drag.current = null;
+          }}
+          onPointerCancel={() => (drag.current = null)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- the customer's own photo */}
+          <img src={photo.src} alt="" draggable={false} className="pointer-events-none size-full object-cover select-none" style={coverImageStyle(focus)} />
+          {caption ? <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white">{caption}</span> : null}
+          {busy ? <Busy text={labels.uploading} /> : null}
+        </div>
+        <p className="mt-2 text-center text-xs text-muted">{labels.dragHint}</p>
+      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <span>{labels.zoom}</span>
+        <input
+          type="range"
+          min={1}
+          max={COVER_ZOOM_MAX}
+          step={0.01}
+          value={focus.zoom}
+          dir="ltr"
+          className="w-full accent-[var(--color-accent)]"
+          aria-label={labels.zoom}
+          onChange={(e) => onFocus(normalizeCoverFocus({ ...focus, zoom: Number(e.target.value) }))}
+          onPointerUp={() => onCommit(latest.current)}
+          onKeyUp={() => onCommit(latest.current)}
+        />
+      </label>
+    </>
   );
 }

@@ -42,13 +42,15 @@ function cleanText(value: string, multiline: boolean): string | null {
  * Never trust the form.
  * `optionalPlace` (a birthday): the place fields count only when the customer chose to add the place
  * (`placeChosen`); otherwise they are left out entirely.
+ * `partial` (template designs, filled in place one text at a time): an empty field is simply left out, never
+ * `required`; checkout validates everything again without it.
  */
 export function validateFieldValues(
   input: Record<string, unknown>,
   fieldKeys: readonly string[],
   defs: ReadonlyMap<string, FieldDef>,
   now = new Date(),
-  opts: { optionalPlace?: boolean } = {},
+  opts: { optionalPlace?: boolean; partial?: boolean } = {},
 ): { ok: true; values: Record<string, string> } | { ok: false; errors: Record<string, FieldError> } {
   const values: Record<string, string> = {};
   const errors: Record<string, FieldError> = {};
@@ -60,7 +62,7 @@ export function validateFieldValues(
     const def = defs.get(key);
     const raw = input[key];
     if (typeof raw !== 'string' || raw.trim() === '') {
-      if (!isOptionalField(key) && !def?.optional) errors[key] = 'required';
+      if (!opts.partial && !isOptionalField(key) && !def?.optional) errors[key] = 'required';
       continue;
     }
     switch (def?.type) {
