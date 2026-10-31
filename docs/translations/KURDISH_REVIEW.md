@@ -1468,3 +1468,103 @@ The redesigned receipt page (`/r/…`): the header, the row of section chips and
 | 10 | Platform: `receipt.heroPaid` | كل ما يخص مناسبتك هنا: رابط الدعوة لضيوفك، والبطاقات للطباعة، والتعديل والردود. | Everything for your celebration is here: the invitation link for your guests, printable cards, edits and replies. | هەموو شتێکی بۆنەکەت لێرەیە: بەستەری بانگهێشت بۆ میوانەکانت، کارتەکانی چاپ، دەستکاری و وەڵامەکان. | هەمی تشتێن بۆنا تە ل ڤێرێنە: لینکا داخوازنامێ بۆ میڤانێن تە، کارتێن چاپێ، دەستکاری و بەرسڤ. |
 | 11 | Platform: `receipt.heroPending` | طلبك محفوظ. بعد الدفع يصلك كل شيء هنا مباشرة. | Your order is saved. Once paid, everything arrives here straight away. | داواکارییەکەت پاشەکەوت کرا. دوای پارەدان هەموو شتێک یەکسەر لێرە دەگات. | داخوازا تە هاتە پاشەکەفتکرن. پشتی پارەدانێ هەمی تشت دێ یەکسەر ل ڤێرێ گەهیت. |
 | 12 | Platform: `receipt.invitationPictureAlt` | صورة الدعوة كما تظهر عند المشاركة | The invitation picture, as it shows when shared | وێنەی بانگهێشت وەک لە کاتی ناردندا دەردەکەوێت | وێنێ داخوازنامێ وەکی د دەمێ هنارتنێ دا دیار دبیت |
+
+## Batch 46 — Couples: BAHJAFLIX (#25), its template editor, video and posters — ✅ AUTO-APPROVED (2026-10-31, owner checks in Admin → Translations)
+
+The new Couples section, the BAHJAFLIX design (its own lines, buttons and example photos), the template editor where the customer fills the design in place, the video and the couple posters.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Platform: `store.features.video` | فيديو واحد خاص بكم في أعلى الصفحة (حتى دقيقة) | Your own video at the top of the page (up to a minute) | ڤیدیۆیەکی تایبەتی خۆتان لە سەرەوەی پەڕەکە (تا خولەکێک) | ڤیدیۆیەکا تایبەت ب هەوە ل سەرێ پەرێ (هەتا خولەکەکێ) |
+| 2 | Platform: `store.features.couple_poster` | ملصقان للطباعة (عرضي وطولي) بتصميمكم | Two posters to print (landscape and portrait) in your design | دوو پۆستەر بۆ چاپ (پانی و درێژی) بە دیزاینەکەتان | دوو پۆستەر بۆ چاپێ (پانی و درێژی) ب دیزاینا هەوە |
+| 3 | Platform: `store.template.title` | املؤوا تصميمكم | Fill in your design | دیزاینەکەتان پڕ بکەنەوە | دیزاینا خۆ تژی بکەن |
+| 4 | Platform: `store.template.subtitle` | هذا تصميمكم نفسه. اضغطوا على أي نص لكتابته، وعلى أي إطار لإضافة صورة أو الفيديو. كل شيء يُحفظ تلقائياً، ويمكنكم تعديله لاحقاً. | This is your design itself. Tap any text to write it, any frame to add a photo or the video. Everything is saved as you go, and you can change it later. | ئەمە خودی دیزاینەکەتانە. لەسەر هەر دەقێک دابگرن بۆ نووسینی، و لەسەر هەر چوارچێوەیەک بۆ زیادکردنی وێنە یان ڤیدیۆکە. هەموو شتێک خۆکارانە پاشەکەوت دەکرێت، و دواتریش دەتوانن بیگۆڕن. | ئەڤە دیزاینا هەوە ب خۆیە. ل سەر هەر نڤیسینەکێ بکەن دا بنڤیسن، و ل سەر هەر چوارچووڤەیەکێ دا وێنەیەکێ یان ڤیدیۆیێ زێدە بکەن. هەمی تشت ب خۆکاری دهێتە پاراستن، و پاشی ژی دشێن بگوهۆڕن. |
+| 5 | Platform: `store.template.orderSubtitle` | اختاروا لغة الصفحة ثم تابعوا: في الخطوة التالية تملؤون التصميم نفسه بنصوصكم وصوركم والفيديو. | Choose the page’s language, then continue: next you fill the design itself with your texts, photos and video. | زمانی پەڕەکە هەڵبژێرن و بەردەوام بن: لە هەنگاوی داهاتوودا خودی دیزاینەکە بە دەق و وێنە و ڤیدیۆکەتان پڕ دەکەنەوە. | زمانێ پەرێ هەلبژێرن و بەردەوام بن: د گاڤا بێتدا هوین دیزاینێ ب خۆ ب نڤیسین و وێنە و ڤیدیۆیا خۆ تژی دکەن. |
+| 6 | Platform: `store.template.hint` | اضغطوا على أي نص لكتابته، وعلى أي إطار لإضافة صورة أو الفيديو | Tap any text to write it, any frame to add a photo or the video | لەسەر هەر دەقێک دابگرن بۆ نووسینی، و لەسەر هەر چوارچێوەیەک بۆ زیادکردنی وێنە یان ڤیدیۆکە | ل سەر هەر نڤیسینەکێ بکەن دا بنڤیسن، و ل سەر هەر چوارچووڤەیەکێ دا وێنەیەکێ یان ڤیدیۆیێ زێدە بکەن |
+| 7 | Platform: `store.template.texts` | النصوص | Texts | دەقەکان | نڤیسین |
+| 8 | Platform: `store.template.photos` | الصور | Photos | وێنەکان | وێنە |
+| 9 | Platform: `store.template.video` | الفيديو | Video | ڤیدیۆ | ڤیدیۆ |
+| 10 | Platform: `store.template.preview` | معاينة | Preview | پێشبینین | پێشدیتن |
+| 11 | Platform: `store.template.save` | حفظ ومتابعة | Save and continue | پاشەکەوت و بەردەوامبوون | پاراستن و بەردەوامبوون |
+| 12 | Platform: `store.template.finish` | تم | Done | تەواو | تەمام |
+| 13 | Platform: `store.template.saved` | محفوظ | Saved | پاشەکەوت کرا | هاتە پاراستن |
+| 14 | Platform: `store.template.saving` | جارٍ الحفظ… | Saving… | پاشەکەوت دەکرێت… | دهێتە پاراستن… |
+| 15 | Platform: `store.template.cancel` | إلغاء | Cancel | هەڵوەشاندنەوە | بەتالکرن |
+| 16 | Platform: `store.template.done` | تم | Done | تەواو | تەمام |
+| 17 | Platform: `store.template.next` | التالي | Next | دواتر | یا پشتی |
+| 18 | Platform: `store.template.back` | رجوع | Back | گەڕانەوە | زڤرین |
+| 19 | Platform: `store.template.textPlaceholder` | اكتبوا هنا | Write it here | لێرە بنووسن | ل ڤێرێ بنڤیسن |
+| 20 | Platform: `store.template.addPhoto` | أضيفوا صورة | Add a photo | وێنەیەک زیاد بکەن | وێنەیەکێ زێدە بکەن |
+| 21 | Platform: `store.template.choosePhoto` | اختيار صورة | Choose a photo | هەڵبژاردنی وێنە | هەلبژارتنا وێنەی |
+| 22 | Platform: `store.template.frameTitle` | اضبطوا الصورة داخل الإطار | Place the photo in its frame | وێنەکە لەناو چوارچێوەکەدا ڕێک بخەن | وێنەی د ناڤ چوارچووڤەیێدا رێک بێخن |
+| 23 | Platform: `store.template.frameHint` | ما يظهر داخل الإطار هو ما سيظهر في صفحتكم بالضبط. اسحبوا الصورة لتحريكها، وكبّروها إن أردتم. | What is inside the frame is exactly what your page shows. Drag the photo to move it, and zoom in if you like. | ئەوەی لەناو چوارچێوەکەدایە ڕێک ئەوەیە کە لە پەڕەکەتاندا دەردەکەوێت. وێنەکە ڕابکێشن بۆ جوڵاندنی، و ئەگەر ویستتان گەورەی بکەن. | یا د ناڤ چوارچووڤەیێدا ب دروستی ئەوە یا د پەرا هەوەدا دیار دبیت. وێنەی بکێشن دا بلڤینن، و ئەگەر هەوە ڤیا مەزن بکەن. |
+| 24 | Platform: `store.template.frameCaption` | هكذا ستظهر | How it will look | بەم شێوەیە دەردەکەوێت | ب ڤی رەنگی دیار دبیت |
+| 25 | Platform: `store.template.uploading` | جارٍ الرفع… | Uploading… | بار دەکرێت… | دهێتە بارکرن… |
+| 26 | Platform: `store.template.wordsTitle` | عنوان الصورة ووصفها | The photo’s title and words | ناونیشان و وەسفی وێنەکە | ناڤونیشان و وەسفا وێنەی |
+| 27 | Platform: `store.template.photoTitle` | عنوان الصورة | Title | ناونیشانی وێنە | ناڤونیشانێ وێنەی |
+| 28 | Platform: `store.template.photoCaption` | وصف قصير (يظهر عند فتح الصورة) | A few words (shown when the photo is opened) | وەسفێکی کورت (کاتی کردنەوەی وێنەکە دەردەکەوێت) | وەسفەکا کورت (دەمێ ڤەکرنا وێنەی دیار دبیت) |
+| 29 | Platform: `store.template.reframe` | ضبط الإطار | Adjust the frame | ڕێکخستنی چوارچێوە | رێکخستنا چوارچووڤەیێ |
+| 30 | Platform: `store.template.videoTitle` | الفيديو | Video | ڤیدیۆ | ڤیدیۆ |
+| 31 | Platform: `store.template.videoHint` | فيديو واحد يعمل في أعلى صفحتكم. حتى دقيقة واحدة (الأطول يُقصّ)، وحجم الملف حتى 100 ميغابايت. | One video plays at the top of your page. Up to a minute (longer ones are cut), files up to 100 MB. | یەک ڤیدیۆ لە سەرەوەی پەڕەکەتان کار دەکات. تا خولەکێک (درێژتر دەبڕدرێت)، و قەبارەی فایل تا ١٠٠ مێگابایت. | ئێک ڤیدیۆ ل سەرێ پەرا هەوە کار دکەت. هەتا خولەکەکێ (یا درێژتر دهێتە بڕین)، و قەبارێ فایلی هەتا ١٠٠ مێگابایت. |
+| 32 | Platform: `store.template.chooseVideo` | اختيار فيديو | Choose a video | هەڵبژاردنی ڤیدیۆ | هەلبژارتنا ڤیدیۆیێ |
+| 33 | Platform: `store.template.replaceVideo` | تغيير الفيديو | Change the video | گۆڕینی ڤیدیۆ | گوهۆڕینا ڤیدیۆیێ |
+| 34 | Platform: `store.template.removeVideo` | حذف الفيديو | Remove the video | سڕینەوەی ڤیدیۆ | ژێبرنا ڤیدیۆیێ |
+| 35 | Platform: `store.template.converting` | نجهّز الفيديو… قد يستغرق ذلك دقيقة. | Preparing your video… this can take a minute. | ڤیدیۆکە ئامادە دەکەین… لەوانەیە خولەکێک بخایەنێت. | ئەم ڤیدیۆیێ بەرهەڤ دکەین… رەنگە خولەکەکێ ببەت. |
+| 36 | Platform: `store.template.missing` | ما زال ينقص: {list} | Still missing: {list} | هێشتا ماوە: {list} | هێشتا مایە: {list} |
+| 37 | Platform: `store.template.errors.tooLarge` | هذا الملف كبير جداً (100 ميغابايت كحد أقصى). اختاروا فيديو أقصر. | This file is too large (100 MB at most). Choose a shorter video. | ئەم فایلە زۆر گەورەیە (زۆرترین ١٠٠ مێگابایت). ڤیدیۆیەکی کورتتر هەڵبژێرن. | ئەڤ فایلە گەلەک مەزنە (پترین ١٠٠ مێگابایت). ڤیدیۆیەکا کورتتر هەلبژێرن. |
+| 38 | Platform: `store.template.errors.unsupportedVideo` | لم نتمكن من قراءة هذا الفيديو. اختاروا فيديو آخر. | We couldn’t read this video. Choose another one. | نەمانتوانی ئەم ڤیدیۆیە بخوێنینەوە. ڤیدیۆیەکی تر هەڵبژێرن. | مە نەشیا ئەڤێ ڤیدیۆیێ بخوینین. ڤیدیۆیەکا دی هەلبژێرن. |
+| 39 | Platform: `store.template.errors.tooLong` | النص أطول من المسموح. | This text is too long. | دەقەکە لە ڕادەی ڕێگەپێدراو درێژترە. | نڤیسین ژ رادەیا رێپێدای درێژترە. |
+| 40 | Platform: `store.template.errors.invalidText` | لا يمكن حفظ هذا النص. جرّبوا نصاً آخر. | This text can’t be saved. Try another. | ناتوانرێت ئەم دەقە پاشەکەوت بکرێت. دەقێکی تر تاقی بکەنەوە. | ئەڤ نڤیسینە نەشێت بهێتە پاراستن. نڤیسینەکا دی تاقی بکەن. |
+| 41 | Platform: `store.extras.posterLandscape` | الملصق العرضي | Landscape poster | پۆستەری پانی | پۆستەرێ پانی |
+| 42 | Platform: `store.extras.posterPortrait` | الملصق الطولي | Portrait poster | پۆستەری درێژی | پۆستەرێ درێژی |
+| 43 | Section `couples` (seed): name | للأزواج | Couples | بۆ هاوسەران | بۆ هەڤژینان |
+| 44 | Section `couples`: field `person_1_name` | اسمه | His name | ناوی ئەو (پیاو) | ناڤێ وی |
+| 45 | Section `couples`: field `person_2_name` | اسمها | Her name | ناوی ئەو (ئافرەت) | ناڤێ وێ |
+| 46 | Section `couples`: field `invitation_message` | قصتكما | Your story | چیرۆکەکەتان | چیرۆکا هەوە |
+| 47 | #25 BAHJAFLIX: title | بهجة فليكس | BAHJAFLIX | بەهجەفلیکس | بەهجەفلیکس |
+| 48 | #25 BAHJAFLIX: wording `title` (label) | عنوان فيلمكما | Your film's title | ناونیشانی فیلمەکەتان | ناڤونیشانێ فیلما هەوە |
+| 49 | #25 BAHJAFLIX: wording `title` (text) | معاً إلى الأبد | Together Forever | پێکەوە بۆ هەمیشە | پێکڤە بۆ هەروهەر |
+| 50 | #25 BAHJAFLIX: wording `label` (label) | الكلمة بجانب شعار B | The word next to the B | وشەی تەنیشت B | پەیڤا تەنشت B |
+| 51 | #25 BAHJAFLIX: wording `label` (text) | ذكريات | MEMORIES | یادەوەری | بیرهاتن |
+| 52 | #25 BAHJAFLIX: wording `badge` (label) | السطر بجانب TOP #01 | The line next to TOP #01 | دێڕی تەنیشت TOP #01 | رێزا تەنشت TOP #01 |
+| 53 | #25 BAHJAFLIX: wording `badge` (text) | رقم 1 في قلبي | No. 1 in my heart | یەکەم لە دڵمدا | ئێکەم د دلێ مندا |
+| 54 | #25 BAHJAFLIX: wording `since` (label) | سطر التاريخ | The date line | دێڕی بەروار | رێزا رێکەفتێ |
+| 55 | #25 BAHJAFLIX: wording `since` (text) | منذ 14 شباط 2019 | Since 14 February 2019 | لە ١٤ی شوباتی ٢٠١٩ەوە | ژ ١٤ی شوباتا ٢٠١٩ێ |
+| 56 | #25 BAHJAFLIX: wording `tag` (label) | المناسبة | The occasion | بۆنە | بۆنە |
+| 57 | #25 BAHJAFLIX: wording `tag` (text) | ذكرى زواجنا | Our anniversary | یادی هاوسەرگیریمان | بیرهاتنا زەواجا مە |
+| 58 | #25 BAHJAFLIX: wording `row1` (label) | عنوان الصف الأول | First row title | ناونیشانی ڕیزی یەکەم | ناڤونیشانێ رێزا ئێکێ |
+| 59 | #25 BAHJAFLIX: wording `row1` (text) | أجمل ذكرياتنا | Our best memories | جوانترین یادەوەرییەکانمان | جوانترین بیرهاتنێن مە |
+| 60 | #25 BAHJAFLIX: wording `row2` (label) | عنوان الصف الثاني | Second row title | ناونیشانی ڕیزی دووەم | ناڤونیشانێ رێزا دووێ |
+| 61 | #25 BAHJAFLIX: wording `row2` (text) | لحظاتنا | Our moments | ساتەکانمان | دەمێن مە |
+| 62 | #25 BAHJAFLIX: wording `row3` (label) | عنوان الصف الثالث | Third row title | ناونیشانی ڕیزی سێیەم | ناڤونیشانێ رێزا سێیێ |
+| 63 | #25 BAHJAFLIX: wording `row3` (text) | نحن | Us | ئێمە | ئەم |
+| 64 | #25 BAHJAFLIX: `home` | الرئيسية | Home | سەرەکی | سەرەکی |
+| 65 | #25 BAHJAFLIX: `video` | الفيديو | Video | ڤیدیۆ | ڤیدیۆ |
+| 66 | #25 BAHJAFLIX: `play` | تشغيل | Play | لێدان | لێدان |
+| 67 | #25 BAHJAFLIX: `moreInfo` | مزيد من المعلومات | More info | زانیاری زیاتر | پتر پێزانین |
+| 68 | #25 BAHJAFLIX: `info` | معلومات | Info | زانیاری | پێزانین |
+| 69 | #25 BAHJAFLIX: `starring` | البطولة: | Starring: | ئەکتەران: | ئەکتەر: |
+| 70 | #25 BAHJAFLIX: `match` | تطابق 100% | 100% match | ١٠٠٪ گونجاو | ١٠٠٪ گونجای |
+| 71 | #25 BAHJAFLIX: `close` | إغلاق | Close | داخستن | گرتن |
+| 72 | #25 BAHJAFLIX: `previous` | السابق | Previous | پێشوو | یا بەری |
+| 73 | #25 BAHJAFLIX: `next` | التالي | Next | دواتر | یا پشتی |
+| 74 | #25 BAHJAFLIX: `mute` | كتم الصوت | Mute | بێدەنگکردن | بێدەنگکرن |
+| 75 | #25 BAHJAFLIX: `unmute` | تشغيل الصوت | Unmute | دەنگ | دەنگ |
+| 76 | #25 BAHJAFLIX: `addVideo` | أضيفوا فيديو واحداً (حتى دقيقة) | Add one video (up to a minute) | یەک ڤیدیۆ زیاد بکەن (تا خولەکێک) | ئێک ڤیدیۆ زێدە بکەن (هەتا خولەکەکێ) |
+| 77 | #25 BAHJAFLIX: `addPhoto` | أضيفوا صورة | Add a photo | وێنەیەک زیاد بکەن | وێنەیەکێ زێدە بکەن |
+| 78 | #25 BAHJAFLIX: `namesHint` | الاسم | Name | ناو | ناڤ |
+| 79 | #25 BAHJAFLIX: `storyHint` | اكتبوا هنا قصتكما في سطرين أو ثلاثة… | Write your story here in two or three lines… | چیرۆکەکەتان لێرە لە دوو سێ دێڕدا بنووسن… | چیرۆکا خۆ ل ڤێرێ د دوو سێ رێزاندا بنڤیسن… |
+| 80 | #25 BAHJAFLIX: `storyLabel` | القصة (تظهر عند الضغط على «معلومات») | The story (shown under “Info”) | چیرۆکەکە (لە «زانیاری»دا دەردەکەوێت) | چیرۆک (د «پێزانین»ێدا دیار دبیت) |
+| 81 | #25 BAHJAFLIX: `sampleStory` | الحضور الثابت الذي يمشي بجانبي في كل فصل من فصول الحياة. قلبك الذي أستند إليه، وصوتك الذي أثق به، وحبك الذي يجعل العالم أكثر دفئاً وإشراقاً. | The steady presence beside me through every season of life. Your heart I lean on, your voice I trust, and your love that makes the world warmer and brighter. | ئەو هاوڕێیە جێگیرەی لە هەموو وەرزەکانی ژیاندا لە تەنیشتمە. دڵت کە پشتی پێ دەبەستم، دەنگت کە متمانەی پێ دەکەم، و خۆشەویستییەکەت کە جیهان گەرمتر و ڕووناکتر دەکات. | ئەو هەڤالێ جێگیر یێ د هەمی وەرزێن ژیانێدا ل تەنشت من. دلێ تە یێ ئەز پشتا خۆ پێ گرێ ددەم، دەنگێ تە یێ ئەز باوەریێ پێ دکەم، و ڤیانا تە یا جیهانێ گەرمتر و رۆناهیتر دکەت. |
+| 82 | #25 BAHJAFLIX: sample photo 1 title | كورنيش الغروب | Sunset on the corniche | ئاوابوونی کۆرنیش | ئاڤابوونا کۆرنیشێ |
+| 83 | #25 BAHJAFLIX: sample photo 1 words | مساء على الكورنيش، والشمس تغيب خلفنا. | An evening by the sea, the sun going down behind us. | ئێوارەیەک لە کەناری دەریا، خۆر لە پشتمانەوە ئاوا دەبێت. | ئێڤارەک ل بەر دەریایێ، رۆژ ل پشت مە ئاڤا دبیت. |
+| 84 | #25 BAHJAFLIX: sample photo 2 title | ليلة على الميناء | A night at the harbour | شەوێک لە بەندەر | شەڤەک ل بەندەرێ |
+| 85 | #25 BAHJAFLIX: sample photo 2 words | أول صورة لنا معاً، ولم نكن نعرف بعدُ أنها البداية. | Our first photo together; we didn’t know yet it was the start. | یەکەم وێنەمان پێکەوە، هێشتا نەماندەزانی سەرەتایە. | ئێکەم وێنێ مە پێکڤە، هێشتا مە نەدزانی کو دەستپێکە. |
+| 86 | #25 BAHJAFLIX: sample photo 3 title | بالأبيض والأسود | Black and white | ڕەش و سپی | رەش و سپی |
+| 87 | #25 BAHJAFLIX: sample photo 3 words | لقطة كلاسيكية لا تُنسى. | A classic we will never forget. | وێنەیەکی کلاسیکی کە لەبیر ناچێت. | وێنەیەکێ کلاسیک کو ژبیر ناچیت. |
+| 88 | #25 BAHJAFLIX: sample photo 4 title | دفء المساء | Warm evening | گەرمی ئێوارە | گەرمیا ئێڤارێ |
+| 89 | #25 BAHJAFLIX: sample photo 4 words | ضحكة ودفء وبحر. | Laughter, warmth and the sea. | پێکەنین و گەرمی و دەریا. | کەنی و گەرمی و دەریا. |
+| 90 | #25 BAHJAFLIX: sample photo 5 title | الخاتم | The ring | ئەڵقەکە | ئەلقە |
+| 91 | #25 BAHJAFLIX: sample photo 5 words | اللحظة التي قالت فيها: نعم. | The moment she said yes. | ئەو ساتەی گوتی: بەڵێ. | ئەو دەمێ وێ گۆتی: بەلێ. |
+| 92 | #25 BAHJAFLIX: sample photo 6 title | المراكب | The boats | بەلەمەکان | بەلەم |
+| 93 | #25 BAHJAFLIX: sample photo 6 words | نزهة هادئة بين المراكب. | A quiet walk among the boats. | پیاسەیەکی ئارام لە نێوان بەلەمەکاندا. | گەشتەکا ئارام د ناڤبەرا بەلەماندا. |

@@ -71,6 +71,8 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `occasion` | Which occasion this invitation is for, as a section key (`wedding`, `engagement`, …). The owner can sell one design in several occasions (Admin → Themes → "Also sold in"); list every occasion your wording supports in the manifest `sections` and pick the wording from `occasion` (e.g. "حفل الخطوبة" / "حفل الزفاف"), falling back to your main occasion's wording for anything else. A design for one occasion can ignore it. Print companions get it too (`occasion` in their props). |
 | `wording` | The design's changeable lines (manifest `wording`) by key: the customer's choice, or the Arabic default. Every declared key is present. Also given to print companions and newborn extras. A line in another script than the invitation (Arabic on an English order) should get its own `lang`/`dir`. |
 | `switches` | The design's yes/no choices (manifest `switches`) by key: the customer's answer, or the default. Every declared key is present. Also given to print companions and newborn extras. |
+| `photoPlaces` | How many photo places this invitation has: the design's `photos.max`, or fewer when its package sells fewer (Admin → package "Photos in this package"). 0 without `photos`. Template designs show that many frames in the editor; everywhere else draw only `photos`. |
+| `video` | The customer's one video (feature `video`): `{ src, poster, width, height }`, an MP4 of at most a minute (720p, sound as AAC) and a still from it, or null (none yet, samples, or a package without it). Play it with `<VideoSlot>`; show `fallback` (e.g. a photo) when null. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`
@@ -225,6 +227,38 @@ the lettering («Happy Birthday», the name, the message) in the invitation's la
 typefaces on them ships `print/Collage.tsx` (a server component) that renders `<Collage {...props} fonts={…} />` with a
 Latin and an Arabic set (`script`, `display`, `body`) inside its fonts class; the registry picks it up. The platform
 adds the watermark before payment and makes the JPG pictures. See `themes/blush-floral/v2/print/Collage.tsx`.
+
+### Template designs (`editor: 'template'`)
+
+Owner, 2026-10-31 (Couples): some designs are not filled through the order form. With `editor: 'template'` in the
+manifest, the customer picks a package and the language, and then gets **the design itself, empty**, inside the
+template editor on the order page (and again on their receipt, for changes after paying, with `self_edit`). They tap a
+text to write it, the next empty frame to add a photo (framed in exactly that frame's shape, then given a title and a
+few words), and the video's place to add the video. Everything is saved as it is done; checkout still needs the
+required fields (names…).
+
+So a template design draws **everything the customer can write** with the SDK's editable pieces, which draw normally
+everywhere else and become editable only in the editor:
+
+- `<EditableText id="field:person_1_name" value={fields.person_1_name} placeholder="…" as="h1" className={…} />` for
+  fields (`field:<key>`) and wording lines (`wording:<key>`; `multiline` for a long text such as the story). Empty text
+  draws nothing outside the editor.
+- `<PhotoSlot index={i} photos={props.photos} className={…} label="…" />` for every photo place, from 0 to
+  `photoPlaces - 1` in the editor (`useTemplateEditing()` says when). The frame is `className`. Photos fill places in
+  order: in the editor the next free place shows a "+", later ones a faint outline.
+- `<VideoSlot video={props.video} className={…} autoPlay muted loop playsInline fallback={…} />` for the video.
+
+Each photo has the customer's own `title` and `caption` (`props.photos[i].title`, `.caption`, or null). In the editor the
+design is shown already open (no entrance) and taps never open the design's own views. See `themes/bahjaflix/v1`.
+
+### Couple posters (`couple_poster`)
+
+A design sold with `couple_poster` ships `print/CouplePoster.tsx` (a server component, `PrintPosterProps` from
+`@/theme-sdk`; the registry refuses the design without it). It draws **both** posters (`orientation`: `landscape` or
+`portrait`, A3) in a box of exactly `size` CSS px, from the couple's `fields`, `wording`, `photos` (full size) and the
+video's `still`, and ends with Bahja's own details at the bottom: `contact.website`, `contact.phone` (the WhatsApp
+number, or the phone) and `contact.instagram`, from Admin → Settings. The platform adds the watermark before payment and
+gives out the JPGs once paid. (`print/Poster.tsx` in older designs is something else.)
 
 ## 7. Preview and review
 
