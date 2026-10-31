@@ -13,6 +13,7 @@ import type { CollageText } from '@/theme-sdk/collage';
 import type { ThemePhoto } from '@/theme-sdk/types';
 import type { PrintPosterProps } from '@/theme-sdk/poster';
 import { customerVideo } from '@/server/video/video';
+import { resolvePoster, type PosterOrientation, type PosterPick } from '@/lib/poster-choices';
 import { getSettings } from '@/server/settings/service';
 import { env } from '@/server/env';
 
@@ -38,7 +39,7 @@ export function productDataFrom(
     codeRef?: string;
     collagePhotos?: ThemePhoto[];
     /** Couple posters: the photos at full size, the video's still and Bahja's details for the bottom. */
-    poster?: { photos: ThemePhoto[]; still: string | null; contact: PrintPosterProps['contact'] };
+    poster?: { photos: ThemePhoto[]; still: string | null; contact: PrintPosterProps['contact']; picks: Record<PosterOrientation, PosterPick<ThemePhoto>> };
   },
 ): ProductData {
   const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string; collage: CollageText } };
@@ -100,14 +101,19 @@ export async function productData(db: DbOrTx, inv: InvitationRow, opts: { sticke
     ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }))
     : [];
   // Couple posters: the photos at full size, the video's still, and Bahja's details for the bottom.
-  const poster = inv.featureKeys.includes('couple_poster')
-    ? {
-        photos: (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption })),
-        still: (await customerVideo(db, inv))?.poster ?? null,
-        contact: await posterContact(db),
-      }
-    : undefined;
+  const poster = inv.featureKeys.includes('couple_poster') ? await posterData(db, inv) : undefined;
   return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos, poster });
+}
+
+/** The posters' pictures (full size), the video's still, the customer's choices for each poster, and Bahja's details. */
+async function posterData(db: DbOrTx, inv: InvitationRow) {
+  const photos = (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }));
+  const still = (await customerVideo(db, inv))?.poster ?? null;
+  const picks = {
+    landscape: resolvePoster(inv.posterChoices.landscape, photos, Boolean(still), 'landscape'),
+    portrait: resolvePoster(inv.posterChoices.portrait, photos, Boolean(still), 'portrait'),
+  };
+  return { photos, still, picks, contact: await posterContact(db) };
 }
 
 /** Bahja's details at the bottom of the posters: the website (from APP_URL), the WhatsApp number (or the phone) and Instagram. */

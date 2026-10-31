@@ -20,7 +20,9 @@ import { setTemplateText, TemplateTextError } from '@/server/template/text';
 import { handleTemplateTextRequest } from '@/server/template/http';
 import { customerVideo, removeVideo, setVideo } from '@/server/video/video';
 import { processVideo, VIDEO_MAX_SECONDS } from '@/server/media/video';
-import { spacedPhone } from '@/server/products/data';
+import { productData, spacedPhone } from '@/server/products/data';
+import { cleanPosterChoices, resolvePoster } from '@/lib/poster-choices';
+import { handlePosterRequest } from '@/server/posters/http';
 import { randomToken } from '@/lib/crypto';
 import { activeTheme, testManifest } from '../fixtures';
 import { ctx, uniqueKey } from '../helpers';
@@ -193,5 +195,38 @@ describe('posters', () => {
   it('print the WhatsApp number spaced for reading', () => {
     expect(spacedPhone('+9647701234567')).toBe('+964 770 123 4567');
     expect(spacedPhone('+441234567890')).toBe('+441234567890');
+  });
+
+  it('show the pictures the customer chose; choices that no longer fit fall back', () => {
+    const photos = [0, 1, 2, 3, 4, 5, 6].map((index) => ({ index }));
+    expect(resolvePoster(undefined, photos, true, 'landscape')).toEqual({ main: null, row: photos.slice(0, 5) });
+    expect(resolvePoster(undefined, photos, false, 'portrait')).toEqual({ main: photos[0], row: [] });
+    expect(resolvePoster({ main: 3, row: [6, 2] }, photos, true, 'landscape')).toEqual({ main: photos[3], row: [photos[6], photos[2]] });
+    // Photo 9 is gone (removed): the default comes back; the row keeps what still exists.
+    expect(resolvePoster({ main: 9, row: [9, 1] }, photos, false, 'landscape')).toEqual({ main: photos[0], row: [photos[1]] });
+    expect(cleanPosterChoices({ landscape: { main: -1, row: [1, 2] } }, 3)).toEqual({ landscape: { main: -1, row: [1, 2] } });
+    for (const bad of [null, { landscape: { main: 6 } }, { landscape: { row: [1, 1] } }, { landscape: { row: [0, 1, 2, 3, 4, 5] } }, { portrait: 'x' }]) {
+      expect(cleanPosterChoices(bad, 6)).toBeNull();
+    }
+  });
+
+  it('are chosen on the poster step and drawn that way', async () => {
+    const posterPkg = await createPackage(db(), shop.themeId, { name: { ar: 'ملصق', en: 'Poster' }, priceIqd: 40000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 9 }, shop.actor);
+    const { inv } = await draft(posterPkg.id);
+    // A package without the posters has no poster step.
+    const req = (body: unknown) => new Request('http://x/p/t/poster', { method: 'PATCH', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+    expect((await handlePosterRequest(db(), req({ portrait: { main: 0 } }), inv, { ipHash: null, published: false })).status).toBe(400);
+    // With them (the feature switched on for this draft).
+    await db().update(invitations).set({ featureKeys: [...inv.featureKeys, 'couple_poster'] }).where(eq(invitations.id, inv.id));
+    let row = await reload(inv.id);
+    for (const color of ['#a33', '#3a3']) await setPhoto(db(), row, 8, await sharp({ create: { width: 800, height: 1000, channels: 3, background: color } }).jpeg().toBuffer());
+    expect((await handlePosterRequest(db(), req({ portrait: { main: 7 } }), row, { ipHash: null, published: false })).status).toBe(400);
+    const res = await handlePosterRequest(db(), req({ portrait: { main: 1 }, landscape: { row: [1] } }), row, { ipHash: null, published: false });
+    expect(await res.json()).toEqual({ posterChoices: { portrait: { main: 1 }, landscape: { row: [1] } } });
+    row = await reload(inv.id);
+    const data = await productData(db(), row);
+    expect(data.poster?.picks.portrait.main?.index).toBe(1);
+    expect(data.poster?.picks.landscape.row.map((p) => p.index)).toEqual([1]);
+    expect(data.poster?.picks.landscape.main?.index).toBe(0);
   });
 });

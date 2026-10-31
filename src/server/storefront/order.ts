@@ -111,7 +111,10 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
       })),
   ];
   const included = videoIncluded(inv);
-  return { texts, videoIncluded: included, video: included ? await customerVideo(db(), inv) : null };
+  const video = included ? await customerVideo(db(), inv) : null;
+  // The poster step (couple_poster): the customer's choices so far and the video's still, one of the pictures to choose.
+  const posters = inv.featureKeys.includes('couple_poster') ? { choices: inv.posterChoices, still: video?.poster ?? null } : null;
+  return { texts, videoIncluded: included, video, posters };
 }
 
 /** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */

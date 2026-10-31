@@ -1608,6 +1608,20 @@
         "tooLong": "This text is too long.",
         "invalidText": "This text can’t be saved. Try another."
       }
+    },
+    "posters": {
+      "title": "Your posters",
+      "subtitle": "Choose the pictures for each poster. The texts are your page’s own (change them on the page).",
+      "landscape": "Landscape poster",
+      "portrait": "Portrait poster",
+      "main": "The big picture",
+      "videoStill": "A still from the video",
+      "row": "Photos in the row (up to {max})",
+      "rowHint": "Tap the photos in the order you want; tap again to take one out.",
+      "drawing": "Drawing the poster…",
+      "back": "Back to the page",
+      "next": "Continue to your order",
+      "finish": "Done"
     }
   },
   "contact": {

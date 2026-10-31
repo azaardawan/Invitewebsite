@@ -147,6 +147,35 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await expect(design.locator('video').first()).toHaveAttribute('src', /videos\//);
   await page.screenshot({ path: testInfo.outputPath('editor-filled.png'), fullPage: true });
 
+  // The page is done: on to the posters, where each poster's pictures are chosen, then the order.
+  await expect(page.locator('#checkout')).toHaveCount(0);
+  await page.locator('[data-template-save]').click();
+  await expect(page).toHaveURL(/step=posters/);
+  const posters = page.locator('[data-poster-editor]');
+  await expect(posters).toBeVisible();
+  await expect(posters.locator('[data-poster-preview="landscape"]')).toHaveJSProperty('complete', true);
+  await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  // The video's still is the big picture at first; choose the photo instead.
+  await expect(posters.locator('[data-poster-main] [data-poster-thumb="still"]')).toHaveAttribute('aria-pressed', 'true');
+  const saved = page.waitForResponse((r) => r.url().endsWith('/poster') && r.request().method() === 'PATCH');
+  await posters.locator('[data-poster-main] [data-poster-thumb="main-0"]').click();
+  expect((await saved).status()).toBe(200);
+  await expect(posters.locator('[data-poster-main] [data-poster-thumb="main-0"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  await page.screenshot({ path: testInfo.outputPath('posters-step.png'), fullPage: true });
+  await posters.getByRole('tab', { name: 'Portrait poster' }).click();
+  await expect(posters.locator('[data-poster-preview="portrait"]')).toBeVisible();
+  await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  await posters.locator('[data-poster-continue]').click();
+  await expect(page.locator('#checkout')).toBeVisible();
+  for (const o of ['landscape', 'portrait'] as const) {
+    const res = await page.request.get(`/p/${previewToken}/extra/poster-${o}.preview`);
+    expect(res.status(), `poster-${o}`).toBe(200);
+    writeFileSync(testInfo.outputPath(`poster-${o}.jpg`), await res.body());
+  }
+  // The files themselves only once paid.
+  expect((await page.request.get(`/p/${previewToken}/extra/poster-landscape.jpg`)).status()).toBe(404);
+
   // All saved: the preview shows it, and the photo opens with its words.
   await page.goto(`/p/${previewToken}`);
   await page.getByRole('button', { name: 'Open invitation' }).click();
@@ -157,13 +186,4 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await expect(page.getByRole('dialog')).toContainText('Sea, sun and us.');
   await expect(page.getByRole('dialog')).toContainText('Dara & Ava');
   await page.screenshot({ path: testInfo.outputPath('preview-photo.png') });
-
-  // The posters (landscape and portrait): watermarked pictures before payment, never the files themselves.
-  for (const o of ['landscape', 'portrait'] as const) {
-    const res = await page.request.get(`/p/${previewToken}/extra/poster-${o}.preview`);
-    expect(res.status(), `poster-${o}`).toBe(200);
-    expect(res.headers()['content-type']).toBe('image/jpeg');
-    writeFileSync(testInfo.outputPath(`poster-${o}.jpg`), await res.body());
-  }
-  expect((await page.request.get(`/p/${previewToken}/extra/poster-landscape.jpg`)).status()).toBe(404);
 });

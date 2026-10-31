@@ -1,3 +1,4 @@
+import type { PosterChoices } from '../../../lib/poster-choices';
 import type { SignatureStrokes } from '../../../lib/signature-strokes';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
@@ -114,6 +115,11 @@ export const invitations = pgTable(
     wording: jsonb('wording').$type<Record<string, string>>().notNull().default({}),
     /** The design's yes/no choices (manifest `switches`) the customer answered, by key; absent = the default. */
     switches: jsonb('switches').$type<Record<string, boolean>>().notNull().default({}),
+    /**
+     * Couple posters (`couple_poster`): the customer's choices per poster, by orientation: `main` the big picture (a photo
+     * place, or -1 for the video's still) and, on the landscape one, `row` the photo places in its row. Absent = defaults.
+     */
+    posterChoices: jsonb('poster_choices').$type<PosterChoices>().notNull().default({}),
     /** Customer's choice: guest messages shown under the live invitation for everyone with the link (default: keepsake only). */
     publicGuestbook: boolean('public_guestbook').notNull().default(false),
     /** Customer's choice: how many guests are coming / not coming shown on the live invitation (default: only the customer sees it). */

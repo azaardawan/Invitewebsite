@@ -8,7 +8,8 @@ import { db } from '@/server/db/client';
 import { invitations, themeVersions } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
-import { templateLabels } from '@/components/storefront/order/template-labels';
+import { posterLabels, templateLabels } from '@/components/storefront/order/template-labels';
+import { PosterEditor } from '@/components/storefront/order/PosterEditor';
 import { localized } from '@/server/catalog/common';
 import { orderFields } from '@/server/storefront/catalog';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
@@ -23,8 +24,9 @@ import { placeOptionalIn } from '@/server/catalog/occasions';
 import { customerEditAction } from '../actions';
 
 /** The customer changes their published invitation (packages with `self_edit`), from their private receipt. */
-export default async function CustomerEditPage({ params }: PageProps<'/r/[token]/edit'>) {
+export default async function CustomerEditPage({ params, searchParams }: PageProps<'/r/[token]/edit'>) {
   const { token } = await params;
+  const { step } = await searchParams;
   const r = await receiptFor(token);
   if (!r || r.status !== 'PAID' || !r.invitation.selfEdit.included) notFound();
   const locale: Locale = isLocale(r.snapshot.invitation.locale) ? r.snapshot.invitation.locale : 'ar';
@@ -61,6 +63,24 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
   if (manifest?.editor === 'template' && photos) {
     const template = await templateState(inv!, manifest);
     const live = invitationPath(inv!.slug, inv!.publicId);
+    const receipt = `/r/${encodeURIComponent(token)}`;
+    // With the posters: the page first, then the posters' step, as while ordering.
+    if (template.posters && step === 'posters') {
+      return (
+        <main className="mx-auto max-w-[1200px] px-4 py-10">
+          <p className="mb-6">{back}</p>
+          <PosterEditor
+            base={receipt}
+            photos={photos.photos.map((p) => ({ index: p.position, src: p.src, focus: p.focus }))}
+            still={template.posters.still}
+            initial={template.posters.choices}
+            backHref="?"
+            continueHref={`${receipt}#extras`}
+            labels={posterLabels(ts, true)}
+          />
+        </main>
+      );
+    }
     return (
       <main className="mx-auto max-w-[1200px] px-4 py-10">
         <p className="mb-6">{back}</p>
@@ -69,7 +89,7 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
           base={`/r/${encodeURIComponent(token)}`}
           designUrl={`${live}?edit=1`}
           previewUrl={live}
-          continueHref={`/r/${encodeURIComponent(token)}#edit`}
+          continueHref={template.posters ? '?step=posters' : `${receipt}#edit`}
           texts={template.texts}
           photos={photos.photos}
           maxPhotos={photos.max}
@@ -77,7 +97,7 @@ export default async function CustomerEditPage({ params }: PageProps<'/r/[token]
           names={photos.names}
           video={template.video}
           videoIncluded={template.videoIncluded}
-          labels={templateLabels(ts, true)}
+          labels={templateLabels(ts, !template.posters)}
         />
       </main>
     );

@@ -1568,3 +1568,15 @@ The new Couples section, the BAHJAFLIX design (its own lines, buttons and exampl
 | 91 | #25 BAHJAFLIX: sample photo 5 words | اللحظة التي قالت فيها: نعم. | The moment she said yes. | ئەو ساتەی گوتی: بەڵێ. | ئەو دەمێ وێ گۆتی: بەلێ. |
 | 92 | #25 BAHJAFLIX: sample photo 6 title | المراكب | The boats | بەلەمەکان | بەلەم |
 | 93 | #25 BAHJAFLIX: sample photo 6 words | نزهة هادئة بين المراكب. | A quiet walk among the boats. | پیاسەیەکی ئارام لە نێوان بەلەمەکاندا. | گەشتەکا ئارام د ناڤبەرا بەلەماندا. |
+| 94 | Platform: `store.posters.title` | ملصقاتكم | Your posters | پۆستەرەکانتان | پۆستەرێن هەوە |
+| 95 | Platform: `store.posters.subtitle` | اختاروا صور كل ملصق. النصوص هي نصوص صفحتكم نفسها (عدّلوها من الصفحة). | Choose the pictures for each poster. The texts are your page’s own (change them on the page). | وێنەکانی هەر پۆستەرێک هەڵبژێرن. دەقەکان هەمان دەقەکانی پەڕەکەتانن (لە پەڕەکەدا بیانگۆڕن). | وێنێن هەر پۆستەرەکێ هەلبژێرن. نڤیسین هەمان نڤیسینێن پەرا هەوەنە (د پەرێدا بگوهۆڕن). |
+| 96 | Platform: `store.posters.landscape` | الملصق العرضي | Landscape poster | پۆستەری پانی | پۆستەرێ پانی |
+| 97 | Platform: `store.posters.portrait` | الملصق الطولي | Portrait poster | پۆستەری درێژی | پۆستەرێ درێژی |
+| 98 | Platform: `store.posters.main` | الصورة الكبيرة | The big picture | وێنە گەورەکە | وێنێ مەزن |
+| 99 | Platform: `store.posters.videoStill` | لقطة من الفيديو | A still from the video | وێنەیەک لە ڤیدیۆکە | وێنەک ژ ڤیدیۆیێ |
+| 100 | Platform: `store.posters.row` | صور الصف (حتى {max}) | Photos in the row (up to {max}) | وێنەکانی ڕیزەکە (تا {max}) | وێنێن رێزێ (هەتا {max}) |
+| 101 | Platform: `store.posters.rowHint` | اضغطوا على الصور بالترتيب الذي تريدونه، واضغطوا مرة أخرى لإزالتها. | Tap the photos in the order you want; tap again to take one out. | بەو ڕیزەی دەتانەوێت لەسەر وێنەکان دابگرن؛ دووبارە دابگرن بۆ لابردنی. | ب وێ رێزا هەوە دڤێت ل سەر وێنان بکەن؛ جارەکا دی بکەن دا لابەن. |
+| 102 | Platform: `store.posters.drawing` | نرسم الملصق… | Drawing the poster… | پۆستەرەکە دەکێشین… | ئەم پۆستەری دکێشین… |
+| 103 | Platform: `store.posters.back` | رجوع إلى الصفحة | Back to the page | گەڕانەوە بۆ پەڕەکە | زڤرین بۆ پەرێ |
+| 104 | Platform: `store.posters.next` | متابعة إلى الطلب | Continue to your order | بەردەوامبوون بۆ داواکاری | بەردەوامبوون بۆ داخوازێ |
+| 105 | Platform: `store.posters.finish` | تم | Done | تەواو | تەمام |

@@ -22,6 +22,12 @@ export type PrintPosterProps = {
   photos: readonly ThemePhoto[];
   /** A still from the customer's video, or null. */
   still: string | null;
+  /**
+   * The customer's choices for this poster (made on the order page's poster step): `main` the big picture (null: the
+   * video's `still`, or nothing when there is no still either) and `row` the photos for a row (landscape; at most 5).
+   */
+  main: ThemePhoto | null;
+  row: readonly ThemePhoto[];
   /** Bahja's details for the bottom: shown as written (the number already spaced for reading). */
   contact: { website: string; phone: string | null; instagram: string | null };
 };

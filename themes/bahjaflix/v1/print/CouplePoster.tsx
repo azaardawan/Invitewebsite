@@ -68,21 +68,21 @@ function Footer({ contact, className }: { contact: PrintPosterProps['contact']; 
 }
 
 export default function Poster(props: PrintPosterProps) {
-  const { orientation, size, locale, dir, lang, fields, wording, labels, photos, still, contact } = props;
+  const { orientation, size, locale, dir, lang, fields, wording, labels, still, main, row, contact } = props;
   const t = copyFor(locale);
   const demo = DEMO[orientation];
   const couple = [fields.person_1_name, fields.person_2_name].filter(Boolean).join(` ${labels.and} `);
   const story = fields.invitation_message?.trim() ?? '';
-  // The big picture: the video's still, or the first photo; the row shows the photos after it.
-  const hero = still ? undefined : photos[0];
-  const row = photos.slice(still ? 0 : 1, (still ? 0 : 1) + 5);
+  // The customer's choices (the poster step): the big picture (a photo, or the video's still) and the row.
+  const hero = main ?? undefined;
+  const heroStill = main ? null : still;
   const scale = size.width / demo.width;
 
   return (
     <div className={`${fonts.root} ${k('box')}`} dir={dir} lang={lang} style={{ width: demo.width, height: demo.height, transform: `scale(${scale})` }}>
       {orientation === 'portrait' ? (
         <div className={k('portrait')}>
-          <Picture photo={hero} still={still} className={k('photo')} />
+          <Picture photo={hero} still={heroStill} className={k('photo')} />
           <div className={k('fade')} />
           <Wordmark className={k('logo')} />
           <div className={k('info')}>
@@ -113,7 +113,7 @@ export default function Poster(props: PrintPosterProps) {
         </div>
       ) : (
         <div className={k('landscape')}>
-          <Picture photo={hero} still={still} className={k('lphoto')} />
+          <Picture photo={hero} still={heroStill} className={k('lphoto')} />
           <div className={k('lshade')} />
           <div className={k('ribbon')}>
             <small>TOP</small>

@@ -80,7 +80,7 @@ async function PosterPage({ d, orientation }: { d: ProductData; orientation: Pri
   const size = POSTER_SIZES[orientation];
   return (
     <div dir={d.dir} lang={d.lang} data-extra={`poster-${orientation}`} style={{ position: 'relative', width: `${size.width}px`, height: `${size.height}px`, overflow: 'hidden' }}>
-      <Draw {...d.poster} orientation={orientation} size={size} />
+      <Draw {...d.poster} {...d.poster.picks[orientation]} orientation={orientation} size={size} />
       {d.watermark ? <Watermark labels={d.labels} /> : null}
     </div>
   );

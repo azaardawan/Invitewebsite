@@ -52,7 +52,8 @@ product spec's §74 business rules override assumptions.
   (`TemplateEditor`, texts saved via `/p|r/[token]/text`, `src/server/template/*`) instead of the order form; the SDK's
   `<EditableText>`, `<PhotoSlot>`, `<VideoSlot>` (THEME_CONTRACT "Template designs"). A package can sell fewer photos
   than the design holds (`packages.photo_limit`). The video (`video`, `src/server/video/*`, ffmpeg in `media/video.ts`):
-  one MP4 of at most a minute, personal data deleted with the photos. Posters (`couple_poster`): the design's
+  one MP4 of at most a minute, personal data deleted with the photos. Posters (`couple_poster`): a step after the page editor
+  (`?step=posters`, `PosterEditor`, choices in `invitations.poster_choices`) picks each poster's pictures; drawn by the design's
   `print/CouplePoster.tsx`, with Bahja's website, WhatsApp/phone and Instagram from Settings at the bottom.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.

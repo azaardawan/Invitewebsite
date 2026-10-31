@@ -1,5 +1,6 @@
 import type { getTranslations } from 'next-intl/server';
 import type { TemplateEditorLabels } from './TemplateEditor';
+import type { PosterEditorLabels } from './PosterEditor';
 
 type StoreT = Awaited<ReturnType<typeof getTranslations<'store'>>>;
 
@@ -52,5 +53,24 @@ export function templateLabels(t: StoreT, published = false): TemplateEditorLabe
       invalidText: k('errors.invalidText'),
       invalidChoice: k('errors.invalidText'),
     },
+  };
+}
+
+/** The texts of PosterEditor, in the page's language. */
+export function posterLabels(t: StoreT, published = false): PosterEditorLabels {
+  const k = (key: string) => t(`posters.${key}` as Parameters<StoreT>[0]);
+  return {
+    title: k('title'),
+    subtitle: k('subtitle'),
+    landscape: k('landscape'),
+    portrait: k('portrait'),
+    main: k('main'),
+    videoStill: k('videoStill'),
+    row: t.raw('posters.row') as string,
+    rowHint: k('rowHint'),
+    drawing: k('drawing'),
+    back: k('back'),
+    next: published ? k('finish') : k('next'),
+    error: t('photos.errors.generic'),
   };
 }

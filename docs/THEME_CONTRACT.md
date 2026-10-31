@@ -256,7 +256,9 @@ design is shown already open (no entrance) and taps never open the design's own 
 A design sold with `couple_poster` ships `print/CouplePoster.tsx` (a server component, `PrintPosterProps` from
 `@/theme-sdk`; the registry refuses the design without it). It draws **both** posters (`orientation`: `landscape` or
 `portrait`, A3) in a box of exactly `size` CSS px, from the couple's `fields`, `wording`, `photos` (full size) and the
-video's `still`, and ends with Bahja's own details at the bottom: `contact.website`, `contact.phone` (the WhatsApp
+video's `still`. The customer chooses each poster's pictures on the order page's poster step (after filling the page):
+draw `main` as the big picture (null: the video's `still`) and, on the landscape poster, `row` (up to 5 photos, in the
+customer's order). It ends with Bahja's own details at the bottom: `contact.website`, `contact.phone` (the WhatsApp
 number, or the phone) and `contact.instagram`, from Admin → Settings. The platform adds the watermark before payment and
 gives out the JPGs once paid. (`print/Poster.tsx` in older designs is something else.)
 
