@@ -255,16 +255,26 @@ everywhere else and become editable only in the editor:
 Each photo has the customer's own `title` and `caption` (`props.photos[i].title`, `.caption`, or null). In the editor the
 design is shown already open (no entrance) and taps never open the design's own views. See `themes/bahjaflix/v1`.
 
-### Couple posters (`couple_poster`)
+### Couple posters (`couple_poster_landscape`, `couple_poster_portrait`)
 
-A design sold with `couple_poster` ships `print/CouplePoster.tsx` (a server component, `PrintPosterProps` from
-`@/theme-sdk`; the registry refuses the design without it). It draws **both** posters (`orientation`: `landscape` or
-`portrait`, A3) in a box of exactly `size` CSS px, from the couple's `fields`, `wording`, `photos` (full size) and the
-video's `still`. The customer chooses each poster's pictures on the order page's poster step (after filling the page):
-draw `main` as the big picture (null: the video's `still`) and, on the landscape poster, `row` (up to 5 photos, in the
-customer's order). It ends with Bahja's own details at the bottom: `contact.website`, `contact.phone` (the WhatsApp
-number, or the phone) and `contact.instagram`, from Admin → Settings. The platform adds the watermark before payment and
-gives out the JPGs once paid. (`print/Poster.tsx` in older designs is something else.)
+The two posters (A3, landscape and portrait) are sold separately, each its own feature (`couple_poster`, from before the
+split, still means both). A design that sells either ships `print/CouplePoster.tsx` (a server component,
+`PrintPosterProps` from `@/theme-sdk`; the registry refuses the design without it), which draws the poster asked for
+(`orientation`) in a box of exactly `size` CSS px and ends with Bahja's own details at the bottom (`contact.website`,
+`contact.phone`, `contact.instagram`, from Admin → Settings).
+
+The customer makes each poster their own on the poster step, after filling the page, so the design declares in its
+manifest what they can change (`posters`):
+
+- `frames: { landscape, portrait }`: the big picture's frame on each poster (width ÷ height). The customer can upload a
+  picture for one poster only and place it in exactly that frame.
+- `texts`: **every text printed on the posters**, each with its name on the poster step (`label`), the posters it is on
+  (`on`), where it starts from (`from`: `wording:<key>`, `field:<key>` or `couple`, the two names joined) or else its
+  `default`, its `maxLength` and `multiline`. The customer's words for a poster replace it on that poster only.
+
+Draw `main` as the big picture (null: the video's `still`), on the landscape poster `row` (up to 5 photos, in the
+customer's order), and every text from `texts[key]`; '' means the customer left it out, so print nothing (and leave out
+its box). Never print a text the manifest doesn't declare. See `themes/bahjaflix/v3/print/CouplePoster.tsx`.
 
 ## 7. Preview and review
 

@@ -322,7 +322,9 @@
         "collage_story": "Photo collage: story (4 photos)",
         "collage_wall": "Photo collage: photo wall (9 photos)",
         "video": "Customer’s video (one minute)",
-        "couple_poster": "Couple posters (landscape and portrait A3)"
+        "couple_poster": "Both couple posters (landscape and portrait, older option)",
+        "couple_poster_landscape": "Couple poster, landscape (A3)",
+        "couple_poster_portrait": "Couple poster, portrait (A3)"
       },
       "fieldTypes": {
         "text": "Short text",
@@ -1346,7 +1348,9 @@
       "collage_story": "A photo collage for your Instagram story, with four of your photos",
       "collage_wall": "A photo wall collage with nine of your photos, ready to print (4 × 6)",
       "video": "Your own video at the top of the page (up to a minute)",
-      "couple_poster": "Two posters to print (landscape and portrait) in your design"
+      "couple_poster": "Two posters to print (landscape and portrait) in your design",
+      "couple_poster_landscape": "A landscape poster to print, in your design (A3)",
+      "couple_poster_portrait": "A portrait poster to print, in your design (A3)"
     },
     "orderTitle": "Your invitation details",
     "orderSubtitle": "Write the names and details exactly as you want guests to see them. You'll see a preview before paying.",
@@ -1614,7 +1618,7 @@
     },
     "posters": {
       "title": "Your posters",
-      "subtitle": "Choose the pictures for each poster. The texts are your page’s own (change them on the page).",
+      "subtitle": "Choose the pictures for each poster and change any of its words. You can upload a picture just for a poster.",
       "landscape": "Landscape poster",
       "portrait": "Portrait poster",
       "main": "The big picture",
@@ -1624,7 +1628,15 @@
       "drawing": "Drawing the poster…",
       "back": "Back to the page",
       "next": "Continue to your order",
-      "finish": "Done"
+      "finish": "Done",
+      "upload": "Upload a picture",
+      "ownPicture": "Your own picture for this poster",
+      "removePicture": "Remove the picture",
+      "reframe": "Adjust the frame",
+      "frameHint": "What is inside the frame is exactly what the poster shows. Drag the picture to move it, and zoom in if you like.",
+      "texts": "The poster’s words",
+      "textsHint": "They start from your page’s texts. What you change here changes on this poster only; leave a box empty to leave that text out.",
+      "reset": "Back to the page’s text"
     }
   },
   "contact": {

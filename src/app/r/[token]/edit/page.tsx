@@ -74,6 +74,10 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
             photos={photos.photos.map((p) => ({ index: p.position, src: p.src, focus: p.focus }))}
             still={template.posters.still}
             initial={template.posters.choices}
+            orientations={template.posters.orientations}
+            frames={template.posters.frames}
+            own={template.posters.own}
+            texts={template.posters.texts}
             backHref="?"
             continueHref={`${receipt}#extras`}
             labels={posterLabels(ts, true)}

@@ -1,3 +1,5 @@
+import { hasPosters, includedPosters } from '@/catalog/posters';
+
 /** The photo collages (src/catalog/collages.ts), each pictured in its own proportions. */
 const COLLAGE_ITEMS = [
   { key: 'polaroids', feature: 'collage_polaroids', label: 'collagePolaroids', box: 'aspect-[842/1190] w-44' },
@@ -101,8 +103,8 @@ export function ExtrasPreview({
       box: c.box,
       jpg: `${base}/collage-${c.key}.jpg`,
     })),
-    ...(featureKeys.includes('couple_poster')
-      ? (['landscape', 'portrait'] as const).map((o) => ({
+    ...(hasPosters(featureKeys)
+      ? includedPosters(featureKeys).map((o) => ({
           key: `poster-${o}`,
           label: o === 'landscape' ? labels.posterLandscape : labels.posterPortrait,
           src: `${base}/poster-${o}.preview`,

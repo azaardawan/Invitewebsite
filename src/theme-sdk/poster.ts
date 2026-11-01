@@ -28,6 +28,11 @@ export type PrintPosterProps = {
    */
   main: ThemePhoto | null;
   row: readonly ThemePhoto[];
+  /**
+   * Every text of this poster, by its key in the manifest's `posters.texts`: the customer's own words for this poster,
+   * or what the text starts from (the page's text or the design's default). '' = the customer left it out: print nothing.
+   */
+  texts: Readonly<Record<string, string>>;
   /** Bahja's details for the bottom: shown as written (the number already spaced for reading). */
   contact: { website: string; phone: string | null; instagram: string | null };
 };
