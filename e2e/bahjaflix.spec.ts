@@ -140,8 +140,10 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await expect(page.locator('[data-template-photos]')).toHaveAttribute('data-template-photos', '1');
   await expect(design.locator('[data-bahja-photo-slot="1"]')).toBeVisible();
 
-  // Each row fills on its own: a tap on the second row's third frame puts the photo in that row's first place.
-  await design.locator('[data-bahja-photo-slot="8"]').click();
+  // Each row fills on its own: the second row is ready for its first photo though the first row isn't full; its later
+  // frames wait their turn.
+  await expect(design.locator('[data-bahja-photo-slot="8"]')).toHaveAttribute('aria-hidden', 'true');
+  await design.locator('[data-bahja-photo-slot="6"]').click();
   await expect(sheet).toHaveAttribute('data-template-sheet', 'photo-add');
   await sheet.locator('[data-template-photo-input]').setInputFiles(await photo('#3050b0', 2000, 1250));
   await expect(sheet).toHaveAttribute('data-template-sheet', 'photo-frame', { timeout: 30_000 });
