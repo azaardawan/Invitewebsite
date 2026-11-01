@@ -1,0 +1,358 @@
+/* BAHJAFLIX posters, drawn at the demo's size (1240 × 1754 / 1754 × 1240) and scaled into the platform's box. */
+.box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.box h1,
+.box h2,
+.box p {
+  margin: 0;
+}
+.box b,
+.box em,
+.box i {
+  font-style: normal;
+}
+
+/* Shared */
+.logo,
+.llogo {
+  position: absolute;
+  display: inline-flex;
+  color: #e50914;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 14px rgb(0 0 0 / 0.4);
+}
+.logo span,
+.llogo span {
+  display: inline-block;
+  transform-origin: 50% 0;
+}
+.rank {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 32px;
+  font-weight: 800;
+}
+.dot {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e50914;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  direction: ltr;
+}
+.dot b {
+  display: block;
+  font-size: 16px;
+}
+.green {
+  color: #46d369;
+  font-weight: 800;
+}
+.star {
+  margin-top: 18px;
+  font-size: 32px;
+  font-weight: 700;
+}
+.star em {
+  color: #f5b335;
+}
+.star i {
+  color: #f5b335;
+  margin-inline-start: 12px;
+  letter-spacing: 0.08em;
+}
+.foot,
+.lfoot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  color: #d8d8d8;
+  font-weight: 600;
+  border-top: 2px solid #2a2a2a;
+}
+.foot span,
+.lfoot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.foot svg,
+.lfoot svg {
+  color: #e50914;
+  flex: none;
+}
+
+/* Portrait */
+.portrait {
+  position: absolute;
+  inset: 0;
+  background: #0b0b0f;
+}
+.photo {
+  position: absolute !important;
+  inset: 0 0 auto;
+  height: 1250px;
+  background: #1a1a1a center 20% / cover;
+}
+.fade {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1250px;
+  background: linear-gradient(to bottom, rgb(11 11 15 / 0.25) 0%, transparent 18%, transparent 50%, rgb(11 11 15 / 0.8) 78%, #0b0b0f 100%);
+}
+.logo {
+  top: 70px;
+  inset-inline-start: 80px;
+  font-size: 92px;
+  transform: scaleX(0.8);
+  transform-origin: right;
+}
+.box[dir='ltr'] .logo {
+  transform-origin: left;
+}
+.info {
+  position: absolute;
+  inset: auto 80px 70px;
+}
+.kind {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 26px;
+  letter-spacing: 0.35em;
+  font-weight: 800;
+  color: #ddd;
+}
+.kind b,
+.sub b {
+  color: #e50914;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 0;
+  transform: scaleX(0.8);
+}
+.title {
+  font-family: 'BF Script', 'BF Sans', serif;
+  font-weight: 700;
+  font-size: 118px;
+  line-height: 1.2;
+  margin: 8px 0 18px !important;
+  text-shadow: 0 6px 30px rgb(0 0 0 / 0.55);
+  overflow-wrap: anywhere;
+}
+.meta {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin: 18px 0 20px;
+  font-size: 30px;
+}
+.story {
+  font-size: 27px;
+  line-height: 1.65;
+  color: #ececec;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.foot {
+  margin-top: 28px;
+  padding-top: 22px;
+  font-size: 26px;
+}
+.foot svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Landscape */
+.landscape {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+.lphoto {
+  position: absolute !important;
+  top: 0;
+  inset-inline-end: 0;
+  width: 62%;
+  height: 800px;
+  background: #1a1a1a 30% 30% / cover;
+}
+.lshade {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 800px;
+  background:
+    linear-gradient(to left, #000 0%, #000 40%, rgb(0 0 0 / 0.8) 47%, rgb(60 60 60 / 0.35) 58%, transparent 70%),
+    linear-gradient(to top, #000 0%, transparent 22%);
+}
+.box[dir='ltr'] .lshade {
+  background:
+    linear-gradient(to right, #000 0%, #000 40%, rgb(0 0 0 / 0.8) 47%, rgb(60 60 60 / 0.35) 58%, transparent 70%),
+    linear-gradient(to top, #000 0%, transparent 22%);
+}
+.ribbon {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 120px;
+  width: 130px;
+  padding: 22px 0 40px;
+  background: #e50914;
+  text-align: center;
+  font-weight: 900;
+  line-height: 1;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+}
+.ribbon small {
+  display: block;
+  font-size: 36px;
+}
+.ribbon b {
+  display: block;
+  font-size: 68px;
+  margin-top: 6px;
+}
+.tag {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 640px;
+  background: #000;
+  padding: 18px 50px 18px 40px;
+  font-size: 32px;
+  font-weight: 700;
+  border-inline-start: 6px solid #e50914;
+}
+.linfo {
+  position: absolute;
+  top: 44px;
+  inset-inline-start: 110px;
+  width: 820px;
+}
+.llogo {
+  position: static;
+  font-size: 128px;
+  transform: scaleX(0.82);
+  transform-origin: right;
+}
+.box[dir='ltr'] .llogo {
+  transform-origin: left;
+}
+.sub {
+  margin: 10px 0 16px;
+  font-size: 22px;
+  letter-spacing: 0.5em;
+  color: #ddd;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.ltitle {
+  font-family: 'BF Script', 'BF Sans', serif;
+  font-weight: 700;
+  font-size: 100px;
+  line-height: 1.15;
+  margin-bottom: 12px !important;
+  overflow-wrap: anywhere;
+}
+.lstory {
+  margin-top: 16px !important;
+  font-size: 26px;
+  line-height: 1.7;
+  color: #ececec;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.btns {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 26px;
+  white-space: nowrap;
+  font-size: 30px;
+}
+.play {
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+  padding: 10px 34px;
+  border-radius: 6px;
+}
+.more {
+  background: #555;
+  font-weight: 700;
+  padding: 10px 30px;
+  border-radius: 6px;
+}
+.when {
+  font-size: 28px;
+  color: #ddd;
+}
+.rowTitle {
+  position: absolute;
+  top: 820px;
+  inset-inline-start: 110px;
+  font-size: 44px;
+  font-weight: 800;
+}
+.mem {
+  position: absolute;
+  top: 900px;
+  bottom: 110px;
+  inset-inline-start: 110px;
+  inset-inline-end: 70px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px;
+}
+.memItem {
+  position: relative;
+  box-shadow: 0 0 0 4px #fff;
+  background: #222;
+}
+.memPhoto {
+  position: absolute !important;
+  inset: 0;
+}
+.memItem b {
+  position: absolute;
+  top: 8px;
+  inset-inline-start: 14px;
+  color: #e50914;
+  font-weight: 900;
+  font-size: 48px;
+  transform: scaleX(0.8);
+}
+.lfoot {
+  position: absolute;
+  inset-inline-start: 110px;
+  inset-inline-end: 70px;
+  bottom: 26px;
+  padding-top: 16px;
+  font-size: 24px;
+}
+.lfoot svg {
+  width: 28px;
+  height: 28px;
+}

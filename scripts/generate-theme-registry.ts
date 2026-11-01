@@ -84,8 +84,9 @@ for (const key of existsSync(themesDir) ? readdirSync(themesDir).sort() : []) {
     const has = (file: string) => existsSync(path.join(themeDir, dirent.name, `print/${file}.tsx`));
     // Optional: the design's photo collages in its own fonts (print/Collage.tsx renders the SDK's <Collage>).
     const extras = { story: has('Story'), sticker: has('Sticker'), bottle: has('Bottle'), collage: has('Collage'), poster: has('CouplePoster') };
-    // The couple posters (feature couple_poster) are the design's own: print/Poster.tsx draws both (print/Poster.tsx is something else in older designs).
-    if (parsed.data.features.includes('couple_poster') && !extras.poster) errors.push(`themes/${key}/${dirent.name}: feature couple_poster needs print/CouplePoster.tsx`);
+    // The couple posters (couple_poster, or each one alone) are the design's own: print/CouplePoster.tsx draws them.
+    const posterFeature = parsed.data.features.find((f) => ['couple_poster', 'couple_poster_landscape', 'couple_poster_portrait'].includes(f));
+    if (posterFeature && !extras.poster) errors.push(`themes/${key}/${dirent.name}: feature ${posterFeature} needs print/CouplePoster.tsx`);
     entries.push({ key, version: parsed.data.version, importPath: `../../themes/${key}/${dirent.name}/manifest`, card, cardBack, keepsake, shape, ...extras });
   }
 }

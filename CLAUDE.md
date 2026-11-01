@@ -53,9 +53,12 @@ product spec's §74 business rules override assumptions.
   `<EditableText>`, `<PhotoSlot>`, `<VideoSlot>` (THEME_CONTRACT "Template designs"). A package can sell fewer photos
   than the design holds (`packages.photo_limit`); a design with photo sets (`photos.set`, e.g. BAHJAFLIX v2's rows of six)
   sells whole sets, each set fills on its own (an empty set is left out), so find a place's photo by its `index`. The video (`video`, `src/server/video/*`, ffmpeg in `media/video.ts`):
-  one MP4 of at most a minute, personal data deleted with the photos. Posters (`couple_poster`): a step after the page editor
-  (`?step=posters`, `PosterEditor`, choices in `invitations.poster_choices`) picks each poster's pictures; drawn by the design's
-  `print/CouplePoster.tsx`, with Bahja's website, WhatsApp/phone and Instagram from Settings at the bottom.
+  one MP4 of at most a minute, personal data deleted with the photos. Posters: landscape and portrait sold separately
+  (`couple_poster_landscape` / `_portrait`, `src/catalog/posters.ts`; the older `couple_poster` = both). A step after the page
+  editor (`?step=posters`, `PosterEditor`, `invitations.poster_choices`) lets the customer change every text of each poster
+  (manifest `posters.texts`) and its pictures, including a picture uploaded for that poster only (an `invitation_photos` row at
+  place 100/101, never listed with the page's photos); drawn by the design's `print/CouplePoster.tsx`, with Bahja's website,
+  WhatsApp/phone and Instagram from Settings at the bottom.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

@@ -8,6 +8,7 @@ import { sha256 } from '@/lib/crypto';
 import { printData } from '@/server/documents/data';
 import { renderProduct, type ProductItem, type ProductRenderer } from '@/server/documents/render';
 import { isPaid, productData } from './data';
+import { includedPosters, POSTER_FEATURES } from '@/catalog/posters';
 
 /** Bump to regenerate every stored extra after a design change in the platform's components (2: denser watermark; 3: the note only). */
 const PRODUCT_PIPELINE_VERSION = 3;
@@ -64,6 +65,12 @@ const FEATURE: Record<ProductItem, string> = {
   'poster-portrait.preview': 'couple_poster',
 };
 
+/** Whether the package sells this extra: each poster by its own feature (or `couple_poster`, both), the rest by FEATURE. */
+export function itemIncluded(featureKeys: readonly string[], item: ProductItem) {
+  if (item.startsWith('poster-')) return includedPosters(featureKeys).includes(item.startsWith('poster-landscape') ? 'landscape' : 'portrait');
+  return featureKeys.includes(FEATURE[item]);
+}
+
 /** The square sticker set exists only when the customer chose both shapes. */
 export const isSquareSet = (item: ProductItem) => item.startsWith('sticker-square.');
 
@@ -113,7 +120,7 @@ export async function ensureProductFile(
 ) {
   const [inv] = await db.select().from(invitations).where(eq(invitations.id, invitationId));
   if (!inv) throw new ProductError('notFound');
-  if (!inv.featureKeys.includes(FEATURE[item])) throw new ProductError('notIncluded');
+  if (!itemIncluded(inv.featureKeys, item)) throw new ProductError('notIncluded');
   if (isSquareSet(item) && inv.stickerShape !== 'both') throw new ProductError('notIncluded');
   const paid = isPaid(inv);
   if (!isPreview(item) && !paid) throw new ProductError('notPaid');
@@ -154,5 +161,8 @@ export async function ensureProductFile(
 
 /** Which extras an invitation's package includes, in the order shown to the customer. */
 export function includedProducts(inv: Pick<typeof invitations.$inferSelect, 'featureKeys'>) {
-  return (['story', 'sticker', 'bottle_label', 'collage_polaroids', 'collage_story', 'collage_wall', 'couple_poster'] as const).filter((f) => inv.featureKeys.includes(f));
+  return [
+    ...(['story', 'sticker', 'bottle_label', 'collage_polaroids', 'collage_story', 'collage_wall'] as const).filter((f) => inv.featureKeys.includes(f)),
+    ...includedPosters(inv.featureKeys).map((o) => POSTER_FEATURES[o]),
+  ];
 }

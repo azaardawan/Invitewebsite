@@ -1,3 +1,4 @@
+import { ANY_POSTER_FEATURES } from '@/catalog/posters';
 import { after } from 'next/server';
 import { isForever } from '@/catalog/lifetime';
 import { getTranslations } from 'next-intl/server';
@@ -112,7 +113,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   const names = [v.person_1_name, v.person_2_name].filter(Boolean).join(' ♡ ') || v.baby_name || '';
   const rawDate = v.event_date || v.birth_date || '';
   const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? date(new Date(`${rawDate}T12:00:00Z`)) : '';
-  const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_') || k === 'couple_poster');
+  const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_') || (ANY_POSTER_FEATURES as readonly string[]).includes(k));
   // The sections a paid customer jumps between (a sticky row of chips; each section scrolls into place below it).
   const nav = paid
     ? ([

@@ -1593,3 +1593,37 @@ The three new rows of BAHJAFLIX v2 (#25): each line's name on the editor and its
 | 4 | #25 BAHJAFLIX v2: wording `row5` (text) | ضحكاتنا | Our laughs | پێکەنینەکانمان | کەنیێن مە |
 | 5 | #25 BAHJAFLIX v2: wording `row6` (label) | عنوان الصف السادس | Sixth row title | ناونیشانی ڕیزی شەشەم | ناڤونیشانێ رێزا شەشێ |
 | 6 | #25 BAHJAFLIX v2: wording `row6` (text) | إلى الأبد | Forever | بۆ هەمیشە | بۆ هەروهەر |
+
+## Batch 48 — couple posters sold separately, every poster text editable — ✅ AUTO-APPROVED (2026-11-01, owner checks in Admin → Translations)
+
+The two posters as separate options, the poster step (own words and an own picture per poster), and BAHJAFLIX v3's poster texts.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Platform: `store.posters.upload` | رفع صورة | Upload a picture | بارکردنی وێنە | بارکرنا وێنەی |
+| 2 | Platform: `store.posters.ownPicture` | صورتكم الخاصة بهذا الملصق | Your own picture for this poster | وێنەی تایبەتی ئەم پۆستەرە | وێنێ تایبەت ب ڤی پۆستەری |
+| 3 | Platform: `store.posters.removePicture` | حذف الصورة | Remove the picture | سڕینەوەی وێنە | ژێبرنا وێنەی |
+| 4 | Platform: `store.posters.reframe` | ضبط الإطار | Adjust the frame | ڕێکخستنی چوارچێوە | رێکخستنا چوارچووڤەیێ |
+| 5 | Platform: `store.posters.frameHint` | ما يظهر داخل الإطار هو ما سيظهر في الملصق بالضبط. اسحبوا الصورة لتحريكها، وكبّروها إن أردتم. | What is inside the frame is exactly what the poster shows. Drag the picture to move it, and zoom in if you like. | ئەوەی لەناو چوارچێوەکەدایە ڕێک ئەوەیە کە لە پۆستەرەکەدا دەردەکەوێت. وێنەکە ڕابکێشن بۆ جوڵاندنی، و ئەگەر ویستتان گەورەی بکەن. | یا د ناڤ چوارچووڤەیێدا ب دروستی ئەوە یا د پۆستەریدا دیار دبیت. وێنەی بکێشن دا بلڤینن، و ئەگەر هەوە ڤیا مەزن بکەن. |
+| 6 | Platform: `store.posters.texts` | نصوص الملصق | The poster’s words | دەقەکانی پۆستەر | نڤیسینێن پۆستەری |
+| 7 | Platform: `store.posters.textsHint` | تبدأ بنصوص صفحتكم. ما تغيّرونه هنا يتغيّر في هذا الملصق فقط؛ اتركوا الخانة فارغة لإخفاء النص. | They start from your page’s texts. What you change here changes on this poster only; leave a box empty to leave that text out. | لە دەقەکانی پەڕەکەتانەوە دەست پێدەکەن. ئەوەی لێرە دەیگۆڕن تەنها لەم پۆستەرەدا دەگۆڕێت؛ خانەیەک بەتاڵ بهێڵنەوە بۆ لابردنی ئەو دەقە. | ژ نڤیسینێن پەرا هەوە دەست پێ دکەن. یا هوین ل ڤێرێ دگوهۆڕن تنێ د ڤی پۆستەریدا دهێتە گوهۆڕین؛ خانەکێ ڤالا بهێلن دا ئەو نڤیسین نەمینیت. |
+| 8 | Platform: `store.posters.reset` | رجوع إلى نص الصفحة | Back to the page’s text | گەڕانەوە بۆ دەقی پەڕە | زڤرین بۆ نڤیسینا پەرێ |
+| 9 | Platform: `store.posters.subtitle` | اختاروا صور كل ملصق وعدّلوا كل نص فيه. يمكنكم رفع صورة خاصة بالملصق. | Choose the pictures for each poster and change any of its words. You can upload a picture just for a poster. | وێنەکانی هەر پۆستەرێک هەڵبژێرن و هەر دەقێکی بگۆڕن. دەتوانن وێنەیەکی تایبەت بە پۆستەرەکە بار بکەن. | وێنێن هەر پۆستەرەکێ هەلبژێرن و هەر نڤیسینەکا وێ بگوهۆڕن. دشێن وێنەکێ تایبەت ب پۆستەری بار بکەن. |
+| 10 | Platform: `store.features.couple_poster_landscape` | ملصق عرضي للطباعة بتصميمكم (A3) | A landscape poster to print, in your design (A3) | پۆستەرێکی پانی بۆ چاپ بە دیزاینەکەتان (A3) | پۆستەرەکێ پانی بۆ چاپێ ب دیزاینا هەوە (A3) |
+| 11 | Platform: `store.features.couple_poster_portrait` | ملصق طولي للطباعة بتصميمكم (A3) | A portrait poster to print, in your design (A3) | پۆستەرێکی درێژی بۆ چاپ بە دیزاینەکەتان (A3) | پۆستەرەکێ درێژی بۆ چاپێ ب دیزاینا هەوە (A3) |
+| 12 | #25 BAHJAFLIX v3: poster text `label` (name) | الكلمة بجانب B | The word next to the B | وشەی تەنیشت B | پەیڤا تەنشت B |
+| 13 | #25 BAHJAFLIX v3: poster text `title` (name) | العنوان | Title | ناونیشان | ناڤونیشان |
+| 14 | #25 BAHJAFLIX v3: poster text `badge` (name) | السطر بجانب TOP #01 | The line next to TOP #01 | دێڕی تەنیشت TOP #01 | رێزا تەنشت TOP #01 |
+| 15 | #25 BAHJAFLIX v3: poster text `story` (name) | القصة | The story | چیرۆکەکە | چیرۆک |
+| 16 | #25 BAHJAFLIX v3: poster text `starring` (name) | كلمة «البطولة» | The word “Starring” | وشەی «ئەکتەران» | پەیڤا «ئەکتەر» |
+| 17 | #25 BAHJAFLIX v3: poster text `couple` (name) | الاسمان | Your names | ناوەکانتان | ناڤێن هەوە |
+| 18 | #25 BAHJAFLIX v3: poster text `match` (name) | السطر الأخضر | The green line | دێڕە سەوزەکە | رێزا کەسک |
+| 19 | #25 BAHJAFLIX v3: poster text `since` (name) | سطر التاريخ | The date line | دێڕی بەروار | رێزا رێکەفتێ |
+| 20 | #25 BAHJAFLIX v3: poster text `tag` (name) | المناسبة | The occasion | بۆنە | بۆنە |
+| 21 | #25 BAHJAFLIX v3: poster text `play` (name) | زر «تشغيل» | The “Play” button | دوگمەی «لێدان» | دوگمەیا «لێدان» |
+| 22 | #25 BAHJAFLIX v3: poster text `moreInfo` (name) | زر «مزيد من المعلومات» | The “More info” button | دوگمەی «زانیاری زیاتر» | دوگمەیا «پتر پێزانین» |
+| 23 | #25 BAHJAFLIX v3: poster text `rowTitle` (name) | عنوان صف الصور | The photo row's title | ناونیشانی ڕیزی وێنەکان | ناڤونیشانێ رێزا وێنان |
+| 24 | #25 BAHJAFLIX v3: poster text `starring` (default) | البطولة: | Starring: | ئەکتەران: | ئەکتەر: |
+| 25 | #25 BAHJAFLIX v3: poster text `match` (default) | تطابق 100% | 100% match | ١٠٠٪ گونجاو | ١٠٠٪ گونجای |
+| 26 | #25 BAHJAFLIX v3: poster text `play` (default) | تشغيل | Play | لێدان | لێدان |
+| 27 | #25 BAHJAFLIX v3: poster text `moreInfo` (default) | مزيد من المعلومات | More info | زانیاری زیاتر | پتر پێزانین |

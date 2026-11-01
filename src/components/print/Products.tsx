@@ -44,7 +44,7 @@ export type ProductData = {
   /** Photo collages: the customer's photos (full size) and the lines written on them. */
   collage: Pick<PrintCollageProps, 'photos' | 'name' | 'message' | 'date' | 'text'>;
   /** Couple posters (packages with `couple_poster`): what the design's print/Poster.tsx draws, or null. */
-  poster: (Omit<PrintPosterProps, 'orientation' | 'size' | 'main' | 'row'> & { picks: Record<PrintPosterProps['orientation'], Pick<PrintPosterProps, 'main' | 'row'>> }) | null;
+  poster: (Omit<PrintPosterProps, 'orientation' | 'size' | 'main' | 'row' | 'texts'> & { picks: Record<PrintPosterProps['orientation'], Pick<PrintPosterProps, 'main' | 'row' | 'texts'>> }) | null;
 };
 
 /** A bottle label's size in mm. */

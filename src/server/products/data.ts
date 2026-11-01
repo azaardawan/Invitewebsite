@@ -7,12 +7,17 @@ import { DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
 import { defaultLook, themeArtwork, type ResolvedArtwork } from '@/server/catalog/card-design';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { invitationRenderData } from '@/server/invitation/load';
-import { listPhotos } from '@/server/photos/photos';
+import { listPhotos, POSTER_PHOTO_PLACE, type InvitationPhoto } from '@/server/photos/photos';
+import { resolvePosterTexts } from '@/lib/poster-texts';
+import type { PosterText, ThemeManifest } from '@/theme-sdk/manifest';
+import { eq } from 'drizzle-orm';
+import { themeVersions } from '@/server/db/schema';
 import { includedCollages } from '@/catalog/collages';
 import type { CollageText } from '@/theme-sdk/collage';
 import type { ThemePhoto } from '@/theme-sdk/types';
 import type { PrintPosterProps } from '@/theme-sdk/poster';
 import { customerVideo } from '@/server/video/video';
+import { hasPosters } from '@/catalog/posters';
 import { resolvePoster, type PosterOrientation, type PosterPick } from '@/lib/poster-choices';
 import { getSettings } from '@/server/settings/service';
 import { env } from '@/server/env';
@@ -39,7 +44,7 @@ export function productDataFrom(
     codeRef?: string;
     collagePhotos?: ThemePhoto[];
     /** Couple posters: the photos at full size, the video's still and Bahja's details for the bottom. */
-    poster?: { photos: ThemePhoto[]; still: string | null; contact: PrintPosterProps['contact']; picks: Record<PosterOrientation, PosterPick<ThemePhoto>> };
+    poster?: { photos: ThemePhoto[]; still: string | null; contact: PrintPosterProps['contact']; picks: Record<PosterOrientation, PosterPick<ThemePhoto> & { texts: Record<string, string> }> };
   },
 ): ProductData {
   const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string; collage: CollageText } };
@@ -101,19 +106,28 @@ export async function productData(db: DbOrTx, inv: InvitationRow, opts: { sticke
     ? (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }))
     : [];
   // Couple posters: the photos at full size, the video's still, and Bahja's details for the bottom.
-  const poster = inv.featureKeys.includes('couple_poster') ? await posterData(db, inv) : undefined;
+  const poster = hasPosters(inv.featureKeys) ? await posterData(db, inv, props, await posterTextsOf(db, inv)) : undefined;
   return productDataFrom(props, await themeArtwork(db, inv.themeId), { stickerShape, bottleSize: inv.bottleSize, watermark: !isPaid(inv), codeRef, collagePhotos, poster });
 }
 
+/** The poster texts the invitation's design version declares (manifest `posters.texts`). */
+async function posterTextsOf(db: DbOrTx, inv: InvitationRow): Promise<readonly PosterText[]> {
+  const [v] = await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
+  return (v?.manifest as ThemeManifest | undefined)?.posters?.texts ?? [];
+}
+
 /** The posters' pictures (full size), the video's still, the customer's choices for each poster, and Bahja's details. */
-async function posterData(db: DbOrTx, inv: InvitationRow) {
-  const photos = (await listPhotos(db, inv.id)).map((p) => ({ index: p.position, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }));
+async function posterData(db: DbOrTx, inv: InvitationRow, props: ThemeProps, texts: readonly PosterText[]) {
+  const asPhoto = (p: InvitationPhoto) => ({ index: p.position, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption });
+  const photos = (await listPhotos(db, inv.id)).map(asPhoto);
+  const own = (await listPhotos(db, inv.id, { posters: true })).map(asPhoto);
   const still = (await customerVideo(db, inv))?.poster ?? null;
-  const picks = {
-    landscape: resolvePoster(inv.posterChoices.landscape, photos, Boolean(still), 'landscape'),
-    portrait: resolvePoster(inv.posterChoices.portrait, photos, Boolean(still), 'portrait'),
-  };
-  return { photos, still, picks, contact: await posterContact(db) };
+  const page = { fields: props.fields, wording: props.wording, and: props.labels.and, locale: props.locale };
+  const pick = (o: PosterOrientation) => ({
+    ...resolvePoster(inv.posterChoices[o], photos, Boolean(still), o, own.find((p) => p.index === POSTER_PHOTO_PLACE[o])),
+    texts: resolvePosterTexts(texts, o, inv.posterChoices[o]?.texts, page),
+  });
+  return { photos, still, picks: { landscape: pick('landscape'), portrait: pick('portrait') }, contact: await posterContact(db) };
 }
 
 /** Bahja's details at the bottom of the posters: the website (from APP_URL), the WhatsApp number (or the phone) and Instagram. */

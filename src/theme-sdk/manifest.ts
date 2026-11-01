@@ -107,6 +107,14 @@ export type ThemeManifest = {
    * `<VideoSlot>`, which become editable there (see docs/THEME_CONTRACT.md, "Template designs").
    */
   editor?: 'template';
+  /**
+   * Couple posters (features `couple_poster_landscape` / `couple_poster_portrait`): what the customer can change on each
+   * poster at the poster step. `frames`: the big picture's frame (width ÷ height) on each poster, for framing their own
+   * picture. `texts`: every text printed on the posters, each with its name on the poster step, the posters it is on
+   * (`on`), where it starts from (`from`: a wording line `wording:<key>`, a field `field:<key>`, or `couple`, the two names
+   * joined) or else its `default`, and its length. The customer's own words for a poster replace it there only.
+   */
+  posters?: PosterSpec;
   /** Internal/demo themes can never be activated for sale. */
   internal?: boolean;
 };
@@ -115,6 +123,17 @@ export type ThemeManifest = {
  * `set`: the places come in sets of this many (a row of the design, for example). Each set fills in order on its own: a
  * customer can fill the third set and leave the second empty, and a package sells whole sets (Admin).
  */
+export type PosterText = {
+  key: string;
+  label: ThemeText;
+  on: readonly ('landscape' | 'portrait')[];
+  from?: `wording:${string}` | `field:${string}` | 'couple';
+  default?: ThemeText;
+  maxLength: number;
+  multiline?: boolean;
+};
+export type PosterSpec = { frames: { landscape: number; portrait: number }; texts: PosterText[] };
+
 export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[]; set?: number };
 
 /** The most photos a design may hold. */
@@ -247,6 +266,24 @@ export const manifestSchema = z
       })
       .optional(),
     editor: z.literal('template').optional(),
+    posters: z
+      .object({
+        frames: z.object({ landscape: z.number().min(0.3).max(4), portrait: z.number().min(0.3).max(4) }),
+        texts: z
+          .array(
+            z.object({
+              key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/),
+              label: themeText,
+              on: z.array(z.enum(['landscape', 'portrait'])).min(1),
+              from: z.union([z.literal('couple'), z.string().regex(/^(wording|field):[a-zA-Z0-9_]+$/)]).optional(),
+              default: themeText.optional(),
+              maxLength: z.number().int().min(1).max(600),
+              multiline: z.boolean().optional(),
+            }),
+          )
+          .max(20),
+      })
+      .optional(),
     internal: z.boolean().optional(),
   })
   .superRefine((m, ctx) => {
@@ -281,6 +318,14 @@ export const manifestSchema = z
     if (m.photos?.labels && m.photos.labels.length > m.photos.max) issue('photos.labels: more labels than photos.max');
     if (m.photos?.frames && m.photos.frames.length > m.photos.max) issue('photos.frames: more frames than photos.max');
     if (m.photos?.set && m.photos.max % m.photos.set !== 0) issue('photos.max must be a whole number of photos.set');
+    if (m.posters) {
+      if (new Set(m.posters.texts.map((t) => t.key)).size !== m.posters.texts.length) issue('posters.texts contains duplicate keys');
+      for (const t of m.posters.texts) {
+        if (!t.from && !t.default) issue(`posters.texts.${t.key}: needs from or default`);
+        if (t.from?.startsWith('wording:') && !m.wording?.some((w) => `wording:${w.key}` === t.from)) issue(`posters.texts.${t.key}: ${t.from} is not a wording line`);
+        if (t.from?.startsWith('field:') && !m.fields.includes(t.from.slice(6) as FieldKey)) issue(`posters.texts.${t.key}: ${t.from} is not a field`);
+      }
+    }
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');

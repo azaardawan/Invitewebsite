@@ -1,4 +1,7 @@
 import 'server-only';
+import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
+import { posterTextDefault } from '@/lib/poster-texts';
+import type { CoverFocus } from '@/lib/cover-focus';
 import { isOptionalField, isPlaceOptional } from '@/catalog/fields';
 import { customMusicIncluded, customSong } from '@/server/music/custom';
 import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
@@ -6,7 +9,7 @@ import { connection } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { invitations, packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
-import { listPhotos, photoSpec } from '@/server/photos/photos';
+import { listPhotos, photoSpec, POSTER_PHOTO_PLACE } from '@/server/photos/photos';
 import { customerVideo, videoIncluded } from '@/server/video/video';
 import { wordingDefault } from '@/theme-sdk/manifest';
 import { manifestByCodeRef } from '@/theme-registry';
@@ -24,7 +27,7 @@ import { orderFields } from './catalog';
 import { BOTTLE_SIZE_KEYS, DEFAULT_BOTTLE_SIZE, type BottleSize } from '@/catalog/products';
 import { BIRTH_DATE_DIGITS, BIRTH_DATE_STYLES, formatBirthDate, type DateStyle, type DigitStyle } from '@/lib/birth-date-format';
 import { localeMeta } from '@/i18n/config';
-import { invitationMessages } from '@/server/invitation/theme-props';
+import { invitationMessages, resolveWording } from '@/server/invitation/theme-props';
 import { baghdadToday } from '@/server/orders/validation';
 
 /** Everything the review and edit screens need about a customer's draft, found by its preview token. */
@@ -78,6 +81,41 @@ export async function draftByToken(token: string) {
   };
 }
 
+/**
+ * The poster step (couple posters): the posters the package sells, each with its frame, its own uploaded picture (if
+ * any), and its texts (name, the customer's words or what it starts from, and that starting text to go back to).
+ */
+async function posterState(inv: typeof invitations.$inferSelect, manifest: ThemeManifest, locale: Locale, still: string | null) {
+  const orientations = includedPosters(inv.featureKeys);
+  const own = await listPhotos(db(), inv.id, { posters: true });
+  const page = { fields: inv.fieldValues, wording: resolveWording(manifest.wording ?? [], inv.wording, locale), and: invitationMessages(locale).and, locale };
+  const defs = manifest.posters?.texts ?? [];
+  return {
+    choices: inv.posterChoices,
+    still,
+    orientations,
+    frames: manifest.posters?.frames ?? { landscape: 1.36, portrait: 1 },
+    own: Object.fromEntries(
+      orientations.map((o) => {
+        const p = own.find((x) => x.position === POSTER_PHOTO_PLACE[o]);
+        return [o, p ? { src: p.src, width: p.width, height: p.height, focus: p.focus } : null];
+      }),
+    ) as Partial<Record<PosterOrientation, { src: string; width: number; height: number; focus: CoverFocus } | null>>,
+    texts: Object.fromEntries(
+      orientations.map((o) => [
+        o,
+        defs
+          .filter((d) => d.on.includes(o))
+          .map((d) => {
+            const start = posterTextDefault(d, page);
+            const mine = inv.posterChoices[o]?.texts?.[d.key];
+            return { key: d.key, label: localized(d.label, locale), value: mine ?? start, start, maxLength: d.maxLength, multiline: Boolean(d.multiline) };
+          }),
+      ]),
+    ) as Partial<Record<PosterOrientation, { key: string; label: string; value: string; start: string; maxLength: number; multiline: boolean }[]>>,
+  };
+}
+
 /** Longest text the template editor offers for a field without its own limit (as validation.ts). */
 const TEXT_MAX = { text: 80, longtext: 500 } as const;
 
@@ -113,7 +151,7 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
   const included = videoIncluded(inv);
   const video = included ? await customerVideo(db(), inv) : null;
   // The poster step (couple_poster): the customer's choices so far and the video's still, one of the pictures to choose.
-  const posters = inv.featureKeys.includes('couple_poster') ? { choices: inv.posterChoices, still: video?.poster ?? null } : null;
+  const posters = hasPosters(inv.featureKeys) ? await posterState(inv, manifest, locale, video?.poster ?? null) : null;
   return { texts, videoIncluded: included, video, posters };
 }
 

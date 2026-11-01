@@ -49,6 +49,9 @@ export const FEATURES = {
   video: { requires: [], requiresFields: [] },
   /** The design's printable posters (landscape and portrait, A3), with the customer's photo and the shop's contact details. */
   couple_poster: { requires: [], requiresFields: [] },
+  // The two posters sold separately (src/catalog/posters.ts); `couple_poster` above is both, from before the split.
+  couple_poster_landscape: { requires: [], requiresFields: [] },
+  couple_poster_portrait: { requires: [], requiresFields: [] },
 } as const satisfies Record<string, { requires: readonly string[]; requiresFields: readonly FieldKey[] }>;
 
 /**

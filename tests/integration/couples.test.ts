@@ -23,7 +23,7 @@ import { customerVideo, removeVideo, setVideo } from '@/server/video/video';
 import { processVideo, VIDEO_MAX_SECONDS } from '@/server/media/video';
 import { productData, spacedPhone } from '@/server/products/data';
 import { cleanPosterChoices, resolvePoster } from '@/lib/poster-choices';
-import { handlePosterRequest } from '@/server/posters/http';
+import { handlePosterPhotoRequest, handlePosterRequest } from '@/server/posters/http';
 import { randomToken } from '@/lib/crypto';
 import { activeTheme, testManifest } from '../fixtures';
 import { ctx, uniqueKey } from '../helpers';
@@ -306,5 +306,91 @@ describe('photo sets (a design whose rows hold six photos each)', () => {
     await setCurrentVersion(db(), t!.id, v1!.id, shop.actor);
     await createPackage(db(), t!.id, { name: { ar: 'تسع', en: 'Nine' }, priceIqd: 1000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 9 }, shop.actor);
     await expect(setCurrentVersion(db(), t!.id, v2!.id, shop.actor)).rejects.toMatchObject({ code: 'packagesInvalidForVersion' });
+  });
+});
+
+describe('posters sold separately, with their own words and pictures', () => {
+  let posters: { themeKey: string; portraitOnly: string; both: string };
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('posters');
+    await syncThemesFromRegistry(
+      db(),
+      [
+        testManifest(key, 1, {
+          sections: ['couples'],
+          fields: [...FIELDS],
+          features: ['photos', 'video', 'couple_poster_landscape', 'couple_poster_portrait'],
+          editor: 'template',
+          validStates: [{ features: ['photos', 'video', 'couple_poster_landscape', 'couple_poster_portrait'], fields: [...FIELDS] }],
+          wording: [{ key: 'title', label: { ar: 'العنوان', en: 'Title' }, ar: 'معاً إلى الأبد', versions: { en: 'Together Forever' }, defaultIn: ['en'], maxLength: 28 }],
+          photos: { max: 6, aspect: 2 / 3 },
+          posters: {
+            frames: { landscape: 1.36, portrait: 1 },
+            texts: [
+              { key: 'title', label: { ar: 'العنوان', en: 'Title' }, on: ['landscape', 'portrait'], from: 'wording:title', maxLength: 28 },
+              { key: 'couple', label: { ar: 'الاسمان', en: 'Names' }, on: ['landscape', 'portrait'], from: 'couple', maxLength: 60 },
+              { key: 'play', label: { ar: 'تشغيل', en: 'Play' }, on: ['landscape'], default: { ar: 'تشغيل', en: 'Play' }, maxLength: 16 },
+            ],
+          },
+          print: undefined,
+        }),
+      ],
+      base.actor,
+      { complete: false },
+    );
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 334, height: 434, channels: 3, background: '#103' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: null }, base.actor);
+    const portraitOnly = await createPackage(db(), t!.id, { name: { ar: 'طولي', en: 'Portrait' }, priceIqd: 1000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video', 'couple_poster_portrait'] }, base.actor);
+    const both = await createPackage(db(), t!.id, { name: { ar: 'كلاهما', en: 'Both' }, priceIqd: 2000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video', 'couple_poster_landscape', 'couple_poster_portrait'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    posters = { themeKey: key, portraitOnly: portraitOnly.id, both: both.id };
+  }, 60_000);
+
+  const draftOf = async (packageId: string) => {
+    const d = await createDraft(db(), { themeKey: posters.themeKey, packageId, locale: 'en', values: { person_1_name: 'Dara', person_2_name: 'Ava' } }, { ...ctx, ipHash: randomToken(8) });
+    return reload(d.invitationId);
+  };
+  const patch = (body: unknown) => new Request('http://x/p/t/poster', { method: 'PATCH', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+
+  it('a package sells only the poster it includes', async () => {
+    const inv = await draftOf(posters.portraitOnly);
+    expect((await handlePosterRequest(db(), patch({ landscape: { texts: { title: 'x' } } }), inv, { ipHash: null, published: false })).status).toBe(400);
+    expect((await handlePosterRequest(db(), patch({ portrait: { texts: { title: 'Ours' } } }), inv, { ipHash: null, published: false })).status).toBe(200);
+    const res = await handlePosterPhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, 'landscape', { ipHash: null, published: false });
+    expect(res.status).toBe(400);
+  });
+
+  it('every text is the page’s until the customer changes it on one poster; a poster can have a picture of its own', async () => {
+    let inv = await draftOf(posters.both);
+    let data = await productData(db(), inv);
+    expect(data.poster?.picks.landscape.texts).toEqual({ title: 'Together Forever', couple: 'Dara & Ava', play: 'Play' });
+    expect(data.poster?.picks.portrait.texts).toEqual({ title: 'Together Forever', couple: 'Dara & Ava' });
+    // Own words on the landscape poster only; '' leaves a text out; unknown keys and the other poster's keys are refused.
+    expect((await handlePosterRequest(db(), patch({ landscape: { texts: { title: 'Our Big Day', play: '' } } }), inv, { ipHash: null, published: false })).status).toBe(200);
+    expect((await handlePosterRequest(db(), patch({ portrait: { texts: { play: 'x' } } }), inv, { ipHash: null, published: false })).status).toBe(400);
+    expect((await handlePosterRequest(db(), patch({ portrait: { texts: { title: 'x'.repeat(29) } } }), inv, { ipHash: null, published: false })).status).toBe(400);
+    inv = await reload(inv.id);
+    data = await productData(db(), inv);
+    expect(data.poster?.picks.landscape.texts).toEqual({ title: 'Our Big Day', couple: 'Dara & Ava', play: '' });
+    expect(data.poster?.picks.portrait.texts.title).toBe('Together Forever');
+
+    // A picture for the portrait poster only: it becomes that poster's big picture, never one of the page's photos.
+    const form = new FormData();
+    form.append('file', new Blob([await sharp({ create: { width: 1400, height: 1400, channels: 3, background: '#2a8' } }).jpeg().toBuffer()], { type: 'image/jpeg' }), 'p.jpg');
+    const up = await handlePosterPhotoRequest(db(), new Request('http://x', { method: 'POST', body: form }), inv, 'portrait', { ipHash: null, published: false });
+    expect(up.status).toBe(200);
+    inv = await reload(inv.id);
+    expect(inv.posterChoices.portrait?.main).toBe(-2);
+    expect(await listPhotos(db(), inv.id)).toHaveLength(0);
+    data = await productData(db(), inv);
+    expect(data.poster?.picks.portrait.main?.index).toBe(101);
+    // Taken away: the poster goes back to the default (no photos and no video here: nothing).
+    await handlePosterPhotoRequest(db(), new Request('http://x', { method: 'DELETE' }), inv, 'portrait', { ipHash: null, published: false });
+    inv = await reload(inv.id);
+    expect(inv.posterChoices.portrait?.main).toBeUndefined();
+    expect(await listPhotos(db(), inv.id, { posters: true })).toHaveLength(0);
   });
 });

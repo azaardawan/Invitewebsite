@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { includedCollages } from '@/catalog/collages';
+import { ANY_POSTER_FEATURES, hasPosters } from '@/catalog/posters';
 import { Link } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
@@ -45,7 +46,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
   // A template design is filled in place: the design itself, editable, instead of the phone preview and photo list.
   const template = draft.template && draft.status === 'DRAFT' && draft.photos ? { ...draft.template, photos: draft.photos } : null;
   // With the posters (couple_poster) the order goes: the page itself, then the posters (`?step=posters`), then checkout.
-  const posters = template && draft.featureKeys.includes('couple_poster') ? template.posters : null;
+  const posters = template && hasPosters(draft.featureKeys) ? template.posters : null;
   const posterStep = Boolean(posters) && step === 'posters';
   const editor = posterStep ? null : template;
   const showCheckout = !posters || posterStep;
@@ -85,6 +86,10 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             photos={template.photos.photos.map((p) => ({ index: p.position, src: p.src, focus: p.focus }))}
             still={posters.still}
             initial={posters.choices}
+            orientations={posters.orientations}
+            frames={posters.frames}
+            own={posters.own}
+            texts={posters.texts}
             backHref="?"
             continueHref="#checkout"
             labels={posterLabels(t)}
@@ -189,7 +194,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
           <ExtrasPreview
             base={`/p/${token}/extra`}
             // The posters have their own step (above) in a template design.
-            featureKeys={posters ? draft.featureKeys.filter((k) => k !== 'couple_poster') : draft.featureKeys}
+            featureKeys={posters ? draft.featureKeys.filter((k) => !(ANY_POSTER_FEATURES as readonly string[]).includes(k)) : draft.featureKeys}
             stickerShape={draft.current.stickerShape}
             cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale)}
             watermarked

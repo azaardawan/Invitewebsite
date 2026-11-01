@@ -33,7 +33,7 @@ function testVideo() {
 
 async function openSample(page: Page, width: number) {
   await page.setViewportSize({ width, height: width >= 1000 ? 800 : 844 });
-  await page.goto('/admin/preview/ar/theme/bahjaflix?v=2&state=1&names=short');
+  await page.goto('/admin/preview/ar/theme/bahjaflix?v=3&state=2&names=short');
   await page.getByRole('button', { name: 'افتح الدعوة' }).click();
   await expect(page.locator('[data-phase="open"]')).toBeVisible({ timeout: 4000 });
 }
@@ -179,10 +179,31 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   expect((await saved).status()).toBe(200);
   await expect(posters.locator('[data-poster-main] [data-poster-thumb="main-0"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  // Every text on the poster is the customer's to change, for this poster only (it starts from the page's).
+  await expect(posters.locator('[data-poster-text="title"]')).toHaveValue('Our Story');
+  await expect(posters.locator('[data-poster-text="couple"]')).toHaveValue('Dara & Ava');
+  const textSaved = page.waitForResponse((r) => r.url().endsWith('/poster') && r.request().method() === 'PATCH');
+  await posters.locator('[data-poster-text="title"]').fill('Our Big Day');
+  await posters.locator('[data-poster-text="play"]').fill('Watch');
+  expect((await textSaved).status()).toBe(200);
+  await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
   await page.screenshot({ path: testInfo.outputPath('posters-step.png'), fullPage: true });
+
+  // The portrait poster: a picture of its own, uploaded and framed in that poster's frame.
   await posters.getByRole('tab', { name: 'Portrait poster' }).click();
   await expect(posters.locator('[data-poster-preview="portrait"]')).toBeVisible();
   await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  // The landscape poster's own words stay there: the portrait one still starts from the page.
+  await expect(posters.locator('[data-poster-text="title"]')).toHaveValue('Our Story');
+  await expect(posters.locator('[data-poster-text="play"]')).toHaveCount(0);
+  await posters.locator('[data-poster-upload]').setInputFiles(await photo('#20a080', 1400, 1400));
+  await expect(posters.locator('[data-poster-framer]')).toBeVisible({ timeout: 30_000 });
+  await expect(posters.locator('[data-poster-main] [data-poster-thumb="own"]')).toHaveAttribute('aria-pressed', 'true');
+  const frameBox = await posters.locator('[data-photo-frame]').boundingBox();
+  expect(frameBox!.width / frameBox!.height).toBeCloseTo(1240 / 1250, 1);
+  await posters.getByRole('button', { name: 'Done' }).click();
+  await expect(posters.getByRole('status')).toHaveCount(0, { timeout: 60_000 });
+  await page.screenshot({ path: testInfo.outputPath('posters-portrait-step.png'), fullPage: true });
   await posters.locator('[data-poster-continue]').click();
   await expect(page.locator('#checkout')).toBeVisible();
   for (const o of ['landscape', 'portrait'] as const) {

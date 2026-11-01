@@ -1,6 +1,6 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
-import { and, asc, eq, gt, inArray, like, lt, notInArray } from 'drizzle-orm';
+import { and, asc, eq, gt, gte, inArray, like, lt, notInArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { assets, invitationPhotos, invitations, themeVersions } from '@/server/db/schema';
 import { storage, publicMediaUrl } from '@/server/storage';
@@ -72,13 +72,25 @@ export type InvitationPhoto = {
   caption: string | null;
 };
 
-/** An invitation's photos in the design's order. */
-export async function listPhotos(db: DbOrTx, invitationId: string): Promise<InvitationPhoto[]> {
+/**
+ * A picture the customer uploaded for one poster only (couple posters): kept with the photos (same files, privacy and
+ * deletion) in a place of its own, past every design place, so it never shows on the page or in collages.
+ */
+export const POSTER_PHOTO_PLACE = { landscape: 100, portrait: 101 } as const;
+const FIRST_POSTER_PLACE = 100;
+
+/** An invitation's photos in the design's order (`posters`: instead, the pictures uploaded for the posters only). */
+export async function listPhotos(db: DbOrTx, invitationId: string, opts: { posters?: boolean } = {}): Promise<InvitationPhoto[]> {
   const rows = await db
     .select({ photo: invitationPhotos, display: assets })
     .from(invitationPhotos)
     .innerJoin(assets, eq(assets.id, invitationPhotos.displayAssetId))
-    .where(eq(invitationPhotos.invitationId, invitationId))
+    .where(
+      and(
+        eq(invitationPhotos.invitationId, invitationId),
+        opts.posters ? gte(invitationPhotos.position, FIRST_POSTER_PLACE) : lt(invitationPhotos.position, FIRST_POSTER_PLACE),
+      ),
+    )
     .orderBy(asc(invitationPhotos.position));
   if (!rows.length) return [];
   const fulls = await db.select({ id: assets.id, storageKey: assets.storageKey }).from(assets).where(inArray(assets.id, rows.map((r) => r.photo.assetId)));
@@ -135,6 +147,16 @@ export async function deletePhotoFiles(db: DbOrTx, ids: string[]) {
  * (MediaError for a bad file), so nothing is stored for a refused upload. Starts centred in the frame.
  */
 export async function setPhoto(db: DbOrTx, inv: InvitationRow, position: number, input: Buffer) {
+  return storePhotoAt(db, inv, await placeFor(db, inv, position), input);
+}
+
+/** A picture for one poster only (its own place, see POSTER_PHOTO_PLACE), replacing the one before. */
+export async function setPosterPhoto(db: DbOrTx, inv: InvitationRow, orientation: keyof typeof POSTER_PHOTO_PLACE, input: Buffer) {
+  return storePhotoAt(db, inv, POSTER_PHOTO_PLACE[orientation], input, { posters: true });
+}
+
+/** Where a new design photo goes: its set's next free place (at most), never leaving a gap in a set. */
+async function placeFor(db: DbOrTx, inv: InvitationRow, position: number) {
   const spec = await photoSpec(db, inv);
   if (!spec) throw new PhotoError('notIncluded');
   if (!Number.isInteger(position) || position < 0 || position >= spec.max) throw new PhotoError('position');
@@ -148,6 +170,10 @@ export async function setPhoto(db: DbOrTx, inv: InvitationRow, position: number,
     position = Math.min(position, free);
   }
   if (position >= spec.max) throw new PhotoError('position');
+  return position;
+}
+
+async function storePhotoAt(db: DbOrTx, inv: InvitationRow, position: number, input: Buffer, opts: { posters?: boolean } = {}) {
   const img = await processPhoto(input);
   const full = await storeOne(db, img.full);
   const display = await storeOne(db, img.display);
@@ -162,7 +188,7 @@ export async function setPhoto(db: DbOrTx, inv: InvitationRow, position: number,
     return prev;
   });
   if (old) await deletePhotoFiles(db, [old.assetId, old.displayAssetId]);
-  return (await listPhotos(db, inv.id)).find((p) => p.position === position)!;
+  return (await listPhotos(db, inv.id, opts)).find((p) => p.position === position)!;
 }
 
 /** Where a photo sits in its frame (moved and zoomed by the customer). */
@@ -192,6 +218,8 @@ export async function removePhoto(db: DbOrTx, invitationId: string, position: nu
 
 /** Moves every photo after `position` in its set up one place (one by one, in order, so places stay unique). */
 export async function closeGap(tx: DbOrTx, invitationId: string, position: number) {
+  // A poster's own picture has a place of its own: nothing moves.
+  if (position >= FIRST_POSTER_PLACE) return;
   const [inv] = await tx.select().from(invitations).where(eq(invitations.id, invitationId));
   const spec = inv ? await photoSpec(tx, inv) : null;
   const { end } = setOf(position, spec?.set ?? Number.MAX_SAFE_INTEGER);
