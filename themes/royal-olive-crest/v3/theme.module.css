@@ -1,0 +1,695 @@
+/*
+ * Royal Olive Crest. Olive green and gold for the crest pages, cream paper for reading.
+ * The owner's page artwork is shown as "sheets" (2:3, the artwork stretched to the sheet); the text
+ * sits in each sheet's empty area. Sizes inside a sheet use cqw (1 % of the sheet's width), so the
+ * text keeps its place in the artwork on every screen. A sheet grows taller only if its text needs it.
+ */
+
+.root {
+  --ink: #39412d;
+  --ink-soft: #5b5f45;
+  --olive: #4a5228;
+  --olive-deep: #262a10;
+  --gold: #c9a45c;
+  --gold-deep: #8c6c2c;
+  --gold-light: #e6c77d;
+  --cream: #f6ecd4;
+  --field: #fbf6ec;
+  --danger: #9a3b2e;
+  min-height: 100svh;
+  background: var(--olive-deep);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- sheets */
+
+.sheet {
+  position: relative;
+  width: min(100% - 20px, 460px);
+  margin-inline: auto;
+  aspect-ratio: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  container-type: inline-size;
+  box-shadow: 0 10px 28px rgb(70 55 20 / 0.18);
+}
+.sheetNames {
+  background-image: url(./assets/sheet-names.webp);
+}
+.sheetVerse {
+  background-image: url(./assets/sheet-verse.webp);
+}
+.sheetMessage {
+  background-image: url(./assets/sheet-message.webp);
+}
+.sheetVenue {
+  background-image: url(./assets/sheet-venue.webp);
+}
+.sheetCountdown {
+  background-image: url(./assets/sheet-countdown.webp);
+}
+
+/* ---------------------------------------------------------------- the crest page (what the envelope opens onto) */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 58px;
+  background: radial-gradient(ellipse 80% 60% at 50% 42%, #454c24 0%, var(--olive-deep) 100%);
+}
+.hero .sheetNames {
+  width: min(100%, 460px, calc((100svh - 78px) * 2 / 3));
+  box-shadow: 0 18px 44px rgb(0 0 0 / 0.38);
+}
+/* The artwork's empty area: between the crest and the bottom ornament. */
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2cqw;
+  padding: 54% 14% 22%;
+  text-align: center;
+}
+.root[data-hydrated][data-stage='closed'] .heroContent,
+.root[data-stage='opening'] .heroContent {
+  opacity: 0;
+}
+.root[data-stage='open'] .heroContent,
+.root[data-stage='done'] .heroContent {
+  animation: roc-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes roc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(3cqw);
+  }
+}
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 14cqw;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.name,
+.heroDate {
+  padding-block: 0.08em;
+  background: linear-gradient(172deg, #f8e7b0 8%, #dcb565 42%, #ad7f30 72%, #efd38d 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.35));
+}
+.and {
+  margin: 0.4cqw 0 0.2cqw;
+  font-family: var(--font-text);
+  font-size: 7cqw;
+  line-height: 1;
+  color: var(--gold-light);
+}
+.heroDate {
+  margin: 4cqw 0 0;
+  font-family: var(--font-script);
+  font-size: 7.2cqw;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+.scrollCue {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border-right: 2px solid var(--gold-light);
+  border-bottom: 2px solid var(--gold-light);
+  transform: rotate(45deg);
+  opacity: 0.85;
+  animation: roc-cue 2.2s ease-in-out infinite;
+}
+@keyframes roc-cue {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 6px;
+  }
+}
+
+/* ---------------------------------------------------------------- cream pages */
+
+.paper {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px 0 40px;
+  background: radial-gradient(ellipse 120% 50% at 50% 0%, #faf3e4 0%, #efe4cb 100%);
+}
+
+/* Each sheet's text area fills the sheet, so its text is centred in the artwork's empty space. */
+.verseBox,
+.messageBox,
+.venueBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Quran verse, inside the oval. */
+.verseBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4cqw;
+  padding: 37.5% 17% 33%;
+  text-align: center;
+}
+.verse {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: 5.6cqw;
+  line-height: 1.95;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.root[lang|='en'] .verse {
+  font-size: 4.6cqw;
+}
+.verseRef {
+  margin: 0;
+  font-size: 3.4cqw;
+  color: var(--gold-deep);
+}
+.verseTranslation {
+  margin: 0;
+  font-style: italic;
+  font-size: 3.6cqw;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* The couple's message, on the cream panel under the crest. */
+.messageBox {
+  padding: 46.5% 16% 24%;
+}
+.message {
+  margin: 0;
+  font-size: 4.5cqw;
+  line-height: 1.85;
+  text-align: center;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+/* Venue, date and time, inside the gold frame. */
+.venueBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3cqw;
+  padding: 26% 14% 25%;
+  text-align: center;
+}
+.eyebrow {
+  margin: 0;
+  font-size: 3.5cqw;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.root:not([lang|='en']) .eyebrow {
+  letter-spacing: 0;
+}
+.venueName {
+  margin: 0;
+  font-weight: 700;
+  font-size: 6.4cqw;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.divider {
+  display: block;
+  width: 56%;
+  aspect-ratio: 1000 / 123;
+  margin: 1cqw auto;
+  background: url(./assets/divider.webp) center / contain no-repeat;
+}
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 3.4cqw;
+  margin: 0;
+}
+.details dd {
+  margin: 0;
+}
+.detailValue {
+  margin-top: 0.8cqw;
+  font-size: 4.8cqw;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.mapButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  margin-top: 1.5cqw;
+  padding: 0 22px;
+  border: 1.5px solid #d6b56a;
+  border-radius: 999px;
+  background: var(--olive);
+  color: var(--cream);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgb(47 52 22 / 0.22);
+}
+.mapButton:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 3px;
+}
+
+/* Countdown, inside the gold circle on the green page; date and time underneath. */
+.countdownCircle {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  top: 13.5%;
+  height: 33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.6cqw;
+  text-align: center;
+}
+.countdownTitle {
+  max-width: 40cqw;
+  margin: 0;
+  font-size: 3.8cqw;
+  line-height: 1.4;
+  color: #f1e3bd;
+}
+.countdownUnits {
+  display: flex;
+  gap: 3cqw;
+}
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 11cqw;
+}
+.unitValue {
+  font-size: 9cqw;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gold-light);
+  font-variant-numeric: tabular-nums;
+}
+.unitLabel {
+  font-size: 3.2cqw;
+  color: #e9dcb6;
+}
+.countdownAfter {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 56%;
+  bottom: 9%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqw;
+  text-align: center;
+}
+.countdownDate {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 7cqw;
+  line-height: 1.5;
+  color: var(--gold-light);
+  text-wrap: balance;
+}
+.countdownTime {
+  margin: 0;
+  font-size: 5cqw;
+  color: #efe2bf;
+}
+
+/* ---------------------------------------------------------------- guest form, messages, closing */
+
+.finale {
+  position: relative;
+  width: min(100% - 20px, 460px);
+  margin-inline: auto;
+  padding: 84px 22px 72px;
+  background: #f8f1e2;
+  box-shadow: 0 10px 28px rgb(70 55 20 / 0.14);
+}
+.crest {
+  display: block;
+  width: 62%;
+  max-width: 280px;
+  aspect-ratio: 900 / 565;
+  margin: 0 auto 14px;
+  background: url(./assets/crest.webp) center / contain no-repeat;
+}
+.crestSmall {
+  width: 44%;
+}
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--olive);
+}
+.formIntro {
+  margin: 4px 0 20px;
+  font-size: 17px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.label {
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.input {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--gold);
+  border-radius: 16px;
+  background: var(--field);
+  color: #2f3416;
+  font: 17px/1.5 var(--font-text);
+  outline: none;
+  box-shadow: inset 0 1px 2px rgb(80 60 20 / 0.08);
+}
+.input:focus {
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgb(201 164 92 / 0.28);
+}
+.field[data-invalid] .input {
+  border-color: var(--danger);
+}
+.textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--gold);
+  border-radius: 16px;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.choice[data-checked] {
+  border-color: #d6b56a;
+  background: var(--olive);
+  color: var(--cream);
+}
+.choice:has(:focus-visible) {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 2px;
+}
+.field[data-invalid] .choice {
+  border-color: var(--danger);
+}
+.choiceInput {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.choiceDot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  background: var(--field);
+}
+.choice[data-checked] .choiceDot {
+  border-color: #e3c983;
+  background: radial-gradient(circle at 40% 35%, #f6e3a6, var(--gold) 60%, var(--gold-deep));
+  box-shadow: 0 0 0 3px rgb(246 236 212 / 0.22);
+}
+.fieldFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.counter {
+  color: #7d7f62;
+  font-variant-numeric: tabular-nums;
+}
+.counter[data-over] {
+  color: var(--danger);
+}
+.error,
+.formError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--danger);
+  font-size: 15px;
+}
+.formError {
+  justify-content: center;
+}
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  margin-top: 4px;
+  border: 1.5px solid #d6b56a;
+  border-radius: 16px;
+  background: linear-gradient(#545d2d, #434a22);
+  color: var(--cream);
+  font: 700 18px/1 var(--font-text);
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgb(47 52 22 / 0.25);
+}
+.submit:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+.submit:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 3px;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgb(246 236 212 / 0.35);
+  border-top-color: var(--cream);
+  border-radius: 50%;
+  animation: roc-spin 0.8s linear infinite;
+}
+@keyframes roc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.success {
+  padding: 18px 0;
+  text-align: center;
+}
+.successMark {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1.5px solid #d6b56a;
+  border-radius: 50%;
+  background: var(--olive);
+  color: var(--gold-light);
+}
+.successTitle {
+  margin: 12px 0 4px;
+  font-family: var(--font-script);
+  font-size: 28px;
+  color: var(--olive);
+}
+.successBody {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.guestbook {
+  margin-top: 44px;
+}
+.guestbookEmpty {
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.guestbookList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.guestbookItem {
+  padding: 16px 18px;
+  border: 1px solid rgb(201 164 92 / 0.6);
+  border-radius: 16px;
+  background: var(--field);
+}
+.guestbookMessage {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.guestbookName {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gold-deep);
+}
+
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 52px;
+  text-align: center;
+}
+.formSection + .closing {
+  margin-top: 52px;
+}
+.finale > .closing:first-child {
+  margin-top: 0;
+}
+.closingTitle {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 30px;
+  line-height: 1.5;
+  color: var(--olive);
+  text-wrap: balance;
+}
+.closingSub {
+  margin: 0;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.closing .divider {
+  width: 52%;
+  margin-top: 14px;
+}
+
+/* ---------------------------------------------------------------- music button (top-left, as in the design) */
+
+.audio {
+  position: fixed;
+  top: max(14px, calc(env(safe-area-inset-top) + 10px));
+  left: 14px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid #d6b56a;
+  border-radius: 50%;
+  background: var(--olive);
+  color: var(--gold-light);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
+.audio:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollCue {
+    animation: none;
+  }
+  .root[data-stage='open'] .heroContent,
+  .root[data-stage='done'] .heroContent {
+    animation-duration: 0.4s;
+  }
+}
