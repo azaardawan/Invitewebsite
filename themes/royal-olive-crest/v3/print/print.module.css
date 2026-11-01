@@ -90,10 +90,12 @@
 }
 .cardVenue {
   flex-basis: 100%;
+  /* v3 (owner, 2026-11-01): the venue sits a little lower, apart from the date and time. */
+  margin-top: 2.5mm;
 }
 /*
  * v3 (owner, 2026-11-01): the date and time sit a little to the right of centre, balancing the empty space on the
- * right and giving the left more air. Only that row moves (the venue below stays centred).
+ * right and giving the left more air. Only that row moves (the venue below stays centred, a little lower).
  */
 .cardDetails > div:not(.cardVenue) {
   position: relative;

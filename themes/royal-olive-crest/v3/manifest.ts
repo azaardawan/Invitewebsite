@@ -5,7 +5,8 @@ import { HEART_OUTLINE, LEAF_OUTLINE } from './outlines';
  * Royal Olive Crest: an olive-green envelope sealed with a gold wax seal bearing the couple's initials
  * opens onto a crowned crest in gold, then cream pages framed in gold. Design brief and hand-off:
  * docs/themes/royal-olive-crest/brief.md.
- * v3 (owner, 2026-11-01): on the printable card's front the date and time sit a little to the right (print.module.css).
+ * v3 (owner, 2026-11-01): on the printable card's front the date and time sit a little to the right and the venue a
+ * little lower (print.module.css).
  */
 const allFields = [
   'person_1_name',
