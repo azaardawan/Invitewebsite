@@ -107,7 +107,7 @@ export async function productData(db: DbOrTx, inv: InvitationRow, opts: { sticke
 
 /** The posters' pictures (full size), the video's still, the customer's choices for each poster, and Bahja's details. */
 async function posterData(db: DbOrTx, inv: InvitationRow) {
-  const photos = (await listPhotos(db, inv.id)).map((p, i) => ({ index: i, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }));
+  const photos = (await listPhotos(db, inv.id)).map((p) => ({ index: p.position, src: p.fullSrc, width: p.width, height: p.height, focus: p.focus, label: null, title: p.title, caption: p.caption }));
   const still = (await customerVideo(db, inv))?.poster ?? null;
   const picks = {
     landscape: resolvePoster(inv.posterChoices.landscape, photos, Boolean(still), 'landscape'),

@@ -133,6 +133,8 @@ export async function photoState(inv: typeof invitations.$inferSelect) {
     min: spec.min,
     aspect: spec.aspect,
     aspects: spec.aspects,
+    /** Places come in sets of this many (the design's rows); all places are one set without them. */
+    set: spec.set,
     names: Array.from({ length: spec.max }, (_, i) => {
       const l = spec.labels?.[i];
       return l ? (l[inv.locale] ?? l.ar) : null;

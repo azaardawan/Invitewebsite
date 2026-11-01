@@ -381,7 +381,13 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-medium" data-package-lifetime={p.lifetime}>
                 {localized(p.name, locale)} · {price(p.priceIqd)} · {tc(`lifetime.${p.lifetime}`)}
-                {manifest?.photos && p.featureKeys.includes('photos') ? ` · ${t('themes.photoCount', { n: p.photoLimit ?? manifest.photos.max })}` : ''}
+                {manifest?.photos && p.featureKeys.includes('photos')
+                  ? ` · ${
+                      manifest.photos.set
+                        ? t('themes.photoSets', { n: (p.photoLimit ?? manifest.photos.max) / manifest.photos.set, photos: p.photoLimit ?? manifest.photos.max })
+                        : t('themes.photoCount', { n: p.photoLimit ?? manifest.photos.max })
+                    }`
+                  : ''}
               </p>
               {canManage ? (
                 <MoveButtons
@@ -405,7 +411,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                     <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(p.priceIqd)} />
                   </div>
                   <LifetimeChoice value={p.lifetime} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
-                  {manifest.photos ? <PhotoLimit value={p.photoLimit} max={manifest.photos.max} label={t('themes.photoLimit')} hint={t('themes.photoLimitHint', { max: manifest.photos.max })} /> : null}
+                  {manifest.photos ? <PhotoLimit value={p.photoLimit} spec={manifest.photos} t={t} /> : null}
                   <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
@@ -432,7 +438,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   <Field label={t('themes.price')} name="priceIqd" inputMode="numeric" dir="ltr" />
                 </div>
                 <LifetimeChoice value={DEFAULT_LIFETIME} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
-                {manifest.photos ? <PhotoLimit value={null} max={manifest.photos.max} label={t('themes.photoLimit')} hint={t('themes.photoLimitHint', { max: manifest.photos.max })} /> : null}
+                {manifest.photos ? <PhotoLimit value={null} spec={manifest.photos} t={t} /> : null}
                 <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
@@ -528,13 +534,32 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   );
 }
 
-/** How many of their own photos the package lets the customer add (empty = as many as the design holds). */
-function PhotoLimit({ value, max, label, hint }: { value: number | null; max: number; label: string; hint: string }) {
+/**
+ * How many of their own photos the package lets the customer add (empty = as many as the design holds). A design whose
+ * photos come in sets (manifest `photos.set`, e.g. rows of 6) sells whole sets: 1 set, 2 sets…
+ */
+function PhotoLimit({ value, spec, t }: { value: number | null; spec: { max: number; set?: number }; t: Translate }) {
+  if (spec.set) {
+    const sets = spec.max / spec.set;
+    return (
+      <label className="block w-64 space-y-1" data-package-photo-limit>
+        <span className="text-sm font-medium">{t('themes.photoSetsLabel')}</span>
+        <select name="photoLimit" defaultValue={value === null || value === spec.max ? '' : String(value)} className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm">
+          {Array.from({ length: sets }, (_, i) => i + 1).map((n) => (
+            <option key={n} value={n === sets ? '' : String(n * spec.set!)}>
+              {t('themes.photoSets', { n, photos: n * spec.set! })}
+            </option>
+          ))}
+        </select>
+        <span className="block text-xs text-muted">{t('themes.photoSetsHint', { set: spec.set })}</span>
+      </label>
+    );
+  }
   return (
     <label className="block w-48 space-y-1" data-package-photo-limit>
-      <span className="text-sm font-medium">{label}</span>
-      <input name="photoLimit" type="number" min={1} max={max} step={1} defaultValue={value ?? ''} placeholder={String(max)} dir="ltr" className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm" />
-      <span className="block text-xs text-muted">{hint}</span>
+      <span className="text-sm font-medium">{t('themes.photoLimit')}</span>
+      <input name="photoLimit" type="number" min={1} max={spec.max} step={1} defaultValue={value ?? ''} placeholder={String(spec.max)} dir="ltr" className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm" />
+      <span className="block text-xs text-muted">{t('themes.photoLimitHint', { max: spec.max })}</span>
     </label>
   );
 }

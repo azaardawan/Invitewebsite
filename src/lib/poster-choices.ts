@@ -28,10 +28,12 @@ export function resolvePoster<P extends { index: number }>(choice: PosterChoice 
 }
 
 /** Cleans the customer's choices: known orientations, whole numbers, places that exist, no repeats, the row's limit. */
-export function cleanPosterChoices(input: unknown, photoCount: number): PosterChoices | null {
+export function cleanPosterChoices(input: unknown, places: number | readonly number[]): PosterChoices | null {
   if (!input || typeof input !== 'object') return null;
   const out: PosterChoices = {};
-  const place = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && v >= 0 && v < photoCount;
+  // The places that have a photo (a count: places 0…n-1).
+  const filled = new Set(typeof places === 'number' ? Array.from({ length: places }, (_, i) => i) : places);
+  const place = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && filled.has(v);
   for (const o of ['landscape', 'portrait'] as const) {
     const c = (input as Record<string, unknown>)[o];
     if (c === undefined) continue;

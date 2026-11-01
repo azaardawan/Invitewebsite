@@ -91,12 +91,13 @@ export type ThemeManifest = {
    */
   switches?: DesignSwitch[];
   /**
-   * The customer's own photos (feature `photos`): the design holds up to `max` (1–20) and needs at least `min`
+   * The customer's own photos (feature `photos`): the design holds up to `max` (1–36) and needs at least `min`
    * before the order can be paid (default 0). `aspect` is the frame the design shows them in (width ÷ height, e.g. 0.75
    * for 3:4; default 0.75): the customer places each photo in that frame. `labels` names the first photos on the order
    * form ("The couple", "Engagement"…). For a collage whose places have different shapes, `frames` gives each place
    * its own frame (`frames[i].aspect`, the rest use `aspect`), so the customer places each photo in exactly that shape.
-   * Photos always fill the places in order (no gaps): `props.photos[i]` belongs in place i. The theme reads `props.photos`.
+   * Photos fill the places in order (no gaps), each `set` on its own when the design has sets: find place i's photo by its
+   * `index` (`props.photos.find((p) => p.index === i)`). The theme reads `props.photos`.
    */
   photos?: PhotoSpec;
   /**
@@ -110,10 +111,14 @@ export type ThemeManifest = {
   internal?: boolean;
 };
 
-export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[] };
+/**
+ * `set`: the places come in sets of this many (a row of the design, for example). Each set fills in order on its own: a
+ * customer can fill the third set and leave the second empty, and a package sells whole sets (Admin).
+ */
+export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[]; set?: number };
 
 /** The most photos a design may hold. */
-export const MAX_PHOTOS = 20;
+export const MAX_PHOTOS = 36;
 /** The frame photos are placed in when a design does not say (3:4, portrait). */
 export const DEFAULT_PHOTO_ASPECT = 0.75;
 
@@ -225,7 +230,7 @@ export const manifestSchema = z
           maxLength: z.number().int().min(1).max(120),
         }),
       )
-      .max(10)
+      .max(12)
       .optional(),
     switches: z
       .array(z.object({ key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/), label: z.object({ ar: z.string().min(1), en: z.string().min(1) }), default: z.boolean() }))
@@ -233,11 +238,12 @@ export const manifestSchema = z
       .optional(),
     photos: z
       .object({
-        max: z.number().int().min(1).max(20),
-        min: z.number().int().min(0).max(20).optional(),
+        max: z.number().int().min(1).max(MAX_PHOTOS),
+        min: z.number().int().min(0).max(MAX_PHOTOS).optional(),
         aspect: z.number().min(0.4).max(2.5).optional(),
-        labels: z.array(themeText).max(20).optional(),
-        frames: z.array(z.object({ aspect: z.number().min(0.4).max(2.5) })).max(20).optional(),
+        labels: z.array(themeText).max(MAX_PHOTOS).optional(),
+        frames: z.array(z.object({ aspect: z.number().min(0.4).max(2.5) })).max(MAX_PHOTOS).optional(),
+        set: z.number().int().min(2).max(MAX_PHOTOS).optional(),
       })
       .optional(),
     editor: z.literal('template').optional(),
@@ -274,6 +280,7 @@ export const manifestSchema = z
     if (m.photos && (m.photos.min ?? 0) > m.photos.max) issue('photos.min cannot be more than photos.max');
     if (m.photos?.labels && m.photos.labels.length > m.photos.max) issue('photos.labels: more labels than photos.max');
     if (m.photos?.frames && m.photos.frames.length > m.photos.max) issue('photos.frames: more frames than photos.max');
+    if (m.photos?.set && m.photos.max % m.photos.set !== 0) issue('photos.max must be a whole number of photos.set');
     if (m.features.includes('color_choice') && !m.colors) issue('color_choice requires colors.slots');
     if (m.colors && new Set(m.colors.slots.map((c) => c.key)).size !== m.colors.slots.length) issue('colors.slots contain duplicate keys');
     if (m.wording && new Set(m.wording.map((w) => w.key)).size !== m.wording.length) issue('wording contains duplicate keys');

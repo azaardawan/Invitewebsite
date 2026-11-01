@@ -136,7 +136,7 @@ export function resolvePhotos(
   features: readonly string[],
   mode: InvitationMode,
   locale: Locale,
-  photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; title?: string | null; caption?: string | null }[],
+  photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; title?: string | null; caption?: string | null; position?: number }[],
   spec: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null,
 ): ThemeProps['photos'] {
   if (!features.includes('photos')) return [];
@@ -147,9 +147,11 @@ export function resolvePhotos(
   if (mode === 'sample') {
     return Array.from({ length: spec?.max ?? 1 }, (_, i) => ({ index: i, src: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!, width: 900, height: 1200, focus: { x: 50, y: 50, zoom: 1 }, label: label(i), title: null, caption: null }));
   }
+  // Each photo keeps its place (`index`): in a design with sets a whole set may be empty while a later one is filled.
   return photos
-    .slice(0, spec?.max ?? photos.length)
-    .map((p, i) => ({ index: i, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(i), title: p.title ?? null, caption: p.caption ?? null }));
+    .map((p, i) => ({ ...p, place: p.position ?? i }))
+    .filter((p) => p.place < (spec?.max ?? Infinity))
+    .map((p) => ({ index: p.place, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(p.place), title: p.title ?? null, caption: p.caption ?? null }));
 }
 
 /** Each yes/no choice: the customer's answer, else the design's default. */

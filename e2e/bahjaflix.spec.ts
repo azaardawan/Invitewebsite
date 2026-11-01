@@ -33,7 +33,7 @@ function testVideo() {
 
 async function openSample(page: Page, width: number) {
   await page.setViewportSize({ width, height: width >= 1000 ? 800 : 844 });
-  await page.goto('/admin/preview/ar/theme/bahjaflix?state=1&names=short');
+  await page.goto('/admin/preview/ar/theme/bahjaflix?v=2&state=1&names=short');
   await page.getByRole('button', { name: 'افتح الدعوة' }).click();
   await expect(page.locator('[data-phase="open"]')).toBeVisible({ timeout: 4000 });
 }
@@ -47,8 +47,9 @@ test('BAHJAFLIX: the title page on a computer and a phone; a photo opens on its 
   await openSample(page, 1280);
   await expect(page.getByRole('img', { name: 'BAHJAFLIX' }).first()).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('معاً إلى الأبد');
-  await expect(page.locator('section[id^="bf-row"]')).toHaveCount(3);
-  await expect(page.locator('[data-bahja-photo]')).toHaveCount(18);
+  // Six rows (sets) of six.
+  await expect(page.locator('section[id^="bf-row"]')).toHaveCount(6);
+  await expect(page.locator('[data-bahja-photo]')).toHaveCount(36);
   await page.screenshot({ path: testInfo.outputPath('desktop.png') });
   await page.locator('#bf-row1 [role="button"]').first().hover();
   await page.waitForTimeout(800);
@@ -89,8 +90,9 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   const editor = page.locator('[data-template-editor]');
   await expect(editor).toBeVisible();
   const design = page.frameLocator('iframe[data-template-design]');
-  // The package sells nine places: the first is ready for a photo, the next eight wait their turn.
-  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(9);
+  // The package sells two sets (rows) of six: each row's first frame is ready for a photo, the others wait their turn.
+  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(12);
+  await expect(design.locator('section[id^="bf-row"]')).toHaveCount(2);
   await expect(page.locator('[data-template-photos]')).toHaveAttribute('data-template-photos', '0');
   await expect(page.locator('[data-template-missing]')).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('editor-empty.png'), fullPage: true });
@@ -138,6 +140,19 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await expect(page.locator('[data-template-photos]')).toHaveAttribute('data-template-photos', '1');
   await expect(design.locator('[data-bahja-photo-slot="1"]')).toBeVisible();
 
+  // Each row fills on its own: a tap on the second row's third frame puts the photo in that row's first place.
+  await design.locator('[data-bahja-photo-slot="8"]').click();
+  await expect(sheet).toHaveAttribute('data-template-sheet', 'photo-add');
+  await sheet.locator('[data-template-photo-input]').setInputFiles(await photo('#3050b0', 2000, 1250));
+  await expect(sheet).toHaveAttribute('data-template-sheet', 'photo-frame', { timeout: 30_000 });
+  const wide = await sheet.locator('[data-photo-frame]').boundingBox();
+  expect(wide!.width / wide!.height).toBeCloseTo(1.6, 1);
+  await sheet.getByRole('button', { name: 'Next' }).click();
+  await sheet.locator('[data-template-photo-save]').click();
+  await expect(sheet).toBeHidden();
+  await expect(design.locator('[data-bahja-photo="6"]')).toBeVisible();
+  await expect(page.locator('[data-template-photos]')).toHaveAttribute('data-template-photos', '2');
+
   // The video: tap its place, choose it; it is converted and plays at the top.
   await design.locator('[data-bahja-video-slot]').first().click();
   await expect(sheet).toHaveAttribute('data-template-sheet', 'video');
@@ -180,7 +195,9 @@ test('BAHJAFLIX: the customer fills the design in place (texts, a framed photo w
   await page.goto(`/p/${previewToken}`);
   await page.getByRole('button', { name: 'Open invitation' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Our Story');
-  await expect(page.locator('[data-bahja-photo]')).toHaveCount(1);
+  // Only filled places show: one photo in each of the first two rows.
+  await expect(page.locator('[data-bahja-photo]')).toHaveCount(2);
+  await expect(page.locator('section[id^="bf-row"]')).toHaveCount(2);
   await page.locator('#bf-row1 [role="button"]').first().click();
   await expect(page.getByRole('dialog')).toContainText('First trip');
   await expect(page.getByRole('dialog')).toContainText('Sea, sun and us.');

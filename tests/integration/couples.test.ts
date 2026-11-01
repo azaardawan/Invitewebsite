@@ -8,14 +8,15 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { assets, auditLogs, invitations, themes } from '@/server/db/schema';
 import { storage } from '@/server/storage';
-import { syncThemesFromRegistry, transitionTheme, updateThemeSettings } from '@/server/catalog/themes';
+import { setCurrentVersion, syncThemesFromRegistry, transitionTheme, updateThemeSettings } from '@/server/catalog/themes';
+import { themeVersions } from '@/server/db/schema';
 import { createPackage } from '@/server/catalog/packages';
 import { storeImage } from '@/server/media/assets';
 import { createDraft } from '@/server/orders/drafts';
 import { validateFieldValues } from '@/server/orders/validation';
 import { fieldDefs } from '@/server/orders/common';
 import { invitationRenderData } from '@/server/invitation/load';
-import { listPhotos, photoSpec, setPhoto } from '@/server/photos/photos';
+import { listPhotos, photoSpec, removePhoto, setPhoto } from '@/server/photos/photos';
 import { setTemplateText, TemplateTextError } from '@/server/template/text';
 import { handleTemplateTextRequest } from '@/server/template/http';
 import { customerVideo, removeVideo, setVideo } from '@/server/video/video';
@@ -228,5 +229,82 @@ describe('posters', () => {
     expect(data.poster?.picks.portrait.main?.index).toBe(1);
     expect(data.poster?.picks.landscape.row.map((p) => p.index)).toEqual([1]);
     expect(data.poster?.picks.landscape.main?.index).toBe(0);
+  });
+});
+
+describe('photo sets (a design whose rows hold six photos each)', () => {
+  let sets: { themeKey: string; themeId: string; two: string };
+  const jpeg = (color: string) => sharp({ create: { width: 900, height: 1200, channels: 3, background: color } }).jpeg().toBuffer();
+
+  beforeAll(async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('sets');
+    await syncThemesFromRegistry(
+      db(),
+      [
+        testManifest(key, 1, {
+          sections: ['couples'],
+          fields: [...FIELDS],
+          features: ['photos', 'video'],
+          editor: 'template',
+          validStates: [{ features: ['photos', 'video'], fields: [...FIELDS] }],
+          photos: { max: 18, min: 1, set: 6, aspect: 2 / 3 },
+          print: undefined,
+        }),
+      ],
+      base.actor,
+      { complete: false },
+    );
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 333, height: 433, channels: 3, background: '#301' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: null }, base.actor);
+    const two = await createPackage(db(), t!.id, { name: { ar: 'مجموعتان', en: 'Two sets' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 12 }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    sets = { themeKey: key, themeId: t!.id, two: two.id };
+  }, 60_000);
+
+  it('packages sell whole sets', async () => {
+    await expect(
+      createPackage(db(), sets.themeId, { name: { ar: 'تسع', en: 'Nine' }, priceIqd: 1000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 9 }, shop.actor),
+    ).rejects.toThrow();
+    const d = await createDraft(db(), { themeKey: sets.themeKey, packageId: sets.two, locale: 'en', values: {} }, { ...ctx, ipHash: randomToken(8) });
+    const [inv] = await db().select().from(invitations).where(eq(invitations.id, d.invitationId));
+    expect(await photoSpec(db(), inv!)).toMatchObject({ max: 12, set: 6 });
+  });
+
+  it('each set fills on its own; an empty set stays empty and is not drawn', async () => {
+    const d = await createDraft(db(), { themeKey: sets.themeKey, packageId: sets.two, locale: 'en', values: {} }, { ...ctx, ipHash: randomToken(8) });
+    const inv = await reload(d.invitationId);
+    // The second row's third frame: the photo goes to that row's first place, the first row stays empty.
+    expect((await setPhoto(db(), inv, 8, await jpeg('#a33'))).position).toBe(6);
+    expect((await setPhoto(db(), inv, 11, await jpeg('#3a3'))).position).toBe(7);
+    let { props } = await invitationRenderData(db(), await reload(inv.id), 'preview');
+    expect(props.photos.map((p) => p.index)).toEqual([6, 7]);
+    expect(props.photoPlaces).toBe(12);
+    // A photo in the first row; then removing it leaves the second row where it is.
+    expect((await setPhoto(db(), inv, 3, await jpeg('#33a'))).position).toBe(0);
+    await removePhoto(db(), inv.id, 0);
+    expect((await listPhotos(db(), inv.id)).map((p) => p.position)).toEqual([6, 7]);
+    // Inside a set, the later photos still move up.
+    await removePhoto(db(), inv.id, 6);
+    expect((await listPhotos(db(), inv.id)).map((p) => p.position)).toEqual([6]);
+    ({ props } = await invitationRenderData(db(), await reload(inv.id), 'preview'));
+    expect(props.photos.map((p) => p.index)).toEqual([6]);
+    // Poster choices take the real places.
+    expect(cleanPosterChoices({ portrait: { main: 6 } }, [6])).toEqual({ portrait: { main: 6 } });
+    expect(cleanPosterChoices({ portrait: { main: 0 } }, [6])).toBeNull();
+  });
+
+  it('a version switch is refused while a package sells a number of photos the new version cannot hold in whole sets', async () => {
+    const key = uniqueKey('sets-switch');
+    const base = { sections: ['couples'], fields: [...FIELDS], features: ['photos' as const, 'video' as const], editor: 'template' as const, validStates: [{ features: ['photos' as const, 'video' as const], fields: [...FIELDS] }], print: undefined };
+    await syncThemesFromRegistry(db(), [testManifest(key, 1, { ...base, photos: { max: 18 } }), testManifest(key, 2, { ...base, photos: { max: 36, set: 6 } })], shop.actor, { complete: false });
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const [v1] = await db().select().from(themeVersions).where(and(eq(themeVersions.themeId, t!.id), eq(themeVersions.version, 1)));
+    const [v2] = await db().select().from(themeVersions).where(and(eq(themeVersions.themeId, t!.id), eq(themeVersions.version, 2)));
+    await setCurrentVersion(db(), t!.id, v1!.id, shop.actor);
+    await createPackage(db(), t!.id, { name: { ar: 'تسع', en: 'Nine' }, priceIqd: 1000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 9 }, shop.actor);
+    await expect(setCurrentVersion(db(), t!.id, v2!.id, shop.actor)).rejects.toMatchObject({ code: 'packagesInvalidForVersion' });
   });
 });

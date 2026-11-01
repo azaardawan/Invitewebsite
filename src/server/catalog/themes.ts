@@ -406,7 +406,13 @@ export async function setCurrentVersion(db: DbOrTx, themeId: string, versionId: 
     if (!version.inBuild) throw new CatalogError('versionNotInBuild');
     const manifest = version.manifest as ThemeManifest;
     const invalid = (await packagesWithShape(tx, themeId))
-      .filter((p) => p.status === 'ACTIVE' && packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0)
+      .filter(
+        (p) =>
+          p.status === 'ACTIVE' &&
+          (packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0 ||
+            // A package's photo count must fit the version: no more than it holds, whole sets when it has sets.
+            (p.photoLimit != null && (p.photoLimit > (manifest.photos?.max ?? 0) || (manifest.photos?.set ? p.photoLimit % manifest.photos.set !== 0 : false)))),
+      )
       .map((p) => localized(p.name, 'en'));
     if (invalid.length) throw new CatalogError('packagesInvalidForVersion', invalid);
     await tx.update(themes).set({ currentVersionId: versionId }).where(eq(themes.id, themeId));

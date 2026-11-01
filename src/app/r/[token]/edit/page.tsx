@@ -93,6 +93,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
           texts={template.texts}
           photos={photos.photos}
           maxPhotos={photos.max}
+          photoSet={photos.set}
           aspects={photos.aspects}
           names={photos.names}
           video={template.video}

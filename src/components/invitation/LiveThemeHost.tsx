@@ -6,7 +6,7 @@ import { ThemeHost } from '@/theme-registry/loaders.generated';
 import { setForcedReducedMotion } from '@/theme-sdk/runtime';
 import { setTemplateEditing } from '@/theme-sdk/editing';
 
-type LivePhoto = Omit<ThemePhoto, 'label' | 'index' | 'title' | 'caption'> & { title?: string | null; caption?: string | null };
+type LivePhoto = Omit<ThemePhoto, 'label' | 'index' | 'title' | 'caption'> & { title?: string | null; caption?: string | null; index?: number };
 
 /** Messages from the customer's editors on the order page or the receipt (same site only). */
 type LiveMessage =
@@ -55,7 +55,13 @@ export function LiveThemeHost({ codeRef, props }: { codeRef: string; props: Them
       const m = e.data;
       if (m.type === 'bahja:photos' && Array.isArray(m.photos)) {
         // The design's names for each place stay as they were.
-        setPhotos(m.photos.map((p, index) => ({ ...p, index, label: props.photos[index]?.label ?? null, title: p.title ?? null, caption: p.caption ?? null })));
+        // Each photo's place (`index`, sent by editors whose designs have sets), else its turn in the list.
+        setPhotos(
+          m.photos.map((p, i) => {
+            const index = typeof p.index === 'number' ? p.index : i;
+            return { ...p, index, label: props.photos.find((x) => x.index === index)?.label ?? props.photos[index]?.label ?? null, title: p.title ?? null, caption: p.caption ?? null };
+          }),
+        );
       } else if (m.type === 'bahja:show-photo' && Number.isInteger(m.index)) {
         show(m.index);
       } else if (m.type === 'bahja:video') {
