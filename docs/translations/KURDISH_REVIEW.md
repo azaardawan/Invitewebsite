@@ -1580,3 +1580,16 @@ The new Couples section, the BAHJAFLIX design (its own lines, buttons and exampl
 | 103 | Platform: `store.posters.back` | رجوع إلى الصفحة | Back to the page | گەڕانەوە بۆ پەڕەکە | زڤرین بۆ پەرێ |
 | 104 | Platform: `store.posters.next` | متابعة إلى الطلب | Continue to your order | بەردەوامبوون بۆ داواکاری | بەردەوامبوون بۆ داخوازێ |
 | 105 | Platform: `store.posters.finish` | تم | Done | تەواو | تەمام |
+
+## Batch 47 — BAHJAFLIX v2: six rows of photos — ✅ AUTO-APPROVED (2026-11-01, owner checks in Admin → Translations)
+
+The three new rows of BAHJAFLIX v2 (#25): each line's name on the editor and its example title (the customer writes their own).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #25 BAHJAFLIX v2: wording `row4` (label) | عنوان الصف الرابع | Fourth row title | ناونیشانی ڕیزی چوارەم | ناڤونیشانێ رێزا چارێ |
+| 2 | #25 BAHJAFLIX v2: wording `row4` (text) | سفراتنا | Our trips | گەشتەکانمان | گەشتێن مە |
+| 3 | #25 BAHJAFLIX v2: wording `row5` (label) | عنوان الصف الخامس | Fifth row title | ناونیشانی ڕیزی پێنجەم | ناڤونیشانێ رێزا پێنجێ |
+| 4 | #25 BAHJAFLIX v2: wording `row5` (text) | ضحكاتنا | Our laughs | پێکەنینەکانمان | کەنیێن مە |
+| 5 | #25 BAHJAFLIX v2: wording `row6` (label) | عنوان الصف السادس | Sixth row title | ناونیشانی ڕیزی شەشەم | ناڤونیشانێ رێزا شەشێ |
+| 6 | #25 BAHJAFLIX v2: wording `row6` (text) | إلى الأبد | Forever | بۆ هەمیشە | بۆ هەروهەر |

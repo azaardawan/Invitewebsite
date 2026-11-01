@@ -26,7 +26,7 @@ export async function handlePosterRequest(db: DbOrTx, req: Request, inv: Invitat
   if (req.method !== 'PATCH') return json({ error: 'method' }, 405);
   if (ctx.ipHash && !(await consumeRateLimit(db, `posters:ip:${ctx.ipHash}`, SAVES_PER_HOUR, 3600))) return json({ error: 'rateLimited' }, 429);
   const body = await req.json().catch(() => null);
-  const choices = cleanPosterChoices(body, (await listPhotos(db, inv.id)).length);
+  const choices = cleanPosterChoices(body, (await listPhotos(db, inv.id)).map((p) => p.position));
   if (!choices) return json({ error: 'invalid' }, 400);
   const posterChoices = { ...inv.posterChoices, ...choices };
   await db

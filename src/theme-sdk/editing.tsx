@@ -92,9 +92,9 @@ export function EditableText({
 
 /**
  * Place `index` of the customer's photos (`photos` is `props.photos`): the photo (as `<Photo>`) when there is one. An
- * empty place draws nothing, except in the editor: photos fill the places in order, so the next free place is an
- * empty frame with a "+" (and `label`) the customer taps to add a photo, and the places after it are faint outlines
- * until then. In the editor a tap on a photo opens it there too (change it, move it in its frame, its title and words)
+ * empty place draws nothing, except in the editor: photos fill the places in order (each `set` of places on its own,
+ * when the design has sets: manifest `photos.set`), so the next free place of each set is an empty frame with a "+" (and
+ * `label`) the customer taps to add a photo, and the places after it are faint outlines until then. In the editor a tap on a photo opens it there too (change it, move it in its frame, its title and words)
  * instead of whatever the design does on a tap.
  */
 export function PhotoSlot({
@@ -104,18 +104,25 @@ export function PhotoSlot({
   style,
   eager,
   label,
+  set,
 }: {
   index: number;
   photos: readonly ThemePhoto[];
+  /** The design's set size (manifest `photos.set`), when its places come in sets. */
+  set?: number;
   className?: string;
   style?: CSSProperties;
   eager?: boolean;
   label?: string;
 }) {
   const on = useTemplateEditing();
-  const photo = photos[index];
+  const photo = photos.find((p) => p.index === index);
   if (!on) return photo ? <Photo photo={photo} className={className} style={style} eager={eager} /> : null;
-  if (!photo && index > photos.length) {
+  // The next free place of this place's set (the whole design without sets).
+  const first = set ? Math.floor(index / set) * set : 0;
+  let free = first;
+  while (photos.some((p) => p.index === free)) free++;
+  if (!photo && index > free) {
     return <span aria-hidden data-bahja-photo-slot={index} className={className} style={{ ...style, display: 'block', border: '1px dashed rgba(255,255,255,.18)', background: 'rgba(255,255,255,.02)' }} />;
   }
   const open = (e: MouseEvent) => {

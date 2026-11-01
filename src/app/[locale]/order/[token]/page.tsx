@@ -69,6 +69,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             texts={editor.texts}
             photos={editor.photos.photos}
             maxPhotos={editor.photos.max}
+            photoSet={editor.photos.set}
             aspects={editor.photos.aspects}
             names={editor.photos.names}
             video={editor.video}

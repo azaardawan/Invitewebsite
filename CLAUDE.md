@@ -37,7 +37,7 @@ product spec's §74 business rules override assumptions.
   on the owner's artwork (`src/server/products/*`), or by the design's own `print/Story|Sticker|Bottle.tsx`
   (THEME_CONTRACT §6). Anything shown before payment is watermarked by the server's render (`isPaid`);
   files (PNG/PDF) are only served once paid.
-- Customer photos (`photos` feature, manifest `photos: { max ≤ 20, min, aspect, labels }`) are stored per invitation
+- Customer photos (`photos` feature, manifest `photos: { max ≤ 36, min, aspect, labels, set }`) are stored per invitation
   (`invitation_photos`, files under `photos/`, `src/server/photos/*`). Themes draw `props.photos` with `<Photo>`, and must
   look right with fewer photos than `max`. They are personal data: housekeeping deletes them with the guest data.
 - Customer songs (`custom_music`, a platform feature that needs `music`): the upload (audio or video) is converted by
@@ -51,7 +51,8 @@ product spec's §74 business rules override assumptions.
   Its designs are **template designs** (manifest `editor: 'template'`): the customer fills the design in place
   (`TemplateEditor`, texts saved via `/p|r/[token]/text`, `src/server/template/*`) instead of the order form; the SDK's
   `<EditableText>`, `<PhotoSlot>`, `<VideoSlot>` (THEME_CONTRACT "Template designs"). A package can sell fewer photos
-  than the design holds (`packages.photo_limit`). The video (`video`, `src/server/video/*`, ffmpeg in `media/video.ts`):
+  than the design holds (`packages.photo_limit`); a design with photo sets (`photos.set`, e.g. BAHJAFLIX v2's rows of six)
+  sells whole sets, each set fills on its own (an empty set is left out), so find a place's photo by its `index`. The video (`video`, `src/server/video/*`, ffmpeg in `media/video.ts`):
   one MP4 of at most a minute, personal data deleted with the photos. Posters (`couple_poster`): a step after the page editor
   (`?step=posters`, `PosterEditor`, choices in `invitations.poster_choices`) picks each poster's pictures; drawn by the design's
   `print/CouplePoster.tsx`, with Bahja's website, WhatsApp/phone and Instagram from Settings at the bottom.

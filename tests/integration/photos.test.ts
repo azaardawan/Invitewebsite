@@ -81,8 +81,11 @@ describe('customer photos (feature `photos`)', () => {
     expect(issues({ photos: { max: 7 } })).toEqual([]);
     expect(issues({ photos: undefined })).toContain('photos requires photos.max (how many photos the design holds)');
     expect(issues({ photos: { max: 3, min: 4 } })).toContain('photos.min cannot be more than photos.max');
-    expect(issues({ photos: { max: 21 } }).length).toBeGreaterThan(0);
-    expect(issues({ photos: { max: 20 } })).toEqual([]);
+    expect(issues({ photos: { max: 37 } }).length).toBeGreaterThan(0);
+    expect(issues({ photos: { max: 36 } })).toEqual([]);
+    // Sets (a design's rows): the places are whole sets.
+    expect(issues({ photos: { max: 36, set: 6 } })).toEqual([]);
+    expect(issues({ photos: { max: 20, set: 6 } })).toContain('photos.max must be a whole number of photos.set');
   });
 
   it('stores each photo re-encoded in two sizes without its location data, in its place, and replaces it', async () => {

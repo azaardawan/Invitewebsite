@@ -95,6 +95,7 @@ export function TemplateEditor({
   texts: initialTexts,
   photos: initialPhotos,
   maxPhotos,
+  photoSet,
   aspects,
   names,
   video: initialVideo,
@@ -112,6 +113,8 @@ export function TemplateEditor({
   texts: TemplateText[];
   photos: TemplatePhoto[];
   maxPhotos: number;
+  /** The design's photo sets (manifest `photos.set`; all places are one set without them): each fills on its own. */
+  photoSet: number;
   aspects: number[];
   names: (string | null)[];
   video: TemplateVideo | null;
@@ -130,7 +133,7 @@ export function TemplateEditor({
 
   const tell = useCallback((message: unknown) => frame.current?.contentWindow?.postMessage(message, window.location.origin), []);
   const sendPhotos = useCallback(
-    (list: TemplatePhoto[]) => tell({ type: 'bahja:photos', photos: list.map(({ src, width, height, focus, title, caption }) => ({ src, width, height, focus, title, caption })) }),
+    (list: TemplatePhoto[]) => tell({ type: 'bahja:photos', photos: list.map(({ position, src, width, height, focus, title, caption }) => ({ index: position, src, width, height, focus, title, caption })) }),
     [tell],
   );
   const errorText = (code: string | undefined) => (code && labels.errors[code]) || labels.errors.generic;
@@ -148,14 +151,18 @@ export function TemplateEditor({
       } else if (m.kind === 'photo' && typeof m.index === 'number' && m.index >= 0 && m.index < maxPhotos) {
         const has = photos.some((p) => p.position === m.index);
         // Photos fill the places in order: an empty frame takes the next photo.
-        setSheet(has ? { kind: 'photo-words', index: m.index } : { kind: 'photo-add', index: Math.min(m.index, photos.length) });
+        // Photos fill the places of their set in order: an empty frame takes the set's next photo.
+        const first = Math.floor(m.index / photoSet) * photoSet;
+        let free = first;
+        while (photos.some((p) => p.position === free)) free++;
+        setSheet(has ? { kind: 'photo-words', index: m.index } : { kind: 'photo-add', index: Math.min(m.index, free) });
       } else if (m.kind === 'video' && videoIncluded) {
         setSheet({ kind: 'video' });
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [texts, photos, maxPhotos, videoIncluded]);
+  }, [texts, photos, maxPhotos, photoSet, videoIncluded]);
 
   // The page behind stays still while a sheet is open; Escape closes it.
   useEffect(() => {
@@ -234,7 +241,9 @@ export function TemplateEditor({
       const res = await fetch(`${base}/photos/${index}`, { method: 'DELETE' });
       if (!res.ok && res.status !== 404) throw new Error();
       // The photos after it move up a place, as on the server.
-      const next = photos.filter((p) => p.position !== index).map((p) => (p.position > index ? { ...p, position: p.position - 1 } : p));
+      // The photos after it in its set move up a place, as on the server.
+      const end = (Math.floor(index / photoSet) + 1) * photoSet;
+      const next = photos.filter((p) => p.position !== index).map((p) => (p.position > index && p.position < end ? { ...p, position: p.position - 1 } : p));
       setPhotos(next);
       sendPhotos(next);
       setSavedAt(Date.now());

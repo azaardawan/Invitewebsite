@@ -43,6 +43,9 @@ async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], fe
   // A photo limit only makes sense up to what the design holds.
   const designMax = (row.version.manifest as ThemeManifest).photos?.max;
   if (photoLimit != null && (!designMax || photoLimit > designMax)) throw new CatalogError('notValidState', [`photo limit ${photoLimit} is more than the design holds (${designMax ?? 0})`]);
+  // A design whose photos come in sets (its rows) sells whole sets.
+  const set = (row.version.manifest as ThemeManifest).photos?.set;
+  if (photoLimit != null && set && photoLimit % set !== 0) throw new CatalogError('notValidState', [`photo limit ${photoLimit} is not a whole number of sets of ${set}`]);
   return row;
 }
 

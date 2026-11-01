@@ -500,7 +500,10 @@
         "lifetimeHint": "Counted from when the invitation is paid and published. Orders already paid keep their own end date.",
         "photoLimit": "Photos in this package",
         "photoLimitHint": "Leave empty for all of the design’s places ({max}).",
-        "photoCount": "{n} photos"
+        "photoCount": "{n} photos",
+        "photoSetsLabel": "Photo sets in this package",
+        "photoSets": "{n, plural, one {# set} other {# sets}} ({photos} photos)",
+        "photoSetsHint": "Each set is one row of {set} photos in the design."
       },
       "errors": {
         "invalid": "Please check the fields.",

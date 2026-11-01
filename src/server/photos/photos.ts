@@ -30,7 +30,7 @@ const PHOTO_PREFIX = 'photos/';
 export async function photoSpec(
   db: DbOrTx,
   inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'> & Partial<Pick<InvitationRow, 'photoLimit'>>,
-): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[] }) | null> {
+): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[]; set: number }) | null> {
   const collage = collagePhotoCount(inv.featureKeys);
   let spec: PhotoSpec | undefined;
   if (inv.featureKeys.includes('photos')) {
@@ -44,7 +44,15 @@ export async function photoSpec(
   const aspect = spec?.aspect ?? (spec ? DEFAULT_PHOTO_ASPECT : COLLAGE_PHOTO_ASPECT);
   // Each place's frame: its own (a collage design), the design's common one, or the collages' past the design's places.
   const aspects = Array.from({ length: max }, (_, i) => (i < own ? (spec?.frames?.[i]?.aspect ?? aspect) : COLLAGE_PHOTO_ASPECT));
-  return { max, min: Math.min(spec?.min ?? 0, own), aspect, labels: spec?.labels, aspects };
+  // Places in sets (a design's rows): each set fills on its own. Without sets, all places are one set.
+  const set = spec?.set && own % spec.set === 0 && max === own ? spec.set : max;
+  return { max, min: Math.min(spec?.min ?? 0, own), aspect, labels: spec?.labels, aspects, set };
+}
+
+/** The places of the set that place `position` belongs to: [first, end). */
+export function setOf(position: number, set: number) {
+  const first = Math.floor(position / set) * set;
+  return { first, end: first + set };
 }
 
 /** The frame photos past the design's own places are shown in on the order form (the collages crop each to its place). */
@@ -130,9 +138,15 @@ export async function setPhoto(db: DbOrTx, inv: InvitationRow, position: number,
   const spec = await photoSpec(db, inv);
   if (!spec) throw new PhotoError('notIncluded');
   if (!Number.isInteger(position) || position < 0 || position >= spec.max) throw new PhotoError('position');
-  // Photos fill the places in order: a new one goes in the next free place (at most), never leaving a gap.
-  const count = (await listPhotos(db, inv.id)).length;
-  if (position > count) position = count;
+  // Photos fill the places of their set in order: a new one goes in the set's next free place (at most), never
+  // leaving a gap inside a set (a design without sets is one set). An empty set may wait while a later one fills.
+  const { first } = setOf(position, spec.set);
+  const taken = new Set((await listPhotos(db, inv.id)).map((p) => p.position));
+  if (!taken.has(position)) {
+    let free = first;
+    while (taken.has(free)) free++;
+    position = Math.min(position, free);
+  }
   if (position >= spec.max) throw new PhotoError('position');
   const img = await processPhoto(input);
   const full = await storeOne(db, img.full);
@@ -162,7 +176,7 @@ export async function setPhotoFocus(db: DbOrTx, invitationId: string, position: 
   return normalizeCoverFocus(row.focus);
 }
 
-/** Takes a photo away (its files are deleted); the photos after it move up a place, so there is never a gap. */
+/** Takes a photo away (its files are deleted); the photos after it in its set move up a place, so there is never a gap. */
 export async function removePhoto(db: DbOrTx, invitationId: string, position: number) {
   const row = await db.transaction(async (tx) => {
     const [gone] = await tx
@@ -176,12 +190,15 @@ export async function removePhoto(db: DbOrTx, invitationId: string, position: nu
   await deletePhotoFiles(db, [row.assetId, row.displayAssetId]);
 }
 
-/** Moves every photo after `position` up one place (one by one, in order, so places stay unique). */
+/** Moves every photo after `position` in its set up one place (one by one, in order, so places stay unique). */
 export async function closeGap(tx: DbOrTx, invitationId: string, position: number) {
+  const [inv] = await tx.select().from(invitations).where(eq(invitations.id, invitationId));
+  const spec = inv ? await photoSpec(tx, inv) : null;
+  const { end } = setOf(position, spec?.set ?? Number.MAX_SAFE_INTEGER);
   const later = await tx
     .select({ id: invitationPhotos.id, position: invitationPhotos.position })
     .from(invitationPhotos)
-    .where(and(eq(invitationPhotos.invitationId, invitationId), gt(invitationPhotos.position, position)))
+    .where(and(eq(invitationPhotos.invitationId, invitationId), gt(invitationPhotos.position, position), lt(invitationPhotos.position, end)))
     .orderBy(asc(invitationPhotos.position));
   for (const p of later) await tx.update(invitationPhotos).set({ position: p.position - 1 }).where(eq(invitationPhotos.id, p.id));
 }
