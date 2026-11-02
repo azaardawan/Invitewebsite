@@ -1,5 +1,6 @@
 import { defineTheme } from '@/theme-sdk/manifest';
 import { ORDER, SON_OF } from './copy';
+import { SHAPES, type ShapeKey } from './shapes';
 
 /**
  * Bluebird Garden v4 — «Little Blue», the owner's edit (2026-11-02): a powder-blue watercolour birth announcement with
@@ -18,16 +19,21 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['newborn'],
   fields: [...fields],
-  features: ['music', 'rsvp', 'congratulations', 'photos', 'print_card'],
+  features: ['music', 'rsvp', 'congratulations', 'photos', 'print_card', 'card_arch'],
   validStates: [
     { features: ['print_card'], fields: [...fields] },
     { features: ['music', 'rsvp', 'congratulations', 'print_card'], fields: [...fields] },
-    // The complete design: + the baby's photo in the keepsake frame.
-    { features: ['music', 'rsvp', 'congratulations', 'photos', 'print_card'], fields: [...fields] },
+    // The complete design: + the baby's photo in the keepsake frame and the printed posters.
+    { features: ['music', 'rsvp', 'congratulations', 'photos', 'print_card', 'card_arch'], fields: [...fields] },
   ],
   // One photo of the baby, in the arched keepsake frame (4:5); the section is left out without it.
   photos: { max: 1, aspect: 0.8, labels: [{ ar: 'صورة المولود', en: "The baby's photo", ckb: 'وێنەی کۆرپەکە', bdn: 'وێنێ زاروکی' }] },
-  print: { card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#294c60', light: '#00000000' } } },
+  print: {
+    card: { size: 'A5', bleedMm: 3, qr: true, qrColors: { dark: '#294c60', light: '#00000000' } },
+    // The printed posters (feature `card_arch`), the other designs' poster sizes: the announcement's arch, an oval, a wavy
+    // frame and rounded corners (designs.tsx, print/Shape.tsx).
+    shapes: (Object.keys(SHAPES) as ShapeKey[]).map((key) => ({ key, ...SHAPES[key] })),
+  },
   // The customer's parts of the wording, as in v2–v3.
   wording: [
     { key: 'order', label: { ar: 'ترتيب المولود', en: 'Birth order' }, ...ORDER, maxLength: 60 },

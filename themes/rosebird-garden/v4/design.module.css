@@ -309,3 +309,106 @@
 .back .arch {
   inset: 9cqh 6cqw;
 }
+
+/* ---------------------------------------------------------------- the printed posters (Shape.tsx) */
+.posterBox {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+}
+.posterPaper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.paperFill {
+  fill: #fcf8f3;
+}
+.paperLine {
+  fill: none;
+  stroke: #d8b5be;
+  stroke-width: 1.2;
+}
+/* On a poster the paper is the shape (transparent outside); the words keep to its middle. */
+.poster,
+.posterBack {
+  background: none;
+}
+.poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 9cqh 12cqw 6cqh;
+}
+.poster .bunting {
+  width: 64cqw;
+}
+.poster .copy {
+  gap: 1.2cqw;
+}
+.poster .family {
+  margin-top: 1.5cqh;
+}
+[data-shape='arch'] .poster {
+  padding-top: 7cqh;
+}
+[data-shape='arch'] .poster .bunting {
+  width: 58cqw;
+}
+[data-shape='arch-oval'] .poster {
+  padding: 12cqh 19cqw 9cqh;
+}
+[data-shape='arch-oval'] .poster .bunting {
+  width: 44cqw;
+}
+[data-shape='arch-oval'] [data-shape='arch-wavy'] .poster {
+  padding-inline: 14cqw;
+}
+.posterBack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+  padding: 12cqh 14cqw 9cqh;
+}
+[data-shape='arch-oval'] .posterBack {
+  padding-inline: 21cqw;
+}
+.posterBack .eyebrow {
+  font-size: 2.2cqh;
+}
+.posterBack .backTitle {
+  font-size: 7.4cqh;
+}
+.posterBack .backMessage {
+  max-width: 100%;
+  font-size: 3cqh;
+}
+.posterBack .backName {
+  font-size: 3.6cqh;
+}
+.posterQr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8cqh;
+  margin-top: 1cqh;
+}
+.posterQr img {
+  display: block;
+  width: 12cqh;
+  height: 12cqh;
+}
+.posterQr figcaption {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 1.6cqh;
+}
+.posterCorner {
+  position: static;
+  width: 42cqw;
+  margin-top: 1cqh;
+}

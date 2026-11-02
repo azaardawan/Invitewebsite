@@ -1675,3 +1675,7 @@ The online announcement's lines (each design's `copy.ts`). In Kurdish the praise
 | 39 | #8 Rosebird Garden v4 (Little Rose): `orders` (birth order) | الأولى، الثانية، الثالثة، الرابعة | first, second, third, fourth | یەکەم، دووەم، سێیەم، چوارەم | ئێکەمین، دوویەمین، سێیەمین، چارەمین |
 | 40 | #8 Rosebird Garden v4 (Little Rose): `days` (0 / N days of love) | أول يوم من الحب / ١٢ يوماً من الحب | Our very first day of love / 12 days of love | یەکەم ڕۆژی خۆشەویستی / ١٢ ڕۆژ لە خۆشەویستی | ئێکەمین ڕۆژا ڤیانێ / ١٢ ڕۆژ ژ ڤیانێ |
 | 41 | #7 / #8 v4: the photo place's name (manifest `photos.labels`) | صورة المولود / صورة المولودة | The baby's photo | وێنەی کۆرپەکە | وێنێ زاروکی |
+| 42 | #7 / #8 v4: printed poster shape `arch` | قوس | Arch | کەوانە | کەڤان |
+| 43 | #7 / #8 v4: printed poster shape `arch-oval` | بيضاوي | Oval | هێلکەیی | هێلکەیی |
+| 44 | #7 / #8 v4: printed poster shape `arch-wavy` | إطار متموّج | Wavy frame | چوارچێوەی شەپۆلاوی | چوارچۆڤێ شەپۆلی |
+| 45 | #7 / #8 v4: printed poster shape `arch-corners` | إطار بزوايا مقوّسة | Rounded corners | چوارچێوەی گۆشە خڕ | چوارچۆڤێ گۆشە خڕ |

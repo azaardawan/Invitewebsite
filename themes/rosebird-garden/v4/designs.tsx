@@ -86,17 +86,17 @@ function Hearts() {
 }
 
 /** The Instagram story, or the A5 card front: the announcement's opening page, laid out for each shape. */
-export function StoryDesign({ d, variant, qr }: { d: DesignData; variant: 'story' | 'card'; qr?: { src: string; caption: string } | null }) {
+export function StoryDesign({ d, variant, qr }: { d: DesignData; variant: 'story' | 'card' | 'poster'; qr?: { src: string; caption: string } | null }) {
   return (
     <Root d={d} kind={variant}>
-      <span className={styles.arch} aria-hidden="true" />
+      {variant === 'poster' ? null : <span className={styles.arch} aria-hidden="true" />}
       <Art src={bunting} className={styles.bunting} />
       <div className={styles.copy}>
         <p className={styles.eyebrow}>{d.t.introLabel}</p>
         <p className={styles.thanks}>{d.t.praise}</p>
         <Hearts />
         <p className={styles.welcome}>{d.t.welcome}</p>
-        <p className={styles.name} style={{ fontSize: fit(d.name, 70, variant === 'story' ? 20 : 16) }}>
+        <p className={styles.name} style={{ fontSize: fit(d.name, 64, variant === 'story' ? 20 : 16) }}>
           {d.name}
         </p>
         {d.father ? (
@@ -185,5 +185,72 @@ export function CardBackDesign({ d, title, message }: { d: DesignData; title: st
         ) : null}
       </div>
     </Root>
+  );
+}
+
+/**
+ * One side of a printed poster: the paper inside the cut line with a fine line just inside it (transparent outside,
+ * the platform cuts there). Front: the announcement's page; back: the du'a's words, the customer's title and message,
+ * the family's name and the QR code, in one column as on the other designs' posters.
+ */
+export function PosterDesign({
+  d,
+  shape,
+  side,
+  widthMm: w,
+  heightMm: h,
+  outline,
+  title,
+  message,
+  qr,
+}: {
+  d: DesignData;
+  shape: string;
+  side: 'front' | 'back';
+  widthMm: number;
+  heightMm: number;
+  outline: string;
+  title: string;
+  message: string | null;
+  qr: { src: string; caption: string } | null;
+}) {
+  const inset = `translate(${w / 2} ${h / 2}) scale(0.94) translate(${-w / 2} ${-h / 2})`;
+  return (
+    <div className={styles.posterBox} data-shape={shape}>
+      <svg className={styles.posterPaper} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true">
+        <path d={outline} className={styles.paperFill} />
+        <path d={outline} transform={inset} className={styles.paperLine} vectorEffect="non-scaling-stroke" />
+      </svg>
+      {side === 'front' ? (
+        // The QR code goes on the back, as on the other designs' posters.
+        <StoryDesign d={d} variant="poster" />
+      ) : (
+        <Root d={d} kind="posterBack">
+          <p className={styles.eyebrow}>{d.t.blessingLabel}</p>
+          <p className={styles.backTitle} dir="auto">
+            {title}
+          </p>
+          {message ? (
+            <p className={styles.backMessage} dir="auto">
+              {message}
+            </p>
+          ) : null}
+          <Hearts />
+          {d.name ? (
+            <p className={styles.backName}>
+              {d.t.familyOf} {d.name}
+            </p>
+          ) : null}
+          {qr ? (
+            <figure className={styles.posterQr}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}
+              <img src={qr.src} alt="" />
+              <figcaption>{qr.caption}</figcaption>
+            </figure>
+          ) : null}
+          <Art src={cornerArt} className={styles.posterCorner} />
+        </Root>
+      )}
+    </div>
   );
 }
