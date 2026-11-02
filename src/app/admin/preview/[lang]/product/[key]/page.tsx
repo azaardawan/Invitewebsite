@@ -16,6 +16,8 @@ const query = z.object({
   gender: z.enum(['boy', 'girl']).optional(),
   /** Try a layout without saving it. */
   layout: z.string().max(20).optional(),
+  /** A version other than the current one (as the card preview's `v`). */
+  v: z.coerce.number().int().min(1).optional(),
 });
 
 /** Admin sample of a newborn extra (story, sticker, bottle label) on the owner's artwork, with sample details. */
@@ -25,7 +27,7 @@ export default async function ProductSamplePreview({ params, searchParams }: Pag
   if (!isLocale(lang)) notFound();
   const q = query.safeParse(await searchParams);
   if (!q.success) notFound();
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang });
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v });
   if (!sample) notFound();
   const props = { ...sample.props, fields: { ...sample.props.fields, baby_gender: q.data.gender ?? sample.props.fields.baby_gender, baby_name: sample.props.fields.baby_name ?? sample.props.fields.person_1_name } };
   const art = await themeArtwork(db(), sample.theme.id);

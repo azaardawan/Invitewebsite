@@ -1,0 +1,311 @@
+/*
+ * The printed pieces (designs.tsx) in the announcement's paper, ink and art. Every box is a size container: sizes in
+ * cqw / cqh so each piece scales with the box the platform gives it.
+ */
+.root {
+  --paper: #fcf8f3;
+  --paper-light: #fffdf8;
+  --powder: #efcdd3;
+  --ink: #69434f;
+  --muted: #85616a;
+  --line: #d8b5be;
+  --accent: #a77783;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  container-type: size;
+  color: var(--ink);
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, var(--paper-light), transparent 70%),
+    var(--paper);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root p,
+.root figure {
+  margin: 0;
+}
+.art {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+.arch {
+  position: absolute;
+  inset: 4cqw;
+  border: 0.25cqw solid var(--line);
+  border-radius: 40cqw 40cqw 1.4cqw 1.4cqw;
+  pointer-events: none;
+}
+.rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4cqw;
+  color: var(--line);
+  font-size: 3.4cqw;
+  line-height: 1;
+}
+.rule i {
+  width: 8cqw;
+  border-top: 0.2cqw solid var(--line);
+}
+.eyebrow {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 2.8cqw;
+  letter-spacing: 0.04em;
+}
+[data-script='latin'] .eyebrow {
+  font-family: 'LR Serif', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 2.3cqw;
+}
+.name {
+  color: var(--ink);
+  font-family: 'LR Amiri', serif;
+  font-weight: 400;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+[data-script='latin'] .name {
+  font-family: 'LR Serif', serif;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- the story and the A5 card */
+/* One column: the bunting, the words, then the family filling what is left (so a long name never runs under them). */
+.story,
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2cqw 11cqw 6cqw;
+}
+.bunting {
+  position: static;
+  flex: none;
+  width: 74cqw;
+  margin-bottom: -1cqw;
+}
+.copy {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4cqw;
+}
+.thanks {
+  font-size: 4.4cqw;
+  line-height: 1.6;
+}
+.welcome,
+.ending {
+  color: var(--muted);
+  font-size: 4cqw;
+}
+.father {
+  color: var(--accent);
+  font-size: 5.6cqw;
+  line-height: 1.3;
+}
+.date {
+  font-size: 4.2cqw;
+}
+[data-script='latin'] .thanks,
+[data-script='latin'] .welcome,
+[data-script='latin'] .ending,
+[data-script='latin'] .father,
+[data-script='latin'] .date {
+  font-family: 'LR Serif', serif;
+  font-size: 3.6cqw;
+}
+.family {
+  position: static;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  margin-top: 2cqw;
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+.card {
+  padding: 3cqw 13cqw 8cqw;
+}
+.card .bunting {
+  width: 62cqw;
+}
+.card .copy {
+  gap: 0.8cqw;
+}
+.card .thanks {
+  font-size: 3.8cqw;
+}
+.card .welcome,
+.card .ending,
+.card .date {
+  font-size: 3.5cqw;
+}
+.qr {
+  position: absolute;
+  bottom: 7cqw;
+  inset-inline-end: 8cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8cqw;
+  width: 15cqw;
+}
+.qr img {
+  display: block;
+  width: 13cqw;
+  height: 13cqw;
+}
+.qr figcaption {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 1.6cqw;
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- chocolate sticker */
+.sticker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqw;
+}
+.ring {
+  position: absolute;
+  inset: 4cqw;
+  border: 0.9cqw solid var(--powder);
+  pointer-events: none;
+}
+.round {
+  border-radius: 50%;
+}
+.square {
+  border-radius: 6cqw;
+}
+.stBow {
+  position: static;
+  width: 30cqw;
+}
+.stFather {
+  color: var(--accent);
+  font-size: 8cqw;
+  line-height: 1.2;
+}
+.stBooties {
+  position: static;
+  width: 18cqw;
+}
+
+/* ---------------------------------------------------------------- bottle label */
+.bottle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btStart {
+  top: 12cqh;
+  inset-inline-start: 4cqw;
+  height: 76cqh;
+  width: auto;
+}
+.btEnd {
+  top: 6cqh;
+  inset-inline-end: 4cqw;
+  height: 88cqh;
+  width: auto;
+}
+.btCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3cqh;
+}
+.btFather {
+  color: var(--accent);
+  font-size: 16cqh;
+  line-height: 1.2;
+}
+.bottle .rule {
+  font-size: 9cqh;
+}
+.bottle .rule i {
+  width: 10cqh;
+}
+
+/* ---------------------------------------------------------------- the card's back (landscape) */
+.back .arch {
+  inset: 5cqh 4cqw;
+  border-radius: 30cqh 30cqh 1.5cqh 1.5cqh;
+}
+.backCorner {
+  bottom: 5cqh;
+  inset-inline-start: 6cqw;
+  width: 20cqw;
+}
+.backColumn {
+  position: absolute;
+  inset: 14cqh 22cqw 12cqh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+}
+.back .eyebrow {
+  font-size: 2.6cqh;
+}
+.backTitle {
+  font-family: 'LR Amiri', serif;
+  font-size: 9cqh;
+  line-height: 1.35;
+}
+[data-script='latin'] .backTitle {
+  font-family: 'LR Serif', serif;
+  font-style: italic;
+}
+.backMessage {
+  max-width: 52cqw;
+  color: var(--muted);
+  font-size: 4cqh;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.backName {
+  color: var(--accent);
+  font-size: 5cqh;
+}
+
+/* ---------------------------------------------------------------- the A5 boxes (trim + 3 mm bleed); the arch keeps clear of the cut */
+.cardBox {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  container-type: size;
+}
+.card .arch {
+  inset: 6.5cqw;
+}
+.back .arch {
+  inset: 9cqh 6cqw;
+}

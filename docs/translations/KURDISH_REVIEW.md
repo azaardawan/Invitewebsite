@@ -1627,3 +1627,51 @@ The two posters as separate options, the poster step (own words and an own pictu
 | 25 | #25 BAHJAFLIX v3: poster text `match` (default) | تطابق 100% | 100% match | ١٠٠٪ گونجاو | ١٠٠٪ گونجای |
 | 26 | #25 BAHJAFLIX v3: poster text `play` (default) | تشغيل | Play | لێدان | لێدان |
 | 27 | #25 BAHJAFLIX v3: poster text `moreInfo` (default) | مزيد من المعلومات | More info | زانیاری زیاتر | پتر پێزانین |
+
+## Batch 49 — newborn designs #7 Bluebird Garden and #8 Rosebird Garden v4 («Little Blue» / «Little Rose», the owner's edit) — ✅ AUTO-APPROVED (2026-11-02, owner checks in Admin → Translations)
+
+The online announcement's lines (each design's `copy.ts`). In Kurdish the praise and the du'a stay in Arabic, as in the owner's designs; `{n}`/`{the}`/`{order}` are the birth order the customer picks. #8 lists only the lines that differ from #7.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #7 Bluebird Garden v4 (Little Blue): `introLabel` | بكل الحب نشارككم فرحتنا | With love, we share our joy | بە هەموو خۆشەویستییەوە خۆشییەکەمان لەگەڵتان بەش دەکەین | ب هەمی ڤیانێ دلخۆشیا خۆ دگەل هەوە پارڤە دکەین |
+| 2 | #7 Bluebird Garden v4 (Little Blue): `praise` | الحمد لله على تمام النعمة واكتمال المنّة | With grateful hearts, we welcome our beautiful blessing. | الحمد لله على تمام النعمة واكتمال المنّة | الحمد لله على تمام النعمة واكتمال المنّة |
+| 3 | #7 Bluebird Garden v4 (Little Blue): `welcome` | أهلاً بصغيرنا | Welcome, little one | بەخێربێیت بچکۆلەکەمان | ب خێر بێی بچووکێ مە |
+| 4 | #7 Bluebird Garden v4 (Little Blue): `heroEnding` | صغيرٌ بين أيدينا، كبيرٌ في قلوبنا | So little in our arms. So big in our hearts. | لە باوەشماندا بچووکە، لە دڵماندا گەورەیە | د هەمێزا مە دا بچووکە، د دلێ مە دا مەزنە |
+| 5 | #7 Bluebird Garden v4 (Little Blue): `discover` | حكاية فرحتنا | Our little story | چیرۆکی خۆشییەکەمان | چیرۆکا دلخۆشیا مە |
+| 6 | #7 Bluebird Garden v4 (Little Blue): `coverLabel` | بشارة مولود | A little announcement | مژدەی لەدایکبوون | مزگینیا ژدایکبوونێ |
+| 7 | #7 Bluebird Garden v4 (Little Blue): `coverTitle1` | خبرٌ صغير | A little arrival, | هەواڵێکی بچووک | نووچەیەکا بچووک |
+| 8 | #7 Bluebird Garden v4 (Little Blue): `coverTitle2` | وفرحةٌ كبيرة | a whole lot of love. | و خۆشییەکی گەورە | و دلخۆشیەکا مەزن |
+| 9 | #7 Bluebird Garden v4 (Little Blue): `open` | افتح البشارة | Open the announcement | مژدەکە بکەرەوە | مزگینیێ ڤەکە |
+| 10 | #7 Bluebird Garden v4 (Little Blue): `madeWithLove` | بكل الحب، من عائلتنا إليكم | With love, from our family to yours | بە خۆشەویستییەوە، لە خێزانەکەمانەوە بۆ ئێوە | ب ڤیان، ژ مالباتا مە بۆ هەوە |
+| 11 | #7 Bluebird Garden v4 (Little Blue): `storyLabel` | بداية أجمل حكاية | The sweetest new beginning | سەرەتای جوانترین چیرۆک | دەستپێکا جوانترین چیرۆکێ |
+| 12 | #7 Bluebird Garden v4 (Little Blue): `storyTitle1` | {n} أفراحنا | Our {order} joy. | {order} خۆشیمان | {order} دلخۆشیا مە |
+| 13 | #7 Bluebird Garden v4 (Little Blue): `storyTitle2` | وأميرنا {the} | Our little prince. | شازادە بچکۆلەکەمان | شاهزادێ مە یێ بچووک |
+| 14 | #7 Bluebird Garden v4 (Little Blue): `storyBody` | الحمد لله الذي جعل لنا من زينة الحياة نصيباً، ومن الذكور حظاً وسنداً. وهبنا الله {n} أفراحنا وأميرنا {the}، فامتلأت به أيامنا حباً. | Our hearts have found a whole new kind of love. With gratitude and endless joy, we welcome our little boy — a beautiful blessing and the beginning of our favourite chapter. | سوپاس بۆ خودا کە لە جوانییەکانی ژیان بەشێکی پێ بەخشین. خودا {order} خۆشیمانی پێ بەخشین، و ڕۆژەکانمانی پڕ کرد لە خۆشەویستی. | سوپاس بۆ خودێ کو ژ جوانیێن ژیانێ پشکەک دا مە. خودێ {order} دلخۆشیا مە دا مە، و ڕۆژێن مە ب ڤیانێ تژی کرن. |
+| 15 | #7 Bluebird Garden v4 (Little Blue): `storySignature` | الحمد لله على أجمل العطايا | Thankful for the sweetest gift | سوپاس بۆ خودا بۆ جوانترین بەخشش | سوپاس بۆ خودێ بۆ جوانترین دیاری |
+| 16 | #7 Bluebird Garden v4 (Little Blue): `detailsLabel` | تفاصيل صغيرة، ذكرى لا تُنسى | Small details, forever memories | وردەکاریی بچووک، یادەوەریی هەمیشەیی | هوویرکاریێن بچووک، بیرهاتنێن هەروهەر |
+| 17 | #7 Bluebird Garden v4 (Little Blue): `detailsTitle` | يوم أشرقت حياتنا | The day our world changed | ئەو ڕۆژەی ژیانمان ڕووناک بوو | ئەو ڕۆژا ژیانا مە ڕووناک کری |
+| 18 | #7 Bluebird Garden v4 (Little Blue): `memoryLabel` | نحتفظ بأجمل اللحظات | The moments we keep | جوانترین ساتەکان دەپارێزین | جوانترین دەمان دپارێزین |
+| 19 | #7 Bluebird Garden v4 (Little Blue): `memoryTitle1` | صورة صغيرة | A little picture. | وێنەیەکی بچووک | وێنەیەکێ بچووک |
+| 20 | #7 Bluebird Garden v4 (Little Blue): `memoryTitle2` | لذكرى كبيرة | A big memory. | بۆ یادەوەرییەکی گەورە | بۆ بیرهاتنەکا مەزن |
+| 21 | #7 Bluebird Garden v4 (Little Blue): `memoryBody` | أولى نظراته، أصابعه الصغيرة، وأول حضن. تفاصيل نودّ أن تبقى معنا دائماً. | His first little looks, his tiny fingers, that very first cuddle. The details we wish we could keep forever. | یەکەم سەیرکردنەکانی، پەنجە بچکۆلەکانی و یەکەم باوەش. ئەو وردەکارییانەی دەمانەوێت هەمیشە لەگەڵمان بن. | ئێکەمین بەرێن وی، تبلێن وی یێن بچووک، و ئێکەمین هەمێز. ئەو هوویرکاریێن دڤێین هەردەم دگەل مە بمینن. |
+| 22 | #7 Bluebird Garden v4 (Little Blue): `blessingLabel` | دعوة من القلب | A wish from the heart | دوعایەک لە دڵەوە | دوعایەک ژ دلی |
+| 23 | #7 Bluebird Garden v4 (Little Blue): `blessing` | جعله الله فرحةً وبركةً، وغيثاً أينما حلّ. | May his life be filled with love, kindness and blessings, wherever he goes. | جعله الله فرحةً وبركةً، وغيثاً أينما حلّ. | جعله الله فرحةً وبركةً، وغيثاً أينما حلّ. |
+| 24 | #7 Bluebird Garden v4 (Little Blue): `closingLove` | بكل الحب | With all our love, | بە هەموو خۆشەویستییەوە | ب هەمی ڤیانێ |
+| 25 | #7 Bluebird Garden v4 (Little Blue): `familyOf` | عائلة | The family of | خێزانی | مالباتا |
+| 26 | #7 Bluebird Garden v4 (Little Blue): `closingSmall` | بداية صغيرة، وحبّ لا نهاية له | A little beginning. An endless love. | سەرەتایەکی بچووک و خۆشەویستییەکی بێ کۆتایی | دەستپێکەکا بچووک، و ڤیانەکا بێ دوماهی |
+| 27 | #7 Bluebird Garden v4 (Little Blue): `wishesLabel` | تهانيكم | Your wishes | پیرۆزباییەکانتان | پیرۆزباهیێن هەوە |
+| 28 | #7 Bluebird Garden v4 (Little Blue): `replay` | شاهد البشارة مجدداً | Open it again | دووبارە مژدەکە ببینەوە | جارەکا دی مزگینیێ ببینە |
+| 29 | #7 Bluebird Garden v4 (Little Blue): `familyAlt` | رسم مائي للأبوين مع مولودهما النائم في مهد أزرق | Watercolour parents with their sleeping newborn in a powder-blue bassinet | وێنەی ئاوی دایک و باوک لەگەڵ کۆرپە نووستووەکەیان لە بێشکەیەکی شیندا | وێنەیێ ئاڤی یێ دەیک و بابان دگەل زاروکێ وان یێ نڤستی د بێشکەکا شین دا |
+| 30 | #7 Bluebird Garden v4 (Little Blue): `photoAlt` | صورة صغيرنا | Our little one | وێنەی بچکۆلەکەمان | وێنێ بچووکێ مە |
+| 31 | #7 Bluebird Garden v4 (Little Blue): `orders` (birth order) | الأوّل، الثاني، الثالث، الرابع | first, second, third, fourth | یەکەم، دووەم، سێیەم، چوارەم | ئێکەمین، دوویەمین، سێیەمین، چارەمین |
+| 32 | #7 Bluebird Garden v4 (Little Blue): `days` (0 / N days of love) | أول يوم من الحب / ١٢ يوماً من الحب | Our very first day of love / 12 days of love | یەکەم ڕۆژی خۆشەویستی / ١٢ ڕۆژ لە خۆشەویستی | ئێکەمین ڕۆژا ڤیانێ / ١٢ ڕۆژ ژ ڤیانێ |
+| 33 | #8 Rosebird Garden v4 (Little Rose): `welcome` | أهلاً بصغيرتنا | Welcome, little one | بەخێربێیت بچکۆلەکەمان | ب خێر بێی بچووکا مە |
+| 34 | #8 Rosebird Garden v4 (Little Rose): `storyTitle2` | وأميرتنا {the} | Our little princess. | کچە شازادە بچکۆلەکەمان | شاهزادا مە یا بچووک |
+| 35 | #8 Rosebird Garden v4 (Little Rose): `memoryBody` | أولى نظراتها، أصابعها الصغيرة، وأول حضن. تفاصيل نودّ أن تبقى معنا دائماً. | Her first little looks, her tiny fingers, that very first cuddle. The details we wish we could keep forever. | یەکەم سەیرکردنەکانی، پەنجە بچکۆلەکانی و یەکەم باوەش. ئەو وردەکارییانەی دەمانەوێت هەمیشە لەگەڵمان بن. | ئێکەمین بەرێن وێ، تبلێن وێ یێن بچووک، و ئێکەمین هەمێز. ئەو هوویرکاریێن دڤێین هەردەم دگەل مە بمینن. |
+| 36 | #8 Rosebird Garden v4 (Little Rose): `blessing` | جعلها الله فرحةً وبركةً، وغيثاً أينما حلّت. | May her life be filled with love, kindness and blessings, wherever she goes. | جعلها الله فرحةً وبركةً، وغيثاً أينما حلّت. | جعلها الله فرحةً وبركةً، وغيثاً أينما حلّت. |
+| 37 | #8 Rosebird Garden v4 (Little Rose): `familyAlt` | رسم مائي للأبوين مع مولودتهما النائمة في مهد وردي | Watercolour parents with their sleeping newborn in a blush-pink bassinet | وێنەی ئاوی دایک و باوک لەگەڵ کۆرپە نووستووەکەیان لە بێشکەیەکی پەمەییدا | وێنەیێ ئاڤی یێ دەیک و بابان دگەل زاروکێ وان یێ نڤستی د بێشکەکا پەمبەیی دا |
+| 38 | #8 Rosebird Garden v4 (Little Rose): `photoAlt` | صورة صغيرتنا | Our little one | وێنەی بچکۆلەکەمان | وێنێ بچووکا مە |
+| 39 | #8 Rosebird Garden v4 (Little Rose): `orders` (birth order) | الأولى، الثانية، الثالثة، الرابعة | first, second, third, fourth | یەکەم، دووەم، سێیەم، چوارەم | ئێکەمین، دوویەمین، سێیەمین، چارەمین |
+| 40 | #8 Rosebird Garden v4 (Little Rose): `days` (0 / N days of love) | أول يوم من الحب / ١٢ يوماً من الحب | Our very first day of love / 12 days of love | یەکەم ڕۆژی خۆشەویستی / ١٢ ڕۆژ لە خۆشەویستی | ئێکەمین ڕۆژا ڤیانێ / ١٢ ڕۆژ ژ ڤیانێ |
+| 41 | #7 / #8 v4: the photo place's name (manifest `photos.labels`) | صورة المولود / صورة المولودة | The baby's photo | وێنەی کۆرپەکە | وێنێ زاروکی |
