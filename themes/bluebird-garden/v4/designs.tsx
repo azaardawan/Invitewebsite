@@ -8,6 +8,11 @@ import booties from './assets/booties.webp';
 import footprints from './assets/footprints.webp';
 import teddyBalloons from './assets/teddy-balloons.webp';
 import cornerArt from './assets/corner-art.webp';
+import garland from './assets/garland.webp';
+import pram from './assets/pram.webp';
+import decoA from './assets/deco-a.webp';
+import decoB from './assets/deco-b.webp';
+import decoC from './assets/deco-c.webp';
 import fonts from './fonts.module.css';
 import styles from './design.module.css';
 
@@ -85,18 +90,44 @@ function Hearts() {
   );
 }
 
+/** A few of the announcement's sparkles, placed by the piece's CSS (`.sp1` … `.sp6`). */
+function Sparkles() {
+  return (
+    <>
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <span key={i} className={`${styles.sparkle} ${styles[`sp${i}`] ?? ''}`} aria-hidden="true">
+          {i % 3 ? '✧' : '♡'}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** The poster's nursery things around the family: the teddy and the pram at the foot, two small pieces above them. */
+function PosterFrontArt() {
+  return (
+    <>
+      <Sparkles />
+      <Art src={decoB} className={styles.pdB} />
+      <Art src={decoC} className={styles.pdC} />
+      <Art src={teddyBalloons} className={styles.pdTeddy} />
+      <Art src={pram} className={styles.pdPram} />
+    </>
+  );
+}
+
 /** The Instagram story, or the A5 card front: the announcement's opening page, laid out for each shape. */
 export function StoryDesign({ d, variant, qr }: { d: DesignData; variant: 'story' | 'card' | 'poster'; qr?: { src: string; caption: string } | null }) {
   return (
     <Root d={d} kind={variant}>
-      {variant === 'poster' ? null : <span className={styles.arch} aria-hidden="true" />}
+      {variant === 'poster' ? <PosterFrontArt /> : <span className={styles.arch} aria-hidden="true" />}
       <Art src={bunting} className={styles.bunting} />
       <div className={styles.copy}>
         <p className={styles.eyebrow}>{d.t.introLabel}</p>
         <p className={styles.thanks}>{d.t.praise}</p>
         <Hearts />
         <p className={styles.welcome}>{d.t.welcome}</p>
-        <p className={styles.name} style={{ fontSize: fit(d.name, 64, variant === 'story' ? 20 : 16) }}>
+        <p className={styles.name} style={{ fontSize: fit(d.name, 64, variant === 'story' ? 20 : variant === 'poster' ? 17 : 16) }}>
           {d.name}
         </p>
         {d.father ? (
@@ -166,7 +197,11 @@ export function CardBackDesign({ d, title, message }: { d: DesignData; title: st
   return (
     <Root d={d} kind="back">
       <span className={styles.arch} aria-hidden="true" />
+      <Sparkles />
       <Art src={cornerArt} className={styles.backCorner} />
+      <Art src={decoA} className={styles.backDecoA} />
+      <Art src={pram} className={styles.backPram} />
+      <Art src={footprints} className={styles.backFeet} />
       <div className={styles.backColumn}>
         <p className={styles.eyebrow}>{d.t.blessingLabel}</p>
         <p className={styles.backTitle} dir="auto">
@@ -226,6 +261,11 @@ export function PosterDesign({
         <StoryDesign d={d} variant="poster" />
       ) : (
         <Root d={d} kind="posterBack">
+          <Sparkles />
+          <Art src={garland} className={styles.pbGarland} />
+          <Art src={teddyBalloons} className={styles.pbTeddy} />
+          <Art src={pram} className={styles.pbPram} />
+          <Art src={decoA} className={styles.pbDecoA} />
           <p className={styles.eyebrow}>{d.t.blessingLabel}</p>
           <p className={styles.backTitle} dir="auto">
             {title}
@@ -248,7 +288,6 @@ export function PosterDesign({
               <figcaption>{qr.caption}</figcaption>
             </figure>
           ) : null}
-          <Art src={cornerArt} className={styles.posterCorner} />
         </Root>
       )}
     </div>

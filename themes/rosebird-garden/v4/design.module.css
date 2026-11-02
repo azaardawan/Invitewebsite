@@ -335,18 +335,34 @@
 .poster,
 .posterBack {
   background: none;
+  /* Sizes are shares of the whole poster (its box is the container), not of the padded column. */
+  container-type: normal;
 }
 .poster {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 9cqh 12cqw 6cqh;
+  padding: 6cqh 12cqw 4cqh;
 }
 .poster .bunting {
-  width: 64cqw;
+  width: 54cqw;
 }
 .poster .copy {
-  gap: 1.2cqw;
+  gap: 1.4cqw;
+}
+.poster .thanks {
+  font-size: 4.2cqw;
+}
+.poster .welcome,
+.poster .ending,
+.poster .date {
+  font-size: 3.8cqw;
+}
+.poster .father {
+  font-size: 5.2cqw;
+}
+.poster .eyebrow {
+  font-size: 2.6cqw;
 }
 .poster .family {
   margin-top: 1.5cqh;
@@ -371,24 +387,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3cqh;
-  padding: 12cqh 14cqw 9cqh;
+  gap: 2.4cqh;
+  padding: 18cqh 16cqw 30cqh;
 }
 [data-shape='arch-oval'] .posterBack {
   padding-inline: 21cqw;
 }
 .posterBack .eyebrow {
-  font-size: 2.2cqh;
+  font-size: 1.6cqh;
 }
 .posterBack .backTitle {
-  font-size: 7.4cqh;
+  font-size: 5.4cqh;
 }
 .posterBack .backMessage {
   max-width: 100%;
-  font-size: 3cqh;
+  font-size: 2.2cqh;
 }
 .posterBack .backName {
-  font-size: 3.6cqh;
+  font-size: 2.6cqh;
 }
 .posterQr {
   display: flex;
@@ -399,16 +415,189 @@
 }
 .posterQr img {
   display: block;
-  width: 12cqh;
-  height: 12cqh;
+  width: 9cqh;
+  height: 9cqh;
 }
 .posterQr figcaption {
   color: var(--muted);
   font-family: 'LR UI', sans-serif;
-  font-size: 1.6cqh;
+  font-size: 1.2cqh;
 }
-.posterCorner {
-  position: static;
-  width: 42cqw;
-  margin-top: 1cqh;
+
+/* ---------------------------------------------------------------- the nursery things around the words (posters, card back) */
+.sparkle {
+  position: absolute;
+  color: var(--line);
+  font-size: 3.6cqw;
+  line-height: 1;
+}
+.sp1 {
+  top: 22%;
+  left: 10%;
+}
+.sp2 {
+  top: 31%;
+  right: 9%;
+}
+.sp3 {
+  top: 47%;
+  left: 8%;
+  font-size: 3cqw;
+}
+.sp4 {
+  top: 55%;
+  right: 10%;
+}
+.sp5 {
+  top: 68%;
+  left: 14%;
+}
+.sp6 {
+  top: 15%;
+  right: 17%;
+  font-size: 3cqw;
+}
+[data-shape='arch-oval'] .sp1 {
+  left: 17%;
+}
+[data-shape='arch-oval'] .sp5 {
+  left: 19%;
+}
+[data-shape='arch-oval'] .sp6 {
+  right: 24%;
+}
+/* Poster front: the teddy and the pram at the foot either side of the family, two small pieces above them. */
+.poster .family {
+  width: 62cqw;
+  align-self: center;
+}
+.pdTeddy,
+.pdPram {
+  bottom: 9cqh;
+}
+.pdTeddy {
+  inset-inline-start: 9cqw;
+  width: 27cqw;
+}
+.pdPram {
+  inset-inline-end: 9cqw;
+  width: 25cqw;
+}
+.pdB,
+.pdC {
+  bottom: 33cqh;
+  width: 14cqw;
+}
+.pdB {
+  inset-inline-start: 11cqw;
+}
+.pdC {
+  inset-inline-end: 11cqw;
+}
+[data-shape='arch'] .pdTeddy,
+[data-shape='arch'] .pdPram {
+  bottom: 5cqh;
+}
+[data-shape='arch'] .pdTeddy {
+  inset-inline-start: 7cqw;
+}
+[data-shape='arch'] .pdPram {
+  inset-inline-end: 7cqw;
+}
+[data-shape='arch'] .pdB,
+[data-shape='arch'] .pdC {
+  bottom: 27cqh;
+}
+[data-shape='arch-oval'] .pdTeddy,
+[data-shape='arch-oval'] .pdPram {
+  bottom: 12cqh;
+  width: 21cqw;
+}
+[data-shape='arch-oval'] .pdTeddy {
+  inset-inline-start: 18cqw;
+}
+[data-shape='arch-oval'] .pdPram {
+  inset-inline-end: 18cqw;
+}
+[data-shape='arch-oval'] .pdB,
+[data-shape='arch-oval'] .pdC {
+  bottom: 34cqh;
+  width: 11cqw;
+}
+[data-shape='arch-oval'] .pdB {
+  inset-inline-start: 14cqw;
+}
+[data-shape='arch-oval'] .pdC {
+  inset-inline-end: 14cqw;
+}
+/* Poster back: the garland over the words, the teddy, the nursery piece and the pram along the foot. */
+.pbGarland {
+  top: 9cqh;
+  left: 50%;
+  width: 50cqw;
+  transform: translateX(-50%);
+}
+.pbTeddy,
+.pbPram,
+.pbDecoA {
+  bottom: 9cqh;
+}
+.pbTeddy {
+  inset-inline-start: 9cqw;
+  width: 25cqw;
+}
+.pbPram {
+  inset-inline-end: 9cqw;
+  width: 24cqw;
+}
+.pbDecoA {
+  left: 50%;
+  width: 28cqw;
+  transform: translateX(-50%);
+}
+[data-shape='arch'] .pbGarland {
+  top: 7cqh;
+}
+[data-shape='arch'] .pbTeddy,
+[data-shape='arch'] .pbPram,
+[data-shape='arch'] .pbDecoA {
+  bottom: 5cqh;
+}
+[data-shape='arch-oval'] .pbGarland {
+  top: 11cqh;
+  width: 40cqw;
+}
+[data-shape='arch-oval'] .pbTeddy,
+[data-shape='arch-oval'] .pbPram {
+  bottom: 14cqh;
+  width: 20cqw;
+}
+[data-shape='arch-oval'] .pbTeddy {
+  inset-inline-start: 18cqw;
+}
+[data-shape='arch-oval'] .pbPram {
+  inset-inline-end: 18cqw;
+}
+[data-shape='arch-oval'] .pbDecoA {
+  bottom: 7cqh;
+  width: 22cqw;
+}
+/* The A5 card's back (landscape): the nursery piece and the pram on the right, little feet on the left. */
+.back .sparkle {
+  font-size: 4cqh;
+}
+.backDecoA {
+  top: 15cqh;
+  inset-inline-end: 8cqw;
+  width: 14cqw;
+}
+.backPram {
+  bottom: 13cqh;
+  inset-inline-end: 9cqw;
+  width: 12cqw;
+}
+.backFeet {
+  top: 18cqh;
+  inset-inline-start: 11cqw;
+  width: 7cqw;
 }
