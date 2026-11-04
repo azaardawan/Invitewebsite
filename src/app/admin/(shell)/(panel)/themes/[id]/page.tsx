@@ -25,6 +25,7 @@ import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { CoverCropper } from '@/components/admin/CoverCropper';
+import { designThumbnail } from '@/server/catalog/thumbnails';
 import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
 import { ThemePreviewPanel } from '@/components/admin/ThemePreviewPanel';
 import { formatUsd } from '@/lib/currency';
@@ -36,6 +37,7 @@ import {
   packageStatusAction,
   themeFieldsAction,
   themeSettingsAction,
+  designThumbnailAction,
   themeBorderAction,
   savePaletteAction,
   paletteStatusAction,
@@ -89,6 +91,7 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
   const { authz } = await requireAdmin({ permission: 'themes.view' });
   const { id } = await params;
   const d = await getThemeDetail(db(), id).catch((e) => (e instanceof CatalogError ? null : Promise.reject(e)));
+  const thumbnail = d ? await designThumbnail(d.theme.key) : null;
   if (!d) notFound();
   const t = await getTranslations('admin.catalog');
   const tc = await getTranslations('common');
@@ -259,6 +262,21 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
             {d.music ? <audio controls preload="none" src={publicMediaUrl(music.find((m) => m.track.id === d.music!.id)!.asset.storageKey)} className="w-full" /> : null}
             <SubmitButton>{t('common.save')}</SubmitButton>
           </ActionForm>
+        </Card>
+      ) : null}
+
+      {canManage && thumbnail ? (
+        <Card className="flex flex-wrap items-start gap-5">
+          {/* eslint-disable-next-line @next/next/no-img-element -- the design's own file, shown as it is */}
+          <img src={`data:image/webp;base64,${thumbnail.toString('base64')}`} alt="" className="w-32 rounded-t-full rounded-b-lg border border-line" />
+          <div className="min-w-60 flex-1 space-y-3">
+            <h2 className="text-lg font-semibold">{t('themes.thumbnails.heading')}</h2>
+            <p className="text-sm text-muted">{t('themes.thumbnails.hint')}</p>
+            <ActionForm action={designThumbnailAction} confirmMessage={t('themes.thumbnails.confirm')}>
+              <input type="hidden" name="id" value={d.theme.id} />
+              <SubmitButton tone="secondary">{t('themes.thumbnails.use')}</SubmitButton>
+            </ActionForm>
+          </div>
         </Card>
       ) : null}
 
