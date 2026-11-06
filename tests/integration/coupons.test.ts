@@ -72,6 +72,22 @@ describe('coupons', () => {
     expect((await db().select().from(coupons).where(eq(coupons.id, expired.id)))[0]!.usedCount).toBe(0);
   });
 
+  it('a coupon for some themes only works on those themes; none ticked = every theme', async () => {
+    const other = await activeTheme();
+    expect(other.theme.id).not.toBe(shop.theme.id);
+    const elsewhere = await createCoupon(db(), { code: code(), kind: 'PERCENT', value: 20, themeIds: [other.theme.id] }, actor);
+    await expect(checkout(elsewhere.code)).rejects.toMatchObject({ code: 'couponNotForTheme' });
+    expect((await db().select().from(coupons).where(eq(coupons.id, elsewhere.id)))[0]!.usedCount).toBe(0);
+    const here = await createCoupon(db(), { code: code(), kind: 'PERCENT', value: 20, themeIds: [other.theme.id, shop.theme.id] }, actor);
+    const o = await checkout(here.code);
+    expect(o.amountIqd).toBe(shop.full.priceIqd - Math.round(shop.full.priceIqd / 5));
+    const all = await createCoupon(db(), { code: code(), kind: 'AMOUNT', value: 1000 }, actor);
+    expect(all.themeIds).toEqual([]);
+    await expect(checkout(all.code)).resolves.toMatchObject({ amountIqd: shop.full.priceIqd - 1000 });
+    // An unknown theme is refused.
+    await expect(createCoupon(db(), { code: code(), kind: 'PERCENT', value: 10, themeIds: [crypto.randomUUID()] }, actor)).rejects.toMatchObject({ code: 'notFound' });
+  });
+
   it('validates new coupons', async () => {
     await expect(createCoupon(db(), { code: 'x', kind: 'PERCENT', value: 10 }, actor)).rejects.toThrow();
     await expect(createCoupon(db(), { code: code(), kind: 'PERCENT', value: 120 }, actor)).rejects.toThrow();

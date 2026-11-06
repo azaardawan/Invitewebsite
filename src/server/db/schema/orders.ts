@@ -178,6 +178,8 @@ export const coupons = pgTable(
     status: couponStatus('status').notNull().default('ACTIVE'),
     /** Private note for the team (who it is for). */
     note: text('note'),
+    /** The themes it may be used on (owner, 2026-11-06); empty = every theme. */
+    themeIds: uuid('theme_ids').array().notNull().default(sql`'{}'::uuid[]`),
     createdBy: uuid('created_by').references(() => adminUsers.id, { onDelete: 'restrict' }),
     ...timestamps,
   },

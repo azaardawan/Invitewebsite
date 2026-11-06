@@ -30,5 +30,6 @@ export default defineConfig([
       'react/no-danger': 'error',
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'drizzle/**']),
+  // .claude/: agent skills (third-party Node scripts, not app code).
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'drizzle/**', '.claude/**']),
 ]);

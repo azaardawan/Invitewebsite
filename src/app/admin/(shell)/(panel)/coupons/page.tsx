@@ -2,6 +2,9 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { listCoupons } from '@/server/orders/coupons';
+import { listThemes } from '@/server/catalog/themes';
+import { themeNumber } from '@/theme-registry';
+import { localized } from '@/lib/localized';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card, formatIqd } from '@/components/admin/bits';
 import { couponStatusAction, createCouponAction } from '@/app/admin/_actions/coupons';
@@ -12,7 +15,15 @@ export default async function CouponsPage() {
   const t = await getTranslations('admin.coupons');
   const locale = await getLocale();
   const intl = locale === 'ar' ? 'ar-IQ' : 'en-GB';
-  const list = await listCoupons(db());
+  const [list, themeRows] = await Promise.all([listCoupons(db()), listThemes(db())]);
+  const themeLabel = new Map(themeRows.map((r) => [r.theme.id, `#${themeNumber(r.theme.key) ?? '—'} ${localized(r.theme.name, locale)}`]));
+  // Themes to choose from, by section (archived ones left out).
+  const bySection = new Map<string, { id: string; label: string }[]>();
+  for (const r of themeRows) {
+    if (r.theme.archivedAt) continue;
+    const section = r.sectionName ? localized(r.sectionName, locale) : '—';
+    bySection.set(section, [...(bySection.get(section) ?? []), { id: r.theme.id, label: themeLabel.get(r.theme.id)! }]);
+  }
   const now = new Date();
   const input = 'w-full rounded-md border border-line bg-surface px-3 py-2';
 
@@ -38,6 +49,25 @@ export default async function CouponsPage() {
           <Field label={t('maxUses')} name="maxUses" inputMode="numeric" dir="ltr" required={false} />
           <Field label={t('expiresAt')} name="expiresAt" type="date" dir="ltr" required={false} />
           <Field label={t('note')} name="note" required={false} />
+          <fieldset className="sm:col-span-2">
+            <legend className="mb-1 text-sm font-medium">{t('themes')}</legend>
+            <p className="mb-2 text-xs text-muted">{t('themesHint')}</p>
+            <div className="max-h-72 space-y-3 overflow-y-auto rounded-md border border-line p-3">
+              {[...bySection].map(([section, items]) => (
+                <div key={section}>
+                  <p className="mb-1 text-xs font-semibold text-muted">{section}</p>
+                  <div className="grid gap-x-4 gap-y-1 sm:grid-cols-2">
+                    {items.map((it) => (
+                      <label key={it.id} className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="themeIds" value={it.id} className="size-4" />
+                        <span>{it.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </fieldset>
           <p className="text-xs text-muted sm:col-span-2">{t('hint')}</p>
           <div className="sm:col-span-2">
             <SubmitButton>{t('createButton')}</SubmitButton>
@@ -66,6 +96,9 @@ export default async function CouponsPage() {
                   {t('uses', { used: c.usedCount, max: c.maxUses ?? '∞' })}
                   {c.expiresAt ? ` · ${t('until', { date: new Intl.DateTimeFormat(intl, { dateStyle: 'medium', timeZone: 'Asia/Baghdad' }).format(c.expiresAt) })}` : ''}
                   {c.note ? ` · ${c.note}` : ''}
+                </p>
+                <p className="text-muted">
+                  {c.themeIds.length ? t('onlyThemes', { list: c.themeIds.map((id) => themeLabel.get(id) ?? '?').join(locale === 'ar' ? '، ' : ', ') }) : t('allThemes')}
                 </p>
               </div>
               <ActionForm action={couponStatusAction}>

@@ -72,7 +72,7 @@ export function CheckoutForm({
           autoCapitalize="characters"
           dir="ltr"
           maxLength={30}
-          aria-invalid={state.error === 'errors.invalidCoupon' ? true : undefined}
+          aria-invalid={state.error === 'errors.invalidCoupon' || state.error === 'errors.couponNotForTheme' ? true : undefined}
           aria-describedby="c-coupon-hint"
           className={inputCls}
         />

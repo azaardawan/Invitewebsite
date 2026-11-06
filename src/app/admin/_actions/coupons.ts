@@ -28,6 +28,8 @@ export async function createCouponAction(_: ActionState, form: FormData): Promis
         // End of the chosen day, Baghdad time.
         expiresAt: expires ? new Date(`${expires}T23:59:59+03:00`) : null,
         note: readString(form, 'note') ?? null,
+        // No theme ticked = every theme.
+        themeIds: form.getAll('themeIds').map(String),
       },
       a,
     );
