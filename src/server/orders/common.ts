@@ -20,6 +20,7 @@ export class OrderError extends Error {
       | 'rateLimited'
       | 'refunded'
       | 'invalidCoupon'
+      | 'couponNotForTheme'
       | 'photosMissing',
     public readonly fieldErrors: Record<string, string> = {},
   ) {

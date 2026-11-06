@@ -16,9 +16,20 @@ test('the owner makes a 100% coupon and orders an invitation for free', async ({
   await page.getByLabel(/^الرمز/).fill(code.toLowerCase());
   await page.getByLabel('القيمة', { exact: false }).fill('100');
   await page.getByLabel(/^أقصى عدد/).fill('1');
+  // Only for the demo design (#4).
+  await page.getByRole('checkbox', { name: /^#4 / }).check();
   await page.getByRole('button', { name: 'إنشاء الرمز' }).click();
   await expect(page.getByText(code, { exact: true })).toBeVisible();
   await expect(page.getByText(/^خصم (١٠٠|100)٪$/)).toBeVisible();
+  await expect(page.getByText(/^فقط لـ: #4 /)).toBeVisible();
+  // Another code, for a different design only.
+  const elsewhere = `ELSE-${Date.now().toString(36).toUpperCase()}`;
+  await page.getByLabel(/^الرمز/).fill(elsewhere);
+  await page.getByLabel('القيمة', { exact: false }).fill('50');
+  await page.getByRole('checkbox', { name: /^#1 / }).check();
+  await page.getByRole('button', { name: 'إنشاء الرمز' }).click();
+  await expect(page.getByText(elsewhere, { exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('coupons-admin.png'), fullPage: true });
 
   const customer = await browser.newPage();
   await customer.goto('/themes/demo-minimal');
@@ -41,6 +52,11 @@ test('the owner makes a 100% coupon and orders an invitation for free', async ({
   await customer.locator('input[name=terms]').check();
   await customer.getByRole('button', { name: 'تأكيد الطلب' }).click();
   await expect(customer.locator('main').getByRole('alert')).toHaveText('رمز الخصم هذا غير صالح أو انتهت صلاحيته أو استُخدم بالكامل.');
+  // A code made for another design is refused too.
+  await customer.locator('#c-coupon').fill(elsewhere);
+  await customer.locator('input[name=terms]').check();
+  await customer.getByRole('button', { name: 'تأكيد الطلب' }).click();
+  await expect(customer.locator('main').getByRole('alert')).toHaveText('رمز الخصم هذا لا يصلح لهذا التصميم.');
 
   // The real code: no payment page, the invitation is published straight away.
   await customer.locator('#c-coupon').fill(code.toLowerCase());
