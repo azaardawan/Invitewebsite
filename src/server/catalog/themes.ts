@@ -490,3 +490,25 @@ export async function getThemeDetail(db: DbOrTx, themeId: string) {
 export async function themeExtraSectionIds(db: DbOrTx, themeId: string) {
   return (await db.select({ id: themeExtraSections.sectionId }).from(themeExtraSections).where(eq(themeExtraSections.themeId, themeId))).map((r) => r.id);
 }
+
+/**
+ * Sets the design's storefront cover to an image already stored (e.g. the design's own thumbnail), starting centred.
+ * Audited; the rest of the settings are left as they are.
+ */
+export async function setThemeCover(db: DbOrTx, themeId: string, coverAssetId: string, actor: Actor, source: string) {
+  return db.transaction(async (tx) => {
+    const [before] = await tx.select().from(themes).where(eq(themes.id, themeId)).for('update');
+    if (!before) throw new CatalogError('notFound');
+    const [a] = await tx.select({ kind: assets.kind }).from(assets).where(eq(assets.id, coverAssetId));
+    if (a?.kind !== 'IMAGE') throw new CatalogError('invalidAsset');
+    await tx.update(themes).set({ coverAssetId, coverFocus: null }).where(eq(themes.id, themeId));
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: 'theme.cover_updated',
+      objectType: 'theme',
+      objectId: themeId,
+      before: { coverAssetId: before.coverAssetId, coverFocus: before.coverFocus },
+      after: { coverAssetId, coverFocus: null, source },
+    });
+  });
+}

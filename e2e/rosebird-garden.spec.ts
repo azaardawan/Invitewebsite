@@ -18,9 +18,11 @@ test("Rosebird Garden: the girl's wording, «بنت» and a feminine birth order
   const draft = order({ NAME: 'ريم', FATHER: 'عبدالله', W_ORDER: 'opt:0' });
   // Since its online invitation: the preview opens like the guests' invitation (cover, then the design).
   await openPreview(page, draft.previewToken);
-  await expect(page.getByText('بنت عبدالله')).toBeVisible();
+  // v4 shows the family's line twice (the family by the bassinet and the day of birth).
+  await expect(page.getByText('بنت عبدالله').first()).toBeVisible();
   await expect(page.getByText(/الثانية$/)).toBeVisible();
-  await expect(page.getByText(/حلّـــت/)).toBeVisible();
+  // The du'a's feminine «حلّت» (v3 drew it with stretched letters: «حلّـــت»).
+  await expect(page.getByText(/حلّـ*ت/).first()).toBeVisible();
 
   const paid = order({ NAME: 'Reem', FATHER: 'Abdullah', INV_LANG: 'en', PAID: '1' });
   expect((await request.get(`/r/${paid.receiptToken}/extra/story.png`)).status()).toBe(200);

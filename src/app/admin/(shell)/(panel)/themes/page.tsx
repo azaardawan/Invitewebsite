@@ -10,7 +10,7 @@ import { localized } from '@/server/catalog/common';
 import { publicMediaUrl } from '@/server/storage';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card, MoveButtons, formatIqd } from '@/components/admin/bits';
-import { featuredThemesAction, moveThemeAction, syncThemesAction } from '@/app/admin/_actions/catalog';
+import { allDesignThumbnailsAction, featuredThemesAction, moveThemeAction, syncThemesAction } from '@/app/admin/_actions/catalog';
 import { getSettings } from '@/server/settings/service';
 import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
@@ -43,9 +43,14 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
           <p className="mt-1 text-muted">{t('themes.intro')}</p>
         </div>
         {canManage ? (
-          <ActionForm action={syncThemesAction}>
-            <SubmitButton tone="secondary">{t('themes.sync')}</SubmitButton>
-          </ActionForm>
+          <div className="flex flex-wrap gap-2">
+            <ActionForm action={allDesignThumbnailsAction} confirmMessage={t('themes.thumbnails.confirmAll')}>
+              <SubmitButton tone="secondary">{t('themes.thumbnails.useAll')}</SubmitButton>
+            </ActionForm>
+            <ActionForm action={syncThemesAction}>
+              <SubmitButton tone="secondary">{t('themes.sync')}</SubmitButton>
+            </ActionForm>
+          </div>
         ) : null}
       </header>
 

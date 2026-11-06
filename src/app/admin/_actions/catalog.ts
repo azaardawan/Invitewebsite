@@ -29,6 +29,7 @@ import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, EXTRA_SLOTS, updateThemeCardSide, up
 import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
+import { applyAllDesignThumbnails, applyDesignThumbnail } from '@/server/catalog/thumbnails';
 import { catalogFailure, readI18n, readString } from './form-helpers';
 import { savePalette, setPaletteStatus } from '@/server/catalog/palettes';
 import { createSubsection, moveSubsection, setSubsectionStatus, updateSubsection } from '@/server/catalog/subsections';
@@ -175,6 +176,22 @@ export async function syncThemesAction(): Promise<ActionState> {
       ],
       nonce: Date.now(),
     };
+  }, ['/admin/themes']);
+}
+
+/** The design's own thumbnail (themes/<key>/thumbnail.webp) becomes its storefront cover. */
+export async function designThumbnailAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form);
+  return run(() => applyDesignThumbnail(db(), themeId, actor), ['/admin/themes', `/admin/themes/${themeId}`]);
+}
+
+/** Every design that has its own thumbnail gets it as its cover. */
+export async function allDesignThumbnailsAction(): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  return run(async () => {
+    const n = await applyAllDesignThumbnails(db(), actor);
+    return { ok: true, message: 'catalog.themes.thumbnails.allDone', details: [String(n)], nonce: Date.now() };
   }, ['/admin/themes']);
 }
 

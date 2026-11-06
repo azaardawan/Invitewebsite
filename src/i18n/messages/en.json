@@ -505,7 +505,16 @@
         "photoCount": "{n} photos",
         "photoSetsLabel": "Photo sets in this package",
         "photoSets": "{n, plural, one {# set} other {# sets}} ({photos} photos)",
-        "photoSetsHint": "Each set is one row of {set} photos in the design."
+        "photoSetsHint": "Each set is one row of {set} photos in the design.",
+        "thumbnails": {
+          "heading": "The design's own thumbnail",
+          "hint": "Made from the design itself, in the shape of the website's cards, so the whole design shows in the arch. Using it replaces the cover above (you can upload your own again at any time).",
+          "use": "Use as the cover",
+          "confirm": "Replace this design's cover with its own thumbnail?",
+          "useAll": "Use the designs' thumbnails",
+          "confirmAll": "Replace the cover of every design that has its own thumbnail?",
+          "allDone": "Covers replaced with the designs' thumbnails"
+        }
       },
       "errors": {
         "invalid": "Please check the fields.",

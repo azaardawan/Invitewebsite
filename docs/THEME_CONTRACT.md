@@ -18,6 +18,11 @@ themes/<key>/v<N>/
 
 - **Adding a theme means adding this folder and nothing else.** The registry is generated automatically
   on `dev`, `build`, `test` and `lint`.
+- `themes/<key>/thumbnail.webp` (optional, beside the version folders so it never touches a frozen one): the design's own
+  storefront thumbnail, **900 × 1320** (the designs list's arch card, 3 : 4.4), made from its first screen with sample
+  names (the opened invitation, or the closed cover when that shows the design better), with the important parts clear
+  of the arch's rounded top. It is never used on its own: in Admin → the design, «Use as the cover» (or «Use the designs'
+  thumbnails» on the designs list) stores it as the cover, centred and audited; the owner can upload their own again.
 - New versions go in a new folder (`v2`). A version that has ever been **activated is frozen**. Its
   manifest can't change (seeding reports a conflict), and existing invitations keep using it.
 
