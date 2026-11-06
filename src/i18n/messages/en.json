@@ -977,6 +977,10 @@
       "maxUses": "Maximum uses (empty = unlimited)",
       "expiresAt": "Valid until (empty = no end date)",
       "note": "Note for the team (who it is for)",
+      "themes": "Themes it works on",
+      "themesHint": "Tick the themes this coupon is for. Tick none and it works on every theme.",
+      "allThemes": "All themes",
+      "onlyThemes": "Only for: {list}",
       "hint": "Tip: for your own free invitations, make a 100% coupon with an unusual code and a few uses, and stop it when you no longer need it.",
       "createButton": "Create coupon",
       "list": "All coupons",
@@ -1399,6 +1403,7 @@
       "editNotAllowed": "This invitation can no longer be edited here.",
       "editLimitReached": "You have used all your edits. Contact us for any other change.",
       "invalidCoupon": "This coupon code isn't valid, has expired or has been used up.",
+      "couponNotForTheme": "This coupon code isn't for this design.",
       "photosMissing": "Please add the photos this design needs (see “Your photos” above) before continuing."
     },
     "reviewTitle": "Review your invitation",

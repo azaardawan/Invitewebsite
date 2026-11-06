@@ -1,0 +1,1 @@
+ALTER TABLE "coupons" ADD COLUMN "theme_ids" uuid[] DEFAULT '{}'::uuid[] NOT NULL;

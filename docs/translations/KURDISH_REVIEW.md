@@ -1652,3 +1652,11 @@ The design's own lines (`themes/delal-bridge/v1/copy.ts`) and its name. The vers
 | 16 | #26 Delal Bridge: `closingLead` | بكل الحب والامتنان | WITH LOVE AND GRATITUDE | بە خۆشەویستی و سوپاسەوە | ب حەژێکرن و سوپاسیێ |
 | 17 | #26 Delal Bridge: `closing` | شكراً لأنكم جزء من قصتنا، حضوركم أجمل هدية | Thank you for being part of our story. Your presence is the most beautiful gift. | سوپاس کە بەشێکن لە چیرۆکەکەمان، ئامادەبوونتان جوانترین دیارییە | سوپاس کو هوین پشکەک ژ چیرۆکا مەنە، ئامادەبوونا هەوە جوانترین دیاریە |
 | 18 | #26 Delal Bridge: `keepsakeClosing` | شكراً من القلب لكل من شاركنا فرحتنا | With heartfelt thanks to everyone who shared our joy | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری |
+
+## Batch 50 — coupons for some themes only — ✅ AUTO-APPROVED (2026-11-06, owner checks in Admin → Translations)
+
+Shown at checkout when a customer types a coupon made for other themes.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Checkout: `store.errors.couponNotForTheme` | رمز الخصم هذا لا يصلح لهذا التصميم. | This coupon code isn't for this design. | ئەم کۆدی داشکاندنە بۆ ئەم دیزاینە نییە. | ئەڤ کۆدێ داشکاندنێ بۆ ڤێ دیزاینێ نینە. |
