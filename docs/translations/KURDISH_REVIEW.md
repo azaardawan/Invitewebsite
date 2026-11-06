@@ -1628,7 +1628,32 @@ The two posters as separate options, the poster step (own words and an own pictu
 | 26 | #25 BAHJAFLIX v3: poster text `play` (default) | تشغيل | Play | لێدان | لێدان |
 | 27 | #25 BAHJAFLIX v3: poster text `moreInfo` (default) | مزيد من المعلومات | More info | زانیاری زیاتر | پتر پێزانین |
 
-## Batch 49 — newborn designs #7 Bluebird Garden and #8 Rosebird Garden v4 («Little Blue» / «Little Rose», the owner's edit) — ✅ AUTO-APPROVED (2026-11-02, owner checks in Admin → Translations)
+## Batch 49 — Delal Bridge (#26), a Zakho wedding and engagement design — ✅ AUTO-APPROVED (2026-11-05, owner checks in Admin → Translations)
+
+The design's own lines (`themes/delal-bridge/v1/copy.ts`) and its name. The verse (Ar-Rum 30:21), its reference and the basmala stay in Arabic in every language.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #26 Delal Bridge: design name | جسر دلال | Delal Bridge | پردی دەلال | پرا دەلال |
+| 2 | #26 Delal Bridge: `heroWedding` | يحتفلان بزفافهما | ARE GETTING MARRIED | ئاهەنگی هاوسەرگیرییان دەگێڕن | ئاهەنگا داوەتا خۆ دگێڕن |
+| 3 | #26 Delal Bridge: `heroEngagement` | يحتفلان بخطوبتهما | ARE GETTING ENGAGED | ئاهەنگی دەستگیرانییان دەگێڕن | ئاهەنگا دەستگیرانیا خۆ دگێڕن |
+| 4 | #26 Delal Bridge: `blessing` | بمباركة الأهل والأحبة | Together with their families | بە پیرۆزبایی خێزان و خۆشەویستان | ب پیرۆزباهیا مالباتێ و خۆشتڤیان |
+| 5 | #26 Delal Bridge: `cardWedding` | يتشرّفان بدعوتكم لحضور حفل زفافهما | invite you to celebrate their wedding | شانازی دەکەن بە بانگهێشتکردنتان بۆ ئاهەنگی هاوسەرگیرییان | ب شانازی هەوە داخواز دکەن بۆ ئاهەنگا داوەتا خۆ |
+| 6 | #26 Delal Bridge: `cardEngagement` | يتشرّفان بدعوتكم لحضور حفل خطوبتهما | invite you to celebrate their engagement | شانازی دەکەن بە بانگهێشتکردنتان بۆ ئاهەنگی دەستگیرانییان | ب شانازی هەوە داخواز دکەن بۆ ئاهەنگا دەستگیرانیا خۆ |
+| 7 | #26 Delal Bridge: `eventLead` | الاحتفال | THE CELEBRATION | ئاهەنگ | ئاهەنگ |
+| 8 | #26 Delal Bridge: `eventTitle` | شاركونا هذه الفرحة | Join us in this Celebration | بەشداری ئەم خۆشییەمان بکەن | پشکداریێ د ڤێ شاهیێ دا بکەن |
+| 9 | #26 Delal Bridge: `eventWedding` | ليلة الزفاف | Wedding Night | شەوی هاوسەرگیری | شەڤا داوەتێ |
+| 10 | #26 Delal Bridge: `eventEngagement` | حفل الخطوبة | Engagement | ئاهەنگی دەستگیرانی | ئاهەنگا دەستگیرانیێ |
+| 11 | #26 Delal Bridge: `countdownLead` | نعدّ الأيام | COUNTING THE DAYS | ڕۆژەکان دەژمێرین | ئەم ڕۆژان دهژمێرین |
+| 12 | #26 Delal Bridge: `countdownTitle` | حتى اليوم الموعود | Until the big day | تا ڕۆژە چاوەڕوانکراوەکە | هەتا ڕۆژا چاڤەڕێکری |
+| 13 | #26 Delal Bridge: `replyLead` | نرجو الرد | KINDLY REPLY | تکایە وەڵام بدەنەوە | هیڤیە بەرسڤێ بدەن |
+| 14 | #26 Delal Bridge: `replyTitle` | هل ستشاركوننا؟ | Will you join us? | بەشداریمان دەکەن؟ | دێ پشکداریا مە کەن؟ |
+| 15 | #26 Delal Bridge: `guestbookLead` | بكل الحب | WITH LOVE | بە هەموو خۆشەویستییەوە | ب هەمی حەژێکرنێ |
+| 16 | #26 Delal Bridge: `closingLead` | بكل الحب والامتنان | WITH LOVE AND GRATITUDE | بە خۆشەویستی و سوپاسەوە | ب حەژێکرن و سوپاسیێ |
+| 17 | #26 Delal Bridge: `closing` | شكراً لأنكم جزء من قصتنا، حضوركم أجمل هدية | Thank you for being part of our story. Your presence is the most beautiful gift. | سوپاس کە بەشێکن لە چیرۆکەکەمان، ئامادەبوونتان جوانترین دیارییە | سوپاس کو هوین پشکەک ژ چیرۆکا مەنە، ئامادەبوونا هەوە جوانترین دیاریە |
+| 18 | #26 Delal Bridge: `keepsakeClosing` | شكراً من القلب لكل من شاركنا فرحتنا | With heartfelt thanks to everyone who shared our joy | لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون | ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری |
+
+## Batch 51 — newborn designs #7 Bluebird Garden and #8 Rosebird Garden v4 («Little Blue» / «Little Rose», the owner's edit) — ✅ AUTO-APPROVED (2026-11-02, owner checks in Admin → Translations)
 
 The online announcement's lines (each design's `copy.ts`). In Kurdish the praise and the du'a stay in Arabic, as in the owner's designs; `{n}`/`{the}`/`{order}` are the birth order the customer picks. #8 lists only the lines that differ from #7.
 
