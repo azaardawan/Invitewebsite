@@ -25,7 +25,7 @@ import { productData, spacedPhone } from '@/server/products/data';
 import { cleanPosterChoices, resolvePoster } from '@/lib/poster-choices';
 import { handlePosterPhotoRequest, handlePosterRequest } from '@/server/posters/http';
 import { randomToken } from '@/lib/crypto';
-import { activeTheme, testManifest } from '../fixtures';
+import { activeTheme, testManifest, weddingValues } from '../fixtures';
 import { ctx, uniqueKey } from '../helpers';
 
 /** Couples (owner, 2026-10-31): a template design filled in place, with photos (as many as the package sells) and one video. */
@@ -155,6 +155,21 @@ describe('template designs are filled in place', () => {
     const [log] = await db().select().from(auditLogs).where(and(eq(auditLogs.objectId, inv.id), eq(auditLogs.action, 'invitation.text_changed')));
     // The key only: the customer's words stay out of the log.
     expect(log?.after).toEqual({ key: 'field:person_2_name' });
+    // Once published, a required text cannot be emptied.
+    const cleared = await handleTemplateTextRequest(db(), req({ key: 'field:person_2_name', value: '  ' }), inv, { ipHash: null, published: true });
+    expect(cleared.status).toBe(400);
+    expect((await reload(inv.id)).fieldValues.person_2_name).toBe('Ava');
+  });
+
+  it('a design filled with the order form never takes texts here (its changes after publishing are counted self-edits)', async () => {
+    const base = await activeTheme();
+    const d = await createDraft(db(), { themeKey: base.theme.key, packageId: base.full.id, locale: 'ar', values: weddingValues() }, { ...ctx, ipHash: randomToken(8) });
+    const inv = await reload(d.invitationId);
+    const req = new Request('http://x/r/t/text', { method: 'PATCH', body: JSON.stringify({ key: 'field:person_1_name', value: 'Changed' }), headers: { 'Content-Type': 'application/json' } });
+    const res = await handleTemplateTextRequest(db(), req, inv, { ipHash: null, published: true });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'unknownKey' });
+    expect((await reload(inv.id)).fieldValues.person_1_name).toBe(inv.fieldValues.person_1_name);
   });
 });
 

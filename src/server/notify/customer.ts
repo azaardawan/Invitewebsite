@@ -84,7 +84,7 @@ export async function deliverPaidOrders(db: DbOrTx, opts: { now?: Date; send?: W
       .update(orders)
       .set({ deliveredAt: now })
       .where(and(eq(orders.id, id), isNull(orders.deliveredAt)))
-      .returning({ id: orders.id, invitationId: orders.invitationId, customerId: orders.customerId });
+      .returning({ id: orders.id, invitationId: orders.invitationId, customerId: orders.customerId, receiptKeyVersion: orders.receiptKeyVersion });
     if (!claimed) continue;
     result.delivered++;
     const [row] = await db
@@ -100,7 +100,7 @@ export async function deliverPaidOrders(db: DbOrTx, opts: { now?: Date; send?: W
     if (!enabled || !row.phone) continue;
     const lang = templateLang(row.inv.locale);
     const firstName = row.name.trim().split(/\s+/)[0] || row.name;
-    const page = `${site}/r/${receiptTokenFor(claimed.id)}`;
+    const page = `${site}/r/${receiptTokenFor(claimed)}`;
     const sent = [await send(row.phone, lang, { name: e.WHATSAPP_TEMPLATE_PAGE, params: [firstName, page] })];
     if (live) sent.push(await send(row.phone, lang, { name: e.WHATSAPP_TEMPLATE_INVITATION, params: [`${site}${invitationPath(row.inv.slug, row.inv.publicId)}`] }));
     result.messages += sent.filter(Boolean).length;

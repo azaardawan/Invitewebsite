@@ -111,7 +111,7 @@ export async function startPayment(db: DbOrTx, orderId: string, now = new Date()
       label: `${localized(snapshot.theme.name, 'en')} · ${localized(snapshot.package.name, 'en')}`,
       webhookUrl: `${base}/api/webhooks/wayl`,
       webhookSecret: webhookSecretFor(payment.providerReference),
-      redirectionUrl: `${base}/r/${receiptTokenFor(order.id)}?paid=1`,
+      redirectionUrl: `${base}/r/${receiptTokenFor(order)}?paid=1`,
       linkExpiresIn: LINK_TTL.wayl,
     });
   } catch (e) {
@@ -281,10 +281,15 @@ export async function reconcilePayments(db: DbOrTx, now = new Date()) {
 }
 
 /**
- * A WAYL webhook delivery. Stored first (deduplicated by body hash), then
- * treated only as a signal to re-verify with WAYL, so a forged or replayed
- * delivery can never mark anything paid.
+ * A WAYL webhook delivery, treated only as a signal to re-verify with WAYL, so a forged or replayed delivery can never
+ * mark anything paid. A signed delivery is stored (deduplicated by body hash). Anything unsigned is never stored in
+ * full: a delivery for a reference we don't know is dropped, and an unsigned one for a known payment is recorded
+ * without its body, at most once per payment per hour (so nobody can fill the database or make us call WAYL in a loop).
+ * Events are pruned after WEBHOOK_EVENT_RETENTION_DAYS (housekeeping).
  */
+/** Webhook events are kept this long (for support), then deleted by housekeeping. */
+export const WEBHOOK_EVENT_RETENTION_DAYS = 90;
+
 export async function handleWaylWebhook(db: DbOrTx, raw: Buffer, signature: string | null, now = new Date()) {
   let payload: unknown = null;
   try {
@@ -299,16 +304,19 @@ export async function handleWaylWebhook(db: DbOrTx, raw: Buffer, signature: stri
   const [payment] = reference ? await db.select().from(payments).where(eq(payments.providerReference, reference)) : [];
   const signatureValid = payment ? validWebhookSignature(raw, signature, webhookSecretFor(payment.providerReference)) : false;
 
+  if (!payment) return { outcome: 'ignored' as const };
+
+  const hour = Math.floor(now.getTime() / 3_600_000);
   const [event] = await db
     .insert(paymentWebhookEvents)
-    .values({ dedupeKey: sha256Buffer(raw), providerReference: reference, signatureValid, payload: payload ?? null })
+    .values(
+      signatureValid
+        ? { dedupeKey: sha256Buffer(raw), providerReference: reference, signatureValid, payload: payload ?? null }
+        : { dedupeKey: `unsigned:${payment.id}:${hour}`, providerReference: reference, signatureValid, payload: null },
+    )
     .onConflictDoNothing({ target: paymentWebhookEvents.dedupeKey })
     .returning({ id: paymentWebhookEvents.id });
   if (!event) return { outcome: 'duplicate' as const };
-  if (!payment) {
-    await db.update(paymentWebhookEvents).set({ processedAt: now, outcome: 'unknown reference' }).where(eq(paymentWebhookEvents.id, event.id));
-    return { outcome: 'ignored' as const };
-  }
   let outcome: string;
   try {
     outcome = await verifyPayment(db, payment.id, now);

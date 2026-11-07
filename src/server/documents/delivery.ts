@@ -23,21 +23,21 @@ export function keepsakeReady(inv: Pick<InvitationRow, 'status' | 'featureKeys' 
 /** The paying customer's phone, private receipt links and invitation number, for "Send on WhatsApp" in Admin. */
 export async function customerDelivery(db: DbOrTx, invitationId: string) {
   const [row] = await db
-    .select({ orderId: orders.id, phone: customers.phoneE164, name: customers.name })
+    .select({ orderId: orders.id, receiptKeyVersion: orders.receiptKeyVersion, phone: customers.phoneE164, name: customers.name })
     .from(orders)
     .innerJoin(customers, eq(customers.id, orders.customerId))
     .where(and(eq(orders.invitationId, invitationId), eq(orders.status, 'PAID')))
     .orderBy(desc(orders.paidAt))
     .limit(1);
   if (!row) return null;
-  const base = `${env().APP_URL.replace(/\/$/, '')}/r/${receiptTokenFor(row.orderId)}`;
+  const base = `${env().APP_URL.replace(/\/$/, '')}/r/${receiptTokenFor({ id: row.orderId, receiptKeyVersion: row.receiptKeyVersion })}`;
   return {
     phone: row.phone,
     name: row.name,
     receiptUrl: base,
     cardUrl: `${base}/card`,
     keepsakeUrl: `${base}/keepsake`,
-    accessCode: formatAccessCode(accessCodeFor(row.orderId)),
+    accessCode: formatAccessCode(accessCodeFor({ id: row.orderId, receiptKeyVersion: row.receiptKeyVersion })),
   };
 }
 

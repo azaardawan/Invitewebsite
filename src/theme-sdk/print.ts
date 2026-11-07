@@ -66,7 +66,7 @@ export type PrintCardProps = PrintBase & {
 
 /**
  * The back of the printable card (`print/CardBack.tsx`, optional): the same theme as the front but its
- * own layout. A big title and a smaller message, both written by the customer, then the couple's names
+ * own layout. Landscape (the card turned sideways) unless the manifest sets `print.card.back: 'portrait'`. A big title and a smaller message, both written by the customer, then the couple's names
  * (or their signature). Without a CardBack the platform prints a simple back with the theme's border.
  */
 export type PrintCardBackProps = PrintBase & {

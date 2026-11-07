@@ -584,7 +584,7 @@
         "shapesIntro": "The customer picks one of these instead of the card when the package includes \"Shaped printed card\". The print-shop file adds the cut line around the shape.",
         "withCutLine": "with cut line",
         "heading": "Printable card design",
-        "intro": "The front (portrait) and back (landscape) of this theme’s printable card. Each side uses the theme’s own design until you upload your own artwork for it; the invitation’s text is then written on your artwork with the colours, fonts and placement you choose here. Changes apply to every card downloaded from now on.",
+        "intro": "The front (portrait) and back (landscape, or portrait when the design draws it upright) of this theme’s printable card. Each side uses the theme’s own design until you upload your own artwork for it; the invitation’s text is then written on your artwork with the colours, fonts and placement you choose here. Changes apply to every card downloaded from now on.",
         "front": "Front",
         "back": "Back",
         "editFront": "Edit the front",
@@ -596,6 +596,7 @@
         "noFront": "This design has no printable front of its own, so a simple front with the customer's details is printed until you upload artwork.",
         "sizeFront": "Artwork for the front: portrait, 154 × 216 mm including 3 mm bleed on every side (at least 1800 × 2520 px). Leave out the text; keep important artwork away from the edges.",
         "sizeBack": "Artwork for the back: landscape, 216 × 154 mm including 3 mm bleed on every side (at least 2520 × 1800 px). Leave out the text: the customer’s big title, message and signatures are written on it.",
+        "sizeBackPortrait": "Artwork for the back: portrait (upright, like the front), 154 × 216 mm including 3 mm bleed on every side (at least 1800 × 2520 px). Leave out the text: the customer’s big title, message and signatures are written on it.",
         "artwork": "Artwork (JPG, PNG or WebP)",
         "accent": "Names and big title colour",
         "ink": "Text colour",
@@ -748,7 +749,11 @@
         "reason": "Please write a reason (5–500 characters).",
         "refunded": "This order was refunded.",
         "wayl": "Couldn't reach WAYL. Try again in a moment."
-      }
+      },
+      "reissueLinks": "Issue new links",
+      "reissueLinksHelp": "The customer's receipt link and invitation number are replaced; the old ones stop working at once (for example after a staff member who saw them has left). Send the new ones to the customer.",
+      "reissueLinksConfirm": "Replace this order’s receipt link and invitation number? The old ones stop working immediately.",
+      "linksReissued": "New links issued. The old receipt link and invitation number no longer work: send the new ones to the customer."
     },
     "invitations": {
       "heading": "Invitations",
@@ -1403,6 +1408,7 @@
       "previewExpired": "This preview has expired. Please start your order again.",
       "notFound": "We couldn't find this order.",
       "locked": "This order can no longer be edited.",
+      "alreadyOrdered": "An order has already been placed for this invitation. Open the receipt link we sent you, or type your invitation number on “My invitation”.",
       "termsRequired": "Please accept the terms to continue.",
       "invalidCustomer": "Please check your contact details.",
       "packageChanged": "This package has changed since you started. Please start your order again.",

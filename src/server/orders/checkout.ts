@@ -53,7 +53,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
   const reuse = (order: typeof orders.$inferSelect): CheckoutResult => ({
     orderId: order.id,
     orderNumber: order.orderNumber,
-    receiptToken: receiptTokenFor(order.id),
+    receiptToken: receiptTokenFor(order),
     amountIqd: order.amountIqd,
     reused: true,
   });
@@ -67,12 +67,13 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     if (!draft) throw new OrderError('previewExpired');
     const [inv] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
 
-    // A second tap/tab after the order exists: return that order instead of creating another.
+    // The order already exists (a double tap returns it above, by its idempotency key). Never hand its
+    // receipt link to someone who only holds the preview link: that link may have been shared.
     const [active] = await tx
-      .select()
+      .select({ id: orders.id })
       .from(orders)
       .where(and(eq(orders.invitationId, inv!.id), inArray(orders.status, ['PENDING', 'AWAITING_PAYMENT', 'PAID'])));
-    if (active) return reuse(active);
+    if (active) throw new OrderError('alreadyOrdered');
     if (inv!.status !== 'DRAFT') throw new OrderError('locked');
 
     // Re-check availability and price now (the theme may have been archived or re-priced since the draft).
@@ -150,10 +151,10 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
         .returning();
     }
     if (!order) throw new Error('Could not allocate an order number');
-    const receiptToken = receiptTokenFor(order.id);
+    const receiptToken = receiptTokenFor(order);
     await tx
       .update(orders)
-      .set({ receiptTokenHash: receiptTokenHash(receiptToken), accessCodeHash: accessCodeHash(accessCodeFor(order.id)) })
+      .set({ receiptTokenHash: receiptTokenHash(receiptToken), accessCodeHash: accessCodeHash(accessCodeFor(order)) })
       .where(eq(orders.id, order.id));
     await tx
       .update(invitations)

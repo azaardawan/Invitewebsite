@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { auditLogs, guestResponses, invitations } from '@/server/db/schema';
+import { auditLogs, guestResponses, invitations, rateLimitBuckets } from '@/server/db/schema';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
@@ -108,14 +108,36 @@ describe('guest responses', () => {
     expect(await submit(crypto.randomUUID(), { name: 'سارة', attendance: 'ATTENDING' })).toEqual({ ok: false, error: 'closed' });
   });
 
-  it('rate-limits one visitor', async () => {
-    const inv = await published();
+  it('rate-limits one visitor, on one invitation and across invitations', async () => {
+    const invs = await Promise.all([published(), published(), published(), published()]);
     const ipHash = randomToken(8);
     // One clock for every reply, so the burst never straddles the start of a new hour (the limit is per hour).
     const now = new Date();
-    const send = () => submitGuestResponse(db(), { invitationId: inv.id, response: { name: 'سارة', attendance: 'ATTENDING' }, ipHash, clientToken: randomToken(24) }, now);
-    for (let i = 0; i < GUEST_RATE_LIMITS.perIpPerHour; i++) expect(await send()).toEqual({ ok: true });
-    expect(await send()).toEqual({ ok: false, error: 'rateLimited' });
+    const send = (invitationId: string) => submitGuestResponse(db(), { invitationId, response: { name: 'سارة', attendance: 'ATTENDING' }, ipHash, clientToken: randomToken(24) }, now);
+    for (let i = 0; i < GUEST_RATE_LIMITS.perIpPerInvitationPerHour; i++) expect(await send(invs[0]!.id)).toEqual({ ok: true });
+    expect(await send(invs[0]!.id)).toEqual({ ok: false, error: 'rateLimited' });
+    let sent = GUEST_RATE_LIMITS.perIpPerInvitationPerHour + 1;
+    for (const inv of invs.slice(1)) {
+      for (let i = 0; i < GUEST_RATE_LIMITS.perIpPerInvitationPerHour && sent < GUEST_RATE_LIMITS.perIpPerHour; i++, sent++) expect(await send(inv.id)).toEqual({ ok: true });
+    }
+    expect(await send(invs[3]!.id)).toEqual({ ok: false, error: 'rateLimited' });
+  });
+
+  it('a full invitation budget never stops a guest correcting their reply', async () => {
+    const inv = await published();
+    const now = new Date();
+    const phone = randomToken(24);
+    const reply = (attendance: 'ATTENDING' | 'NOT_ATTENDING', clientToken: string) =>
+      submitGuestResponse(db(), { invitationId: inv.id, response: { name: 'سارة', attendance }, ipHash: randomToken(8), clientToken }, now);
+    expect(await reply('ATTENDING', phone)).toEqual({ ok: true });
+    // Someone uses up the invitation's hourly budget for new replies.
+    await db()
+      .insert(rateLimitBuckets)
+      .values({ key: `guest:inv:${inv.id}`, windowStart: new Date(Math.floor(now.getTime() / 3_600_000) * 3_600_000), count: GUEST_RATE_LIMITS.perInvitationPerHour })
+      .onConflictDoUpdate({ target: [rateLimitBuckets.key, rateLimitBuckets.windowStart], set: { count: GUEST_RATE_LIMITS.perInvitationPerHour } });
+    expect(await reply('ATTENDING', randomToken(24))).toEqual({ ok: false, error: 'rateLimited' });
+    expect(await reply('NOT_ATTENDING', phone)).toEqual({ ok: true });
+    expect((await listGuestResponses(db(), inv.id)).map((r) => r.attendance)).toEqual(['NOT_ATTENDING']);
   });
 
   it('hides and restores a message with an audit entry that does not copy the text', async () => {

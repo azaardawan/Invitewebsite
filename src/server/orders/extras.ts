@@ -56,6 +56,30 @@ function cleanLine(text: string) {
   return text.replace(/\s+/g, ' ').trim();
 }
 
+/** New signatures already processed and stored (by prestoreSignatures): the asset, or 'invalid'. */
+export type StoredSignatures = Partial<Record<'signature' | 'signature2', { id: string } | null | 'invalid'>>;
+
+/**
+ * Decodes, re-encodes and stores the new signatures in `extras` *before* the caller opens its transaction: that work
+ * takes seconds for a big drawing and must never hold a database connection and a row lock while it runs.
+ */
+export async function prestoreSignatures(db: DbOrTx, featureKeys: readonly string[], extras: Pick<OrderExtras, 'signature' | 'signature2'>): Promise<StoredSignatures> {
+  const stored: StoredSignatures = {};
+  if (!featureKeys.includes('signature')) return stored;
+  for (const key of ['signature', 'signature2'] as const) {
+    const input = extras[key];
+    if (input === undefined || input === 'keep' || input === 'none' || input === '') continue;
+    try {
+      const asset = await storeSignature(db, input);
+      stored[key] = asset ? { id: asset.id } : null;
+    } catch (e) {
+      if (!(e instanceof MediaError)) throw e;
+      stored[key] = 'invalid';
+    }
+  }
+  return stored;
+}
+
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
 export async function extrasUpdate(
   db: DbOrTx,
@@ -73,6 +97,8 @@ export async function extrasUpdate(
     cardShapes?: readonly string[];
   },
   extras: OrderExtras,
+  /** Signatures already stored by prestoreSignatures (then nothing heavy happens here). */
+  stored: StoredSignatures = {},
 ) {
   const set: Partial<
     Pick<
@@ -107,14 +133,21 @@ export async function extrasUpdate(
     set.cardOptions = next;
   }
 
-  for (const [input, column, strokesColumn, strokes] of [
-    [extras.signature, 'signatureAssetId', 'signatureStrokes', extras.signatureStrokes],
-    [extras.signature2, 'signature2AssetId', 'signature2Strokes', extras.signature2Strokes],
+  for (const [key, input, column, strokesColumn, strokes] of [
+    ['signature', extras.signature, 'signatureAssetId', 'signatureStrokes', extras.signatureStrokes],
+    ['signature2', extras.signature2, 'signature2AssetId', 'signature2Strokes', extras.signature2Strokes],
   ] as const) {
     if (input === undefined || input === 'keep' || !inv.featureKeys.includes('signature')) continue;
     if (input === 'none' || input === '') {
       set[column] = null;
       set[strokesColumn] = null;
+    } else if (key in stored) {
+      const done = stored[key];
+      if (done === 'invalid') errors.signature = 'invalid';
+      else {
+        set[column] = done?.id ?? null;
+        set[strokesColumn] = set[column] ? parseSignatureStrokes(strokes) : null;
+      }
     } else {
       try {
         set[column] = (await storeSignature(db, input))?.id ?? null;

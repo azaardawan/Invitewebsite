@@ -58,15 +58,33 @@ describe('password step', () => {
     expect(session.id).not.toContain(result.token);
   });
 
-  it('locks the account after 5 failures, even for the right password', async () => {
+  it('locks an address after 5 failures for an email, even for the right password', async () => {
     const admin = await makeAdmin();
+    const attacker = { ...ctx, ipHash: `atk-${admin.id}` };
     for (let i = 0; i < 5; i++) {
-      await loginWithPassword(db(), { email: admin.email, password: `wrong-${i}-password` }, { ...ctx, ipHash: `ip-${i}` });
+      await loginWithPassword(db(), { email: admin.email, password: `wrong-${i}-password` }, attacker);
     }
-    expect(await loginWithPassword(db(), { email: admin.email, password: admin.password }, ctx)).toEqual({
+    expect(await loginWithPassword(db(), { email: admin.email, password: admin.password }, attacker)).toEqual({
       ok: false,
       error: 'rateLimited',
     });
+  });
+
+  it('failures from other addresses never lock the real admin out', async () => {
+    const admin = await makeAdmin();
+    for (let i = 0; i < 10; i++) {
+      await loginWithPassword(db(), { email: admin.email, password: `wrong-${i}-password` }, { ...ctx, ipHash: `other-${admin.id}-${i}` });
+    }
+    expect((await loginWithPassword(db(), { email: admin.email, password: admin.password }, { ...ctx, ipHash: `owner-${admin.id}` })).ok).toBe(true);
+  });
+
+  it('concurrent wrong passwords cannot get past the limit', async () => {
+    const admin = await makeAdmin();
+    const ip = { ...ctx, ipHash: `burst-${admin.id}` };
+    const results = await Promise.all(
+      Array.from({ length: 20 }, (_, i) => loginWithPassword(db(), { email: admin.email, password: `wrong-${i}-password` }, ip)),
+    );
+    expect(results.filter((r) => !r.ok && r.error === 'invalid').length).toBeLessThanOrEqual(5);
   });
 
   it('refuses disabled users', async () => {

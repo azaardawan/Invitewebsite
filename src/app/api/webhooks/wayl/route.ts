@@ -11,7 +11,8 @@ const MAX_BODY = 64 * 1024;
  */
 export async function POST(req: Request) {
   const ipHash = hashIp(clientIpFrom(req.headers));
-  if (ipHash && !(await consumeRateLimit(db(), `wayl-webhook:${ipHash}`, 600, 3600))) {
+  // Without a client address every such delivery shares one budget (never unlimited).
+  if (!(await consumeRateLimit(db(), `wayl-webhook:${ipHash ?? 'no-ip'}`, 600, 3600))) {
     return Response.json({ ok: false }, { status: 429 });
   }
   const raw = Buffer.from(await req.arrayBuffer());

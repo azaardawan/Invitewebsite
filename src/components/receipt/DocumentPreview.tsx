@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react';
  * One file on the receipt: a picture that opens the PDF, and a download button. The picture may take a
  * few seconds the first time (it is drawn on the server), so a soft placeholder shows until it arrives;
  * without a picture (an uploaded card) the tile just says PDF. With `back` (the printable card), a button
- * turns the card over: it flips in 3D from the portrait front to the landscape back and back again.
+ * turns the card over: it flips in 3D from the portrait front to the back (landscape, or portrait when the design draws
+ * it upright) and back again.
  */
 export function DocumentPreview({
   title,
@@ -18,7 +19,7 @@ export function DocumentPreview({
 }: {
   title: string;
   imageSrc: string | null;
-  back?: { src: string; title: string };
+  back?: { src: string; title: string; portrait?: boolean };
   openHref: string;
   downloadHref: string;
   labels: { download: string; pdf: string; flip?: string };
@@ -42,7 +43,7 @@ export function DocumentPreview({
     }, 300);
   };
 
-  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: 'aspect-[210/148]' } : { src: imageSrc, alt: title, ratio: 'aspect-[148/210]' };
+  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: back.portrait ? 'aspect-[148/210]' : 'aspect-[210/148]' } : { src: imageSrc, alt: title, ratio: 'aspect-[148/210]' };
 
   return (
     <figure className="flex min-w-0 flex-col gap-2">

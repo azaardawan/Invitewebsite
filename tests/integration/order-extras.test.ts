@@ -2,16 +2,16 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import sharp from 'sharp';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { auditLogs, invitations, themes } from '@/server/db/schema';
+import { assets, auditLogs, invitations, themes } from '@/server/db/schema';
 import { syncThemesFromRegistry, transitionTheme, updateThemeSettings } from '@/server/catalog/themes';
 import { createPackage } from '@/server/catalog/packages';
 import { listPalettes, savePalette, setPaletteStatus } from '@/server/catalog/palettes';
-import { createDraft, updateDraft } from '@/server/orders/drafts';
+import { createDraft, DRAFT_EDIT_LIMITS, updateDraft } from '@/server/orders/drafts';
 import { invitationRenderData } from '@/server/invitation/load';
 import { invitationCards, printData, shapeSheet } from '@/server/documents/data';
 import { updateCardOptions } from '@/server/documents/documents';
 import { manifestSchema } from '@/theme-sdk/manifest';
-import { storeImage } from '@/server/media/assets';
+import { deleteOrphanSignatures, storeImage } from '@/server/media/assets';
 import { randomToken } from '@/lib/crypto';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
@@ -423,5 +423,31 @@ describe('signature drawn again (strokes)', () => {
     const inv = await row(d.invitationId);
     expect(inv.signatureStrokes).toEqual(strokes);
     expect(inv.signature2Strokes).toBeNull();
+  });
+});
+
+describe('draft edits and their signatures', () => {
+  it('a draft takes a limited number of edits per hour', async () => {
+    const d = await draft({});
+    const now = new Date();
+    for (let i = 0; i < DRAFT_EDIT_LIMITS.perDraftPerHour; i++) await updateDraft(db(), d.previewToken, { values: weddingValues() }, now);
+    await expect(updateDraft(db(), d.previewToken, { values: weddingValues() }, now)).rejects.toMatchObject({ code: 'rateLimited' });
+  });
+
+  it('signatures no invitation uses any more are deleted (row and file) a day later', async () => {
+    // Drawings no other test uses (identical images are stored once and shared).
+    const unique = () => STROKE.replace('M20 150', `M${10 + Math.floor(Math.random() * 500)} ${10 + Math.floor(Math.random() * 180)}`);
+    const d = await draft({ signature: await pngDataUrl(unique()) });
+    const first = (await row(d.invitationId)).signatureAssetId!;
+    await updateDraft(db(), d.previewToken, { values: weddingValues(), extras: { signature: await pngDataUrl(unique()) } });
+    const second = (await row(d.invitationId)).signatureAssetId!;
+    expect(second).not.toBe(first);
+    const old = new Date(Date.now() - 2 * 86_400_000);
+    await db().update(assets).set({ createdAt: old }).where(eq(assets.id, first));
+    await db().update(assets).set({ createdAt: old }).where(eq(assets.id, second));
+    expect(await deleteOrphanSignatures(db())).toBeGreaterThanOrEqual(1);
+    expect(await db().select().from(assets).where(eq(assets.id, first))).toEqual([]);
+    // The one in use stays.
+    expect(await db().select().from(assets).where(eq(assets.id, second))).toHaveLength(1);
   });
 });

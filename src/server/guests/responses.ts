@@ -1,5 +1,5 @@
 import 'server-only';
-import { asc, eq, sql } from 'drizzle-orm';
+import { and, asc, eq, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { guestResponses, invitations } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
@@ -10,9 +10,13 @@ import { trackEvent } from '@/server/analytics/events';
 import { sha256 } from '@/lib/crypto';
 import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult } from '@/theme-sdk/types';
 
-/** Per visitor (IP) across all invitations, and per invitation across all visitors. */
-// Mobile carriers put many users behind one address (CGNAT), so the per-IP limit stays generous.
-export const GUEST_RATE_LIMITS = { perIpPerHour: 30, perInvitationPerHour: 300 } as const;
+/**
+ * Per visitor (IP) across all invitations, per visitor on one invitation, and new replies per invitation across all
+ * visitors. Mobile carriers put many users behind one address (CGNAT), so the per-IP limits stay generous.
+ * A correction of an earlier reply (same device and name) never uses the invitation's budget, so filling that budget
+ * cannot stop guests who already replied from changing their answer.
+ */
+export const GUEST_RATE_LIMITS = { perIpPerHour: 30, perIpPerInvitationPerHour: 10, perInvitationPerHour: 300 } as const;
 
 export class GuestResponseError extends Error {
   constructor(public readonly code: 'notFound') {
@@ -64,7 +68,17 @@ export async function submitGuestResponse(
   if (input.ipHash && !(await consumeRateLimit(db, `guest:ip:${input.ipHash}`, GUEST_RATE_LIMITS.perIpPerHour, 3600, now))) {
     return { ok: false, error: 'rateLimited' };
   }
-  if (!(await consumeRateLimit(db, `guest:inv:${inv.id}`, GUEST_RATE_LIMITS.perInvitationPerHour, 3600, now))) {
+  if (input.ipHash && !(await consumeRateLimit(db, `guest:ip-inv:${input.ipHash}:${inv.id}`, GUEST_RATE_LIMITS.perIpPerInvitationPerHour, 3600, now))) {
+    return { ok: false, error: 'rateLimited' };
+  }
+
+  // Same phone + same name = a correction (updates the earlier reply); another name on a shared phone is a new reply.
+  const clientTokenHash = sha256(`${input.clientToken}:${nameKey(name)}`);
+  const [earlier] = await db
+    .select({ id: guestResponses.id })
+    .from(guestResponses)
+    .where(and(eq(guestResponses.invitationId, inv.id), eq(guestResponses.clientTokenHash, clientTokenHash)));
+  if (!earlier && !(await consumeRateLimit(db, `guest:inv:${inv.id}`, GUEST_RATE_LIMITS.perInvitationPerHour, 3600, now))) {
     return { ok: false, error: 'rateLimited' };
   }
 
@@ -75,8 +89,7 @@ export async function submitGuestResponse(
     partySize,
     message: withMessage ? message : null,
     ipHash: input.ipHash,
-    // Same phone + same name = a correction (updates the earlier reply); another name on a shared phone is a new reply.
-    clientTokenHash: sha256(`${input.clientToken}:${nameKey(name)}`),
+    clientTokenHash,
   };
   await db
     .insert(guestResponses)

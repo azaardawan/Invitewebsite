@@ -1712,3 +1712,19 @@ The online announcement's lines (each design's `copy.ts`). In Kurdish the praise
 | 43 | #7 / #8 v4: printed poster shape `arch-oval` | بيضاوي | Oval | هێلکەیی | هێلکەیی |
 | 44 | #7 / #8 v4: printed poster shape `arch-wavy` | إطار متموّج | Wavy frame | چوارچێوەی شەپۆلاوی | چوارچۆڤێ شەپۆلی |
 | 45 | #7 / #8 v4: printed poster shape `arch-corners` | إطار بزوايا مقوّسة | Rounded corners | چوارچێوەی گۆشە خڕ | چوارچۆڤێ گۆشە خڕ |
+
+## Batch 52 — security fixes: an order already placed for this invitation — ✅ AUTO-APPROVED (2026-11-07, owner checks in Admin → Translations)
+
+Shown at checkout when someone with only the preview link tries to order an invitation that already has an order (the receipt link is never handed out that way).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Checkout: `store.errors.alreadyOrdered` | تم تقديم طلب لهذه الدعوة مسبقاً. افتح رابط الإيصال الذي أرسلناه لك، أو اكتب رقم دعوتك في صفحة «دعوتي». | An order has already been placed for this invitation. Open the receipt link we sent you, or type your invitation number on “My invitation”. | پێشتر داواکاری بۆ ئەم بانگهێشتنامەیە کراوە. لینکی پسوولەکە بکەرەوە کە بۆمان ناردوویت، یان ژمارەی بانگهێشتنامەکەت لە «بانگهێشتنامەکەم» بنووسە. | بەری نوکە داخوازی بۆ ڤێ داخوازنامێ هاتیە کرن. لینکا پسوولێ ڤەکە یا مە بۆ تە هنارتی، یان ژمارا داخوازناما خۆ ل «داخوازناما من» بنڤیسە. |
+
+## Batch 53 — Delal Bridge (#26) v2: the bridge-shaped card — ✅ AUTO-APPROVED (2026-11-07, owner checks in Admin → Translations)
+
+The name of the design's shaped card on the order form (manifest `print.shapes`, `arch-bridge`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #26 Delal Bridge v2: card shape `arch-bridge` | جسر | Bridge | پرد | پر |

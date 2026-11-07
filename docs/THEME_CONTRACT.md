@@ -133,8 +133,10 @@ Performance budgets (JS/image size) are reported during M11 hardening.
 ## 6. Print companions
 
 Every printable card is **two pages**: the front (`print/Card.tsx`, **portrait**) and the back
-(`print/CardBack.tsx`, `PrintCardBackProps`, **landscape**: A5 turned sideways, 210 × 148 mm, drawn at
-216 × 154 mm with the 3 mm bleed): the same theme, its own layout. The back gets the customer's big `title`
+(`print/CardBack.tsx`, `PrintCardBackProps`), by default **landscape**: A5 turned sideways, 210 × 148 mm, drawn at
+216 × 154 mm with the 3 mm bleed. A design whose back is drawn upright sets `print.card.back: 'portrait'` in its
+manifest: the back is then printed, pictured and shown on the receipt the same way up as the front (148 × 210 mm,
+drawn at 154 × 216 mm), and Admin asks for upright back artwork (owner, 2026-11-07). Either way: the same theme, its own layout. The back gets the customer's big `title`
 (or a default such as "With love"), their smaller `message` (or null), and `signatures`/`fields` for a closing
 (the signatures, or the names). Each side is printed on its own and the two are joined, so the `<ThemeBorder>`
 you draw on the front also frames the landscape back, laid out for its shape. Without a `CardBack.tsx` the

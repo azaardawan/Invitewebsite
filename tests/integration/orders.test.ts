@@ -87,9 +87,12 @@ describe('checkout', () => {
     const k = key();
     const first = await createOrder(db(), { previewToken: d.previewToken, customer, acceptedTerms: true, idempotencyKey: k }, visitor());
     const sameKey = await createOrder(db(), { previewToken: d.previewToken, customer, acceptedTerms: true, idempotencyKey: k }, visitor());
-    const otherTab = await createOrder(db(), { previewToken: d.previewToken, customer, acceptedTerms: true, idempotencyKey: key() }, visitor());
     expect(sameKey).toMatchObject({ orderNumber: first.orderNumber, receiptToken: first.receiptToken, reused: true });
-    expect(otherTab.orderNumber).toBe(first.orderNumber);
+    // Another checkout with only the preview link never receives the existing order's receipt link.
+    await expect(
+      createOrder(db(), { previewToken: d.previewToken, customer, acceptedTerms: true, idempotencyKey: key() }, visitor()),
+    ).rejects.toMatchObject({ code: 'alreadyOrdered' });
+    expect(await db().select().from(orders).where(eq(orders.invitationId, (await db().select().from(orders).where(eq(orders.orderNumber, first.orderNumber)))[0]!.invitationId))).toHaveLength(1);
     expect(first.amountIqd).toBe(60000);
 
     const [order] = await db().select().from(orders).where(eq(orders.orderNumber, first.orderNumber));

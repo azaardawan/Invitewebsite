@@ -56,6 +56,37 @@ describe('housekeeping', () => {
     expect(await runHousekeeping(db(), new Date(), { prepareKeepsakes: false })).toMatchObject({ repliesDeleted: 0, keepsakesDeleted: 0 });
   });
 
+  it('deletes the collages, posters and other pictures made from the customer photos with them', async () => {
+    const old = await publishedWithKeepsake();
+    await db().update(invitations).set({ expiresAt: new Date(Date.now() - 400 * 86_400_000) }).where(eq(invitations.id, old.id));
+    const kinds = ['COLLAGE_WALL_JPG', 'COLLAGE_WALL_PREVIEW', 'POSTER_PORTRAIT_JPG', 'POSTER_LANDSCAPE_PREVIEW', 'OG_IMAGE', 'PRINT_CARD'] as const;
+    const keys: string[] = [];
+    for (const kind of kinds) {
+      const key = `documents/${crypto.randomUUID()}.png`;
+      await storage().put(key, Buffer.from('x'), 'image/png');
+      await db().insert(generatedDocuments).values({ invitationId: old.id, kind, storageKey: key, sourceHash: 'h', byteSize: 1, themeVersionId: old.themeVersionId });
+      keys.push(key);
+    }
+    const result = await runHousekeeping(db(), new Date(), { prepareKeepsakes: false });
+    expect(result.documentsDeleted).toBeGreaterThanOrEqual(kinds.length + 1);
+    expect(await db().select().from(generatedDocuments).where(eq(generatedDocuments.invitationId, old.id))).toEqual([]);
+    for (const key of keys) expect(await storage().get(key)).toBeNull();
+  });
+
+  it('deletes every watermarked preview of an order left unpaid for a week, collages and posters included', async () => {
+    const visitor = { ...ctx, ipHash: randomToken(8) };
+    const d = await createDraft(db(), { themeKey: shop.theme.key, packageId: shop.full.id, locale: 'ar', values: weddingValues() }, visitor);
+    const [draft] = await db().select().from(invitations).where(eq(invitations.id, d.invitationId));
+    for (const kind of ['COLLAGE_STORY_PREVIEW', 'POSTER_PORTRAIT_PREVIEW', 'STORY_PREVIEW'] as const) {
+      const key = `documents/${crypto.randomUUID()}.png`;
+      await storage().put(key, Buffer.from('x'), 'image/png');
+      await db().insert(generatedDocuments).values({ invitationId: d.invitationId, kind, storageKey: key, sourceHash: 'h', byteSize: 1, themeVersionId: draft!.themeVersionId });
+    }
+    await db().update(invitations).set({ updatedAt: new Date(Date.now() - 8 * 86_400_000) }).where(eq(invitations.id, d.invitationId));
+    await runHousekeeping(db(), new Date(), { prepareKeepsakes: false });
+    expect(await db().select().from(generatedDocuments).where(eq(generatedDocuments.invitationId, d.invitationId))).toEqual([]);
+  });
+
   it('prepares the keepsake of an invitation that ended in the last 7 days', async () => {
     const ended = await publishedWithKeepsake();
     await db().update(invitations).set({ expiresAt: new Date(Date.now() - 2 * 86_400_000) }).where(eq(invitations.id, ended.id));

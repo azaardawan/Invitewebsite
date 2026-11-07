@@ -12,8 +12,8 @@ type CardData = Awaited<ReturnType<typeof cardData>>;
 const BASE = 'html,body{margin:0;padding:0;background:#fff}';
 
 /**
- * Both sides of the printable card, as Chromium prints them: the front (portrait), then the back (landscape,
- * its own @page size). Each side is the owner's artwork when set in Admin, otherwise the theme's own design
+ * Both sides of the printable card, as Chromium prints them: the front (portrait), then the back (landscape, or
+ * portrait when the design says so; its own @page size). Each side is the owner's artwork when set in Admin, otherwise the theme's own design
  * (the back falls back to the platform's simple back). `view` prints one side only (the PDF joins them; each
  * side is also a picture on the receipt). The Admin card preview uses the same component with sample data.
  */
@@ -59,7 +59,8 @@ export async function CardPages({
   const backSheet = { width: data.backPage.width, height: data.backPage.height, overflow: 'hidden', position: 'relative' } as const;
   const backSide = (
     <div style={{ ...vars, page: view === 'back' ? undefined : 'back' } as React.CSSProperties}>
-      <div style={backSheet}>
+      {/* `data-card-side`: the picture renderers photograph the back at its own size (landscape or portrait). */}
+      <div data-card-side="back" style={backSheet}>
         {data.design.back ? (
           <ArtworkCardBack {...data.back} design={data.design.back} sheet={data.sheet} />
         ) : Back ? (

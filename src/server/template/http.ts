@@ -2,7 +2,6 @@ import 'server-only';
 import { eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations } from '@/server/db/schema';
-import { recordAudit } from '@/server/audit/audit';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { PREVIEW_TTL_MS } from '@/server/orders/common';
 import { PhotoError } from '@/server/photos/photos';
@@ -26,10 +25,9 @@ export async function handleTemplateTextRequest(db: DbOrTx, req: Request, inv: I
   const body = (await req.json().catch(() => null)) as { key?: unknown; value?: unknown } | null;
   if (typeof body?.key !== 'string' || typeof body.value !== 'string') return json({ error: 'invalid' }, 400);
   try {
-    const value = await setTemplateText(db, inv, body.key, body.value);
-    if (ctx.published) {
-      await recordAudit(db, { actorType: 'CUSTOMER', actorAdminId: null, action: 'invitation.text_changed', objectType: 'invitation', objectId: inv.id, after: { key: body.key } });
-    } else {
+    // After publishing the change is audited by setTemplateText, in its transaction.
+    const value = await setTemplateText(db, inv, body.key, body.value, new Date(), { published: ctx.published });
+    if (!ctx.published) {
       await db.update(invitations).set({ previewExpiresAt: new Date(Date.now() + PREVIEW_TTL_MS) }).where(eq(invitations.id, inv.id));
     }
     return json({ value });

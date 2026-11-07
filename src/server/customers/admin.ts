@@ -59,8 +59,8 @@ export async function customerProfile(db: DbOrTx, customerId: string, now = new 
       amountIqd: r.order.amountIqd,
       createdAt: r.order.createdAt,
       snapshot: r.order.snapshot as OrderSnapshot,
-      receiptPath: `/r/${receiptTokenFor(r.order.id)}`,
-      accessCode: formatAccessCode(accessCodeFor(r.order.id)),
+      receiptPath: `/r/${receiptTokenFor(r.order)}`,
+      accessCode: formatAccessCode(accessCodeFor(r.order)),
       invitation: { id: r.invitation.id, status: r.invitation.status, live: isLive(r.invitation, now), expiresAt: r.invitation.expiresAt },
     })),
   };

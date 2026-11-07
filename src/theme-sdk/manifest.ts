@@ -54,7 +54,17 @@ export type ThemeManifest = {
      * `qrColors`: the QR code in the design's colours instead of black on white (`dark` must contrast strongly
      * with `light` and with the paper under a transparent `light`, e.g. '#00000000').
      */
-    card?: { size: 'A5' | '5x7'; bleedMm: number; qr: boolean; qrColors?: { dark: string; light: string } };
+    card?: {
+      size: 'A5' | '5x7';
+      bleedMm: number;
+      qr: boolean;
+      qrColors?: { dark: string; light: string };
+      /**
+       * How the back is printed and shown: `landscape` (default, the card turned sideways, 210 × 148 mm for A5) or
+       * `portrait` (the same way up as the front, 148 × 210 mm), when the design's back is drawn upright.
+       */
+      back?: 'landscape' | 'portrait';
+    };
     keepsake?: { size: 'A4' };
     /**
      * Shaped printed cards (features `card_leaf`, `card_heart`, `card_arch`; one per shape key `leaf`, `heart`, `arch`): the customer may choose one of these instead of the
@@ -202,6 +212,7 @@ export const manifestSchema = z
             bleedMm: z.number().min(0).max(10),
             qr: z.boolean(),
             qrColors: z.object({ dark: z.string().regex(/^#[0-9a-fA-F]{6}$/), light: z.string().regex(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/) }).optional(),
+            back: z.enum(['landscape', 'portrait']).optional(),
           })
           .optional(),
         keepsake: z.object({ size: z.literal('A4') }).optional(),
@@ -370,4 +381,9 @@ export function fieldIsOptional(manifest: Pick<ThemeManifest, 'optionalFields'> 
 
 export function codeRef(m: Pick<ThemeManifest, 'key' | 'version'>) {
   return `${m.key}@${m.version}`;
+}
+
+/** Whether the design's A5 card back is printed upright like the front (manifest `print.card.back: 'portrait'`). */
+export function cardBackPortrait(manifest: Pick<ThemeManifest, 'print'> | null | undefined): boolean {
+  return manifest?.print?.card?.back === 'portrait';
 }

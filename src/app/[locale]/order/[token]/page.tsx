@@ -196,7 +196,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             // The posters have their own step (above) in a template design.
             featureKeys={posters ? draft.featureKeys.filter((k) => !(ANY_POSTER_FEATURES as readonly string[]).includes(k)) : draft.featureKeys}
             stickerShape={draft.current.stickerShape}
-            cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale)}
+            cards={cardPictures(draft.featureKeys, draft.current.cardChoices, draft.current.cardShapes, draft.locale, draft.current.cardBackPortrait)}
             watermarked
             labels={{
               title: t('extras.title'),

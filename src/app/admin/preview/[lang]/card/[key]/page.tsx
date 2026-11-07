@@ -25,7 +25,7 @@ const query = z.object({
 });
 
 /**
- * Admin sample of one side of a theme's printable card (front portrait, back landscape), with the owner's
+ * Admin sample of one side of a theme's printable card (front portrait, back landscape or upright), with the owner's
  * artwork when set: exactly what the PDF prints, with sample names. Embedded on the theme page.
  */
 export default async function CardSamplePreview({ params, searchParams }: PageProps<'/admin/preview/[lang]/card/[key]'>) {
