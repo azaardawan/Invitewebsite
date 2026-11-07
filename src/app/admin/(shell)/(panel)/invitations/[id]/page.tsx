@@ -25,6 +25,7 @@ import { invitationPath } from '@/lib/ids';
 import { accessCodeFor, formatAccessCode } from '@/server/orders/tokens';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
+import { reissueLinksAction } from '@/app/admin/_actions/orders';
 import {
   cardOptionsAction,
   editInvitationAction,
@@ -76,6 +77,8 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   // The customer's photos (packages with `photos`): looked at here, and taken off when unsuitable.
   const photos = inv.featureKeys.includes('photos') ? await listPhotos(db(), inv.id) : null;
   const canEdit = can(authz, 'invitations.edit');
+  const canReissue = can(authz, 'payments.override');
+  const to = await getTranslations('admin.orders');
   // The customer's own song (packages with `custom_music`): it plays instead of the design's; taken off on a complaint.
   const song = await customSong(db(), inv);
   const [fields, tracks, guests, counts] = await Promise.all([
@@ -173,8 +176,18 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
             <span className="text-muted">({o.status})</span>{' '}
             <span className="text-muted">· {t('accessCode')}: </span>
             <span className="font-mono" dir="ltr">
-              {formatAccessCode(accessCodeFor(o.id))}
+              {formatAccessCode(accessCodeFor(o))}
             </span>
+            {canReissue ? (
+              <details className="mt-1">
+                <summary className="cursor-pointer text-xs text-danger">{to('reissueLinks')}</summary>
+                <ActionForm action={reissueLinksAction} confirmMessage={to('reissueLinksConfirm')} className="mt-2 space-y-2">
+                  <input type="hidden" name="orderId" value={o.id} />
+                  <span className="block text-xs text-muted">{to('reissueLinksHelp')}</span>
+                  <SubmitButton tone="danger">{to('reissueLinks')}</SubmitButton>
+                </ActionForm>
+              </details>
+            ) : null}
           </p>
         ))}
       </Card>

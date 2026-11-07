@@ -109,7 +109,7 @@ export async function editDraftAction(_prev: OrderFormState, form: FormData): Pr
   const token = str(form, 'token');
   const values = fieldValues(form);
   try {
-    await updateDraft(db(), token, { values, locale: invitationLocale(form, locale), extras: orderExtras(form) });
+    await updateDraft(db(), token, { values, locale: invitationLocale(form, locale), extras: orderExtras(form) }, new Date(), await requestContext());
   } catch (e) {
     return failure(e, typedValues(form));
   }

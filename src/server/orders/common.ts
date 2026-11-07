@@ -14,6 +14,7 @@ export class OrderError extends Error {
       | 'previewExpired'
       | 'notFound'
       | 'locked'
+      | 'alreadyOrdered'
       | 'termsRequired'
       | 'invalidCustomer'
       | 'packageChanged'

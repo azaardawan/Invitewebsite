@@ -170,11 +170,17 @@ describe('webhooks', () => {
     expect((await orderRow(o.orderId)).status).toBe('AWAITING_PAYMENT');
     const [ev] = await db().select().from(paymentWebhookEvents).where(eq(paymentWebhookEvents.providerReference, ref));
     expect(ev!.signatureValid).toBe(false);
+    // Its body is not kept, and more unsigned deliveries for it (any body) are not stored or checked again this hour.
+    expect(ev!.payload).toBeNull();
+    for (let i = 0; i < 3; i++) expect(await handleWaylWebhook(db(), body(ref, { total: i, pad: 'x'.repeat(i) }), null)).toEqual({ outcome: 'duplicate' });
+    expect(await db().select().from(paymentWebhookEvents).where(eq(paymentWebhookEvents.providerReference, ref))).toHaveLength(1);
   });
 
-  it('unknown references and junk bodies are recorded and ignored', async () => {
+  it('unknown references and junk bodies are ignored and not stored', async () => {
+    const ref = `ORD-NOPE-${randomToken(4)}`;
     expect(await handleWaylWebhook(db(), Buffer.from(`not json ${randomToken(4)}`), null)).toEqual({ outcome: 'ignored' });
-    expect(await handleWaylWebhook(db(), body(`ORD-NOPE-${randomToken(4)}`), null)).toEqual({ outcome: 'ignored' });
+    expect(await handleWaylWebhook(db(), body(ref), null)).toEqual({ outcome: 'ignored' });
+    expect(await db().select().from(paymentWebhookEvents).where(eq(paymentWebhookEvents.providerReference, ref))).toEqual([]);
   });
 });
 

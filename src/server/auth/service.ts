@@ -4,7 +4,7 @@ import type { DbOrTx } from '@/server/db/client';
 import { adminRecoveryCodes, adminUsers } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { hashPassword, passwordProblem, verifyAgainstDummy, verifyPassword } from './password';
-import { isPasswordLoginBlocked, isSecondFactorBlocked, recordAuthAttempt } from './rate-limit';
+import { finishAuthAttempt, startAuthAttempt } from './rate-limit';
 import type { RequestContext } from './request-context';
 import { createSession, nextAuthStep, revokeSession, revokeUserSessions, type AuthStep, type SessionRecord } from './session';
 import {
@@ -29,16 +29,15 @@ export async function loginWithPassword(
   ctx: RequestContext,
 ): Promise<LoginResult> {
   const emailLower = input.email.trim().toLowerCase();
-  if (await isPasswordLoginBlocked(db, emailLower, ctx.ipHash)) {
-    return { ok: false, error: 'rateLimited' };
-  }
+  const attempt = await startAuthAttempt(db, { kind: 'password', emailLower, ipHash: ctx.ipHash });
+  if (attempt.blocked) return { ok: false, error: 'rateLimited' };
 
   const [user] = await db.select().from(adminUsers).where(sql`lower(${adminUsers.email}) = ${emailLower}`);
   const valid = user
     ? user.status === 'ACTIVE' && (await verifyPassword(user.passwordHash, input.password))
     : await verifyAgainstDummy(input.password);
 
-  await recordAuthAttempt(db, { kind: 'password', emailLower, userId: user?.id, ipHash: ctx.ipHash, success: valid });
+  await finishAuthAttempt(db, attempt.id, { success: valid, userId: user?.id });
   if (!valid || !user) {
     if (user) {
       await recordAudit(db, {
@@ -79,7 +78,8 @@ export async function verifySecondFactor(
 ): Promise<SecondFactorResult> {
   const [user] = await db.select().from(adminUsers).where(eq(adminUsers.id, session.userId));
   if (!user?.totpEnabledAt || !user.totpSecretEnc) return { ok: false, error: 'notEnrolled' };
-  if (await isSecondFactorBlocked(db, user.id)) return { ok: false, error: 'rateLimited' };
+  const attempt = await startAuthAttempt(db, { kind: 'totp', userId: user.id, ipHash: ctx.ipHash });
+  if (attempt.blocked) return { ok: false, error: 'rateLimited' };
 
   let usedRecoveryCode = false;
   let accepted = false;
@@ -117,7 +117,7 @@ export async function verifySecondFactor(
     usedRecoveryCode = accepted;
   }
 
-  await recordAuthAttempt(db, { kind: 'totp', userId: user.id, ipHash: ctx.ipHash, success: accepted });
+  await finishAuthAttempt(db, attempt.id, { success: accepted });
   if (!accepted) return { ok: false, error: 'invalid' };
 
   const next = await db.transaction(async (tx) => {
@@ -162,10 +162,11 @@ export async function confirmTotpEnrollment(
 ): Promise<EnrollmentResult> {
   const [user] = await db.select().from(adminUsers).where(eq(adminUsers.id, session.userId));
   if (!user?.totpSecretEnc || user.totpEnabledAt) return { ok: false, error: 'notStarted' };
-  if (await isSecondFactorBlocked(db, user.id)) return { ok: false, error: 'rateLimited' };
+  const attempt = await startAuthAttempt(db, { kind: 'totp', userId: user.id, ipHash: ctx.ipHash });
+  if (attempt.blocked) return { ok: false, error: 'rateLimited' };
 
   const step = verifyTotp(decryptSecret(user.totpSecretEnc), code);
-  await recordAuthAttempt(db, { kind: 'totp', userId: user.id, ipHash: ctx.ipHash, success: step !== null });
+  await finishAuthAttempt(db, attempt.id, { success: step !== null });
   if (step === null) return { ok: false, error: 'invalid' };
 
   const recoveryCodes = generateRecoveryCodes();

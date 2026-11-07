@@ -1,8 +1,8 @@
 import 'server-only';
 import { randomUUID } from 'node:crypto';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, lt, notInArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { assets } from '@/server/db/schema';
+import { assets, invitations } from '@/server/db/schema';
 import { storage, publicMediaUrl } from '@/server/storage';
 import { sha256Buffer } from '@/lib/crypto';
 import { processAudio, processImage, processSignature } from './process';
@@ -81,3 +81,40 @@ export async function storeSignature(db: DbOrTx, dataUrl: string) {
     .returning();
   return row!;
 }
+
+/**
+ * Signature drawings no invitation uses any more (redrawn, cleared, or their draft deleted), a day after they were
+ * stored: the database row and the file. A row something else still points to is left alone.
+ */
+export async function deleteOrphanSignatures(db: DbOrTx, now = new Date()) {
+  const used = db
+    .select({ id: invitations.signatureAssetId })
+    .from(invitations)
+    .where(isNotNull(invitations.signatureAssetId))
+    .union(db.select({ id: invitations.signature2AssetId }).from(invitations).where(isNotNull(invitations.signature2AssetId)));
+  const orphans = await db
+    .select({ id: assets.id, key: assets.storageKey })
+    .from(assets)
+    .where(
+      and(
+        eq(assets.kind, 'IMAGE'),
+        eq(assets.originalFilename, 'signature'),
+        isNull(assets.uploadedBy),
+        notInArray(assets.id, used),
+        lt(assets.createdAt, new Date(now.getTime() - 86_400_000)),
+      ),
+    )
+    .limit(1000);
+  let deleted = 0;
+  for (const o of orphans) {
+    try {
+      await db.delete(assets).where(eq(assets.id, o.id));
+    } catch {
+      continue; // still referenced elsewhere
+    }
+    await storage().delete(o.key).catch(() => {});
+    deleted++;
+  }
+  return deleted;
+}
+

@@ -217,6 +217,11 @@ export const orders = pgTable(
     receiptTokenHash: text('receipt_token_hash').notNull().unique(),
     /** Hash of the customer's 10-digit invitation number (see accessCodeFor); null only before backfill. */
     accessCodeHash: text('access_code_hash').unique(),
+    /**
+     * Which receipt link and invitation number are valid (see receiptTokenFor). Raising it in Admin ("Issue new links")
+     * makes the old link and number stop working, e.g. after they reached someone who should not have them.
+     */
+    receiptKeyVersion: integer('receipt_key_version').notNull().default(0),
     /** Client-generated key: a double-tapped "Pay" returns the same order. */
     idempotencyKey: text('idempotency_key').notNull().unique(),
     paidAt: timestamp('paid_at', { withTimezone: true }),

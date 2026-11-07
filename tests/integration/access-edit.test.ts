@@ -6,7 +6,8 @@ import { auditLogs, invitations, orders, themes } from '@/server/db/schema';
 import { createDraft } from '@/server/orders/drafts';
 import { createOrder } from '@/server/orders/checkout';
 import { markOrderPaid } from '@/server/orders/payment';
-import { ACCESS_RATE_LIMIT, backfillAccessCodes, lookupAccessCode } from '@/server/orders/access';
+import { ACCESS_RATE_LIMIT, backfillAccessCodes, lookupAccessCode, reissueCustomerLinks } from '@/server/orders/access';
+import { getReceipt } from '@/server/orders/receipt';
 import { accessCodeFor, formatAccessCode, normalizeAccessCode, receiptTokenFor } from '@/server/orders/tokens';
 import { SELF_EDIT_LIMIT, customerEditInvitation } from '@/server/invitation/customer-edit';
 import { invitationRenderData } from '@/server/invitation/load';
@@ -40,7 +41,7 @@ describe('invitation number ("My invitation")', () => {
 
   it('opens the customer receipt from the number, with a guess limit', async () => {
     const o = await paidOrder();
-    const code = accessCodeFor(o.orderId);
+    const code = accessCodeFor({ id: o.orderId, receiptKeyVersion: 0 });
     expect(code).toMatch(/^\d{10}$/);
     expect(await lookupAccessCode(db(), formatAccessCode(code), randomToken(8))).toEqual({ ok: true, receiptToken: o.receiptToken });
     expect(await lookupAccessCode(db(), 'abc', randomToken(8))).toEqual({ ok: false, error: 'invalid' });
@@ -55,7 +56,25 @@ describe('invitation number ("My invitation")', () => {
     const o = await paidOrder();
     await db().update(orders).set({ accessCodeHash: null }).where(eq(orders.id, o.orderId));
     expect(await backfillAccessCodes(db())).toBeGreaterThanOrEqual(1);
-    expect(await lookupAccessCode(db(), accessCodeFor(o.orderId), randomToken(8))).toEqual({ ok: true, receiptToken: receiptTokenFor(o.orderId) });
+    expect(await lookupAccessCode(db(), accessCodeFor({ id: o.orderId, receiptKeyVersion: 0 }), randomToken(8))).toEqual({ ok: true, receiptToken: receiptTokenFor({ id: o.orderId, receiptKeyVersion: 0 }) });
+  });
+});
+
+describe('new links for an order (Admin)', () => {
+  it('the old receipt link and invitation number stop working; the new ones open the order', async () => {
+    const o = await paidOrder();
+    const oldCode = accessCodeFor({ id: o.orderId, receiptKeyVersion: 0 });
+    expect(await getReceipt(db(), o.receiptToken)).not.toBeNull();
+    const fresh = await reissueCustomerLinks(db(), o.orderId, { adminId: shop.admin.id, ipHash: null });
+    expect(fresh.receiptToken).not.toBe(o.receiptToken);
+    expect(await getReceipt(db(), o.receiptToken)).toBeNull();
+    expect(await lookupAccessCode(db(), oldCode, randomToken(8))).toEqual({ ok: false, error: 'notFound' });
+    expect((await getReceipt(db(), fresh.receiptToken))?.accessCode).toBe(formatAccessCode(fresh.accessCode));
+    expect(await lookupAccessCode(db(), fresh.accessCode, randomToken(8))).toEqual({ ok: true, receiptToken: fresh.receiptToken });
+    const [log] = await db().select().from(auditLogs).where(eq(auditLogs.objectId, o.orderId)).then((r) => r.filter((l) => l.action === 'order.links_reissued'));
+    // The log never holds the links themselves.
+    expect(JSON.stringify(log)).not.toContain(fresh.receiptToken);
+    expect(log?.after).toEqual({ receiptKeyVersion: 1 });
   });
 });
 

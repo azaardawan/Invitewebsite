@@ -1,6 +1,6 @@
 import 'server-only';
 import { invitationNames } from '@/catalog/fields';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, orders } from '@/server/db/schema';
 import { placeOptionalIn } from '@/server/catalog/occasions';
@@ -12,7 +12,7 @@ import { receiptTokenHash } from '@/server/orders/tokens';
 import { validateFieldValues } from '@/server/orders/validation';
 import { isLocale, type Locale } from '@/i18n/config';
 import { slugFromNames } from '@/lib/ids';
-import { extrasUpdate } from '@/server/orders/extras';
+import { extrasUpdate, prestoreSignatures } from '@/server/orders/extras';
 import { OrderError } from '@/server/orders/common';
 
 /** How many times a customer can change their published invitation themselves (packages with `self_edit`). */
@@ -43,7 +43,16 @@ export async function customerEditInvitation(
   now = new Date(),
 ): Promise<CustomerEditResult> {
   if (input.ipHash && !(await consumeRateLimit(db, `self-edit:${input.ipHash}`, 20, 3600, now))) return { ok: false, error: 'rateLimited' };
+  // New signatures are processed and stored before the transaction (see prestoreSignatures), for a real receipt only.
+  const [found] = await db
+    .select({ status: orders.status, featureKeys: invitations.featureKeys })
+    .from(orders)
+    .innerJoin(invitations, eq(invitations.id, orders.invitationId))
+    .where(eq(orders.receiptTokenHash, receiptTokenHash(input.receiptToken)));
+  if (!found || found.status !== 'PAID') return { ok: false, error: 'notFound' };
+  const stored = await prestoreSignatures(db, found.featureKeys, { signature: input.signature, signature2: input.signature2 });
   return db.transaction(async (tx) => {
+    await tx.execute(sql`set local lock_timeout = '5s'`);
     const [row] = await tx
       .select({ order: orders, inv: invitations })
       .from(orders)
@@ -66,7 +75,12 @@ export async function customerEditInvitation(
     // Signatures can be redrawn too (packages with `signature`): same pads as the order form.
     let signatures;
     try {
-      signatures = await extrasUpdate(tx, inv!, { signature: input.signature, signature2: input.signature2, signatureStrokes: input.signatureStrokes, signature2Strokes: input.signature2Strokes });
+      signatures = await extrasUpdate(
+        tx,
+        inv!,
+        { signature: input.signature, signature2: input.signature2, signatureStrokes: input.signatureStrokes, signature2Strokes: input.signature2Strokes },
+        stored,
+      );
     } catch (e) {
       if (e instanceof OrderError) return { ok: false, error: 'invalidFields', fieldErrors: e.fieldErrors } as const;
       throw e;

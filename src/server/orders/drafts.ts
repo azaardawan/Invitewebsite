@@ -1,6 +1,6 @@
 import 'server-only';
 import { invitationNames } from '@/catalog/fields';
-import { and, eq, gt, inArray } from 'drizzle-orm';
+import { and, eq, gt, inArray, sql } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
 import { invitations, themeVersions } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -12,7 +12,7 @@ import { OrderError, PREVIEW_TTL_MS, fieldDefs, loadPurchasable } from './common
 import { newPreviewToken, previewTokenHash } from './tokens';
 import { trackEvent } from '@/server/analytics/events';
 import { validateFieldValues } from './validation';
-import { extrasUpdate, type OrderExtras } from './extras';
+import { extrasUpdate, prestoreSignatures, type OrderExtras } from './extras';
 import { occasionSectionId, placeOptionalIn, themeOccasions } from '@/server/catalog/occasions';
 
 /** `occasion`: which occasion (section key) the invitation is for, for a design sold in several. */
@@ -107,14 +107,32 @@ export async function findByPreviewToken(db: DbOrTx, token: string, now = new Da
   return row ?? null;
 }
 
+/** Edits of one draft per hour, and from one visitor per hour (each can carry two signature drawings to process). */
+export const DRAFT_EDIT_LIMITS = { perDraftPerHour: 60, perIpPerHour: 120 } as const;
+
 /** The customer corrects their details before paying; each edit extends the preview window. */
 export async function updateDraft(
   db: DbOrTx,
   token: string,
   input: { values: Record<string, unknown>; locale?: Locale; extras?: OrderExtras },
   now = new Date(),
+  ctx: { ipHash: string | null } = { ipHash: null },
 ) {
+  const found = await findByPreviewToken(db, token, now);
+  if (!found) throw new OrderError('previewExpired');
+  if (found.status !== 'DRAFT') throw new OrderError('locked');
+  if (
+    !(await consumeRateLimit(db, `draft-edit:${found.id}`, DRAFT_EDIT_LIMITS.perDraftPerHour, 3600, now)) ||
+    (ctx.ipHash && !(await consumeRateLimit(db, `draft-edit:ip:${ctx.ipHash}`, DRAFT_EDIT_LIMITS.perIpPerHour, 3600, now)))
+  ) {
+    throw new OrderError('rateLimited');
+  }
+  // New signatures are processed and stored first, outside the transaction (see prestoreSignatures).
+  const stored = await prestoreSignatures(db, found.featureKeys, input.extras ?? {});
+
   return db.transaction(async (tx) => {
+    // Never wait long for another edit of the same draft while holding a connection.
+    await tx.execute(sql`set local lock_timeout = '5s'`);
     const draft = await findByPreviewToken(tx, token, now);
     if (!draft) throw new OrderError('previewExpired');
     const [locked] = await tx.select().from(invitations).where(eq(invitations.id, draft.id)).for('update');
@@ -135,6 +153,7 @@ export async function updateDraft(
         locale: input.locale ?? locked!.locale,
       },
       input.extras ?? {},
+      stored,
     );
     await tx
       .update(invitations)

@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { markOrderPaid } from '@/server/orders/payment';
+import { reissueCustomerLinks } from '@/server/orders/access';
+import { requestContext } from '@/server/auth/request-context';
 import { OrderError } from '@/server/orders/common';
 import { verifyLatestForOrder } from '@/server/payments/service';
 import { WaylError } from '@/server/payments/wayl';
@@ -45,4 +47,20 @@ export async function markPaidManuallyAction(_: ActionState, form: FormData): Pr
     if (e instanceof OrderError) return { error: `orders.errors.${e.code === 'refunded' ? 'refunded' : 'invalid'}` };
     throw e;
   }
+}
+
+/** Replaces an order's receipt link and invitation number (the old ones stop working). Owner-level; audited. */
+export async function reissueLinksAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'payments.override' });
+  const orderId = id.safeParse(form.get('orderId'));
+  if (!orderId.success) return { error: 'orders.errors.invalid' };
+  try {
+    await reissueCustomerLinks(db(), orderId.data, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  } catch (e) {
+    if (e instanceof OrderError) return { error: 'orders.errors.invalid' };
+    throw e;
+  }
+  revalidatePath('/admin/orders');
+  revalidatePath('/admin/invitations');
+  return { ok: true, message: 'orders.linksReissued', nonce: Date.now() };
 }

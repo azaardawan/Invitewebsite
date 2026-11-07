@@ -87,7 +87,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
                   {tr(`statuses.${order.status}`)}
                 </Badge>
                 <span className="font-medium">{formatIqd(order.amountIqd, intl)}</span>
-                <Link href={`/r/${receiptTokenFor(order.id)}`} target="_blank" className="text-accent underline">
+                <Link href={`/r/${receiptTokenFor(order)}`} target="_blank" className="text-accent underline">
                   {t('receipt')}
                 </Link>
               </div>

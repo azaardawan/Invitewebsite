@@ -47,7 +47,7 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
     orderId: row.order.id,
     orderNumber: row.order.orderNumber,
     /** The customer's 10-digit invitation number for the "My invitation" page. */
-    accessCode: formatAccessCode(accessCodeFor(row.order.id)),
+    accessCode: formatAccessCode(accessCodeFor(row.order)),
     invoiceNumber: row.order.invoiceNumber,
     status: row.order.status,
     amountIqd: row.order.amountIqd,
