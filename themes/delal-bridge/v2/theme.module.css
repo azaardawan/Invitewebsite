@@ -610,3 +610,18 @@
 .reduced .open {
   animation: none !important;
 }
+
+/* The couple's drawn signatures under the thanks (packages with `signature`). */
+.closingSignature {
+  margin-top: 18px;
+  width: min(100%, 420px);
+}
+.closingSignature > span[data-bahja-signature] {
+  width: 100%;
+}
+.signatureInk {
+  height: 72px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}

@@ -23,7 +23,7 @@ export default defineTheme({
   experience: 'INVITATION',
   sections: ['wedding', 'engagement'],
   fields: [...allFields],
-  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+  features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'signature'],
   // Example packages; the owner builds the real ones in Admin from any combination.
   validStates: [
     // Normal: the opening, names, verse, the celebration card and the thanks.
@@ -36,9 +36,10 @@ export default defineTheme({
       features: ['music', 'countdown', 'map', 'rsvp', 'print_card'],
       fields: [...allFields],
     },
-    // VVIP = complete: + a message in the same form, the guests' messages and the keepsake PDF.
+    // VVIP = complete: + a message in the same form, the guests' messages, the keepsake PDF, the bridge card and the
+    // couple's drawn signatures (on the cards' backs and under the thanks).
     {
-      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch'],
+      features: ['music', 'countdown', 'map', 'rsvp', 'congratulations', 'keepsake_pdf', 'print_card', 'card_arch', 'signature'],
       fields: [...allFields],
     },
   ],
