@@ -1,0 +1,310 @@
+/*
+ * Delal Bridge v2 cards on the owner's artwork (2026-11-07): the A5 card (portrait front, landscape back, 3 mm bleed)
+ * and the bridge-shaped card. Every position is in millimetres, measured on the artwork. Physical units only.
+ */
+
+.a5,
+.back,
+.bridge {
+  --ink: #3d2b1c;
+  --maroon: #7a1f1c;
+  --muted: #6f4a32;
+  --gold: #a87a26;
+  position: relative;
+  color: var(--maroon);
+  font-family: var(--db-text);
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.a5 *,
+.back *,
+.bridge * {
+  box-sizing: border-box;
+}
+.a5 :is(p, h1, figure),
+.back :is(p, h1, figure),
+.bridge :is(p, h1, figure) {
+  margin: 0;
+  font-weight: 400;
+}
+.a5 img,
+.back img,
+.bridge img {
+  display: block;
+}
+
+/* ---------------------------------------------------------------- A5 front (154 × 216 with the bleed) */
+.a5 {
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  background: #f9e2be;
+}
+.a5Art {
+  position: absolute;
+  left: 3mm;
+  top: 3mm;
+  width: 148mm;
+  height: 210mm;
+  object-fit: cover;
+}
+.a5Title,
+.a5Names,
+.a5Details {
+  position: absolute;
+  left: 31mm;
+  right: 31mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.a5Title {
+  top: 54.5mm;
+  height: 10mm;
+  font-family: var(--db-display);
+  font-size: 19pt;
+  line-height: 1.1;
+}
+.a5Names {
+  top: 109.5mm;
+  height: 36mm;
+  font-family: var(--db-display);
+  line-height: 1.05;
+}
+.a5Name {
+  font-size: 30pt;
+  overflow-wrap: anywhere;
+}
+.a5Names[data-long] .a5Name {
+  font-size: 22pt;
+}
+.a5And {
+  margin: 1mm 0 !important;
+  font-size: 18pt;
+  color: var(--gold);
+}
+.a5Details {
+  top: 154.5mm;
+  height: 22mm;
+  gap: 0.6mm;
+  font-family: var(--db-display);
+  font-size: 12pt;
+  line-height: 1.2;
+}
+.a5Details p {
+  overflow-wrap: anywhere;
+}
+.a5Extra {
+  font-family: var(--db-text);
+  font-size: 9pt;
+  color: var(--gold);
+}
+
+/* ---------------------------------------------------------------- A5 back, landscape (216 × 154 with the bleed) */
+.back {
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  background: #f9e0b8;
+}
+.backArt {
+  position: absolute;
+  left: 3mm;
+  top: 3mm;
+  width: 210mm;
+  height: 148mm;
+  object-fit: cover;
+}
+.backSafe {
+  position: absolute;
+  inset: 15mm 30mm 26mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+}
+.backSafe[data-qr] {
+  inset-inline: 42mm;
+}
+.backTitle {
+  font-family: var(--db-display);
+  font-size: 26pt;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.backOrnament {
+  width: 88mm;
+  height: auto;
+}
+.backMessage {
+  max-width: 125mm;
+  font-size: 10.5pt;
+  line-height: 1.55;
+  color: var(--muted);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.backMessage[data-long] {
+  font-size: 9pt;
+}
+.backSignature {
+  max-height: 17mm;
+  width: auto;
+  object-fit: contain;
+}
+.backNames {
+  font-family: var(--db-display);
+  font-size: 16pt;
+}
+.backQr {
+  position: absolute;
+  right: 9.5mm;
+  bottom: 16.5mm;
+  width: 22mm;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0.8mm;
+}
+.backQr img {
+  width: 17.5mm;
+  height: 17.5mm;
+}
+.backQr figcaption {
+  font-size: 5.5pt;
+  line-height: 1.15;
+  color: var(--maroon);
+}
+
+/* ---------------------------------------------------------------- the bridge card (210 × 89.5) */
+.bridge {
+  width: 100%;
+  height: 100%;
+}
+.bridgeArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.bTitle,
+.bNames,
+.bLine,
+.bExtra,
+.bCol,
+.bMessage,
+.bSign {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: anywhere;
+}
+.bTitle {
+  left: 70mm;
+  width: 70mm;
+  top: 22.4mm;
+  height: 9mm;
+  font-family: var(--db-display);
+  font-size: 13pt;
+  line-height: 1.1;
+}
+.bNames {
+  left: 62mm;
+  width: 86mm;
+  top: 34.6mm;
+  height: 9.4mm;
+  font-family: var(--db-display);
+  font-size: 17pt;
+  line-height: 1.05;
+}
+.bNames[data-long] {
+  font-size: 12.5pt;
+}
+.bLine {
+  left: 63mm;
+  width: 84mm;
+  top: 44.4mm;
+  height: 5mm;
+  font-size: 7.4pt;
+  line-height: 1.2;
+  color: var(--muted);
+}
+.bExtra {
+  left: 63mm;
+  width: 84mm;
+  top: 49.3mm;
+  height: 4mm;
+  font-size: 6.4pt;
+  color: var(--gold);
+}
+.bCol {
+  top: 64.4mm;
+  height: 12mm;
+  align-items: flex-start;
+  font-family: var(--db-display);
+  font-size: 7.6pt;
+  line-height: 1.2;
+}
+.bDate {
+  left: 59mm;
+  width: 27.5mm;
+}
+.bTime {
+  left: 90.5mm;
+  width: 29mm;
+}
+.bVenue {
+  left: 124mm;
+  width: 28.5mm;
+}
+.bMessage {
+  left: 64mm;
+  width: 82mm;
+  top: 35.6mm;
+  height: 23mm;
+  font-size: 7.6pt;
+  line-height: 1.45;
+  color: var(--muted);
+  white-space: pre-line;
+}
+.bMessage[data-long] {
+  font-size: 6.5pt;
+}
+.bSign {
+  left: 64mm;
+  width: 82mm;
+  top: 62mm;
+  height: 18mm;
+}
+.bSignature {
+  max-height: 14mm;
+  width: auto;
+  object-fit: contain;
+}
+.bSignNames {
+  font-family: var(--db-display);
+  font-size: 12pt;
+}
+.bQr {
+  position: absolute;
+  left: 180mm;
+  top: 50.2mm;
+  width: 16.6mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6mm;
+}
+.bQr img {
+  width: 16.6mm;
+  height: 16.6mm;
+}
+.bQr figcaption {
+  font-size: 4.6pt;
+  line-height: 1.1;
+  color: var(--maroon);
+}
