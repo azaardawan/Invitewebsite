@@ -1199,6 +1199,16 @@
       "manLong": "Mohammed Al-Hasani|Ahmed Al-Jubouri|Hussein Al-Obaidi|Mustafa Al-Rubaie|Ali Al-Saadi|Haider Al-Mousawi|Ammar Al-Tamimi|Khalid Al-Dulaimi|Samer Al-Azzawi|Yasir Al-Khafaji|Tariq Al-Shammari|Ziad Al-Kubaisi",
       "woman": "Noor|Zainab|Ruqaya|Huda|Duaa|Alaa|Rana|Shaimaa|Marwa|Israa|Ban|Sura|Hiba|Rasha|Nadia|Aseel|Dina|Lama|Raghad|Duha",
       "womanLong": "Zahraa Al-Mousawi|Huda Al-Obaidi|Ruqaya Al-Saadi|Alaa Al-Tamimi|Duaa Al-Rubaie|Marwa Al-Khafaji|Israa Al-Dulaimi|Sura Al-Azzawi|Rana Al-Shammari|Hiba Al-Kubaisi|Shaimaa Al-Jubouri|Ban Al-Karkhi"
+    },
+    "kurdishNames": {
+      "boy": "Ari|Aras|Zhiyar|Diyar|Hemin|Rebwar|Karwan|Alan|Shad|Aso|Barzan|Diler|Zana|Soran|Hawre|Ako|Raman|Sardar|Bestun|Lawa",
+      "boyLong": "Abdulrahman|Mohammed Amin|Abdullah|Nuradin|Saifadin|Abdulaziz|Zainulabidin|Salahadin|Abdulmalik|Abdulkarim|Alaadin|Abdulwahab|Shamsadin|Badradin|Abdulrahim|Abdulhadi|Izadin|Abdulbasit|Muhyadin|Abdullatif",
+      "girl": "Zhila|Vian|Avin|Nazdar|Shilan|Rozhan|Hevi|Bafrin|Dilniya|Shadi|Raz|Nian|Awezan|Lana|Sana|Runak|Kazhal|Gulala|Parez|Zhino",
+      "girlLong": "Nurulhuda|Fatima Zahra|Sidratulmuntaha|Shamsulzuha|Nuriyaqin|Ayatulrahman|Hibatulrahman|Ziaulhuda|Nurulaiman|Zahratulrabi|Bintulhuda|Ruhulfuad",
+      "man": "Ali|Ahmad|Husen|Karwan|Aras|Hemin|Sardar|Diyar|Azad|Shwan|Rebin|Bakhtiyar|Nawzad|Salam|Kamaran|Omed|Rizgar|Hawkar|Farhad|Aso",
+      "manLong": "Ahmad Karim|Ali Hasan|Karwan Omar|Aras Mahmud|Sardar Ibrahim|Hemin Rashid|Azad Salih|Shwan Aziz|Rebin Qadir|Bakhtiyar Hama|Nawzad Osman|Farhad Jalal",
+      "woman": "Zhila|Nazdar|Shilan|Vian|Rozhan|Bafrin|Kazhal|Hero|Suzan|Gulala|Nasrin|Pakhshan|Shirin|Runak|Awat|Hataw|Zhian|Dilniya|Nigar|Sima",
+      "womanLong": "Zhila Ahmad|Nazdar Karim|Shilan Omar|Vian Mahmud|Rozhan Ibrahim|Bafrin Rashid|Kazhal Salih|Hero Aziz|Suzan Qadir|Gulala Hama|Nasrin Osman|Pakhshan Jalal"
     }
   },
   "receipt": {

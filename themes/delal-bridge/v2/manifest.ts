@@ -43,6 +43,8 @@ export default defineTheme({
       fields: [...allFields],
     },
   ],
+  // The storefront sample: in Badini (a Zakho design), with Kurdish names; English visitors see it in English with Kurdish names.
+  sample: { locale: 'bdn', names: 'kurdish' },
   print: {
     card: {
       size: 'A5',

@@ -202,10 +202,13 @@ function sampleGuestbook(locale: Locale) {
 export function sampleValues(
   locale: Locale,
   variant: 'short' | 'long',
-  opts: { now?: Date; babyGender?: 'boy' | 'girl'; seed?: number } = {},
+  opts: { now?: Date; babyGender?: 'boy' | 'girl'; seed?: number; kurdishNames?: boolean } = {},
 ): Record<string, string> {
-  const { names, ...all } = (messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> & { names: SampleNameLists } })
-    .invitationSamples;
+  const { names: plain, kurdishNames, ...all } = (
+    messagesFor(locale) as unknown as { invitationSamples: Record<'short' | 'long', Record<string, string>> & { names: SampleNameLists; kurdishNames?: SampleNameLists } }
+  ).invitationSamples;
+  // Kurdish example names (manifest `sample.names`): Sorani and Badini names are Kurdish already; English has its own list.
+  const names = opts.kurdishNames && kurdishNames ? kurdishNames : plain;
   const now = opts.now ?? new Date();
   const babyGender = opts.babyGender ?? 'boy';
   const date = new Date(now.getTime() + 45 * 86400000).toISOString().slice(0, 10);

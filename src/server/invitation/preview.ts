@@ -25,6 +25,8 @@ export type SampleRequest = {
   colors?: Record<string, string>;
   /** Which occasion to show (a design sold in several); omitted = its main one. */
   occasion?: string;
+  /** Kurdish example names (the storefront sample of a design with manifest `sample.names: 'kurdish'`). */
+  kurdishNames?: boolean;
 };
 
 /**
@@ -77,7 +79,7 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     locale: req.locale,
     fieldKeys,
     features,
-    values: sampleValues(req.locale, req.names ?? 'short', { babyGender: group?.key === 'girl' ? 'girl' : 'boy', seed: themeNumber(theme.key) }),
+    values: sampleValues(req.locale, req.names ?? 'short', { babyGender: group?.key === 'girl' ? 'girl' : 'boy', seed: themeNumber(theme.key), kurdishNames: req.kurdishNames }),
     musicSrc: music ? publicMediaUrl(music.key) : null,
     border: await themeBorder(db, theme.id),
     colorSlots: manifest.colors?.slots ?? [],
