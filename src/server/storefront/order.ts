@@ -11,7 +11,7 @@ import { db } from '@/server/db/client';
 import { invitations, packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { listPhotos, photoSpec, POSTER_PHOTO_PLACE } from '@/server/photos/photos';
 import { customerVideo, videoIncluded } from '@/server/video/video';
-import { wordingDefault } from '@/theme-sdk/manifest';
+import { cardBackPortrait, wordingDefault } from '@/theme-sdk/manifest';
 import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
 import type { Locale } from '@/i18n/config';
@@ -61,6 +61,8 @@ export async function draftByToken(token: string) {
       stickerShape: inv.stickerShape,
       cardChoices: inv.cardChoices,
       cardShapes: (row.manifest as ThemeManifest).print?.shapes ?? [],
+      /** The A5 card's back is drawn upright like the front (manifest `print.card.back`). */
+      cardBackPortrait: cardBackPortrait(row.manifest as ThemeManifest),
       bottleSize: inv.bottleSize,
       birthDate: { style: inv.birthDateStyle, digits: inv.birthDateDigits, value: inv.fieldValues.birth_date ?? null },
       wordingLines: (row.manifest as ThemeManifest).wording ?? [],
@@ -269,10 +271,10 @@ export async function orderFormExtras(
 }
 
 /** The ticked printed cards as ExtrasPreview pictures them: key, the shape's name, and each side's width ÷ height. */
-export function cardPictures(featureKeys: readonly string[], choices: readonly string[] | null | undefined, shapes: readonly CardShape[], locale: Locale) {
+export function cardPictures(featureKeys: readonly string[], choices: readonly string[] | null | undefined, shapes: readonly CardShape[], locale: Locale, backPortrait = false) {
   return chosenCards(featureKeys, choices, shapes.map((x) => x.key)).map((key) => {
     const s = shapes.find((x) => x.key === key);
-    if (!s) return { key, ratio: 148 / 210, backRatio: 210 / 148 };
+    if (!s) return { key, ratio: 148 / 210, backRatio: backPortrait ? 148 / 210 : 210 / 148 };
     return { key, label: localized(s.label, locale), ratio: s.widthMm / s.heightMm, backRatio: s.backSideways ? s.heightMm / s.widthMm : s.widthMm / s.heightMm };
   });
 }

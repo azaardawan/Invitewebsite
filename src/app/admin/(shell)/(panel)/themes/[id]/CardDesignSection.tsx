@@ -4,6 +4,7 @@ import { CARD_FONTS, CARD_SIDE_DEFAULTS, themeArtwork, type ArtworkSlot } from '
 import type { CardDesign, CardSideDesign } from '@/server/db/schema';
 import { printComponents } from '@/theme-registry/print.generated';
 import { manifestByCodeRef } from '@/theme-registry';
+import { cardBackPortrait } from '@/theme-sdk/manifest';
 import { localized } from '@/lib/localized';
 import { SHAPE_MARGIN_MM } from '@/server/documents/data';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
@@ -14,7 +15,8 @@ import { themeCardSideAction } from '@/app/admin/_actions/catalog';
 const input = 'w-full rounded-md border border-line bg-surface px-3 py-2';
 
 /**
- * Admin → Themes → Printable card design: the front (portrait) and back (landscape) of the theme's printable
+ * Admin → Themes → Printable card design: the front (portrait) and back (landscape, or portrait when the design draws
+ * it upright, manifest `print.card.back`) of the theme's printable
  * card. Each side is the theme's own design until the owner uploads artwork for it; the platform then writes
  * the invitation's text on that artwork with the colours, fonts and placement chosen here.
  */
@@ -41,7 +43,9 @@ export async function CardDesignSection({
   const loaders = codeRef ? printComponents[codeRef] : undefined;
   const own = { front: !!loaders?.card, back: !!loaders?.cardBack };
   // The design's shaped cards (leaf, heart…), each sold with its own feature (`card_leaf`, `card_heart`).
-  const shapes = (codeRef ? manifestByCodeRef(codeRef)?.print?.shapes : undefined) ?? [];
+  const manifest = codeRef ? manifestByCodeRef(codeRef) : undefined;
+  const shapes = manifest?.print?.shapes ?? [];
+  const upright = cardBackPortrait(manifest);
   // A design without its own front prints the platform's simple front, so there is always something to show.
   const previewable = true;
   const src = (side: 'front' | 'back') =>
@@ -56,7 +60,7 @@ export async function CardDesignSection({
 
       {previewable ? (
         <div className="flex flex-wrap items-start gap-4" dir="ltr">
-          {/* Front A5 portrait (148 × 210 mm ≈ 559 × 794 px) and back landscape, shown at half size. */}
+          {/* Front A5 portrait (148 × 210 mm ≈ 559 × 794 px) and the back (landscape, or portrait), shown at half size. */}
           <figure className="space-y-1">
             <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: 280, height: 397 }}>
               <iframe title={t('front')} src={src('front')} style={{ width: 560, height: 794, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
@@ -64,8 +68,8 @@ export async function CardDesignSection({
             <figcaption className="text-center text-xs text-muted">{t('front')}</figcaption>
           </figure>
           <figure className="space-y-1">
-            <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: 397, height: 280 }}>
-              <iframe title={t('back')} src={src('back')} style={{ width: 794, height: 560, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
+            <div className="overflow-hidden rounded-md border border-line bg-white" style={upright ? { width: 280, height: 397 } : { width: 397, height: 280 }}>
+              <iframe title={t('back')} src={src('back')} style={{ width: upright ? 560 : 794, height: upright ? 794 : 560, border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
             </div>
             <figcaption className="text-center text-xs text-muted">{t('back')}</figcaption>
           </figure>
@@ -113,7 +117,7 @@ export async function CardDesignSection({
               resolvedSrc={resolved[side]?.src ?? null}
               title={t(side === 'front' ? 'editFront' : 'editBack')}
               using={resolved[side] ? t('usingArtwork') : own[side] ? t('usingTheme') : side === 'back' ? t('usingSimpleBack') : t('usingSimpleFront')}
-              sizeHint={t(side === 'front' ? 'sizeFront' : 'sizeBack')}
+              sizeHint={t(side === 'front' ? 'sizeFront' : upright ? 'sizeBackPortrait' : 'sizeBack')}
               restoreLabel={t(side === 'back' && !own.back ? 'restoreSimple' : side === 'front' && !own.front ? 'restoreSimpleFront' : 'restore')}
             />
           ))

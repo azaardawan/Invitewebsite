@@ -183,8 +183,9 @@ export async function cardData(
     kind === 'card'
       ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
       : { width: `${w + 2 * spec.bleedMm}mm`, height: `${h + 2 * spec.bleedMm}mm`, margin: '0', cropMm: 0 };
-  // The back is landscape: the same card turned sideways (A5 → 210 × 148 mm).
-  const backPage: PageSpec = { ...page, width: page.height, height: page.width };
+  // The back is landscape (the same card turned sideways, A5 → 210 × 148 mm), or upright like the front when the
+  // design draws it that way (manifest `print.card.back: 'portrait'`).
+  const backPage: PageSpec = spec.back === 'portrait' ? { ...page } : { ...page, width: page.height, height: page.width };
   const sheet = { bleedMm: spec.bleedMm, pageHasBleed: kind === 'cardBleed' };
   const gender = base.fields.baby_gender === 'boy' || base.fields.baby_gender === 'girl' ? base.fields.baby_gender : null;
   const look = tintedLook(ownerLook ?? defaultLook(base.colors), gender);

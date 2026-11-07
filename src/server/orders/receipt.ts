@@ -1,6 +1,7 @@
 import 'server-only';
 import { invitationCardDetails } from '@/server/documents/data';
 import { manifestByCodeRef } from '@/theme-registry';
+import { cardBackPortrait } from '@/theme-sdk/manifest';
 import { selfEditState } from '@/server/invitation/customer-edit';
 import { keepsakeReady } from '@/server/documents/delivery';
 import { documentAvailable } from '@/server/documents/documents';
@@ -40,7 +41,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
   if (!row) return null;
   const snapshot = row.order.snapshot as OrderSnapshot;
   // Designs without an online invitation (manifest `onlineInvitation: false`) sell files only: no link.
-  const onlineInvitation = manifestByCodeRef(snapshot.themeVersion.codeRef)?.onlineInvitation !== false;
+  const manifest = manifestByCodeRef(snapshot.themeVersion.codeRef);
+  const onlineInvitation = manifest?.onlineInvitation !== false;
   const cardDetails = await invitationCardDetails(db, row.invitation);
   return {
     /** Internal id, for server-side follow-ups (payment checks); never rendered. */
@@ -60,6 +62,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       hasPrintCard: row.invitation.featureKeys.includes('print_card'),
       /** The printed cards the customer gets (`a5` = the card, and/or shapes: leaf, heart…), in order; one file each. */
       cards: cardDetails.map((c) => c.key),
+      /** The A5 card's back is upright like its front (manifest `print.card.back`), else landscape. */
+      cardBackPortrait: cardBackPortrait(manifest),
       /** Each shaped card's name in the design's languages (the A5 card has none). */
       cardLabels: Object.fromEntries(cardDetails.filter((c) => c.shape).map((c) => [c.key, c.shape!.label])),
       /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */

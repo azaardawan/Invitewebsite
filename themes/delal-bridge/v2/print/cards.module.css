@@ -102,32 +102,32 @@
   color: var(--gold);
 }
 
-/* ---------------------------------------------------------------- A5 back, landscape (216 × 154 with the bleed) */
+/* ---------------------------------------------------------------- A5 back, upright (154 × 216 with the bleed) */
+/* The artwork (1024 × 1536) is fitted to the card's height: 140 × 210 mm, centred, the paper colour either side. */
 .back {
-  width: 216mm;
-  height: 154mm;
+  width: 154mm;
+  height: 216mm;
   overflow: hidden;
-  background: #f9e0b8;
+  background: #fcd59c;
 }
 .backArt {
   position: absolute;
-  left: 3mm;
+  left: 7mm;
   top: 3mm;
-  width: 210mm;
-  height: 148mm;
-  object-fit: cover;
+  width: 140mm;
+  height: 210mm;
 }
 .backSafe {
   position: absolute;
-  inset: 15mm 30mm 26mm;
+  left: 22mm;
+  right: 22mm;
+  top: 24mm;
+  height: 124mm;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3mm;
-}
-.backSafe[data-qr] {
-  inset-inline: 42mm;
+  gap: 4mm;
 }
 .backTitle {
   font-family: var(--db-display);
@@ -135,23 +135,24 @@
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
-.backOrnament {
-  width: 88mm;
-  height: auto;
+.backRule {
+  width: 46mm;
+  height: 0.35mm;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .backMessage {
-  max-width: 125mm;
-  font-size: 10.5pt;
-  line-height: 1.55;
+  max-width: 100mm;
+  font-size: 11pt;
+  line-height: 1.6;
   color: var(--muted);
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
 .backMessage[data-long] {
-  font-size: 9pt;
+  font-size: 9.5pt;
 }
 .backSignature {
-  max-height: 17mm;
+  max-height: 18mm;
   width: auto;
   object-fit: contain;
 }
@@ -159,23 +160,30 @@
   font-family: var(--db-display);
   font-size: 16pt;
 }
+/* Where the artwork's QR was: 123.9–138.9 mm across, 178.4–193.3 mm down (card coordinates, with the bleed). */
 .backQr {
   position: absolute;
-  right: 9.5mm;
-  bottom: 16.5mm;
-  width: 22mm;
+  left: 99mm;
+  top: 178.4mm;
+  width: 39.9mm;
+  height: 15mm;
+  direction: ltr;
   display: flex;
-  flex-direction: column-reverse;
   align-items: center;
-  gap: 0.8mm;
+  justify-content: flex-end;
+  gap: 2mm;
 }
 .backQr img {
-  width: 17.5mm;
-  height: 17.5mm;
+  width: 15mm;
+  height: 15mm;
+  order: 2;
 }
 .backQr figcaption {
-  font-size: 5.5pt;
-  line-height: 1.15;
+  order: 1;
+  max-width: 22mm;
+  font-size: 6pt;
+  line-height: 1.2;
+  text-align: right;
   color: var(--maroon);
 }
 

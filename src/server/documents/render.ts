@@ -1,5 +1,5 @@
 import 'server-only';
-import { chromium, type Browser } from 'playwright-core';
+import { chromium, type Browser, type Locator, type Page } from 'playwright-core';
 import { PDFDocument } from 'pdf-lib';
 import { env } from '@/server/env';
 import { printToken, type ProductView, type RenderKind } from './tokens';
@@ -20,7 +20,7 @@ function printOrigin() {
  * Opens this app's internal print page in headless Chromium and saves it as
  * a PDF at the page size the print page declares (`@page`). Arabic and
  * Kurdish shaping, RTL and the theme's embedded fonts come out right because
- * it is a real browser. Cards are printed one side at a time (portrait front, landscape back) and joined,
+ * it is a real browser. Cards are printed one side at a time (portrait front, landscape or portrait back) and joined,
  * so each side's border is laid out for its own page shape.
  */
 export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
@@ -75,11 +75,18 @@ export const renderShapePng: ShapePngRenderer = async (side, invitationId, opts)
   }
 };
 
+/** One card side as a JPEG: the window is sized to the side first, so a side of any shape is pictured whole. */
+async function shootSide(page: Page, side: Locator, quality: number) {
+  const box = await side.boundingBox();
+  if (box) await page.setViewportSize({ width: Math.max(1, Math.ceil(box.x + box.width)), height: Math.max(1, Math.ceil(box.y + box.height)) });
+  return side.screenshot({ type: 'jpeg', quality });
+}
+
 export type PreviewKind = 'card' | 'cardBack' | 'keepsake' | 'og';
 export type PreviewRenderer = (kind: PreviewKind, invitationId: string, opts?: CardPick) => Promise<Buffer>;
 
 const PX_PER_MM = 96 / 25.4;
-/** Viewport in px: page sizes of what the customer gets (A5 card portrait, back landscape, A4 cover), and 1200 × 630 for link previews. */
+/** Viewport in px: page sizes of what the customer gets (A5 card portrait, back landscape unless the design draws it upright, A4 cover), and 1200 × 630 for link previews. */
 const PREVIEW_VIEWPORT: Record<PreviewKind, { width: number; height: number; scale: number }> = {
   card: { width: Math.round(148 * PX_PER_MM), height: Math.round(210 * PX_PER_MM), scale: 1.2 },
   cardBack: { width: Math.round(210 * PX_PER_MM), height: Math.round(148 * PX_PER_MM), scale: 1.2 },
@@ -111,9 +118,9 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) =
     await page.evaluate(() => document.fonts.ready);
     // The cover's images and entrance settle.
     if (kind === 'og') await page.waitForTimeout(800);
-    // A shaped card (leaf, heart…): its page has its own size; picture the whole page.
+    // A shaped card (leaf, heart…) or the A5 back (landscape or portrait): its page has its own size; picture it.
     const shaped = kind === 'og' ? null : page.locator('[data-card-side]').first();
-    if (shaped && (await shaped.count())) return await shaped.screenshot({ type: 'jpeg', quality: 82 });
+    if (shaped && (await shaped.count())) return await shootSide(page, shaped, 82);
     return await page.screenshot({ type: 'jpeg', quality: 82 });
   } finally {
     await browser.close();
@@ -166,7 +173,7 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square
   'sticker-square.preview': { view: 'sticker', width: mmPx(40), height: mmPx(40), scale: 4, type: 'png', transparent: true },
   'bottle.preview': { view: 'bottle', width: mmPx(215), height: mmPx(55), scale: 1.6, type: 'jpeg' },
   'card.preview': { view: 'card', width: mmPx(148), height: mmPx(210), scale: 1.2, type: 'jpeg' },
-  // The A5 back is landscape (a shaped card's back is pictured at its own size, below).
+  // The A5 back is usually landscape; a portrait back (or a shaped card's) is pictured at its own size, below.
   'cardBack.preview': { view: 'cardBack', width: mmPx(210), height: mmPx(148), scale: 1.2, type: 'jpeg' },
   'collage-polaroids.jpg': { view: 'collagePolaroids', width: 842, height: 1190, scale: 3, type: 'jpeg' },
   'collage-polaroids.preview': { view: 'collagePolaroids', width: 842, height: 1190, scale: 0.6, type: 'jpeg' },
@@ -205,9 +212,9 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
-    // A shaped card (leaf, heart…): its page has its own size; picture the card itself.
+    // A shaped card (leaf, heart…) or the A5 back (landscape or portrait): its page has its own size; picture it.
     const shaped = card ? page.locator('[data-card-side]').first() : null;
-    if (shaped && (await shaped.count())) return await shaped.screenshot({ type: 'jpeg', quality: 84 });
+    if (shaped && (await shaped.count())) return await shootSide(page, shaped, 84);
     return await page.screenshot({ type: shot.type, ...(shot.type === 'jpeg' ? { quality: 84 } : {}), omitBackground: shot.transparent ?? false });
   } finally {
     await browser.close();

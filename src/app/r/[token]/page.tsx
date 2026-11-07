@@ -103,6 +103,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               title: r.invitation.cardLabels[c] ? `${t('printCardTitle')} · ${localized(r.invitation.cardLabels[c]!, locale)}` : t('printCardTitle'),
               download: t('printCardDownload'),
               preview: !r.invitation.customCard,
+              backPortrait: c === 'a5' && r.invitation.cardBackPortrait,
             }))
           : []),
         ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, key: 'keepsake', query: '', title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
@@ -428,7 +429,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                   key={f.key}
                   title={f.title}
                   imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
-                  back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading') } : undefined}
+                  back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading'), portrait: 'backPortrait' in f && f.backPortrait } : undefined}
                   openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
                   downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
                   labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}

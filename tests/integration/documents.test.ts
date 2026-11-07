@@ -15,7 +15,9 @@ import { customerDelivery, keepsakeReady } from '@/server/documents/delivery';
 import { receiptTokenHash } from '@/server/orders/tokens';
 import { orders } from '@/server/db/schema';
 import { PDFDocument } from 'pdf-lib';
-import { printData } from '@/server/documents/data';
+import { cardData, printData } from '@/server/documents/data';
+import { buildThemeProps } from '@/server/invitation/theme-props';
+import { cardBackPortrait, type ThemeManifest } from '@/theme-sdk/manifest';
 import { printToken, verifyPrintToken } from '@/server/documents/tokens';
 import { storage } from '@/server/storage';
 import { randomToken } from '@/lib/crypto';
@@ -281,5 +283,41 @@ describe('owner card artwork', () => {
     doc.addPage([419.53, 595.28]);
     doc.addPage([595.28, 419.53]);
     expect(await uploadCustomCard(db(), inv.id, Buffer.from(await doc.save()), { adminId: shop.admin.id, ipHash: null })).toBe(2);
+  });
+});
+
+describe('the card back', () => {
+  const theme = () =>
+    buildThemeProps({
+      mode: 'live',
+      locale: 'ar',
+      fieldKeys: ['person_1_name', 'person_2_name'],
+      features: ['print_card'],
+      values: { person_1_name: 'علي', person_2_name: 'نور' },
+      musicSrc: null,
+      border: null,
+      signatureSrcs: [],
+      colorSlots: [],
+      colors: null,
+      occasion: 'wedding',
+      birthDateFormat: { style: 'long', digits: 'arab' },
+      wordingLines: [],
+      wording: {},
+      switchDefs: [],
+      switches: {},
+      photos: [],
+      photoSpec: null,
+    });
+  const manifest = (back?: 'landscape' | 'portrait') =>
+    ({ print: { card: { size: 'A5', bleedMm: 3, qr: false, ...(back ? { back } : {}) } } }) as unknown as ThemeManifest;
+
+  it('is landscape by default, and upright like the front when the design says so', async () => {
+    const plain = await cardData(theme(), manifest(), 'card', {}, null, { front: null, back: null });
+    expect(plain.page).toMatchObject({ width: '148mm', height: '210mm' });
+    expect(plain.backPage).toMatchObject({ width: '210mm', height: '148mm' });
+    const upright = await cardData(theme(), manifest('portrait'), 'cardBleed', {}, null, { front: null, back: null });
+    expect(upright.backPage).toMatchObject({ width: '154mm', height: '216mm' });
+    expect(cardBackPortrait(manifest('portrait'))).toBe(true);
+    expect(cardBackPortrait(manifest())).toBe(false);
   });
 });

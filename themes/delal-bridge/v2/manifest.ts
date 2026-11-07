@@ -48,6 +48,8 @@ export default defineTheme({
       bleedMm: 3,
       qr: true,
       qrColors: { dark: '#5a1f1b', light: '#00000000' },
+      // The owner's back is drawn upright, like the front (2026-11-07).
+      back: 'portrait',
     },
     keepsake: { size: 'A4' },
     // The bridge card (owner's artwork, 2026-11-07), sold with `card_arch`; the A5 card (front and back) is the owner's too.
