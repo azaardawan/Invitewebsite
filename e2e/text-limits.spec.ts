@@ -60,7 +60,7 @@ async function domIssues(page: Page): Promise<Found> {
     };
     const out = new Set<string>();
     if (document.documentElement.scrollWidth - document.documentElement.clientWidth > 1) out.add('page-wider-than-screen');
-    const nodes: { node: Text; rects: DOMRect[]; path: string }[] = [];
+    const nodes: { node: Text; rects: DOMRect[]; path: string; turned: boolean }[] = [];
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       const t = n as Text;
@@ -80,7 +80,14 @@ async function domIssues(page: Page): Promise<Found> {
         if (box.width < 1 || box.height < 1 || !rects.some(meets)) hidden = true;
         if (hidden) break;
       }
-      if (rects.length && !hidden) nodes.push({ node: t, rects, path: path(el) });
+      // A turned text's boxes are upright rectangles larger than its letters: not compared with others.
+      let turned = false;
+      for (let a: Element | null = el; a && !turned; a = a.parentElement) {
+        const tf = getComputedStyle(a).transform;
+        const mx = /^matrix\(([^,]+), ([^,]+), ([^,]+)/.exec(tf);
+        if (mx && (Math.abs(Number(mx[2])) > 0.01 || Math.abs(Number(mx[3])) > 0.01)) turned = true;
+      }
+      if (rects.length && !hidden) nodes.push({ node: t, rects, path: path(el), turned });
     }
     for (const { node, rects, path: p } of nodes) {
       // Cut off by a box that hides what runs out of it.
@@ -100,7 +107,7 @@ async function domIssues(page: Page): Promise<Found> {
       for (let j = i + 1; j < nodes.length; j++) {
         const A = nodes[i]!;
         const B = nodes[j]!;
-        if (A.node.parentElement === B.node.parentElement) continue;
+        if (A.node.parentElement === B.node.parentElement || A.turned || B.turned) continue;
         let hit = false;
         for (const a of A.rects) {
           for (const b of B.rects) {
@@ -138,8 +145,9 @@ async function domIssues(page: Page): Promise<Found> {
       if (hidden) continue;
       graphics.push({ el, r, path: path(el) });
     }
-    for (const { node, rects, path: p } of nodes)
+    for (const { node, rects, path: p, turned } of nodes)
       for (const g of graphics) {
+        if (turned) continue;
         if (g.el.contains(node)) continue;
         for (const a of rects) {
           const w = Math.min(a.right, g.r.right) - Math.max(a.left, g.r.left);
@@ -160,9 +168,29 @@ async function domIssues(page: Page): Promise<Found> {
  */
 async function issues(page: Page): Promise<string[]> {
   const found = await domIssues(page);
-  const hide = await page.addStyleTag({ content: '*{color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important;caret-color:transparent!important}svg text{fill:transparent!important;stroke:transparent!important}' });
+  const hide = await page.addStyleTag({ content: '*{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;-webkit-text-stroke:0!important;caret-color:transparent!important}svg text{fill:transparent!important;stroke:transparent!important}' });
+  // Letters painted with a gradient (background-clip: text) are text too: their paint goes with them.
+  const painted = await page.evaluate(() => {
+    const els = [...document.querySelectorAll('*')].filter((e) => {
+      const cs = getComputedStyle(e);
+      return cs.backgroundClip === 'text' || cs.getPropertyValue('-webkit-background-clip') === 'text';
+    }) as HTMLElement[];
+    for (const e of els) {
+      e.dataset.probeBg = e.style.background;
+      e.style.setProperty('background', 'none', 'important');
+    }
+    return els.length;
+  });
   const png = await page.screenshot({ fullPage: true, animations: 'disabled' });
   await hide.evaluate((el) => (el as Element).remove());
+  if (painted)
+    await page.evaluate(() => {
+      for (const e of document.querySelectorAll<HTMLElement>('[data-probe-bg]')) {
+        e.style.removeProperty('background');
+        if (e.dataset.probeBg) e.style.background = e.dataset.probeBg;
+        delete e.dataset.probeBg;
+      }
+    });
   const { data, info } = await sharp(png).removeAlpha().greyscale().raw().toBuffer({ resolveWithObject: true });
   const W = info.width;
   const H = info.height;
@@ -283,6 +311,14 @@ for (const m of manifests) {
             if (found.length) {
               const again = new Set(await render(page, s, lang, json(p, lang, length)));
               found = found.filter((x) => again.has(x));
+            }
+            if (found.length && process.env.TEXT_LIMITS_EXPLAIN) {
+              const texts = await page.evaluate((paths) => paths.map((p) => {
+                const sel = 'body > ' + p.split('>').map((x) => { const m = /^([a-z0-9]+?)(\d+)$/.exec(x)!; return `${m[1]}:nth-of-type(${m[2]})`; }).join(' > ');
+                const el = document.querySelector(sel);
+                return `${p} = «${el?.textContent?.trim().slice(0, 60)}» ${el ? JSON.stringify(el.getBoundingClientRect().toJSON()) : ''}`;
+              }), [...new Set(found.flatMap((x) => x.replace(/^[a-z-]+\/|^cover\//g, '').replace(/^[a-z-]+:/, '').split('|')))]);
+              console.log(`EXPLAIN ${m.key} ${p.key} ${length} ${s.name}/${lang}\n  ${found.join('\n  ')}\n  ${texts.join('\n  ')}`);
             }
             if (found.length) return found.map((x) => `${s.name}/${lang}: ${x}`);
           }
