@@ -41,7 +41,7 @@ function textOf(words: string[], length: number): string {
   return s.slice(0, length).trimEnd().padEnd(length, words[0]![0]);
 }
 
-type Surface = { name: string; url: (lang: Lang, probe: string) => string; invitation: boolean };
+type Surface = { theme?: string; name: string; url: (lang: Lang, probe: string) => string; invitation: boolean };
 type Probe = { key: string; kind: 'field' | 'wording' | 'cardTitle' | 'cardMessage'; max: number; long: boolean };
 
 /** Where a text is and how it looks, so a broken layout can be compared with the design's normal one. */
@@ -194,7 +194,7 @@ async function render(page: Page, surface: Surface, lang: Lang, probe: string): 
   if (!res || res.status() !== 200) return [`status-${res?.status()}`];
   await page.evaluate(() => document.fonts.ready);
   const shot = async (tag: string) => {
-    if (process.env.TEXT_LIMITS_SHOTS) await page.screenshot({ path: `${OUT}/shots/${surface.name}-${lang}-${probe.length}-${tag}.png`, fullPage: true });
+    if (process.env.TEXT_LIMITS_SHOTS) await page.screenshot({ path: `${OUT}/shots/${surface.theme ?? ''}-${surface.name}-${lang}-${probe.length}-${tag}.png`, fullPage: true });
   };
   if (!surface.invitation) {
     await shot('print');
@@ -234,6 +234,8 @@ for (const m of manifests) {
     test.setTimeout(60 * 60_000);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await signInAsNewOwner(page);
+    // A still clock: the countdown must not change between two renders.
+    await page.clock.setFixedTime(new Date('2026-11-01T09:00:00Z'));
     const q = (probe: string) => `v=${m.version}&try=${encodeURIComponent(probe)}`;
     const surfaces: Surface[] = [];
     if (m.onlineInvitation !== false) surfaces.push({ name: 'invitation', invitation: true, url: (l, p) => `/admin/preview/${l}/theme/${m.key}?${q(p)}` });
@@ -243,6 +245,7 @@ for (const m of manifests) {
       for (const side of ['front', 'back'] as const)
         surfaces.push({ name: `${s.key}-${side}`, invitation: false, url: (l, p) => `/admin/preview/${l}/card/${m.key}?shape=${s.key}&side=${side}&${q(p)}` });
 
+    for (const s of surfaces) s.theme = m.key;
     const probes: Probe[] = [];
     for (const f of m.fields) {
       const spec = STANDARD_FIELDS[f as keyof typeof STANDARD_FIELDS] as { type: string; maxLength?: number };
@@ -275,7 +278,12 @@ for (const m of manifests) {
         for (const s of [...relevant(p)].sort((a, b) => Number(a.invitation) - Number(b.invitation)))
           for (const lang of ['en', 'ar'] as const) {
             const before = base.get(`${s.name}/${lang}`)!;
-            const found = (await render(page, s, lang, json(p, lang, length))).filter((x) => !before.has(x));
+            let found = (await render(page, s, lang, json(p, lang, length))).filter((x) => !before.has(x));
+            // Only what shows again on a second render (nothing that moves by itself).
+            if (found.length) {
+              const again = new Set(await render(page, s, lang, json(p, lang, length)));
+              found = found.filter((x) => again.has(x));
+            }
             if (found.length) return found.map((x) => `${s.name}/${lang}: ${x}`);
           }
         return [];
