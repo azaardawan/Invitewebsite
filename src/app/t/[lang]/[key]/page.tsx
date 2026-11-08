@@ -33,9 +33,16 @@ export default async function PublicThemeSample({ params, searchParams }: PagePr
     .where(and(eq(themes.key, key), eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE')));
   if (!live) notFound();
   const q = query.safeParse(await searchParams);
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names, occasion: q.data?.occasion });
-  if (!sample || !manifestByCodeRef(sample.version.codeRef)) notFound();
-  const msgs = invitationMessages(lang);
+  const first = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names, occasion: q.data?.occasion });
+  if (!first || !manifestByCodeRef(first.version.codeRef)) notFound();
+  // A design may show its sample in its own language and with Kurdish names (manifest `sample`); English stays English.
+  const wanted = first.manifest.sample;
+  const locale = wanted?.locale && lang !== 'en' ? wanted.locale : lang;
+  const sample =
+    locale !== lang || wanted?.names === 'kurdish'
+      ? ((await resolveSample(db(), { themeKey: key, locale, packageId: q.data?.pkg, names: q.data?.names, occasion: q.data?.occasion, kurdishNames: wanted?.names === 'kurdish' })) ?? first)
+      : first;
+  const msgs = invitationMessages(locale);
   return (
     <InvitationView
       codeRef={sample.version.codeRef}

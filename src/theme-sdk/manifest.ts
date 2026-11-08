@@ -88,6 +88,12 @@ export type ThemeManifest = {
    */
   onlineInvitation?: boolean;
   /**
+   * The public sample on the storefront (the design with example names). `locale`: the language it shows in
+   * whatever the storefront's language, except on the English storefront, which keeps English. `names: 'kurdish'`:
+   * Kurdish example names in every language (Latin letters in English). E.g. a Zakho design shown in Badini.
+   */
+  sample?: { locale?: 'ar' | 'en' | 'ckb' | 'bdn'; names?: 'kurdish' };
+  /**
    * Lines of the design's own wording the customer may change on the order form (never Quran or du'a):
    * the Arabic is the default (except in the languages listed in `defaultIn`, which default to their
    * version); `versions` are offered as a choice for orders in that language; or the customer writes their
@@ -247,6 +253,7 @@ export const manifestSchema = z
       })
       .optional(),
     onlineInvitation: z.boolean().optional(),
+    sample: z.object({ locale: z.enum(['ar', 'en', 'ckb', 'bdn']).optional(), names: z.literal('kurdish').optional() }).optional(),
     wording: z
       .array(
         z.object({

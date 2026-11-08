@@ -152,9 +152,13 @@
   font-size: 9.5pt;
 }
 .backSignature {
-  max-height: 18mm;
+  height: 17mm;
   width: auto;
+  max-width: 100%;
   object-fit: contain;
+}
+.backSafe > span[data-bahja-signature] {
+  width: 100%;
 }
 .backNames {
   font-family: var(--db-display);
@@ -250,24 +254,28 @@
   color: var(--gold);
 }
 .bCol {
-  top: 64.4mm;
-  height: 12mm;
-  align-items: flex-start;
+  top: 64.6mm;
+  height: 13mm;
+  align-items: center;
   font-family: var(--db-display);
-  font-size: 7.6pt;
-  line-height: 1.2;
+  font-size: 11pt;
+  line-height: 1.12;
+}
+.bCol[data-long] {
+  font-size: 9pt;
 }
 .bDate {
-  left: 59mm;
-  width: 27.5mm;
+  left: 58mm;
+  width: 29.5mm;
 }
 .bTime {
-  left: 90.5mm;
-  width: 29mm;
+  left: 89.6mm;
+  width: 30.8mm;
+  font-size: 13pt;
 }
 .bVenue {
-  left: 124mm;
-  width: 28.5mm;
+  left: 122.5mm;
+  width: 30mm;
 }
 .bMessage {
   left: 64mm;
@@ -289,9 +297,35 @@
   height: 18mm;
 }
 .bSignature {
-  max-height: 14mm;
+  height: 14mm;
   width: auto;
+  max-width: 100%;
   object-fit: contain;
+}
+.bSign > span[data-bahja-signature] {
+  width: 100%;
+}
+/* Two signatures: each in its half, a fine gold line between (where the artwork had it). */
+.bSignPair {
+  position: absolute;
+  left: 64mm;
+  width: 82mm;
+  top: 62mm;
+  height: 18mm;
+  display: grid;
+  grid-template-columns: 1fr 0.3mm 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 3mm;
+  direction: ltr;
+}
+.bSignPair > span[data-bahja-signature] {
+  width: 100%;
+}
+.bSignBar {
+  width: 0.3mm;
+  height: 13mm;
+  background: var(--gold);
 }
 .bSignNames {
   font-family: var(--db-display);

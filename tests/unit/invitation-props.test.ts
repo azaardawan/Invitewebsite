@@ -110,3 +110,15 @@ describe('sample names', () => {
     expect(sampleValues('ar', 'short', { seed: 7 }).baby_name).toBe('سليم');
   });
 });
+
+describe('sample names', () => {
+  it('a design can show Kurdish example names, in Latin letters in English', () => {
+    const en = sampleValues('en', 'short', { seed: 26, kurdishNames: true });
+    const bdn = sampleValues('bdn', 'short', { seed: 26, kurdishNames: true });
+    expect(en.person_1_name).toBe('Sardar');
+    expect(en.person_2_name).toBe('Kazhal');
+    // Badini names are Kurdish already: the same people, in the Badini spelling.
+    expect(bdn.person_1_name).toBe('سەردار');
+    expect(sampleValues('en', 'short', { seed: 26 }).person_1_name).not.toBe('Sardar');
+  });
+});

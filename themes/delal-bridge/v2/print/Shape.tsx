@@ -8,8 +8,9 @@ import p from './cards.module.css';
 /**
  * The bridge card (manifest `print.shapes`, `arch-bridge`, the owner's artwork, 2026-11-07): Delal Bridge's stone arches
  * with the kilim, pomegranates and two painted views, cut along its roofline. Front: the celebration, the names, the
- * invitation line and the date, time and venue under the artwork's icons. Back: the customer's title and message, their
- * signatures (or the names), the tulip, and the QR code in the right arch. Transparent outside the shape.
+ * invitation line and the date, time and venue under the artwork's icons. Back: the customer's title and message, the
+ * couple's drawn signatures (feature `signature`; the names only until they are drawn), the tulip, and the QR code in the
+ * right arch. Transparent outside the shape.
  */
 export default function Shape({ side, widthMm: w, heightMm: h, outline, locale, dir, lang, fields, event, labels, title, message, signatures, qrDataUrl, extraLine, occasion, shape }: PrintShapeProps) {
   const t = copyFor(locale);
@@ -39,9 +40,13 @@ export default function Shape({ side, widthMm: w, heightMm: h, outline, locale, 
           ) : null}
           <p className={p.bLine}>{byOccasion(occasion, t.cardWedding, t.cardEngagement)}</p>
           {extraLine ? <p className={p.bExtra}>{extraLine}</p> : null}
-          <p className={`${p.bCol} ${p.bDate}`}>{event.date?.full ?? ''}</p>
+          <p className={`${p.bCol} ${p.bDate}`} data-long={(event.date?.full.length ?? 0) > 26 ? '' : undefined}>
+            {event.date?.full ?? ''}
+          </p>
           <p className={`${p.bCol} ${p.bTime}`}>{event.time ?? ''}</p>
-          <p className={`${p.bCol} ${p.bVenue}`}>{fields.venue_name ?? ''}</p>
+          <p className={`${p.bCol} ${p.bVenue}`} data-long={(fields.venue_name?.length ?? 0) > 26 ? '' : undefined}>
+            {fields.venue_name ?? ''}
+          </p>
         </>
       ) : (
         <>
@@ -51,9 +56,19 @@ export default function Shape({ side, widthMm: w, heightMm: h, outline, locale, 
               {words}
             </p>
           ) : null}
-          <div className={p.bSign}>
-            {signatures.length ? <Signature signatures={signatures} className={p.bSignature} /> : names ? <p className={p.bSignNames}>{names}</p> : null}
-          </div>
+          {/* The couple's drawn signatures, as in the artwork: two side by side with a fine line between (or one in the
+              middle). Only before any is drawn: the names. */}
+          {signatures.length > 1 ? (
+            <div className={p.bSignPair}>
+              <Signature signatures={signatures.slice(0, 1)} className={p.bSignature} />
+              <span className={p.bSignBar} />
+              <Signature signatures={signatures.slice(1, 2)} className={p.bSignature} />
+            </div>
+          ) : (
+            <div className={p.bSign}>
+              {signatures.length ? <Signature signatures={signatures} className={p.bSignature} /> : names ? <p className={p.bSignNames}>{names}</p> : null}
+            </div>
+          )}
           {qrDataUrl ? (
             <figure className={p.bQr}>
               {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}

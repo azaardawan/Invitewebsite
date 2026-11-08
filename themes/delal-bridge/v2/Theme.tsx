@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
   GuestFormSlot,
+  Signature,
   ThemeBorder,
   formatNumber,
   hasFeature,
@@ -228,6 +229,11 @@ export default function DelalBridge(props: ThemeProps) {
             <p className={c('eyebrow')}>{t.closingLead}</p>
             {names ? <p className={c('closingNames')}>{names}</p> : null}
             <p className={c('message')}>{t.closing}</p>
+            {hasFeature(props, 'signature') && props.signatures.length ? (
+              <div className={c('closingSignature')}>
+                <Signature signatures={props.signatures} className={c('signatureInk')} alt={names ?? ''} />
+              </div>
+            ) : null}
           </footer>
         </main>
       </article>
