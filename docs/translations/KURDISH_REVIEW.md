@@ -1728,3 +1728,7 @@ The name of the design's shaped card on the order form (manifest `print.shapes`,
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #26 Delal Bridge v2: card shape `arch-bridge` | جسر | Bridge | پرد | پر |
+
+## Batch 54 — Kurdish example names for storefront samples — ✅ AUTO-APPROVED (2026-11-08, owner checks in Admin → Translations)
+
+`invitationSamples.kurdishNames` (used by a design whose manifest sets `sample.names: 'kurdish'`, e.g. Delal Bridge v2). In Sorani and Badini these are the same lists as `invitationSamples.names` (already approved, batch of the sample names); English has the same names in Latin letters. Nothing new to translate.
