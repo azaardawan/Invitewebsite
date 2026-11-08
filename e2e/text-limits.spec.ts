@@ -70,7 +70,17 @@ async function domIssues(page: Page): Promise<Found> {
       const range = document.createRange();
       range.selectNodeContents(t);
       const rects = [...range.getClientRects()].filter((r) => r.width > 0.5 && r.height > 0.5);
-      if (rects.length) nodes.push({ node: t, rects, path: path(el) });
+      // Kept out of sight inside a box that hides it (e.g. the card front's copy behind the back): not shown, not checked.
+      let hidden = false;
+      for (let a = el; a && a !== document.documentElement; a = a.parentElement) {
+        const cs = getComputedStyle(a);
+        if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+        const box = a.getBoundingClientRect();
+        const meets = (r: DOMRect) => r.right > box.left && r.left < box.right && r.bottom > box.top && r.top < box.bottom;
+        if (box.width < 1 || box.height < 1 || !rects.some(meets)) hidden = true;
+        if (hidden) break;
+      }
+      if (rects.length && !hidden) nodes.push({ node: t, rects, path: path(el) });
     }
     for (const { node, rects, path: p } of nodes) {
       // Cut off by a box that hides what runs out of it.
