@@ -1,15 +1,15 @@
-import { ThemeBorder, type KeepsakeProps } from '@/theme-sdk';
-import { KILIM_BORDER } from '../border';
-import { copyFor } from '../copy';
-import fonts from '../fonts.module.css';
-import page from '../assets/keepsake-page.webp';
-import divider from '../assets/keepsake-divider.webp';
-import p from './print.module.css';
+import { ThemeBorder, type KeepsakeProps } from "@/theme-sdk";
+import { KILIM_BORDER } from "../border";
+import { copyFor } from "../copy";
+import fonts from "../fonts.module.css";
+import page from "../assets/keepsake-page.webp";
+import divider from "../assets/keepsake-divider.webp";
+import p from "./print.module.css";
 
 /**
  * Keepsake of guest messages, A4 (owner's artwork, 2026-11-08): «Guest Wishes» under the kilim arch, then guest slots
- * of a «Guest Name:» line and ruled lines, with the diamond divider between them and the pomegranate at the foot. Every
- * page is the artwork; each message is written on its slot's lines (a long one gets more lines). The last page is
+ * of a «Guest Name:» line and the message (no ruled lines: owner, 2026-11-08), with the diamond divider between them and the pomegranate at the foot. Every
+ * page is the artwork; each message is written in its slot (a long one gets more room). The last page is
  * filled with empty slots, as in the artwork, so it can also be written in by hand; with no messages yet the keepsake
  * is one page of empty slots. An owner's replacement border is drawn over it; the design's own frame is in the artwork.
  */
@@ -28,23 +28,26 @@ type Slot = { name: string; text: string; lines: number } | null;
 
 function tidy(message: string): string[] {
   const rows = message
-    .replace(/\r/g, '')
-    .split('\n')
+    .replace(/\r/g, "")
+    .split("\n")
     .map((r) => r.trim())
     .filter(Boolean);
   // A message of many short rows is joined so it can't need more lines than a page has.
-  return rows.length > MAX_ROWS ? [rows.join(' ')] : rows;
+  return rows.length > MAX_ROWS ? [rows.join(" ")] : rows;
 }
 
 function linesFor(rows: string[]): number {
-  const n = rows.reduce((sum, r) => sum + Math.max(1, Math.ceil(r.length / CHARS_PER_LINE)), 0);
+  const n = rows.reduce(
+    (sum, r) => sum + Math.max(1, Math.ceil(r.length / CHARS_PER_LINE)),
+    0,
+  );
   return Math.max(MIN_LINES, n);
 }
 
 const height = (lines: number) => HEAD + lines * LINE;
 
 /** Pages of slots: messages in order, then empty slots while they fit on the last page. */
-function paginate(messages: KeepsakeProps['messages']): Slot[][] {
+function paginate(messages: KeepsakeProps["messages"]): Slot[][] {
   const pages: Slot[][] = [];
   let current: Slot[] = [];
   let used = 0;
@@ -58,7 +61,7 @@ function paginate(messages: KeepsakeProps['messages']): Slot[][] {
   for (const m of messages) {
     const rows = tidy(m.message);
     const lines = linesFor(rows);
-    const slot = { name: m.guestName, text: rows.join('\n'), lines };
+    const slot = { name: m.guestName, text: rows.join("\n"), lines };
     if (!place(slot, lines)) {
       pages.push(current);
       current = [];
@@ -71,12 +74,25 @@ function paginate(messages: KeepsakeProps['messages']): Slot[][] {
   return pages;
 }
 
-export default function Keepsake({ locale, dir, lang, messages, border }: KeepsakeProps) {
+export default function Keepsake({
+  locale,
+  dir,
+  lang,
+  messages,
+  border,
+}: KeepsakeProps) {
   const t = copyFor(locale);
   const pages = paginate(messages);
   return (
-    <div className={`${fonts.fonts} ${p.keepsake}`} dir={dir} lang={lang} data-script={locale === 'en' ? 'latin' : 'arabic'}>
-      {border ? <ThemeBorder border={border} fallback={KILIM_BORDER} medium="print" /> : null}
+    <div
+      className={`${fonts.fonts} ${p.keepsake}`}
+      dir={dir}
+      lang={lang}
+      data-script={locale === "en" ? "latin" : "arabic"}
+    >
+      {border ? (
+        <ThemeBorder border={border} fallback={KILIM_BORDER} medium="print" />
+      ) : null}
       {pages.map((slots, i) => (
         <section key={i} className={p.page}>
           {/* eslint-disable-next-line @next/next/no-img-element -- print artwork */}
@@ -86,15 +102,23 @@ export default function Keepsake({ locale, dir, lang, messages, border }: Keepsa
             {slots.map((slot, j) => (
               <article key={j} className={p.slot}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- print artwork */}
-                {j > 0 ? <img className={p.divider} src={divider.src} alt="" /> : null}
+                {j > 0 ? (
+                  <img className={p.divider} src={divider.src} alt="" />
+                ) : null}
                 <div className={p.nameRow}>
                   <span className={p.nameLabel}>{t.guestName}</span>
                   <span className={p.name} dir="auto">
-                    {slot?.name ?? ''}
+                    {slot?.name ?? ""}
                   </span>
                 </div>
-                <p className={p.lines} dir="auto" style={{ minHeight: `${(slot?.lines ?? MIN_LINES) * LINE}mm` }}>
-                  <span className={p.text}>{slot?.text ?? ''}</span>
+                <p
+                  className={p.lines}
+                  dir="auto"
+                  style={{
+                    minHeight: `${(slot?.lines ?? MIN_LINES) * LINE}mm`,
+                  }}
+                >
+                  {slot?.text ?? ""}
                 </p>
               </article>
             ))}

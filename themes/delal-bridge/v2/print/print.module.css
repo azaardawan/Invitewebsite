@@ -1,6 +1,6 @@
 /*
  * Delal Bridge keepsake, A4 (owner's artwork, 2026-11-08). Every page is the artwork without its words; the title, the
- * «Guest Name:» rows, the ruled lines and the dividers are drawn here at the artwork's places. Physical units only;
+ * «Guest Name:» rows and the dividers are drawn here at the artwork's places. Physical units only;
  * the slot sizes are in step with LINE / HEAD / BETWEEN in Keepsake.tsx.
  */
 
@@ -54,7 +54,7 @@
   color: var(--wine);
   white-space: nowrap;
 }
-.keepsake[data-script='arabic'] .title {
+.keepsake[data-script="arabic"] .title {
   font-style: normal;
   font-weight: 700;
   font-size: 11.5mm;
@@ -91,7 +91,7 @@
   line-height: 1;
   color: var(--wine);
 }
-.keepsake[data-script='arabic'] .nameLabel {
+.keepsake[data-script="arabic"] .nameLabel {
   font-style: normal;
   font-weight: 700;
   font-size: 15pt;
@@ -116,18 +116,4 @@
   white-space: pre-line;
   overflow-wrap: anywhere;
   text-align: start;
-  /* One rule near the foot of each line box, kept off the tile's edges so no hairline shows where tiles meet. */
-  background-image: linear-gradient(
-    to bottom,
-    transparent 6.6mm,
-    var(--rule) 6.6mm,
-    var(--rule) 6.86mm,
-    transparent 6.86mm
-  );
-  background-size: 100% 7.22mm;
-}
-/* The words sit on the ruled lines, not between them. */
-.text {
-  position: relative;
-  top: 0.95mm;
 }
