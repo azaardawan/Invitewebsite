@@ -1,191 +1,133 @@
 /*
- * Delal Bridge print companions: the A5 card (+ 3 mm bleed) and the A4 keepsake, on the gateway's cream wall with the
- * kilim garland, rosette and band. Physical units only.
+ * Delal Bridge keepsake, A4 (owner's artwork, 2026-11-08). Every page is the artwork without its words; the title, the
+ * «Guest Name:» rows, the ruled lines and the dividers are drawn here at the artwork's places. Physical units only;
+ * the slot sizes are in step with LINE / HEAD / BETWEEN in Keepsake.tsx.
  */
 
-.card,
 .keepsake {
   --ink: #3d2b1c;
-  --muted: #7a6650;
-  --madder: #962d28;
-  --river: #1d6b73;
-  --gold: #a87a26;
+  --wine: #7d1414;
+  --rule: rgb(92 40 18 / 0.9);
   color: var(--ink);
   font-family: var(--db-text);
-  text-align: center;
-  -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
-.card *,
 .keepsake * {
   box-sizing: border-box;
 }
-.card :is(p, h1, figure),
-.keepsake :is(p, h1, figure) {
+.keepsake :is(p, h1) {
   margin: 0;
   font-weight: 400;
 }
-.card img,
-.keepsake img {
-  display: block;
-  height: auto;
-}
 
-/* ---------------------------------------------------------------- card, A5 + bleed */
-.card {
+.page {
   position: relative;
-  width: 154mm;
-  height: 216mm;
-  overflow: hidden;
-  background: radial-gradient(circle at 50% 42%, #fffaee 0%, #f8eedc 55%, #ecdcbf 100%);
-}
-.garland {
-  position: absolute;
-  top: 3mm;
-  left: 7mm;
-  width: 140mm;
-}
-.band {
-  position: absolute;
-  bottom: 4mm;
-  left: 12mm;
-  width: 130mm;
-}
-.safe {
-  position: absolute;
-  inset: 52mm 18mm 50mm;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2.2mm;
-}
-.ornament {
-  width: 48mm;
-  margin-bottom: 2mm;
-}
-.blessing,
-.line {
-  font-size: 9.5pt;
-  color: var(--muted);
-  line-height: 1.45;
-}
-.names {
-  font-family: var(--db-display);
-  font-size: 30pt;
-  line-height: 1.15;
-  color: var(--madder);
-  overflow-wrap: anywhere;
-}
-.names[data-long] {
-  font-size: 22pt;
-}
-.when {
-  margin-top: 2mm !important;
-  font-family: var(--db-display);
-  font-size: 12pt;
-  color: var(--river);
-}
-.time,
-.venue {
-  font-size: 10pt;
-}
-.message {
-  max-width: 105mm;
-  font-size: 9pt;
-  line-height: 1.5;
-  color: var(--muted);
-  overflow-wrap: anywhere;
-}
-.message[data-long] {
-  font-size: 8pt;
-}
-.extra {
-  font-size: 9pt;
-  color: var(--gold);
-}
-.qr {
-  margin-top: 2mm !important;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1mm;
-}
-.qr img {
-  width: 22mm;
-}
-.qr figcaption {
-  font-size: 6.5pt;
-  color: var(--muted);
-}
-
-/* ---------------------------------------------------------------- keepsake, A4 */
-.keepsake {
-  background: #f8eedc;
-}
-.keepsakeFrame {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-.cover {
-  position: relative;
+  width: 210mm;
   height: 297mm;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5mm;
-  padding: 0 24mm;
   overflow: hidden;
   break-after: page;
-  background: radial-gradient(circle at 50% 45%, #fffaee 0%, #f8eedc 55%, #ecdcbf 100%);
 }
-.coverGarland {
+.page:last-child {
+  break-after: auto;
+}
+.pageArt {
   position: absolute;
-  top: 6mm;
-  left: 10mm;
-  width: 190mm;
+  inset: 0;
+  display: block;
+  width: 210mm;
+  height: 297mm;
 }
-.coverBand {
+
+.title {
   position: absolute;
-  bottom: 10mm;
-  left: 20mm;
-  width: 170mm;
+  top: 35.4mm;
+  left: 40mm;
+  right: 40mm;
+  height: 16mm;
+  font-family: var(--db-script);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14.2mm;
+  line-height: 16mm;
+  text-align: center;
+  color: var(--wine);
+  white-space: nowrap;
 }
-.coverRosette {
-  width: 34mm;
+.keepsake[data-script='arabic'] .title {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11.5mm;
+  top: 34.6mm;
 }
-.coverTitle {
-  font-family: var(--db-display);
-  font-size: 26pt;
-  color: var(--ink);
+
+.slots {
+  position: absolute;
+  top: 63.3mm;
+  left: 16.2mm;
+  right: 16.2mm;
 }
-.messages {
-  padding: 22mm 24mm;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-.note {
+.slot {
   break-inside: avoid;
-  padding: 5mm 0;
-  border-bottom: 0.3mm solid rgb(168 122 38 / 0.4);
-  text-align: start;
 }
-.note p {
+.divider {
+  display: block;
+  width: 105.9mm;
+  height: 5.97mm;
+  margin: 5.16mm auto 2.2mm;
+}
+.nameRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.4mm;
+  height: 5.97mm;
+}
+.nameLabel {
+  flex: none;
+  font-family: var(--db-script);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 13.5pt;
+  line-height: 1;
+  color: var(--wine);
+}
+.keepsake[data-script='arabic'] .nameLabel {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15pt;
+}
+.name {
+  min-width: 67.3mm;
+  max-width: 100%;
+  height: 5.97mm;
+  padding-inline: 1mm;
+  border-bottom: 0.26mm solid var(--rule);
+  font-size: 10.5pt;
+  line-height: 5.6mm;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lines {
+  margin-top: 0.44mm !important;
+  padding-inline: 1mm;
   font-size: 11pt;
-  line-height: 1.6;
+  line-height: 7.22mm;
+  white-space: pre-line;
   overflow-wrap: anywhere;
+  text-align: start;
+  /* One rule near the foot of each line box, kept off the tile's edges so no hairline shows where tiles meet. */
+  background-image: linear-gradient(
+    to bottom,
+    transparent 6.6mm,
+    var(--rule) 6.6mm,
+    var(--rule) 6.86mm,
+    transparent 6.86mm
+  );
+  background-size: 100% 7.22mm;
 }
-.note footer {
-  margin-top: 2mm;
-  font-size: 9.5pt;
-  color: var(--gold);
-}
-.empty,
-.closing {
-  margin-top: 8mm !important;
-  font-family: var(--db-display);
-  font-size: 13pt;
-  color: var(--madder);
+/* The words sit on the ruled lines, not between them. */
+.text {
+  position: relative;
+  top: 0.95mm;
 }
