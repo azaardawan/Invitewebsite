@@ -126,6 +126,16 @@ async function domIssues(page: Page): Promise<Found> {
       const r = el.getBoundingClientRect();
       const area = r.width * r.height;
       if (area < 16 || area > 0.25 * pageArea) continue;
+      // Kept out of sight (as for texts above): not shown.
+      let hidden = false;
+      for (let a: Element | null = el.parentElement; a && a !== document.documentElement; a = a.parentElement) {
+        const cs = getComputedStyle(a);
+        if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+        const box = a.getBoundingClientRect();
+        if (box.width < 1 || box.height < 1 || r.right <= box.left || r.left >= box.right || r.bottom <= box.top || r.top >= box.bottom) hidden = true;
+        if (hidden) break;
+      }
+      if (hidden) continue;
       graphics.push({ el, r, path: path(el) });
     }
     for (const { node, rects, path: p } of nodes)
