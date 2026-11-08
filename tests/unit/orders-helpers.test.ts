@@ -126,7 +126,11 @@ describe('invitation field validation', () => {
     expect(themeTextLimit(null, 'person_1_name', null)).toBe(null);
     expect(cardBackLimits('no-such-design', { title: 40, message: 300 })).toEqual({ title: 40, message: 300 });
     // A longer text is written smaller (down to MIN_TEXT_SCALE), so customers may write up to what fits at that size.
-    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBe(smallerTextLimit(key, n));
+    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBeGreaterThanOrEqual(n);
+    for (const [design, limits] of Object.entries(THEME_TEXT_LIMITS))
+      for (const [key, n] of Object.entries(limits)) expect(themeTextLimit(design, key, 1000)).toBeLessThanOrEqual(smallerTextLimit(key, n));
+    expect(themeTextLimit('vintage-love-letters', 'person_1_name', 40)).toBe(15);
+    expect(themeTextLimit('rosebird-garden', 'baby_name', 40)).toBe(10);
     expect(smallerTextLimit('person_1_name', 10)).toBe(14);
     expect(smallerTextLimit('invitation_message', 32)).toBe(65);
     for (const limits of Object.values(THEME_TEXT_LIMITS)) for (const n of Object.values(limits)) expect(n).toBeGreaterThanOrEqual(8);

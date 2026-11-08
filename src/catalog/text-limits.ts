@@ -30,6 +30,24 @@ export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, 
   'winter-flower': { person_1_name: 21, person_2_name: 15 },
 };
 
+/**
+ * Where a design sets the size of a text itself (so writing it smaller does not take), customers may write only what
+ * was checked to fit (measured with the smaller writing on, owner 2026-11-08). Overrides `smallerTextLimit`.
+ */
+const CHECKED_MAX: Readonly<Record<string, Readonly<Record<string, number>>>> = {
+  bahjaflix: { 'wording.row3': 11 },
+  'bluebird-garden': { father_name: 11, 'wording.sonOf': 11 },
+  'blush-floral': { person_1_name: 23, invitation_message: 38 },
+  'cherry-confetti': { person_1_name: 28 },
+  'cherry-confetti-party': { invitation_message: 32 },
+  'espresso-ivory': { person_2_name: 38, person_1_family: 49, person_2_family: 49 },
+  'pink-ribbon': { person_1_name: 28 },
+  'pink-ribbon-party': { person_1_name: 36, invitation_message: 32 },
+  'rosebird-garden': { baby_name: 10, father_name: 10, 'wording.sonOf': 9 },
+  'vintage-love-letters': { venue_name: 78 },
+  'winter-flower': { person_1_name: 23, person_2_name: 18 },
+};
+
 export type CardBackLimits = { title: number; message: number };
 
 /**
@@ -80,7 +98,7 @@ export function themeTextLimit(themeKey: string | null | undefined, key: string,
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null {
   const fits = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
   if (fits === undefined) return max;
-  const own = smallerTextLimit(key, fits);
+  const own = CHECKED_MAX[themeKey!]?.[key] ?? smallerTextLimit(key, fits);
   return max === null ? own : Math.min(max, own);
 }
 
