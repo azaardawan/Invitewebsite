@@ -1,12 +1,13 @@
 /**
- * The longest each customer text may be on a design (owner, 2026-11-08): beyond it the design breaks (the text runs out
+ * The longest each customer text may be on a design at the design's own size (owner, 2026-11-08): beyond it the design breaks (the text runs out
  * of its place, is cut off, or runs into another text or the artwork's drawing) on the invitation or the printed card.
  * Measured for every design by `e2e/text-limits.spec.ts` (phone 360 px, Arabic and English, cover and opened
  * invitation, card front and back, shaped cards); the low ones were checked by eye. Re-run it after changing a design.
  *
  * Keys: a field (`person_1_name`), a wording line (`wording.<key>`), the printed card's back title and message
  * (`card_title`, `card_message`). A text not listed keeps its usual limit (the Field Library's, the wording line's own,
- * `CARD_BACK_LIMITS`). These only ever lower a limit. A new design: run the probe and add its limits here.
+ * `CARD_BACK_LIMITS`). These only ever lower a limit. Longer texts are written smaller up to `smallerTextLimit` (MIN_TEXT_SCALE), which is
+ * the limit customers get. A new design: run the probe and add its limits here.
  */
 export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   bahjaflix: { 'wording.row1': 16, 'wording.row2': 11, 'wording.row3': 10 },
@@ -31,12 +32,55 @@ export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, 
 
 export type CardBackLimits = { title: number; message: number };
 
-/** The limit of a text on a design: its usual `max`, or the design's own when lower. */
+/**
+ * Owner, 2026-11-08: a text longer than what fits at the design's size is written smaller instead of being refused,
+ * down to this share of its size; the hard limit is then the length that fits at that size.
+ */
+export const MIN_TEXT_SCALE = 0.7;
+
+/** Texts that wrap over several lines: they shrink in both directions (the size goes with the square root). */
+const MULTILINE = new Set(['invitation_message', 'family_names', 'card_message']);
+const power = (key: string) => (MULTILINE.has(key) ? 0.5 : 1);
+
+/** The longest a text may be on a design when written smaller (`fits` letters fit at the design's own size). */
+export function smallerTextLimit(key: string, fits: number): number {
+  return Math.floor(fits / MIN_TEXT_SCALE ** (1 / power(key)));
+}
+
+/**
+ * How much smaller to write a text on a design: 1 while it fits at the design's size, else just enough smaller
+ * (never below MIN_TEXT_SCALE) for it to take the room the longest text that fits takes.
+ */
+export function textScale(themeKey: string | null | undefined, key: string, length: number): number {
+  const fits = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
+  if (fits === undefined || length <= fits) return 1;
+  return Math.max(MIN_TEXT_SCALE, (fits / length) ** power(key));
+}
+
+/** The customer's texts on a design that must be written smaller, the smallest first (see `FitLongTexts`). */
+export function textsToShrink(
+  themeKey: string | null | undefined,
+  texts: Record<string, string | null | undefined>,
+): { text: string; scale: number }[] {
+  return Object.entries(texts)
+    .flatMap(([key, value]) => {
+      const text = value?.trim().replace(/\s+/g, ' ');
+      const scale = text ? textScale(themeKey, key, text.length) : 1;
+      return text && scale < 1 ? [{ text, scale }] : [];
+    })
+    .sort((a, b) => a.scale - b.scale);
+}
+
+/**
+ * The limit of a text on a design: its usual `max`, or, when the design holds less at its own size, the length that
+ * fits written smaller (`smallerTextLimit`), whichever is lower.
+ */
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number): number;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null {
-  const own = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
-  if (own === undefined) return max;
+  const fits = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
+  if (fits === undefined) return max;
+  const own = smallerTextLimit(key, fits);
   return max === null ? own : Math.min(max, own);
 }
 

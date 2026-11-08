@@ -42,11 +42,17 @@ export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
   }
 };
 
+/** Long texts are written smaller by the page itself once it runs (FitLongTexts): wait for it (a few seconds at most). */
+async function textsFitted(page: Page) {
+  await page.waitForFunction(() => !document.querySelector('[data-bahja-fit-pending]'), null, { timeout: 5_000 }).catch(() => {});
+}
+
 async function pdfOf(browser: Browser, path: string, opts: { fillLastPage?: boolean } = {}) {
   const page = await browser.newPage();
   const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
   if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
   await page.evaluate(() => document.fonts.ready);
+  await textsFitted(page);
   if (opts.fillLastPage) await page.evaluate(fillPagesWithLastBackground);
   const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true, tagged: true });
   await page.close();
@@ -112,6 +118,7 @@ export const renderShapePng: ShapePngRenderer = async (side, invitationId, opts)
     const res = await page.goto(`${printOrigin()}/print/${printToken('card', invitationId)}?view=${side}&png=1${cardParam(opts)}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
+    await textsFitted(page);
     return await page.locator('[data-card-side]').first().screenshot({ type: 'png', omitBackground: true });
   } finally {
     await browser.close();
@@ -159,6 +166,7 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) =
     const res = await page.goto(`${printOrigin()}${url}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
+    await textsFitted(page);
     // The cover's images and entrance settle.
     if (kind === 'og') await page.waitForTimeout(800);
     // A shaped card (leaf, heart…) or the A5 back (landscape or portrait): its page has its own size; picture it.
@@ -255,6 +263,7 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
     if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
     await page.evaluate(() => document.fonts.ready);
+    await textsFitted(page);
     // A shaped card (leaf, heart…) or the A5 back (landscape or portrait): its page has its own size; picture it.
     const shaped = card ? page.locator('[data-card-side]').first() : null;
     if (shaped && (await shaped.count())) return await shootSide(page, shaped, 84);

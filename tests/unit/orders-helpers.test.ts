@@ -3,7 +3,7 @@ import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, pub
 import { normalizePhone } from '@/lib/phone';
 import { fieldValuesFromForm, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
-import { cardBackLimits, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
+import { cardBackLimits, smallerTextLimit, textScale, textsToShrink, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
 
 describe('ids and URLs', () => {
   it('public ids are 10 unambiguous characters', () => {
@@ -125,8 +125,20 @@ describe('invitation field validation', () => {
     expect(themeTextLimit('no-such-design', 'person_1_name', 40)).toBe(40);
     expect(themeTextLimit(null, 'person_1_name', null)).toBe(null);
     expect(cardBackLimits('no-such-design', { title: 40, message: 300 })).toEqual({ title: 40, message: 300 });
-    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBe(n);
+    // A longer text is written smaller (down to MIN_TEXT_SCALE), so customers may write up to what fits at that size.
+    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBe(smallerTextLimit(key, n));
+    expect(smallerTextLimit('person_1_name', 10)).toBe(14);
+    expect(smallerTextLimit('invitation_message', 32)).toBe(65);
     for (const limits of Object.values(THEME_TEXT_LIMITS)) for (const n of Object.values(limits)) expect(n).toBeGreaterThanOrEqual(8);
+  });
+
+  it('a text longer than a design holds is written smaller, never below 70%', () => {
+    expect(textScale('rosebird-garden', 'baby_name', 10)).toBe(1);
+    expect(textScale('rosebird-garden', 'baby_name', 12)).toBeCloseTo(10 / 12);
+    expect(textScale('rosebird-garden', 'baby_name', 40)).toBe(0.7);
+    expect(textScale('no-such-design', 'baby_name', 40)).toBe(1);
+    const list = textsToShrink('rosebird-garden', { baby_name: 'Abdulrahman A', father_name: 'Ali', 'wording.sonOf': 'son of Abdulrahman' });
+    expect(list.map((x) => x.text)).toEqual(['son of Abdulrahman', 'Abdulrahman A']);
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {

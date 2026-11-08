@@ -1,3 +1,6 @@
+import { FitLongTexts } from '@/components/invitation/FitLongTexts';
+import { customerTexts } from '@/components/invitation/InvitationView';
+import { textsToShrink } from '@/catalog/text-limits';
 import type React from 'react';
 import type { cardData } from '@/server/documents/data';
 import { printComponents } from '@/theme-registry/print.generated';
@@ -17,6 +20,15 @@ const BASE = 'html,body{margin:0;padding:0;background:#fff}';
  * (the back falls back to the platform's simple back). `view` prints one side only (the PDF joins them; each
  * side is also a picture on the receipt). The Admin card preview uses the same component with sample data.
  */
+/** The card's texts longer than the design holds at its size, to write smaller (src/catalog/text-limits.ts). */
+function cardTextsToShrink(codeRef: string, data: CardData) {
+  return textsToShrink(codeRef.split('@')[0], {
+    ...customerTexts(data.props),
+    card_title: data.back.title,
+    card_message: data.back.message,
+  });
+}
+
 export async function CardPages({
   codeRef,
   data,
@@ -33,9 +45,10 @@ export async function CardPages({
   png?: boolean;
 }) {
   const loaders = printComponents[codeRef];
+  const fit = <FitLongTexts texts={cardTextsToShrink(codeRef, data)} />;
   if (data.shape && loaders?.shape) {
     const Shape = (await loaders.shape()).default;
-    return <ShapePages Shape={Shape} data={data} shape={data.shape} view={view} watermark={watermark} png={png} />;
+    return <ShapePages Shape={Shape} data={data} shape={data.shape} view={view} watermark={watermark} png={png} fit={fit} />;
   }
   const Card = !data.design.front && loaders?.card ? (await loaders.card()).default : null;
   const Back = !data.design.back && loaders?.cardBack ? (await loaders.cardBack()).default : null;
@@ -79,6 +92,7 @@ export async function CardPages({
     return (
       <>
         <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}${BASE}`}</style>
+        {fit}
         <div style={vars}>
           <div style={front}>
             {frontSide}
@@ -94,6 +108,7 @@ export async function CardPages({
     return (
       <>
         <style>{`@page{size:${data.backPage.width} ${data.backPage.height};margin:0}${BASE}`}</style>
+        {fit}
         {Card ? (
           <div aria-hidden style={{ ...vars, height: 0, overflow: 'hidden' }}>
             <Card {...data.props} />
@@ -106,6 +121,7 @@ export async function CardPages({
   return (
     <>
       <style>{`@page{size:${data.page.width} ${data.page.height};margin:0}@page back{size:${data.backPage.width} ${data.backPage.height};margin:0}${BASE}`}</style>
+      {fit}
       <div style={{ ...vars, breakAfter: 'page' }}>
         <div style={front}>
             {frontSide}
@@ -127,6 +143,7 @@ const CUT_COLOR = '#ec008c';
  * the cut line), or for the PNG just the shape on a transparent page. The back is the front's outline mirrored.
  */
 function ShapePages({
+  fit,
   Shape,
   data,
   shape,
@@ -140,6 +157,8 @@ function ShapePages({
   view?: 'front' | 'back';
   watermark: { watermark: string; watermarkNote: string } | null;
   png: boolean;
+  /** Long texts written smaller (FitLongTexts). */
+  fit: React.ReactNode;
 }) {
   const vars = colorVars(data.props.colors);
   const mark = watermark ? <Watermark labels={watermark} /> : null;
@@ -187,6 +206,7 @@ function ShapePages({
   return (
     <>
       <style>{`${pages}${background}`}</style>
+      {fit}
       {view !== 'back' ? side('front') : null}
       {view !== 'front' ? side('back') : null}
     </>
