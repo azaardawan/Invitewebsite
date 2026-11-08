@@ -1,3 +1,4 @@
+import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
 import { posterTextDefault } from '@/lib/poster-texts';
@@ -145,7 +146,7 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
         key: `wording:${w.key}`,
         label: localized(w.label, locale),
         required: false,
-        maxLength: w.maxLength,
+        maxLength: themeTextLimit(manifest.key, `wording.${w.key}`, w.maxLength),
         multiline: false,
         value: inv.wording[w.key] ?? wordingDefault(w, locale),
       })),
@@ -183,6 +184,12 @@ export async function photoState(inv: typeof invitations.$inferSelect) {
   };
 }
 
+/** A design's key (its texts' limits are kept by key, src/catalog/text-limits.ts). */
+async function themeKey(themeId: string): Promise<string | null> {
+  const [row] = await db().select({ key: themes.key }).from(themes).where(eq(themes.id, themeId));
+  return row?.key ?? null;
+}
+
 /**
  * The optional order-form sections for a package: back of the card (print_card), signature pad
  * (signature) and colour sets (color_choice, when the owner made some), with the current choices.
@@ -211,8 +218,9 @@ export async function orderFormExtras(
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
   const extras: OrderFormExtras = {};
+  const designKey = await themeKey(themeId);
   if (featureKeys.includes('print_card')) {
-    extras.cardBack = { title: current.cardOptions?.backTitle ?? '', message: current.cardOptions?.backMessage ?? '', limits: CARD_BACK_LIMITS };
+    extras.cardBack = { title: current.cardOptions?.backTitle ?? '', message: current.cardOptions?.backMessage ?? '', limits: cardBackLimits(designKey, CARD_BACK_LIMITS) };
   }
   if (featureKeys.includes('signature')) extras.signature = { current: current.signatureSrcs ?? [] };
   if (featureKeys.includes('sticker')) extras.sticker = { current: current.stickerShape ?? 'round' };
@@ -247,7 +255,7 @@ export async function orderFormExtras(
         defaultIn: [...(l.defaultIn ?? [])],
         options: [...(l.options ?? [])],
         custom: l.custom !== false,
-        maxLength: l.maxLength,
+        maxLength: themeTextLimit(designKey, `wording.${l.key}`, l.maxLength),
       })),
       current: current.wording ?? {},
     };

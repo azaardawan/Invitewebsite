@@ -3,6 +3,7 @@ import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, pub
 import { normalizePhone } from '@/lib/phone';
 import { fieldValuesFromForm, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
+import { cardBackLimits, smallerTextLimit, textScale, textsToShrink, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
 
 describe('ids and URLs', () => {
   it('public ids are 10 unambiguous characters', () => {
@@ -108,6 +109,40 @@ describe('invitation field validation', () => {
     expect(empty.ok).toBe(true);
     if (empty.ok) expect(empty.values).not.toHaveProperty('venue_name');
     expect(validateFieldValues({ ...good, venue_name: 'x'.repeat(81) }, keysWithVenue, optional, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+  });
+
+  it("a design's own lower limit applies to new text; a value saved before stays", () => {
+    const withVenue = new Map(defs).set('venue_name', { type: 'text', maxLength: 30 });
+    const keysWithVenue = [...keys, 'venue_name'];
+    const old = 'x'.repeat(50);
+    expect(validateFieldValues({ ...good, venue_name: 'y'.repeat(31) }, keysWithVenue, withVenue, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+    expect(validateFieldValues({ ...good, venue_name: old }, keysWithVenue, withVenue, now, { stored: { venue_name: old } }).ok).toBe(true);
+    expect(validateFieldValues({ ...good, venue_name: `${old}z` }, keysWithVenue, withVenue, now, { stored: { venue_name: old } })).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+  });
+
+  it('design text limits only ever lower a limit', () => {
+    const own = Object.keys(THEME_TEXT_LIMITS)[0];
+    expect(themeTextLimit('no-such-design', 'person_1_name', 40)).toBe(40);
+    expect(themeTextLimit(null, 'person_1_name', null)).toBe(null);
+    expect(cardBackLimits('no-such-design', { title: 40, message: 300 })).toEqual({ title: 40, message: 300 });
+    // A longer text is written smaller (down to MIN_TEXT_SCALE), so customers may write up to what fits at that size.
+    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBeGreaterThanOrEqual(n);
+    for (const [design, limits] of Object.entries(THEME_TEXT_LIMITS))
+      for (const [key, n] of Object.entries(limits)) expect(themeTextLimit(design, key, 1000)).toBeLessThanOrEqual(smallerTextLimit(key, n));
+    expect(themeTextLimit('vintage-love-letters', 'person_1_name', 40)).toBe(15);
+    expect(themeTextLimit('rosebird-garden', 'baby_name', 40)).toBe(10);
+    expect(smallerTextLimit('person_1_name', 10)).toBe(14);
+    expect(smallerTextLimit('invitation_message', 32)).toBe(65);
+    for (const limits of Object.values(THEME_TEXT_LIMITS)) for (const n of Object.values(limits)) expect(n).toBeGreaterThanOrEqual(8);
+  });
+
+  it('a text longer than a design holds is written smaller, never below 70%', () => {
+    expect(textScale('rosebird-garden', 'baby_name', 10)).toBe(1);
+    expect(textScale('rosebird-garden', 'baby_name', 12)).toBeCloseTo(10 / 12);
+    expect(textScale('rosebird-garden', 'baby_name', 40)).toBe(0.7);
+    expect(textScale('no-such-design', 'baby_name', 40)).toBe(1);
+    const list = textsToShrink('rosebird-garden', { baby_name: 'Abdulrahman A', father_name: 'Ali', 'wording.sonOf': 'son of Abdulrahman' });
+    expect(list.map((x) => x.text)).toEqual(['son of Abdulrahman', 'Abdulrahman A']);
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {

@@ -63,7 +63,7 @@ export async function setTemplateText(
     if (field !== undefined) {
       if (!locked.fieldKeys.includes(field)) throw new TemplateTextError('unknownKey');
       // Empty is allowed while the customer is still filling the design; a published one keeps its required fields.
-      const result = validateFieldValues({ [field]: value }, [field], await fieldDefs(tx, [field], locked.themeVersionId), now, { partial: !opts.published });
+      const result = validateFieldValues({ [field]: value }, [field], await fieldDefs(tx, [field], locked.themeVersionId), now, { partial: !opts.published, stored: locked.fieldValues });
       if (!result.ok) throw new TemplateTextError(result.errors[field] ?? 'invalidText');
       const values = { ...locked.fieldValues };
       if (result.values[field]) values[field] = result.values[field];

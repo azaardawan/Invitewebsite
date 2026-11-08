@@ -1732,3 +1732,12 @@ The name of the design's shaped card on the order form (manifest `print.shapes`,
 ## Batch 54 — Kurdish example names for storefront samples — ✅ AUTO-APPROVED (2026-11-08, owner checks in Admin → Translations)
 
 `invitationSamples.kurdishNames` (used by a design whose manifest sets `sample.names: 'kurdish'`, e.g. Delal Bridge v2). In Sorani and Badini these are the same lists as `invitationSamples.names` (already approved, batch of the sample names); English has the same names in Latin letters. Nothing new to translate.
+
+## Batch 55 — Delal Bridge (#26) v2: the keepsake page (the owner's «Guest Wishes» artwork) — ✅ AUTO-APPROVED (2026-11-08, owner checks in Admin → Translations)
+
+The keepsake PDF's title and the label before each guest's name (`themes/delal-bridge/v2/copy.ts`). They replace the keepsake's closing line from batch 49, which is no longer printed.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #26 v2 keepsake: title (`keepsakeTitle`) | أمنيات الضيوف | Guest Wishes | ئاواتەکانی میوانان | هیڤیێن میڤانان |
+| 2 | #26 v2 keepsake: before each guest's name (`guestName`) | اسم الضيف: | Guest Name: | ناوی میوان: | ناڤێ میڤانی: |

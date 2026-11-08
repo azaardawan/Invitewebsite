@@ -1,6 +1,7 @@
 /*
  * Delal Bridge typefaces, all SIL Open Font License (fonts/OFL-*.txt).
  * DB Display: Forum (Latin names and titles). DB Text: Montserrat (Latin text and spaced capitals).
+ * DB Script: EB Garamond italic (the keepsake's «Guest Wishes» and «Guest Name:», as in the owner's artwork).
  * DB Arabic: Amiri (names, titles and the verse in Arabic and Kurdish). DB Arabic Text: Noto Sans Arabic.
  * Family names are theme-prefixed so they cannot collide with other themes.
  */
@@ -25,6 +26,13 @@
   font-weight: 500;
   font-display: swap;
   src: url(./fonts/montserrat-latin-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'DB Script';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/eb-garamond-italic-500-latin.woff2) format('woff2');
 }
 @font-face {
   font-family: 'DB Arabic';
@@ -52,10 +60,12 @@
   --db-display: 'DB Display', 'DB Arabic', Georgia, serif;
   --db-text: 'DB Text', 'DB Arabic Text', system-ui, sans-serif;
   --db-verse: 'DB Arabic', serif;
+  --db-script: 'DB Script', 'DB Arabic', Georgia, serif;
 }
 /* Arabic and Kurdish invitations: Amiri for names and titles, Noto Sans Arabic for the text. */
 .fonts [data-script='arabic'],
 .fonts[data-script='arabic'] {
   --db-display: 'DB Arabic', serif;
   --db-text: 'DB Arabic Text', sans-serif;
+  --db-script: 'DB Arabic', serif;
 }

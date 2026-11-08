@@ -50,7 +50,8 @@ export function validateFieldValues(
   fieldKeys: readonly string[],
   defs: ReadonlyMap<string, FieldDef>,
   now = new Date(),
-  opts: { optionalPlace?: boolean; partial?: boolean } = {},
+  /** `stored`: the values saved now; one longer than a limit lowered since (a design's own) may stay as it is. */
+  opts: { optionalPlace?: boolean; partial?: boolean; stored?: Readonly<Record<string, string>> } = {},
 ): { ok: true; values: Record<string, string> } | { ok: false; errors: Record<string, FieldError> } {
   const values: Record<string, string> = {};
   const errors: Record<string, FieldError> = {};
@@ -71,7 +72,7 @@ export function validateFieldValues(
         const multiline = def.type === 'longtext';
         const v = cleanText(raw, multiline);
         if (!v) errors[key] = 'required';
-        else if (v.length > (def.maxLength ?? DEFAULT_MAX[def.type])) errors[key] = 'tooLong';
+        else if (v.length > (def.maxLength ?? DEFAULT_MAX[def.type]) && v !== opts.stored?.[key]) errors[key] = 'tooLong';
         else values[key] = v;
         break;
       }

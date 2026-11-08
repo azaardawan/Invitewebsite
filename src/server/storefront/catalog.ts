@@ -1,3 +1,4 @@
+import { themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { connection } from 'next/server';
 import { and, asc, eq, inArray, or, sql } from 'drizzle-orm';
@@ -207,7 +208,7 @@ export async function orderFields(themeId: string, sectionId: string | null, key
     .map((f) => ({
       key: f.key,
       type: f.type,
-      maxLength: f.maxLength,
+      maxLength: themeTextLimit(manifest?.key, f.key, f.maxLength),
       label: (f.themeLabel ?? f.sectionLabel ?? f.label) as I18nContent,
       order: f.order ?? 999,
       optional: fieldIsOptional(manifest, f.key),

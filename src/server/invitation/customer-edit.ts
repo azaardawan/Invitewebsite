@@ -69,6 +69,7 @@ export async function customerEditInvitation(
     const validateAt = keepsPastDate && new Date(`${existingDate}T00:00:00Z`) < now ? new Date(`${existingDate}T00:00:00Z`) : now;
     const result = validateFieldValues(input.values, inv!.fieldKeys, await fieldDefs(tx, inv!.fieldKeys, inv!.themeVersionId), validateAt, {
       optionalPlace: await placeOptionalIn(tx, inv!.sectionId),
+      stored: inv!.fieldValues,
     });
     if (!result.ok) return { ok: false, error: 'invalidFields', fieldErrors: result.errors } as const;
 

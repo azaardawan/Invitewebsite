@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { resolveSample } from '@/server/invitation/preview';
+import { parseTextProbe } from '@/server/invitation/probe';
 import { cardData } from '@/server/documents/data';
 import { themeCardDesign } from '@/server/catalog/card-design';
 import { isLocale } from '@/i18n/config';
@@ -22,6 +23,8 @@ const query = z.object({
   /** `1`: a sample message on the back (the long one with `names=long`), to check it fits. */
   msg: z.literal('1').optional(),
   v: z.coerce.number().int().min(1).optional(),
+  /** Texts to try (JSON, `parseTextProbe`): the automatic text-length checks. */
+  try: z.string().max(8000).optional(),
 });
 
 /**
@@ -34,7 +37,8 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
   if (!isLocale(lang)) notFound();
   const q = query.safeParse(await searchParams);
   if (!q.success) notFound();
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v, names: q.data.names });
+  const probe = parseTextProbe(q.data.try);
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v, names: q.data.names, values: probe.values, wording: probe.wording });
   if (!sample) notFound();
   const manifest = manifestByCodeRef(sample.version.codeRef);
   if (!manifest) notFound();
@@ -44,7 +48,11 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
     sample.props,
     manifest,
     q.data.cut ? 'cardBleed' : 'card',
-    q.data.msg && sample.props.fields.invitation_message ? { backMessage: sample.props.fields.invitation_message } : {},
+    probe.title !== undefined || probe.message !== undefined
+      ? { backTitle: probe.title, backMessage: probe.message }
+      : q.data.msg && sample.props.fields.invitation_message
+        ? { backMessage: sample.props.fields.invitation_message }
+        : {},
     'https://bahjaaa.com/i/sample',
     await themeCardDesign(db(), sample.theme.id),
     null,

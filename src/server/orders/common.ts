@@ -1,3 +1,4 @@
+import { themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { and, eq, inArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
@@ -55,7 +56,8 @@ export async function fieldDefs(db: DbOrTx, keys: readonly string[], themeVersio
   const rows = await db.select().from(fieldDefinitions).where(and(inArray(fieldDefinitions.key, [...keys])));
   const [version] = themeVersionId ? await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, themeVersionId)) : [];
   const manifest = version?.manifest as ThemeManifest | null | undefined;
-  return new Map(rows.map((r) => [r.key, { type: r.type, maxLength: r.maxLength, optional: fieldIsOptional(manifest, r.key) }]));
+  // A design may hold less than the Field Library allows before its layout breaks (src/catalog/text-limits.ts).
+  return new Map(rows.map((r) => [r.key, { type: r.type, maxLength: themeTextLimit(manifest?.key, r.key, r.maxLength), optional: fieldIsOptional(manifest, r.key) }]));
 }
 
 export function sameSet(a: readonly string[], b: readonly string[]) {

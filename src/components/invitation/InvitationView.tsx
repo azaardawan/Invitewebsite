@@ -6,6 +6,13 @@ import { ThemeErrorBoundary } from './ThemeErrorBoundary';
 import { LiveThemeHost } from './LiveThemeHost';
 import styles from './platform.module.css';
 import { WatermarkLayer, type WatermarkText } from '@/components/print/watermark';
+import { textsToShrink } from '@/catalog/text-limits';
+import { FitLongTexts } from './FitLongTexts';
+
+/** The customer's texts by the keys their limits use (fields, `wording.<key>`). */
+export function customerTexts(props: Pick<ThemeProps, 'fields' | 'wording'>): Record<string, string | null | undefined> {
+  return { ...props.fields, ...Object.fromEntries(Object.entries(props.wording ?? {}).map(([k, v]) => [`wording.${k}`, v])) };
+}
 
 /**
  * Renders one theme with the platform around it: runtime (music, guest form),
@@ -52,6 +59,8 @@ export function InvitationView({
           {props.features.includes('photos') ? <LiveThemeHost codeRef={codeRef} props={props} /> : <ThemeHost codeRef={codeRef} {...props} />}
         </ThemeErrorBoundary>
       </div>
+      {/* Texts longer than the design holds at its size are written smaller (src/catalog/text-limits.ts). */}
+      <FitLongTexts texts={textsToShrink(codeRef.split('@')[0], customerTexts(props))} root="[data-bahja-theme]" />
       {ribbon ? (
         <div className={styles.ribbon} role="note">
           {ribbon}

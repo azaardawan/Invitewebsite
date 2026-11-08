@@ -4,7 +4,7 @@ import type { InvitationLocale } from '@/theme-sdk';
  * The design's own lines. Platform strings (buttons, form, countdown units, map, guest messages) come from
  * `props.labels`; the couple's details come from fields. Wedding and engagement wording is chosen from `props.occasion`.
  * The verse and its reference always stay in Arabic; English invitations add a translation under it.
- * Kurdish: docs/translations/KURDISH_REVIEW.md, batch 49 (auto-approved, the owner checks it in Admin → Translations).
+ * Kurdish: docs/translations/KURDISH_REVIEW.md, batches 49 and 55 (auto-approved, the owner checks it in Admin → Translations).
  */
 const ar = {
   /** Over the names on the cover. */
@@ -31,7 +31,9 @@ const ar = {
   guestbookLead: 'بكل الحب',
   closingLead: 'بكل الحب والامتنان',
   closing: 'شكراً لأنكم جزء من قصتنا، حضوركم أجمل هدية',
-  keepsakeClosing: 'شكراً من القلب لكل من شاركنا فرحتنا',
+  /** Keepsake page (owner's artwork): the title and the label before each guest's name. */
+  keepsakeTitle: 'أمنيات الضيوف',
+  guestName: 'اسم الضيف:',
 } as const;
 
 export type Copy = { [K in keyof typeof ar]: string };
@@ -58,7 +60,8 @@ const en: Copy = {
   guestbookLead: 'WITH LOVE',
   closingLead: 'WITH LOVE AND GRATITUDE',
   closing: 'Thank you for being part of our story. Your presence is the most beautiful gift.',
-  keepsakeClosing: 'With heartfelt thanks to everyone who shared our joy',
+  keepsakeTitle: 'Guest Wishes',
+  guestName: 'Guest Name:',
 };
 
 const ckb: Copy = {
@@ -82,7 +85,8 @@ const ckb: Copy = {
   guestbookLead: 'بە هەموو خۆشەویستییەوە',
   closingLead: 'بە خۆشەویستی و سوپاسەوە',
   closing: 'سوپاس کە بەشێکن لە چیرۆکەکەمان، ئامادەبوونتان جوانترین دیارییە',
-  keepsakeClosing: 'لە دڵەوە سوپاس بۆ هەموو ئەوانەی بەشداری خۆشیمان بوون',
+  keepsakeTitle: 'ئاواتەکانی میوانان',
+  guestName: 'ناوی میوان:',
 };
 
 const bdn: Copy = {
@@ -106,7 +110,8 @@ const bdn: Copy = {
   guestbookLead: 'ب هەمی حەژێکرنێ',
   closingLead: 'ب حەژێکرن و سوپاسیێ',
   closing: 'سوپاس کو هوین پشکەک ژ چیرۆکا مەنە، ئامادەبوونا هەوە جوانترین دیاریە',
-  keepsakeClosing: 'ژ دل سوپاس بۆ هەمی ئەوێن پشکداری د شاهیا مە دا کری',
+  keepsakeTitle: 'هیڤیێن میڤانان',
+  guestName: 'ناڤێ میڤانی:',
 };
 
 const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb, bdn };
