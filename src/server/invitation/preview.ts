@@ -27,6 +27,9 @@ export type SampleRequest = {
   occasion?: string;
   /** Kurdish example names (the storefront sample of a design with manifest `sample.names: 'kurdish'`). */
   kurdishNames?: boolean;
+  /** Admin checks: texts to try instead of the sample's (fields by key, wording lines by key). */
+  values?: Record<string, string>;
+  wording?: Record<string, string>;
 };
 
 /**
@@ -79,12 +82,16 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     locale: req.locale,
     fieldKeys,
     features,
-    values: sampleValues(req.locale, req.names ?? 'short', { babyGender: group?.key === 'girl' ? 'girl' : 'boy', seed: themeNumber(theme.key), kurdishNames: req.kurdishNames }),
+    values: {
+      ...sampleValues(req.locale, req.names ?? 'short', { babyGender: group?.key === 'girl' ? 'girl' : 'boy', seed: themeNumber(theme.key), kurdishNames: req.kurdishNames }),
+      ...req.values,
+    },
     musicSrc: music ? publicMediaUrl(music.key) : null,
     border: await themeBorder(db, theme.id),
     colorSlots: manifest.colors?.slots ?? [],
     colors: req.colors ?? null,
     wordingLines: manifest.wording ?? [],
+    wording: req.wording ?? null,
     switchDefs: manifest.switches ?? [],
     photoSpec: manifest.photos ?? null,
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),

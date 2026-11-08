@@ -3,6 +3,7 @@ import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, pub
 import { normalizePhone } from '@/lib/phone';
 import { fieldValuesFromForm, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
+import { cardBackLimits, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
 
 describe('ids and URLs', () => {
   it('public ids are 10 unambiguous characters', () => {
@@ -108,6 +109,24 @@ describe('invitation field validation', () => {
     expect(empty.ok).toBe(true);
     if (empty.ok) expect(empty.values).not.toHaveProperty('venue_name');
     expect(validateFieldValues({ ...good, venue_name: 'x'.repeat(81) }, keysWithVenue, optional, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+  });
+
+  it("a design's own lower limit applies to new text; a value saved before stays", () => {
+    const withVenue = new Map(defs).set('venue_name', { type: 'text', maxLength: 30 });
+    const keysWithVenue = [...keys, 'venue_name'];
+    const old = 'x'.repeat(50);
+    expect(validateFieldValues({ ...good, venue_name: 'y'.repeat(31) }, keysWithVenue, withVenue, now)).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+    expect(validateFieldValues({ ...good, venue_name: old }, keysWithVenue, withVenue, now, { stored: { venue_name: old } }).ok).toBe(true);
+    expect(validateFieldValues({ ...good, venue_name: `${old}z` }, keysWithVenue, withVenue, now, { stored: { venue_name: old } })).toEqual({ ok: false, errors: { venue_name: 'tooLong' } });
+  });
+
+  it('design text limits only ever lower a limit', () => {
+    const own = Object.keys(THEME_TEXT_LIMITS)[0];
+    expect(themeTextLimit('no-such-design', 'person_1_name', 40)).toBe(40);
+    expect(themeTextLimit(null, 'person_1_name', null)).toBe(null);
+    expect(cardBackLimits('no-such-design', { title: 40, message: 300 })).toEqual({ title: 40, message: 300 });
+    if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBe(n);
+    for (const limits of Object.values(THEME_TEXT_LIMITS)) for (const n of Object.values(limits)) expect(n).toBeGreaterThanOrEqual(8);
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {

@@ -5,6 +5,7 @@ import { db } from '@/server/db/client';
 import { themePalettes } from '@/server/db/schema';
 import { requireAdmin } from '@/server/auth/guard';
 import { resolveSample } from '@/server/invitation/preview';
+import { parseTextProbe } from '@/server/invitation/probe';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { isLocale } from '@/i18n/config';
 import { manifestByCodeRef } from '@/theme-registry';
@@ -22,6 +23,8 @@ const query = z.object({
   palette: z.uuid().optional(),
   /** Which occasion's wording, for a design sold in several. */
   occasion: z.string().max(40).optional(),
+  /** Texts to try (JSON, `parseTextProbe`): the automatic text-length checks. */
+  try: z.string().max(8000).optional(),
 });
 
 const list = (v: string | undefined) => (v === undefined ? undefined : v.split(',').filter(Boolean));
@@ -35,6 +38,7 @@ export default async function ThemeSamplePreview({ params, searchParams }: PageP
   const { lang, key } = await params;
   if (!isLocale(lang)) notFound();
   const q = query.safeParse(await searchParams);
+  const probe = parseTextProbe(q.data?.try);
   const sample = await resolveSample(db(), {
     themeKey: key,
     locale: lang,
@@ -44,6 +48,8 @@ export default async function ThemeSamplePreview({ params, searchParams }: PageP
     custom: q.data?.features !== undefined || q.data?.fields !== undefined ? { features: list(q.data?.features) ?? [], fields: list(q.data?.fields) ?? [] } : undefined,
     names: q.data?.names,
     occasion: q.data?.occasion,
+    values: probe.values,
+    wording: probe.wording,
     colors: q.data?.palette ? (await db().select({ colors: themePalettes.colors }).from(themePalettes).where(eq(themePalettes.id, q.data.palette)))[0]?.colors : undefined,
   });
   if (!sample) notFound();

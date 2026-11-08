@@ -141,6 +141,7 @@ export async function updateDraft(
     const result = validateFieldValues(input.values, locked!.fieldKeys, await fieldDefs(tx, locked!.fieldKeys, locked!.themeVersionId), now, {
       optionalPlace: await placeOptionalIn(tx, locked!.sectionId),
       partial: (version?.manifest as ThemeManifest | undefined)?.editor === 'template',
+      stored: locked!.fieldValues,
     });
     if (!result.ok) throw new OrderError('invalidFields', result.errors);
     const extra = await extrasUpdate(

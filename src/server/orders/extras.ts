@@ -1,8 +1,9 @@
+import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { CARD_SHAPE_FEATURES, MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, themePalettes, type CardOptions } from '@/server/db/schema';
+import { invitations, themePalettes, themes, type CardOptions } from '@/server/db/schema';
 import { storeSignature } from '@/server/media/assets';
 import { parseSignatureStrokes } from '@/lib/signature-strokes';
 import { MediaError } from '@/server/media/process';
@@ -119,12 +120,15 @@ export async function extrasUpdate(
     >
   > = {};
   const errors: Record<string, string> = {};
+  // The design's own limits (src/catalog/text-limits.ts); a text saved before a limit was lowered may stay as it is.
+  const [design] = await db.select({ key: themes.key }).from(themes).where(eq(themes.id, inv.themeId));
+  const limits = cardBackLimits(design?.key, CARD_BACK_LIMITS);
 
   if (extras.cardBack && inv.featureKeys.includes('print_card')) {
     const title = extras.cardBack.title.trim();
     const message = extras.cardBack.message.replace(/\r\n/g, '\n').trim();
-    if (title.length > CARD_BACK_LIMITS.title) errors.cardBackTitle = 'tooLong';
-    if (message.length > CARD_BACK_LIMITS.message) errors.cardBackMessage = 'tooLong';
+    if (title.length > limits.title && title !== (inv.cardOptions?.backTitle ?? '').trim()) errors.cardBackTitle = 'tooLong';
+    if (message.length > limits.message && message !== (inv.cardOptions?.backMessage ?? '').trim()) errors.cardBackMessage = 'tooLong';
     const next: CardOptions = { ...(inv.cardOptions ?? {}) };
     if (title) next.backTitle = title;
     else delete next.backTitle;
@@ -228,7 +232,7 @@ export async function extrasUpdate(
       else if (pick.choice === 'lang' && version) keep(version);
       else if (pick.choice === 'custom' && line.custom === false) errors[`w.${line.key}`] = 'invalidChoice';
       else if (pick.choice === 'custom' && !text) errors[`w.${line.key}`] = 'required';
-      else if (pick.choice === 'custom' && text.length > line.maxLength) errors[`w.${line.key}`] = 'tooLong';
+      else if (pick.choice === 'custom' && text.length > themeTextLimit(design?.key, `wording.${line.key}`, line.maxLength) && text !== inv.wording?.[line.key]) errors[`w.${line.key}`] = 'tooLong';
       else if (pick.choice === 'custom' && /[<>]/.test(text)) errors[`w.${line.key}`] = 'invalidText';
       else if (pick.choice === 'custom') next[line.key] = text;
       else errors[`w.${line.key}`] = 'invalidChoice';

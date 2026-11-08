@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { resolveSample } from '@/server/invitation/preview';
+import { parseTextProbe } from '@/server/invitation/probe';
 import { CARD_SIDE_DEFAULTS, themeArtwork } from '@/server/catalog/card-design';
 import { productDataFrom } from '@/server/products/data';
 import { isLocale } from '@/i18n/config';
@@ -18,6 +19,8 @@ const query = z.object({
   layout: z.string().max(20).optional(),
   /** A version other than the current one (as the card preview's `v`). */
   v: z.coerce.number().int().min(1).optional(),
+  /** Texts to try (JSON, `parseTextProbe`): the automatic text-length checks. */
+  try: z.string().max(8000).optional(),
 });
 
 /** Admin sample of a newborn extra (story, sticker, bottle label) on the owner's artwork, with sample details. */
@@ -27,7 +30,8 @@ export default async function ProductSamplePreview({ params, searchParams }: Pag
   if (!isLocale(lang)) notFound();
   const q = query.safeParse(await searchParams);
   if (!q.success) notFound();
-  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v });
+  const probe = parseTextProbe(q.data.try);
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, version: q.data.v, values: probe.values, wording: probe.wording });
   if (!sample) notFound();
   const props = { ...sample.props, fields: { ...sample.props.fields, baby_gender: q.data.gender ?? sample.props.fields.baby_gender, baby_name: sample.props.fields.baby_name ?? sample.props.fields.person_1_name } };
   const art = await themeArtwork(db(), sample.theme.id);
