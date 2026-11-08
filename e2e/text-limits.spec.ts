@@ -87,7 +87,15 @@ async function domIssues(page: Page): Promise<Found> {
         const mx = /^matrix\(([^,]+), ([^,]+), ([^,]+)/.exec(tf);
         if (mx && (Math.abs(Number(mx[2])) > 0.01 || Math.abs(Number(mx[3])) > 0.01)) turned = true;
       }
-      if (rects.length && !hidden) nodes.push({ node: t, rects, path: path(el), turned });
+      // Covered by something drawn on top (e.g. the opening cover over the page): not seen, not checked.
+      const seen = rects.some((r) => {
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+        if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) return true; // off screen: can't tell, keep it
+        const top = document.elementFromPoint(x, y);
+        return !top || top === el || el.contains(top) || top.contains(el);
+      });
+      if (rects.length && !hidden && seen) nodes.push({ node: t, rects, path: path(el), turned });
     }
     for (const { node, rects, path: p } of nodes) {
       // Cut off by a box that hides what runs out of it.
@@ -108,6 +116,8 @@ async function domIssues(page: Page): Promise<Found> {
         const A = nodes[i]!;
         const B = nodes[j]!;
         if (A.node.parentElement === B.node.parentElement || A.turned || B.turned) continue;
+        // A lone symbol (✧, ♡, a dot) is decoration, not words: a text touching it is not broken.
+        if (!/[\p{L}\p{N}]/u.test(A.node.data) || !/[\p{L}\p{N}]/u.test(B.node.data)) continue;
         let hit = false;
         for (const a of A.rects) {
           for (const b of B.rects) {
