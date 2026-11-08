@@ -72,7 +72,7 @@ async function domIssues(page: Page): Promise<Found> {
       const rects = [...range.getClientRects()].filter((r) => r.width > 0.5 && r.height > 0.5);
       // Kept out of sight inside a box that hides it (e.g. the card front's copy behind the back): not shown, not checked.
       let hidden = false;
-      for (let a = el; a && a !== document.documentElement; a = a.parentElement) {
+      for (let a: HTMLElement | null = el; a && a !== document.documentElement; a = a.parentElement) {
         const cs = getComputedStyle(a);
         if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
         const box = a.getBoundingClientRect();

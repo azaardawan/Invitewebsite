@@ -30,7 +30,7 @@ export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
   });
   try {
     const url = `/print/${printToken(kind, invitationId)}`;
-    if (kind !== 'card' && kind !== 'cardBleed') return await pdfOf(browser, url);
+    if (kind !== 'card' && kind !== 'cardBleed') return await pdfOf(browser, url, { fillLastPage: kind === 'keepsake' });
     const merged = await PDFDocument.create();
     for (const side of ['front', 'back']) {
       const part = await PDFDocument.load(await pdfOf(browser, `${url}?view=${side}${cardParam(opts)}`));
@@ -42,14 +42,57 @@ export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
   }
 };
 
-async function pdfOf(browser: Browser, path: string) {
+async function pdfOf(browser: Browser, path: string, opts: { fillLastPage?: boolean } = {}) {
   const page = await browser.newPage();
   const res = await page.goto(`${printOrigin()}${path}`, { waitUntil: 'networkidle', timeout: 60_000 });
   if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
   await page.evaluate(() => document.fonts.ready);
+  if (opts.fillLastPage) await page.evaluate(fillPagesWithLastBackground);
   const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true, tagged: true });
   await page.close();
   return pdf;
+}
+
+/**
+ * Keepsakes (owner, 2026-11-08): a last page the messages only partly fill must not end in white paper. The design's
+ * paper is the background of its last section (the one that reaches the end of the document, page-wide); it is laid
+ * once more behind everything, `fixed`, which Chromium prints on every page, so each page is the design's paper to its
+ * foot. Pages that draw their own (the cover) cover it. Runs in the page; designs need no change (frozen versions too).
+ */
+export function fillPagesWithLastBackground() {
+  const end = document.documentElement.scrollHeight;
+  const minWidth = 0.9 * (210 * 96) / 25.4; // nearly an A4 page wide
+  let best: Element | null = null;
+  let bestTop = -1;
+  for (const el of document.body.querySelectorAll('*')) {
+    const cs = getComputedStyle(el);
+    if (cs.position === 'fixed') continue;
+    const painted = cs.backgroundImage !== 'none' || !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(cs.backgroundColor);
+    if (!painted) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < minWidth || Math.abs(r.bottom + scrollY - end) > 4) continue;
+    if (r.top + scrollY > bestTop) {
+      best = el;
+      bestTop = r.top + scrollY;
+    }
+  }
+  if (!best) return;
+  const cs = getComputedStyle(best);
+  const layer = document.createElement('div');
+  layer.setAttribute('aria-hidden', 'true');
+  Object.assign(layer.style, {
+    position: 'fixed',
+    inset: '0',
+    zIndex: '-1',
+    pointerEvents: 'none',
+    backgroundColor: cs.backgroundColor,
+    backgroundImage: cs.backgroundImage,
+    backgroundSize: cs.backgroundSize,
+    backgroundPosition: cs.backgroundPosition,
+    backgroundRepeat: cs.backgroundRepeat,
+    printColorAdjust: 'exact',
+  });
+  document.body.prepend(layer);
 }
 
 /**
