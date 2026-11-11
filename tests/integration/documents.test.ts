@@ -189,6 +189,12 @@ describe('changing the card', () => {
     const r = fakeRenderer();
     await ensureDocument(db(), inv.id, 'card', { render: r.render });
 
+    // The invitation's paragraph is never on the card (owner, 2026-11-11): not on the front, not on the back.
+    const plain = await printData(db(), inv, 'card');
+    expect(plain.props.fields.invitation_message).toBeUndefined();
+    expect('back' in plain && plain.back.fields.invitation_message).toBeUndefined();
+    expect('back' in plain && plain.back.message).toBeNull();
+
     await updateCardOptions(db(), inv.id, { message: 'دعوة خاصة للأهل', extraLine: 'الدعوة عائلية', showQr: false }, actor);
     const [row] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
     const data = await printData(db(), row!, 'card');

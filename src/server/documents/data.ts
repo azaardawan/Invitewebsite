@@ -170,15 +170,17 @@ export async function cardData(
   const [w, h] = CARD_SIZES[spec.size];
   // In the design's colours when it sets them (scanners read any strong contrast), otherwise black on white.
   const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M', ...(spec.qrColors ? { color: spec.qrColors } : {}) }) : null;
-  // Card-only wording from Admin: replace (or remove) the message, add one extra line.
-  const fields = { ...base.fields };
-  if (opts.message !== undefined) {
-    if (opts.message.trim()) fields.invitation_message = opts.message.trim();
-    else delete fields.invitation_message;
-  }
+  // Owner, 2026-11-11: the invitation's paragraph is never printed on the card. The card's only paragraph is the one
+  // the customer writes for its back (`backMessage`), so neither side gets `invitation_message` (some designs would
+  // print it on the front, or on the back when no back message was written). Admin may still write a line for the
+  // front of one order's card (`message`) and one extra line.
+  const cardFields = { ...base.fields };
+  delete cardFields.invitation_message;
+  const fields = { ...cardFields };
+  if (opts.message?.trim()) fields.invitation_message = opts.message.trim();
   const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
   // The back: the customer's big title (or a default) and smaller message.
-  const back: PrintCardBackProps = { ...base, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null, qrDataUrl };
+  const back: PrintCardBackProps = { ...base, fields: cardFields, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null, qrDataUrl };
   const page: PageSpec =
     kind === 'card'
       ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }
