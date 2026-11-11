@@ -505,6 +505,18 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                     {f.fieldKey}
                   </span>
                 </p>
+                {/* The owner's choice: must the customer fill it, or may it stay empty (the design then leaves that part out). */}
+                {f.alwaysRequired ? (
+                  <p className="text-xs text-muted">{t('themes.fieldAlwaysRequired')}</p>
+                ) : (
+                  <label className="text-sm">
+                    <span className="mb-1 block text-xs text-muted">{t('themes.fieldNeed')}</span>
+                    <select name={`tf.${f.fieldKey}.need`} defaultValue={f.optional ? 'optional' : 'required'} disabled={!canManage} className="rounded-md border border-line bg-surface px-2 py-1.5 text-sm">
+                      <option value="required">{t('themes.fieldRequired')}</option>
+                      <option value="optional">{t('themes.fieldOptional')}</option>
+                    </select>
+                  </label>
+                )}
                 <div className="w-24">
                   <Field label={t('common.order')} name={`tf.${f.fieldKey}.order`} type="number" defaultValue={String(i)} required={false} />
                 </div>

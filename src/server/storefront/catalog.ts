@@ -1,3 +1,4 @@
+import { mayStayEmpty } from '@/catalog/fields';
 import { themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { connection } from 'next/server';
@@ -192,7 +193,7 @@ export type OrderField = Awaited<ReturnType<typeof orderFields>>[number];
 export async function orderFields(themeId: string, sectionId: string | null, keys: readonly string[]) {
   if (!keys.length) return [];
   const rows = await db()
-    .select({ key: fieldDefinitions.key, type: fieldDefinitions.type, maxLength: fieldDefinitions.maxLength, label: fieldDefinitions.label, themeLabel: themeFields.label, sectionLabel: sectionDefaultFields.label, order: themeFields.sortOrder })
+    .select({ key: fieldDefinitions.key, type: fieldDefinitions.type, maxLength: fieldDefinitions.maxLength, label: fieldDefinitions.label, themeLabel: themeFields.label, required: themeFields.required, sectionLabel: sectionDefaultFields.label, order: themeFields.sortOrder })
     .from(fieldDefinitions)
     .leftJoin(themeFields, and(eq(themeFields.fieldKey, fieldDefinitions.key), eq(themeFields.themeId, themeId)))
     .leftJoin(sectionDefaultFields, and(eq(sectionDefaultFields.fieldKey, fieldDefinitions.key), sectionId ? eq(sectionDefaultFields.sectionId, sectionId) : sql`false`))
@@ -211,7 +212,7 @@ export async function orderFields(themeId: string, sectionId: string | null, key
       maxLength: themeTextLimit(manifest?.key, f.key, f.maxLength),
       label: (f.themeLabel ?? f.sectionLabel ?? f.label) as I18nContent,
       order: f.order ?? 999,
-      optional: fieldIsOptional(manifest, f.key),
+      optional: mayStayEmpty(f.key, fieldIsOptional(manifest, f.key), f.required),
     }))
     .sort((a, b) => a.order - b.order);
 }

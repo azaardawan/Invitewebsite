@@ -317,4 +317,23 @@ describe('theme lifecycle', () => {
     expect((await getThemeDetail(db(), t.id)).fields.map((f) => f.fieldKey)).toEqual(reversed.map((f) => f.fieldKey));
     await expect(setThemeFields(db(), t.id, reversed.slice(1), actor)).rejects.toMatchObject({ code: 'fieldSetMismatch' });
   });
+
+  it('lets the owner say which fields must be filled and which may stay empty, except what the platform needs', async () => {
+    const t = await registeredTheme();
+    const d = await getThemeDetail(db(), t.id);
+    const other = d.fields.find((f) => !f.alwaysRequired)!;
+    const needed = d.fields.find((f) => f.alwaysRequired)!;
+    expect(other.optional).toBe(false);
+    const set = (required: boolean) => setThemeFields(db(), t.id, d.fields.map((f) => ({ fieldKey: f.fieldKey, label: null, required })), actor);
+    await set(false);
+    let after = await getThemeDetail(db(), t.id);
+    expect(after.fields.find((f) => f.fieldKey === other.fieldKey)!.optional).toBe(true);
+    expect(after.fields.find((f) => f.fieldKey === needed.fieldKey)!.optional).toBe(false);
+    await set(true);
+    after = await getThemeDetail(db(), t.id);
+    expect(after.fields.every((f) => !f.optional)).toBe(true);
+    // Without a choice in the call (reordering only), the stored choice stays.
+    await setThemeFields(db(), t.id, d.fields.map((f) => ({ fieldKey: f.fieldKey, label: null })), actor);
+    expect((await getThemeDetail(db(), t.id)).fields.every((f) => !f.optional)).toBe(true);
+  });
 });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, publicIdFromSlugPath, slugFromNames } from '@/lib/ids';
 import { normalizePhone } from '@/lib/phone';
-import { fieldValuesFromForm, splitInitials } from '@/catalog/fields';
+import { ALWAYS_REQUIRED_FIELDS, fieldValuesFromForm, mayStayEmpty, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
 import { cardBackLimits, smallerTextLimit, textScale, textsToShrink, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
 
@@ -143,6 +143,23 @@ describe('invitation field validation', () => {
     expect(textScale('no-such-design', 'baby_name', 40)).toBe(1);
     const list = textsToShrink('rosebird-garden', { baby_name: 'Abdulrahman A', father_name: 'Ali', 'wording.sonOf': 'son of Abdulrahman' });
     expect(list.map((x) => x.text)).toEqual(['son of Abdulrahman', 'Abdulrahman A']);
+  });
+
+  it("the owner's choice per design decides what must be filled (Admin → the design → Fields)", () => {
+    // By default: the library's and the design's.
+    expect(mayStayEmpty('venue_name', false, null)).toBe(false);
+    expect(mayStayEmpty('seal_initials', true, undefined)).toBe(true);
+    // The owner's choice wins either way.
+    expect(mayStayEmpty('person_1_family', false, false)).toBe(true);
+    expect(mayStayEmpty('seal_initials', true, true)).toBe(false);
+    // Never for what the platform needs.
+    for (const key of ALWAYS_REQUIRED_FIELDS) expect(mayStayEmpty(key, true, false)).toBe(false);
+    // Validation follows it: a family name made optional may stay empty and is left out; one made required must be filled.
+    const withFamily = new Map(defs).set('person_1_family', { type: 'text', maxLength: 60, optional: true }).set('seal_initials', { type: 'initials', maxLength: 3, optional: false });
+    const empty = validateFieldValues({ ...good, person_1_family: '', seal_initials: 'A|B' }, [...keys, 'person_1_family', 'seal_initials'], withFamily, now);
+    expect(empty.ok).toBe(true);
+    if (empty.ok) expect(empty.values).not.toHaveProperty('person_1_family');
+    expect(validateFieldValues({ ...good, person_1_family: '', seal_initials: '' }, [...keys, 'person_1_family', 'seal_initials'], withFamily, now)).toEqual({ ok: false, errors: { seal_initials: 'required' } });
   });
 
   it('optional fields (the seal initials) may stay empty, and are checked when filled', () => {
