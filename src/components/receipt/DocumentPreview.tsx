@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from 'react';
  */
 export function DocumentPreview({
   title,
+  alt,
   imageSrc,
   back,
   openHref,
@@ -19,6 +20,8 @@ export function DocumentPreview({
 }: {
   /** The tile's own name (to tell several cards apart), or null when its group's heading says it all. */
   title: string | null;
+  /** What the picture shows, for screen readers (the full name, even when the tile shows no name). */
+  alt: string;
   imageSrc: string | null;
   back?: { src: string; title: string; portrait?: boolean };
   openHref: string;
@@ -44,7 +47,7 @@ export function DocumentPreview({
     }, 300);
   };
 
-  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: back.portrait ? 'aspect-[148/210]' : 'aspect-[210/148]' } : { src: imageSrc, alt: title ?? labels.download, ratio: 'aspect-[148/210]' };
+  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: back.portrait ? 'aspect-[148/210]' : 'aspect-[210/148]' } : { src: imageSrc, alt, ratio: 'aspect-[148/210]' };
 
   return (
     // Four rows shared with the tiles beside it (subgrid): name, picture, turn-over, download. Each row is as tall as

@@ -444,6 +444,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 <DocumentPreview
                       key={f.key}
                       title={f.title}
+                      alt={f.title ? `${t('printCardTitle')} · ${f.title}` : t('printCardTitle')}
                       imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
                       back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading'), portrait: 'backPortrait' in f && f.backPortrait } : undefined}
                       openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
@@ -519,6 +520,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 <DocumentPreview
                       key={f.key}
                       title={null}
+                      alt={t('keepsakeTitle')}
                       imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
                       back={undefined}
                       openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
