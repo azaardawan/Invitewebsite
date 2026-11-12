@@ -1,0 +1,603 @@
+/*
+ * The printed pieces (designs.tsx) in the announcement's paper, ink and art. Every box is a size container: sizes in
+ * cqw / cqh so each piece scales with the box the platform gives it.
+ */
+.root {
+  --paper: #fcf8f3;
+  --paper-light: #fffdf8;
+  --powder: #efcdd3;
+  --ink: #69434f;
+  --muted: #85616a;
+  --line: #d8b5be;
+  --accent: #a77783;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  container-type: size;
+  color: var(--ink);
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, var(--paper-light), transparent 70%),
+    var(--paper);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root p,
+.root figure {
+  margin: 0;
+}
+.art {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+.arch {
+  position: absolute;
+  inset: 4cqw;
+  border: 0.25cqw solid var(--line);
+  border-radius: 40cqw 40cqw 1.4cqw 1.4cqw;
+  pointer-events: none;
+}
+.rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4cqw;
+  color: var(--line);
+  font-size: 3.4cqw;
+  line-height: 1;
+}
+.rule i {
+  width: 8cqw;
+  border-top: 0.2cqw solid var(--line);
+}
+.eyebrow {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 2.8cqw;
+  letter-spacing: 0.04em;
+}
+[data-script='latin'] .eyebrow {
+  font-family: 'LR Serif', serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 2.3cqw;
+}
+.name {
+  color: var(--ink);
+  font-family: 'LR Amiri', serif;
+  font-weight: 400;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+[data-script='latin'] .name {
+  font-family: 'LR Serif', serif;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- the story and the A5 card */
+/* One column: the bunting, the words, then the family filling what is left (so a long name never runs under them). */
+.story,
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2cqw 11cqw 6cqw;
+}
+.bunting {
+  position: static;
+  flex: none;
+  width: 74cqw;
+  margin-bottom: -1cqw;
+}
+.copy {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4cqw;
+}
+.thanks {
+  font-size: 4.4cqw;
+  line-height: 1.6;
+}
+.welcome,
+.ending {
+  color: var(--muted);
+  font-size: 4cqw;
+}
+.father {
+  color: var(--accent);
+  font-size: 5.6cqw;
+  line-height: 1.3;
+}
+.date {
+  font-size: 4.2cqw;
+}
+[data-script='latin'] .thanks,
+[data-script='latin'] .welcome,
+[data-script='latin'] .ending,
+[data-script='latin'] .father,
+[data-script='latin'] .date {
+  font-family: 'LR Serif', serif;
+  font-size: 3.6cqw;
+}
+.family {
+  position: static;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  margin-top: 2cqw;
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+.card {
+  padding: 3cqw 13cqw 8cqw;
+}
+.card .bunting {
+  width: 62cqw;
+}
+.card .copy {
+  gap: 0.8cqw;
+}
+.card .thanks {
+  font-size: 3.8cqw;
+}
+.card .welcome,
+.card .ending,
+.card .date {
+  font-size: 3.5cqw;
+}
+.qr {
+  position: absolute;
+  bottom: 7cqw;
+  inset-inline-end: 8cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8cqw;
+  width: 15cqw;
+}
+.qr img {
+  display: block;
+  width: 13cqw;
+  height: 13cqw;
+}
+.qr figcaption {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 1.6cqw;
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- chocolate sticker */
+.sticker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqw;
+}
+.ring {
+  position: absolute;
+  inset: 4cqw;
+  border: 0.9cqw solid var(--powder);
+  pointer-events: none;
+}
+.round {
+  border-radius: 50%;
+}
+.square {
+  border-radius: 6cqw;
+}
+.stBow {
+  position: static;
+  width: 30cqw;
+}
+.stFather {
+  color: var(--accent);
+  font-size: 8cqw;
+  line-height: 1.2;
+}
+.stBooties {
+  position: static;
+  width: 18cqw;
+}
+
+/* ---------------------------------------------------------------- bottle label */
+.bottle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btStart {
+  top: 12cqh;
+  inset-inline-start: 4cqw;
+  height: 76cqh;
+  width: auto;
+}
+.btEnd {
+  top: 6cqh;
+  inset-inline-end: 4cqw;
+  height: 88cqh;
+  width: auto;
+}
+.btCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3cqh;
+}
+.btFather {
+  color: var(--accent);
+  font-size: 16cqh;
+  line-height: 1.2;
+}
+.bottle .rule {
+  font-size: 9cqh;
+}
+.bottle .rule i {
+  width: 10cqh;
+}
+
+/* ---------------------------------------------------------------- the card's back (landscape) */
+.back .arch {
+  inset: 5cqh 4cqw;
+  border-radius: 30cqh 30cqh 1.5cqh 1.5cqh;
+}
+.backCorner {
+  bottom: 5cqh;
+  inset-inline-start: 6cqw;
+  width: 20cqw;
+}
+.backColumn {
+  position: absolute;
+  inset: 14cqh 22cqw 12cqh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqh;
+}
+.back .eyebrow {
+  font-size: 2.6cqh;
+}
+.backTitle {
+  font-family: 'LR Amiri', serif;
+  font-size: 9cqh;
+  line-height: 1.35;
+}
+[data-script='latin'] .backTitle {
+  font-family: 'LR Serif', serif;
+  font-style: italic;
+}
+.backMessage {
+  max-width: 52cqw;
+  color: var(--muted);
+  font-size: 4cqh;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.backName {
+  color: var(--accent);
+  font-size: 5cqh;
+}
+
+/* ---------------------------------------------------------------- the A5 boxes (trim + 3 mm bleed); the arch keeps clear of the cut */
+.cardBox {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  container-type: size;
+}
+.backBox {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  container-type: size;
+}
+.card .arch {
+  inset: 6.5cqw;
+}
+.back .arch {
+  inset: 9cqh 6cqw;
+}
+
+/* ---------------------------------------------------------------- the printed posters (Shape.tsx) */
+.posterBox {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+}
+.posterPaper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.paperFill {
+  fill: #fcf8f3;
+}
+.paperLine {
+  fill: none;
+  stroke: #d8b5be;
+  stroke-width: 1.2;
+}
+/* On a poster the paper is the shape (transparent outside); the words keep to its middle. */
+.poster,
+.posterBack {
+  background: none;
+  /* Sizes are shares of the whole poster (its box is the container), not of the padded column. */
+  container-type: normal;
+}
+.poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6cqh 12cqw 4cqh;
+}
+.poster .bunting {
+  width: 54cqw;
+}
+.poster .copy {
+  gap: 1.4cqw;
+}
+.poster .thanks {
+  font-size: 4.2cqw;
+}
+.poster .welcome,
+.poster .ending,
+.poster .date {
+  font-size: 3.8cqw;
+}
+.poster .father {
+  font-size: 5.2cqw;
+}
+.poster .eyebrow {
+  font-size: 2.6cqw;
+}
+.poster .family {
+  margin-top: 1.5cqh;
+}
+[data-shape='arch'] .poster {
+  padding-top: 7cqh;
+}
+[data-shape='arch'] .poster .bunting {
+  width: 58cqw;
+}
+[data-shape='arch-oval'] .poster {
+  padding: 12cqh 19cqw 9cqh;
+}
+[data-shape='arch-oval'] .poster .bunting {
+  width: 44cqw;
+}
+[data-shape='arch-oval'] [data-shape='arch-wavy'] .poster {
+  padding-inline: 14cqw;
+}
+.posterBack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4cqh;
+  padding: 18cqh 16cqw 30cqh;
+}
+[data-shape='arch-oval'] .posterBack {
+  padding-inline: 21cqw;
+}
+.posterBack .eyebrow {
+  font-size: 1.6cqh;
+}
+.posterBack .backTitle {
+  font-size: 5.4cqh;
+}
+.posterBack .backMessage {
+  max-width: 100%;
+  font-size: 2.2cqh;
+}
+.posterBack .backName {
+  font-size: 2.6cqh;
+}
+.posterQr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8cqh;
+  margin-top: 1cqh;
+}
+.posterQr img {
+  display: block;
+  width: 9cqh;
+  height: 9cqh;
+}
+.posterQr figcaption {
+  color: var(--muted);
+  font-family: 'LR UI', sans-serif;
+  font-size: 1.2cqh;
+}
+
+/* ---------------------------------------------------------------- the nursery things around the words (posters, card back) */
+.sparkle {
+  position: absolute;
+  color: var(--line);
+  font-size: 3.6cqw;
+  line-height: 1;
+}
+.sp1 {
+  top: 22%;
+  left: 10%;
+}
+.sp2 {
+  top: 31%;
+  right: 9%;
+}
+.sp3 {
+  top: 47%;
+  left: 8%;
+  font-size: 3cqw;
+}
+.sp4 {
+  top: 55%;
+  right: 10%;
+}
+.sp5 {
+  top: 68%;
+  left: 14%;
+}
+.sp6 {
+  top: 15%;
+  right: 17%;
+  font-size: 3cqw;
+}
+[data-shape='arch-oval'] .sp1 {
+  left: 17%;
+}
+[data-shape='arch-oval'] .sp5 {
+  left: 19%;
+}
+[data-shape='arch-oval'] .sp6 {
+  right: 24%;
+}
+/* Poster front: the teddy and the pram at the foot either side of the family, two small pieces above them. */
+.poster .family {
+  width: 62cqw;
+  align-self: center;
+}
+.pdTeddy,
+.pdPram {
+  bottom: 9cqh;
+}
+.pdTeddy {
+  inset-inline-start: 9cqw;
+  width: 27cqw;
+}
+.pdPram {
+  inset-inline-end: 9cqw;
+  width: 25cqw;
+}
+.pdB,
+.pdC {
+  bottom: 33cqh;
+  width: 14cqw;
+}
+.pdB {
+  inset-inline-start: 11cqw;
+}
+.pdC {
+  inset-inline-end: 11cqw;
+}
+[data-shape='arch'] .pdTeddy,
+[data-shape='arch'] .pdPram {
+  bottom: 5cqh;
+}
+[data-shape='arch'] .pdTeddy {
+  inset-inline-start: 7cqw;
+}
+[data-shape='arch'] .pdPram {
+  inset-inline-end: 7cqw;
+}
+[data-shape='arch'] .pdB,
+[data-shape='arch'] .pdC {
+  bottom: 27cqh;
+}
+[data-shape='arch-oval'] .pdTeddy,
+[data-shape='arch-oval'] .pdPram {
+  bottom: 12cqh;
+  width: 21cqw;
+}
+[data-shape='arch-oval'] .pdTeddy {
+  inset-inline-start: 18cqw;
+}
+[data-shape='arch-oval'] .pdPram {
+  inset-inline-end: 18cqw;
+}
+[data-shape='arch-oval'] .pdB,
+[data-shape='arch-oval'] .pdC {
+  bottom: 34cqh;
+  width: 11cqw;
+}
+[data-shape='arch-oval'] .pdB {
+  inset-inline-start: 14cqw;
+}
+[data-shape='arch-oval'] .pdC {
+  inset-inline-end: 14cqw;
+}
+/* Poster back: the garland over the words, the teddy, the nursery piece and the pram along the foot. */
+.pbGarland {
+  top: 9cqh;
+  left: 50%;
+  width: 50cqw;
+  transform: translateX(-50%);
+}
+.pbTeddy,
+.pbPram,
+.pbDecoA {
+  bottom: 9cqh;
+}
+.pbTeddy {
+  inset-inline-start: 9cqw;
+  width: 25cqw;
+}
+.pbPram {
+  inset-inline-end: 9cqw;
+  width: 24cqw;
+}
+.pbDecoA {
+  left: 50%;
+  width: 28cqw;
+  transform: translateX(-50%);
+}
+[data-shape='arch'] .pbGarland {
+  top: 7cqh;
+}
+[data-shape='arch'] .pbTeddy,
+[data-shape='arch'] .pbPram,
+[data-shape='arch'] .pbDecoA {
+  bottom: 5cqh;
+}
+[data-shape='arch-oval'] .pbGarland {
+  top: 11cqh;
+  width: 40cqw;
+}
+[data-shape='arch-oval'] .pbTeddy,
+[data-shape='arch-oval'] .pbPram {
+  bottom: 14cqh;
+  width: 20cqw;
+}
+[data-shape='arch-oval'] .pbTeddy {
+  inset-inline-start: 18cqw;
+}
+[data-shape='arch-oval'] .pbPram {
+  inset-inline-end: 18cqw;
+}
+[data-shape='arch-oval'] .pbDecoA {
+  bottom: 7cqh;
+  width: 22cqw;
+}
+/* The A5 card's back (landscape): the nursery piece and the pram on the right, little feet on the left. */
+.back .sparkle {
+  font-size: 4cqh;
+}
+.backDecoA {
+  top: 15cqh;
+  inset-inline-end: 8cqw;
+  width: 14cqw;
+}
+.backPram {
+  bottom: 13cqh;
+  inset-inline-end: 9cqw;
+  width: 12cqw;
+}
+.backFeet {
+  top: 18cqh;
+  inset-inline-start: 11cqw;
+  width: 7cqw;
+}

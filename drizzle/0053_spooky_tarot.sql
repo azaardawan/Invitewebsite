@@ -1,0 +1,1 @@
+ALTER TABLE "theme_fields" ADD COLUMN "required" boolean;

@@ -17,7 +17,10 @@ export type FieldError =
   | 'invalidChoice'
   | 'birthTooFar';
 
-/** A field as validated: its type, its length limit, and whether this design lets the customer leave it empty. */
+/**
+ * A field as validated: its type, its length limit, and whether the customer may leave it empty on this design
+ * (`optional`: the final answer when given, see `mayStayEmpty`; without it, the Field Library's).
+ */
 export type FieldDef = { type: string; maxLength: number | null; optional?: boolean };
 
 const DEFAULT_MAX = { text: 80, longtext: 500 } as const;
@@ -63,7 +66,7 @@ export function validateFieldValues(
     const def = defs.get(key);
     const raw = input[key];
     if (typeof raw !== 'string' || raw.trim() === '') {
-      if (!opts.partial && !isOptionalField(key) && !def?.optional) errors[key] = 'required';
+      if (!opts.partial && !(def?.optional ?? isOptionalField(key))) errors[key] = 'required';
       continue;
     }
     switch (def?.type) {
@@ -83,7 +86,7 @@ export function validateFieldValues(
         const b = cleanText(second, false) ?? '';
         if (Array.from(a).length > INITIALS_MAX || Array.from(b).length > INITIALS_MAX) errors[key] = 'tooLong';
         else if (joinInitials(a, b)) values[key] = joinInitials(a, b);
-        else if (!isOptionalField(key) && !def?.optional) errors[key] = 'required';
+        else if (!(def?.optional ?? isOptionalField(key))) errors[key] = 'required';
         break;
       }
       case 'date': {

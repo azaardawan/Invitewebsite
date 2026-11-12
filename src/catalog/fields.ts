@@ -128,6 +128,21 @@ export function isOptionalField(key: string): boolean {
   return isFieldKey(key) && (STANDARD_FIELDS[key] as FieldSpec).optional === true;
 }
 
+/**
+ * Fields the customer must always fill, whatever the owner chooses in Admin: the platform itself needs them (the
+ * invitation's address is made from the name, the dates drive the countdown, reminders and clean-up).
+ */
+export const ALWAYS_REQUIRED_FIELDS: readonly string[] = ['person_1_name', 'baby_name', 'event_date', 'birth_date', 'baby_gender'];
+
+/**
+ * Whether the customer may leave a field empty on a design: the owner's choice for that design when they made one
+ * (`required`: true / false, Admin → the design → Fields), else `byDefault` (the Field Library's and the design's own).
+ */
+export function mayStayEmpty(key: string, byDefault: boolean, required: boolean | null | undefined): boolean {
+  if (ALWAYS_REQUIRED_FIELDS.includes(key)) return false;
+  return required === null || required === undefined ? byDefault : !required;
+}
+
 /** The fixed options of a `choice` field (empty for other fields). */
 export function fieldOptions(key: string): readonly string[] {
   return isFieldKey(key) ? ((STANDARD_FIELDS[key] as FieldSpec).options ?? []) : [];

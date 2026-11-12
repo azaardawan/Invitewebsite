@@ -1,0 +1,1799 @@
+/*
+ * Little Rose: the designer's stylesheet (owner's edit, 2026-11-02), scoped to the theme; the page's states sit on the
+ * root (is-closed, is-opening, is-open, has-photo). Below it, the platform's parts in the same paper and ink.
+ */
+#frame .root {
+  --paper: #fcf8f3;
+  --paper-light: #fffdf8;
+  --rose-wash: #f6e8e8;
+  --powder: #efcdd3;
+  --rose: #a77783;
+  --ink: #69434f;
+  --muted: #85616a;
+  --line: #d8b5be;
+  --cream: #f1e3ca;
+  --body: "LR Amiri", Georgia, serif;
+  --ui: "LR UI", Arial, sans-serif;
+}
+#frame .root * {
+  box-sizing: border-box;
+}
+#frame .root {
+  scroll-behavior: smooth;
+}
+#frame .root {
+  margin: 0;
+  background: #efeaeb;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 23px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+#frame .root.is-closed {
+  overflow: hidden;
+}
+#frame .root button,
+#frame .root input,
+#frame .root textarea {
+  font: inherit;
+}
+#frame .root button,
+#frame .root a {
+  -webkit-tap-highlight-color: transparent;
+}
+#frame .root button {
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+#frame .root a {
+  color: inherit;
+}
+#frame .root button:focus-visible,
+#frame .root a:focus-visible,
+#frame .root input:focus-visible,
+#frame .root textarea:focus-visible {
+  outline: 2px solid #834356;
+  outline-offset: 5px;
+}
+#frame .root button[disabled] {
+  opacity: 0.55;
+  cursor: wait;
+}
+#frame .root [hidden] {
+  display: none !important;
+}
+#frame .root img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+}
+#frame .root h1,
+#frame .root h2,
+#frame .root h3,
+#frame .root p,
+#frame .root figure {
+  margin: 0;
+}
+#frame .root h2 {
+  font-weight: 400;
+  font-size: clamp(38px, 4.1vw, 58px);
+  line-height: 1.5;
+}
+#frame .root h2 em {
+  font-style: normal;
+  color: #9b6b7a;
+}
+#frame .root .eyebrow {
+  font: 11px/1.9 var(--ui);
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+#frame .root .keepsake {
+  max-width: 1240px;
+  margin: 0 auto 35px;
+  background: var(--paper);
+  box-shadow: 0 10px 70px #552e3a0b;
+  overflow: hidden;
+  border-radius: 3px;
+  position: relative;
+  isolation: isolate;
+}
+#frame .root .keepsake::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.23;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.79' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23746b5b' opacity='.1' d='M0 0h180v180H0z' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#frame .root .announcement {
+  min-height: 100svh;
+  position: relative;
+  isolation: isolate;
+  padding: 82px 78px 54px;
+  display: grid;
+  align-content: center;
+}
+#frame .root .hero-border {
+  position: absolute;
+  inset: 21px;
+  border: 1px solid #ccaeb7;
+  border-radius: 180px 180px 8px 8px;
+  pointer-events: none;
+  z-index: -1;
+}
+#frame .root .hero-border:after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid #e2d8db;
+  border-radius: 172px 172px 3px 3px;
+}
+#frame .root .hero-corner {
+  position: absolute;
+  z-index: -1;
+  font-size: 35px;
+  color: #c7a9b2;
+}
+#frame .root .corner-a {
+  top: 105px;
+  left: 56px;
+}
+#frame .root .corner-b {
+  bottom: 48px;
+  right: 54px;
+}
+#frame .root .hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 20px;
+  align-items: center;
+  direction: rtl;
+}
+#frame .root .hero-copy {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  padding: 40px 0;
+}
+#frame .root .hero-thanks {
+  max-width: 380px;
+  margin: 15px auto 0;
+  font-size: 20px;
+  line-height: 1.9;
+}
+#frame .root .fine-rule {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  margin: 25px auto 18px;
+  color: #b18f99;
+  max-width: 165px;
+  font-size: 15px;
+}
+#frame .root .fine-rule i {
+  height: 1px;
+  background: var(--line);
+  flex: 1;
+}
+#frame .root .welcome-line {
+  font-size: 27px;
+  color: #946d79;
+}
+#frame .root .baby-name {
+  font-family: "LR Amiri", serif;
+  font-weight: 400;
+  font-size: clamp(90px, 11vw, 150px);
+  line-height: 1.35;
+  margin: -6px 0 -3px;
+  overflow-wrap: anywhere;
+}
+#frame .root .family-name {
+  font-size: 29px;
+  line-height: 1.6;
+}
+#frame .root .hero-date {
+  font-size: 20px;
+  margin-top: 16px;
+  color: #794e5b;
+}
+#frame .root .hero-ending {
+  font-size: 18px;
+  margin-top: 26px;
+  color: #82646d;
+}
+#frame .root .family-portrait {
+  position: relative;
+  align-self: end;
+  padding: 40px 0 12px;
+}
+#frame .root .family-portrait > img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: 610px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: none;
+}
+#frame .root .portrait-arch {
+  position: absolute;
+  inset: 5% -10px 3%;
+  border-radius: 50% 50% 5px 5px;
+  background: radial-gradient(
+    ellipse at 50% 36%,
+    #eedee3b0 0%,
+    #f0ebec6b 48%,
+    #fbf8f100 75%
+  );
+  border-top: 1px solid #dfcbd1;
+}
+#frame .root .arch-star {
+  position: absolute;
+  color: #be97a3;
+  font-size: 24px;
+}
+#frame .root .star-one {
+  left: 8%;
+  top: 30%;
+}
+#frame .root .star-two {
+  right: 6%;
+  top: 18%;
+  font-size: 18px;
+}
+#frame .root .hero-scroll {
+  text-decoration: none;
+  position: relative;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font: 10px var(--ui);
+  margin-top: 22px;
+  color: var(--muted);
+}
+#frame .root .hero-scroll span:last-child {
+  font-size: 23px;
+}
+#frame .root .opening-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  perspective: 1600px;
+  direction: ltr;
+}
+#frame .root .paper-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.2%;
+  background-color: #f6f4eb;
+  background-image: repeating-linear-gradient(
+    0deg,
+    #946a7604 0 1px,
+    transparent 1px 4px
+  );
+  will-change: transform;
+  backface-visibility: hidden;
+  box-shadow: 0 0 30px #5e384318;
+}
+#frame .root .door-left {
+  left: 0;
+  transform-origin: left center;
+}
+#frame .root .door-right {
+  right: 0;
+  transform-origin: right center;
+}
+#frame .root .door-frame {
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  border: 1px solid #c3a1ab;
+  box-shadow:
+    0 0 0 6px #f6f4eb,
+    0 0 0 7px #dbccd0;
+}
+#frame .root .door-left .door-frame {
+  left: 25px;
+  right: 0;
+  border-right: 0;
+  border-radius: 190px 0 0 3px;
+}
+#frame .root .door-right .door-frame {
+  right: 25px;
+  left: 0;
+  border-left: 0;
+  border-radius: 0 190px 3px 0;
+}
+#frame .root .ribbon-band {
+  position: absolute;
+  top: 61%;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(180deg, #debec8, #e9d8dd 45%, #d8b8c2);
+  border-block: 1px solid #d1aeb9;
+  opacity: 0.9;
+}
+#frame .root .cover-bunting {
+  position: absolute;
+  top: 33px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 450px;
+  max-width: 74%;
+  height: auto;
+  z-index: 1;
+}
+#frame .root .cover-copy {
+  position: absolute;
+  top: 29%;
+  left: 12%;
+  right: 12%;
+  text-align: center;
+  direction: rtl;
+  pointer-events: none;
+}
+#frame .root .cover-title {
+  font-size: clamp(40px, 5vw, 67px);
+  line-height: 1.6;
+  margin-top: 9px;
+}
+#frame .root .cover-title em {
+  font-style: normal;
+  color: #9a7681;
+}
+#frame .root .open-announcement {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  z-index: 4;
+}
+#frame .root .opening-bow {
+  position: absolute;
+  top: 61%;
+  left: 50%;
+  width: 174px;
+  transform: translate(-43%, -38%) rotate(-10deg);
+  filter: drop-shadow(0 2px 2px #844f5f12);
+  transition: transform 0.5s;
+}
+#frame .root .open-announcement:hover .opening-bow {
+  transform: translate(-43%, -38%) rotate(-6deg) scale(1.035);
+}
+#frame .root .open-prompt {
+  position: absolute;
+  top: 82%;
+  left: 0;
+  right: 0;
+  font: 12px var(--ui);
+  color: #744956;
+  letter-spacing: 0.03em;
+}
+#frame .root .open-prompt:after {
+  content: "↗";
+  display: inline-block;
+  margin-inline: 13px;
+  font: 19px "LR Serif";
+}
+#frame .root .cover-foot {
+  position: absolute;
+  bottom: 46px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 16px;
+  color: #8e727b;
+}
+#frame .root .cover-spark {
+  position: absolute;
+  color: #c29faa;
+  font-size: 30px;
+}
+#frame .root .spark-a {
+  left: 18%;
+  top: 46%;
+}
+#frame .root .spark-b {
+  right: 17%;
+  top: 70%;
+  font-size: 20px;
+}
+#frame .root .section {
+  position: relative;
+  padding: 100px 88px;
+}
+#frame .root .our-joy {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  background: linear-gradient(180deg, transparent, #f0e9eb70 40%, #f0e9eb99);
+  padding-block: 120px 100px;
+}
+#frame .root .seam-line {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 38px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #cdb3bb, transparent);
+}
+#frame .root .story-art {
+  max-width: 320px;
+  justify-self: center;
+  transform: rotate(-3deg);
+}
+#frame .root .story-copy {
+  max-width: 450px;
+}
+#frame .root .story-copy h2 {
+  margin: 15px 0 24px;
+}
+#frame .root .story-body {
+  font-size: 22px;
+  line-height: 2;
+  max-width: 430px;
+}
+#frame .root .handwritten {
+  font-size: 25px;
+  color: #9a707d;
+  margin-top: 25px;
+}
+#frame .root .birth-section {
+  padding-top: 40px;
+  background: linear-gradient(#f0e9eb99, #f2f5ef70 65%, transparent);
+  padding-bottom: 90px;
+}
+#frame .root .nursery-garland {
+  max-width: 630px;
+  width: 90%;
+  height: auto;
+  margin: 0 auto 30px;
+  position: relative;
+  z-index: 1;
+}
+#frame .root .birth-paper {
+  background: #fffdf8;
+  position: relative;
+  text-align: center;
+  padding: 55px 100px 50px;
+  max-width: 820px;
+  margin: auto;
+  box-shadow: 0 4px 20px #734e5907;
+  border: 1px solid #d9cace;
+  border-radius: 4px 4px 50% 50%/4px 4px 25px 25px;
+}
+#frame .root .paper-stitches {
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed #d2b8c0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+#frame .root .birth-paper h2 {
+  font-size: 40px;
+  margin: 12px 0 25px;
+}
+#frame .root .date-medallion {
+  border: 1px solid #d2bec4;
+  outline: 1px solid #e8e1e3;
+  outline-offset: 6px;
+  border-radius: 50%;
+  width: 166px;
+  height: 192px;
+  margin: 10px auto 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+  background: radial-gradient(ellipse, #faf6f7, #f6eff1);
+}
+#frame .root .date-medallion span {
+  font-size: 18px;
+}
+#frame .root .date-medallion strong {
+  font:
+    65px/1.35 "LR Amiri",
+    serif;
+  font-weight: 400;
+  margin: 2px 0;
+}
+#frame .root .detail-family {
+  font-size: 25px;
+}
+#frame .root .optional-details {
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+  margin-top: 22px;
+}
+#frame .root .optional-details p {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#frame .root .optional-details span {
+  font: 11px var(--ui);
+  color: var(--muted);
+}
+#frame .root .optional-details strong {
+  font-size: 23px;
+  font-weight: 400;
+  direction: ltr;
+}
+#frame .root .days-of-love {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 23px;
+  color: #8c636f;
+  font-size: 17px;
+}
+#frame .root .days-of-love strong {
+  font-weight: 400;
+}
+#frame .root .footprints {
+  position: absolute;
+  width: 66px;
+  top: 25%;
+  left: 35px;
+  transform: rotate(-15deg);
+  opacity: 0.7;
+}
+#frame .root .booties {
+  position: absolute;
+  width: 103px;
+  bottom: 18%;
+  right: 28px;
+  transform: rotate(8deg);
+}
+#frame .root .memory-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 110px;
+}
+#frame .root .memory-copy h2 {
+  margin: 14px 0 20px;
+}
+#frame .root .memory-copy > p:not(.eyebrow) {
+  font-size: 22px;
+  line-height: 1.9;
+  max-width: 400px;
+}
+#frame .root .photo-keepsake {
+  padding: 20px 20px 15px;
+  background: #fffdf8;
+  border: 1px solid #d6c5ca;
+  box-shadow: 0 9px 30px #5a313d10;
+  transform: rotate(2deg);
+  width: 100%;
+  max-width: 430px;
+  justify-self: center;
+  position: relative;
+}
+#frame .root .photo-keepsake > img {
+  aspect-ratio: 4/5;
+  object-fit: contain;
+  width: 100%;
+  background: #f3ebed;
+  padding: 35px;
+  border-radius: 48% 48% 2px 2px;
+}
+#frame .root.has-photo .photo-keepsake > img {
+  object-fit: cover;
+  padding: 0;
+}
+#frame .root .photo-keepsake figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  margin-top: 15px;
+}
+#frame .root .photo-corners:before,
+#frame .root .photo-corners:after {
+  content: "";
+  position: absolute;
+  width: 55px;
+  height: 28px;
+  background: #e4d5dab0;
+  top: -10px;
+  transform: rotate(-30deg);
+  z-index: 2;
+}
+#frame .root .photo-corners:before {
+  left: -12px;
+}
+#frame .root .photo-corners:after {
+  right: -12px;
+  transform: rotate(30deg);
+}
+#frame .root:not(.has-photo) .memory-section {
+  display: none;
+}
+#frame .root .blessing-section {
+  background: #ebdee2;
+  text-align: center;
+  padding: 95px 140px 180px;
+  min-height: 610px;
+  overflow: hidden;
+}
+#frame .root .blessing-frame {
+  position: absolute;
+  inset: 28px;
+  border: 1px solid #c2a3ac;
+  border-radius: 160px 160px 5px 5px;
+  pointer-events: none;
+}
+#frame .root .blessing-frame:after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid #d2c0c5;
+  border-radius: inherit;
+}
+#frame .root .blessing-section h2 {
+  font-size: clamp(33px, 4vw, 52px);
+  line-height: 1.9;
+  max-width: 660px;
+  margin: 27px auto 22px;
+  position: relative;
+  z-index: 2;
+}
+#frame .root .blessing-signature {
+  font-size: 19px;
+  position: relative;
+  z-index: 2;
+}
+#frame .root .blessing-signature p {
+  font-size: 30px;
+  margin-top: 0;
+}
+#frame .root .toy-corner {
+  position: absolute;
+  left: 31px;
+  bottom: 31px;
+  width: 310px;
+  max-width: 38%;
+  height: auto;
+  pointer-events: none;
+}
+#frame .root .closing-star {
+  position: absolute;
+  right: 85px;
+  bottom: 145px;
+  color: #a67685;
+  font-size: 42px;
+}
+#frame .root .closing-small {
+  position: absolute;
+  bottom: 60px;
+  left: 31%;
+  right: 8%;
+  font-size: 19px;
+  color: #7f5562;
+}
+#frame .root .footer {
+  padding: 23px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font: 11px var(--ui);
+  color: #795761;
+  background: #f5f5ee;
+}
+#frame .root .footer button {
+  padding: 8px 3px;
+}
+#frame .root .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+#frame .root .reveal.is-seen {
+  opacity: 1;
+  transform: none;
+}
+#frame .root .story-art.is-seen {
+  transform: rotate(-3deg);
+}
+#frame .root .photo-keepsake.is-seen {
+  transform: rotate(2deg);
+}
+#frame .root .arch-star,
+#frame .root .cover-spark {
+  animation: quiet-star 4s steps(2, end) infinite alternate;
+}
+#frame .root .star-two,
+#frame .root .spark-b {
+  animation-delay: -2s;
+}
+@keyframes quiet-star {
+  0% {
+    opacity: 0.5;
+    rotate: -5deg;
+  }
+  60% {
+    opacity: 1;
+    rotate: 5deg;
+  }
+  100% {
+    opacity: 0.7;
+    rotate: -2deg;
+  }
+}
+#frame .root.motion-paused * {
+  animation-play-state: paused !important;
+}
+#frame .root.motion-paused .reveal {
+  transition: none;
+  opacity: 1;
+  transform: none;
+}
+#frame .root label {
+  display: block;
+  font: 11px/1.8 var(--ui);
+  margin-bottom: 10px;
+}
+#frame .root label > span {
+  display: block;
+  margin-bottom: 5px;
+}
+#frame .root input,
+#frame .root textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #d0bac1;
+  border-radius: 4px;
+  padding: 10px 12px;
+  background: #fffdf8;
+  color: var(--ink);
+  font: 16px/1.5 var(--body);
+  min-width: 0;
+}
+#frame .root input[type="file"] {
+  font: 11px var(--ui);
+  padding: 11px 7px;
+}
+#frame .root input[type="date"],
+#frame .root input[type="time"] {
+  font: 14px/1.7 var(--ui);
+}
+#frame .root textarea {
+  resize: vertical;
+}
+#frame .root[data-script='latin'] {
+  --body: "LR Serif", Georgia, serif;
+  --ui: Arial, sans-serif;
+}
+#frame .root[data-script='latin'] .hero-inner {
+  direction: ltr;
+}
+#frame .root[data-script='latin'] .baby-name {
+  font-family: "LR Serif", serif;
+  font-style: italic;
+  font-size: clamp(66px, 8vw, 105px);
+  line-height: 1.25;
+  margin: 16px 0;
+}
+#frame .root[data-script='latin'] .cover-title {
+  font-family: "LR Serif", serif;
+  line-height: 1.2;
+}
+#frame .root[data-script='latin'] .cover-title em,
+#frame .root[data-script='latin'] h2 em {
+  font-style: italic;
+}
+#frame .root[data-script='latin'] .hero-thanks {
+  font-size: 19px;
+  line-height: 1.5;
+}
+#frame .root[data-script='latin'] .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 10px;
+}
+#frame .root[data-script='latin'] h2 {
+  line-height: 1.2;
+}
+#frame .root[data-script='latin'] .date-medallion strong {
+  font-family: "LR Serif", serif;
+  line-height: 1.15;
+}
+#frame .root[data-script='latin'] .story-body {
+  line-height: 1.65;
+}
+#frame .root[data-script='latin'] .blessing-section h2 {
+  line-height: 1.5;
+}
+@media (min-width: 1400px) {
+  #frame .root .announcement {
+    min-height: 780px;
+  }
+}
+@media (max-width: 1100px) {
+  #frame .root .keepsake {
+    margin-inline: 18px;
+  }
+  #frame .root .announcement {
+    padding-inline: 52px;
+  }
+  #frame .root .section {
+    padding-inline: 60px;
+  }
+  #frame .root .our-joy,
+  #frame .root .memory-section {
+    gap: 45px;
+  }
+  #frame .root .hero-thanks {
+    font-size: 18px;
+  }
+  #frame .root .birth-paper {
+    padding-inline: 90px;
+  }
+  #frame .root .cover-bunting {
+    width: 420px;
+  }
+  #frame .root .blessing-section {
+    padding-inline: 100px;
+  }
+}
+@media (max-width: 700px) {
+  #frame .root {
+    font-size: 21px;
+  }
+  #frame .root .keepsake {
+    margin: 0 8px 12px;
+  }
+  #frame .root .announcement {
+    min-height: 100svh;
+    padding: 48px 36px 30px;
+    align-content: start;
+  }
+  #frame .root .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  #frame .root .hero-border {
+    inset: 13px;
+    border-radius: 120px 120px 5px 5px;
+  }
+  #frame .root .hero-border:after {
+    inset: 5px;
+    border-radius: 114px 114px 3px 3px;
+  }
+  #frame .root .hero-corner {
+    font-size: 23px;
+  }
+  #frame .root .corner-a {
+    top: 180px;
+    left: 25px;
+  }
+  #frame .root .corner-b {
+    bottom: 51px;
+    right: 25px;
+  }
+  #frame .root .hero-copy {
+    padding: 13px 0 0;
+  }
+  #frame .root .hero-copy .eyebrow {
+    font-size: 9px;
+  }
+  #frame .root .hero-thanks {
+    font-size: 17px;
+    line-height: 1.8;
+    margin-top: 8px;
+    max-width: 280px;
+  }
+  #frame .root .fine-rule {
+    margin: 15px auto 10px;
+    gap: 10px;
+    max-width: 115px;
+  }
+  #frame .root .welcome-line {
+    font-size: 22px;
+  }
+  #frame .root .baby-name {
+    font-size: 94px;
+    line-height: 1.12;
+    margin: 3px 0 0;
+  }
+  #frame .root .family-name {
+    font-size: 24px;
+    line-height: 1.4;
+  }
+  #frame .root .hero-date {
+    font-size: 17px;
+    margin-top: 12px;
+  }
+  #frame .root .hero-ending {
+    font-size: 15px;
+    margin-top: 10px;
+  }
+  #frame .root .family-portrait {
+    max-width: 330px;
+    width: 100%;
+    justify-self: center;
+    padding: 16px 10px 0;
+  }
+  #frame .root .family-portrait > img {
+    max-height: 350px;
+    width: 100%;
+    object-fit: contain;
+  }
+  #frame .root .portrait-arch {
+    inset: 7% 2% 1%;
+    border-color: #e2d3d7;
+  }
+  #frame .root .star-one {
+    font-size: 20px;
+    left: 0;
+    top: 24%;
+  }
+  #frame .root .star-two {
+    right: 0;
+    top: 39%;
+  }
+  #frame .root .hero-scroll {
+    margin-top: 18px;
+    font-size: 9px;
+  }
+  #frame .root .cover-copy {
+    top: 29%;
+    left: 8%;
+    right: 8%;
+  }
+  #frame .root .cover-title {
+    font-size: 42px;
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+  #frame .root .cover-copy .eyebrow {
+    font-size: 10px;
+  }
+  #frame .root .cover-bunting {
+    top: 31px;
+    max-width: 82%;
+    width: 340px;
+  }
+  #frame .root .door-frame {
+    top: 18px;
+    bottom: 18px;
+  }
+  #frame .root .door-left .door-frame {
+    left: 18px;
+    border-radius: 125px 0 0 3px;
+  }
+  #frame .root .door-right .door-frame {
+    right: 18px;
+    border-radius: 0 125px 3px 0;
+  }
+  #frame .root .opening-bow {
+    width: 135px;
+    top: 62%;
+  }
+  #frame .root .ribbon-band {
+    height: 16px;
+    top: 62%;
+  }
+  #frame .root .open-prompt {
+    top: 81%;
+    font-size: 11px;
+  }
+  #frame .root .cover-foot {
+    bottom: 42px;
+    font-size: 14px;
+  }
+  #frame .root .spark-a {
+    top: 49%;
+    left: 13%;
+    font-size: 22px;
+  }
+  #frame .root .spark-b {
+    top: 71%;
+    right: 14%;
+    font-size: 19px;
+  }
+  #frame .root .section {
+    padding-inline: 32px;
+  }
+  #frame .root .our-joy {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding-top: 85px;
+    padding-bottom: 65px;
+    text-align: center;
+  }
+  #frame .root .story-art {
+    width: 185px;
+    grid-row: 2;
+  }
+  #frame .root .story-copy {
+    max-width: none;
+  }
+  #frame .root .story-copy h2 {
+    font-size: 38px;
+    margin: 14px 0 20px;
+  }
+  #frame .root .story-body {
+    font-size: 21px;
+    line-height: 1.95;
+  }
+  #frame .root .handwritten {
+    font-size: 24px;
+    margin-top: 18px;
+  }
+  #frame .root .seam-line {
+    top: 26px;
+    left: 14%;
+    right: 14%;
+  }
+  #frame .root .birth-section {
+    padding: 15px 22px 65px;
+  }
+  #frame .root .nursery-garland {
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 12px;
+  }
+  #frame .root .birth-paper {
+    padding: 38px 36px 48px;
+  }
+  #frame .root .birth-paper h2 {
+    font-size: 33px;
+    line-height: 1.5;
+    margin: 10px 0 22px;
+  }
+  #frame .root .birth-paper .eyebrow {
+    font-size: 9px;
+  }
+  #frame .root .date-medallion {
+    width: 132px;
+    height: 158px;
+    margin-bottom: 22px;
+  }
+  #frame .root .date-medallion span {
+    font-size: 16px;
+  }
+  #frame .root .date-medallion strong {
+    font-size: 53px;
+  }
+  #frame .root .detail-family {
+    font-size: 24px;
+  }
+  #frame .root .footprints {
+    width: 40px;
+    top: 40%;
+    left: 12px;
+    opacity: 0.55;
+  }
+  #frame .root .booties {
+    width: 58px;
+    right: 13px;
+    bottom: 14%;
+    opacity: 0.85;
+  }
+  #frame .root .days-of-love {
+    font-size: 15px;
+    gap: 9px;
+  }
+  #frame .root .optional-details {
+    gap: 20px;
+  }
+  #frame .root .optional-details span {
+    font-size: 10px;
+  }
+  #frame .root .optional-details strong {
+    font-size: 19px;
+  }
+  #frame .root .memory-section {
+    grid-template-columns: 1fr;
+    gap: 33px;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 75px;
+  }
+  #frame .root .memory-copy h2 {
+    font-size: 38px;
+  }
+  #frame .root .memory-copy > p:not(.eyebrow) {
+    font-size: 21px;
+  }
+  #frame .root .photo-keepsake {
+    max-width: 310px;
+    padding: 14px 14px 13px;
+  }
+  #frame .root .photo-keepsake > img {
+    padding: 28px;
+  }
+  #frame .root .photo-keepsake figcaption {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  #frame .root .blessing-section {
+    padding: 75px 42px 165px;
+    min-height: 590px;
+  }
+  #frame .root .blessing-frame {
+    inset: 17px;
+    border-radius: 115px 115px 3px 3px;
+  }
+  #frame .root .blessing-frame:after {
+    inset: 6px;
+  }
+  #frame .root .blessing-section .eyebrow {
+    font-size: 10px;
+  }
+  #frame .root .blessing-section h2 {
+    font-size: 34px;
+    line-height: 1.8;
+    margin: 22px auto 15px;
+  }
+  #frame .root .blessing-signature {
+    font-size: 17px;
+  }
+  #frame .root .blessing-signature p {
+    font-size: 26px;
+  }
+  #frame .root .toy-corner {
+    left: 20px;
+    bottom: 20px;
+    width: 185px;
+    max-width: 48%;
+  }
+  #frame .root .closing-star {
+    right: 48px;
+    bottom: 135px;
+    font-size: 29px;
+  }
+  #frame .root .closing-small {
+    font-size: 16px;
+    bottom: 65px;
+    left: 47%;
+    right: 30px;
+    line-height: 1.8;
+  }
+  #frame .root .footer {
+    gap: 10px;
+    font-size: 10px;
+    padding: 16px 10px;
+  }
+  #frame .root .eyebrow {
+    font-size: 10px;
+  }
+  #frame .root[data-script='latin'] .baby-name {
+    font-size: 72px;
+    margin: 10px 0 4px;
+  }
+  #frame .root[data-script='latin'] .hero-copy .eyebrow {
+    font-size: 8px;
+  }
+  #frame .root[data-script='latin'] .hero-thanks {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  #frame .root[data-script='latin'] .cover-title {
+    font-size: 42px;
+    line-height: 1.35;
+  }
+  #frame .root[data-script='latin'] .cover-copy {
+    top: 30%;
+  }
+  #frame .root[data-script='latin'] .story-body {
+    font-size: 19px;
+  }
+  #frame .root[data-script='latin'] .birth-paper h2 {
+    font-size: 29px;
+  }
+  #frame .root[data-script='latin'] .blessing-section h2 {
+    font-size: 29px;
+    line-height: 1.5;
+  }
+}
+@media (max-width: 360px) {
+  #frame .root .announcement {
+    padding-inline: 30px;
+  }
+  #frame .root .hero-thanks {
+    font-size: 16px;
+  }
+  #frame .root .baby-name {
+    font-size: 84px;
+  }
+  #frame .root .cover-title {
+    font-size: 37px;
+  }
+  #frame .root .section {
+    padding-inline: 25px;
+  }
+  #frame .root .birth-section {
+    padding-inline: 16px;
+  }
+  #frame .root .birth-paper {
+    padding-inline: 28px;
+  }
+  #frame .root .blessing-section {
+    padding-inline: 35px;
+  }
+}
+#frame .root.is-closed:not(.is-opening) .hero-inner {
+  visibility: hidden;
+}
+#frame .root[data-script='latin'] .cover-copy {
+  direction: ltr;
+}
+@media screen and (max-width: 700px) {
+  #frame .root .opening-cover {
+    bottom: auto;
+    height: 100svh;
+  }
+  #frame .root[data-script='latin'] .cover-title {
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.35;
+  }
+  #frame .root[data-script='latin'] .cover-copy {
+    top: 28%;
+  }
+  #frame .root .cover-foot {
+    bottom: 36px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #frame .root {
+    scroll-behavior: auto;
+  }
+  #frame .root *,
+  #frame .root *::before,
+  #frame .root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  #frame .root .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+#frame .root .opening-bow {
+  width: 150px;
+  transform: translate(-34%, -24%) rotate(-7deg);
+}
+#frame .root .open-announcement:hover .opening-bow {
+  transform: translate(-34%, -24%) rotate(-4deg) scale(1.03);
+}
+#frame .root .nursery-garland {
+  width: 210px;
+  margin-bottom: 24px;
+  opacity: 0.85;
+}
+#frame .root .toy-corner {
+  width: 220px;
+  max-width: 27%;
+  left: 54px;
+  bottom: 47px;
+}
+#frame .root .blessing-section {
+  background: linear-gradient(180deg, #f5e8e8, #f0dde1);
+}
+#frame .root .closing-small {
+  left: 29%;
+}
+#frame .root .birth-section {
+  padding-top: 42px;
+}
+#frame .root .birth-paper {
+  isolation: isolate;
+}
+#frame .root .birth-paper:before {
+  content: "";
+  position: absolute;
+  inset: -16px 18px 12px;
+  border: 1px solid #e7cdd2;
+  border-radius: inherit;
+  z-index: -1;
+  transform: rotate(-1.2deg);
+  background: #fffaf6;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+  #frame .root .opening-bow {
+    width: 130px;
+  }
+  #frame .root .nursery-garland {
+    width: 160px;
+    margin-bottom: 22px;
+  }
+  #frame .root .toy-corner {
+    width: 155px;
+    max-width: 38%;
+    left: 28px;
+    bottom: 32px;
+  }
+  #frame .root .closing-small {
+    left: 47%;
+  }
+  #frame .root .birth-section {
+    padding-top: 22px;
+  }
+  #frame .root .blessing-section {
+    padding-bottom: 170px;
+  }
+}
+#frame .root .welcome-line,
+#frame .root .hero-ending,
+#frame .root .hero-date,
+#frame .root .cover-foot,
+#frame .root .open-prompt {
+  color: var(--muted);
+}
+#frame .root .opening-cover {
+  perspective: 1150px;
+  perspective-origin: 50% 48%;
+  --ribbon-main: #c0dce9;
+  --ribbon-light: #eff7fb;
+  --ribbon-dark: #8fb5c9;
+}
+#frame .root .paper-door {
+  transform-style: preserve-3d;
+  will-change: auto;
+  box-shadow: 0 2px 15px #294c600c;
+}
+#frame .root .paper-door:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent 6%, #263c491f 65%, #ffffff55);
+}
+#frame .root .door-right:after {
+  background: linear-gradient(270deg, transparent 6%, #263c491f 65%, #ffffff55);
+}
+#frame .root .ribbon-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  overflow: visible;
+  pointer-events: none;
+}
+#frame .root .ribbon-main {
+  stop-color: var(--ribbon-main);
+}
+#frame .root .ribbon-light {
+  stop-color: var(--ribbon-light);
+}
+#frame .root .ribbon-dark {
+  stop-color: var(--ribbon-dark);
+}
+#frame .root .ribbon-strips path,
+#frame .root .loop-shape,
+#frame .root .knot-shape {
+  stroke: var(--ribbon-dark);
+  stroke-width: 0.55;
+  stroke-linejoin: round;
+}
+#frame .root .loop-crease {
+  fill: none;
+  stroke: var(--ribbon-dark);
+  stroke-width: 1.2;
+  opacity: 0.54;
+  stroke-linecap: round;
+}
+#frame .root .loop-shine {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.4;
+  opacity: 0.65;
+  stroke-linecap: round;
+}
+#frame .root .cover-bunting {
+  transform-origin: 50% 0;
+  animation: nursery-bunting-sway 5.2s ease-in-out infinite alternate;
+}
+#frame .root.is-opening .paper-door {
+  will-change: transform;
+}
+#frame .root.is-opening .door-left {
+  animation: nursery-fold-left 1.85s 0.7s cubic-bezier(0.28, 0.62, 0.22, 1) both;
+}
+#frame .root.is-opening .door-right {
+  animation: nursery-fold-right 1.85s 0.78s cubic-bezier(0.28, 0.62, 0.22, 1)
+    both;
+}
+#frame .root.is-opening .paper-door:after {
+  animation: nursery-fold-shade 1.8s 0.7s ease both;
+}
+#frame .root.is-opening .cover-bunting {
+  animation: nursery-bunting-lift 1.45s 0.55s cubic-bezier(0.24, 0.7, 0.3, 1)
+    both;
+}
+#frame .root.is-opening .cover-copy {
+  animation: nursery-title-lift 0.7s 0.45s ease both;
+}
+#frame .root.is-opening .cover-foot,
+#frame .root.is-opening .open-prompt,
+#frame .root.is-opening .cover-spark {
+  animation: nursery-cover-clear 0.45s 0.4s ease both;
+}
+#frame .root.is-opening .hero-copy {
+  animation: none;
+}
+#frame .root.is-opening .hero-copy > * {
+  animation: nursery-text-arrive 0.75s 1.15s cubic-bezier(0.2, 0.75, 0.3, 1)
+    both;
+}
+#frame .root.is-opening .hero-copy > .hero-thanks {
+  animation-delay: 1.25s;
+}
+#frame .root.is-opening .hero-copy > .fine-rule {
+  animation-delay: 1.35s;
+}
+#frame .root.is-opening .hero-copy > .welcome-line {
+  animation-delay: 1.43s;
+}
+#frame .root.is-opening .hero-copy > .baby-name {
+  animation-delay: 1.5s;
+}
+#frame .root.is-opening .hero-copy > .family-name {
+  animation-delay: 1.62s;
+}
+#frame .root.is-opening .hero-copy > .hero-date {
+  animation-delay: 1.72s;
+}
+#frame .root.is-opening .hero-copy > .hero-ending {
+  animation-delay: 1.82s;
+}
+#frame .root.is-opening .family-portrait {
+  transform-origin: 50% 100%;
+  animation: nursery-art-arrive 1.45s 1.1s cubic-bezier(0.19, 0.72, 0.25, 1)
+    both;
+}
+#frame .root .opening-sparkles {
+  position: absolute;
+  top: 61%;
+  left: 50%;
+  z-index: 3;
+  pointer-events: none;
+}
+#frame .root .opening-sparkles i {
+  position: absolute;
+  opacity: 0;
+  font:
+    normal 22px/1 "LR Serif",
+    serif;
+  color: var(--ribbon-dark);
+  transform: scale(0.1);
+}
+#frame .root .opening-sparkles i:nth-child(3n) {
+  font-size: 35px;
+}
+#frame .root .opening-sparkles i:nth-child(2n) {
+  font-size: 16px;
+  color: var(--ink);
+}
+#frame .root.is-opening .opening-sparkles i {
+  animation: nursery-spark-release 1.35s calc(0.55s + var(--delay)) ease-out
+    both;
+}
+@keyframes nursery-bunting-sway {
+  from {
+    transform: translateX(-50%) rotate(-1.1deg);
+  }
+  to {
+    transform: translateX(-50%) rotate(1.1deg);
+  }
+}
+@keyframes nursery-bunting-lift {
+  0% {
+    transform: translateX(-50%) rotate(0);
+  }
+  20% {
+    transform: translate(-50%, 8px) rotate(-2.5deg);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-53%, -155px) rotate(7deg);
+    opacity: 0;
+  }
+}
+@keyframes nursery-fold-left {
+  0% {
+    transform: rotateY(0);
+  }
+  10% {
+    transform: rotateY(3deg);
+  }
+  100% {
+    transform: rotateY(-106deg);
+  }
+}
+@keyframes nursery-fold-right {
+  0% {
+    transform: rotateY(0);
+  }
+  10% {
+    transform: rotateY(-3deg);
+  }
+  100% {
+    transform: rotateY(106deg);
+  }
+}
+@keyframes nursery-fold-shade {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+@keyframes nursery-title-lift {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.015);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+}
+@keyframes nursery-cover-clear {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes nursery-text-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes nursery-art-arrive {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96) rotate(-0.7deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.005) rotate(0.1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes nursery-spark-release {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0) scale(0.2);
+  }
+  16% {
+    opacity: 0.85;
+  }
+  65% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--spin)) scale(1.15);
+  }
+}
+#frame .root.motion-paused .opening-cover * {
+  animation: none !important;
+}
+@media (max-width: 700px) {
+  #frame .root .opening-cover {
+    perspective: 750px;
+  }
+  #frame .root .opening-sparkles {
+    top: 62%;
+  }
+  #frame .root .opening-sparkles i {
+    font-size: 18px;
+  }
+  #frame .root .opening-sparkles i:nth-child(3n) {
+    font-size: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #frame .root .opening-cover * {
+    animation: none !important;
+  }
+  #frame .root .opening-sparkles {
+    display: none;
+  }
+}
+#frame .root .opening-cover {
+  --ribbon-main: #ecc0ca;
+  --ribbon-light: #fff0f2;
+  --ribbon-dark: #bf899a;
+}
+
+/* ---------------------------------------------------------------- platform parts, in the design's paper and ink */
+#frame {
+  min-height: 100svh;
+}
+.page {
+  background: #efeaeb;
+}
+#frame .root {
+  --accent: var(--rose);
+  min-height: 100svh;
+  overflow-x: clip;
+}
+#frame .root .keepsake {
+  margin-bottom: 0;
+}
+#frame .root .baby-photo {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  border-radius: 48% 48% 2px 2px;
+  background: var(--powder);
+}
+#frame .root .guest-pages {
+  position: relative;
+  padding: 70px 24px 60px;
+  display: grid;
+  gap: 46px;
+  justify-items: center;
+}
+#frame .root .guest-section {
+  width: min(560px, 100%);
+  padding: 34px 30px 30px;
+  background: var(--paper-light);
+  border: 1px solid var(--line);
+  border-radius: 140px 140px 6px 6px;
+  text-align: center;
+  box-shadow: 0 6px 26px #0000000a;
+}
+#frame .root .guest-section h2 {
+  margin: 4px 0 18px;
+}
+#frame .root .guest-form {
+  display: grid;
+  gap: 18px;
+  text-align: start;
+  font-family: var(--ui);
+  font-size: 15px;
+}
+#frame .root .form-field {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+}
+#frame .root .form-field input,
+#frame .root .form-field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 17px var(--body);
+}
+#frame .root .form-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: var(--muted);
+}
+#frame .root .form-choices legend {
+  margin-bottom: 8px;
+}
+#frame .root .form-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+#frame .root .form-choice input {
+  accent-color: var(--accent);
+}
+#frame .root .form-error {
+  color: #a3423f;
+  font-size: 13px;
+}
+#frame .root .form-submit {
+  justify-self: center;
+  padding: 12px 34px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper-light);
+  font: 15px var(--ui);
+  cursor: pointer;
+}
+#frame .root .form-submit:disabled {
+  opacity: 0.6;
+}
+#frame .root .form-sent,
+#frame .root .wish-empty {
+  color: var(--muted);
+}
+#frame .root .wishes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  text-align: start;
+}
+#frame .root .wish {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--paper);
+  border: 1px dashed var(--line);
+}
+#frame .root .wish p {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.7;
+}
+#frame .root .wish-from {
+  margin-top: 4px !important;
+  color: var(--muted);
+  font: 13px var(--ui) !important;
+}
+#frame .root .music-fab {
+  position: fixed;
+  inset-inline-end: 16px;
+  bottom: 16px;
+  z-index: 20;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--paper-light);
+  color: var(--ink);
+  box-shadow: 0 4px 16px #00000014;
+  cursor: pointer;
+}
+#frame .root .footer button {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* v5 (owner, 2026-11-11): on a phone the baby's and the father's names keep clear of the little shoes and the
+   footprints at the paper's sides (a long name ran under them). */
+@media (max-width: 720px) {
+  #frame .root .detail-family {
+    margin-inline: 62px;
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,3 +1,4 @@
+import { ALWAYS_REQUIRED_FIELDS, mayStayEmpty } from '@/catalog/fields';
 import 'server-only';
 import { COVER_ZOOM_MAX, normalizeCoverFocus } from '@/lib/cover-focus';
 import { and, asc, eq, ilike, inArray, ne, notInArray, or, sql, type SQL } from 'drizzle-orm';
@@ -22,7 +23,7 @@ import type { I18nContent } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { env } from '@/server/env';
 import { sha256 } from '@/lib/crypto';
-import { codeRef, packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
+import { codeRef, fieldIsOptional, packageShapeProblems, type ThemeManifest } from '@/theme-sdk/manifest';
 import { CatalogError, auditActor, i18nContent, localized, moveInList, optionalI18nContent, type Actor } from './common';
 import { themeKeyByNumber } from '@/theme-registry';
 
@@ -362,7 +363,8 @@ export async function updateThemeSettings(db: DbOrTx, themeId: string, input: z.
   });
 }
 
-export const themeFieldsInput = z.array(z.object({ fieldKey: z.string(), label: optionalI18nContent(120) })).max(50);
+/** `required`: the owner's choice (true must be filled, false may stay empty); null = as the library and the design say. */
+export const themeFieldsInput = z.array(z.object({ fieldKey: z.string(), label: optionalI18nContent(120), required: z.boolean().nullable().optional() })).max(50);
 
 /** Reorders a theme's fields and sets per-theme labels. The set of fields is defined by the theme code. */
 export async function setThemeFields(db: DbOrTx, themeId: string, input: z.input<typeof themeFieldsInput>, actor: Actor) {
@@ -379,7 +381,8 @@ export async function setThemeFields(db: DbOrTx, themeId: string, input: z.input
     for (const [i, it] of items.entries()) {
       await tx
         .update(themeFields)
-        .set({ sortOrder: i, label: it.label })
+        // A field the platform itself needs can never be made optional (ALWAYS_REQUIRED_FIELDS).
+        .set({ sortOrder: i, label: it.label, ...(it.required === undefined ? {} : { required: ALWAYS_REQUIRED_FIELDS.includes(it.fieldKey) ? null : it.required }) })
         .where(and(eq(themeFields.themeId, themeId), eq(themeFields.fieldKey, it.fieldKey)));
     }
     await recordAudit(tx, {
@@ -387,7 +390,7 @@ export async function setThemeFields(db: DbOrTx, themeId: string, input: z.input
       action: 'theme.fields_updated',
       objectType: 'theme',
       objectId: themeId,
-      before: before.map((b) => ({ fieldKey: b.fieldKey, label: b.label })),
+      before: before.map((b) => ({ fieldKey: b.fieldKey, label: b.label, required: b.required })),
       after: items,
     });
   });
@@ -480,6 +483,10 @@ export async function getThemeDetail(db: DbOrTx, themeId: string) {
       /** What customers see: theme override → section default → field library. */
       effectiveLabel: f.tf.label ?? f.sectionLabel ?? f.def.label,
       maxLength: f.def.maxLength,
+      /** Whether the customer may leave it empty on this design (the owner's choice, else the library's and the design's). */
+      optional: mayStayEmpty(f.tf.fieldKey, fieldIsOptional(current?.manifest as ThemeManifest | undefined, f.tf.fieldKey), f.tf.required),
+      /** The platform always needs it: the owner cannot make it optional. */
+      alwaysRequired: ALWAYS_REQUIRED_FIELDS.includes(f.tf.fieldKey),
     })),
     packages: await packagesWithShape(db, themeId),
     readiness: await themeReadiness(db, themeId),

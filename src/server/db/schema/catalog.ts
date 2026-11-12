@@ -273,6 +273,12 @@ export const themeFields = pgTable(
       .references(() => fieldDefinitions.key, { onDelete: 'restrict' }),
     sortOrder: integer('sort_order').notNull().default(0),
     label: jsonb('label_i18n').$type<I18nContent>(),
+    /**
+     * The owner's choice for this design (Admin → the design → Fields; owner, 2026-11-11): `true` the customer must fill
+     * it, `false` they may leave it empty (the design then leaves that part out). Null: as the Field Library and the
+     * design say (`fieldIsOptional`).
+     */
+    required: boolean('required'),
   },
   (t) => [primaryKey({ columns: [t.themeId, t.fieldKey] })],
 );

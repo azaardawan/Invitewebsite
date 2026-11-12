@@ -3,7 +3,7 @@ import 'server-only';
 import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
 import { posterTextDefault } from '@/lib/poster-texts';
 import type { CoverFocus } from '@/lib/cover-focus';
-import { isOptionalField, isPlaceOptional } from '@/catalog/fields';
+import { isPlaceOptional } from '@/catalog/fields';
 import { customMusicIncluded, customSong } from '@/server/music/custom';
 import { MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { connection } from 'next/server';
@@ -135,7 +135,7 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
       .map((f) => ({
         key: `field:${f.key}`,
         label: localized(f.label, locale),
-        required: !f.optional && !isOptionalField(f.key),
+        required: !f.optional,
         maxLength: f.maxLength ?? TEXT_MAX[f.type as 'text' | 'longtext'],
         multiline: f.type === 'longtext',
         value: inv.fieldValues[f.key] ?? '',

@@ -72,3 +72,11 @@ product spec's §74 business rules override assumptions.
 - Theme code follows `docs/THEME_CONTRACT.md`. Themes are rendered only via `InvitationView` +
   the generated `ThemeHost` (per-theme lazy chunks). Never import a theme directly into platform code.
 - `e2e/themes.spec.ts` validates every theme state automatically; a new theme must pass it.
+- No text may clash with a design's decoration (owner, 2026-11-11): `e2e/theme-clashes.spec.ts` checks the newest version of
+  every design (long names, Arabic and English, phone). A new or changed design: run it with
+  `CLASH_STRICT=1 CLASH_SHOTS=1 CLASH_THEMES=<key>` and look at each picture; list only texts meant to sit on artwork in
+  `e2e/theme-clashes.allow.json`, never a real clash. Customer-text length limits per design: `src/catalog/text-limits.ts`
+  (`e2e/text-limits.spec.ts` measures them).
+- The owner chooses per design which fields are required (Admin → the design → Fields, `theme_fields.required`): a theme
+  must leave out a whole part when its field is empty. The invitation's paragraph (`invitation_message`) is never printed
+  on a card; the card's only paragraph is the back's own message.

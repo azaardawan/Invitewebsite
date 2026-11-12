@@ -1,0 +1,25 @@
+/* The designer's typefaces (woff2 of the package's own): Amiri, Noto Sans Arabic (UI) and P052 for English. */
+@font-face {
+  font-family: "LR Amiri";
+  src: url(./fonts/amiri.woff2) format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "LR UI";
+  src: url(./fonts/arabic-ui.woff2) format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "LR Serif";
+  src: url(./fonts/serif.woff2) format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "LR Serif";
+  src: url(./fonts/serif-italic.woff2) format("woff2");
+  font-style: italic;
+  font-display: swap;
+}
+.fonts {
+  font-family: "LR Amiri", "LR Serif", Georgia, serif;
+}

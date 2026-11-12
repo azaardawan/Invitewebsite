@@ -315,9 +315,13 @@ export async function themeFieldsAction(_: ActionState, form: FormData): Promise
   return run(async () => {
     const keys = form.getAll('fieldKey').filter((v): v is string => typeof v === 'string');
     const items = keys
-      .map((k) => ({ fieldKey: k, order: Number(form.get(`tf.${k}.order`) ?? 0), label: readI18n(form, `tf.${k}.label`) }))
+      .map((k) => {
+        // "required" / "optional" (the owner's choice); anything else leaves the stored choice as it is.
+        const need = form.get(`tf.${k}.need`);
+        return { fieldKey: k, order: Number(form.get(`tf.${k}.order`) ?? 0), label: readI18n(form, `tf.${k}.label`), required: need === 'required' ? true : need === 'optional' ? false : undefined };
+      })
       .sort((a, b) => a.order - b.order)
-      .map(({ fieldKey, label }) => ({ fieldKey, label }));
+      .map(({ fieldKey, label, required }) => ({ fieldKey, label, required }));
     await setThemeFields(db(), themeId, items, actor);
   }, [`/admin/themes/${themeId}`]);
 }

@@ -2,7 +2,8 @@ import { themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
 import { and, eq, inArray } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { fieldDefinitions, sections, themeVersions, themes } from '@/server/db/schema';
+import { fieldDefinitions, sections, themeFields, themeVersions, themes } from '@/server/db/schema';
+import { mayStayEmpty } from '@/catalog/fields';
 import { packagesWithShape } from '@/server/catalog/themes';
 import { fieldIsOptional, type ThemeManifest } from '@/theme-sdk/manifest';
 import type { FieldDef } from './validation';
@@ -54,10 +55,18 @@ export async function loadPurchasable(db: DbOrTx, themeKey: string, packageId: s
 export async function fieldDefs(db: DbOrTx, keys: readonly string[], themeVersionId?: string): Promise<Map<string, FieldDef>> {
   if (!keys.length) return new Map();
   const rows = await db.select().from(fieldDefinitions).where(and(inArray(fieldDefinitions.key, [...keys])));
-  const [version] = themeVersionId ? await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, themeVersionId)) : [];
+  const [version] = themeVersionId ? await db.select({ manifest: themeVersions.manifest, themeId: themeVersions.themeId }).from(themeVersions).where(eq(themeVersions.id, themeVersionId)) : [];
   const manifest = version?.manifest as ThemeManifest | null | undefined;
+  // The owner's own choice per field for this design (Admin → the design → Fields).
+  const chosen = version ? await db.select({ key: themeFields.fieldKey, required: themeFields.required }).from(themeFields).where(eq(themeFields.themeId, version.themeId)) : [];
+  const required = new Map(chosen.map((c) => [c.key, c.required]));
   // A design may hold less than the Field Library allows before its layout breaks (src/catalog/text-limits.ts).
-  return new Map(rows.map((r) => [r.key, { type: r.type, maxLength: themeTextLimit(manifest?.key, r.key, r.maxLength), optional: fieldIsOptional(manifest, r.key) }]));
+  return new Map(
+    rows.map((r) => [
+      r.key,
+      { type: r.type, maxLength: themeTextLimit(manifest?.key, r.key, r.maxLength), optional: mayStayEmpty(r.key, fieldIsOptional(manifest, r.key), required.get(r.key)) },
+    ]),
+  );
 }
 
 export function sameSet(a: readonly string[], b: readonly string[]) {
