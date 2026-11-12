@@ -121,6 +121,8 @@ let the layout depend on the border's exact artwork. `size` is px on a 390 px ph
 | CSS Modules only; no `:global`, `:root`, `html`, `body` | Registry generator (fails dev/build/CI) |
 | Renders every designed state at 360/390/430/1280 px in all 4 languages with short and long names, with no errors and no sideways scrolling | `e2e/themes.spec.ts` (fails CI; saves screenshots) |
 | Features absent from a package are really absent (map, guest form) | `e2e/themes.spec.ts` |
+| No text clashes with the decoration (cut off, over another text, over a drawing or the frame's border), with long names, in Arabic and English on a phone; a text meant to sit on artwork is listed in `e2e/theme-clashes.allow.json` after looking at it | `e2e/theme-clashes.spec.ts` (fails CI) |
+| A part whose field the customer may leave empty (the owner chooses per design in Admin) is left out whole when empty: no heading, frame or icon without its text | review + `e2e/themes.spec.ts` states |
 | Looks right with each feature switched off on its own (any package combination) | `e2e/themes.spec.ts` |
 | Opens with an animation after tapping "Open", finished within 4 s; reduced motion shows the invitation within 1 s | `e2e/themes.spec.ts` |
 | One border via `<ThemeBorder>` on the invitation (and on the card and keepsake) | `e2e/themes.spec.ts` + print review |
