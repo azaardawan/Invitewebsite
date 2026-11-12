@@ -17,7 +17,8 @@ export function DocumentPreview({
   downloadHref,
   labels,
 }: {
-  title: string;
+  /** The tile's own name (to tell several cards apart), or null when its group's heading says it all. */
+  title: string | null;
   imageSrc: string | null;
   back?: { src: string; title: string; portrait?: boolean };
   openHref: string;
@@ -43,12 +44,15 @@ export function DocumentPreview({
     }, 300);
   };
 
-  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: back.portrait ? 'aspect-[148/210]' : 'aspect-[210/148]' } : { src: imageSrc, alt: title, ratio: 'aspect-[148/210]' };
+  const showing = side === 'back' && back ? { src: back.src, alt: back.title, ratio: back.portrait ? 'aspect-[148/210]' : 'aspect-[210/148]' } : { src: imageSrc, alt: title ?? labels.download, ratio: 'aspect-[148/210]' };
 
   return (
-    <figure className="flex min-w-0 flex-col gap-2">
-      <figcaption className="text-center text-sm font-semibold">{side === 'back' && back ? back.title : title}</figcaption>
-      <div className="flex min-h-0 flex-1 items-center justify-center [perspective:900px]">
+    // Four rows shared with the tiles beside it (subgrid): name, picture, turn-over, download. Each row is as tall as
+    // its tallest tile, so pictures and buttons line up even when one tile has no name or no turn-over button.
+    <figure className="row-span-4 grid min-w-0 grid-rows-subgrid gap-y-2">
+      <figcaption className="self-end text-center text-sm font-semibold">{side === 'back' && back ? back.title : title}</figcaption>
+      {/* Every picture sits in the same upright A5 box, centred, whatever its own shape. */}
+      <div className="flex aspect-[148/210] items-center justify-center [perspective:900px]">
         <a
           href={openHref}
           target="_blank"
@@ -64,10 +68,12 @@ export function DocumentPreview({
           <span aria-hidden>↻</span>
           {labels.flip}
         </button>
-      ) : null}
+      ) : (
+        <span aria-hidden />
+      )}
       <a
         href={downloadHref}
-        className="inline-flex min-h-11 items-center justify-center rounded-full border border-accent px-3 py-2 text-center text-xs font-semibold text-accent sm:text-sm"
+        className="inline-flex min-h-11 items-center justify-center self-start rounded-full border border-accent px-3 py-2 text-center text-xs font-semibold text-accent sm:text-sm"
       >
         {labels.download}
       </a>

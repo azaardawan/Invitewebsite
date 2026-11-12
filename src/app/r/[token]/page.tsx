@@ -100,7 +100,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               key: `card-${c}`,
               // Only the A5 card: the same addresses as before; with shapes, each file is asked for by key.
               query: r.invitation.customCard || (r.invitation.cards.length === 1 && c === 'a5') ? '' : `card=${c}`,
-              title: r.invitation.cardLabels[c] ? `${t('printCardTitle')} · ${localized(r.invitation.cardLabels[c]!, locale)}` : t('printCardTitle'),
+              // The group's heading says «printable card»: a tile is named only to tell several cards apart.
+              title: r.invitation.cards.length > 1 && !r.invitation.customCard ? (r.invitation.cardLabels[c] ? localized(r.invitation.cardLabels[c]!, locale) : c === 'a5' ? 'A5' : null) : null,
               download: t('printCardDownload'),
               preview: !r.invitation.customCard,
               backPortrait: c === 'a5' && r.invitation.cardBackPortrait,
@@ -109,6 +110,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         ...(r.invitation.hasKeepsake ? [{ kind: 'keepsake' as const, key: 'keepsake', query: '', title: t('keepsakeTitle'), download: t('keepsakeDownload'), preview: true }] : []),
       ]
     : [];
+  const cardFiles = files.filter((f) => f.kind === 'card');
+  const keepsakeFile = files.find((f) => f.kind === 'keepsake');
 
   const v = r.snapshot.invitation.fieldValues;
   const names = [v.person_1_name, v.person_2_name].filter(Boolean).join(' ♡ ') || v.baby_name || '';
@@ -423,19 +426,32 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               {t('filesTitle')}
             </h2>
             <p className="text-sm text-muted">{t('filesHelp')}</p>
-            <div className={`grid gap-4 ${files.length > 1 ? 'grid-cols-2' : 'mx-auto max-w-[220px] grid-cols-1'}`}>
-              {files.map((f) => (
+            {/* The printed cards and the keepsake are two different things (owner, 2026-11-11): each has its own framed
+                group with its name and sign, and the tiles of a group line up row by row (name, picture, turn, download). */}
+            {cardFiles.length ? (
+              <div data-file-group="cards" className="space-y-4 rounded-2xl border border-line bg-canvas p-4">
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
+                  <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-surface">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="5" y="3" width="14" height="18" rx="2" />
+                      <path d="M9 8h6M9 12h6" />
+                    </svg>
+                  </span>
+                  {t('printCardTitle')}
+                </h3>
+                <div className={`grid gap-x-4 gap-y-6 ${cardFiles.length > 1 ? 'grid-cols-2' : 'mx-auto max-w-[220px] grid-cols-1'}`}>
+                  {cardFiles.map((f) => (
                 <DocumentPreview
-                  key={f.key}
-                  title={f.title}
-                  imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
-                  back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading'), portrait: 'backPortrait' in f && f.backPortrait } : undefined}
-                  openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
-                  downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
-                  labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
-                />
-              ))}
-            </div>
+                      key={f.key}
+                      title={f.title}
+                      imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
+                      back={f.kind === 'card' && f.preview ? { src: `${base}/preview/cardBack${f.query ? `?${f.query}` : ''}`, title: tStore('cardBack.heading'), portrait: 'backPortrait' in f && f.backPortrait } : undefined}
+                      openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
+                      downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
+                      labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
+                    />
+                  ))}
+                </div>
             {r.invitation.hasPrintCard && r.invitation.cards.some((c) => c !== 'a5') && !r.invitation.customCard ? (
               <div className="space-y-2">
                 <p className="text-xs text-muted">{t('shapeCardHelp')}</p>
@@ -486,10 +502,35 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
                 </form>
               </details>
             ) : null}
-            {r.invitation.hasKeepsake ? (
-              <p className="text-xs text-muted">
-                {t('keepsakeHelp')} {r.invitation.keepsakeReady ? null : t('keepsakeGrowing')}
-              </p>
+              </div>
+            ) : null}
+            {keepsakeFile ? (
+              <div data-file-group="keepsake" className="space-y-4 rounded-2xl border border-dashed border-accent/60 bg-surface p-4">
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
+                  <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full border border-accent text-accent">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 20s-7-4.6-7-9.6A3.9 3.9 0 0 1 12 8a3.900 3.900 0 0 1 7 2.400c0 5-7 9.600-7 9.600z" />
+                    </svg>
+                  </span>
+                  {t('keepsakeTitle')}
+                </h3>
+                <div className="mx-auto grid max-w-[220px] grid-cols-1">
+                  {[keepsakeFile].map((f) => (
+                <DocumentPreview
+                      key={f.key}
+                      title={null}
+                      imageSrc={f.preview ? `${base}/preview/${f.kind}${f.query ? `?${f.query}` : ''}` : null}
+                      back={undefined}
+                      openHref={`${base}/${f.kind}?inline=1${f.query ? `&${f.query}` : ''}`}
+                      downloadHref={`${base}/${f.kind}${f.query ? `?${f.query}` : ''}`}
+                      labels={{ download: f.download, pdf: t('pdfFile'), flip: t('flipCard') }}
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-muted">
+                  {t('keepsakeHelp')} {r.invitation.keepsakeReady ? null : t('keepsakeGrowing')}
+                </p>
+              </div>
             ) : null}
           </section>
         ) : null}
