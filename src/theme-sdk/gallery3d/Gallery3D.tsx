@@ -26,6 +26,8 @@ export type Gallery3DProps = {
   labels?: Readonly<Record<number, { title: string | null; caption: string | null }>>;
   /** Each room's name on its sign, by room key (rooms without one keep a blank sign hidden). */
   signs?: Readonly<Record<string, string>>;
+  /** Each room's plaque on its wall (rooms with `plaque` in the plan): its name and few words, by room key. */
+  rooms?: Readonly<Record<string, { title: string; text: string }>>;
   /** What the model's screen shows: a picture (e.g. the video's still, with a play button), or else a title and text. */
   screen?: { image: string | null; play: boolean; title?: string; body?: string } | null;
   /** The design's typeface (a CSS font-family list, loaded on the page) and colours for the signs and the screen. */
@@ -113,7 +115,8 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
   const { labels } = props;
   const label = (p: ThemePhoto) => labels?.[p.index] ?? { title: p.title, caption: p.caption };
   const photoKey = photos.map((p) => `${p.index}:${p.src}:${p.focus.x},${p.focus.y},${p.focus.zoom}:${label(p).title}:${label(p).caption}`).join('|');
-  const signKey = JSON.stringify(signs ?? {});
+  const signKey = JSON.stringify([signs ?? {}, props.rooms ?? {}]);
+  const { rooms } = props;
   const screenKey = JSON.stringify(screen ?? null);
 
   useEffect(() => {
@@ -140,6 +143,7 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
           photos: photos.map((p) => ({ index: p.index, src: p.src, focus: p.focus, ...label(p) })),
           dir,
           signs: signTexts,
+          plaques: rooms ?? {},
           screen: screenSpec,
           look,
           reducedMotion,

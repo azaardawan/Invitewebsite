@@ -33,6 +33,11 @@ export type GalleryRoom = {
   spots: readonly string[];
   /** The model's mesh for the room's name (drawn on it), if any. */
   sign?: string;
+  /**
+   * Where the room's own plaque hangs (its name and few words, `<Gallery3D rooms>`): a point on a wall and the wall's
+   * direction into the room, [x, z]. Usually the wall a visitor faces on walking in.
+   */
+  plaque?: { x: number; z: number; normal: readonly [number, number] };
 };
 
 export type GalleryPlan = {

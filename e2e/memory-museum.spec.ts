@@ -35,14 +35,19 @@ test('the museum opens in 3D, and the guide walks to a photo', async ({ page }, 
     await page.goto('/admin/preview/en/theme/memory-museum?v=1&names=short');
     await page.getByRole('button', { name: 'Open the museum' }).click();
     await expect(page.locator('[data-museum-3d="ready"]')).toBeVisible({ timeout: 60_000 });
+    await page.mouse.move(5, 5);
     await expect(page.locator('canvas')).toHaveCount(1);
-    // The guide lists every sample photo (six rooms of eight).
-    await expect(page.getByRole('list', { name: 'Photos in the museum' }).getByRole('listitem')).toHaveCount(48);
+    // Nothing but the museum on the screen: a welcome card with the names, gone once the guest moves.
+    await expect(page.getByText('Ammar').first()).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath(`hall-${width}.png`) });
-    await page.locator('[data-place="9"]').click();
-    // Standing in front of it, in the front wing's second room: its room and words show.
-    await expect(page.locator('[data-museum-room-now="room2"]')).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText('Our engagement').first()).toBeVisible();
+    await page.keyboard.press('ArrowUp');
+    await expect(page.locator('[data-museum-3d] [class*="welcomeGone"]')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Next photo' })).toHaveCount(0);
+    // For screen readers, a list of every sample photo (six rooms of eight) walks straight to one.
+    await expect(page.getByRole('list', { name: 'Photos in the museum' }).getByRole('listitem')).toHaveCount(48);
+    await page.locator('[data-place="9"]').dispatchEvent('click');
+    // Standing in front of it, in the front wing's second room.
+    await expect(page.locator('[data-museum-viewing="9"][data-museum-room-now="room2"]')).toBeVisible({ timeout: 20_000 });
     await page.screenshot({ path: testInfo.outputPath(`photo-${width}.png`) });
   }
   expect(errors).toEqual([]);
@@ -114,15 +119,14 @@ test('a two-room package: the couple fills two rooms; guests see only the rooms 
   await openPreview(page, previewToken);
   await expect(page.locator('[data-museum-3d="ready"]')).toBeVisible({ timeout: 60_000 });
   await expect(page.locator('[data-bahja-photo]')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Next photo' }).click();
-  await expect(page.getByText('Eiffel Tower')).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByText('Paris').first()).toBeVisible();
+  // Its title (and words) hang under it; the room's name and words are on the room's sign and plaque.
+  await page.locator('[data-place="8"]').dispatchEvent('click');
+  await expect(page.locator('[data-museum-viewing="8"][data-museum-room-now="room2"]')).toBeVisible({ timeout: 20_000 });
   await page.screenshot({ path: testInfo.outputPath('guest-photo.png') });
-  // Stepping back from the photo, in its room: the room's name and few words.
-  await page.keyboard.down('KeyS');
-  await page.waitForTimeout(600);
-  await page.keyboard.up('KeyS');
-  await expect(page.locator('[data-museum-room-card]')).toContainText('Our honeymoon in France.', { timeout: 10_000 });
+  // Turning round to the room's plaque on the wall ahead of the doorway.
+  await page.keyboard.down('ArrowLeft');
+  await page.waitForTimeout(900);
+  await page.keyboard.up('ArrowLeft');
   await page.screenshot({ path: testInfo.outputPath('guest-room.png') });
   expect(errors).toEqual([]);
 });

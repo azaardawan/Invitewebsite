@@ -26,8 +26,8 @@ import s from './theme.module.css';
 type Phase = 'closed' | 'opening' | 'open';
 const OPENING_MS = 1550;
 const REDUCED_MS = 380;
-/** How long the walking hint stays (unless the guest starts walking). */
-const HINT_MS = 7000;
+/** How long the welcome card stays (unless the guest starts walking first). */
+const WELCOME_MS = 6000;
 
 const MODEL = new URL('./assets/museum.glb', import.meta.url).href;
 
@@ -135,16 +135,20 @@ function Cover({ props, copy, phase, onOpen }: { props: ThemeProps; copy: Copy; 
   );
 }
 
-/** The 3D museum with the design's placard, photo guide and buttons over it. */
+/**
+ * The 3D museum, and nothing else on the screen while guests walk (owner, 2026-11-13): the rooms' names hang over their
+ * doorways, each room's plaque on its wall, each photo's title and words under it, the video on the entrance screen.
+ * Only a welcome card with the couple's names when the doors open (gone as soon as the guest moves), the touch pad on
+ * a phone, and a list of the photos for screen readers (not shown).
+ */
 function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: ThemeProps; copy: Copy; reduced: boolean; active: boolean; onUnavailable: () => void }) {
   const gallery = useRef<Gallery3DHandle>(null);
-  const rail = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const [viewing, setViewing] = useState<number | null>(null);
   const [room, setRoom] = useState<string>('hall');
-  const [hint, setHint] = useState(true);
-  const [sheet, setSheet] = useState<'story' | 'video' | null>(null);
+  const [welcome, setWelcome] = useState(true);
+  const [sheet, setSheet] = useState(false);
   const touch = useTouchScreen();
 
   const photos = useMemo(() => [...props.photos].sort((a, b) => a.index - b.index), [props.photos]);
@@ -153,29 +157,29 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   const names = [props.fields.person_1_name, props.fields.person_2_name].filter(Boolean).join(` ${props.labels.and} `);
 
   const signs = useMemo(() => Object.fromEntries(ROOMS.map((key) => [key, props.wording[key] ?? ''])), [props.wording]);
+  const rooms = useMemo(() => Object.fromEntries(ROOMS.map((key, r) => [key, { title: props.wording[key] ?? '', text: roomText(props, r) }])), [props]);
   const labels = useMemo(() => Object.fromEntries(photos.map((p) => [p.index, words(p, props, copy)])), [photos, props, copy]);
   const screen = useMemo(
     () => (video ? { image: video.poster, play: true } : { image: null, play: false, title: names, body: story || undefined }),
     [video, names, story],
   );
 
+  // The welcome card goes after a while, or as soon as the guest starts walking or looking around.
   useEffect(() => {
-    if (!active || !ready) return;
-    const t = window.setTimeout(() => setHint(false), HINT_MS);
-    return () => window.clearTimeout(t);
-  }, [active, ready]);
-  // Keep the photo in view visible in the guide.
-  useEffect(() => {
-    if (viewing === null) return;
-    rail.current?.querySelector<HTMLElement>(`[data-place="${viewing}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduced ? 'auto' : 'smooth' });
-  }, [viewing, reduced]);
-
-  const current = viewing === null ? null : (photos.find((p) => p.index === viewing) ?? null);
-  const currentWords = current ? words(current, props, copy) : null;
-  const roomIndex = ROOMS.indexOf(room);
+    if (!active || !ready || !welcome) return;
+    const t = window.setTimeout(() => setWelcome(false), WELCOME_MS);
+    const away = () => setWelcome(false);
+    window.addEventListener('keydown', away, { once: true });
+    window.addEventListener('pointerdown', away, { once: true });
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('keydown', away);
+      window.removeEventListener('pointerdown', away);
+    };
+  }, [active, ready, welcome]);
 
   return (
-    <section className={c('walk')} data-museum-3d={ready ? 'ready' : 'loading'} data-museum-room-now={room}>
+    <section className={c('walk')} data-museum-3d={ready ? 'ready' : 'loading'} data-museum-room-now={room} data-museum-viewing={viewing ?? ''}>
       <Gallery3D
         ref={gallery}
         className={c('stage')}
@@ -184,6 +188,7 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         photos={photos}
         labels={labels}
         signs={signs}
+        rooms={rooms}
         screen={screen}
         look={LOOK}
         dir={props.dir}
@@ -195,80 +200,35 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         onUnavailable={onUnavailable}
         onView={(i) => {
           setViewing(i);
-          if (i !== null) setHint(false);
+          if (i !== null) setWelcome(false);
         }}
         onRoom={(key) => {
           setRoom(key);
-          if (key !== 'hall') setHint(false);
+          if (key !== 'hall') setWelcome(false);
         }}
-        onScreen={() => (video ? setSheet('video') : story ? setSheet('story') : undefined)}
+        onScreen={() => (video || story ? setSheet(true) : undefined)}
       />
 
-      <div className={c('top')}>
-        {story || video ? (
-          <button type="button" className={c('pill')} onClick={() => setSheet(video ? 'video' : 'story')}>
-            {video ? copy.video : copy.story}
-          </button>
-        ) : null}
+      <div className={c('welcome', !(active && ready && welcome) && 'welcomeGone')} aria-hidden={!welcome}>
+        <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
+        {props.wording.title ? <p className={c('captionRoom')}>{props.wording.title}</p> : null}
+        <Names props={props} className="welcomeNames" as="p" />
+        {props.wording.since ? <p className={c('captionText')}>{props.wording.since}</p> : null}
+        <p className={c('welcomeHint')}>{touch ? copy.hintTouch : copy.hintKeys}</p>
       </div>
 
-      {active && ready && hint ? <p className={c('hint')}>{touch ? copy.hintTouch : copy.hintKeys}</p> : null}
-
-      <div className={c('bottom')}>
-        {/* One card, framed: the photo in view, else the room walked into, else (in the hall) the museum and the couple. */}
-        <div className={c('caption')} aria-live="polite" {...(!current && roomIndex >= 0 ? { 'data-museum-room-card': '' } : {})}>
-          <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
-          {current && currentWords ? (
-            <>
-              <span className={c('captionRoom')}>{roomName(props, copy, roomOf(current.index))}</span>
-              {currentWords.title ? <span className={c('captionTitle')}>{currentWords.title}</span> : null}
-              {currentWords.caption ? <span className={c('captionText')}>{currentWords.caption}</span> : null}
-            </>
-          ) : roomIndex >= 0 ? (
-            <>
-              <span className={c('captionRoom')}>
-                {copy.room} {roomIndex + 1}
-              </span>
-              <span className={c('captionTitle')}>{roomName(props, copy, roomIndex)}</span>
-              {roomText(props, roomIndex) ? <span className={c('captionText')}>{roomText(props, roomIndex)}</span> : null}
-            </>
-          ) : (
-            <>
-              {props.wording.title ? <span className={c('captionRoom')}>{props.wording.title}</span> : null}
-              {names ? <span className={c('captionTitle')}>{names}</span> : null}
-              {props.wording.since ? <span className={c('captionText')}>{props.wording.since}</span> : null}
-            </>
-          )}
-        </div>
-        {photos.length ? (
-          <div ref={rail} className={c('rail')} role="list" aria-label={copy.guide}>
-            {photos.map((p) => (
-              <button
-                key={p.index}
-                type="button"
-                role="listitem"
-                data-place={p.index}
-                className={c('thumbButton', viewing === p.index && 'thumbActive')}
-                aria-label={words(p, props, copy).title ?? `${roomName(props, copy, roomOf(p.index))} ${(p.index % PER_ROOM) + 1}`}
-                onClick={() => gallery.current?.goToPhoto(p.index)}
-              >
-                <Photo photo={p} className={c('thumb')} />
+      {/* For screen readers only: every photo, to walk straight to it (guests who can't walk around). */}
+      {photos.length ? (
+        <ul className={c('srOnly')} aria-label={copy.guide}>
+          {photos.map((p) => (
+            <li key={p.index}>
+              <button type="button" data-place={p.index} onClick={() => gallery.current?.goToPhoto(p.index)}>
+                <Photo photo={p} alt={words(p, props, copy).title ?? `${roomName(props, copy, roomOf(p.index))} ${(p.index % PER_ROOM) + 1}`} />
               </button>
-            ))}
-          </div>
-        ) : null}
-        <div className={c('controls')}>
-          <button type="button" className={c('pill')} onClick={() => gallery.current?.previous()} disabled={!photos.length}>
-            {copy.previous}
-          </button>
-          <button type="button" className={c('pill', 'pillPrimary')} onClick={() => gallery.current?.next()} disabled={!photos.length}>
-            {copy.next}
-          </button>
-          <button type="button" className={c('pill')} onClick={() => gallery.current?.goToStart()}>
-            {copy.entrance}
-          </button>
-        </div>
-      </div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       <div className={c('loader', ready && 'loaded')} aria-hidden={ready}>
         <span>{copy.loading}</span>
@@ -278,13 +238,13 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
       </div>
 
       {sheet ? (
-        <div className={c('sheet')} role="dialog" aria-modal="true" aria-label={sheet === 'video' ? copy.video : copy.story} onClick={() => setSheet(null)}>
+        <div className={c('sheet')} role="dialog" aria-modal="true" aria-label={video ? copy.video : copy.story} onClick={() => setSheet(false)}>
           <div className={c('panel')} onClick={(e) => e.stopPropagation()}>
-            {sheet === 'video' && video ? <VideoSlot video={video} className={c('video')} controls autoPlay playsInline /> : null}
+            {video ? <VideoSlot video={video} className={c('video')} controls autoPlay playsInline /> : null}
             {props.wording.title ? <p className={c('plaqueTitle')}>{props.wording.title}</p> : null}
             {names ? <p className={c('plaqueNames')}>{names}</p> : null}
             {story ? <p className={c('panelText')}>{story}</p> : null}
-            <button type="button" className={c('pill')} onClick={() => setSheet(null)}>
+            <button type="button" className={c('pill')} onClick={() => setSheet(false)}>
               {copy.close}
             </button>
           </div>

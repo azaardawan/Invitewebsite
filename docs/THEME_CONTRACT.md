@@ -306,8 +306,11 @@ Rules:
 - **Always have a flat version.** `onUnavailable` is called on a device without WebGL (or when the model fails): show
   the rooms flat with `<Photo>`. Template designs show the flat rooms in the editor too (`<PhotoSlot set={…}>`,
   `<EditableText>` for each room's name), since frames can't be tapped in 3D there.
-- The opening, the border and the guest's text rules still apply: keep the photos in a guide drawn with `<Photo>` (a
-  list to tap) so they are also reachable without walking, and keep texts on solid panels (the 3D view moves behind them).
+- The opening, the border and the guest's text rules still apply. A gallery may keep the screen clear while guests walk
+  (#27 shows only a welcome card with the names, gone once they move): list the photos with `<Photo>` for screen readers
+  at least (a visually hidden list of buttons that walk to each one), so they are reachable without walking, and keep
+  any text on solid panels (the 3D view moves behind them). Room names and words can hang in the museum itself (`sign`,
+  `plaque` in the plan; `<Gallery3D signs rooms>`).
 
 ### Couple posters (`couple_poster_landscape`, `couple_poster_portrait`)
 

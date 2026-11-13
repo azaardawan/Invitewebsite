@@ -25,6 +25,8 @@ export type EngineOptions = {
   plan: GalleryPlan;
   photos: readonly EnginePhoto[];
   signs: Readonly<Record<string, EngineSign>>;
+  /** Each room's plaque: its name and few words, by room key. */
+  plaques: Readonly<Record<string, { title: string; text: string }>>;
   screen: EngineScreen | null;
   look: EngineLook;
   reducedMotion: boolean;
@@ -292,6 +294,8 @@ export class GalleryEngine {
         else if (sign) sign.visible = false;
       }
       if (room.door && !open.has(room.key) && open.has(room.parent ?? '')) this.closeDoor(room.door, wallMaterial);
+      const plaque = this.o.plaques[room.key];
+      if (room.plaque && open.has(room.key) && (plaque?.title.trim() || plaque?.text.trim())) this.drawPlaque(room.plaque, plaque!);
     }
     for (const spot of this.spots) this.drawLabel(spot);
     if (this.screenMesh) this.drawScreen(this.screenMesh).catch((e) => console.warn('3D gallery screen', e));
@@ -357,6 +361,54 @@ export class GalleryEngine {
     const map = canvasTexture(c, this.renderer);
     mesh.material = new THREE.MeshStandardMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: 0.35, roughness: 0.45, metalness: 0.2, side: THREE.FrontSide });
     this.disposables.push(map, mesh.material as THREE.Material);
+  }
+
+  /** A room's plaque on its wall: the room's name and its few words. */
+  private drawPlaque(at: NonNullable<GalleryPlan['rooms'][number]['plaque']>, plaque: { title: string; text: string }) {
+    const { look, dir } = this.o;
+    const W = 1024;
+    const g0 = document.createElement('canvas').getContext('2d')!;
+    g0.font = `400 38px ${look.textFont}`;
+    const lines = plaque.text.trim() ? wrap(g0, plaque.text.trim(), W - 140, 5) : [];
+    const H = 70 + (plaque.title.trim() ? 110 : 0) + lines.length * 56 + 60;
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    const g = c.getContext('2d')!;
+    g.fillStyle = look.signGround;
+    g.fillRect(0, 0, W, H);
+    g.strokeStyle = look.signInk;
+    g.lineWidth = 3;
+    g.strokeRect(14, 14, W - 28, H - 28);
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.direction = dir;
+    g.fillStyle = look.signInk;
+    let y = 70;
+    if (plaque.title.trim()) {
+      fitText(g, plaque.title.trim(), W / 2, y + 40, W - 140, 76, look.font);
+      y += 110;
+    }
+    g.fillStyle = look.screenInk;
+    g.font = `400 38px ${look.textFont}`;
+    for (const line of lines) {
+      g.fillText(line, W / 2, y + 22);
+      y += 56;
+    }
+    const map = new THREE.CanvasTexture(c);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+    const width = 4;
+    const height = (width * H) / W;
+    const geo = new THREE.PlaneGeometry(width, height);
+    const mat = new THREE.MeshStandardMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: 0.35, roughness: 0.5 });
+    const mesh = new THREE.Mesh(geo, mat);
+    const normal = new THREE.Vector3(at.normal[0], 0, at.normal[1]);
+    const pos = new THREE.Vector3(at.x, this.o.plan.eye + 1.1, at.z).addScaledVector(normal, 0.03);
+    mesh.position.copy(pos);
+    mesh.lookAt(pos.clone().add(normal));
+    this.scene.add(mesh);
+    this.disposables.push(map, geo, mat);
   }
 
   /** The card under a photo with its title and few words (none when the photo has neither). */
