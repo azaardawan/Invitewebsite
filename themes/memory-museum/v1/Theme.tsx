@@ -205,12 +205,6 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
       />
 
       <div className={c('top')}>
-        <div className={c('plaque')}>
-          <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
-          {props.wording.title ? <p className={c('plaqueTitle')}>{props.wording.title}</p> : null}
-          <Names props={props} className="plaqueNames" as="p" />
-          {props.wording.since ? <p className={c('plaqueSince')}>{props.wording.since}</p> : null}
-        </div>
         {story || video ? (
           <button type="button" className={c('pill')} onClick={() => setSheet(video ? 'video' : 'story')}>
             {video ? copy.video : copy.story}
@@ -218,25 +212,34 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         ) : null}
       </div>
 
-      {active && ready ? <p className={c('hint', !hint && 'hintGone')}>{touch ? copy.hintTouch : copy.hintKeys}</p> : null}
+      {active && ready && hint ? <p className={c('hint')}>{touch ? copy.hintTouch : copy.hintKeys}</p> : null}
 
       <div className={c('bottom')}>
-        {current && currentWords ? (
-          <div className={c('caption')} aria-live="polite">
-            <span className={c('captionRoom')}>{roomName(props, copy, roomOf(current.index))}</span>
-            {currentWords.title ? <span className={c('captionTitle')}>{currentWords.title}</span> : null}
-            {currentWords.caption ? <span className={c('captionText')}>{currentWords.caption}</span> : null}
-          </div>
-        ) : roomIndex >= 0 ? (
-          // Walking into a room: its name and its few words.
-          <div className={c('caption')} aria-live="polite" data-museum-room-card>
-            <span className={c('captionRoom')}>
-              {copy.room} {roomIndex + 1}
-            </span>
-            <span className={c('captionTitle')}>{roomName(props, copy, roomIndex)}</span>
-            {roomText(props, roomIndex) ? <span className={c('captionText')}>{roomText(props, roomIndex)}</span> : null}
-          </div>
-        ) : null}
+        {/* One card, framed: the photo in view, else the room walked into, else (in the hall) the museum and the couple. */}
+        <div className={c('caption')} aria-live="polite" {...(!current && roomIndex >= 0 ? { 'data-museum-room-card': '' } : {})}>
+          <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
+          {current && currentWords ? (
+            <>
+              <span className={c('captionRoom')}>{roomName(props, copy, roomOf(current.index))}</span>
+              {currentWords.title ? <span className={c('captionTitle')}>{currentWords.title}</span> : null}
+              {currentWords.caption ? <span className={c('captionText')}>{currentWords.caption}</span> : null}
+            </>
+          ) : roomIndex >= 0 ? (
+            <>
+              <span className={c('captionRoom')}>
+                {copy.room} {roomIndex + 1}
+              </span>
+              <span className={c('captionTitle')}>{roomName(props, copy, roomIndex)}</span>
+              {roomText(props, roomIndex) ? <span className={c('captionText')}>{roomText(props, roomIndex)}</span> : null}
+            </>
+          ) : (
+            <>
+              {props.wording.title ? <span className={c('captionRoom')}>{props.wording.title}</span> : null}
+              {names ? <span className={c('captionTitle')}>{names}</span> : null}
+              {props.wording.since ? <span className={c('captionText')}>{props.wording.since}</span> : null}
+            </>
+          )}
+        </div>
         {photos.length ? (
           <div ref={rail} className={c('rail')} role="list" aria-label={copy.guide}>
             {photos.map((p) => (

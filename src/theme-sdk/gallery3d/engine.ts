@@ -368,9 +368,9 @@ export class GalleryEngine {
     const { look, dir } = this.o;
     const W = 1024;
     const g0 = document.createElement('canvas').getContext('2d')!;
-    g0.font = `400 34px ${look.textFont}`;
-    const lines = caption ? wrap(g0, caption, W - 110, 3) : [];
-    const H = 40 + (title ? 84 : 0) + lines.length * 48 + 30;
+    g0.font = `400 40px ${look.textFont}`;
+    const lines = caption ? wrap(g0, caption, W - 100, 3) : [];
+    const H = 40 + (title ? 90 : 0) + lines.length * 54 + 30;
     const c = document.createElement('canvas');
     c.width = W;
     c.height = H;
@@ -386,20 +386,20 @@ export class GalleryEngine {
     g.fillStyle = look.labelInk;
     let y = 40;
     if (title) {
-      fitText(g, title, W / 2, y + 40, W - 110, 58, look.font);
-      y += 84;
+      fitText(g, title, W / 2, y + 42, W - 100, 66, look.font);
+      y += 90;
     }
-    g.font = `400 34px ${look.textFont}`;
-    g.globalAlpha = 0.82;
+    g.font = `400 40px ${look.textFont}`;
+    g.globalAlpha = 0.85;
     for (const line of lines) {
-      g.fillText(line, W / 2, y + 24);
-      y += 48;
+      g.fillText(line, W / 2, y + 27);
+      y += 54;
     }
     const map = new THREE.CanvasTexture(c);
     map.colorSpace = THREE.SRGBColorSpace;
     map.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     // Label width: most of the photo's; height from its text. Hung just under the frame.
-    const width = spot.width * 0.82;
+    const width = spot.width * 0.92;
     const height = (width * H) / W;
     const geo = new THREE.PlaneGeometry(width, height);
     const mat = new THREE.MeshStandardMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: 0.3, roughness: 0.7 });
@@ -587,12 +587,14 @@ export class GalleryEngine {
     const spot = this.spots.find((s) => s.index === index);
     if (!spot) return;
     const { plan } = this.o;
-    const dist = this.camera.aspect < 1 ? plan.view.phone : plan.view.distance;
+    const phone = this.camera.aspect < 1;
+    const dist = phone ? plan.view.phone : plan.view.distance;
+    const tilt = (phone ? plan.view.tilt?.phone : plan.view.tilt?.computer) ?? TILT;
     const to = spot.center.clone().addScaledVector(spot.normal, dist);
     const look = spot.center.clone().sub(new THREE.Vector3(to.x, plan.eye, to.z));
     // Look up only part of the way: a level camera keeps the frame's sides upright, and the picture still fits above
     // the middle of the view.
-    this.walkTo([to.x, to.z], Math.atan2(-look.x, -look.z), Math.atan2(look.y, Math.hypot(look.x, look.z)) * TILT, index);
+    this.walkTo([to.x, to.z], Math.atan2(-look.x, -look.z), Math.atan2(look.y, Math.hypot(look.x, look.z)) * tilt, index);
   }
 
   goToStart() {

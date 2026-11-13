@@ -35,7 +35,9 @@ export const PLAN: GalleryPlan = {
   rooms,
   start: { x: 0, z: 12.5, yaw: 0 },
   eye: 2.05,
-  view: { distance: 5, phone: 3.7 },
+  // On a phone the design's panels cover the bottom of the screen: stand further back and look level, so the photo
+  // and its card stay above them.
+  view: { distance: 5, phone: 4.4, tilt: { computer: 0, phone: -0.1 } },
   // The sculpture in the middle of the hall and its four columns.
   obstacles: [
     { x: 0, z: 0, r: 0.8 },

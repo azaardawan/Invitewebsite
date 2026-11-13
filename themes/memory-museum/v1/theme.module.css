@@ -325,9 +325,10 @@
 }
 
 .caption {
-  max-width: min(460px, 100%);
-  padding: 10px 16px;
-  background: var(--mm-panel);
+  position: relative;
+  width: min(460px, 100%);
+  padding: 22px 34px 20px;
+  background: rgba(24, 19, 13, 0.95);
   border: 1px solid var(--mm-line);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -403,7 +404,7 @@
 
 .hint {
   position: absolute;
-  bottom: 150px;
+  top: 64px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
@@ -416,11 +417,6 @@
   line-height: 1.6;
   pointer-events: none;
   z-index: 3;
-  transition: opacity 0.5s ease;
-}
-
-.hintGone {
-  opacity: 0;
 }
 
 .loader {

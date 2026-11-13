@@ -41,8 +41,12 @@ export type GalleryPlan = {
   start: { x: number; z: number; yaw: number };
   /** Eye height. */
   eye: number;
-  /** How far from a photo a visitor stands to look at it (on a computer, and on a phone held upright). */
-  view: { distance: number; phone: number };
+  /**
+   * How far from a photo a visitor stands to look at it (on a computer, and on a phone held upright), and how much of
+   * the way up to the photo's middle the camera tilts there (default 0.45; less, or below 0, keeps the photo higher on
+   * the screen, clear of the design's panels at the bottom).
+   */
+  view: { distance: number; phone: number; tilt?: { computer: number; phone: number } };
   /** Round things in the way (columns, a sculpture) that walks go around. */
   obstacles: readonly { x: number; z: number; r: number }[];
   /** Meshes (name prefixes) left out of the scene, e.g. a figure that only shows the model's scale. */
