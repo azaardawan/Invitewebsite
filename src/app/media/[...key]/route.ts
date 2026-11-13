@@ -1,28 +1,23 @@
 import { NextResponse } from 'next/server';
 import { env } from '@/server/env';
 import { isValidStorageKey, storage } from '@/server/storage';
-
-const TYPES: Record<string, string> = { webp: 'image/webp', mp3: 'audio/mpeg', mp4: 'video/mp4', jpg: 'image/jpeg' };
+import { mediaServedHere } from '@/server/storage/served-here';
 
 /**
- * Serves locally stored media in development only. In staging/production
- * media is served from the CDN domain and this route returns 404.
- * (PDF documents are private and never served here.)
+ * Serves locally stored media in development. In staging/production media is served from the CDN domain, and this
+ * route serves only the customers' photos and video stills, which the 3D gallery needs from the site itself
+ * (`mediaServedHere`). PDF documents are private and never served here.
  */
 export async function GET(_req: Request, ctx: RouteContext<'/media/[...key]'>) {
   const { key: parts } = await ctx.params;
   const key = parts.join('/');
-  const ext = key.split('.').pop() ?? '';
-  // JPEGs here are only a video's still: the extras' JPEGs (documents/) are private.
-  const privateFile = ext === 'jpg' && !key.startsWith('videos/');
-  if (env().STORAGE_DRIVER !== 'local' || !isValidStorageKey(key) || !TYPES[ext] || privateFile) {
-    return new NextResponse(null, { status: 404 });
-  }
+  const type = isValidStorageKey(key) ? mediaServedHere(key, env().STORAGE_DRIVER) : null;
+  if (!type) return new NextResponse(null, { status: 404 });
   const body = await storage().get(key);
   if (!body) return new NextResponse(null, { status: 404 });
   return new NextResponse(new Uint8Array(body), {
     headers: {
-      'Content-Type': TYPES[ext],
+      'Content-Type': type,
       'Content-Length': String(body.byteLength),
       'Cache-Control': 'public, max-age=31536000, immutable',
       'X-Content-Type-Options': 'nosniff',

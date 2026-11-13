@@ -10,7 +10,7 @@ import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
 import { customSong } from '@/server/music/custom';
 import { customerVideo } from '@/server/video/video';
-import type { ThemeManifest } from '@/theme-sdk/manifest';
+import { pageText, type ThemeManifest } from '@/theme-sdk/manifest';
 import type { SignatureStrokes } from '@/lib/signature-strokes';
 
 type InvitationRow = typeof invitations.$inferSelect;
@@ -56,6 +56,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id) : [],
       photoSpec: limitedPhotoSpec((version!.manifest as ThemeManifest).photos ?? null, inv.photoLimit),
       video: await customerVideo(db, inv),
+      openLabel: pageText(version!.manifest as ThemeManifest, 'open', inv.locale),
     }),
   };
 }

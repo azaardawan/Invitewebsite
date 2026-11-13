@@ -83,6 +83,8 @@ export function buildThemeProps(input: {
   photoSpec?: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null;
   /** The customer's own video (packages with `video`), or null. */
   video?: { src: string; poster: string; width: number; height: number } | null;
+  /** The design's own words for the "Open" button (manifest `pageTexts.open`), for a design that is not an invitation. */
+  openLabel?: string | null;
 }): ThemeProps {
   const msgs = invitationMessages(input.locale);
   const fields: Partial<Record<FieldKey, string>> = {};
@@ -93,6 +95,7 @@ export function buildThemeProps(input: {
   const features = [...input.features] as FeatureKey[];
   const cal = calendarLocale(input.locale);
   const labels = Object.fromEntries(LABEL_KEYS.map((k) => [k, msgs[k]])) as ThemeLabels;
+  if (input.openLabel) labels.openInvitation = input.openLabel;
 
   return {
     mode: input.mode,

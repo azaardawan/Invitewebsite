@@ -41,7 +41,7 @@ product spec's §74 business rules override assumptions.
   on the owner's artwork (`src/server/products/*`), or by the design's own `print/Story|Sticker|Bottle.tsx`
   (THEME_CONTRACT §6). Anything shown before payment is watermarked by the server's render (`isPaid`);
   files (PNG/PDF) are only served once paid.
-- Customer photos (`photos` feature, manifest `photos: { max ≤ 36, min, aspect, labels, set }`) are stored per invitation
+- Customer photos (`photos` feature, manifest `photos: { max ≤ 50, min, aspect, labels, set }`) are stored per invitation
   (`invitation_photos`, files under `photos/`, `src/server/photos/*`). Themes draw `props.photos` with `<Photo>`, and must
   look right with fewer photos than `max`. They are personal data: housekeeping deletes them with the guest data.
 - Customer songs (`custom_music`, a platform feature that needs `music`): the upload (audio or video) is converted by
@@ -63,6 +63,8 @@ product spec's §74 business rules override assumptions.
   (manifest `posters.texts`) and its pictures, including a picture uploaded for that poster only (an `invitation_photos` row at
   place 100/101, never listed with the page's photos); drawn by the design's `print/CouplePoster.tsx`, with Bahja's website,
   WhatsApp/phone and Instagram from Settings at the bottom.
+- 3D galleries (`<Gallery3D>` in the theme SDK, `src/theme-sdk/gallery3d/*`): the design's glTF model + a `GalleryPlan`; a room is a
+  photo set, so packages sell rooms. Always keep a flat version (no WebGL, and the template editor). THEME_CONTRACT §6.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

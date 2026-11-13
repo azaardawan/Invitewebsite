@@ -10,7 +10,7 @@ import { publicMediaUrl } from '@/server/storage';
 export type PublicInvitation =
   | { state: 'missing' }
   | { state: 'redirect'; to: string }
-  | { state: 'ended'; locale: string }
+  | { state: 'ended'; locale: string; themeVersionId: string }
   | { state: 'live'; invitation: typeof invitations.$inferSelect; canonicalPath: string; coverUrl: string | null };
 
 /**
@@ -30,6 +30,6 @@ export const resolvePublicInvitation = cache(async (segment: string): Promise<Pu
   if (!row || !row.inv.publishedAt) return { state: 'missing' };
   const canonicalPath = invitationPath(row.inv.slug, row.inv.publicId);
   if (`/i/${segment}` !== canonicalPath) return { state: 'redirect', to: canonicalPath };
-  if (!isLive(row.inv)) return { state: 'ended', locale: row.inv.locale };
+  if (!isLive(row.inv)) return { state: 'ended', locale: row.inv.locale, themeVersionId: row.inv.themeVersionId };
   return { state: 'live', invitation: row.inv, canonicalPath, coverUrl: row.coverKey ? publicMediaUrl(row.coverKey) : null };
 });
