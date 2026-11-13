@@ -20,9 +20,9 @@ type OwnerSetup = {
   workingTitleAr: string;
   name: I18nContent;
   description: I18nContent;
-  /** Packages in order; each takes the price of the package at the same position in `pricesFrom`. */
+  /** Packages in order; each takes the price of the package at the same position in `pricesFrom`. None: left to Admin. */
   packages: { name: I18nContent; description: I18nContent; featureKeys: FeatureKey[] }[];
-  pricesFrom: string;
+  pricesFrom?: string;
 };
 
 const FIELDS: FieldKey[] = ['baby_name', 'father_name', 'birth_date'];
@@ -65,6 +65,20 @@ export const OWNER_SETUPS: OwnerSetup[] = [
     packages: GIRL_PACKAGES,
     pricesFrom: 'rosebird-garden',
   },
+  {
+    // Memory Museum (owner, 2026-11-13): the description in four languages. The packages (2, 4 and 6 rooms) are made in
+    // Admin with the owner's prices; their texts are in docs/themes/memory-museum/PACKAGES.md.
+    themeKey: 'memory-museum',
+    workingTitleAr: 'متحف الذكريات',
+    name: { ar: 'متحف الذكريات', en: 'Memory Museum', ckb: 'مۆزەخانەی یادەوەری', bdn: 'مۆزەخانەیا بیرهاتنان' },
+    description: {
+      ar: 'متحف ثلاثي الأبعاد لذكرياتكما: يتجوّل ضيوفكم بين قاعاته من هاتفهم أو حاسوبهم، ويرون صوركم معلّقة على الجدران كلوحات فنية، لكل صورة عنوانها ووصفها ولكل قاعة اسمها، ويُعرض الفيديو على شاشة المدخل.',
+      en: 'A 3D museum of your memories: your guests walk through its rooms on their phone or computer and see your photos hanging on the walls like paintings, each with its own title and words, each room with its own name, and your video on the screen at the entrance.',
+      ckb: 'مۆزەخانەیەکی سێ ڕەهەندی بۆ یادەوەرییەکانتان: میوانەکانتان لە مۆبایل یان کۆمپیوتەرەکەیانەوە بە هۆڵەکانیدا دەگەڕێن و وێنەکانتان وەک تابلۆ لەسەر دیوارەکان دەبینن، هەر وێنەیەک بە ناونیشان و وەسفی خۆی و هەر هۆڵێک بە ناوی خۆی، و ڤیدیۆکەتان لەسەر شاشەی دەروازە.',
+      bdn: 'مۆزەخانەکا سێ ڕەهەندی بۆ بیرهاتنێن هەوە: میڤانێن هەوە ژ مۆبایل یان کۆمپیوتەرا خۆ د هۆلێن ویدا دگەڕن و وێنێن هەوە وەکی تابلۆیان ل سەر دیواران دبینن، هەر وێنەک ب ناڤونیشان و وەسفا خۆ و هەر هۆلەک ب ناڤێ خۆ، و ڤیدیۆیا هەوە ل سەر شاشا دەرگەهی.',
+    },
+    packages: [],
+  },
 ];
 
 /** Applies the owner's chat requests that Admin hasn't overtaken yet. Returns what it did, for the deploy log. */
@@ -73,7 +87,9 @@ export async function applyOwnerSetups(db: DbOrTx, actor: Actor, setups = OWNER_
   for (const s of setups) {
     const [theme] = await db.select().from(themes).where(eq(themes.key, s.themeKey));
     if (!theme) continue;
-    if (theme.name.ar === s.workingTitleAr) {
+    // Only while the owner hasn't changed them: the working title still there, and (when the name stays the working
+    // title) no description written yet.
+    if (theme.name.ar === s.workingTitleAr && (s.name.ar !== s.workingTitleAr || !theme.description?.ar?.trim())) {
       await updateThemeSettings(
         db,
         theme.id,
@@ -82,6 +98,7 @@ export async function applyOwnerSetups(db: DbOrTx, actor: Actor, setups = OWNER_
       );
       done.push(`${s.themeKey}: name and description`);
     }
+    if (!s.packages.length || !s.pricesFrom) continue;
     const [anyPackage] = await db.select({ id: packages.id }).from(packages).where(eq(packages.themeId, theme.id)).limit(1);
     if (anyPackage) continue;
     const [source] = await db.select({ id: themes.id }).from(themes).where(eq(themes.key, s.pricesFrom));
