@@ -58,9 +58,76 @@ const FLOOR = [
   ...both(rect(34.1, 48.9, -10.3, 10.3)),
 ];
 
+/** The inside of each gallery (its wall faces, measured from the model). */
+const R = 10.79;
+const INSIDE = {
+  room1: rect(-R, R, -31.29, -15.71),
+  room2: rect(-R, R, -49.29, -33.71),
+  room3: rect(-31.29, -15.71, -R, R),
+  room4: rect(-49.29, -33.71, -R, R),
+  room5: rect(15.71, 31.29, -R, R),
+  room6: rect(33.71, 49.29, -R, R),
+};
+/** The hall's parts round the glass pyramid (whose base is 7.4 m up and ±7.2 m wide). */
+const HALL = {
+  north: rect(-5.29, 5.29, -15.29, -8),
+  south: rect(-5.29, 5.29, 8, 15.29),
+  east: rect(8, 15.29, -5.29, 5.29),
+  west: rect(-15.29, -8, -5.29, 5.29),
+};
+const PYRAMID = 7.4;
+
+/**
+ * Decoration and repairs (owner, 2026-11-13): the model has no ceilings outside the pyramid, open corners in the hall,
+ * an open main entrance, hollow walls between a wing's two rooms and gaps above its doorways. All closed here, with
+ * coffered ceilings, and the galleries' walls (and the hall's long walls) in Renaissance ornament.
+ */
+const DECOR: NonNullable<GalleryPlan['decor']> = {
+  wallHeight: 8,
+  ceilings: [
+    ...Object.values(INSIDE).map((r) => ({ ...r, y: 8 })),
+    ...Object.values(HALL).map((r) => ({ ...r, y: PYRAMID })),
+    // The frame between the pyramid's base and the hall's corners.
+    { ...rect(-8, 8, -8, -7.2), y: PYRAMID },
+    { ...rect(-8, 8, 7.2, 8), y: PYRAMID },
+    { ...rect(-8, -7.2, -7.2, 7.2), y: PYRAMID },
+    { ...rect(7.2, 8, -7.2, 7.2), y: PYRAMID },
+  ],
+  walls: [
+    ...Object.values(INSIDE).map((r) => ({ ...r, height: 8 })),
+    { ...HALL.north, height: PYRAMID, sides: ['e', 'w'] as const },
+    { ...HALL.south, height: PYRAMID, sides: ['e', 'w'] as const },
+    { ...HALL.east, height: PYRAMID, sides: ['n', 's'] as const },
+    { ...HALL.west, height: PYRAMID, sides: ['n', 's'] as const },
+  ],
+  fills: [
+    // The hall's four open corners, where a corridor meets an arm.
+    ...[-1, 1].flatMap((sx) =>
+      [-1, 1].flatMap((sz) => [
+        { ...rect(Math.min(sx * 5.1, sx * 8.4), Math.max(sx * 5.1, sx * 8.4), Math.min(sz * 8, sz * 8.4), Math.max(sz * 8, sz * 8.4)), maxY: 8 },
+        { ...rect(Math.min(sx * 8, sx * 8.4), Math.max(sx * 8, sx * 8.4), Math.min(sz * 5.1, sz * 8.4), Math.max(sz * 5.1, sz * 8.4)), maxY: 8 },
+      ]),
+    ),
+    // The main entrance (an opening in the model): closed, with a pair of doors drawn on it.
+    { ...rect(-2.95, 2.95, 15.3, 15.9), maxY: 8 },
+  ],
+  doors: [{ x: 0, z: 15.29, normal: [0, -1], width: 5.3, height: 5.6 }],
+  doorways: true,
+  floorMaterial: 'Smoked oak parquet',
+  // The model lights the first room of each wing; the rooms behind get a lamp of the same strength.
+  lampHeight: 5.8,
+  lamps: [
+    { x: 0, y: 5.8, z: -41.5, intensity: 320 },
+    { x: -41.5, y: 5.8, z: 0, intensity: 320 },
+    { x: 41.5, y: 5.8, z: 0, intensity: 320 },
+  ],
+  sky: '#a9c1cb',
+};
+
 export const PLAN: GalleryPlan = {
   rooms,
   floor: FLOOR,
+  decor: DECOR,
   start: { x: 0, z: 12.5, yaw: 0 },
   eye: 2.05,
   // On a phone the design's panels cover the bottom of the screen: stand further back and look level, so the photo

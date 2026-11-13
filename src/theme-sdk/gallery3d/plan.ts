@@ -70,6 +70,11 @@ export type GalleryPlan = {
   plaques?: string;
   /** The model's material used to close a doorway to a room that is not shown. */
   wallMaterial: string;
+  /**
+   * Decoration and repairs drawn over the model (`./decor.ts`): coffered ceilings, ornamented walls, blocks closing the
+   * model's openings, its doorways closed round their openings, a pair of doors, extra lamps, the sky colour.
+   */
+  decor?: import('./decor').DecorSpec;
   /** The screen mesh (`<Gallery3D screen>`), if the model has one. */
   screen?: string;
   /** Light: how strongly to use the model's own lamps, the soft light everywhere, and the exposure. */
@@ -77,6 +82,7 @@ export type GalleryPlan = {
 };
 
 export type Point = readonly [number, number];
+export type { DecorSpec } from './decor';
 
 /** The room a floor point is in (the first room when it is in no other room's bounds). */
 export function roomAt(plan: GalleryPlan, x: number, z: number): GalleryRoom {
