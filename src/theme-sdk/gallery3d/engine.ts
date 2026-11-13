@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { onFloor, openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
+import { buildDecor } from './decor';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -230,7 +231,12 @@ export class GalleryEngine {
 
     const meshes: THREE.Mesh[] = [];
     root.traverse((o) => {
-      if ((o as THREE.Light).isLight) (o as THREE.Light).intensity *= plan.light.lamps;
+      if ((o as THREE.Light).isLight) {
+        (o as THREE.Light).intensity *= plan.light.lamps;
+        // Under the decoration's ceilings, the model's lamps hang a little lower (see DecorSpec.lampHeight).
+        const h = plan.decor?.lampHeight;
+        if (h && o.position.y < plan.decor!.wallHeight) o.position.y = h;
+      }
       if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
     });
     for (const mesh of meshes) {
@@ -285,6 +291,7 @@ export class GalleryEngine {
       m.dispose();
     }
     this.scene.add(root);
+    if (plan.decor) this.decorate(root, open, wallMaterial);
 
     for (const room of plan.rooms) {
       if (room.sign) {
@@ -299,6 +306,69 @@ export class GalleryEngine {
     }
     for (const spot of this.spots) this.drawLabel(spot);
     if (this.screenMesh) this.drawScreen(this.screenMesh).catch((e) => console.warn('3D gallery screen', e));
+  }
+
+  /**
+   * The plan's decoration (`plan.decor`): the model's gaps closed, coffered ceilings, and the walls of the rooms that
+   * are shown dressed in Renaissance ornament around their photos, doorways and plaques.
+   */
+  private decorate(root: THREE.Object3D, open: Set<string>, wallMaterial: THREE.Material | null) {
+    const { plan } = this.o;
+    const spec = plan.decor!;
+    let floorMaterial: THREE.Material | null = null;
+    root.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (m && spec.floorMaterial && m.name === spec.floorMaterial) floorMaterial = m;
+    });
+    const doors = plan.rooms.flatMap((r) => (r.door ? [r.door] : []));
+    // A sign hung inside a doorway's wall (which is now filled) moves out to the wall's face on the parent's side.
+    for (const r of plan.rooms) {
+      const sign = r.sign ? (root.getObjectByName(r.sign) as THREE.Mesh | undefined) : undefined;
+      if (!sign || !r.door) continue;
+      const d = r.door;
+      sign.geometry.computeBoundingBox();
+      const c = sign.geometry.boundingBox!.getCenter(new THREE.Vector3()).applyMatrix4(sign.matrixWorld);
+      const through = d.axis[0] !== 0 ? c.x - d.x : c.z - d.z;
+      if (Math.abs(through) < d.face - 0.05) {
+        const shift = -(d.face + 0.04) * Math.sign(d.axis[0] + d.axis[1]) - through;
+        sign.geometry.translate(d.axis[0] !== 0 ? shift : 0, 0, d.axis[0] !== 0 ? 0 : shift);
+      }
+    }
+    const roomOfRect = (r: { minX: number; maxX: number; minZ: number; maxZ: number }) => roomAt(plan, (r.minX + r.maxX) / 2, (r.minZ + r.maxZ) / 2).key;
+    const hung: { x: number; z: number; half: number }[] = [];
+    for (const r of plan.rooms) {
+      if (r.plaque) hung.push({ x: r.plaque.x, z: r.plaque.z, half: 2.25 });
+      const sign = r.sign ? (root.getObjectByName(r.sign) as THREE.Mesh | undefined) : undefined;
+      if (sign) {
+        sign.geometry.computeBoundingBox();
+        const b = sign.geometry.boundingBox!.clone().applyMatrix4(sign.matrixWorld);
+        const c = b.getCenter(new THREE.Vector3());
+        hung.push({ x: c.x, z: c.z, half: Math.max(b.max.x - b.min.x, b.max.z - b.min.z) / 2 + 0.2 });
+      }
+    }
+    if (this.screenMesh) {
+      this.screenMesh.geometry.computeBoundingBox();
+      const b = this.screenMesh.geometry.boundingBox!.clone().applyMatrix4(this.screenMesh.matrixWorld);
+      const c = b.getCenter(new THREE.Vector3());
+      hung.push({ x: c.x, z: c.z, half: Math.max(b.max.x - b.min.x, b.max.z - b.min.z) / 2 + 0.6 });
+    }
+    const out = buildDecor({
+      spec: { ...spec, walls: spec.walls.filter((w) => open.has(roomOfRect(w))) },
+      renderer: this.renderer,
+      spots: this.spots.map((s) => ({ center: s.center, normal: s.normal, width: s.width, top: s.center.y + (s.center.y - s.bottom) })),
+      doors,
+      hung,
+      wallMaterial,
+      floorMaterial,
+    });
+    for (const m of out.meshes) this.scene.add(m);
+    for (const l of out.lights) this.scene.add(l);
+    for (const m of out.colliders) {
+      m.geometry.computeBoundsTree();
+      this.colliders.push(m);
+    }
+    this.disposables.push(...out.disposables);
+    if (spec.sky) this.scene.background = new THREE.Color(spec.sky);
   }
 
   /** Removes the triangles of `mesh` that sit inside any of the boxes (the frame and label around an empty spot). */

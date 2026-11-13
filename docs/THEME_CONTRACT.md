@@ -297,6 +297,14 @@ obstacles. The design draws its own buttons over it and drives it through a ref 
 room walked into, for its name and words — `onScreen`,
 `onProgress`, `onReady`). It draws only when something moves, so phones stay cool.
 
+A model is often an empty shell (no ceilings, open corners, hollow walls). The plan's `decor` (`DecorSpec`,
+`src/theme-sdk/gallery3d/decor.ts`) dresses it without editing the model file: coffered `ceilings`, Renaissance `walls`
+(a gilt frieze, fluted pilasters between the photos, laurel medallions above them, moulded damask panels on the wide empty
+stretches, all kept clear of photos, doorways, plaques, signs and the screen), solid `fills` for openings, `doorways: true`
+to close the walls round every doorway (above the door, a hollow wall's insides, its floor), panelled `doors` drawn on a
+wall, `lamps` and `lampHeight`, and the `sky` seen through glass. Everything is drawn on canvases and merged per kind (a
+few draw calls). Only the rooms that are shown get their walls dressed. See `themes/memory-museum/v1/plan.ts`.
+
 Rules:
 
 - three.js loads only when a gallery is shown (its own chunk). The model must not embed pictures (the site's security
