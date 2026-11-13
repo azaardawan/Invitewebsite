@@ -32,8 +32,35 @@ const rooms: GalleryRoom[] = [
   { key: 'room6', parent: 'room5', sign: 'ROOM_TITLE_04', plaque: { x: 49.29, z: 0, normal: [-1, 0] }, bounds: { minX: 32.5, maxX: 51, minZ: -SIDE, maxZ: SIDE }, door: { x: 32.5, z: 0, axis: [1, 0], ...FAR }, spots: spots(45, 46, 47, 48, 44, 43, 42, 41) },
 ];
 
+/** A rectangle, and its mirror image across the hall (the left and right wings are alike). */
+const rect = (minX: number, maxX: number, minZ: number, maxZ: number) => ({ minX, maxX, minZ, maxZ });
+const both = (r: ReturnType<typeof rect>) => [r, rect(-r.maxX, -r.minX, r.minZ, r.maxZ)];
+
+/**
+ * Where visitors may stand (measured from the model, 0.4 m clear of the walls). The main entrance at the south end of
+ * the hall is an opening in the model, so the floor stops before it: nobody walks out of the museum.
+ */
+const FLOOR = [
+  // The hall: its middle, the corridor ahead to the front wing, the entrance corridor behind, the arms to the side wings.
+  rect(-7.6, 7.6, -7.6, 8.1),
+  rect(-5.1, 5.1, -14.9, -7.6),
+  rect(-5.1, 5.1, 7.6, 14.9),
+  ...both(rect(7.6, 14.9, -5.1, 5.1)),
+  // The front wing: its doorway, first room, the passage, second room.
+  rect(-1.3, 1.3, -16.2, -14.8),
+  rect(-10.3, 10.3, -30.9, -16.1),
+  rect(-1.3, 1.3, -34.1, -30.8),
+  rect(-10.3, 10.3, -48.9, -34.1),
+  // The side wings (right, and mirrored left).
+  ...both(rect(14.8, 16.2, -1.3, 1.3)),
+  ...both(rect(16.1, 30.9, -10.3, 10.3)),
+  ...both(rect(30.8, 34.1, -1.3, 1.3)),
+  ...both(rect(34.1, 48.9, -10.3, 10.3)),
+];
+
 export const PLAN: GalleryPlan = {
   rooms,
+  floor: FLOOR,
   start: { x: 0, z: 12.5, yaw: 0 },
   eye: 2.05,
   // On a phone the design's panels cover the bottom of the screen: stand further back and look level, so the photo

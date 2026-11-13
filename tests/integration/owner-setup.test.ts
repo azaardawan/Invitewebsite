@@ -36,6 +36,23 @@ describe("the owner's chat requests applied on deploy", () => {
     expect(await db().select().from(packages).where(eq(packages.themeId, t!.id))).toHaveLength(2);
   });
 
+  it('Memory Museum: its description in four languages, once; the packages are left to Admin (the owner’s prices)', async () => {
+    const { actor } = await activeTheme();
+    const key = uniqueKey('museum');
+    await syncThemesFromRegistry(db(), [{ ...manifestByCodeRef('memory-museum@1')!, key }], actor, { complete: false });
+    const setup = { ...OWNER_SETUPS.find((x) => x.themeKey === 'memory-museum')!, themeKey: key };
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([`${key}: name and description`]);
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    expect(t!.name).toMatchObject({ ar: 'متحف الذكريات', en: 'Memory Museum', ckb: 'مۆزەخانەی یادەوەری', bdn: 'مۆزەخانەیا بیرهاتنان' });
+    expect(Object.keys(t!.description ?? {}).sort()).toEqual(['ar', 'bdn', 'ckb', 'en']);
+    expect(await db().select().from(packages).where(eq(packages.themeId, t!.id))).toHaveLength(0);
+    // The name stays the working title, so the description is the guard: an Admin edit is kept on the next deploy.
+    await db().update(themes).set({ description: { ar: 'وصف المالك', en: "Owner's words" } }).where(eq(themes.id, t!.id));
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([]);
+    const [again] = await db().select().from(themes).where(eq(themes.id, t!.id));
+    expect(again!.description?.ar).toBe('وصف المالك');
+  });
+
   it('leave the packages to Admin when the sister design has no prices', async () => {
     const { actor } = await activeTheme();
     const key = uniqueKey('pearl');

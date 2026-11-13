@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
-import { openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
+import { onFloor, openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -581,8 +581,9 @@ export class GalleryEngine {
     d.moved += Math.abs(dx) + Math.abs(dy);
     if (d.moved < 6) return;
     const k = e.pointerType === 'touch' ? 0.0055 : 0.0035;
-    this.yaw += dx * k;
-    this.pitch = THREE.MathUtils.clamp(this.pitch + dy * k, -1.1, 1.1);
+    // The view follows the finger or the mouse: drag right to look right, drag up to look up.
+    this.yaw -= dx * k;
+    this.pitch = THREE.MathUtils.clamp(this.pitch - dy * k, -1.1, 1.1);
     this.stopWalk();
     this.dirty = true;
     this.kick();
@@ -689,17 +690,23 @@ export class GalleryEngine {
     return false;
   }
 
+  /** Whether a visitor may stand at (x, z): on the plan's floor, when it has one (never out of the building). */
+  private standable(x: number, z: number) {
+    return onFloor(this.o.plan, x, z);
+  }
+
   private step(dx: number, dz: number) {
     const len = Math.hypot(dx, dz);
     if (!len) return;
-    if (!this.blocked(new THREE.Vector3(dx / len, 0, dz / len), len)) {
+    const { x, z } = this.pos;
+    if (!this.blocked(new THREE.Vector3(dx / len, 0, dz / len), len) && this.standable(x + dx, z + dz)) {
       this.pos.x += dx;
       this.pos.z += dz;
       return;
     }
-    // Slide along the wall.
-    if (dx && !this.blocked(new THREE.Vector3(Math.sign(dx), 0, 0), Math.abs(dx))) this.pos.x += dx;
-    if (dz && !this.blocked(new THREE.Vector3(0, 0, Math.sign(dz)), Math.abs(dz))) this.pos.z += dz;
+    // Slide along the wall (or the floor's edge).
+    if (dx && !this.blocked(new THREE.Vector3(Math.sign(dx), 0, 0), Math.abs(dx)) && this.standable(this.pos.x + dx, this.pos.z)) this.pos.x += dx;
+    if (dz && !this.blocked(new THREE.Vector3(0, 0, Math.sign(dz)), Math.abs(dz)) && this.standable(this.pos.x, this.pos.z + dz)) this.pos.z += dz;
   }
 
   private kick() {

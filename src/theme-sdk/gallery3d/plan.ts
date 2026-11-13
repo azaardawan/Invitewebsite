@@ -52,6 +52,12 @@ export type GalleryPlan = {
    * the screen, clear of the design's panels at the bottom).
    */
   view: { distance: number; phone: number; tilt?: { computer: number; phone: number } };
+  /**
+   * Where a visitor may stand, as rectangles (already kept clear of the walls): the rooms, corridors and doorways.
+   * Steps off it are refused, so nobody walks out of the building through an opening in the model. Without it, only
+   * the model's walls stop visitors.
+   */
+  floor?: readonly { minX: number; maxX: number; minZ: number; maxZ: number }[];
   /** Round things in the way (columns, a sculpture) that walks go around. */
   obstacles: readonly { x: number; z: number; r: number }[];
   /** Meshes (name prefixes) left out of the scene, e.g. a figure that only shows the model's scale. */
@@ -83,6 +89,12 @@ export function roomAt(plan: GalleryPlan, x: number, z: number): GalleryRoom {
 
 function byKey(plan: GalleryPlan, key: string | null): GalleryRoom | undefined {
   return key ? plan.rooms.find((r) => r.key === key) : undefined;
+}
+
+/** Whether a visitor may stand at (x, z): inside one of the plan's floor rectangles (anywhere without a floor). */
+export function onFloor(plan: GalleryPlan, x: number, z: number): boolean {
+  if (!plan.floor?.length) return true;
+  return plan.floor.some((r) => x >= r.minX && x <= r.maxX && z >= r.minZ && z <= r.maxZ);
 }
 
 /** The rooms from the first room down to `room` (walks go through every doorway between them). */
