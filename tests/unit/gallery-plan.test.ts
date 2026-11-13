@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { openRooms, photoRooms, roomAt, route, type Point } from '@/theme-sdk/gallery3d/plan';
+import { onFloor, openRooms, photoRooms, roomAt, route, type Point } from '@/theme-sdk/gallery3d/plan';
 import { PLAN } from '../../themes/memory-museum/v1/plan';
 
 /** The shortest distance from point p to the segment a–b. */
@@ -60,6 +60,29 @@ describe('3D gallery floor plan (Memory Museum)', () => {
       const pts: Point[] = [from, ...route(PLAN, from, to)];
       for (let i = 1; i < pts.length; i++) {
         for (const o of PLAN.obstacles) expect(distance([o.x, o.z], pts[i - 1]!, pts[i]!)).toBeGreaterThan(o.r + 0.5);
+      }
+    }
+  });
+
+  it('keeps visitors in the building: the floor ends before the main entrance, and every walk stays on it', () => {
+    expect(onFloor(PLAN, PLAN.start.x, PLAN.start.z)).toBe(true);
+    // Out through the entrance at the south end of the hall, or through a wall: refused.
+    expect(onFloor(PLAN, 0, 16)).toBe(false);
+    expect(onFloor(PLAN, 0, -15.5 + 0)).toBe(true); // the front wing's doorway
+    expect(onFloor(PLAN, 4, -15.5)).toBe(false); // the wall beside it
+    expect(onFloor(PLAN, -60, 0)).toBe(false);
+    // Every point of a walk to any photo's viewing spot, and the spots themselves, are on the floor.
+    const views: Point[] = [];
+    for (const [x, z] of [[-5.66, -17.9], [5.66, -29.1], [-5.66, -45], [-25, 5.66], [-40, -5.66], [25, 5.66], [44, -5.66], [-6.26, -21.6], [6.26, -40]] as Point[]) views.push([x, z]);
+    for (const v of views) {
+      expect(onFloor(PLAN, v[0], v[1]), `view ${v}`).toBe(true);
+      const way: Point[] = [[PLAN.start.x, PLAN.start.z], ...route(PLAN, [PLAN.start.x, PLAN.start.z], v)];
+      for (let i = 1; i < way.length; i++) {
+        for (let t = 0; t <= 1; t += 0.05) {
+          const x = way[i - 1]![0] + (way[i]![0] - way[i - 1]![0]) * t;
+          const z = way[i - 1]![1] + (way[i]![1] - way[i - 1]![1]) * t;
+          expect(onFloor(PLAN, x, z), `walk to ${v} at ${x.toFixed(1)},${z.toFixed(1)}`).toBe(true);
+        }
       }
     }
   });
