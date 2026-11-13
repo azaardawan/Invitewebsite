@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   EditableText,
   Gallery3D,
@@ -78,8 +78,12 @@ export default function MemoryMuseum(props: ThemeProps) {
   const [flat, setFlat] = useState(false);
   const shown: Phase = editing ? 'open' : phase;
 
+  const touch = useTouchScreen();
   const open = () => {
     if (phase !== 'closed') return;
+    // Phones walk the museum held sideways (owner, 2026-11-13): where the browser allows it (Android), full screen and
+    // locked to landscape; elsewhere the museum asks the guest to turn the phone.
+    if (touch) landscape();
     setPhase('opening');
     window.setTimeout(() => setPhase('open'), reduced ? REDUCED_MS : OPENING_MS);
   };
@@ -96,6 +100,26 @@ export default function MemoryMuseum(props: ThemeProps) {
       {shown !== 'open' ? <Cover props={props} copy={copy} phase={shown} onOpen={open} /> : null}
     </div>
   );
+}
+
+/** Full screen, turned sideways (only from a tap; refused quietly where the browser doesn't allow it, e.g. iPhone). */
+function landscape() {
+  const lock = () => (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.('landscape');
+  document.documentElement
+    .requestFullscreen?.({ navigationUI: 'hide' })
+    .then(lock)
+    .catch(() => {});
+}
+
+const PORTRAIT = '(orientation: portrait)';
+function subscribePortrait(cb: () => void) {
+  const q = window.matchMedia(PORTRAIT);
+  q.addEventListener('change', cb);
+  return () => q.removeEventListener('change', cb);
+}
+/** True while a screen is held upright. */
+function usePortrait() {
+  return useSyncExternalStore(subscribePortrait, () => window.matchMedia(PORTRAIT).matches, () => false);
 }
 
 function Names({ props, className, as: Tag = 'h1' }: { props: ThemeProps; className: string; as?: 'h1' | 'p' }) {
@@ -150,6 +174,9 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   const [welcome, setWelcome] = useState(true);
   const [sheet, setSheet] = useState(false);
   const touch = useTouchScreen();
+  const portrait = usePortrait();
+  // A phone held upright: the museum waits until it is turned sideways.
+  const turn = touch && portrait && active;
 
   const photos = useMemo(() => [...props.photos].sort((a, b) => a.index - b.index), [props.photos]);
   const video = hasFeature(props, 'video') ? props.video : null;
@@ -216,6 +243,13 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         {props.wording.since ? <p className={c('captionText')}>{props.wording.since}</p> : null}
         <p className={c('welcomeHint')}>{touch ? copy.hintTouch : copy.hintKeys}</p>
       </div>
+
+      {turn ? (
+        <div className={c('turn')} role="status" data-museum-turn>
+          <span className={c('turnPhone')} aria-hidden />
+          <p className={c('turnText')}>{copy.rotate}</p>
+        </div>
+      ) : null}
 
       {/* For screen readers only: every photo, to walk straight to it (guests who can't walk around). */}
       {photos.length ? (

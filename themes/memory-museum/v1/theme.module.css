@@ -224,7 +224,87 @@
 .walk {
   position: relative;
   height: 100dvh;
-  min-height: 520px;
+  min-height: 280px;
+}
+
+/* A phone held upright: turn it sideways (the museum is walked in landscape). */
+.turn {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 22px;
+  padding: 24px;
+  background: var(--mm-ground);
+  text-align: center;
+}
+
+.turnPhone {
+  width: 54px;
+  height: 92px;
+  border: 3px solid var(--mm-gilt);
+  border-radius: 10px;
+  position: relative;
+  animation: mm-turn 2.4s ease-in-out infinite;
+}
+
+.turnPhone::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 14px;
+  height: 3px;
+  margin-left: -7px;
+  border-radius: 2px;
+  background: var(--mm-gilt);
+}
+
+@keyframes mm-turn {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  55%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+.turnText {
+  margin: 0;
+  max-width: 260px;
+  font-family: var(--mm-display);
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--mm-stone);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turnPhone {
+    animation: none;
+    transform: rotate(-90deg);
+  }
+}
+
+/* Sideways on a phone: a short screen, so a smaller touch pad and welcome card. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .joystick {
+    width: 96px;
+    height: 96px;
+    bottom: 18px;
+  }
+
+  .welcome {
+    padding: 18px 28px 16px;
+    gap: 2px;
+  }
+
+  .welcomeNames {
+    font-size: 21px;
+  }
 }
 
 .stage {

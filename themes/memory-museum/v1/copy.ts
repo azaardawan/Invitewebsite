@@ -10,6 +10,8 @@ const ar = {
   /** Under the names on the cover. */
   welcome: 'أهلاً بكم في متحفنا',
   loading: 'جارٍ فتح المتحف…',
+  /** On a phone held upright (the museum is walked sideways). */
+  rotate: 'أديروا الهاتف بالعرض للتجوّل في المتحف',
   next: 'الصورة التالية',
   previous: 'السابقة',
   entrance: 'المدخل',
@@ -55,6 +57,7 @@ export type Copy = { [K in keyof typeof ar]: K extends 'samples' ? readonly (rea
 const en: Copy = {
   welcome: 'Welcome to our museum',
   loading: 'Opening the museum…',
+  rotate: 'Turn your phone sideways to walk through the museum',
   next: 'Next photo',
   previous: 'Previous',
   entrance: 'Entrance',
@@ -93,6 +96,7 @@ const en: Copy = {
 const ckb: Copy = {
   welcome: 'بەخێربێن بۆ مۆزەخانەکەمان',
   loading: 'مۆزەخانەکە دەکرێتەوە…',
+  rotate: 'مۆبایلەکەتان بە پانی بسووڕێنن بۆ گەڕان لە مۆزەخانەکەدا',
   next: 'وێنەی دواتر',
   previous: 'پێشوو',
   entrance: 'دەروازە',
@@ -131,6 +135,7 @@ const ckb: Copy = {
 const bdn: Copy = {
   welcome: 'ب خێر بێن بۆ مۆزەخانەیا مە',
   loading: 'مۆزەخانە دهێتە ڤەکرن…',
+  rotate: 'مۆبایلا خۆ ب پانی بزڤڕینن بۆ گەڕیانێ د مۆزەخانێدا',
   next: 'وێنێ دویڤدا',
   previous: 'یێ بەری',
   entrance: 'دەرگەهـ',

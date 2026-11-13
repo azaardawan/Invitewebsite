@@ -53,6 +53,32 @@ test('the museum opens in 3D, and the guide walks to a photo', async ({ page }, 
   expect(errors).toEqual([]);
 });
 
+test('on a phone the museum is walked sideways: held upright, it asks to turn the phone', async ({ browser }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
+  test.setTimeout(120_000);
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await signInAsNewOwner(page);
+  const errors = watchErrors(page);
+  await page.goto('/admin/preview/en/theme/memory-museum?v=1&names=short');
+  await page.getByRole('button', { name: 'Open the museum' }).click();
+  await expect(page.locator('[data-museum-turn]')).toContainText('Turn your phone sideways');
+  await page.screenshot({ path: testInfo.outputPath('phone-upright.png') });
+  // Tapping Open asked for full screen (to lock the phone sideways where the browser allows it).
+  expect(await page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+  await page.evaluate(() => document.exitFullscreen());
+  // Turned sideways: the museum, with only the touch pad over it.
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.locator('[data-museum-turn]')).toHaveCount(0);
+  await expect(page.locator('[data-museum-3d="ready"]')).toBeVisible({ timeout: 60_000 });
+  const overflow = await page.evaluate(() => document.documentElement.scrollHeight - document.documentElement.clientHeight);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: testInfo.outputPath('phone-sideways.png') });
+  expect(errors).toEqual([]);
+  await context.close();
+});
+
 test('without 3D the museum is shown flat, room by room', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
   await signInAsNewOwner(page);
