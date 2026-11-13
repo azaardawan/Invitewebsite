@@ -1741,3 +1741,60 @@ The keepsake PDF's title and the label before each guest's name (`themes/delal-b
 |---|---|---|---|---|---|
 | 1 | #26 v2 keepsake: title (`keepsakeTitle`) | أمنيات الضيوف | Guest Wishes | ئاواتەکانی میوانان | هیڤیێن میڤانان |
 | 2 | #26 v2 keepsake: before each guest's name (`guestName`) | اسم الضيف: | Guest Name: | ناوی میوان: | ناڤێ میڤانی: |
+
+## Batch 56 — Memory Museum (#27, Couples): the 3D museum of the couple's photos — ✅ AUTO-APPROVED (2026-11-13, owner checks in Admin → Translations)
+
+The design's name, its changeable lines (the museum's name, the date line, the six rooms' names; manifest `wording`) and its own words around the museum (`themes/memory-museum/v1/copy.ts`: buttons, hints, the editor's help, the sample photos' titles and the sample story). The date line and three room names reuse BAHJAFLIX's approved Kurdish (batches 46–48).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #27 Memory Museum: design name (manifest `title`) | متحف الذكريات | Memory Museum | مۆزەخانەی یادەوەری | مۆزەخانەیا بیرهاتنان |
+| 2 | #27 wording `title`: its label on the order form | اسم متحفكما | Your museum’s name | ناوی مۆزەخانەکەتان | ناڤێ مۆزەخانەیا هەوە |
+| 3 | #27 wording `title`: the default | متحف ذكرياتنا | Our Memory Museum | مۆزەخانەی یادەوەرییەکانمان | مۆزەخانەیا بیرهاتنێن مە |
+| 4 | #27 wording `since`: its label on the order form | سطر التاريخ | The date line | دێڕی بەروار | رێزا رێکەفتێ |
+| 5 | #27 wording `since`: the default | منذ 14 شباط 2019 | Since 14 February 2019 | لە ١٤ی شوباتی ٢٠١٩ەوە | ژ ١٤ی شوباتا ٢٠١٩ێ |
+| 6 | #27 wording `room1`: its label on the order form | اسم القاعة الأولى | The first room’s name | ناوی هۆڵی یەکەم | ناڤێ هۆلا ئێکێ |
+| 7 | #27 wording `room1`: the default | البداية | The beginning | سەرەتا | دەستپێک |
+| 8 | #27 wording `room2`: its label on the order form | اسم القاعة الثانية | The second room’s name | ناوی هۆڵی دووەم | ناڤێ هۆلا دووێ |
+| 9 | #27 wording `room2`: the default | خطوبتنا | Our engagement | دەستگیرانیمان | دەستگیرانیا مە |
+| 10 | #27 wording `room3`: its label on the order form | اسم القاعة الثالثة | The third room’s name | ناوی هۆڵی سێیەم | ناڤێ هۆلا سێیێ |
+| 11 | #27 wording `room3`: the default | زفافنا | Our wedding | زەماوەندەکەمان | داوەتا مە |
+| 12 | #27 wording `room4`: its label on the order form | اسم القاعة الرابعة | The fourth room’s name | ناوی هۆڵی چوارەم | ناڤێ هۆلا چارێ |
+| 13 | #27 wording `room4`: the default | سفراتنا | Our trips | گەشتەکانمان | گەشتێن مە |
+| 14 | #27 wording `room5`: its label on the order form | اسم القاعة الخامسة | The fifth room’s name | ناوی هۆڵی پێنجەم | ناڤێ هۆلا پێنجێ |
+| 15 | #27 wording `room5`: the default | لحظاتنا | Our moments | ساتەکانمان | دەمێن مە |
+| 16 | #27 wording `room6`: its label on the order form | اسم القاعة السادسة | The sixth room’s name | ناوی هۆڵی شەشەم | ناڤێ هۆلا شەشێ |
+| 17 | #27 wording `room6`: the default | إلى الأبد | Forever | بۆ هەمیشە | بۆ هەروهەر |
+| 18 | #27 `welcome` | أهلاً بكم في متحفنا | Welcome to our museum | بەخێربێن بۆ مۆزەخانەکەمان | ب خێر بێن بۆ مۆزەخانەیا مە |
+| 19 | #27 `loading` | جارٍ فتح المتحف… | Opening the museum… | مۆزەخانەکە دەکرێتەوە… | مۆزەخانە دهێتە ڤەکرن… |
+| 20 | #27 `next` | الصورة التالية | Next photo | وێنەی دواتر | وێنێ دویڤدا |
+| 21 | #27 `previous` | السابقة | Previous | پێشوو | یێ بەری |
+| 22 | #27 `entrance` | المدخل | Entrance | دەروازە | دەرگەهـ |
+| 23 | #27 `story` | قصتنا | Our story | چیرۆکەکەمان | چیرۆکا مە |
+| 24 | #27 `close` | إغلاق | Close | داخستن | گرتن |
+| 25 | #27 `video` | شاهدوا الفيديو | Watch the video | سەیری ڤیدیۆکە بکەن | سەحکەنە ڤیدیۆیێ |
+| 26 | #27 `hintKeys` | اسحبوا للنظر، وامشوا بالأسهم. اضغطوا على صورة للاقتراب منها. | Drag to look around and walk with the arrow keys. Click a photo to walk up to it. | ڕابکێشن بۆ سەیرکردن، و بە تیرەکان بڕۆن. کرتە لە وێنەیەک بکەن بۆ نزیکبوونەوە لێی. | بکێشن بۆ دیتنێ، و ب تیران بچن. کلیک ل سەر وێنەکی بکەن دا نێزیکی وی ببن. |
+| 27 | #27 `hintTouch` | اسحبوا للنظر، وامشوا بالدائرة. اضغطوا على صورة للاقتراب منها. | Drag to look around and walk with the circle. Tap a photo to walk up to it. | ڕابکێشن بۆ سەیرکردن، و بە بازنەکە بڕۆن. دەست لە وێنەیەک بدەن بۆ نزیکبوونەوە لێی. | بکێشن بۆ دیتنێ، و ب بازنێ بچن. دەستێ خۆ ل سەر وێنەکی بدەن دا نێزیکی وی ببن. |
+| 28 | #27 `guide` | صور المتحف | Photos in the museum | وێنەکانی مۆزەخانە | وێنێن مۆزەخانێ |
+| 29 | #27 `room` | القاعة | Room | هۆڵ | هۆل |
+| 30 | #27 `addPhoto` | أضيفوا صورة | Add a photo | وێنەیەک زیاد بکەن | وێنەکی زێدە بکەن |
+| 31 | #27 `addVideo` | أضيفوا فيديو (يظهر على شاشة المدخل) | Add a video (it plays on the entrance screen) | ڤیدیۆیەک زیاد بکەن (لەسەر شاشەی دەروازە پیشان دەدرێت) | ڤیدیۆیەکێ زێدە بکەن (ل سەر شاشا دەرگەهی دهێتە نیشاندان) |
+| 32 | #27 `namesHint` | الاسم | Name | ناو | ناڤ |
+| 33 | #27 `storyHint` | اكتبوا قصتكما في سطرين أو ثلاثة… | Write your story in two or three lines… | چیرۆکەکەتان لە دوو بۆ سێ دێڕدا بنووسن… | چیرۆکا خۆ د دوو یان سێ رێزاندا بنڤیسن… |
+| 34 | #27 `roomHint` | اسم القاعة | Room name | ناوی هۆڵ | ناڤێ هۆلێ |
+| 35 | #27 `titleHint` | اسم المتحف | Museum name | ناوی مۆزەخانە | ناڤێ مۆزەخانێ |
+| 36 | #27 `sinceHint` | سطر التاريخ (مثلاً: منذ 2019) | Date line (e.g. Since 2019) | دێڕی بەروار (بۆ نموونە: لە ٢٠١٩ەوە) | رێزا رێکەفتێ (بۆ نموونە: ژ ٢٠١٩ێ) |
+| 37 | #27 `editorNote` | كل قاعة تتسع لثماني صور. الزوار يتجولون في المتحف ثلاثي الأبعاد ويرون صوركم معلّقة على الجدران. | Each room holds eight photos. Guests walk through the 3D museum and see your photos hanging on the walls. | هەر هۆڵێک هەشت وێنە دەگرێت. میوانەکان بە مۆزەخانە سێ ڕەهەندییەکەدا دەگەڕێن و وێنەکانتان لەسەر دیوارەکان دەبینن. | هەر هۆلەک هەشت وێنەیان دگریت. میڤان د مۆزەخانا سێ ڕەهەندیدا دگەڕن و وێنێن هەوە ل سەر دیواران دبینن. |
+| 38 | #27 sample photo 1: title (`samples`) | أول لقاء | First meeting | یەکەم دیدار | ئێکەم دیدار |
+| 39 | #27 sample photo 1: words (`samples`) | اليوم الذي بدأ فيه كل شيء. | The day it all began. | ئەو ڕۆژەی هەموو شتێک دەستی پێکرد. | ئەو ڕۆژا هەمی تشت پێ دەستپێکری. |
+| 40 | #27 sample photo 2: title (`samples`) | على الشاطئ | On the beach | لە کەناری دەریا | ل بەر دەریایێ |
+| 41 | #27 sample photo 2: words (`samples`) | مساء هادئ والبحر أمامنا. | A quiet evening by the sea. | ئێوارەیەکی هێمن و دەریا لەبەردەممان. | ئێڤارەکا هێمن و دەریا ل بەرامبەری مە. |
+| 42 | #27 sample photo 3: title (`samples`) | الخطوبة | Engagement | دەستگیرانی | دەستگیرانی |
+| 43 | #27 sample photo 3: words (`samples`) | اللحظة التي قلنا فيها: نعم. | The moment we said yes. | ئەو ساتەی گوتمان: بەڵێ. | ئەو دەمێ مە گۆتی: بەلێ. |
+| 44 | #27 sample photo 4: title (`samples`) | ليلة الزفاف | Our wedding night | شەوی زەماوەند | شەڤا داوەتێ |
+| 45 | #27 sample photo 4: words (`samples`) | أجمل ليلة في حياتنا. | The most beautiful night of our lives. | جوانترین شەوی ژیانمان. | جوانترین شەڤا ژیانا مە. |
+| 46 | #27 sample photo 5: title (`samples`) | سفرتنا الأولى | Our first trip | یەکەم گەشتمان | ئێکەم گەشتا مە |
+| 47 | #27 sample photo 5: words (`samples`) | مدينة جديدة وذكريات لا تُنسى. | A new city and memories to keep. | شارێکی نوێ و یادەوەرییەکی لەبیرنەکراو. | باژێرەکێ نوو و بیرهاتنێن ژبیرنەکری. |
+| 48 | #27 sample photo 6: title (`samples`) | معاً | Together | پێکەوە | پێکڤە |
+| 49 | #27 sample photo 6: words (`samples`) | ضحكة تكفي لعمر كامل. | One laugh is enough for a lifetime. | پێکەنینێک بۆ تەواوی تەمەن بەسە. | کەنیەک بۆ هەمی ژیانێ بەسە. |
+| 50 | #27 `sampleStory` | التقينا صدفة، ومنذ ذلك اليوم صار كل يوم معاً ذكرى تستحق أن تُعلَّق على جدار. هذا متحفنا الصغير، أهلاً بكم. | We met by chance, and since that day every day together has been a memory worth hanging on a wall. This is our little museum. Welcome. | بە ڕێکەوت یەکترمان بینی، و لەو ڕۆژەوە هەموو ڕۆژێکی پێکەوە بووە یادەوەرییەک کە شایەنی هەڵواسینە لەسەر دیوار. ئەمە مۆزەخانە بچووکەکەمانە، بەخێربێن. | ب ڕێکەفت مە ئێک دیت، و ژ وێ ڕۆژێ هەر ڕۆژەکا پێکڤە بوویە بیرهاتنەک کو هێژایی هەلاویستنێ یە ل سەر دیواری. ئەڤە مۆزەخانەیا مە یا بچووکە، ب خێر بێن. |

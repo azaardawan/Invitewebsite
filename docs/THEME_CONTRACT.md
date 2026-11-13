@@ -89,6 +89,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `useCountdown(startsAt)` | Live countdown (shared 1-second clock) |
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
 | `formatNumber(n, locale)` | Arabic-Indic digits for Arabic/Kurdish |
+| `<Gallery3D>` | A walkable 3D gallery of the customer's photos, built from the design's own model (§6, "3D galleries"). With `webglAvailable()` and `useTouchScreen()`. |
 
 ## 4A. Opening animation (required for sellable themes)
 
@@ -194,7 +195,7 @@ shape (with or without the cut line).
 ### Customer photos (`photos`)
 
 A design can show the customer's own photos: list `photos` in `features` and say how many it holds in the manifest,
-`photos: { max, min?, aspect?, labels?, set? }`. `max` is 1–36. `min` is how many must be added before the order can be paid
+`photos: { max, min?, aspect?, labels?, set? }`. `max` is 1–50. `min` is how many must be added before the order can be paid
 (default 0). `aspect` is the frame's width ÷ height that you draw them in (default 0.75, 3:4): the customer places
 each photo in that frame on the order form (drag and zoom). `labels` names the first places (`{ ar, en, ckb?, bdn? }`,
 e.g. "Cover photo", "Engagement"). **A collage** gives each place its own shape with `frames: [{ aspect }, …]` (place i
@@ -263,6 +264,43 @@ everywhere else and become editable only in the editor:
 
 Each photo has the customer's own `title` and `caption` (`props.photos[i].title`, `.caption`, or null). In the editor the
 design is shown already open (no entrance) and taps never open the design's own views. See `themes/bahjaflix/v1`.
+
+### 3D galleries (`<Gallery3D>`)
+
+Owner, 2026-11-13 (Couples, #27 Memory Museum): a design can hang the customer's photos in a 3D place the guests walk
+through. The design ships the place as a glTF model (`assets/<name>.glb`, loaded with
+`new URL('./assets/<name>.glb', import.meta.url).href`; keep it small, about 1–2 MB) and describes it in a `GalleryPlan`
+(`@/theme-sdk`, see `themes/memory-museum/v1/plan.ts`):
+
+- `rooms`: the first is where visitors start (no doorway); every other room has its floor `bounds`, its `parent` and the
+  `door` it is entered by (centre, the direction into the room, the opening's size, how far the parent's wall face is),
+  its photo `spots` (mesh names, in the order the places fill them) and a `sign` mesh for its name. **A room is a photo
+  set**: give the manifest `photos.set` = spots per room, so a package sells whole rooms (Admin → package "Photos in this
+  package") and its preview shows only those.
+- `start`, `eye` (eye height, in the model's units), `view` (how far from a photo a visitor stands, computer / phone),
+  `obstacles` walks go around, `hidden` / `passThrough` / `frames` (mesh-name prefixes), the `wallMaterial` used to wall
+  up a doorway, an optional `screen` mesh, and the `light`.
+
+`<Gallery3D model plan photos signs screen look dir reducedMotion …/>` then does the rest: each photo hangs on the spot of
+its place (`index`), cropped as the customer placed it; **a spot without a photo is left out with its frame and label**;
+a room with no photo (and nothing behind it) is walled up at its doorway; the signs show the rooms' names, the screen the
+video's still (with a play button) or a title and text. Guests walk with the arrow keys / WASD or the on-screen joystick
+(touch screens), look around by dragging, and tap a photo to walk up to it; walks go through the doorways and around the
+obstacles. The design draws its own buttons over it and drives it through a ref (`Gallery3DHandle`: `goToPhoto`, `next`,
+`previous`, `goToStart`) and its callbacks (`onView` — the photo in front of the visitor, for its caption — `onScreen`,
+`onProgress`, `onReady`). It draws only when something moves, so phones stay cool.
+
+Rules:
+
+- three.js loads only when a gallery is shown (its own chunk). The model must not embed pictures (the site's security
+  policy blocks how they load, and none are shown: every spot shows a customer photo or nothing). Customer photos are
+  loaded from the site itself (`/media/photos/…`, served for this from the CDN's files), because WebGL can only draw
+  pictures from the page's own site.
+- **Always have a flat version.** `onUnavailable` is called on a device without WebGL (or when the model fails): show
+  the rooms flat with `<Photo>`. Template designs show the flat rooms in the editor too (`<PhotoSlot set={…}>`,
+  `<EditableText>` for each room's name), since frames can't be tapped in 3D there.
+- The opening, the border and the guest's text rules still apply: keep the photos in a guide drawn with `<Photo>` (a
+  list to tap) so they are also reachable without walking, and keep texts on solid panels (the 3D view moves behind them).
 
 ### Couple posters (`couple_poster_landscape`, `couple_poster_portrait`)
 

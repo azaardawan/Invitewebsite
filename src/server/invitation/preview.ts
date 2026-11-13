@@ -93,7 +93,8 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     wordingLines: manifest.wording ?? [],
     wording: req.wording ?? null,
     switchDefs: manifest.switches ?? [],
-    photoSpec: manifest.photos ?? null,
+    // A package may sell fewer photos than the design holds (e.g. fewer rooms of a gallery): its preview shows that many.
+    photoSpec: manifest.photos && pkg?.photoLimit != null ? { ...manifest.photos, max: Math.min(manifest.photos.max, pkg.photoLimit) } : (manifest.photos ?? null),
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
   });
   return { theme, version, manifest, props };

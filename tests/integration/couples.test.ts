@@ -16,6 +16,7 @@ import { createDraft } from '@/server/orders/drafts';
 import { validateFieldValues } from '@/server/orders/validation';
 import { fieldDefs } from '@/server/orders/common';
 import { invitationRenderData } from '@/server/invitation/load';
+import { resolveSample } from '@/server/invitation/preview';
 import { listPhotos, photoSpec, removePhoto, setPhoto } from '@/server/photos/photos';
 import { setTemplateText, TemplateTextError } from '@/server/template/text';
 import { handleTemplateTextRequest } from '@/server/template/http';
@@ -88,6 +89,14 @@ describe('packages sell a number of photos', () => {
     expect((await photoSpec(db(), all.inv))?.max).toBe(18);
     const { props } = await invitationRenderData(db(), nine.inv, 'preview');
     expect(props.photoPlaces).toBe(9);
+  });
+
+  it('a package’s sample preview shows as many photos as it sells (e.g. fewer rooms of a gallery)', async () => {
+    const nine = await resolveSample(db(), { themeKey: shop.themeKey, locale: 'en', packageId: shop.nine });
+    expect(nine?.props.photos).toHaveLength(9);
+    expect(nine?.props.photoPlaces).toBe(9);
+    const all = await resolveSample(db(), { themeKey: shop.themeKey, locale: 'en', packageId: shop.all });
+    expect(all?.props.photos).toHaveLength(18);
   });
 
   it('a package cannot sell more photos than the design holds', async () => {

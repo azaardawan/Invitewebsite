@@ -107,7 +107,7 @@ export type ThemeManifest = {
    */
   switches?: DesignSwitch[];
   /**
-   * The customer's own photos (feature `photos`): the design holds up to `max` (1–36) and needs at least `min`
+   * The customer's own photos (feature `photos`): the design holds up to `max` (1–50) and needs at least `min`
    * before the order can be paid (default 0). `aspect` is the frame the design shows them in (width ÷ height, e.g. 0.75
    * for 3:4; default 0.75): the customer places each photo in that frame. `labels` names the first photos on the order
    * form ("The couple", "Engagement"…). For a collage whose places have different shapes, `frames` gives each place
@@ -153,7 +153,7 @@ export type PosterSpec = { frames: { landscape: number; portrait: number }; text
 export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[]; set?: number };
 
 /** The most photos a design may hold. */
-export const MAX_PHOTOS = 36;
+export const MAX_PHOTOS = 50;
 /** The frame photos are placed in when a design does not say (3:4, portrait). */
 export const DEFAULT_PHOTO_ASPECT = 0.75;
 
