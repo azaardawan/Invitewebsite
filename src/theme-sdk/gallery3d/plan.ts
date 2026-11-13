@@ -51,6 +51,8 @@ export type GalleryPlan = {
   passThrough: readonly string[];
   /** Meshes (name prefixes) with the frames and labels around the spots: a spot without a photo loses its frame too. */
   frames: readonly string[];
+  /** The model's material of the small plaques under the spots: hidden, the gallery draws each photo's label there. */
+  plaques?: string;
   /** The model's material used to close a doorway to a room that is not shown. */
   wallMaterial: string;
   /** The screen mesh (`<Gallery3D screen>`), if the model has one. */

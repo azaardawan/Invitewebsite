@@ -22,6 +22,8 @@ export type Gallery3DProps = {
   plan: GalleryPlan;
   /** `props.photos`: each hangs on the spot of its place; spots without a photo are left out, frame and all. */
   photos: readonly ThemePhoto[];
+  /** Each photo's label under it (its title and few words), by place; default: the photo's own `title` and `caption`. */
+  labels?: Readonly<Record<number, { title: string | null; caption: string | null }>>;
   /** Each room's name on its sign, by room key (rooms without one keep a blank sign hidden). */
   signs?: Readonly<Record<string, string>>;
   /** What the model's screen shows: a picture (e.g. the video's still, with a play button), or else a title and text. */
@@ -42,6 +44,8 @@ export type Gallery3DProps = {
   onUnavailable?: () => void;
   /** The visitor stopped in front of a photo (its place), or walked away from it (null). */
   onView?: (index: number | null) => void;
+  /** The visitor walked into a room (its key in the plan). */
+  onRoom?: (key: string) => void;
   /** The visitor tapped the screen. */
   onScreen?: () => void;
 };
@@ -106,7 +110,9 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
   }, []);
 
   // One scene per set of photos: rebuilt only when what is shown changes.
-  const photoKey = photos.map((p) => `${p.index}:${p.src}:${p.focus.x},${p.focus.y},${p.focus.zoom}`).join('|');
+  const { labels } = props;
+  const label = (p: ThemePhoto) => labels?.[p.index] ?? { title: p.title, caption: p.caption };
+  const photoKey = photos.map((p) => `${p.index}:${p.src}:${p.focus.x},${p.focus.y},${p.focus.zoom}:${label(p).title}:${label(p).caption}`).join('|');
   const signKey = JSON.stringify(signs ?? {});
   const screenKey = JSON.stringify(screen ?? null);
 
@@ -131,7 +137,8 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
           container: el,
           model,
           plan,
-          photos: photos.map((p) => ({ index: p.index, src: p.src, focus: p.focus })),
+          photos: photos.map((p) => ({ index: p.index, src: p.src, focus: p.focus, ...label(p) })),
+          dir,
           signs: signTexts,
           screen: screenSpec,
           look,
@@ -141,6 +148,7 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
             viewing.current = i;
             callbacks.current.onView?.(i);
           },
+          onRoom: (k) => callbacks.current.onRoom?.(k),
           onScreen: () => callbacks.current.onScreen?.(),
         });
         engine.current = e;

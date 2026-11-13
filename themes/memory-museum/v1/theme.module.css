@@ -636,3 +636,175 @@
     transition-duration: 0.2s;
   }
 }
+
+/* ---------- a room's few words ---------- */
+
+.roomText {
+  margin: 0;
+  justify-self: center;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--mm-stone-dim);
+  text-align: center;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- the editor: the museum's plan, and each room as it is ---------- */
+
+.mapBox {
+  width: min(100%, 560px);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.mapTitle {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--mm-stone);
+}
+
+.map {
+  width: min(100%, 360px);
+  height: auto;
+}
+
+.mapSmall {
+  width: 92px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.mapHall {
+  fill: rgba(241, 233, 219, 0.1);
+  stroke: var(--mm-line);
+}
+
+.mapEntrance {
+  fill: none;
+  stroke: var(--mm-gilt);
+  stroke-width: 2;
+}
+
+.mapRoom rect {
+  stroke-width: 1.5;
+}
+
+.mapRoom text {
+  font-family: var(--mm-display);
+  font-size: 20px;
+}
+
+.mapSold rect {
+  fill: rgba(210, 173, 102, 0.16);
+  stroke: var(--mm-gilt);
+}
+
+.mapSold text {
+  fill: var(--mm-stone);
+}
+
+.mapClosed rect {
+  fill: none;
+  stroke: rgba(201, 189, 169, 0.35);
+  stroke-dasharray: 4 4;
+}
+
+.mapClosed text {
+  fill: rgba(201, 189, 169, 0.45);
+}
+
+.mapHere rect {
+  fill: var(--mm-gilt);
+}
+
+.mapHere text {
+  fill: #1d160c;
+}
+
+.roomHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.roomNumber {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+}
+
+.roomPlan {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr);
+  gap: 10px;
+  width: min(100%, 560px);
+  justify-self: center;
+  padding: 14px 12px 0;
+  border: 1px solid var(--mm-line);
+  border-bottom: 0;
+  background: rgba(241, 233, 219, 0.03);
+}
+
+.wall {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  min-width: 0;
+}
+
+.wallName {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+  text-align: center;
+}
+
+/* The parquet floor between the two walls. */
+.floor {
+  background: repeating-linear-gradient(180deg, rgba(168, 130, 63, 0.18) 0 2px, transparent 2px 22px);
+  border-inline: 1px solid rgba(210, 173, 102, 0.15);
+}
+
+.doorway {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin-bottom: -1px;
+  padding: 8px 18px;
+  border: 1px solid var(--mm-line);
+  border-bottom-color: var(--mm-ground);
+  background: var(--mm-ground);
+  font-size: 12px;
+  color: var(--mm-stone-dim);
+}
+
+.wallSpot {
+  position: relative;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spotNumber {
+  position: absolute;
+  top: -8px;
+  inset-inline-start: -6px;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mm-enamel);
+  border: 1px solid var(--mm-gilt);
+  color: #e2c27a;
+  font-size: 11px;
+}

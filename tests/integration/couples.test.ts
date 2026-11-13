@@ -64,6 +64,7 @@ beforeAll(async () => {
           { key: 'tag', label: { ar: 'المناسبة', en: 'Occasion' }, ar: 'ذكرى زواجنا', options: ['خطوبتنا'], custom: false, maxLength: 24 },
         ],
         photos: { max: 18, min: 1, aspect: 2 / 3 },
+        pageTexts: { open: { ar: 'افتح المتحف', en: 'Open the museum' } },
         print: undefined,
       }),
     ],
@@ -97,6 +98,16 @@ describe('packages sell a number of photos', () => {
     expect(nine?.props.photoPlaces).toBe(9);
     const all = await resolveSample(db(), { themeKey: shop.themeKey, locale: 'en', packageId: shop.all });
     expect(all?.props.photos).toHaveLength(18);
+  });
+
+  it('a design that is not an invitation has its own words on the Open button (manifest pageTexts)', async () => {
+    const en = await resolveSample(db(), { themeKey: shop.themeKey, locale: 'en', packageId: shop.all });
+    expect(en?.props.labels.openInvitation).toBe('Open the museum');
+    // Without Kurdish, the Arabic.
+    const ckb = await resolveSample(db(), { themeKey: shop.themeKey, locale: 'ckb', packageId: shop.all });
+    expect(ckb?.props.labels.openInvitation).toBe('افتح المتحف');
+    const { props } = await invitationRenderData(db(), (await draft(shop.all)).inv, 'preview');
+    expect(props.labels.openInvitation).toBe('Open the museum');
   });
 
   it('a package cannot sell more photos than the design holds', async () => {

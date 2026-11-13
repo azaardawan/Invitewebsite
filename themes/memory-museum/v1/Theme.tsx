@@ -33,10 +33,14 @@ const MODEL = new URL('./assets/museum.glb', import.meta.url).href;
 
 const LOOK = {
   font: "'MM Display', 'Amiri', Georgia, serif",
+  textFont: "'MM Text', system-ui, sans-serif",
   signInk: '#e2c27a',
   signGround: '#1d2a2a',
   screenInk: '#f1e9db',
   screenGround: '#14110d',
+  labelInk: '#2a2118',
+  labelGround: '#f3ebdc',
+  labelLine: '#b8924c',
 };
 
 const c = (...names: (string | false | null | undefined)[]) =>
@@ -54,12 +58,16 @@ function words(p: ThemePhoto, props: ThemeProps, copy: Copy): { title: string | 
   return { title: p.title, caption: p.caption };
 }
 
-/** The room a photo place is in (0-based) and that room's name (the customer's, or "Room 2" when they cleared it). */
+/** The room a photo place is in (0-based). */
 function roomOf(index: number) {
   return Math.floor(index / PER_ROOM);
 }
+/** A room's name (the customer's, or "Room 2" when they cleared it) and its few words (or ''). */
 function roomName(props: ThemeProps, copy: Copy, room: number) {
   return props.wording[ROOMS[room]!]?.trim() || `${copy.room} ${room + 1}`;
+}
+function roomText(props: ThemeProps, room: number) {
+  return props.wording[`${ROOMS[room]!}Text`]?.trim() ?? '';
 }
 
 export default function MemoryMuseum(props: ThemeProps) {
@@ -78,7 +86,13 @@ export default function MemoryMuseum(props: ThemeProps) {
 
   return (
     <div className={c(fonts.root, 'root', reduced && 'reduced')} dir={props.dir} lang={props.lang} data-phase={shown}>
-      {editing || flat ? <FlatMuseum props={props} copy={copy} editing={editing} /> : <MuseumWalk props={props} copy={copy} reduced={reduced} active={shown === 'open'} onUnavailable={() => setFlat(true)} />}
+      {editing ? (
+        <MuseumEditor props={props} copy={copy} />
+      ) : flat ? (
+        <FlatMuseum props={props} copy={copy} />
+      ) : (
+        <MuseumWalk props={props} copy={copy} reduced={reduced} active={shown === 'open'} onUnavailable={() => setFlat(true)} />
+      )}
       {shown !== 'open' ? <Cover props={props} copy={copy} phase={shown} onOpen={open} /> : null}
     </div>
   );
@@ -112,6 +126,7 @@ function Cover({ props, copy, phase, onOpen }: { props: ThemeProps; copy: Copy; 
         {props.wording.since ? <p className={c('since')}>{props.wording.since}</p> : null}
         <span className={c('rule')} aria-hidden />
         <p className={c('coverTitle')}>{copy.welcome}</p>
+        {/* The design's own words ("Open the museum", manifest pageTexts.open). */}
         <button type="button" className={c('openButton')} onClick={onOpen} disabled={phase !== 'closed'}>
           {props.labels.openInvitation}
         </button>
@@ -127,6 +142,7 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const [viewing, setViewing] = useState<number | null>(null);
+  const [room, setRoom] = useState<string>('hall');
   const [hint, setHint] = useState(true);
   const [sheet, setSheet] = useState<'story' | 'video' | null>(null);
   const touch = useTouchScreen();
@@ -137,6 +153,7 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   const names = [props.fields.person_1_name, props.fields.person_2_name].filter(Boolean).join(` ${props.labels.and} `);
 
   const signs = useMemo(() => Object.fromEntries(ROOMS.map((key) => [key, props.wording[key] ?? ''])), [props.wording]);
+  const labels = useMemo(() => Object.fromEntries(photos.map((p) => [p.index, words(p, props, copy)])), [photos, props, copy]);
   const screen = useMemo(
     () => (video ? { image: video.poster, play: true } : { image: null, play: false, title: names, body: story || undefined }),
     [video, names, story],
@@ -153,17 +170,19 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
     rail.current?.querySelector<HTMLElement>(`[data-place="${viewing}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduced ? 'auto' : 'smooth' });
   }, [viewing, reduced]);
 
-  const current = viewing === null ? null : photos.find((p) => p.index === viewing) ?? null;
+  const current = viewing === null ? null : (photos.find((p) => p.index === viewing) ?? null);
   const currentWords = current ? words(current, props, copy) : null;
+  const roomIndex = ROOMS.indexOf(room);
 
   return (
-    <section className={c('walk')} data-museum-3d={ready ? 'ready' : 'loading'}>
+    <section className={c('walk')} data-museum-3d={ready ? 'ready' : 'loading'} data-museum-room-now={room}>
       <Gallery3D
         ref={gallery}
         className={c('stage')}
         model={MODEL}
         plan={PLAN}
         photos={photos}
+        labels={labels}
         signs={signs}
         screen={screen}
         look={LOOK}
@@ -177,6 +196,10 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         onView={(i) => {
           setViewing(i);
           if (i !== null) setHint(false);
+        }}
+        onRoom={(key) => {
+          setRoom(key);
+          if (key !== 'hall') setHint(false);
         }}
         onScreen={() => (video ? setSheet('video') : story ? setSheet('story') : undefined)}
       />
@@ -203,6 +226,15 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
             <span className={c('captionRoom')}>{roomName(props, copy, roomOf(current.index))}</span>
             {currentWords.title ? <span className={c('captionTitle')}>{currentWords.title}</span> : null}
             {currentWords.caption ? <span className={c('captionText')}>{currentWords.caption}</span> : null}
+          </div>
+        ) : roomIndex >= 0 ? (
+          // Walking into a room: its name and its few words.
+          <div className={c('caption')} aria-live="polite" data-museum-room-card>
+            <span className={c('captionRoom')}>
+              {copy.room} {roomIndex + 1}
+            </span>
+            <span className={c('captionTitle')}>{roomName(props, copy, roomIndex)}</span>
+            {roomText(props, roomIndex) ? <span className={c('captionText')}>{roomText(props, roomIndex)}</span> : null}
           </div>
         ) : null}
         {photos.length ? (
@@ -259,52 +291,53 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   );
 }
 
-/**
- * The museum shown flat: its rooms one under another, eight framed photos each. Guests see it on a device without 3D;
- * the couple fills it in the editor (every place of the rooms their package sells, the rooms' names, the video).
- */
-function FlatMuseum({ props, copy, editing }: { props: ThemeProps; copy: Copy; editing: boolean }) {
+/** The museum's header: its name, the couple, the date line and the story (editable in the editor). */
+function Header({ props, copy, editing }: { props: ThemeProps; copy: Copy; editing: boolean }) {
   const story = props.fields.invitation_message?.trim() || (props.mode === 'sample' && !editing ? copy.sampleStory : '');
-  const rooms = editing ? Math.ceil(props.photoPlaces / PER_ROOM) : ROOMS.length;
-  const video = hasFeature(props, 'video');
+  return (
+    <header className={c('flatHeader')}>
+      <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
+      <EditableText id="wording:title" value={props.wording.title} placeholder={copy.titleHint} as="p" className={c('eyebrow')} />
+      {editing ? (
+        <h1 className={c('names')}>
+          <EditableText id="field:person_1_name" value={props.fields.person_1_name} placeholder={copy.namesHint} />
+          <span className={c('and')}>{props.labels.and}</span>
+          <EditableText id="field:person_2_name" value={props.fields.person_2_name} placeholder={copy.namesHint} />
+        </h1>
+      ) : (
+        <Names props={props} className="names" />
+      )}
+      <EditableText id="wording:since" value={props.wording.since} placeholder={copy.sinceHint} as="p" className={c('since')} />
+      <EditableText id="field:invitation_message" value={story} placeholder={copy.storyHint} as="p" className={c('panelText')} multiline />
+    </header>
+  );
+}
+
+/**
+ * The museum shown flat, for guests on a device without 3D: its rooms one under another, each with its name, its few
+ * words and its framed photos with their words.
+ */
+function FlatMuseum({ props, copy }: { props: ThemeProps; copy: Copy }) {
   return (
     <div className={c('flat')} data-museum-flat>
-      <header className={c('flatHeader')}>
-        <ThemeBorder border={props.border} fallback={FRAME_BORDER} medium="screen" />
-        <EditableText id="wording:title" value={props.wording.title} placeholder={copy.titleHint} as="p" className={c('eyebrow')} />
-        {editing ? (
-          <h1 className={c('names')}>
-            <EditableText id="field:person_1_name" value={props.fields.person_1_name} placeholder={copy.namesHint} />
-            <span className={c('and')}>{props.labels.and}</span>
-            <EditableText id="field:person_2_name" value={props.fields.person_2_name} placeholder={copy.namesHint} />
-          </h1>
-        ) : (
-          <Names props={props} className="names" />
-        )}
-        <EditableText id="wording:since" value={props.wording.since} placeholder={copy.sinceHint} as="p" className={c('since')} />
-        <EditableText id="field:invitation_message" value={story} placeholder={copy.storyHint} as="p" className={c('panelText')} multiline />
-      </header>
-
-      {editing ? <p className={c('note')}>{copy.editorNote}</p> : null}
-
-      {video && (props.video || editing) ? <VideoSlot video={props.video} className={c('videoBox')} controls playsInline label={copy.addVideo} /> : null}
-
-      {Array.from({ length: rooms }, (_, r) => {
-        const places = Array.from({ length: PER_ROOM }, (_, i) => r * PER_ROOM + i).filter((i) => editing || props.photos.some((p) => p.index === i));
-        if (!places.length) return null;
+      <Header props={props} copy={copy} editing={false} />
+      {hasFeature(props, 'video') && props.video ? <VideoSlot video={props.video} className={c('videoBox')} controls playsInline /> : null}
+      {ROOMS.map((_, r) => {
+        const photos = props.photos.filter((p) => roomOf(p.index) === r).sort((a, b) => a.index - b.index);
+        if (!photos.length) return null;
         return (
           <section key={r} className={c('room')} data-museum-room={r + 1}>
-            <EditableText id={`wording:${ROOMS[r]}`} value={props.wording[ROOMS[r]!]} placeholder={copy.roomHint} as="h2" className={c('roomTitle')} />
+            <h2 className={c('roomTitle')}>{roomName(props, copy, r)}</h2>
+            {roomText(props, r) ? <p className={c('roomText')}>{roomText(props, r)}</p> : null}
             <div className={c('grid')}>
-              {places.map((i) => {
-                const photo = props.photos.find((p) => p.index === i);
-                const w = photo ? words(photo, props, copy) : null;
+              {photos.map((p) => {
+                const w = words(p, props, copy);
                 return (
-                  <figure key={i} className={c('figure')}>
+                  <figure key={p.index} className={c('figure')}>
                     <div className={c('frame')}>
-                      <PhotoSlot index={i} photos={props.photos} set={PER_ROOM} className={c('framePhoto')} label={copy.addPhoto} />
+                      <Photo photo={p} className={c('framePhoto')} />
                     </div>
-                    {w && (w.title || w.caption) ? (
+                    {w.title || w.caption ? (
                       <figcaption className={c('figcaption')}>
                         {w.title ? <span className={c('figTitle')}>{w.title}</span> : null}
                         {w.caption ? <span>{w.caption}</span> : null}
@@ -318,5 +351,123 @@ function FlatMuseum({ props, copy, editing }: { props: ThemeProps; copy: Copy; e
         );
       })}
     </div>
+  );
+}
+
+/**
+ * The editor (template designs are filled in place): the museum's plan with the rooms the package includes, then
+ * room by room: its name, its few words, and its eight frames where they hang, along the left wall going in and back
+ * along the right wall, each with its title and words under it.
+ */
+function MuseumEditor({ props, copy }: { props: ThemeProps; copy: Copy }) {
+  const rooms = Math.min(ROOMS.length, Math.ceil(props.photoPlaces / PER_ROOM));
+  return (
+    <div className={c('flat')} data-museum-flat>
+      <Header props={props} copy={copy} editing />
+      <section className={c('mapBox')}>
+        <h2 className={c('mapTitle')}>{copy.mapTitle}</h2>
+        <MuseumMap rooms={rooms} names={ROOMS.map((_, r) => roomName(props, copy, r))} copy={copy} />
+        <p className={c('note')}>{copy.editorNote}</p>
+      </section>
+
+      {hasFeature(props, 'video') ? <VideoSlot video={props.video} className={c('videoBox')} controls playsInline label={copy.addVideo} /> : null}
+
+      {Array.from({ length: rooms }, (_, r) => {
+        const place = (i: number) => r * PER_ROOM + i;
+        // The left wall from the back to the doorway (places 4…1), the right wall from the back to the doorway (5…8).
+        const left = [3, 2, 1, 0].map(place);
+        const right = [4, 5, 6, 7].map(place);
+        const slot = (i: number) => {
+          const photo = props.photos.find((p) => p.index === i);
+          return (
+            <figure key={i} className={c('wallSpot')}>
+              <span className={c('spotNumber')}>{(i % PER_ROOM) + 1}</span>
+              <div className={c('frame')}>
+                <PhotoSlot index={i} photos={props.photos} set={PER_ROOM} className={c('framePhoto')} label={copy.addPhoto} />
+              </div>
+              {photo && (photo.title || photo.caption) ? (
+                <figcaption className={c('figcaption')}>
+                  {photo.title ? <span className={c('figTitle')}>{photo.title}</span> : null}
+                  {photo.caption ? <span>{photo.caption}</span> : null}
+                </figcaption>
+              ) : null}
+            </figure>
+          );
+        };
+        return (
+          <section key={r} id={`mm-room-${r + 1}`} className={c('room')} data-museum-room={r + 1}>
+            <div className={c('roomHead')}>
+              <span className={c('roomNumber')}>
+                {copy.room} {r + 1}
+              </span>
+              <MuseumMap rooms={rooms} highlight={r} copy={copy} small />
+            </div>
+            <EditableText id={`wording:${ROOMS[r]}`} value={props.wording[ROOMS[r]!]} placeholder={copy.roomHint} as="h2" className={c('roomTitle')} />
+            <EditableText id={`wording:${ROOMS[r]}Text`} value={props.wording[`${ROOMS[r]!}Text`]} placeholder={copy.roomTextHint} as="p" className={c('roomText')} multiline />
+            <p className={c('note')}>{copy.photoHint}</p>
+            {/* The room seen from above, with the doorway at the bottom: the walls are drawn as they are, whatever the language. */}
+            <div className={c('roomPlan')} dir="ltr">
+              <div className={c('wall')}>
+                <span className={c('wallName')} dir={props.dir}>
+                  {copy.leftWall}
+                </span>
+                {left.map(slot)}
+              </div>
+              <div className={c('floor')} aria-hidden />
+              <div className={c('wall')}>
+                <span className={c('wallName')} dir={props.dir}>
+                  {copy.rightWall}
+                </span>
+                {right.map(slot)}
+              </div>
+              <div className={c('doorway')} dir={props.dir}>
+                <span aria-hidden>↑</span> {copy.doorway}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * The museum from above: the hall with the entrance at the bottom, the front wing (rooms 1–2) ahead, the left wing
+ * (3–4) and the right wing (5–6). The package's rooms are gilt (links to their part of the editor), the others dashed.
+ * `highlight`: one room picked out (the room being filled).
+ */
+function MuseumMap({ rooms, highlight, names, copy, small = false }: { rooms: number; highlight?: number; names?: string[]; copy: Copy; small?: boolean }) {
+  const ROOM_BOXES = [
+    [125, 82],
+    [125, 28],
+    [70, 136],
+    [16, 136],
+    [180, 136],
+    [234, 136],
+  ] as const;
+  return (
+    <svg className={c(small ? 'mapSmall' : 'map')} viewBox="0 0 300 236" role="img" aria-label={copy.mapTitle} direction="ltr">
+      <path className={c('mapHall')} d="M125 136h50v50h-50z" />
+      <path className={c('mapEntrance')} d="M150 222v-26m-7 9 7-9 7 9" />
+      {ROOM_BOXES.map(([x, y], r) => {
+        const sold = r < rooms;
+        const box = (
+          <g key={r} className={c('mapRoom', sold ? 'mapSold' : 'mapClosed', highlight === r && 'mapHere')}>
+            <rect x={x} y={y} width={50} height={50} rx={2} />
+            <text x={x + 25} y={y + 31} textAnchor="middle">
+              {r + 1}
+            </text>
+            {names && sold ? <title>{names[r]}</title> : null}
+          </g>
+        );
+        return sold && !small ? (
+          <a key={r} href={`#mm-room-${r + 1}`}>
+            {box}
+          </a>
+        ) : (
+          box
+        );
+      })}
+    </svg>
   );
 }

@@ -88,6 +88,12 @@ export type ThemeManifest = {
    */
   onlineInvitation?: boolean;
   /**
+   * The platform's words around a design that is not an invitation (e.g. a museum of the couple's photos), replacing
+   * "Open invitation" on the button (`labels.openInvitation`), the text under the link when it is shared, and the page
+   * shown once the link has ended. Each is optional (the invitation's words otherwise).
+   */
+  pageTexts?: PageTexts;
+  /**
    * The public sample on the storefront (the design with example names). `locale`: the language it shows in
    * whatever the storefront's language, except on the English storefront, which keeps English. `names: 'kurdish'`:
    * Kurdish example names in every language (Latin letters in English). E.g. a Zakho design shown in Badini.
@@ -182,6 +188,14 @@ export type DesignSwitch = {
 };
 
 /** A line's default text for an invitation language: its version where `defaultIn` lists the language, else the Arabic. */
+export type PageTexts = { open?: ThemeText; share?: ThemeText; endedTitle?: ThemeText; endedBody?: ThemeText };
+
+/** A design's own page text (`pageTexts[key]`) in `locale` (the Arabic when there is no Kurdish), or null. */
+export function pageText(manifest: Pick<ThemeManifest, 'pageTexts'> | null | undefined, key: keyof PageTexts, locale: string): string | null {
+  const t = manifest?.pageTexts?.[key];
+  return t ? (t[locale as keyof ThemeText] ?? t.ar) : null;
+}
+
 export function wordingDefault(line: Pick<WordingLine, 'ar' | 'versions' | 'defaultIn'>, locale: string): string {
   const l = locale as 'en' | 'ckb' | 'bdn';
   return (line.defaultIn?.includes(l) && line.versions?.[l]) || line.ar;
@@ -267,7 +281,7 @@ export const manifestSchema = z
           maxLength: z.number().int().min(1).max(120),
         }),
       )
-      .max(12)
+      .max(20)
       .optional(),
     switches: z
       .array(z.object({ key: z.string().regex(/^[a-z][a-zA-Z0-9]*$/), label: z.object({ ar: z.string().min(1), en: z.string().min(1) }), default: z.boolean() }))
@@ -303,6 +317,7 @@ export const manifestSchema = z
       })
       .optional(),
     internal: z.boolean().optional(),
+    pageTexts: z.object({ open: themeText.optional(), share: themeText.optional(), endedTitle: themeText.optional(), endedBody: themeText.optional() }).optional(),
   })
   .superRefine((m, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: 'custom', message });

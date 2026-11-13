@@ -47,6 +47,10 @@ themes/<key>/v<N>/
   for orders in that language; or the customer writes their own. The theme prints `props.wording[key]` (always filled). Kurdish versions need the owner's approval.
   A line may add `options` (fixed alternatives offered after the Arabic, e.g. «ثاني / ثالث») and `custom: false`
   (no own text: only the offered choices).
+- `pageTexts` (owner, 2026-11-13): a design that is **not an invitation** (e.g. #27 Memory Museum) gives the platform's
+  words around it in `{ar, en, ckb?, bdn?}`: `open` (the Open button, given to the theme as `labels.openInvitation`, so
+  the theme keeps drawing that label), `share` (the text under the shared link), `endedTitle` / `endedBody` (the page once
+  the link has ended). Each is optional; Kurdish needs the owner's approval like the rest.
 - `switches`: yes/no questions for the customer on the order form, each `{ key, label: {ar, en}, default }`
   (e.g. "show the father's name on the stickers"). The theme reads `props.switches[key]` (always filled).
 - Every design has an online invitation, newborn designs included (owner, 2026-10-28): a newborn invitation shows
@@ -278,16 +282,19 @@ through. The design ships the place as a glTF model (`assets/<name>.glb`, loaded
   set**: give the manifest `photos.set` = spots per room, so a package sells whole rooms (Admin → package "Photos in this
   package") and its preview shows only those.
 - `start`, `eye` (eye height, in the model's units), `view` (how far from a photo a visitor stands, computer / phone),
-  `obstacles` walks go around, `hidden` / `passThrough` / `frames` (mesh-name prefixes), the `wallMaterial` used to wall
-  up a doorway, an optional `screen` mesh, and the `light`.
+  `obstacles` walks go around, `hidden` / `passThrough` / `frames` (mesh-name prefixes), the `plaques` material (the
+  model's small plaques under the spots, replaced by the gallery's labels), the `wallMaterial` used to wall up a doorway,
+  an optional `screen` mesh, and the `light`.
 
 `<Gallery3D model plan photos signs screen look dir reducedMotion …/>` then does the rest: each photo hangs on the spot of
-its place (`index`), cropped as the customer placed it; **a spot without a photo is left out with its frame and label**;
+its place (`index`), cropped as the customer placed it, with a card under it showing its title and few words (`labels`,
+by place; default the photo's own `title` / `caption`); **a spot without a photo is left out with its frame and label**;
 a room with no photo (and nothing behind it) is walled up at its doorway; the signs show the rooms' names, the screen the
 video's still (with a play button) or a title and text. Guests walk with the arrow keys / WASD or the on-screen joystick
 (touch screens), look around by dragging, and tap a photo to walk up to it; walks go through the doorways and around the
 obstacles. The design draws its own buttons over it and drives it through a ref (`Gallery3DHandle`: `goToPhoto`, `next`,
-`previous`, `goToStart`) and its callbacks (`onView` — the photo in front of the visitor, for its caption — `onScreen`,
+`previous`, `goToStart`) and its callbacks (`onView` — the photo in front of the visitor, for its caption — `onRoom` — the
+room walked into, for its name and words — `onScreen`,
 `onProgress`, `onReady`). It draws only when something moves, so phones stay cool.
 
 Rules:

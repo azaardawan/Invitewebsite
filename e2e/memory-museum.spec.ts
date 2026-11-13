@@ -33,15 +33,16 @@ test('the museum opens in 3D, and the guide walks to a photo', async ({ page }, 
   for (const width of [390, 1280]) {
     await page.setViewportSize({ width, height: width >= 1000 ? 800 : 844 });
     await page.goto('/admin/preview/en/theme/memory-museum?v=1&names=short');
-    await page.getByRole('button', { name: 'Open invitation' }).click();
+    await page.getByRole('button', { name: 'Open the museum' }).click();
     await expect(page.locator('[data-museum-3d="ready"]')).toBeVisible({ timeout: 60_000 });
     await expect(page.locator('canvas')).toHaveCount(1);
     // The guide lists every sample photo (six rooms of eight).
     await expect(page.getByRole('list', { name: 'Photos in the museum' }).getByRole('listitem')).toHaveCount(48);
     await page.screenshot({ path: testInfo.outputPath(`hall-${width}.png`) });
     await page.locator('[data-place="9"]').click();
-    // Standing in front of it: its room and words show.
-    await expect(page.getByText('Our engagement').first()).toBeVisible({ timeout: 20_000 });
+    // Standing in front of it, in the front wing's second room: its room and words show.
+    await expect(page.locator('[data-museum-room-now="room2"]')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText('Our engagement').first()).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath(`photo-${width}.png`) });
   }
   expect(errors).toEqual([]);
@@ -60,7 +61,7 @@ test('without 3D the museum is shown flat, room by room', async ({ page }, testI
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/admin/preview/ar/theme/memory-museum?v=1&names=short');
-  await page.getByRole('button', { name: 'افتح الدعوة' }).click();
+  await page.getByRole('button', { name: 'افتح المتحف' }).click();
   await expect(page.locator('[data-museum-flat]')).toBeVisible();
   await expect(page.locator('[data-museum-room]')).toHaveCount(6);
   await expect(page.locator('[data-museum-flat] [data-bahja-photo]')).toHaveCount(48);
@@ -76,9 +77,11 @@ test('a two-room package: the couple fills two rooms; guests see only the rooms 
   await page.goto(`/en/order/${previewToken}`);
   await expect(page.locator('[data-template-editor]')).toBeVisible();
   const design = page.frameLocator('iframe[data-template-design]');
-  // The editor shows the rooms flat: two rooms of eight places, each room's first place ready for a photo.
+  // The editor shows the museum's plan and the package's two rooms (the front wing), each laid out as its walls: eight
+  // places, each room's first place ready for a photo.
   await expect(design.locator('[data-museum-room]')).toHaveCount(2);
   await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(16);
+  await expect(design.getByRole('img', { name: 'Your museum’s plan' }).first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('editor-empty.png'), fullPage: true });
 
   // A room's name, then a photo in the second room.
@@ -87,6 +90,10 @@ test('a two-room package: the couple fills two rooms; guests see only the rooms 
   await sheet.locator('[data-template-text-input]').fill('Paris');
   await sheet.locator('[data-template-text-save]').click();
   await expect(design.locator('[data-bahja-edit="wording:room2"]')).toHaveText('Paris');
+  await design.locator('[data-bahja-edit="wording:room2Text"]').click();
+  await sheet.locator('[data-template-text-input]').fill('Our honeymoon in France.');
+  await sheet.locator('[data-template-text-save]').click();
+  await expect(design.locator('[data-bahja-edit="wording:room2Text"]')).toHaveText('Our honeymoon in France.');
   await design.locator('[data-bahja-photo-slot="8"]').click();
   await expect(sheet).toHaveAttribute('data-template-sheet', 'photo-add');
   const jpeg = await sharp({ create: { width: 1500, height: 2000, channels: 3, background: '#b04050' } }).jpeg().toBuffer();
@@ -96,6 +103,7 @@ test('a two-room package: the couple fills two rooms; guests see only the rooms 
   expect(box!.width / box!.height).toBeCloseTo(2.04 / 2.74, 1);
   await sheet.getByRole('button', { name: 'Next' }).click();
   await sheet.locator('[data-template-photo-title]').fill('Eiffel Tower');
+  await sheet.locator('[data-template-photo-caption]').fill('Our first evening in Paris.');
   await sheet.locator('[data-template-photo-save]').click();
   await expect(sheet).toBeHidden();
   await page.screenshot({ path: testInfo.outputPath('editor-filled.png'), fullPage: true });
@@ -110,5 +118,11 @@ test('a two-room package: the couple fills two rooms; guests see only the rooms 
   await expect(page.getByText('Eiffel Tower')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText('Paris').first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('guest-photo.png') });
+  // Stepping back from the photo, in its room: the room's name and few words.
+  await page.keyboard.down('KeyS');
+  await page.waitForTimeout(600);
+  await page.keyboard.up('KeyS');
+  await expect(page.locator('[data-museum-room-card]')).toContainText('Our honeymoon in France.', { timeout: 10_000 });
+  await page.screenshot({ path: testInfo.outputPath('guest-room.png') });
   expect(errors).toEqual([]);
 });

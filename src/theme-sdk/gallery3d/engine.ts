@@ -8,16 +8,16 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
-import { openRooms, photoRooms, route, type GalleryPlan, type Point } from './plan';
+import { openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
-export type EnginePhoto = { index: number; src: string; focus: { x: number; y: number; zoom: number } };
+export type EnginePhoto = { index: number; src: string; focus: { x: number; y: number; zoom: number }; title: string | null; caption: string | null };
 export type EngineSign = { text: string; dir: 'rtl' | 'ltr' };
 export type EngineScreen = { image: string | null; title?: string; body?: string; dir: 'rtl' | 'ltr'; play: boolean };
-export type EngineLook = { font: string; signInk: string; signGround: string; screenInk: string; screenGround: string };
+export type EngineLook = { font: string; textFont: string; signInk: string; signGround: string; screenInk: string; screenGround: string; labelInk: string; labelGround: string; labelLine: string };
 
 export type EngineOptions = {
   container: HTMLElement;
@@ -30,10 +30,12 @@ export type EngineOptions = {
   reducedMotion: boolean;
   onProgress: (share: number) => void;
   onView: (index: number | null) => void;
+  onRoom: (key: string) => void;
   onScreen: () => void;
+  dir: 'rtl' | 'ltr';
 };
 
-type Spot = { mesh: THREE.Mesh; center: THREE.Vector3; normal: THREE.Vector3; aspect: number; index: number };
+type Spot = { mesh: THREE.Mesh; center: THREE.Vector3; normal: THREE.Vector3; aspect: number; index: number; width: number; bottom: number };
 type Walk = { pts: Point[]; lengths: number[]; total: number; done: number; yaw: number; pitch: number; view: number | null };
 
 const SPEED = 4.2;
@@ -148,6 +150,7 @@ export class GalleryEngine {
   private stick = { x: 0, y: 0 };
   private walk: Walk | null = null;
   private viewing: number | null = null;
+  private room = '';
   private frame = 0;
   private last = 0;
   private dirty = true;
@@ -204,6 +207,7 @@ export class GalleryEngine {
     if (!this.alive) return;
     this.build(gltf.scene);
     this.o.onProgress(1);
+    this.checkRoom();
     this.kick();
     await this.hangPhotos();
   }
@@ -244,7 +248,7 @@ export class GalleryEngine {
         const aspect = Math.max(size.x, size.z) / size.y;
         replaced.add(mat);
         if (photoAt.has(index)) {
-          this.spots.push({ mesh, center: box.getCenter(new THREE.Vector3()), normal, aspect, index });
+          this.spots.push({ mesh, center: box.getCenter(new THREE.Vector3()), normal, aspect, index, width: Math.max(size.x, size.z), bottom: box.min.y });
           mesh.visible = false; // until its photo arrives
         } else {
           mesh.visible = false;
@@ -252,7 +256,14 @@ export class GalleryEngine {
         }
         continue;
       }
-      if (named(mesh, plan.frames)) frames.push(mesh);
+      if (named(mesh, plan.frames)) {
+        // The model's small plaques: each photo gets the design's own label there instead.
+        if (plan.plaques && mat.name === plan.plaques) {
+          mesh.visible = false;
+          continue;
+        }
+        frames.push(mesh);
+      }
       if (plan.screen && mesh.name === plan.screen) {
         this.screenMesh = mesh;
         continue;
@@ -282,6 +293,7 @@ export class GalleryEngine {
       }
       if (room.door && !open.has(room.key) && open.has(room.parent ?? '')) this.closeDoor(room.door, wallMaterial);
     }
+    for (const spot of this.spots) this.drawLabel(spot);
     if (this.screenMesh) this.drawScreen(this.screenMesh).catch((e) => console.warn('3D gallery screen', e));
   }
 
@@ -345,6 +357,59 @@ export class GalleryEngine {
     const map = canvasTexture(c, this.renderer);
     mesh.material = new THREE.MeshStandardMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: 0.35, roughness: 0.45, metalness: 0.2, side: THREE.FrontSide });
     this.disposables.push(map, mesh.material as THREE.Material);
+  }
+
+  /** The card under a photo with its title and few words (none when the photo has neither). */
+  private drawLabel(spot: Spot) {
+    const photo = this.o.photos.find((p) => p.index === spot.index);
+    const title = photo?.title?.trim() ?? '';
+    const caption = photo?.caption?.trim() ?? '';
+    if (!title && !caption) return;
+    const { look, dir } = this.o;
+    const W = 1024;
+    const g0 = document.createElement('canvas').getContext('2d')!;
+    g0.font = `400 34px ${look.textFont}`;
+    const lines = caption ? wrap(g0, caption, W - 110, 3) : [];
+    const H = 40 + (title ? 84 : 0) + lines.length * 48 + 30;
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    const g = c.getContext('2d')!;
+    g.fillStyle = look.labelGround;
+    g.fillRect(0, 0, W, H);
+    g.strokeStyle = look.labelLine;
+    g.lineWidth = 4;
+    g.strokeRect(8, 8, W - 16, H - 16);
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.direction = dir;
+    g.fillStyle = look.labelInk;
+    let y = 40;
+    if (title) {
+      fitText(g, title, W / 2, y + 40, W - 110, 58, look.font);
+      y += 84;
+    }
+    g.font = `400 34px ${look.textFont}`;
+    g.globalAlpha = 0.82;
+    for (const line of lines) {
+      g.fillText(line, W / 2, y + 24);
+      y += 48;
+    }
+    const map = new THREE.CanvasTexture(c);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+    // Label width: most of the photo's; height from its text. Hung just under the frame.
+    const width = spot.width * 0.82;
+    const height = (width * H) / W;
+    const geo = new THREE.PlaneGeometry(width, height);
+    const mat = new THREE.MeshStandardMaterial({ map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: 0.3, roughness: 0.7 });
+    const label = new THREE.Mesh(geo, mat);
+    const at = spot.center.clone().addScaledVector(spot.normal, 0.02);
+    at.y = spot.bottom - 0.3 - height / 2;
+    label.position.copy(at);
+    label.lookAt(at.clone().add(spot.normal));
+    this.scene.add(label);
+    this.disposables.push(map, geo, mat);
   }
 
   private async drawScreen(mesh: THREE.Mesh) {
@@ -650,6 +715,7 @@ export class GalleryEngine {
       }
     }
 
+    if (moving) this.checkRoom();
     if (moving || this.dirty) {
       this.camera.position.copy(this.pos);
       this.camera.rotation.set(this.pitch, this.yaw, 0);
@@ -658,6 +724,14 @@ export class GalleryEngine {
     }
     if (moving) this.kick();
   };
+
+  /** Tells the design when the visitor walks into another room. */
+  private checkRoom() {
+    const key = roomAt(this.o.plan, this.pos.x, this.pos.z).key;
+    if (key === this.room) return;
+    this.room = key;
+    this.o.onRoom(key);
+  }
 
   private resize() {
     const el = this.o.container;
