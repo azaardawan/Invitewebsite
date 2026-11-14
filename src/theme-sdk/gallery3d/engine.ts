@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { onFloor, openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
-import { buildDecor, mix } from './decor';
+import { applySurfaces, buildDecor, mix } from './decor';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -377,6 +377,12 @@ export class GalleryEngine {
       wallColor: this.o.tint ?? null,
     });
     for (const m of out.meshes) this.scene.add(m);
+    // Texture on the walls and floors: the model's own, and the decoration's blocks and floors of the same materials.
+    if (spec.surfaces) {
+      const meshes: THREE.Mesh[] = [...out.meshes];
+      root.traverse((o) => (o as THREE.Mesh).isMesh && meshes.push(o as THREE.Mesh));
+      this.disposables.push(...applySurfaces(meshes, spec.surfaces, this.renderer));
+    }
     for (const l of out.lights) this.scene.add(l);
     for (const m of out.colliders) {
       m.geometry.computeBoundsTree();

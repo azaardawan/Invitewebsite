@@ -483,6 +483,8 @@ export type DecorSpec = {
   /** The model's materials that are the walls (recoloured when the customer picks another wall colour), and its
    * carved trim (recoloured a little lighter). */
   tint?: { walls: readonly string[]; trim?: readonly string[] };
+  /** Texture for the model's plain walls (plaster) and floors (marble tiles); see SurfaceSpec. */
+  surfaces?: SurfaceSpec;
   /** The colour seen through glass roofs. */
   sky?: string;
   palette?: DecorPalette;
@@ -654,6 +656,213 @@ export function buildDecor(input: DecorInput): DecorOutput {
     const lamp = new THREE.PointLight(0xfff1dc, l.intensity, 0, 2);
     lamp.position.set(l.x, l.y, l.z);
     out.lights.push(lamp);
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Surfaces: the model's plain walls and floors given a texture (owner, 2026-11-14: "not so flat, not so bland").
+
+/** A small seeded random, so every visitor sees the same marble and plaster. */
+function seeded(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+/** Draws `draw` at (x, y) and at its wrapped copies, so a texture repeats without seams. */
+function wrapped(S: number, x: number, y: number, r: number, draw: (x: number, y: number) => void) {
+  for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) if (x + dx > -r && x + dx < S + r && y + dy > -r && y + dy < S + r) draw(x + dx, y + dy);
+}
+
+/** Fine grain over a canvas (±`amount` per pixel), the tooth of stone and plaster. */
+function grain(g: CanvasRenderingContext2D, S: number, amount: number, rnd: () => number) {
+  const img = g.getImageData(0, 0, S, S);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const n = (rnd() - 0.5) * amount;
+    img.data[i] = Math.max(0, Math.min(255, img.data[i]! + n));
+    img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1]! + n));
+    img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2]! + n));
+  }
+  g.putImageData(img, 0, 0);
+}
+
+/**
+ * Limestone plaster (repeating, near white so the wall's own colour shows through): soft clouding, fine grain, and the
+ * faint joints of dressed stone blocks, `rows` courses high and two blocks long per course, every other course offset.
+ */
+export function plasterTexture(rows = 4): HTMLCanvasElement {
+  const S = 1024;
+  const [c, g] = canvas(S, S);
+  const rnd = seeded(7);
+  g.fillStyle = '#f8f5ef';
+  g.fillRect(0, 0, S, S);
+  // Clouding: soft light and dark patches, gentle (a plaster wall, not a stained one).
+  for (let i = 0; i < 600; i++) {
+    const x = rnd() * S;
+    const y = rnd() * S;
+    const r = 20 + rnd() * 110;
+    const dark = rnd() < 0.5;
+    wrapped(S, x, y, r, (px, py) => {
+      const grad = g.createRadialGradient(px, py, 0, px, py, r);
+      grad.addColorStop(0, dark ? 'rgba(140,120,90,0.028)' : 'rgba(255,255,255,0.06)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = grad;
+      g.fillRect(px - r, py - r, r * 2, r * 2);
+    });
+  }
+  grain(g, S, 9, rnd);
+  // Joints between the stone courses and blocks.
+  const h = S / rows;
+  for (let r = 0; r < rows; r++) {
+    const y = r * h;
+    g.fillStyle = 'rgba(96,82,60,0.2)';
+    g.fillRect(0, y, S, 3);
+    g.fillStyle = 'rgba(255,255,255,0.3)';
+    g.fillRect(0, y + 3, S, 2);
+    const off = r % 2 ? S / 4 : 0;
+    for (const x of [off, off + S / 2]) {
+      g.fillStyle = 'rgba(96,82,60,0.18)';
+      g.fillRect(x % S, y, 3, h);
+      g.fillStyle = 'rgba(255,255,255,0.25)';
+      g.fillRect((x + 3) % S, y, 2, h);
+    }
+  }
+  return c;
+}
+
+/**
+ * Polished marble floor tiles (repeating; 2 × 2 tiles): two tones in a chequer, each tile with its own veins, and
+ * grout between them.
+ */
+export function tilesTexture(light = '#ebe3d3', dark = '#cdbfa8', groutColor = '#8e7f67'): HTMLCanvasElement {
+  const S = 1024;
+  const T = S / 2;
+  const [c, g] = canvas(S, S);
+  const rnd = seeded(11);
+  for (let ty = 0; ty < 2; ty++) {
+    for (let tx = 0; tx < 2; tx++) {
+      const x0 = tx * T;
+      const y0 = ty * T;
+      const base = (tx + ty) % 2 ? dark : light;
+      const grad = g.createLinearGradient(x0, y0, x0 + T, y0 + T);
+      grad.addColorStop(0, mix(base, '#ffffff', 0.08));
+      grad.addColorStop(1, mix(base, '#000000', 0.05));
+      g.fillStyle = grad;
+      g.fillRect(x0, y0, T, T);
+      g.save();
+      g.beginPath();
+      g.rect(x0, y0, T, T);
+      g.clip();
+      // Clouds in the stone.
+      for (let i = 0; i < 40; i++) {
+        const x = x0 + rnd() * T;
+        const y = y0 + rnd() * T;
+        const r = 30 + rnd() * 90;
+        const cg = g.createRadialGradient(x, y, 0, x, y, r);
+        cg.addColorStop(0, rnd() < 0.5 ? 'rgba(255,255,255,0.10)' : 'rgba(110,92,66,0.07)');
+        cg.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = cg;
+        g.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      // Veins: thin wandering lines across the tile.
+      for (let v = 0; v < 4; v++) {
+        g.strokeStyle = `rgba(${rnd() < 0.5 ? '120,104,82' : '160,146,124'},${0.18 + rnd() * 0.18})`;
+        g.lineWidth = 0.8 + rnd() * 1.8;
+        g.beginPath();
+        let x = x0 + rnd() * T;
+        let y = y0;
+        g.moveTo(x, y);
+        while (y < y0 + T) {
+          x += (rnd() - 0.5) * 60;
+          y += 20 + rnd() * 40;
+          g.lineTo(x, y);
+        }
+        g.stroke();
+      }
+      g.restore();
+    }
+  }
+  grain(g, S, 8, rnd);
+  // Grout (half on each edge, so tiles meet across the repeat).
+  g.fillStyle = groutColor;
+  for (const p of [0, T, S]) {
+    g.fillRect(p - 3, 0, 6, S);
+    g.fillRect(0, p - 3, S, 6);
+  }
+  return c;
+}
+
+/**
+ * Gives a mesh texture coordinates from its place in the world (box mapping: floors by x and z, walls by their run and
+ * height), `size` metres per repeat of the texture, so a texture lies at the same scale everywhere and lines up
+ * across rooms. The model's walls and floors come without coordinates of their own.
+ */
+export function worldUv(mesh: THREE.Mesh, size: number) {
+  const geo = mesh.geometry;
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const nor = geo.attributes.normal as THREE.BufferAttribute | undefined;
+  if (!nor) return;
+  mesh.updateMatrixWorld(true);
+  const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
+  const p = new THREE.Vector3();
+  const n = new THREE.Vector3();
+  const uv = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    p.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld);
+    n.fromBufferAttribute(nor, i).applyMatrix3(normalMatrix);
+    const ax = Math.abs(n.x);
+    const ay = Math.abs(n.y);
+    const az = Math.abs(n.z);
+    let u: number;
+    let v: number;
+    if (ay >= ax && ay >= az) [u, v] = [p.x, p.z];
+    else if (ax >= az) [u, v] = [p.z, p.y];
+    else [u, v] = [p.x, p.y];
+    uv[i * 2] = u / size;
+    uv[i * 2 + 1] = v / size;
+  }
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
+
+/** What the plan asks for: which materials are walls and floors, and how big a repeat of each texture is (metres). */
+export type SurfaceSpec = {
+  walls?: { materials: readonly string[]; size: number; rows?: number };
+  floors?: { materials: readonly string[]; size: number; light?: string; dark?: string; grout?: string };
+};
+
+/**
+ * Textures the model's walls and floors (`spec`) on every mesh of those materials (`meshes`, the model's and the
+ * decoration's own pieces): plaster for walls (it keeps the wall's colour, which a colour set may change), marble tiles
+ * for floors. Each texture also gives the surface a little relief.
+ */
+export function applySurfaces(meshes: readonly THREE.Mesh[], spec: SurfaceSpec, renderer: THREE.WebGLRenderer): { dispose(): void }[] {
+  const out: { dispose(): void }[] = [];
+  const kinds: { names: Set<string>; size: number; make: () => HTMLCanvasElement; floor: boolean }[] = [];
+  if (spec.walls) kinds.push({ names: new Set(spec.walls.materials), size: spec.walls.size, make: () => plasterTexture(spec.walls!.rows), floor: false });
+  if (spec.floors) kinds.push({ names: new Set(spec.floors.materials), size: spec.floors.size, make: () => tilesTexture(spec.floors!.light, spec.floors!.dark, spec.floors!.grout), floor: true });
+  for (const k of kinds) {
+    const targets = meshes.filter((m) => k.names.has((m.material as THREE.Material).name));
+    if (!targets.length) continue;
+    const map = decorTexture(k.make(), renderer, true);
+    out.push(map);
+    for (const m of targets) worldUv(m, k.size);
+    for (const mat of new Set(targets.map((m) => m.material as THREE.MeshStandardMaterial))) {
+      mat.map = map;
+      mat.bumpMap = map;
+      mat.bumpScale = k.floor ? 1.2 : 0.8;
+      if (k.floor) {
+        // The tiles carry their own colours: no tint of the old floor over them, and a polished sheen.
+        mat.color.set('#ffffff');
+        mat.roughness = 0.32;
+        mat.metalness = 0;
+      } else {
+        mat.roughness = Math.max(mat.roughness, 0.75);
+      }
+      mat.needsUpdate = true;
+    }
   }
   return out;
 }

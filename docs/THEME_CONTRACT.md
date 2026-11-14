@@ -302,7 +302,8 @@ A model is often an empty shell (no ceilings, open corners, hollow walls). The p
 (a gilt frieze, fluted pilasters between the photos, laurel medallions above them, moulded damask panels on the wide empty
 stretches, all kept clear of photos, doorways, plaques, signs and the screen), solid `fills` for openings, `doorways: true`
 to close the walls round every doorway (above the door, a hollow wall's insides, its floor), panelled `doors` drawn on a
-wall, `lamps` and `lampHeight`, the `sky` seen through glass, and `tint` (the model's wall and trim materials, recoloured
+wall, `lamps` and `lampHeight`, the `sky` seen through glass, `surfaces` (plaster on the model's walls, marble tiles on
+its floors, mapped from their place in the world since models often have no texture coordinates), and `tint` (the model's wall and trim materials, recoloured
 with the walls' ornament when the design passes `<Gallery3D tint>`: e.g. a colour set the customer chose, colour slot `walls`). Everything is drawn on canvases and merged per kind (a
 few draw calls). Only the rooms that are shown get their walls dressed. See `themes/memory-museum/v1/plan.ts`.
 
