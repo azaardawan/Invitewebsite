@@ -51,7 +51,7 @@ product spec's §74 business rules override assumptions.
   customer's photos fill each collage of their package (the order form asks for the largest one's count), drawn by the SDK's
   `<Collage>` (`src/theme-sdk/collage.tsx`), in the design's typefaces when it has `print/Collage.tsx` (THEME_CONTRACT §6).
   Watermarked previews before payment; the JPGs only once paid.
-- Couples (owner, 2026-10-31): a section that is not an invitation (no date, venue or replies), mainly photos plus one video.
+- Couples (owner, 2026-10-31), and Friends (2026-11-14, the same for two friends): sections that are not an invitation (no date, venue or replies), mainly photos plus one video. A design sold in both reads `props.occasion`.
   Its designs are **template designs** (manifest `editor: 'template'`): the customer fills the design in place
   (`TemplateEditor`, texts saved via `/p|r/[token]/text`, `src/server/template/*`) instead of the order form; the SDK's
   `<EditableText>`, `<PhotoSlot>`, `<VideoSlot>` (THEME_CONTRACT "Template designs"). A package can sell fewer photos

@@ -42,6 +42,8 @@ export function templateLabels(t: StoreT, published = false): TemplateEditorLabe
     removeVideo: k('removeVideo'),
     converting: k('converting'),
     missing: t.raw('template.missing') as string,
+    colors: k('colors'),
+    colorsOriginal: k('colorsOriginal'),
     errors: {
       generic: t('photos.errors.generic'),
       tooLarge: k('errors.tooLarge'),

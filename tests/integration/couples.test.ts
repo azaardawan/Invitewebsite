@@ -11,6 +11,8 @@ import { storage } from '@/server/storage';
 import { setCurrentVersion, syncThemesFromRegistry, transitionTheme, updateThemeSettings } from '@/server/catalog/themes';
 import { themeVersions } from '@/server/db/schema';
 import { createPackage } from '@/server/catalog/packages';
+import { savePalette, setPaletteStatus } from '@/server/catalog/palettes';
+import { paletteChoice } from '@/server/storefront/order';
 import { storeImage } from '@/server/media/assets';
 import { createDraft } from '@/server/orders/drafts';
 import { validateFieldValues } from '@/server/orders/validation';
@@ -427,5 +429,62 @@ describe('posters sold separately, with their own words and pictures', () => {
     inv = await reload(inv.id);
     expect(inv.posterChoices.portrait?.main).toBeUndefined();
     expect(await listPhotos(db(), inv.id, { posters: true })).toHaveLength(0);
+  });
+});
+
+describe('colour choice in a template design (the museum’s wall colour)', () => {
+  it('the editor saves one of the design’s colour sets, or the design’s own colours; only with colour choice', async () => {
+    const base = await activeTheme();
+    const key = uniqueKey('museum-colours');
+    await syncThemesFromRegistry(
+      db(),
+      [
+        testManifest(key, 1, {
+          sections: ['couples'],
+          fields: [...FIELDS],
+          features: ['photos', 'color_choice'],
+          editor: 'template',
+          colors: { slots: [{ key: 'walls', label: { ar: 'لون الجدران', en: 'Wall colour' }, default: '#ece2cd' }] },
+          validStates: [{ features: ['photos', 'color_choice'], fields: [...FIELDS] }],
+          photos: { max: 8 },
+          print: undefined,
+        }),
+      ],
+      base.actor,
+      { complete: false },
+    );
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    const cover = await storeImage(db(), await sharp({ create: { width: 331, height: 431, channels: 3, background: '#123' } }).png().toBuffer(), { uploadedBy: null });
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: null }, base.actor);
+    const withColours = await createPackage(db(), t!.id, { name: { ar: 'ملون', en: 'Colours' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'color_choice'] }, base.actor);
+    const plain = await createPackage(db(), t!.id, { name: { ar: 'عادي', en: 'Plain' }, priceIqd: 20000, fieldKeys: [...FIELDS], featureKeys: ['photos'] }, base.actor);
+    await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
+    await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
+    const burgundy = await savePalette(db(), t!.id, { name: { ar: 'عنابي داكن', en: 'Deep Burgundy' }, colors: { walls: '#6e2a35' } }, base.actor);
+    const other = await activeTheme(); // a colour set of another design is refused
+
+    const make = async (packageId: string) => {
+      const d = await createDraft(db(), { themeKey: key, packageId, locale: 'en', values: {} }, { ...ctx, ipHash: randomToken(8) });
+      return (await db().select().from(invitations).where(eq(invitations.id, d.invitationId)))[0]!;
+    };
+    const inv = await make(withColours.id);
+    // The editor offers the sets, with the slot's name and the design's own colour.
+    const choice = await paletteChoice(t!.id, null, 'en');
+    expect(choice).toMatchObject({ current: '', original: ['#ece2cd'], slotName: 'Wall colour', options: [{ id: burgundy, name: 'Deep Burgundy', swatches: ['#6e2a35'] }] });
+
+    expect(await setTemplateText(db(), inv, 'palette', burgundy)).toBe(burgundy);
+    expect((await reload(inv.id)).colors).toEqual({ walls: '#6e2a35' });
+    const { props } = await invitationRenderData(db(), await reload(inv.id), 'preview');
+    expect(props.colors.walls).toBe('#6e2a35');
+    expect((await paletteChoice(t!.id, { walls: '#6e2a35' }, 'en'))?.current).toBe(burgundy);
+    // Back to the design's own colours.
+    expect(await setTemplateText(db(), inv, 'palette', '')).toBe('');
+    expect((await reload(inv.id)).colors).toBeNull();
+    // Refused: another design's set, a set no longer offered, and a package without colour choice.
+    const foreign = await savePalette(db(), other.theme.id, { name: { ar: 'س', en: 'X' }, colors: {} }, base.actor).catch(() => null);
+    if (foreign) await expect(setTemplateText(db(), inv, 'palette', foreign)).rejects.toMatchObject({ code: 'invalidChoice' });
+    await setPaletteStatus(db(), t!.id, burgundy, 'ARCHIVED', base.actor);
+    await expect(setTemplateText(db(), inv, 'palette', burgundy)).rejects.toMatchObject({ code: 'invalidChoice' });
+    await expect(setTemplateText(db(), await make(plain.id), 'palette', '')).rejects.toMatchObject({ code: 'unknownKey' });
   });
 });

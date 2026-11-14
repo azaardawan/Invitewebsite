@@ -1,0 +1,969 @@
+/*
+ * Memory Museum. A museum at night: deep bronze ground, gilt lines, limestone text, the enamel-green of the room signs.
+ * The entrance is a pair of tall enamel doors with a gilt placard; on "Open" the doors swing in and the 3D museum is
+ * behind them. Over the museum: a small framed placard (top), the photo guide and the walking buttons (bottom).
+ */
+.root {
+  --mm-ground: #14110d;
+  --mm-panel: rgba(21, 17, 12, 0.8);
+  --mm-panel-solid: #1b1611;
+  --mm-line: rgba(210, 173, 102, 0.42);
+  --mm-gilt: #d2ad66;
+  --mm-gilt-deep: #a8823f;
+  --mm-stone: #f1e9db;
+  --mm-stone-dim: #c9bda9;
+  --mm-enamel: #1d2a2a;
+  --mm-enamel-deep: #121b1b;
+  --mm-display: 'MM Display', 'Amiri', Georgia, serif;
+  position: relative;
+  min-height: 100dvh;
+  background: var(--mm-ground);
+  color: var(--mm-stone);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root button {
+  font: inherit;
+  color: inherit;
+}
+
+.root button:focus-visible {
+  outline: 2px solid var(--mm-gilt);
+  outline-offset: 2px;
+}
+
+/* ---------- entrance ---------- */
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 20px;
+  perspective: 1400px;
+  overflow: hidden;
+}
+
+.door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.28)),
+    linear-gradient(180deg, var(--mm-enamel) 0%, var(--mm-enamel-deep) 100%);
+  box-shadow: inset 0 0 0 1px rgba(210, 173, 102, 0.25);
+  transition: transform 1.5s cubic-bezier(0.6, 0.02, 0.25, 1), opacity 1.5s ease;
+  backface-visibility: hidden;
+}
+
+/* Two raised panels on each door, in thin gilt lines. */
+.door::before,
+.door::after {
+  content: '';
+  position: absolute;
+  inset-inline: 14%;
+  border: 1px solid var(--mm-line);
+  box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.12), inset 0 0 0 6px rgba(210, 173, 102, 0.18);
+}
+
+.door::before {
+  top: 7%;
+  height: 40%;
+}
+
+.door::after {
+  top: 52%;
+  bottom: 7%;
+}
+
+.doorL {
+  left: 0;
+  transform-origin: left center;
+}
+
+.doorR {
+  right: 0;
+  transform-origin: right center;
+}
+
+.handle {
+  position: absolute;
+  bottom: 9%;
+  width: 7px;
+  height: 64px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f0d79d, var(--mm-gilt-deep));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.doorL .handle {
+  right: 10px;
+}
+
+.doorR .handle {
+  left: 10px;
+}
+
+.placard {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  padding: 40px 34px 36px;
+  text-align: center;
+  background: radial-gradient(120% 90% at 50% 0%, #2a221a 0%, var(--mm-panel-solid) 70%);
+  border: 1px solid var(--mm-line);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+}
+
+.coverTitle {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--mm-stone-dim);
+  text-wrap: balance;
+}
+
+.names {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: clamp(30px, 9vw, 44px);
+  line-height: 1.25;
+  color: var(--mm-stone);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.and {
+  display: block;
+  font-size: 0.55em;
+  color: var(--mm-gilt);
+  line-height: 1.4;
+}
+
+.since {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mm-stone-dim);
+}
+
+.rule {
+  width: 72px;
+  height: 1px;
+  background: var(--mm-line);
+}
+
+.openButton {
+  margin-top: 6px;
+  min-height: 46px;
+  padding: 12px 28px;
+  border: 1px solid var(--mm-gilt);
+  border-radius: 999px;
+  background: var(--mm-gilt);
+  color: #1d160c !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.openButton:hover {
+  background: #e0bf7d;
+}
+
+/* The doors swing in; the placard rises away. */
+.cover[data-phase='opening'] .doorL {
+  transform: rotateY(-102deg);
+  opacity: 0.2;
+}
+
+.cover[data-phase='opening'] .doorR {
+  transform: rotateY(102deg);
+  opacity: 0.2;
+}
+
+.cover[data-phase='opening'] .placard {
+  opacity: 0;
+  transform: translateY(-18px) scale(0.98);
+}
+
+.reduced .door,
+.reduced .placard {
+  transition: opacity 0.35s ease;
+}
+
+.reduced .cover[data-phase='opening'] .doorL,
+.reduced .cover[data-phase='opening'] .doorR {
+  transform: none;
+  opacity: 0;
+}
+
+.reduced .cover[data-phase='opening'] .placard {
+  transform: none;
+}
+
+/* ---------- the museum in 3D ---------- */
+
+.walk {
+  position: relative;
+  height: 100dvh;
+  min-height: 280px;
+}
+
+/* A phone held upright: turn it sideways (the museum is walked in landscape). */
+.turn {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 22px;
+  padding: 24px;
+  background: var(--mm-ground);
+  text-align: center;
+}
+
+.turnPhone {
+  width: 54px;
+  height: 92px;
+  border: 3px solid var(--mm-gilt);
+  border-radius: 10px;
+  position: relative;
+  animation: mm-turn 2.4s ease-in-out infinite;
+}
+
+.turnPhone::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 14px;
+  height: 3px;
+  margin-left: -7px;
+  border-radius: 2px;
+  background: var(--mm-gilt);
+}
+
+@keyframes mm-turn {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  55%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+.turnText {
+  margin: 0;
+  max-width: 260px;
+  font-family: var(--mm-display);
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--mm-stone);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turnPhone {
+    animation: none;
+    transform: rotate(-90deg);
+  }
+}
+
+/* Sideways on a phone: a short screen, so a smaller touch pad and welcome card. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .joystick {
+    width: 96px;
+    height: 96px;
+    bottom: 18px;
+  }
+
+  .welcome {
+    padding: 18px 28px 16px;
+    gap: 2px;
+  }
+
+  .welcomeNames {
+    font-size: 21px;
+  }
+}
+
+.stage {
+  position: absolute !important;
+  inset: 0;
+  background: var(--mm-ground);
+}
+
+.top {
+  position: absolute;
+  top: 12px;
+  inset-inline: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.plaque {
+  position: relative;
+  max-width: min(340px, calc(100% - 110px));
+  padding: 24px 30px 22px;
+  background: rgba(24, 19, 13, 0.95);
+  border: 1px solid var(--mm-line);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: auto;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.plaqueTitle {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+  overflow-wrap: anywhere;
+}
+
+.plaqueNames {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.plaqueSince {
+  margin: 0;
+  font-size: 12px;
+  color: var(--mm-stone-dim);
+}
+
+.pill {
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid var(--mm-line);
+  border-radius: 999px;
+  background: var(--mm-panel);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  border-color: var(--mm-gilt);
+}
+
+.pillPrimary {
+  background: var(--mm-gilt);
+  border-color: var(--mm-gilt);
+  color: #1d160c !important;
+}
+
+.pillPrimary:hover {
+  background: #e0bf7d;
+}
+
+.bottom {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 0 12px 12px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.caption {
+  position: relative;
+  width: min(460px, 100%);
+  padding: 22px 34px 20px;
+  background: rgba(24, 19, 13, 0.95);
+  border: 1px solid var(--mm-line);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-align: center;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.captionRoom {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+}
+
+.captionTitle {
+  font-family: var(--mm-display);
+  font-size: 19px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.captionText {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--mm-stone-dim);
+  overflow-wrap: anywhere;
+}
+
+.rail {
+  display: flex;
+  gap: 6px;
+  max-width: min(100%, 760px);
+  overflow-x: auto;
+  padding: 4px 2px;
+  pointer-events: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.thumbButton {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--mm-line);
+  background: var(--mm-panel-solid);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.thumbButton:hover,
+.thumbActive {
+  opacity: 1;
+  border-color: var(--mm-gilt);
+  box-shadow: 0 0 0 1px var(--mm-gilt);
+}
+
+.thumb {
+  width: 40px;
+  aspect-ratio: 2.04 / 2.74;
+}
+
+.controls {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hint {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  width: min(320px, calc(100% - 48px));
+  padding: 12px 16px;
+  background: var(--mm-panel);
+  border: 1px solid var(--mm-line);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.loader {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  background: var(--mm-ground);
+  text-align: center;
+  font-family: var(--mm-display);
+  font-size: 20px;
+  transition: opacity 0.5s ease;
+}
+
+.loaded {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bar {
+  width: 180px;
+  height: 2px;
+  background: var(--mm-line);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--mm-gilt);
+  transition: width 0.25s ease;
+}
+
+.joystick {
+  position: absolute;
+  inset-inline-start: 22px;
+  bottom: 36px;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  border: 1px solid rgba(210, 173, 102, 0.3);
+  background: rgba(21, 17, 12, 0.18);
+  opacity: 0.75;
+  z-index: 3;
+}
+
+.knob {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--mm-gilt);
+  opacity: 0.88;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- a panel over the museum (the story, the video) ---------- */
+
+.sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 8, 6, 0.72);
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 28px 24px 22px;
+  background: var(--mm-panel-solid);
+  border: 1px solid var(--mm-line);
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+
+.panelText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--mm-stone);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.video {
+  width: 100%;
+  max-height: 70dvh;
+  background: #000;
+}
+
+/* ---------- the museum shown flat (no 3D on the device, and the editor) ---------- */
+
+.room {
+  border-radius: 2px;
+}
+
+.flat {
+  min-height: 100dvh;
+  padding: 20px 16px 48px;
+  display: grid;
+  gap: 28px;
+  align-content: start;
+  justify-items: center;
+  background: radial-gradient(120% 60% at 50% 0%, #241d15 0%, var(--mm-ground) 60%);
+}
+
+.flatHeader {
+  position: relative;
+  width: min(100%, 560px);
+  padding: 40px 34px 36px;
+  border: 1px solid var(--mm-line);
+  background: var(--mm-panel-solid);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+
+.note {
+  margin: 0;
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--mm-stone-dim);
+  text-align: center;
+}
+
+.videoBox {
+  width: min(100%, 720px);
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--mm-line);
+  background: #000;
+  display: block;
+}
+
+.room {
+  width: min(100%, 980px);
+  display: grid;
+  gap: 14px;
+}
+
+.roomTitle {
+  margin: 0;
+  justify-self: center;
+  padding: 8px 22px;
+  background: var(--mm-enamel);
+  border: 1px solid var(--mm-line);
+  color: #e2c27a;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: 20px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 14px;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.figure {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.frame {
+  padding: 7px;
+  background: linear-gradient(135deg, #e3c27e, var(--mm-gilt-deep) 45%, #e9cf94 70%, var(--mm-gilt-deep));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.framePhoto {
+  width: 100%;
+  aspect-ratio: 2.04 / 2.74;
+  background: #0d0b08;
+}
+
+.figcaption {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--mm-stone-dim);
+  overflow-wrap: anywhere;
+}
+
+.figTitle {
+  font-family: var(--mm-display);
+  font-size: 16px;
+  color: var(--mm-stone);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door,
+  .placard,
+  .hint,
+  .loader,
+  .barFill {
+    transition-duration: 0.2s;
+  }
+}
+
+/* ---------- a room's few words ---------- */
+
+.roomText {
+  margin: 0;
+  justify-self: center;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--mm-stone-dim);
+  text-align: center;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- the editor: the museum's plan, and each room as it is ---------- */
+
+.mapBox {
+  width: min(100%, 560px);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.mapTitle {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--mm-stone);
+}
+
+.map {
+  width: min(100%, 360px);
+  height: auto;
+}
+
+.mapSmall {
+  width: 92px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.mapHall {
+  fill: rgba(241, 233, 219, 0.1);
+  stroke: var(--mm-line);
+}
+
+.mapEntrance {
+  fill: none;
+  stroke: var(--mm-gilt);
+  stroke-width: 2;
+}
+
+.mapRoom rect {
+  stroke-width: 1.5;
+}
+
+.mapRoom text {
+  font-family: var(--mm-display);
+  font-size: 20px;
+}
+
+.mapSold rect {
+  fill: rgba(210, 173, 102, 0.16);
+  stroke: var(--mm-gilt);
+}
+
+.mapSold text {
+  fill: var(--mm-stone);
+}
+
+.mapClosed rect {
+  fill: none;
+  stroke: rgba(201, 189, 169, 0.35);
+  stroke-dasharray: 4 4;
+}
+
+.mapClosed text {
+  fill: rgba(201, 189, 169, 0.45);
+}
+
+.mapHere rect {
+  fill: var(--mm-gilt);
+}
+
+.mapHere text {
+  fill: #1d160c;
+}
+
+.roomHead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.roomNumber {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+}
+
+.roomPlan {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr);
+  gap: 10px;
+  width: min(100%, 560px);
+  justify-self: center;
+  padding: 14px 12px 0;
+  border: 1px solid var(--mm-line);
+  border-bottom: 0;
+  /* The museum's walls in the colour chosen (colour choice; warm cream otherwise), so the customer sees it here too. */
+  background: color-mix(in srgb, var(--bahja-color-walls, #ece2cd) 24%, transparent);
+}
+
+.wall {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  min-width: 0;
+}
+
+.wallName {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mm-gilt);
+  text-align: center;
+}
+
+/* The parquet floor between the two walls. */
+.floor {
+  background: repeating-linear-gradient(180deg, rgba(168, 130, 63, 0.18) 0 2px, transparent 2px 22px);
+  border-inline: 1px solid rgba(210, 173, 102, 0.15);
+}
+
+.doorway {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin-bottom: -1px;
+  padding: 8px 18px;
+  border: 1px solid var(--mm-line);
+  border-bottom-color: var(--mm-ground);
+  background: var(--mm-ground);
+  font-size: 12px;
+  color: var(--mm-stone-dim);
+}
+
+.wallSpot {
+  position: relative;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.spotNumber {
+  position: absolute;
+  top: -8px;
+  inset-inline-start: -6px;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--mm-enamel);
+  border: 1px solid var(--mm-gilt);
+  color: #e2c27a;
+  font-size: 11px;
+}
+
+/* ---------- over the 3D museum: only the welcome card (then nothing) ---------- */
+
+.welcome {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: min(380px, calc(100% - 40px));
+  padding: 30px 34px 26px;
+  background: rgba(24, 19, 13, 0.92);
+  border: 1px solid var(--mm-line);
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.welcomeGone {
+  opacity: 0;
+}
+
+.welcomeNames {
+  margin: 0;
+  font-family: var(--mm-display);
+  font-size: 26px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.welcomeHint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--mm-stone-dim);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The music's on/off: small, in the corner opposite the touch pad. */
+.sound {
+  position: absolute;
+  inset-inline-end: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(210, 173, 102, 0.45);
+  background: rgba(21, 17, 12, 0.45);
+  color: var(--mm-gilt);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.sound:hover {
+  opacity: 1;
+}
+
+.soundOff {
+  color: var(--mm-stone-dim);
+}

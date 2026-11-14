@@ -1648,7 +1648,9 @@
         "unsupportedVideo": "We couldn’t read this video. Choose another one.",
         "tooLong": "This text is too long.",
         "invalidText": "This text can’t be saved. Try another."
-      }
+      },
+      "colors": "Colours",
+      "colorsOriginal": "Original colour"
     },
     "posters": {
       "title": "Your posters",

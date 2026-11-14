@@ -21,6 +21,18 @@ export type DecorPalette = {
 
 export const DEFAULT_PALETTE: DecorPalette = { ivory: '#ece2cd', shade: '#b9a98a', gold: '#d2ad66', goldDeep: '#8f6a2c', field: '#22394a' };
 
+/** Mixes two colours (`t` = 0 → a, 1 → b), as a #rrggbb string. */
+export function mix(a: string, b: string, t: number): string {
+  const ca = new THREE.Color(a);
+  const cb = new THREE.Color(b);
+  return `#${ca.lerp(cb, t).getHexString()}`;
+}
+
+/** The decoration's palette with the walls in another colour (a customer's colour set): the plaster and its shadows. */
+export function tinted(p: DecorPalette, wall: string): DecorPalette {
+  return { ...p, ivory: wall, shade: mix(wall, '#000000', 0.24) };
+}
+
 function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const c = document.createElement('canvas');
   c.width = w;
@@ -77,8 +89,8 @@ export function cofferTexture(p: DecorPalette): HTMLCanvasElement {
   // Stepped mouldings, each a little darker going in (light from below).
   const steps = [
     [26, p.ivory, p.shade],
-    [58, '#e2d6bd', '#a9987a'],
-    [86, '#d6c8ab', '#9a8968'],
+    [58, mix(p.ivory, '#000000', 0.05), mix(p.shade, '#000000', 0.08)],
+    [86, mix(p.ivory, '#000000', 0.1), mix(p.shade, '#000000', 0.16)],
   ] as const;
   for (const [inset, light, dark] of steps) {
     g.fillStyle = dark;
@@ -199,8 +211,8 @@ export function pilasterTexture(p: DecorPalette): HTMLCanvasElement {
     const x = 18 + i * 20;
     const grad = g.createLinearGradient(x, 0, x + 12, 0);
     grad.addColorStop(0, p.shade);
-    grad.addColorStop(0.5, '#d9cdb3');
-    grad.addColorStop(1, '#f6eedd');
+    grad.addColorStop(0.5, mix(p.ivory, p.shade, 0.35));
+    grad.addColorStop(1, mix(p.ivory, '#ffffff', 0.35));
     g.fillStyle = grad;
     g.beginPath();
     g.roundRect(x, 150, 12, H - 150 - 120, 6);
@@ -209,7 +221,7 @@ export function pilasterTexture(p: DecorPalette): HTMLCanvasElement {
   // Base.
   g.fillStyle = p.shade;
   g.fillRect(0, H - 110, W, 8);
-  g.fillStyle = '#d9cdb3';
+  g.fillStyle = mix(p.ivory, p.shade, 0.35);
   g.fillRect(4, H - 100, W - 8, 30);
   g.fillStyle = p.shade;
   g.fillRect(0, H - 66, W, 66);
@@ -277,7 +289,7 @@ export function panelTexture(p: DecorPalette, w: number, h: number): HTMLCanvasE
   g.fillStyle = p.ivory;
   g.fillRect(0, 0, W, H);
   // Damask: a lattice of lozenges with small fleurons, a shade darker than the wall.
-  const field = '#e3d7bf';
+  const field = mix(p.ivory, '#000000', 0.05);
   g.fillStyle = field;
   g.fillRect(34, 34, W - 68, H - 68);
   g.save();
@@ -468,6 +480,9 @@ export type DecorSpec = {
   lampHeight?: number;
   /** Extra lamps (rooms the model left dark): position and intensity (candela). */
   lamps?: readonly { x: number; y: number; z: number; intensity: number }[];
+  /** The model's materials that are the walls (recoloured when the customer picks another wall colour), and its
+   * carved trim (recoloured a little lighter). */
+  tint?: { walls: readonly string[]; trim?: readonly string[] };
   /** The colour seen through glass roofs. */
   sky?: string;
   palette?: DecorPalette;
@@ -512,6 +527,8 @@ export type DecorInput = {
   hung: readonly { x: number; z: number; half: number }[];
   wallMaterial: THREE.Material | null;
   floorMaterial: THREE.Material | null;
+  /** The walls' colour the customer chose (a colour set), or null for the plan's own palette. */
+  wallColor?: string | null;
 };
 
 export type DecorOutput = { meshes: THREE.Mesh[]; colliders: THREE.Mesh[]; lights: THREE.Light[]; disposables: { dispose(): void }[] };
@@ -519,6 +536,8 @@ export type DecorOutput = { meshes: THREE.Mesh[]; colliders: THREE.Mesh[]; light
 export function buildDecor(input: DecorInput): DecorOutput {
   const { spec, renderer } = input;
   const p = spec.palette ?? DEFAULT_PALETTE;
+  // The walls' ornament takes the walls' colour; the ceilings keep the plan's own.
+  const wp = input.wallColor ? tinted(p, input.wallColor) : p;
   const out: DecorOutput = { meshes: [], colliders: [], lights: [], disposables: [] };
   const wall = input.wallMaterial ?? new THREE.MeshStandardMaterial({ color: 0xd8cfbd, roughness: 0.6 });
   const keep = <T extends { dispose(): void }>(x: T) => (out.disposables.push(x), x);
@@ -571,9 +590,9 @@ export function buildDecor(input: DecorInput): DecorOutput {
   add(merged(spec.ceilings.map((r) => ceilingQuad(r, r.y, 1.8))), cofferMat);
 
   // --- Walls: frieze, pilasters, medallions, panels.
-  const friezeMap = keep(decorTexture(friezeTexture(p), renderer, true));
-  const pilasterMap = keep(decorTexture(pilasterTexture(p), renderer));
-  const medallionMap = keep(decorTexture(medallionTexture(p), renderer));
+  const friezeMap = keep(decorTexture(friezeTexture(wp), renderer, true));
+  const pilasterMap = keep(decorTexture(pilasterTexture(wp), renderer));
+  const medallionMap = keep(decorTexture(medallionTexture(wp), renderer));
   const friezes: THREE.BufferGeometry[] = [];
   const pilasters: THREE.BufferGeometry[] = [];
   const medallions: THREE.BufferGeometry[] = [];
@@ -621,7 +640,7 @@ export function buildDecor(input: DecorInput): DecorOutput {
   add(merged(medallions), keep(decorMaterial(medallionMap, { transparent: true, glow: 0.25 })));
   for (const [key, parts] of panels) {
     const [pw, ph] = key.split('x').map(Number);
-    add(merged(parts), keep(decorMaterial(keep(decorTexture(panelTexture(p, pw!, ph!), renderer)))));
+    add(merged(parts), keep(decorMaterial(keep(decorTexture(panelTexture(wp, pw!, ph!), renderer)))));
   }
 
   // --- Doors drawn on walls.

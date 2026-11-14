@@ -8,6 +8,8 @@ export type TemplatePhoto = { position: number; src: string; width: number; heig
 export type TemplateVideo = { src: string; poster: string; width: number; height: number; durationSeconds: number };
 /** A text of the design the customer writes: its key (`field:…`, `wording:…`), name, and whether checkout needs it. */
 export type TemplateText = { key: string; label: string; required: boolean; maxLength: number; multiline: boolean; value: string };
+/** Colour choice (packages with `color_choice`): the sets on offer with their swatches, and the one chosen ('' = the design's own). */
+export type TemplateColors = { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[]; slotName: string | null };
 
 export type TemplateEditorLabels = {
   /** Above the design: "Tap any text to write it, any frame to add a photo or the video". */
@@ -52,6 +54,9 @@ export type TemplateEditorLabels = {
   converting: string;
   /** Checkout needs these: "Still missing: {list}". */
   missing: string;
+  /** Colour choice: the heading when the design doesn't name its colour, and the design's own colours. */
+  colors: string;
+  colorsOriginal: string;
   errors: Record<string, string> & { generic: string };
 };
 
@@ -100,6 +105,7 @@ export function TemplateEditor({
   names,
   video: initialVideo,
   videoIncluded,
+  colors,
   labels,
 }: {
   /** `/p/<token>` while ordering, `/r/<token>` after publishing. */
@@ -119,6 +125,8 @@ export function TemplateEditor({
   names: (string | null)[];
   video: TemplateVideo | null;
   videoIncluded: boolean;
+  /** Colour choice: the sets to pick from (shown above the design), or null without it. */
+  colors?: TemplateColors | null;
   labels: TemplateEditorLabels;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -130,6 +138,8 @@ export function TemplateEditor({
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState(0);
   const [progress, setProgress] = useState<number | null>(null);
+  const [colorId, setColorId] = useState(colors?.current ?? '');
+  const reloads = useRef(0);
 
   const tell = useCallback((message: unknown) => frame.current?.contentWindow?.postMessage(message, window.location.origin), []);
   const sendPhotos = useCallback(
@@ -147,7 +157,9 @@ export function TemplateEditor({
       setError(null);
       if (m.kind === 'text' && typeof m.key === 'string') {
         const text = texts.find((t) => t.key === m.key);
-        if (text) setSheet({ kind: 'text', text });
+        // The text as the design shows it (a design may show its own default, e.g. a museum ordered for friends).
+        const shown = (m as { value?: unknown }).value;
+        if (text) setSheet({ kind: 'text', text: typeof shown === 'string' && shown ? { ...text, value: shown } : text });
       } else if (m.kind === 'photo' && typeof m.index === 'number' && m.index >= 0 && m.index < maxPhotos) {
         const has = photos.some((p) => p.position === m.index);
         // Photos fill the places in order: an empty frame takes the next photo.
@@ -200,6 +212,30 @@ export function TemplateEditor({
     } catch {
       setError(labels.errors.generic);
       return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Colour choice: saves the set and redraws the design in it. */
+  async function chooseColors(id: string) {
+    if (busy || id === colorId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`${base}/text`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'palette', value: id }) });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setError(errorText(data.error));
+        return;
+      }
+      setColorId(id);
+      setSavedAt((n) => n + 1);
+      // The design takes its colours from the server: load it again (it gets the photos, texts and video back on load).
+      reloads.current += 1;
+      if (frame.current) frame.current.src = `${designUrl}${designUrl.includes('?') ? '&' : '?'}c=${reloads.current}`;
+    } catch {
+      setError(labels.errors.generic);
     } finally {
       setBusy(false);
     }
@@ -329,6 +365,36 @@ export function TemplateEditor({
   return (
     <section className="flex flex-col gap-3" data-template-editor aria-label={labels.hint}>
       <p className="rounded-2xl bg-accent/10 px-4 py-3 text-sm font-medium text-heading">{labels.hint}</p>
+      {colors ? (
+        <fieldset className="flex flex-col gap-2 rounded-2xl border border-line bg-surface px-4 py-3" data-template-colors>
+          <legend className="px-1 text-sm font-semibold text-heading">{colors.slotName ?? labels.colors}</legend>
+          {error && !sheet ? (
+            <p role="alert" className="text-sm text-danger">
+              {error}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {[{ id: '', name: labels.colorsOriginal, swatches: colors.original }, ...colors.options].map((p) => (
+              <button
+                key={p.id || 'original'}
+                type="button"
+                aria-pressed={colorId === p.id}
+                disabled={busy}
+                onClick={() => void chooseColors(p.id)}
+                data-template-color={p.id || 'original'}
+                className="flex items-center gap-2 rounded-full border border-line bg-paper py-1.5 ps-1.5 pe-3 text-sm font-medium text-heading aria-pressed:border-accent aria-pressed:ring-2 aria-pressed:ring-accent/25"
+              >
+                <span className="flex" aria-hidden>
+                  {p.swatches.map((c, i) => (
+                    <span key={i} className="-ms-2 size-7 rounded-full border-2 border-surface shadow-sm first:ms-0" style={{ background: c }} />
+                  ))}
+                </span>
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
       <div className="relative overflow-hidden rounded-[22px] border border-line bg-black shadow-[0_30px_60px_rgb(58_21_32/0.2)]">
         <iframe
           ref={frame}

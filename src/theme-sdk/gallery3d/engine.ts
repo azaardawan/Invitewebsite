@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { onFloor, openRooms, photoRooms, roomAt, route, type GalleryPlan, type Point } from './plan';
-import { buildDecor } from './decor';
+import { buildDecor, mix } from './decor';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -30,6 +30,8 @@ export type EngineOptions = {
   plaques: Readonly<Record<string, { title: string; text: string }>>;
   screen: EngineScreen | null;
   look: EngineLook;
+  /** The walls' colour the customer chose (a colour set), or null for the model's own. */
+  tint?: string | null;
   reducedMotion: boolean;
   onProgress: (share: number) => void;
   onView: (index: number | null) => void;
@@ -218,8 +220,10 @@ export class GalleryEngine {
   private build(root: THREE.Object3D) {
     const { plan } = this.o;
     root.updateMatrixWorld(true);
+    // three.js renames a model's parts as it loads them (spaces become "_"): compare names the same way.
+    const clean = (n: string) => THREE.PropertyBinding.sanitizeNodeName(n);
     const named = (o: THREE.Object3D, prefixes: readonly string[]) =>
-      prefixes.some((p) => o.name.startsWith(p) || (o.parent?.name ?? '').startsWith(p));
+      prefixes.some((p) => o.name.startsWith(clean(p)) || (o.parent?.name ?? '').startsWith(clean(p)));
     const spotIndex = new Map<string, number>();
     for (const { room, first } of photoRooms(plan)) room.spots.forEach((name, i) => spotIndex.set(name, first + i));
     const photoAt = new Set(this.o.photos.map((p) => p.index));
@@ -352,6 +356,16 @@ export class GalleryEngine {
       const c = b.getCenter(new THREE.Vector3());
       hung.push({ x: c.x, z: c.z, half: Math.max(b.max.x - b.min.x, b.max.z - b.min.z) / 2 + 0.6 });
     }
+    // The customer's wall colour: the model's walls, and its carved trim a little lighter.
+    if (this.o.tint && spec.tint) {
+      const want = new Set([...spec.tint.walls, ...(spec.tint.trim ?? [])]);
+      root.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
+        if (!m || !want.has(m.name) || m.userData.tinted) return;
+        m.color.set(spec.tint!.trim?.includes(m.name) ? mix(this.o.tint!, '#ffffff', 0.2) : this.o.tint!);
+        m.userData.tinted = true;
+      });
+    }
     const out = buildDecor({
       spec: { ...spec, walls: spec.walls.filter((w) => open.has(roomOfRect(w))) },
       renderer: this.renderer,
@@ -360,6 +374,7 @@ export class GalleryEngine {
       hung,
       wallMaterial,
       floorMaterial,
+      wallColor: this.o.tint ?? null,
     });
     for (const m of out.meshes) this.scene.add(m);
     for (const l of out.lights) this.scene.add(l);
