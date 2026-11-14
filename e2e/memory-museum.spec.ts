@@ -100,6 +100,37 @@ test('without 3D the museum is shown flat, room by room', async ({ page }, testI
   await page.screenshot({ path: testInfo.outputPath('flat.png'), fullPage: true });
 });
 
+test('v2: for friends the museum speaks of friends; a colour set changes the walls', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
+  const out = execFileSync('pnpm', ['-s', 'exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/museum-friends.ts'], {
+    env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL },
+  }).toString();
+  const sets = JSON.parse(out.trim().split('\n').at(-1)!) as { id: string; name: string }[];
+  expect(sets.map((x) => x.name)).toEqual(['Deep Burgundy', 'Muted Sage Green', 'Dusty Blue', 'Soft Rose', 'Warm Taupe']);
+  await signInAsNewOwner(page);
+  // The flat museum (no WebGL) shows the rooms' names as text.
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
+      if (type.startsWith('webgl')) return null;
+      return (original as (...a: unknown[]) => RenderingContext | null).call(this, type, ...rest);
+    } as typeof original;
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const burgundy = sets.find((x) => x.name === 'Deep Burgundy')!.id;
+  await page.goto(`/admin/preview/en/theme/memory-museum?v=2&names=short&occasion=friends&palette=${burgundy}`);
+  await page.getByRole('button', { name: 'Open the museum' }).click();
+  await expect(page.locator('[data-museum-room="1"]')).toContainText('How we met');
+  await expect(page.locator('[data-museum-room="1"]')).toContainText('The day our friendship began.');
+  await expect(page.getByText('Graduation day').first()).toBeVisible();
+  const wall = await page.locator('[data-bahja-theme]').evaluate((el) => getComputedStyle(el).getPropertyValue('--bahja-color-walls').trim());
+  expect(wall.toLowerCase()).toBe('#6e2a35');
+  // For a couple: the couple's words.
+  await page.goto('/admin/preview/en/theme/memory-museum?v=2&names=short');
+  await page.getByRole('button', { name: 'Open the museum' }).click();
+  await expect(page.locator('[data-museum-room="1"]')).toContainText('The beginning');
+});
+
 test('a two-room package: the couple fills two rooms; guests see only the rooms with photos', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
   test.setTimeout(240_000);

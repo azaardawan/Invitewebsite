@@ -32,6 +32,8 @@ export type Gallery3DProps = {
   screen?: { image: string | null; play: boolean; title?: string; body?: string } | null;
   /** The design's typeface (a CSS font-family list, loaded on the page) and colours for the signs and the screen. */
   look: EngineLook;
+  /** Another colour for the walls (a colour set the customer chose; see the plan's `decor.tint`), or null. */
+  tint?: string | null;
   dir: 'rtl' | 'ltr';
   reducedMotion: boolean;
   className?: string;
@@ -146,6 +148,7 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
           plaques: rooms ?? {},
           screen: screenSpec,
           look,
+          tint: props.tint ?? null,
           reducedMotion,
           onProgress: (s) => callbacks.current.onProgress?.(s),
           onView: (i) => {
@@ -172,7 +175,7 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
       engine.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- rebuilt when what is shown changes (the keys), not on every render
-  }, [model, photoKey, signKey, screenKey, dir, reducedMotion]);
+  }, [model, photoKey, signKey, screenKey, dir, reducedMotion, props.tint]);
 
   return (
     <div ref={box} className={props.className} style={{ position: 'relative', overflow: 'hidden', ...props.style }}>

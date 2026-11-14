@@ -27,7 +27,8 @@ try {
     (await createPackage(db(), t.id, { name: { ar: 'قاعتان وفيديو', en: 'Two rooms and a video' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video'], photoLimit: 16 }, actor)).id;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
   if (t.status !== 'ACTIVE') await transitionTheme(db(), t.id, 'ACTIVE', actor);
-  const d = await createDraft(db(), { themeKey: 'memory-museum', packageId, locale: 'en', values: {} }, { ipHash: randomToken(8), userAgent: 'e2e' });
+  // The design may also be sold in Friends (memory-museum.spec): this order is for a couple.
+  const d = await createDraft(db(), { themeKey: 'memory-museum', packageId, locale: 'en', values: {}, occasion: 'couples' }, { ipHash: randomToken(8), userAgent: 'e2e' });
   console.log(JSON.stringify({ previewToken: d.previewToken, packageId }));
 } finally {
   await closeDb();

@@ -1,7 +1,9 @@
 import 'server-only';
 import { and, asc, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { packages, themes, type I18nContent } from '@/server/db/schema';
+import { packages, themePalettes, themes, type I18nContent } from '@/server/db/schema';
+import { recordAudit } from '@/server/audit/audit';
+import { auditActor } from './common';
 import { createPackage } from './packages';
 import { updateThemeSettings } from './themes';
 import type { Actor } from './common';
@@ -23,6 +25,8 @@ type OwnerSetup = {
   /** Packages in order; each takes the price of the package at the same position in `pricesFrom`. None: left to Admin. */
   packages: { name: I18nContent; description: I18nContent; featureKeys: FeatureKey[] }[];
   pricesFrom?: string;
+  /** Colour sets the customer may pick from (packages with colour choice), added while the design has none. */
+  palettes?: { name: I18nContent; colors: Record<string, string> }[];
 };
 
 const FIELDS: FieldKey[] = ['baby_name', 'father_name', 'birth_date'];
@@ -78,6 +82,15 @@ export const OWNER_SETUPS: OwnerSetup[] = [
       bdn: 'مۆزەخانەکا سێ ڕەهەندی بۆ بیرهاتنێن هەوە: میڤانێن هەوە ژ مۆبایل یان کۆمپیوتەرا خۆ د هۆلێن ویدا دگەڕن و وێنێن هەوە وەکی تابلۆیان ل سەر دیواران دبینن، هەر وێنەک ب ناڤونیشان و وەسفا خۆ و هەر هۆلەک ب ناڤێ خۆ، و ڤیدیۆیا هەوە ل سەر شاشا دەرگەهی.',
     },
     packages: [],
+    // The walls' colours the owner offers instead of the warm cream (2026-11-14), for packages with colour choice
+    // (the design's slot `walls`, from v2).
+    palettes: [
+      { name: { ar: 'عنابي داكن', en: 'Deep Burgundy', ckb: 'شەرابیی تۆخ', bdn: 'شەرابیێ تاری' }, colors: { walls: '#6e2a35' } },
+      { name: { ar: 'أخضر مريمية هادئ', en: 'Muted Sage Green', ckb: 'سەوزی کاڵی مێرامی', bdn: 'کەسکێ کاڵێ مێرامی' }, colors: { walls: '#9aab8f' } },
+      { name: { ar: 'أزرق مغبر', en: 'Dusty Blue', ckb: 'شینی تۆزاوی', bdn: 'شینێ تۆزاوی' }, colors: { walls: '#8ea3b5' } },
+      { name: { ar: 'وردي ناعم', en: 'Soft Rose', ckb: 'پەمەیی نەرم', bdn: 'پەمبەیی نەرم' }, colors: { walls: '#d9b0aa' } },
+      { name: { ar: 'رمادي بني دافئ', en: 'Warm Taupe', ckb: 'قاوەیی خۆڵەمێشیی گەرم', bdn: 'قاوەیی خۆلەمێشیێ گەرم' }, colors: { walls: '#a8977f' } },
+    ],
   },
 ];
 
@@ -97,6 +110,16 @@ export async function applyOwnerSetups(db: DbOrTx, actor: Actor, setups = OWNER_
         actor,
       );
       done.push(`${s.themeKey}: name and description`);
+    }
+    if (s.palettes?.length) {
+      const [anyPalette] = await db.select({ id: themePalettes.id }).from(themePalettes).where(eq(themePalettes.themeId, theme.id)).limit(1);
+      if (!anyPalette) {
+        for (const [i, p] of s.palettes.entries()) {
+          await db.insert(themePalettes).values({ themeId: theme.id, name: p.name, colors: p.colors, sortOrder: i });
+          await recordAudit(db, { ...auditActor(actor), action: 'palette.create', objectType: 'theme', objectId: theme.id, after: { name: p.name, colors: p.colors } });
+        }
+        done.push(`${s.themeKey}: ${s.palettes.length} colour sets`);
+      }
     }
     if (!s.packages.length || !s.pricesFrom) continue;
     const [anyPackage] = await db.select({ id: packages.id }).from(packages).where(eq(packages.themeId, theme.id)).limit(1);

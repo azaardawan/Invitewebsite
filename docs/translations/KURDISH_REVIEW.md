@@ -1835,3 +1835,35 @@ The design's description (filled in on deploy, `src/server/catalog/owner-setup.t
 | 5 | #27 package «2. Four rooms»: description | الجناحان الأمامي والأيسر: أربع قاعات تتسع لـ32 صورة، لكل صورة عنوانها ووصفها، مع الفيديو على شاشة المدخل. | The front and left wings: four rooms for 32 photos, each with its own title and words, and your video on the entrance screen. | باڵی پێشەوە و باڵی چەپ: چوار هۆڵ بۆ ٣٢ وێنە، هەر وێنەیەک بە ناونیشان و وەسفی خۆی، لەگەڵ ڤیدیۆکەتان لەسەر شاشەی دەروازە. | باڵێ پێشێ و باڵێ چەپێ: چار هۆل بۆ ٣٢ وێنەیان، هەر وێنەک ب ناڤونیشان و وەسفا خۆ، دگەل ڤیدیۆیا هەوە ل سەر شاشا دەرگەهی. |
 | 6 | #27 package «3. The whole museum»: name | المتحف كاملاً | The whole museum | هەموو مۆزەخانەکە | هەمی مۆزەخانە |
 | 7 | #27 package «3. The whole museum»: description | المتحف بأجنحته الثلاثة: ست قاعات تتسع لـ48 صورة، لكل صورة عنوانها ووصفها، مع الفيديو على شاشة المدخل. | All three wings: six rooms for 48 photos, each with its own title and words, and your video on the entrance screen. | هەر سێ باڵەکەی مۆزەخانە: شەش هۆڵ بۆ ٤٨ وێنە، هەر وێنەیەک بە ناونیشان و وەسفی خۆی، لەگەڵ ڤیدیۆکەتان لەسەر شاشەی دەروازە. | هەر سێ باڵێن مۆزەخانێ: شەش هۆل بۆ ٤٨ وێنەیان، هەر وێنەک ب ناڤونیشان و وەسفا خۆ، دگەل ڤیدیۆیا هەوە ل سەر شاشا دەرگەهی. |
+
+## Batch 58 — the Friends section, and Memory Museum (#27) v2: friends' words and the wall colours — ✅ AUTO-APPROVED (2026-11-14, owner checks in Admin → Translations)
+
+The new section «Friends» (seeded, `src/server/catalog/seed.ts`) with its field labels; Memory Museum v2's words for friends (a museum ordered in the Friends section: the rooms' default names and words, `themes/memory-museum/v2/rooms.ts`, and two sample photos' words, `copy.ts`); and the five wall colours the owner offers (colour sets, `src/server/catalog/owner-setup.ts`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | Section «Friends»: its name | للأصدقاء | Friends | بۆ هاوڕێیان | بۆ هەڤالان |
+| 2 | Section «Friends»: field `person_1_name` | اسم الصديق الأول | First friend’s name | ناوی هاوڕێی یەکەم | ناڤێ هەڤالێ ئێکێ |
+| 3 | Section «Friends»: field `person_2_name` | اسم الصديق الثاني | Second friend’s name | ناوی هاوڕێی دووەم | ناڤێ هەڤالێ دووێ |
+| 4 | Section «Friends»: field `invitation_message` | قصتكم | Your story | چیرۆکەکەتان | چیرۆکا هەوە |
+| 5 | #27 v2, friends: room 1's default name | كيف تعارفنا | How we met | چۆن یەکترمان ناسی | چاوا مە ئێک ناسی |
+| 6 | #27 v2, friends: room 2's default name | سفراتنا | Our trips | گەشتەکانمان | گەشتێن مە |
+| 7 | #27 v2, friends: room 3's default name | مغامراتنا | Our adventures | سەرکێشییەکانمان | سەرکێشیێن مە |
+| 8 | #27 v2, friends: room 4's default name | احتفالاتنا | Our celebrations | ئاهەنگەکانمان | ئاهەنگێن مە |
+| 9 | #27 v2, friends: room 5's default name | ضحكاتنا | Our laughs | پێکەنینەکانمان | کەنیێن مە |
+| 10 | #27 v2, friends: room 6's default name | أصدقاء للأبد | Friends forever | هاوڕێ بۆ هەمیشە | هەڤال بۆ هەروهەر |
+| 11 | #27 v2, friends: room 1's default words | اليوم الذي بدأت فيه صداقتنا. | The day our friendship began. | ئەو ڕۆژەی هاوڕێیەتیمان دەستی پێکرد. | ئەو ڕۆژا هەڤالینیا مە دەستپێکری. |
+| 12 | #27 v2, friends: room 2's default words | أماكن زرناها معاً. | Places we visited together. | ئەو شوێنانەی پێکەوە سەردانمان کردن. | ئەو جهێن مە پێکڤە سەرەدان کرین. |
+| 13 | #27 v2, friends: room 3's default words | كل ما جرّبناه معاً. | Everything we tried together. | هەموو ئەو شتانەی پێکەوە تاقیمان کردەوە. | هەمی ئەو تشتێن مە پێکڤە تاقیکرین. |
+| 14 | #27 v2, friends: room 4's default words | أعياد الميلاد والمناسبات. | Birthdays and special days. | ڕۆژانی لەدایکبوون و بۆنە تایبەتەکان. | ڕۆژێن ژدایکبوونێ و بۆنەیێن تایبەت. |
+| 15 | #27 v2, friends: room 5's default words | لحظات صغيرة لا تُنسى. | Small moments we will never forget. | ساتە بچووکە لەبیرنەکراوەکان. | دەمێن بچووک یێن ژبیرنەکری. |
+| 16 | #27 v2, friends: room 6's default words | وما زالت الحكاية مستمرة. | And the story goes on. | و چیرۆکەکە هێشتا بەردەوامە. | و چیرۆک هێشتا بەردەوامە. |
+| 17 | #27 v2, friends: sample photo 3's title | يوم التخرج | Graduation day | ڕۆژی دەرچوون | ڕۆژا دەرچوونێ |
+| 18 | #27 v2, friends: sample photo 3's words | اليوم الذي تخرّجنا فيه معاً. | The day we graduated together. | ئەو ڕۆژەی پێکەوە دەرچووین. | ئەو ڕۆژا ئەم پێکڤە دەرچووین. |
+| 19 | #27 v2, friends: sample photo 4's title | حفلة عيد الميلاد | Birthday party | ئاهەنگی ڕۆژی لەدایکبوون | ئاهەنگا ڕۆژا ژدایکبوونێ |
+| 20 | #27 v2, friends: sample photo 4's words | كعكة وشموع وضحكات. | Cake, candles and laughter. | کێک و مۆم و پێکەنین. | کێک و مۆم و کەنی. |
+| 21 | #27 colour set (walls #6e2a35) | عنابي داكن | Deep Burgundy | شەرابیی تۆخ | شەرابیێ تاری |
+| 22 | #27 colour set (walls #9aab8f) | أخضر مريمية هادئ | Muted Sage Green | سەوزی کاڵی مێرامی | کەسکێ کاڵێ مێرامی |
+| 23 | #27 colour set (walls #8ea3b5) | أزرق مغبر | Dusty Blue | شینی تۆزاوی | شینێ تۆزاوی |
+| 24 | #27 colour set (walls #d9b0aa) | وردي ناعم | Soft Rose | پەمەیی نەرم | پەمبەیی نەرم |
+| 25 | #27 colour set (walls #a8977f) | رمادي بني دافئ | Warm Taupe | قاوەیی خۆڵەمێشیی گەرم | قاوەیی خۆلەمێشیێ گەرم |

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { asc, eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { packageFeatures, packages, themes } from '@/server/db/schema';
+import { packageFeatures, packages, themePalettes, themes } from '@/server/db/schema';
 import { syncThemesFromRegistry } from '@/server/catalog/themes';
 import { applyOwnerSetups, OWNER_SETUPS } from '@/server/catalog/owner-setup';
 import { manifestByCodeRef } from '@/theme-registry';
@@ -41,11 +41,20 @@ describe("the owner's chat requests applied on deploy", () => {
     const key = uniqueKey('museum');
     await syncThemesFromRegistry(db(), [{ ...manifestByCodeRef('memory-museum@1')!, key }], actor, { complete: false });
     const setup = { ...OWNER_SETUPS.find((x) => x.themeKey === 'memory-museum')!, themeKey: key };
-    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([`${key}: name and description`]);
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([`${key}: name and description`, `${key}: 5 colour sets`]);
     const [t] = await db().select().from(themes).where(eq(themes.key, key));
     expect(t!.name).toMatchObject({ ar: 'متحف الذكريات', en: 'Memory Museum', ckb: 'مۆزەخانەی یادەوەری', bdn: 'مۆزەخانەیا بیرهاتنان' });
     expect(Object.keys(t!.description ?? {}).sort()).toEqual(['ar', 'bdn', 'ckb', 'en']);
     expect(await db().select().from(packages).where(eq(packages.themeId, t!.id))).toHaveLength(0);
+    // The owner's five wall colours, for packages with colour choice (slot `walls`).
+    const sets = await db().select().from(themePalettes).where(eq(themePalettes.themeId, t!.id)).orderBy(asc(themePalettes.sortOrder));
+    expect(sets.map((p) => [p.name.en, p.colors.walls])).toEqual([
+      ['Deep Burgundy', '#6e2a35'],
+      ['Muted Sage Green', '#9aab8f'],
+      ['Dusty Blue', '#8ea3b5'],
+      ['Soft Rose', '#d9b0aa'],
+      ['Warm Taupe', '#a8977f'],
+    ]);
     // The name stays the working title, so the description is the guard: an Admin edit is kept on the next deploy.
     await db().update(themes).set({ description: { ar: 'وصف المالك', en: "Owner's words" } }).where(eq(themes.id, t!.id));
     expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([]);

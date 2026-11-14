@@ -155,7 +155,9 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
   const video = included ? await customerVideo(db(), inv) : null;
   // The poster step (couple_poster): the customer's choices so far and the video's still, one of the pictures to choose.
   const posters = hasPosters(inv.featureKeys) ? await posterState(inv, manifest, locale, video?.poster ?? null) : null;
-  return { texts, videoIncluded: included, video, posters };
+  // Colour choice: the sets to pick from, shown above the design in the editor.
+  const colors = inv.featureKeys.includes('color_choice') ? await paletteChoice(inv.themeId, inv.colors ?? null, locale) : null;
+  return { texts, videoIncluded: included, video, posters, colors };
 }
 
 /** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */
@@ -264,18 +266,28 @@ export async function orderFormExtras(
     extras.switches = current.switchDefs.map((d) => ({ key: d.key, label: localized(withKurdishLabel(d.label), locale), on: current.switches?.[d.key] ?? d.default }));
   }
   if (featureKeys.includes('color_choice')) {
-    const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
-    if (slots.length && palettes.length) {
-      const swatches = (colors: Record<string, string>) => slots.map((s) => colors[s.key] ?? s.default);
-      const same = (a: Record<string, string>, b: Record<string, string>) => slots.every((s) => (a[s.key] ?? s.default).toLowerCase() === (b[s.key] ?? s.default).toLowerCase());
-      extras.palettes = {
-        current: current.colors ? (palettes.find((p) => same(p.colors, current.colors!))?.id ?? '') : '',
-        original: swatches({}),
-        options: palettes.map((p) => ({ id: p.id, name: localized(p.name, locale), swatches: swatches(p.colors) })),
-      };
-    }
+    const choice = await paletteChoice(themeId, current.colors ?? null, locale);
+    if (choice) extras.palettes = { current: choice.current, original: choice.original, options: choice.options };
   }
   return extras;
+}
+
+/**
+ * The colour sets a customer may pick (packages with colour choice): each with its name and swatches (one per colour
+ * slot of the design), the design's own colours, which one is chosen ('' = the design's own), and the slot's name when
+ * the design has one slot (e.g. "The museum's wall colour"). Null when the design has no slots or no sets on offer.
+ */
+export async function paletteChoice(themeId: string, colors: Record<string, string> | null, locale: Locale) {
+  const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
+  if (!slots.length || !palettes.length) return null;
+  const swatches = (c: Record<string, string>) => slots.map((s) => c[s.key] ?? s.default);
+  const same = (a: Record<string, string>, b: Record<string, string>) => slots.every((s) => (a[s.key] ?? s.default).toLowerCase() === (b[s.key] ?? s.default).toLowerCase());
+  return {
+    current: colors ? (palettes.find((p) => same(p.colors, colors))?.id ?? '') : '',
+    original: swatches({}),
+    options: palettes.map((p) => ({ id: p.id, name: localized(p.name, locale), swatches: swatches(p.colors) })),
+    slotName: slots.length === 1 ? localized(slots[0]!.label, locale) : null,
+  };
 }
 
 /** The ticked printed cards as ExtrasPreview pictures them: key, the shape's name, and each side's width ÷ height. */

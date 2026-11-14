@@ -1,8 +1,8 @@
 import 'server-only';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { invitationNames } from '@/catalog/fields';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, themeVersions } from '@/server/db/schema';
+import { invitations, themePalettes, themeVersions } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { fieldDefs } from '@/server/orders/common';
 import { validateFieldValues, type FieldError } from '@/server/orders/validation';
@@ -19,12 +19,13 @@ export class TemplateTextError extends Error {
 }
 
 /** A key the template editor saves: a field, a wording line, or a photo's title or words. */
-const KEY = /^(?:field:([a-z][a-z0-9_]*)|wording:([a-z][a-zA-Z0-9]*)|photo:(\d{1,2}):(title|caption))$/;
+const KEY = /^(?:field:([a-z][a-z0-9_]*)|wording:([a-z][a-zA-Z0-9]*)|photo:(\d{1,2}):(title|caption)|(palette))$/;
 
 /**
  * One text of a template design (manifest `editor: 'template'`), typed by the customer in place: `field:<key>` (a
  * field of their package, checked like on the order form but allowed to be empty until checkout), `wording:<key>` (one
- * of the design's lines; empty brings back its default), or `photo:<n>:title|caption`. Returns what is now shown
+ * of the design's lines; empty brings back its default), `photo:<n>:title|caption`, or `palette` (a colour set's id,
+ * '' for the design's own colours; packages with colour choice). Returns what is now shown
  * (cleaned, or the line's default). TemplateTextError for a key the design does not have or a text that is refused.
  */
 export async function setTemplateText(
@@ -37,7 +38,7 @@ export async function setTemplateText(
 ): Promise<string> {
   const m = KEY.exec(key);
   if (!m || value.length > 2000) throw new TemplateTextError(m ? 'tooLong' : 'unknownKey');
-  const [, field, line, photo, part] = m;
+  const [, field, line, photo, part, palette] = m;
   // Only template designs are filled in place. Any other design changes its texts through the order form (before
   // checkout) or the counted self-edit (after publishing), never through this endpoint.
   const [version] = await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
@@ -48,6 +49,27 @@ export async function setTemplateText(
     opts.published
       ? recordAudit(tx, { actorType: 'CUSTOMER', actorAdminId: null, action: 'invitation.text_changed', objectType: 'invitation', objectId: inv.id, after: { key } })
       : Promise.resolve();
+
+  // The colour set (packages with colour choice): one of the design's sets on offer, or '' for the design's own colours.
+  if (palette !== undefined) {
+    if (!inv.featureKeys.includes('color_choice')) throw new TemplateTextError('unknownKey');
+    const id = value.trim();
+    let colors: Record<string, string> | null = null;
+    if (id) {
+      if (!/^[0-9a-f-]{36}$/i.test(id)) throw new TemplateTextError('invalidChoice');
+      const [p] = await db
+        .select({ colors: themePalettes.colors })
+        .from(themePalettes)
+        .where(and(eq(themePalettes.id, id), eq(themePalettes.themeId, inv.themeId), eq(themePalettes.status, 'ACTIVE')));
+      if (!p) throw new TemplateTextError('invalidChoice');
+      colors = p.colors;
+    }
+    return db.transaction(async (tx) => {
+      await tx.update(invitations).set({ colors }).where(eq(invitations.id, inv.id));
+      await audit(tx);
+      return id;
+    });
+  }
 
   if (photo !== undefined) {
     return db.transaction(async (tx) => {

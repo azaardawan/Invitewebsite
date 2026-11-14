@@ -108,6 +108,18 @@ const STARTER_SECTIONS: StarterSection[] = [
       { key: 'invitation_message', label: { ar: 'قصتكما', en: 'Your story', ckb: 'چیرۆکەکەتان', bdn: 'چیرۆکا هەوە' } },
     ],
   },
+  {
+    // Friends (owner, 2026-11-14): like Couples (not an invitation; photos and one video, filled in on the design
+    // itself), for two friends. A design sold here too ("Also sold in" in Admin) reads `occasion` = 'friends'.
+    key: 'friends',
+    name: { ar: 'للأصدقاء', en: 'Friends', ckb: 'بۆ هاوڕێیان', bdn: 'بۆ هەڤالان' },
+    requiredFeatures: ['photos', 'video'],
+    fields: [
+      { key: 'person_1_name', label: { ar: 'اسم الصديق الأول', en: 'First friend’s name', ckb: 'ناوی هاوڕێی یەکەم', bdn: 'ناڤێ هەڤالێ ئێکێ' } },
+      { key: 'person_2_name', label: { ar: 'اسم الصديق الثاني', en: 'Second friend’s name', ckb: 'ناوی هاوڕێی دووەم', bdn: 'ناڤێ هەڤالێ دووێ' } },
+      { key: 'invitation_message', label: { ar: 'قصتكم', en: 'Your story', ckb: 'چیرۆکەکەتان', bdn: 'چیرۆکا هەوە' } },
+    ],
+  },
 ];
 
 export async function seedCatalog(db: DbOrTx) {
