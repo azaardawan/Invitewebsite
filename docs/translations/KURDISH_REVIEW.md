@@ -1838,7 +1838,7 @@ The design's description (filled in on deploy, `src/server/catalog/owner-setup.t
 
 ## Batch 58 — the Friends section, and Memory Museum (#27) v2: friends' words and the wall colours — ✅ AUTO-APPROVED (2026-11-14, owner checks in Admin → Translations)
 
-The new section «Friends» (seeded, `src/server/catalog/seed.ts`) with its field labels; Memory Museum v2's words for friends (a museum ordered in the Friends section: the rooms' default names and words, `themes/memory-museum/v2/rooms.ts`, and two sample photos' words, `copy.ts`); and the five wall colours the owner offers (colour sets, `src/server/catalog/owner-setup.ts`).
+The new section «Friends» (seeded, `src/server/catalog/seed.ts`) with its field labels; Memory Museum v2's words for friends (a museum ordered in the Friends section: the rooms' default names and words, `themes/memory-museum/v2/rooms.ts`, and two sample photos' words, `copy.ts`); the five wall colours the owner offers (colour sets, `src/server/catalog/owner-setup.ts`); and the template editor's colour choice (`template.colors`, `template.colorsOriginal`).
 
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
@@ -1867,3 +1867,5 @@ The new section «Friends» (seeded, `src/server/catalog/seed.ts`) with its fiel
 | 23 | #27 colour set (walls #8ea3b5) | أزرق مغبر | Dusty Blue | شینی تۆزاوی | شینێ تۆزاوی |
 | 24 | #27 colour set (walls #d9b0aa) | وردي ناعم | Soft Rose | پەمەیی نەرم | پەمبەیی نەرم |
 | 25 | #27 colour set (walls #a8977f) | رمادي بني دافئ | Warm Taupe | قاوەیی خۆڵەمێشیی گەرم | قاوەیی خۆلەمێشیێ گەرم |
+| 26 | Template editor (`template.colors`): the colour choice's heading when a design doesn't name its colour | الألوان | Colours | ڕەنگەکان | ڕەنگ |
+| 27 | Template editor (`template.colorsOriginal`): the design's own colour | اللون الأصلي | Original colour | ڕەنگی ڕەسەن | ڕەنگێ ڕەسەن |

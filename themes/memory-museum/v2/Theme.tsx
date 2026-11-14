@@ -9,6 +9,7 @@ import {
   ThemeBorder,
   VideoSlot,
   hasFeature,
+  useMusic,
   useReducedMotion,
   useTemplateEditing,
   useTouchScreen,
@@ -99,8 +100,11 @@ export default function MemoryMuseum(props: ThemeProps) {
   const shown: Phase = editing ? 'open' : phase;
 
   const touch = useTouchScreen();
+  const music = useMusic();
   const open = () => {
     if (phase !== 'closed') return;
+    // The museum's music starts (fading in) on the guest's tap: phones play sound only after one.
+    music.start();
     // Phones walk the museum held sideways (owner, 2026-11-13): where the browser allows it (Android), full screen and
     // locked to landscape; elsewhere the museum asks the guest to turn the phone.
     if (touch) landscape();
@@ -195,6 +199,23 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
   const [sheet, setSheet] = useState(false);
   const touch = useTouchScreen();
   const portrait = usePortrait();
+  const music = useMusic();
+  // The music pauses while the couple's video plays (it has its own sound), and comes back after.
+  const paused = useRef(false);
+  const openSheet = () => {
+    if (video && music.playing) {
+      music.toggle();
+      paused.current = true;
+    }
+    setSheet(true);
+  };
+  const closeSheet = () => {
+    setSheet(false);
+    if (paused.current) {
+      paused.current = false;
+      music.toggle();
+    }
+  };
   // A phone held upright: the museum waits until it is turned sideways.
   const turn = touch && portrait && active;
 
@@ -254,7 +275,7 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
           setRoom(key);
           if (key !== 'hall') setWelcome(false);
         }}
-        onScreen={() => (video || story ? setSheet(true) : undefined)}
+        onScreen={() => (video || story ? openSheet() : undefined)}
       />
 
       <div className={c('welcome', !(active && ready && welcome) && 'welcomeGone')} aria-hidden={!welcome}>
@@ -264,6 +285,26 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
         {props.wording.since ? <p className={c('captionText')}>{props.wording.since}</p> : null}
         <p className={c('welcomeHint')}>{touch ? copy.hintTouch : copy.hintKeys}</p>
       </div>
+
+      {/* The music's on/off: the one control over the museum besides the touch pad (guests must be able to mute it). */}
+      {music.available && active ? (
+        <button
+          type="button"
+          className={c('sound', !music.playing && 'soundOff')}
+          aria-pressed={music.playing}
+          aria-label={music.playing ? props.labels.musicPause : props.labels.musicPlay}
+          onClick={() => music.toggle()}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+            {music.playing ? (
+              <path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            ) : (
+              <path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            )}
+          </svg>
+        </button>
+      ) : null}
 
       {turn ? (
         <div className={c('turn')} role="status" data-museum-turn>
@@ -293,13 +334,13 @@ function MuseumWalk({ props, copy, reduced, active, onUnavailable }: { props: Th
       </div>
 
       {sheet ? (
-        <div className={c('sheet')} role="dialog" aria-modal="true" aria-label={video ? copy.video : copy.story} onClick={() => setSheet(false)}>
+        <div className={c('sheet')} role="dialog" aria-modal="true" aria-label={video ? copy.video : copy.story} onClick={closeSheet}>
           <div className={c('panel')} onClick={(e) => e.stopPropagation()}>
             {video ? <VideoSlot video={video} className={c('video')} controls autoPlay playsInline /> : null}
             {props.wording.title ? <p className={c('plaqueTitle')}>{props.wording.title}</p> : null}
             {names ? <p className={c('plaqueNames')}>{names}</p> : null}
             {story ? <p className={c('panelText')}>{story}</p> : null}
-            <button type="button" className={c('pill')} onClick={() => setSheet(false)}>
+            <button type="button" className={c('pill')} onClick={closeSheet}>
               {copy.close}
             </button>
           </div>

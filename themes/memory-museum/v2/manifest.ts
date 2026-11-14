@@ -4,7 +4,8 @@ import { ROOM_NAMES, ROOM_TEXTS, WARM_CREAM } from './rooms';
 
 /**
  * v2 (owner, 2026-11-14): also for Friends (the design's room names, sample words follow `props.occasion`), and the
- * walls' warm cream can be changed with colour choice (slot `walls`; the owner's five colour sets).
+ * walls' warm cream can be changed with colour choice (slot `walls`; the owner's five colour sets), and background
+ * music (the design's song, or the couple's own with custom music), with a small sound button.
  *
  * Memory Museum (Couples, owner 2026-11-13): the couple's photos hang as paintings in a museum their guests walk
  * through in 3D (the owner's model, `assets/museum.glb`; `<Gallery3D>`). Three wings of two rooms (eight photos each)
@@ -34,7 +35,9 @@ export default defineTheme({
   sections: ['couples', 'friends'],
   fields: [...allFields],
   // Colour choice (owner, 2026-11-14): a package may let the customer change the warm cream of the walls.
-  features: ['photos', 'video', 'color_choice'],
+  // Background music (owner, 2026-11-14): the design's song (Admin → the design → Music), or the couple's own with
+  // custom music; it starts on «Open the museum».
+  features: ['photos', 'video', 'color_choice', 'music'],
   colors: {
     slots: [{ key: 'walls', label: { ar: 'لون جدران المتحف', en: 'The museum’s wall colour' }, default: WARM_CREAM }],
   },
@@ -47,7 +50,9 @@ export default defineTheme({
     endedBody: { ar: 'شكراً لزيارتكم. هذا المتحف لم يعد مفتوحاً.', en: 'Thank you for visiting. This museum is no longer open.', ckb: 'سوپاس بۆ سەردانەکەتان. ئەم مۆزەخانەیە ئیتر کراوە نییە.', bdn: 'سوپاس بۆ سەرەدانا هەوە. ئەڤ مۆزەخانە ئێدی ڤەکری نینە.' },
   },
   validStates: [
+    { features: ['photos', 'video', 'color_choice', 'music'], fields: [...allFields] },
     { features: ['photos', 'video', 'color_choice'], fields: [...allFields] },
+    { features: ['photos', 'video', 'music'], fields: [...allFields] },
     { features: ['photos', 'video'], fields: [...allFields] },
     { features: ['photos'], fields: [...allFields] },
   ],

@@ -941,3 +941,29 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* The music's on/off: small, in the corner opposite the touch pad. */
+.sound {
+  position: absolute;
+  inset-inline-end: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(210, 173, 102, 0.45);
+  background: rgba(21, 17, 12, 0.45);
+  color: var(--mm-gilt);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.sound:hover {
+  opacity: 1;
+}
+
+.soundOff {
+  color: var(--mm-stone-dim);
+}

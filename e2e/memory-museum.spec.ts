@@ -131,6 +131,32 @@ test('v2: for friends the museum speaks of friends; a colour set changes the wal
   await expect(page.locator('[data-museum-room="1"]')).toContainText('The beginning');
 });
 
+test('colour choice: the customer picks the walls’ colour above the design, and it stays', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
+  test.setTimeout(120_000);
+  const out = execFileSync('pnpm', ['-s', 'exec', 'tsx', '--conditions=react-server', '--env-file-if-exists=.env', 'e2e/scripts/make-museum-order.ts'], {
+    env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL, MUSEUM_COLOURS: '1' },
+  }).toString();
+  const { previewToken } = JSON.parse(out.trim().split('\n').at(-1)!) as { previewToken: string };
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/en/order/${previewToken}`);
+  const picker = page.locator('[data-template-colors]');
+  await expect(picker).toContainText('The museum’s wall colour');
+  await expect(picker.getByRole('button')).toHaveCount(6);
+  await expect(picker.getByRole('button', { name: 'Original colour' })).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('colours.png') });
+  await picker.getByRole('button', { name: 'Deep Burgundy' }).click();
+  await expect(picker.getByRole('button', { name: 'Deep Burgundy' })).toHaveAttribute('aria-pressed', 'true');
+  // The design is drawn again in that colour, and the choice is kept.
+  const design = page.frameLocator('iframe[data-template-design]');
+  await expect
+    .poll(async () => (await design.locator('[data-bahja-theme]').evaluate((el) => getComputedStyle(el).getPropertyValue('--bahja-color-walls').trim())).toLowerCase(), { timeout: 15_000 })
+    .toBe('#6e2a35');
+  await page.reload();
+  await expect(page.locator('[data-template-colors]').getByRole('button', { name: 'Deep Burgundy' })).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('colours-burgundy.png'), fullPage: true });
+});
+
 test('a two-room package: the couple fills two rooms; guests see only the rooms with photos', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
   test.setTimeout(240_000);
