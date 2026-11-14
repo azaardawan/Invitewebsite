@@ -1869,3 +1869,15 @@ The new section «Friends» (seeded, `src/server/catalog/seed.ts`) with its fiel
 | 25 | #27 colour set (walls #a8977f) | رمادي بني دافئ | Warm Taupe | قاوەیی خۆڵەمێشیی گەرم | قاوەیی خۆلەمێشیێ گەرم |
 | 26 | Template editor (`template.colors`): the colour choice's heading when a design doesn't name its colour | الألوان | Colours | ڕەنگەکان | ڕەنگ |
 | 27 | Template editor (`template.colorsOriginal`): the design's own colour | اللون الأصلي | Original colour | ڕەنگی ڕەسەن | ڕەنگێ ڕەسەن |
+
+## Batch 59 — Memory Museum (#27): olive green instead of muted sage green, and the customer's choice of no music — ✅ AUTO-APPROVED (2026-11-14, owner checks in Admin → Translations)
+
+The owner asked for olive green in place of muted sage green. Deploys rename the sage colour set (batch 58, row 22) to
+this one while the owner hasn't changed it in Admin.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #27 colour set (walls #6f7a45) | أخضر زيتوني | Olive Green | سەوزی زەیتوونی | کەسکێ زەیتوونی |
+| 2 | Template editor (`template.music`): the heading over the music choice | الموسيقى في الخلفية | Background music | مۆسیقای پاشبنەما | مۆسیقایا پاشبنەمایێ |
+| 3 | Template editor (`template.musicOn`) | مع موسيقى | With music | لەگەڵ مۆسیقا | دگەل مۆسیقایێ |
+| 4 | Template editor (`template.musicOff`) | بدون موسيقى | No music | بێ مۆسیقا | بێ مۆسیقا |

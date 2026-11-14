@@ -113,6 +113,10 @@ const DECOR: NonNullable<GalleryPlan['decor']> = {
   ],
   doors: [{ x: 0, z: 15.29, normal: [0, -1], width: 5.3, height: 5.6 }],
   doorways: true,
+  // Over every doorway, both sides: a wreath and garlands (framing the room's sign on the side it hangs).
+  overdoors: true,
+  // The panels over the doorways are a lighter stone in the model: they are wall (its colour and texture).
+  asWalls: [{ mesh: 'ARCHITECTURE', material: 'Carved warm limestone' }],
   floorMaterial: 'Smoked oak parquet',
   // The model lights the first room of each wing; the rooms behind get a lamp of the same strength.
   lampHeight: 5.8,
@@ -122,8 +126,14 @@ const DECOR: NonNullable<GalleryPlan['decor']> = {
     { x: 41.5, y: 5.8, z: 0, intensity: 320 },
   ],
   sky: '#a9c1cb',
+  // Not so flat, not so bland (owner, 2026-11-14): plaster walls with faint stone courses (0.6 m), marble floor tiles (0.9 m).
+  surfaces: {
+    walls: { materials: ['Louvre pale limestone'], size: 2.4, rows: 4 },
+    floors: { materials: ['Smoked oak parquet', 'Courtyard marble'], size: 1.8 },
+  },
   // A customer's wall colour (colour choice) replaces the warm cream of these.
-  tint: { walls: ['Louvre pale limestone', 'Gallery plaster'], trim: ['Carved warm limestone'] },
+  // (The hall's columns, «Gallery plaster», stay cream.)
+  tint: { walls: ['Louvre pale limestone'], trim: ['Carved warm limestone'] },
 };
 
 export const PLAN: GalleryPlan = {

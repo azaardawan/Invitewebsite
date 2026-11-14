@@ -76,6 +76,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             video={editor.video}
             videoIncluded={editor.videoIncluded}
             colors={editor.colors}
+            music={editor.music}
             labels={templateLabels(t)}
           />
         </div>

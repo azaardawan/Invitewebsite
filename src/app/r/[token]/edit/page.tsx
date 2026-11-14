@@ -103,6 +103,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
           video={template.video}
           videoIncluded={template.videoIncluded}
           colors={template.colors}
+          music={template.music}
           labels={templateLabels(ts, !template.posters)}
         />
       </main>

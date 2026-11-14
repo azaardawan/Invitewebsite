@@ -157,7 +157,9 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
   const posters = hasPosters(inv.featureKeys) ? await posterState(inv, manifest, locale, video?.poster ?? null) : null;
   // Colour choice: the sets to pick from, shown above the design in the editor.
   const colors = inv.featureKeys.includes('color_choice') ? await paletteChoice(inv.themeId, inv.colors ?? null, locale) : null;
-  return { texts, videoIncluded: included, video, posters, colors };
+  // Background music (packages with music): on, or off when the customer chose none.
+  const music: 'on' | 'off' | null = inv.featureKeys.includes('music') ? (inv.musicOff ? 'off' : 'on') : null;
+  return { texts, videoIncluded: included, video, posters, colors, music };
 }
 
 /** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */

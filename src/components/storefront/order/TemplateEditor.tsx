@@ -57,6 +57,10 @@ export type TemplateEditorLabels = {
   /** Colour choice: the heading when the design doesn't name its colour, and the design's own colours. */
   colors: string;
   colorsOriginal: string;
+  /** Background music or none: the heading and the two buttons. */
+  music: string;
+  musicOn: string;
+  musicOff: string;
   errors: Record<string, string> & { generic: string };
 };
 
@@ -106,6 +110,7 @@ export function TemplateEditor({
   video: initialVideo,
   videoIncluded,
   colors,
+  music,
   labels,
 }: {
   /** `/p/<token>` while ordering, `/r/<token>` after publishing. */
@@ -127,6 +132,8 @@ export function TemplateEditor({
   videoIncluded: boolean;
   /** Colour choice: the sets to pick from (shown above the design), or null without it. */
   colors?: TemplateColors | null;
+  /** Background music (packages with music): on, or off when the customer chose none; null without music. */
+  music?: 'on' | 'off' | null;
   labels: TemplateEditorLabels;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -139,6 +146,7 @@ export function TemplateEditor({
   const [savedAt, setSavedAt] = useState(0);
   const [progress, setProgress] = useState<number | null>(null);
   const [colorId, setColorId] = useState(colors?.current ?? '');
+  const [musicChoice, setMusicChoice] = useState(music ?? null);
   const reloads = useRef(0);
 
   const tell = useCallback((message: unknown) => frame.current?.contentWindow?.postMessage(message, window.location.origin), []);
@@ -218,18 +226,18 @@ export function TemplateEditor({
   }
 
   /** Colour choice: saves the set and redraws the design in it. */
-  async function chooseColors(id: string) {
-    if (busy || id === colorId) return;
+  // A choice the design takes from the server (the colour set, the music): saved, then the design is loaded again.
+  async function chooseSetting(key: 'palette' | 'music', value: string, done: () => void) {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`${base}/text`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'palette', value: id }) });
+      const res = await fetch(`${base}/text`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, value }) });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         setError(errorText(data.error));
         return;
       }
-      setColorId(id);
+      done();
       setSavedAt((n) => n + 1);
       // The design takes its colours from the server: load it again (it gets the photos, texts and video back on load).
       reloads.current += 1;
@@ -365,6 +373,34 @@ export function TemplateEditor({
   return (
     <section className="flex flex-col gap-3" data-template-editor aria-label={labels.hint}>
       <p className="rounded-2xl bg-accent/10 px-4 py-3 text-sm font-medium text-heading">{labels.hint}</p>
+      {musicChoice ? (
+        <fieldset className="flex flex-col gap-2 rounded-2xl border border-line bg-surface px-4 py-3" data-template-music>
+          <legend className="px-1 text-sm font-semibold text-heading">{labels.music}</legend>
+          {error && !sheet && !colors ? (
+            <p role="alert" className="text-sm text-danger">
+              {error}
+            </p>
+          ) : null}
+          <div className="grid grid-cols-2 gap-2">
+            {(['on', 'off'] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={musicChoice === v}
+                disabled={busy}
+                onClick={() => musicChoice !== v && !busy && void chooseSetting('music', v, () => setMusicChoice(v))}
+                data-template-music-choice={v}
+                className="flex items-center justify-center gap-2 rounded-xl border border-line bg-paper px-3 py-2.5 text-sm font-medium text-heading aria-pressed:border-accent aria-pressed:ring-2 aria-pressed:ring-accent/25"
+              >
+                <span aria-hidden className="text-base leading-none">
+                  {v === 'on' ? '♪' : '✕'}
+                </span>
+                {v === 'on' ? labels.musicOn : labels.musicOff}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
       {colors ? (
         <fieldset className="flex flex-col gap-2 rounded-2xl border border-line bg-surface px-4 py-3" data-template-colors>
           <legend className="px-1 text-sm font-semibold text-heading">{colors.slotName ?? labels.colors}</legend>
@@ -380,7 +416,7 @@ export function TemplateEditor({
                 type="button"
                 aria-pressed={colorId === p.id}
                 disabled={busy}
-                onClick={() => void chooseColors(p.id)}
+                onClick={() => colorId !== p.id && !busy && void chooseSetting('palette', p.id, () => setColorId(p.id))}
                 data-template-color={p.id || 'original'}
                 className="flex items-center gap-2 rounded-full border border-line bg-paper py-1.5 ps-1.5 pe-3 text-sm font-medium text-heading aria-pressed:border-accent aria-pressed:ring-2 aria-pressed:ring-accent/25"
               >

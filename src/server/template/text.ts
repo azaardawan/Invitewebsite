@@ -19,13 +19,14 @@ export class TemplateTextError extends Error {
 }
 
 /** A key the template editor saves: a field, a wording line, or a photo's title or words. */
-const KEY = /^(?:field:([a-z][a-z0-9_]*)|wording:([a-z][a-zA-Z0-9]*)|photo:(\d{1,2}):(title|caption)|(palette))$/;
+const KEY = /^(?:field:([a-z][a-z0-9_]*)|wording:([a-z][a-zA-Z0-9]*)|photo:(\d{1,2}):(title|caption)|(palette)|(music))$/;
 
 /**
  * One text of a template design (manifest `editor: 'template'`), typed by the customer in place: `field:<key>` (a
  * field of their package, checked like on the order form but allowed to be empty until checkout), `wording:<key>` (one
- * of the design's lines; empty brings back its default), `photo:<n>:title|caption`, or `palette` (a colour set's id,
- * '' for the design's own colours; packages with colour choice). Returns what is now shown
+ * of the design's lines; empty brings back its default), `photo:<n>:title|caption`, `palette` (a colour set's id,
+ * '' for the design's own colours; packages with colour choice), or `music` ('on' or 'off': packages with background
+ * music, whose customers may choose none). Returns what is now shown
  * (cleaned, or the line's default). TemplateTextError for a key the design does not have or a text that is refused.
  */
 export async function setTemplateText(
@@ -38,7 +39,7 @@ export async function setTemplateText(
 ): Promise<string> {
   const m = KEY.exec(key);
   if (!m || value.length > 2000) throw new TemplateTextError(m ? 'tooLong' : 'unknownKey');
-  const [, field, line, photo, part, palette] = m;
+  const [, field, line, photo, part, palette, music] = m;
   // Only template designs are filled in place. Any other design changes its texts through the order form (before
   // checkout) or the counted self-edit (after publishing), never through this endpoint.
   const [version] = await db.select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv.themeVersionId));
@@ -68,6 +69,17 @@ export async function setTemplateText(
       await tx.update(invitations).set({ colors }).where(eq(invitations.id, inv.id));
       await audit(tx);
       return id;
+    });
+  }
+
+  // Background music or none (packages with music): the customer may turn it off, whatever the package.
+  if (music !== undefined) {
+    if (!inv.featureKeys.includes('music')) throw new TemplateTextError('unknownKey');
+    if (value !== 'on' && value !== 'off') throw new TemplateTextError('invalidChoice');
+    return db.transaction(async (tx) => {
+      await tx.update(invitations).set({ musicOff: value === 'off' }).where(eq(invitations.id, inv.id));
+      await audit(tx);
+      return value;
     });
   }
 

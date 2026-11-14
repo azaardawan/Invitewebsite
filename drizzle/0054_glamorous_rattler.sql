@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "music_off" boolean DEFAULT false NOT NULL;

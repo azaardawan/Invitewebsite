@@ -1650,7 +1650,10 @@
         "invalidText": "This text can’t be saved. Try another."
       },
       "colors": "Colours",
-      "colorsOriginal": "Original colour"
+      "colorsOriginal": "Original colour",
+      "music": "Background music",
+      "musicOn": "With music",
+      "musicOff": "No music"
     },
     "posters": {
       "title": "Your posters",

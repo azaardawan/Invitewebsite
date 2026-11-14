@@ -50,11 +50,20 @@ describe("the owner's chat requests applied on deploy", () => {
     const sets = await db().select().from(themePalettes).where(eq(themePalettes.themeId, t!.id)).orderBy(asc(themePalettes.sortOrder));
     expect(sets.map((p) => [p.name.en, p.colors.walls])).toEqual([
       ['Deep Burgundy', '#6e2a35'],
-      ['Muted Sage Green', '#9aab8f'],
+      ['Olive Green', '#6f7a45'],
       ['Dusty Blue', '#8ea3b5'],
       ['Soft Rose', '#d9b0aa'],
       ['Warm Taupe', '#a8977f'],
     ]);
+    // Olive green replaced muted sage green (owner, 2026-11-14): a sage set added by an earlier deploy becomes olive;
+    // a set the owner changed in Admin is kept.
+    const olive = sets[1]!;
+    await db().update(themePalettes).set({ name: { ar: 'أخضر مريمية هادئ', en: 'Muted Sage Green' }, colors: { walls: '#9AAB8F' } }).where(eq(themePalettes.id, olive.id));
+    await db().update(themePalettes).set({ name: { ar: 'أخضر مريمية هادئ', en: 'Muted Sage Green' }, colors: { walls: '#8a9b80' } }).where(eq(themePalettes.id, sets[2]!.id));
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([`${key}: colour set Muted Sage Green → Olive Green`]);
+    const after = await db().select().from(themePalettes).where(eq(themePalettes.themeId, t!.id)).orderBy(asc(themePalettes.sortOrder));
+    expect(after.map((p) => [p.name.en, p.colors.walls])[1]).toEqual(['Olive Green', '#6f7a45']);
+    expect(after.map((p) => [p.name.en, p.colors.walls])[2]).toEqual(['Muted Sage Green', '#8a9b80']);
     // The name stays the working title, so the description is the guard: an Admin edit is kept on the next deploy.
     await db().update(themes).set({ description: { ar: 'وصف المالك', en: "Owner's words" } }).where(eq(themes.id, t!.id));
     expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([]);

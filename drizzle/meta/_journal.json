@@ -379,6 +379,13 @@
       "when": 1794413212587,
       "tag": "0053_spooky_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1794669354807,
+      "tag": "0054_glamorous_rattler",
+      "breakpoints": true
     }
   ]
 }

@@ -144,6 +144,8 @@ export const invitations = pgTable(
     videoPosterAssetId: uuid('video_poster_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
+    /** The customer chose no background music (packages with `music`): the design plays none and shows no sound button. */
+    musicOff: boolean('music_off').notNull().default(false),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */
     selfEdits: integer('self_edits').notNull().default(0),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */

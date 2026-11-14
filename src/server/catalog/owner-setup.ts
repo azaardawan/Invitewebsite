@@ -27,6 +27,8 @@ type OwnerSetup = {
   pricesFrom?: string;
   /** Colour sets the customer may pick from (packages with colour choice), added while the design has none. */
   palettes?: { name: I18nContent; colors: Record<string, string> }[];
+  /** Colour sets added earlier that the owner asked to change: replaced while the owner hasn't edited them in Admin. */
+  paletteChanges?: { from: { en: string; colors: Record<string, string> }; to: { name: I18nContent; colors: Record<string, string> } }[];
 };
 
 const FIELDS: FieldKey[] = ['baby_name', 'father_name', 'birth_date'];
@@ -86,10 +88,17 @@ export const OWNER_SETUPS: OwnerSetup[] = [
     // (the design's slot `walls`, from v2).
     palettes: [
       { name: { ar: 'عنابي داكن', en: 'Deep Burgundy', ckb: 'شەرابیی تۆخ', bdn: 'شەرابیێ تاری' }, colors: { walls: '#6e2a35' } },
-      { name: { ar: 'أخضر مريمية هادئ', en: 'Muted Sage Green', ckb: 'سەوزی کاڵی مێرامی', bdn: 'کەسکێ کاڵێ مێرامی' }, colors: { walls: '#9aab8f' } },
+      { name: { ar: 'أخضر زيتوني', en: 'Olive Green', ckb: 'سەوزی زەیتوونی', bdn: 'کەسکێ زەیتوونی' }, colors: { walls: '#6f7a45' } },
       { name: { ar: 'أزرق مغبر', en: 'Dusty Blue', ckb: 'شینی تۆزاوی', bdn: 'شینێ تۆزاوی' }, colors: { walls: '#8ea3b5' } },
       { name: { ar: 'وردي ناعم', en: 'Soft Rose', ckb: 'پەمەیی نەرم', bdn: 'پەمبەیی نەرم' }, colors: { walls: '#d9b0aa' } },
       { name: { ar: 'رمادي بني دافئ', en: 'Warm Taupe', ckb: 'قاوەیی خۆڵەمێشیی گەرم', bdn: 'قاوەیی خۆلەمێشیێ گەرم' }, colors: { walls: '#a8977f' } },
+    ],
+    // Olive green instead of muted sage green (owner, 2026-11-14), where the first set was already added.
+    paletteChanges: [
+      {
+        from: { en: 'Muted Sage Green', colors: { walls: '#9aab8f' } },
+        to: { name: { ar: 'أخضر زيتوني', en: 'Olive Green', ckb: 'سەوزی زەیتوونی', bdn: 'کەسکێ زەیتوونی' }, colors: { walls: '#6f7a45' } },
+      },
     ],
   },
 ];
@@ -119,6 +128,15 @@ export async function applyOwnerSetups(db: DbOrTx, actor: Actor, setups = OWNER_
           await recordAudit(db, { ...auditActor(actor), action: 'palette.create', objectType: 'theme', objectId: theme.id, after: { name: p.name, colors: p.colors } });
         }
         done.push(`${s.themeKey}: ${s.palettes.length} colour sets`);
+      }
+    }
+    for (const ch of s.paletteChanges ?? []) {
+      const rows = await db.select().from(themePalettes).where(eq(themePalettes.themeId, theme.id));
+      const same = (a: Record<string, string>, b: Record<string, string>) => Object.keys(b).every((k) => a[k]?.toLowerCase() === b[k]!.toLowerCase());
+      for (const row of rows.filter((r) => r.name.en === ch.from.en && same(r.colors, ch.from.colors))) {
+        await db.update(themePalettes).set({ name: ch.to.name, colors: ch.to.colors }).where(eq(themePalettes.id, row.id));
+        await recordAudit(db, { ...auditActor(actor), action: 'palette.update', objectType: 'theme', objectId: theme.id, before: { name: row.name, colors: row.colors }, after: { name: ch.to.name, colors: ch.to.colors } });
+        done.push(`${s.themeKey}: colour set ${ch.from.en} → ${ch.to.name.en}`);
       }
     }
     if (!s.packages.length || !s.pricesFrom) continue;
