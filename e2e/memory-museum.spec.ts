@@ -106,7 +106,7 @@ test('v2: for friends the museum speaks of friends; a colour set changes the wal
     env: { ...process.env, DATABASE_URL: E2E_DATABASE_URL },
   }).toString();
   const sets = JSON.parse(out.trim().split('\n').at(-1)!) as { id: string; name: string }[];
-  expect(sets.map((x) => x.name)).toEqual(['Deep Burgundy', 'Muted Sage Green', 'Dusty Blue', 'Soft Rose', 'Warm Taupe']);
+  expect(sets.map((x) => x.name)).toEqual(['Deep Burgundy', 'Olive Green', 'Dusty Blue', 'Soft Rose', 'Warm Taupe']);
   await signInAsNewOwner(page);
   // The flat museum (no WebGL) shows the rooms' names as text.
   await page.addInitScript(() => {
@@ -155,6 +155,14 @@ test('colour choice: the customer picks the walls’ colour above the design, an
   await page.reload();
   await expect(page.locator('[data-template-colors]').getByRole('button', { name: 'Deep Burgundy' })).toHaveAttribute('aria-pressed', 'true');
   await page.screenshot({ path: testInfo.outputPath('colours-burgundy.png'), fullPage: true });
+  // Background music, or none (owner, 2026-11-14): two buttons; the choice is kept.
+  const music = page.locator('[data-template-music]');
+  await expect(music.getByRole('button', { name: 'With music' })).toHaveAttribute('aria-pressed', 'true');
+  await music.getByRole('button', { name: 'No music' }).click();
+  await expect(music.getByRole('button', { name: 'No music' })).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.locator('[data-template-music]').getByRole('button', { name: 'No music' })).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('[data-template-music]').screenshot({ path: testInfo.outputPath('music.png') });
 });
 
 test('a two-room package: the couple fills two rooms; guests see only the rooms with photos', async ({ page }, testInfo) => {

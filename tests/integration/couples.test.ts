@@ -442,10 +442,10 @@ describe('colour choice in a template design (the museum’s wall colour)', () =
         testManifest(key, 1, {
           sections: ['couples'],
           fields: [...FIELDS],
-          features: ['photos', 'color_choice'],
+          features: ['photos', 'color_choice', 'music'],
           editor: 'template',
           colors: { slots: [{ key: 'walls', label: { ar: 'لون الجدران', en: 'Wall colour' }, default: '#ece2cd' }] },
-          validStates: [{ features: ['photos', 'color_choice'], fields: [...FIELDS] }],
+          validStates: [{ features: ['photos', 'color_choice', 'music'], fields: [...FIELDS] }],
           photos: { max: 8 },
           print: undefined,
         }),
@@ -455,8 +455,8 @@ describe('colour choice in a template design (the museum’s wall colour)', () =
     );
     const [t] = await db().select().from(themes).where(eq(themes.key, key));
     const cover = await storeImage(db(), await sharp({ create: { width: 331, height: 431, channels: 3, background: '#123' } }).png().toBuffer(), { uploadedBy: null });
-    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: null }, base.actor);
-    const withColours = await createPackage(db(), t!.id, { name: { ar: 'ملون', en: 'Colours' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'color_choice'] }, base.actor);
+    await updateThemeSettings(db(), t!.id, { name: t!.name, sectionId: t!.sectionId, coverAssetId: cover.id, musicTrackId: base.song.id }, base.actor);
+    const withColours = await createPackage(db(), t!.id, { name: { ar: 'ملون', en: 'Colours' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'color_choice', 'music'] }, base.actor);
     const plain = await createPackage(db(), t!.id, { name: { ar: 'عادي', en: 'Plain' }, priceIqd: 20000, fieldKeys: [...FIELDS], featureKeys: ['photos'] }, base.actor);
     await transitionTheme(db(), t!.id, 'READY_FOR_REVIEW', base.actor);
     await transitionTheme(db(), t!.id, 'ACTIVE', base.actor);
@@ -486,5 +486,15 @@ describe('colour choice in a template design (the museum’s wall colour)', () =
     await setPaletteStatus(db(), t!.id, burgundy, 'ARCHIVED', base.actor);
     await expect(setTemplateText(db(), inv, 'palette', burgundy)).rejects.toMatchObject({ code: 'invalidChoice' });
     await expect(setTemplateText(db(), await make(plain.id), 'palette', '')).rejects.toMatchObject({ code: 'unknownKey' });
+
+    // Background music: the customer may choose none, whatever the package (owner, 2026-11-14).
+    expect((await invitationRenderData(db(), await reload(inv.id), 'preview')).props.music).not.toBeNull();
+    expect(await setTemplateText(db(), inv, 'music', 'off')).toBe('off');
+    expect((await reload(inv.id)).musicOff).toBe(true);
+    expect((await invitationRenderData(db(), await reload(inv.id), 'preview')).props.music).toBeNull();
+    expect(await setTemplateText(db(), inv, 'music', 'on')).toBe('on');
+    expect((await invitationRenderData(db(), await reload(inv.id), 'preview')).props.music).not.toBeNull();
+    await expect(setTemplateText(db(), inv, 'music', 'loud')).rejects.toMatchObject({ code: 'invalidChoice' });
+    await expect(setTemplateText(db(), await make(plain.id), 'music', 'off')).rejects.toMatchObject({ code: 'unknownKey' });
   });
 });

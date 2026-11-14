@@ -356,13 +356,24 @@ export class GalleryEngine {
       const c = b.getCenter(new THREE.Vector3());
       hung.push({ x: c.x, z: c.z, half: Math.max(b.max.x - b.min.x, b.max.z - b.min.z) / 2 + 0.6 });
     }
-    // The customer's wall colour: the model's walls, and its carved trim a little lighter.
+    // Parts of the model that are wall, though made of another material (e.g. the panels over the doorways): they take
+    // the wall's material, so its colour and texture.
+    if (spec.asWalls?.length && wallMaterial) {
+      const prefixes = spec.asWalls.map((a) => ({ mesh: THREE.PropertyBinding.sanitizeNodeName(a.mesh), material: a.material }));
+      root.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        const named = (prefix: string) => m.name.startsWith(prefix) || (m.parent?.name ?? '').startsWith(prefix);
+        if (prefixes.some((p) => named(p.mesh) && (m.material as THREE.Material).name === p.material)) m.material = wallMaterial;
+      });
+    }
+    // The customer's wall colour: the model's walls, and its carved trim in a warmer, gilded tone of it.
     if (this.o.tint && spec.tint) {
       const want = new Set([...spec.tint.walls, ...(spec.tint.trim ?? [])]);
       root.traverse((o) => {
         const m = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
         if (!m || !want.has(m.name) || m.userData.tinted) return;
-        m.color.set(spec.tint!.trim?.includes(m.name) ? mix(this.o.tint!, '#ffffff', 0.2) : this.o.tint!);
+        m.color.set(spec.tint!.trim?.includes(m.name) ? mix(this.o.tint!, '#d2ad66', 0.3) : this.o.tint!);
         m.userData.tinted = true;
       });
     }

@@ -39,7 +39,8 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       fieldKeys: inv.fieldKeys,
       features: inv.featureKeys,
       values: inv.fieldValues,
-      musicSrc: own?.src ?? (music ? publicMediaUrl(music.key) : null),
+      // The customer may choose no music at all (their package's music turned off in the editor).
+      musicSrc: inv.musicOff ? null : (own?.src ?? (music ? publicMediaUrl(music.key) : null)),
       border: await themeBorder(db, inv.themeId),
       guestbook: mode === 'live' && inv.publicGuestbook && inv.featureKeys.includes('congratulations') ? await publicGuestbook(db, inv.id) : null,
       attendance: mode === 'live' && inv.publicAttendance && inv.featureKeys.includes('rsvp') ? await attendanceCounts(db, inv.id) : null,

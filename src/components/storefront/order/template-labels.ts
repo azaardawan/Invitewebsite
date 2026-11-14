@@ -44,6 +44,9 @@ export function templateLabels(t: StoreT, published = false): TemplateEditorLabe
     missing: t.raw('template.missing') as string,
     colors: k('colors'),
     colorsOriginal: k('colorsOriginal'),
+    music: k('music'),
+    musicOn: k('musicOn'),
+    musicOff: k('musicOff'),
     errors: {
       generic: t('photos.errors.generic'),
       tooLarge: k('errors.tooLarge'),

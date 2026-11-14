@@ -28,9 +28,16 @@ export function mix(a: string, b: string, t: number): string {
   return `#${ca.lerp(cb, t).getHexString()}`;
 }
 
-/** The decoration's palette with the walls in another colour (a customer's colour set): the plaster and its shadows. */
+/** The decoration's palette with the walls in another colour (a customer's colour set): the plaster and its shadows,
+ * and the deep field of the frieze and the coffers in a deep tone of that colour. */
 export function tinted(p: DecorPalette, wall: string): DecorPalette {
-  return { ...p, ivory: wall, shade: mix(wall, '#000000', 0.24) };
+  return { ...p, ivory: wall, shade: mix(wall, '#000000', 0.24), field: mix(wall, '#0b0d10', 0.55) };
+}
+
+/** The ceilings' palette for a wall colour: their mouldings a pale tone of it, their coffers its deep tone. */
+export function ceilingTinted(p: DecorPalette, wall: string): DecorPalette {
+  const ivory = mix(wall, '#ffffff', 0.3);
+  return { ...p, ivory, shade: mix(ivory, '#000000', 0.22), field: mix(wall, '#0b0d10', 0.55) };
 }
 
 function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
@@ -348,6 +355,51 @@ export function panelTexture(p: DecorPalette, w: number, h: number): HTMLCanvasE
   return c;
 }
 
+/** The ornament over a doorway (transparent outside): a laurel wreath with a rosette, and gilt garlands with ribbons. */
+export function overdoorTexture(p: DecorPalette): HTMLCanvasElement {
+  const W = 1024;
+  const H = 272;
+  const [c, g] = canvas(W, H);
+  const cx = W / 2;
+  const cy = H / 2;
+  // Garlands: a swag of leaves each side, hung from ribbons.
+  for (const s of [-1, 1]) {
+    const x0 = cx + s * 120;
+    const x1 = cx + s * 470;
+    for (let t = 0; t <= 1; t += 0.035) {
+      const x = x0 + (x1 - x0) * t;
+      const y = 70 + Math.sin(t * Math.PI) * 120;
+      const a = Math.atan2(Math.cos(t * Math.PI) * 120 * Math.PI, (x1 - x0)) + (s < 0 ? Math.PI : 0);
+      leaf(g, x, y, 34, a + 0.6, Math.round(t * 30) % 2 ? p.gold : p.goldDeep);
+      leaf(g, x, y, 34, a - 0.6 + Math.PI, Math.round(t * 30) % 2 ? p.goldDeep : p.gold);
+    }
+    // Ribbon ends where the swag hangs.
+    for (const x of [x0, x1]) {
+      g.strokeStyle = p.gold;
+      g.lineWidth = 6;
+      g.beginPath();
+      g.moveTo(x, 60);
+      g.quadraticCurveTo(x + s * 18, 110, x - s * 6, 160);
+      g.stroke();
+      rosette(g, x, 58, 18, p, 8);
+    }
+  }
+  // The wreath in the middle.
+  g.fillStyle = p.ivory;
+  g.beginPath();
+  g.arc(cx, cy, 70, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = p.gold;
+  g.lineWidth = 5;
+  g.stroke();
+  rosette(g, cx, cy, 44, p, 12);
+  for (let i = 0; i < 26; i++) {
+    const a = (i / 26) * Math.PI * 2;
+    leaf(g, cx + Math.cos(a) * 92, cy + Math.sin(a) * 92, 32, a + Math.PI / 2 + (i % 2 ? 0.5 : -0.5), i % 2 ? p.gold : p.goldDeep);
+  }
+  return c;
+}
+
 /** A pair of panelled doors in their frame (the closed main entrance). */
 export function doorsTexture(p: DecorPalette): HTMLCanvasElement {
   const W = 768;
@@ -474,6 +526,10 @@ export type DecorSpec = {
   doors?: readonly { x: number; z: number; normal: readonly [number, number]; width: number; height: number }[];
   /** Close the model's doorways around their openings: the wall above the door, a hollow wall's insides, the floor. */
   doorways?: boolean;
+  /** A gilt ornament over every doorway, on the room's side (the parent's side has the room's sign): a wreath and garlands. */
+  overdoors?: boolean;
+  /** Parts of the model made of another material that are wall all the same (mesh-name prefix and material). */
+  asWalls?: readonly { mesh: string; material: string }[];
   /** The model's floor material (for the doorways' floors). */
   floorMaterial?: string;
   /** The model's own lamps under the new ceilings hang at this height (too close to a ceiling, they glare on it). */
@@ -587,7 +643,7 @@ export function buildDecor(input: DecorInput): DecorOutput {
   if (input.floorMaterial) add(merged(floors), input.floorMaterial);
 
   // --- Ceilings.
-  const cofferMap = keep(decorTexture(cofferTexture(p), renderer, true));
+  const cofferMap = keep(decorTexture(cofferTexture(input.wallColor ? ceilingTinted(p, input.wallColor) : p), renderer, true));
   const cofferMat = keep(decorMaterial(cofferMap, { glow: 0.28 }));
   add(merged(spec.ceilings.map((r) => ceilingQuad(r, r.y, 1.8))), cofferMat);
 
@@ -643,6 +699,17 @@ export function buildDecor(input: DecorInput): DecorOutput {
   for (const [key, parts] of panels) {
     const [pw, ph] = key.split('x').map(Number);
     add(merged(parts), keep(decorMaterial(keep(decorTexture(panelTexture(wp, pw!, ph!), renderer)))));
+  }
+
+  // --- Over the doorways, on the room's side: a wreath and garlands, in front of the model's panel over the door.
+  if (spec.overdoors) {
+    const parts: THREE.BufferGeometry[] = [];
+    for (const d of input.doors) {
+      const normal = new THREE.Vector3(d.axis[0], 0, d.axis[1]);
+      const at = new THREE.Vector3(d.x, d.height + 1.45, d.z).addScaledVector(normal, d.face + 0.12);
+      parts.push(quad(at, normal, d.width + 1.8, 1.45));
+    }
+    add(merged(parts), keep(decorMaterial(keep(decorTexture(overdoorTexture(wp), renderer)), { transparent: true, glow: 0.25 })));
   }
 
   // --- Doors drawn on walls.

@@ -113,6 +113,10 @@ const DECOR: NonNullable<GalleryPlan['decor']> = {
   ],
   doors: [{ x: 0, z: 15.29, normal: [0, -1], width: 5.3, height: 5.6 }],
   doorways: true,
+  // Over every doorway, both sides: a wreath and garlands (framing the room's sign on the side it hangs).
+  overdoors: true,
+  // The panels over the doorways are a lighter stone in the model: they are wall (its colour and texture).
+  asWalls: [{ mesh: 'ARCHITECTURE', material: 'Carved warm limestone' }],
   floorMaterial: 'Smoked oak parquet',
   // The model lights the first room of each wing; the rooms behind get a lamp of the same strength.
   lampHeight: 5.8,
