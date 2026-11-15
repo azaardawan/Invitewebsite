@@ -49,6 +49,8 @@ export const STANDARD_FIELDS = {
   /** Optional: one box per person; when empty, the theme writes the first letters of the two names (first name first). */
   seal_initials: { type: 'initials', maxLength: INITIALS_MAX, optional: true, label: { ar: 'الأحرف الأولى على الختم', en: 'Initials on the seal', ckb: 'پیتە سەرەتاییەکان لەسەر مۆر', bdn: 'تیپێن ئێکێ ل سەر مۆرێ' } },
   invitation_message: { type: 'longtext', maxLength: 300, label: { ar: 'نص الدعوة', en: 'Invitation message', ckb: 'دەقی بانگهێشتنامە', bdn: 'نڤیسینا داخوازنامێ' } },
+  // Couples and friends: the customer's own letter (paragraphs kept); written in place on template designs.
+  letter: { type: 'longtext', maxLength: 1500, label: { ar: 'الرسالة', en: 'The letter', ckb: 'نامەکە', bdn: 'نامە' } },
   // Newborn baby.
   baby_name: { type: 'text', maxLength: 40, label: { ar: 'اسم المولود', en: "Baby's name", ckb: 'ناوی منداڵ', bdn: 'ناڤێ زاروکی' } },
   baby_gender: { type: 'choice', options: ['boy', 'girl'], label: { ar: 'ولد أم بنت', en: 'Boy or girl', ckb: 'کوڕ یان کچ', bdn: 'کوڕ یان کچ' } },

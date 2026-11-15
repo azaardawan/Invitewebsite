@@ -1,0 +1,2715 @@
+/*
+ * Erbil · Hewlêr: the designer's stylesheet (site/style.css), scoped to the design. The opening is one screen: the
+ * Open tap plays the journey (motion.ts writes each layer's transform and opacity), then the page scrolls on.
+ */
+.page {
+  background: #f4eddc;
+}
+#frame .root {
+  --cream: #f4eddc;
+  --paper: #f8f1e1;
+  --ink: #393b2d;
+  --teal: #2b575b;
+  --olive: #4a583e;
+  --gold: #b78d4f;
+  --red: #994d3a;
+  --line: #bea67570;
+}
+#frame .root,
+#frame .root * {
+  box-sizing: border-box;
+}
+#frame .root {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'EH Serif', Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+}
+#frame .root h1,
+#frame .root h2,
+#frame .root h3,
+#frame .root p {
+  margin: 0;
+}
+#frame .root h1,
+#frame .root h2,
+#frame .root h3 {
+  font-weight: 400;
+}
+#frame .root h2 {
+  font-size: clamp(43px, 5.6vw, 80px);
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+#frame .root h2 em {
+  color: var(--teal);
+}
+#frame .root button,
+#frame .root input,
+#frame .root textarea {
+  font: inherit;
+}
+#frame .root button {
+  cursor: pointer;
+  border: 0;
+  color: inherit;
+}
+#frame .root button,
+#frame .root a {
+  -webkit-tap-highlight-color: transparent;
+}
+#frame .root a {
+  color: inherit;
+  text-decoration: none;
+}
+#frame .root img {
+  display: block;
+  max-width: 100%;
+}
+#frame .root button:focus-visible,
+#frame .root a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 5px;
+}
+#frame .root [hidden] {
+  display: none !important;
+}
+#frame .root .sun {
+  width: 30px;
+  height: 30px;
+  display: block;
+  color: #f2d893;
+}
+#frame .root .sun svg {
+  width: 100%;
+  height: 100%;
+}
+#frame .root .eyebrow {
+  font:
+    10px/1.7 Arial,
+    sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+#frame .root .opening {
+  height: 100svh;
+  position: relative;
+}
+#frame .root .stage {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--cream);
+}
+#frame .root .sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#377f9e 0%, #76b0bd 58%, #d2d8b3 100%);
+  z-index: 0;
+}
+#frame .root .warmth {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 35%, #fff7dc, var(--cream) 72%);
+  z-index: 3;
+  opacity: 0;
+}
+#frame .root .cloud {
+  position: absolute;
+  z-index: 4;
+  will-change: transform;
+}
+#frame .root .cloud img {
+  width: 100%;
+  animation: cloud-drift 20s ease-in-out infinite alternate;
+}
+#frame .root .cloud-one {
+  top: -2%;
+  left: -20%;
+  width: 49%;
+  opacity: 0.85;
+}
+#frame .root .cloud-two {
+  top: 4%;
+  right: -19%;
+  width: 45%;
+  opacity: 0.7;
+}
+#frame .root .cloud-two img {
+  animation-delay: -10s;
+  transform: scaleX(-1);
+}
+@keyframes cloud-drift {
+  from {
+    translate: -10px 0;
+  }
+  to {
+    translate: 16px 0;
+  }
+}
+#frame .root .distant-citadel {
+  position: absolute;
+  z-index: 2;
+  bottom: -2%;
+  left: 5%;
+  width: 90%;
+  opacity: 0.6;
+  will-change: transform;
+}
+#frame .root .distant-citadel img {
+  width: 100%;
+}
+#frame .root .opening-names {
+  position: absolute;
+  z-index: 42;
+  left: 20%;
+  right: 20%;
+  top: 16%;
+  text-align: center;
+  color: #fff7e2;
+  will-change: transform, opacity;
+  text-shadow: 0 2px 16px #244d5720;
+}
+#frame .root .opening-names .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+}
+#frame .root .opening-names .eyebrow span {
+  display: block;
+  font:
+    22px 'EH Amiri',
+    serif;
+  letter-spacing: 0;
+  margin: 6px 0 16px;
+}
+#frame .root .opening-names h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  font-size: clamp(68px, 9.5vw, 140px);
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+}
+#frame .root .opening-names h1 i {
+  font-size: 0.4em;
+  color: #f5dfaa;
+  font-style: italic;
+}
+#frame .root .occasion {
+  font:
+    10px Arial,
+    sans-serif;
+  letter-spacing: 0.33em;
+  text-transform: uppercase;
+  margin-top: 26px;
+}
+#frame .root .gate-layer {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  width: max(116vw, 900px);
+  aspect-ratio: 3/2;
+  bottom: -46vh;
+  transform-origin: 50% 72%;
+  translate: -50% 0;
+  will-change: transform, opacity;
+}
+#frame .root .gate-layer > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#frame .root .flag-pole {
+  position: absolute;
+  top: 8%;
+  left: 63%;
+  height: 120px;
+  width: 85px;
+  z-index: 4;
+}
+#frame .root .flag-pole > span {
+  height: 100%;
+  width: 2px;
+  background: #6b5741;
+  display: block;
+}
+#frame .root .kurdish-flag {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 64px;
+  height: 43px;
+  transform-origin: left center;
+  filter: drop-shadow(1px 1px 2px #0002);
+  animation: flag 4s ease-in-out infinite;
+  clip-path: polygon(0 0, 33% 3%, 66% 0, 100% 4%, 100% 96%, 66% 100%, 33% 97%, 0 100%);
+}
+@keyframes flag {
+  0%,
+  100% {
+    transform: perspective(160px) rotateY(-18deg) skewY(-3deg);
+  }
+  50% {
+    transform: perspective(160px) rotateY(18deg) skewY(3deg);
+    clip-path: polygon(0 0, 33% 0, 66% 4%, 100% 0, 100% 100%, 66% 96%, 33% 100%, 0 100%);
+  }
+}
+#frame .root .city-world {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0;
+  will-change: opacity;
+}
+#frame .root .city-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 85%, #e4cf9d55, transparent 70%);
+}
+#frame .root .city-square {
+  position: absolute;
+  left: -25%;
+  bottom: 0;
+  width: 85%;
+  height: 90%;
+  will-change: transform;
+  z-index: 2;
+}
+#frame .root .city-square > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+}
+#frame .root .city-minaret {
+  position: absolute;
+  right: -10%;
+  bottom: 3%;
+  width: 47%;
+  height: 90%;
+  z-index: 3;
+  will-change: transform;
+}
+#frame .root .city-minaret > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#frame .root .city-caption {
+  position: absolute;
+  z-index: 4;
+  top: 14%;
+  left: 40%;
+  right: 27%;
+  text-align: center;
+  will-change: transform, opacity;
+}
+#frame .root .city-caption > span {
+  font:
+    8px/1.8 Arial,
+    sans-serif;
+  letter-spacing: 0.16em;
+  color: #654b2f;
+}
+#frame .root .city-caption > p {
+  font-size: clamp(40px, 5vw, 80px);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  color: #4b4c35;
+  margin-top: 22px;
+}
+#frame .root .city-caption em {
+  color: var(--teal);
+}
+#frame .root .landmark-note {
+  position: absolute;
+  font:
+    8px Arial,
+    sans-serif;
+  letter-spacing: 0.15em;
+  color: #5d5840;
+  bottom: 5%;
+  left: 55%;
+}
+#frame .root .city-minaret .landmark-note {
+  left: 40%;
+  bottom: 2%;
+}
+#frame .root .water-shimmer {
+  position: absolute;
+  bottom: 9%;
+  left: 37%;
+  width: 50%;
+  height: 10%;
+  transform: rotate(-5deg);
+}
+#frame .root .water-shimmer i {
+  position: absolute;
+  left: 15%;
+  top: 40%;
+  height: 1px;
+  width: 25%;
+  background: #fffde2;
+  animation: water 3.4s ease-in-out infinite;
+}
+#frame .root .water-shimmer i:nth-child(2) {
+  left: 60%;
+  top: 65%;
+  animation-delay: -1s;
+}
+#frame .root .water-shimmer i:nth-child(3) {
+  left: 0;
+  top: 80%;
+  animation-delay: -2s;
+}
+@keyframes water {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translateX(-8px) scaleX(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(8px) scaleX(1.2);
+  }
+}
+#frame .root .paving {
+  position: absolute;
+  bottom: -8%;
+  left: -10%;
+  right: -10%;
+  height: 28%;
+  z-index: 0;
+  background: radial-gradient(ellipse, #d7c49e60, transparent 66%);
+}
+#frame .root .map-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+#frame .root .map-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.17;
+}
+#frame .root .reveal-card:before {
+  content: '';
+  position: absolute;
+  inset: 8% 8% 3%;
+  background: #f8f1e1;
+  clip-path: polygon(50% 0, 74% 14%, 93% 32%, 100% 50%, 100% 100%, 0 100%, 0 50%, 7% 32%, 26% 14%);
+  z-index: -1;
+}
+#frame .root .reveal-card {
+  position: absolute;
+  z-index: 10;
+  height: min(88svh, 850px);
+  aspect-ratio: 2/3;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  opacity: 0;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 10px 30px #64533118);
+}
+#frame .root .painted-frame {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#frame .root .card-copy {
+  position: absolute;
+  inset: 27% 17% 13%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+#frame .root .card-copy .eyebrow {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+#frame .root .card-copy h2 {
+  font-size: clamp(35px, 4.8vw, 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 0.95;
+  color: var(--teal);
+  letter-spacing: -0.035em;
+}
+#frame .root .card-copy h2 i {
+  font-size: 0.45em;
+  color: var(--red);
+  line-height: 1.35;
+}
+#frame .root .card-message {
+  font-size: 17px;
+  line-height: 1.5;
+  max-width: 290px;
+}
+#frame .root .small-rosette {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+#frame .root .small-rosette svg {
+  width: 100%;
+  height: 100%;
+}
+#frame .root .card-date {
+  font-size: 22px;
+  color: var(--teal);
+}
+#frame .root .card-city {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+#frame .root .foreground {
+  position: absolute;
+  z-index: 34;
+  width: 57vw;
+  max-width: 950px;
+  bottom: -14%;
+  will-change: transform, opacity;
+  pointer-events: none;
+  opacity: 0;
+}
+#frame .root .foreground img {
+  width: 100%;
+}
+#frame .root .foliage-left {
+  left: -6%;
+  transform-origin: 10% 90%;
+}
+#frame .root .foliage-right {
+  right: -6%;
+  transform-origin: 90% 90%;
+}
+#frame .root .foliage-right .leaf-sway {
+  transform-origin: 85% 85%;
+}
+#frame .root .foliage-right img {
+  transform: scaleX(-1);
+}
+#frame .root .leaf-sway {
+  transform-origin: 15% 85%;
+  animation: leaf-sway 5.5s ease-in-out infinite;
+}
+#frame .root .foliage-right .leaf-sway {
+  animation-delay: -2.3s;
+}
+@keyframes leaf-sway {
+  0%,
+  100% {
+    rotate: -1.3deg;
+  }
+  50% {
+    rotate: 1.5deg;
+  }
+}
+#frame .root .opening-cue {
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 45;
+  color: #fff7de;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  font:
+    8px Arial,
+    sans-serif;
+  letter-spacing: 0.22em;
+  text-shadow: 0 1px 6px #1c3b40;
+}
+#frame .root .opening-cue i {
+  display: block;
+  width: 1px;
+  height: 32px;
+  background: #fff9;
+  position: relative;
+  overflow: hidden;
+}
+#frame .root .opening-cue i:after {
+  content: '';
+  position: absolute;
+  inset: -30px 0 auto;
+  height: 30px;
+  background: white;
+  animation: cue 2s ease-in-out infinite;
+}
+@keyframes cue {
+  to {
+    translate: 0 62px;
+  }
+}
+#frame .root .content-section {
+  position: relative;
+  padding: 100px max(6vw, 24px);
+  overflow: hidden;
+}
+#frame .root .welcome {
+  text-align: center;
+  padding-top: 65px;
+  padding-bottom: 90px;
+  max-width: 1300px;
+  margin: auto;
+}
+#frame .root .kilim-divider {
+  width: min(380px, 75vw);
+  height: 40px;
+  margin: 0 auto 50px;
+  color: var(--gold);
+}
+#frame .root .kilim-divider svg {
+  width: 100%;
+  height: 100%;
+}
+#frame .root .welcome > .eyebrow {
+  color: #76603c;
+  font-size: 9px;
+}
+#frame .root .welcome h2 {
+  font-size: clamp(36px, 4.4vw, 62px);
+  margin: 25px 0;
+}
+#frame .root .welcome-message {
+  max-width: 560px;
+  margin: auto;
+  font-size: 21px;
+  line-height: 1.7;
+}
+#frame .root .welcome-signature {
+  font-size: 32px;
+  font-style: italic;
+  color: var(--red);
+  margin-top: 28px;
+}
+#frame .root .countdown-section {
+  position: relative;
+  text-align: center;
+  background: var(--teal);
+  color: #fff1d2;
+  padding: 64px 24px;
+  isolation: isolate;
+}
+#frame .root .count-border {
+  position: absolute;
+  inset: 13px;
+  border: 1px solid #dcc48c4f;
+  pointer-events: none;
+}
+#frame .root .count-border:after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #dcc48c22;
+}
+#frame .root .countdown-section .eyebrow {
+  color: #dec693;
+  font-size: 8px;
+}
+#frame .root .countdown-section h2 {
+  font-size: 46px;
+  margin: 18px 0 32px;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+#frame .root .countdown {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+}
+#frame .root .countdown > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 90px;
+}
+#frame .root .countdown b {
+  font-weight: 400;
+  font-size: 66px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+#frame .root .countdown span {
+  font:
+    8px Arial,
+    sans-serif;
+  letter-spacing: 0.2em;
+  margin-top: 12px;
+  color: #dcc490;
+}
+#frame .root .countdown i {
+  font-size: 40px;
+  color: #a6b2a0;
+  font-style: normal;
+  padding-top: 6px;
+}
+#frame .root .count-date {
+  font-size: 15px;
+  margin-top: 28px;
+  color: #dfd1ad;
+}
+#frame .root .details-section {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 6%;
+  align-items: center;
+  max-width: 1450px;
+  margin: auto;
+  isolation: isolate;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+#frame .root .details-map {
+  position: absolute;
+  z-index: -1;
+  right: -15%;
+  top: 0;
+  width: 80%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.1;
+  pointer-events: none;
+}
+#frame .root .details-art {
+  position: relative;
+  align-self: center;
+  margin-left: -12%;
+  width: 115%;
+}
+#frame .root .details-art img {
+  width: 100%;
+}
+#frame .root .details-art > span {
+  display: block;
+  font:
+    8px Arial,
+    sans-serif;
+  letter-spacing: 0.15em;
+  color: #756645;
+  text-align: center;
+  margin-top: 20px;
+}
+#frame .root .details-copy {
+  max-width: 470px;
+}
+#frame .root .details-copy .eyebrow {
+  font-size: 9px;
+  color: #897144;
+}
+#frame .root .details-copy h2 {
+  margin: 22px 0 26px;
+}
+#frame .root .detail-rule {
+  height: 1px;
+  width: 100%;
+  background: var(--line);
+  margin-bottom: 26px;
+}
+#frame .root .event-date {
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+#frame .root .event-time {
+  font-size: 18px;
+  margin: 16px 0 28px;
+}
+#frame .root .muted {
+  font-size: 13px;
+  color: #756a52;
+}
+#frame .root .details-copy h3 {
+  font-size: 25px;
+  line-height: 1.3;
+}
+#frame .root .address {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+#frame .root .detail-actions {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+#frame .root .detail-actions button,
+#frame .root .detail-actions a {
+  background: none;
+  border-bottom: 1px solid #b19b70;
+  font:
+    11px Arial,
+    sans-serif;
+  letter-spacing: 0.02em;
+  padding: 0 0 7px;
+}
+#frame .root .photo-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10%;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  padding-top: 20px;
+}
+#frame .root .photo-arch {
+  aspect-ratio: 4/5;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 50% 50% 0 0;
+}
+#frame .root .photo-arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+#frame .root .photo-section h2 {
+  margin: 20px 0;
+}
+#frame .root .photo-section [data-names] {
+  font-size: 27px;
+  font-style: italic;
+  color: var(--red);
+}
+#frame .root .reply-section {
+  padding-top: 25px;
+  padding-bottom: 90px;
+  background: linear-gradient(transparent, #e8dfc75e);
+  text-align: center;
+}
+#frame .root .reply-section .kilim-divider {
+  margin-bottom: 35px;
+}
+#frame .root .reply-heading .eyebrow {
+  font-size: 9px;
+  color: #7d6842;
+}
+#frame .root .reply-heading h2 {
+  margin: 23px 0 35px;
+}
+#frame .root .reply-heading h2 br {
+  display: none;
+}
+#frame .root .reply-heading h2 em {
+  margin-left: 8px;
+}
+#frame .root label {
+  font:
+    10px/1.7 Arial,
+    sans-serif;
+  letter-spacing: 0.04em;
+  display: block;
+}
+#frame .root label > span {
+  font-size: 9px;
+  color: #7e7159;
+}
+#frame .root input,
+#frame .root textarea,
+#frame .root select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid #bda679;
+  background: #fffaf060;
+  border-radius: 0;
+  color: var(--ink);
+  padding: 12px 9px;
+  font:
+    17px 'EH Serif',
+    Georgia,
+    serif;
+  margin-top: 5px;
+}
+#frame .root input:focus,
+#frame .root textarea:focus {
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
+}
+#frame .root textarea {
+  resize: vertical;
+}
+#frame .root fieldset {
+  padding: 0;
+  border: 0;
+  margin: 27px 0;
+  display: flex;
+  gap: 10px;
+}
+#frame .root legend {
+  font:
+    10px Arial,
+    sans-serif;
+  letter-spacing: 0.04em;
+  padding: 0;
+  margin-bottom: 13px;
+}
+#frame .root .radio-label {
+  flex: 1;
+  position: relative;
+}
+#frame .root .radio-label input {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  margin: 0;
+  translate: 0 -50%;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--teal);
+}
+#frame .root .radio-label span {
+  display: block;
+  font:
+    12px Arial,
+    sans-serif;
+  padding: 15px 12px 15px 36px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: #f8f1e1;
+}
+#frame .root .radio-label:has(input:checked) span {
+  border-color: var(--teal);
+  background: #e3e7d9;
+}
+#frame .root .reply-row {
+  display: grid;
+  grid-template-columns: 1fr 2.2fr;
+  gap: 22px;
+}
+#frame .root .primary-button {
+  display: block;
+  width: 100%;
+  background: var(--teal);
+  color: #fff5db;
+  min-height: 49px;
+  padding: 15px 20px;
+  font:
+    11px Arial,
+    sans-serif;
+  letter-spacing: 0.06em;
+  margin-top: 28px;
+  transition: background 0.2s;
+}
+#frame .root .primary-button:hover {
+  background: #3f6664;
+}
+#frame .root .reply-help,
+#frame .root .reply-status {
+  font:
+    10px/1.7 Arial,
+    sans-serif;
+  color: #72664c;
+  text-align: center;
+  margin-top: 13px;
+}
+#frame .root .reply-status:empty {
+  display: none;
+}
+#frame .root .farewell {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 40px 24px 30px;
+  isolation: isolate;
+}
+#frame .root .tea-art {
+  width: 260px;
+  height: 190px;
+  object-fit: contain;
+  margin: 0 auto 24px;
+}
+#frame .root .farewell-map {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.1;
+}
+#frame .root .farewell-map img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#frame .root .farewell h2 {
+  font-size: clamp(42px, 5vw, 66px);
+  margin: 24px 0;
+}
+#frame .root .farewell .eyebrow {
+  font-size: 8px;
+  color: #7e6840;
+}
+#frame .root .farewell-names {
+  font-size: 28px;
+  color: var(--red);
+  font-style: italic;
+  margin: 22px 0 0;
+}
+#frame .root .farewell-kurdish {
+  font:
+    26px 'EH Amiri',
+    serif;
+  margin-top: 12px;
+}
+#frame .root .farewell .kilim-divider {
+  margin-top: 40px;
+  margin-bottom: 0;
+  width: min(650px, 90vw);
+}
+#frame .root .back-top {
+  background: none;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font:
+    9px Arial,
+    sans-serif;
+  color: #77674c;
+  margin-top: 25px;
+}
+#frame .root .steam {
+  position: absolute;
+  top: 33px;
+  left: 50%;
+  width: 50px;
+  height: 60px;
+  pointer-events: none;
+}
+#frame .root .steam i {
+  position: absolute;
+  width: 12px;
+  height: 45px;
+  border-left: 1px solid #9a815570;
+  border-radius: 50%;
+  left: 0;
+  animation: steam 4s ease-in-out infinite;
+}
+#frame .root .steam i:nth-child(2) {
+  left: 17px;
+  top: -15px;
+  animation-delay: -2s;
+}
+@keyframes steam {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  50% {
+    opacity: 0.5;
+    translate: 3px -6px;
+  }
+}
+#frame .root .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+#frame .root .form-row label {
+  min-width: 0;
+}
+#frame .root input[type='file'] {
+  font:
+    10px/1.6 Arial,
+    sans-serif;
+  padding: 11px 0;
+}
+@media (max-width: 900px) {
+  #frame .root .opening-names {
+    left: 10%;
+    right: 10%;
+    top: 19%;
+  }
+  #frame .root .opening-names h1 {
+    font-size: 95px;
+  }
+  #frame .root .gate-layer {
+    width: max(145vw, 1000px);
+    bottom: -34vh;
+  }
+  #frame .root .city-square {
+    width: 100%;
+    left: -38%;
+    height: 78%;
+    bottom: 6%;
+  }
+  #frame .root .city-minaret {
+    width: 56%;
+    right: -19%;
+    height: 85%;
+    bottom: 8%;
+  }
+  #frame .root .city-caption {
+    left: 37%;
+    right: 17%;
+    top: 16%;
+  }
+  #frame .root .city-caption > p {
+    font-size: 58px;
+  }
+  #frame .root .reveal-card {
+    height: min(82svh, 780px);
+  }
+  #frame .root .card-copy {
+    gap: 13px;
+  }
+  #frame .root .card-copy h2 {
+    font-size: 48px;
+  }
+  #frame .root .card-message {
+    font-size: 16px;
+  }
+  #frame .root .foreground {
+    width: 75vw;
+    bottom: -3%;
+  }
+  #frame .root .foliage-left {
+    left: -15%;
+  }
+  #frame .root .foliage-right {
+    right: -15%;
+  }
+  #frame .root .details-section {
+    gap: 3%;
+  }
+  #frame .root .details-copy h2 {
+    font-size: 57px;
+  }
+  #frame .root .event-date {
+    font-size: 28px;
+  }
+  #frame .root .details-copy h3 {
+    font-size: 23px;
+  }
+}
+@media (max-width: 600px) {
+  #frame .root .sun {
+    width: 23px;
+    height: 23px;
+  }
+  #frame .root .stage {
+    min-height: 580px;
+  }
+  #frame .root .opening-names {
+    top: 15%;
+    left: 15%;
+    right: 15%;
+  }
+  #frame .root .opening-names .eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.22em;
+  }
+  #frame .root .opening-names .eyebrow span {
+    font-size: 20px;
+    margin: 6px 0 20px;
+  }
+  #frame .root .opening-names h1 {
+    flex-direction: column;
+    gap: 5px;
+    font-size: clamp(62px, 20vw, 92px);
+    line-height: 0.96;
+  }
+  #frame .root .opening-names h1 i {
+    font-size: 35px;
+    line-height: 1.1;
+  }
+  #frame .root .occasion {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    margin-top: 22px;
+  }
+  #frame .root .cloud-one {
+    top: 0;
+    left: -55%;
+    width: 100%;
+  }
+  #frame .root .cloud-two {
+    top: 20%;
+    right: -60%;
+    width: 100%;
+  }
+  #frame .root .distant-citadel {
+    width: 170%;
+    left: -35%;
+    bottom: 13%;
+    opacity: 0.45;
+  }
+  #frame .root .gate-layer {
+    width: max(190vw, 790px);
+    bottom: -13vh;
+    aspect-ratio: 3/2;
+  }
+  #frame .root .flag-pole {
+    height: 70px;
+    top: 8%;
+    left: 62%;
+    transform: scale(0.6);
+    transform-origin: left bottom;
+  }
+  #frame .root .city-square {
+    width: 138%;
+    height: 72%;
+    left: -58%;
+    bottom: 10%;
+  }
+  #frame .root .city-minaret {
+    height: 70%;
+    width: 80%;
+    right: -9%;
+    bottom: 12%;
+  }
+  #frame .root .city-caption {
+    top: 12%;
+    left: 15%;
+    right: 15%;
+  }
+  #frame .root .city-caption > span {
+    font-size: 7px;
+  }
+  #frame .root .city-caption > p {
+    font-size: 39px;
+    margin-top: 15px;
+  }
+  #frame .root .city-caption > p br {
+    display: none;
+  }
+  #frame .root .city-caption > p em {
+    display: block;
+  }
+  #frame .root .landmark-note {
+    font-size: 6px;
+    bottom: 0;
+    left: 65%;
+  }
+  #frame .root .city-minaret .landmark-note {
+    left: 25%;
+    bottom: 12%;
+  }
+  #frame .root .reveal-card {
+    height: auto;
+    width: 96%;
+    max-width: 410px;
+    aspect-ratio: 2/3;
+    top: 49%;
+  }
+  #frame .root .card-copy {
+    inset: 26% 19% 14%;
+    gap: 11px;
+  }
+  #frame .root .card-copy .eyebrow {
+    font-size: 6px;
+    letter-spacing: 0.08em;
+  }
+  #frame .root .card-copy h2 {
+    font-size: 43px;
+    line-height: 0.94;
+  }
+  #frame .root .card-message {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  #frame .root .small-rosette {
+    width: 23px;
+    height: 23px;
+  }
+  #frame .root .card-date {
+    font-size: 19px;
+  }
+  #frame .root .card-city {
+    font-size: 10px;
+  }
+  #frame .root .foreground {
+    width: 110vw;
+    bottom: 9%;
+    max-width: none;
+  }
+  #frame .root .foliage-left {
+    left: -35%;
+  }
+  #frame .root .foliage-right {
+    right: -35%;
+  }
+  #frame .root .opening-cue {
+    bottom: 9%;
+    font-size: 7px;
+  }
+  #frame .root .welcome {
+    padding: 50px 28px 65px;
+  }
+  #frame .root .kilim-divider {
+    margin-bottom: 35px;
+    height: 34px;
+  }
+  #frame .root .welcome > .eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.13em;
+  }
+  #frame .root .welcome h2 {
+    font-size: 36px;
+    line-height: 1.13;
+    margin: 23px 0;
+  }
+  #frame .root .welcome-message {
+    font-size: 18px;
+    line-height: 1.65;
+  }
+  #frame .root .welcome-signature {
+    font-size: 27px;
+  }
+  #frame .root .countdown-section {
+    padding: 52px 24px;
+  }
+  #frame .root .countdown-section h2 {
+    font-size: 37px;
+    margin: 17px 0 27px;
+  }
+  #frame .root .countdown {
+    gap: 12px;
+  }
+  #frame .root .countdown > div {
+    min-width: 44px;
+  }
+  #frame .root .countdown b {
+    font-size: 38px;
+  }
+  #frame .root .countdown span {
+    font-size: 6px;
+    letter-spacing: 0.1em;
+    margin-top: 9px;
+  }
+  #frame .root .countdown i {
+    font-size: 25px;
+    padding-top: 3px;
+  }
+  #frame .root .count-date {
+    font-size: 14px;
+    margin-top: 25px;
+  }
+  #frame .root .details-section {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 65px 32px 55px;
+    gap: 25px;
+  }
+  #frame .root .details-copy {
+    width: 100%;
+    max-width: 390px;
+  }
+  #frame .root .details-copy h2 {
+    font-size: 53px;
+    margin: 20px 0;
+  }
+  #frame .root .details-copy h2 br {
+    display: none;
+  }
+  #frame .root .details-copy h2 em {
+    display: block;
+  }
+  #frame .root .event-date {
+    font-size: 29px;
+  }
+  #frame .root .event-time {
+    font-size: 17px;
+    margin: 14px 0 22px;
+  }
+  #frame .root .details-copy h3 {
+    font-size: 23px;
+  }
+  #frame .root .address {
+    font-size: 17px;
+  }
+  #frame .root .details-art {
+    margin-left: 0;
+    width: 110%;
+    max-width: 450px;
+  }
+  #frame .root .details-map {
+    width: 150%;
+    right: -45%;
+    height: 70%;
+    top: 3%;
+    opacity: 0.11;
+  }
+  #frame .root .detail-actions {
+    gap: 26px;
+  }
+  #frame .root .detail-actions button,
+  #frame .root .detail-actions a {
+    font-size: 10px;
+  }
+  #frame .root .details-art > span {
+    font-size: 7px;
+    margin-top: 14px;
+  }
+  #frame .root .photo-section {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 38px 60px;
+    gap: 30px;
+    text-align: center;
+  }
+  #frame .root .photo-arch {
+    width: 100%;
+    max-width: 350px;
+  }
+  #frame .root .photo-section h2 {
+    font-size: 45px;
+  }
+  #frame .root .reply-section {
+    padding: 20px 24px 55px;
+  }
+  #frame .root .reply-heading .eyebrow {
+    font-size: 7px;
+  }
+  #frame .root .reply-heading h2 {
+    font-size: 54px;
+  }
+  #frame .root .reply-heading h2 br {
+    display: block;
+  }
+  #frame .root .reply-heading h2 em {
+    margin-left: 0;
+  }
+  #frame .root .radio-label span {
+    padding: 13px 9px 13px 28px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  #frame .root .radio-label input {
+    left: 9px;
+    width: 12px;
+    height: 12px;
+  }
+  #frame .root .reply-row {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+  #frame .root .reply-row input {
+    max-width: 100px;
+  }
+  #frame .root .reply-help,
+  #frame .root .reply-status {
+    font-size: 9px;
+  }
+  #frame .root .farewell {
+    padding: 28px 25px 20px;
+  }
+  #frame .root .farewell h2 {
+    font-size: 40px;
+  }
+  #frame .root .tea-art {
+    width: 230px;
+    height: 160px;
+    margin-bottom: 20px;
+  }
+  #frame .root .farewell .eyebrow {
+    font-size: 7px;
+  }
+  #frame .root .farewell-names {
+    font-size: 26px;
+  }
+  #frame .root .farewell-kurdish {
+    font-size: 25px;
+  }
+  #frame .root .steam {
+    top: 17px;
+  }
+  #frame .root .farewell-map {
+    left: -50%;
+    right: -50%;
+  }
+  #frame .root .form-row {
+    gap: 12px;
+  }
+  #frame .root label {
+    font-size: 10px;
+  }
+}
+@media (max-height: 720px) and (min-width: 601px) {
+  #frame .root .opening-names {
+    top: 15%;
+  }
+  #frame .root .opening-names h1 {
+    font-size: 85px;
+  }
+  #frame .root .opening-names .eyebrow span {
+    margin-bottom: 10px;
+  }
+  #frame .root .occasion {
+    margin-top: 18px;
+  }
+  #frame .root .gate-layer {
+    bottom: -72vh;
+    width: 115vw;
+  }
+  #frame .root .reveal-card {
+    height: 92svh;
+  }
+  #frame .root .card-copy {
+    gap: 9px;
+  }
+  #frame .root .card-copy h2 {
+    font-size: 42px;
+  }
+  #frame .root .card-message {
+    font-size: 14px;
+  }
+  #frame .root .card-date {
+    font-size: 18px;
+  }
+  #frame .root .small-rosette {
+    width: 24px;
+    height: 24px;
+  }
+}
+#frame .root.reduced .stage {
+  background: var(--cream);
+}
+#frame .root.reduced * {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #frame .root {
+    scroll-behavior: auto;
+  }
+  #frame .root,
+  #frame .root *,
+  #frame .root *:before,
+  #frame .root *:after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+#frame .root .card-copy.dense {
+  gap: 8px;
+}
+#frame .root .card-copy.dense .card-message {
+  font-size: 14px;
+  line-height: 1.35;
+}
+#frame .root .card-copy.dense h2 {
+  font-size: 38px;
+}
+@media (max-width: 600px) {
+  #frame .root .card-copy.dense {
+    gap: 6px;
+  }
+  #frame .root .card-copy.dense .card-message {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  #frame .root .card-copy.dense h2 {
+    font-size: 31px;
+  }
+  #frame .root .card-copy.dense .small-rosette {
+    width: 18px;
+    height: 18px;
+  }
+}
+#frame .root .citadel-world {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+#frame .root .citadel-hill {
+  position: absolute;
+  width: min(1380px, 112vw);
+  height: 83%;
+  left: 50%;
+  bottom: -5%;
+  translate: -50% 0;
+  will-change: transform;
+}
+#frame .root .citadel-hill img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+#frame .root .citadel-intro {
+  position: absolute;
+  top: 11%;
+  left: 15%;
+  right: 15%;
+  text-align: center;
+  z-index: 1;
+  will-change: opacity, transform;
+}
+#frame .root .citadel-intro .eyebrow {
+  font-size: 9px;
+  color: #846a41;
+}
+#frame .root .citadel-intro h2 {
+  font-size: clamp(50px, 5.3vw, 77px);
+  margin: 16px 0 14px;
+  line-height: 1.04;
+}
+#frame .root .citadel-intro h2 br {
+  display: none;
+}
+#frame .root .citadel-intro h2 em {
+  margin-left: 10px;
+}
+#frame .root .citadel-intro > p:last-child {
+  font-size: 18px;
+  color: #6f654f;
+}
+#frame .root .map-backdrop {
+  z-index: 4;
+}
+#frame .root .map-backdrop img {
+  opacity: 0.26;
+  object-fit: cover;
+}
+#frame .root .welcome {
+  padding-bottom: 55px;
+}
+#frame .root .details-map {
+  opacity: 0.16;
+}
+#frame .root .farewell-map {
+  opacity: 0.16;
+}
+#frame .root .atlas-section {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: 4%;
+  padding-top: 30px;
+  padding-bottom: 100px;
+  max-width: 1450px;
+  margin: auto;
+  isolation: isolate;
+}
+#frame .root .atlas-copy {
+  padding: 20px 0 0 4%;
+  position: relative;
+  z-index: 2;
+}
+#frame .root .atlas-copy > .eyebrow {
+  font-size: 8px;
+  color: #887043;
+}
+#frame .root .atlas-copy h2 {
+  font-size: clamp(42px, 4.5vw, 64px);
+  margin: 22px 0;
+}
+#frame .root .atlas-intro {
+  font-size: 19px;
+  line-height: 1.6;
+  max-width: 370px;
+  color: #685d46;
+}
+#frame .root .atlas-stops {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 25px;
+  max-width: 360px;
+}
+#frame .root .atlas-stops button {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-top: 1px solid var(--line);
+  padding: 15px 6px;
+  background: none;
+  text-align: left;
+  font-size: 20px;
+  color: #71674f;
+  transition:
+    color 0.2s,
+    padding 0.2s;
+}
+#frame .root .atlas-stops button:last-child {
+  border-bottom: 1px solid var(--line);
+}
+#frame .root .atlas-stops button span {
+  font:
+    9px Arial,
+    sans-serif;
+  color: var(--red);
+}
+#frame .root .atlas-stops button.active {
+  color: var(--teal);
+  padding-left: 15px;
+  background: #bba36910;
+}
+#frame .root .atlas-stops button.active:after {
+  content: '↗';
+  margin-left: auto;
+  font-size: 19px;
+}
+#frame .root .atlas-description {
+  max-width: 370px;
+  min-height: 60px;
+  margin-top: 20px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #74664b;
+}
+#frame .root .atlas-preview {
+  height: 190px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 5px;
+}
+#frame .root .atlas-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+#frame .root .atlas-preview img[data-landmark='minaret'] {
+  object-position: 25% center;
+}
+#frame .root .atlas-sheet {
+  position: relative;
+  aspect-ratio: 700/610;
+  width: 112%;
+  margin-left: -6%;
+  isolation: isolate;
+  background: radial-gradient(ellipse, #e4d4a840, transparent 68%);
+}
+#frame .root .atlas-streets {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  opacity: 0.64;
+}
+#frame .root .atlas-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+#frame .root .atlas-route path {
+  fill: none;
+  stroke: #a45a43;
+  stroke-width: 2;
+  stroke-dasharray: 4 7;
+}
+#frame .root .atlas-route circle {
+  fill: #994d3a;
+}
+#frame .root .atlas-heading {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 8%;
+  font-size: 24px;
+  letter-spacing: 0.13em;
+  text-align: center;
+  color: #7c683e;
+}
+#frame .root .atlas-heading small {
+  display: block;
+  font:
+    7px Arial,
+    sans-serif;
+  letter-spacing: 0.2em;
+  margin-top: 8px;
+}
+#frame .root .map-compass {
+  position: absolute;
+  right: 13%;
+  top: 9%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+#frame .root .map-compass span {
+  font:
+    8px Arial,
+    sans-serif;
+  color: #80653b;
+}
+#frame .root .map-compass svg {
+  width: 17px;
+  height: 34px;
+}
+#frame .root .map-pin {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  translate: -50% -50%;
+  background: none;
+  padding: 8px;
+  max-width: 45%;
+  white-space: nowrap;
+}
+#frame .root .map-pin i {
+  font:
+    10px Arial,
+    sans-serif;
+  font-style: normal;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 1px solid #8e6540;
+  border-radius: 50%;
+  background: #f9f0dd;
+  color: #805039;
+  box-shadow: 0 0 0 6px #f4eddc99;
+  transition: 0.2s;
+}
+#frame .root .map-pin span {
+  font-size: 17px;
+  background: #f7f0dded;
+  padding: 4px 8px;
+  line-height: 1.1;
+  color: #4d5742;
+  border-radius: 2px;
+}
+#frame .root .map-pin.active i {
+  background: var(--red);
+  color: #fff3d3;
+  box-shadow: 0 0 0 6px #994d3a15;
+}
+#frame .root .map-pin.active span {
+  color: var(--red);
+}
+#frame .root .pin-citadel {
+  left: 51%;
+  top: 38%;
+}
+#frame .root .pin-square {
+  left: 52%;
+  top: 57%;
+}
+#frame .root .pin-minaret {
+  left: 25%;
+  top: 64%;
+}
+#frame .root .atlas-key {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font:
+    7px Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  color: #886a44;
+}
+#frame .root .atlas-key i {
+  width: 35px;
+  border-top: 1px dashed var(--red);
+}
+#frame .root .map-impression {
+  position: absolute;
+  bottom: 8%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  font-style: italic;
+  color: #857456;
+}
+#frame .root .postcards-section {
+  max-width: 1550px;
+  margin: auto;
+  padding-top: 30px;
+  padding-bottom: 110px;
+  isolation: isolate;
+}
+#frame .root .postcards-section:before {
+  content: '';
+  position: absolute;
+  inset: 15% 0 5%;
+  background: radial-gradient(ellipse at center, #d8c49b38, transparent 70%);
+  z-index: -1;
+}
+#frame .root .postcards-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 35px;
+  margin-bottom: 48px;
+}
+#frame .root .postcards-head .eyebrow {
+  font-size: 8px;
+  color: #886e42;
+}
+#frame .root .postcards-head h2 {
+  font-size: clamp(46px, 5vw, 67px);
+  margin-top: 20px;
+}
+#frame .root .postcards-head > p {
+  font-size: 18px;
+  line-height: 1.65;
+  max-width: 330px;
+  color: #70624a;
+  padding-bottom: 4px;
+}
+#frame .root .postcards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 30px;
+}
+#frame .root .postcard-flip {
+  display: block;
+  width: 100%;
+  aspect-ratio: 148/105;
+  background: none;
+  padding: 0;
+  perspective: 1200px;
+  position: relative;
+  overflow: visible;
+}
+#frame .root .postcard-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.25, 0.7, 0.2, 1);
+}
+#frame .root .postcard-front,
+#frame .root .postcard-back {
+  position: absolute;
+  inset: 0;
+  display: block;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow:
+    0 6px 10px #4f37191c,
+    0 20px 30px -15px #4f371944;
+}
+#frame .root .postcard-front img,
+#frame .root .postcard-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#frame .root .postcard-back {
+  transform: rotateY(180deg);
+}
+#frame .root .postcard-flip[aria-pressed='true'] .postcard-inner {
+  transform: rotateY(180deg);
+}
+#frame .root .postcard-item:nth-child(1) {
+  rotate: -2deg;
+}
+#frame .root .postcard-item:nth-child(3) {
+  rotate: 2deg;
+}
+#frame .root .postcard-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+  font:
+    9px Arial,
+    sans-serif;
+  color: #7d6b4b;
+  letter-spacing: 0.025em;
+}
+#frame .root .postcard-caption button {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font:
+    9px Arial,
+    sans-serif;
+  background: none;
+  color: var(--teal);
+}
+#frame .root .postcards-foot {
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+#frame .root .postcards-foot > span {
+  font-size: 16px;
+  color: #7d6b50;
+  font-style: italic;
+}
+#frame .root.reduced .postcard-inner {
+  transition: none;
+}
+@media (max-width: 900px) {
+  #frame .root .atlas-section {
+    gap: 0;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+  #frame .root .atlas-copy {
+    padding-left: 0;
+  }
+  #frame .root .atlas-copy h2 {
+    font-size: 48px;
+  }
+  #frame .root .atlas-sheet {
+    width: 120%;
+    margin-left: -8%;
+  }
+  #frame .root .postcards-grid {
+    gap: 17px;
+  }
+  #frame .root .postcard-caption {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  #frame .root .postcards-head > p {
+    max-width: 270px;
+    font-size: 17px;
+  }
+  #frame .root .postcards-head h2 {
+    font-size: 53px;
+  }
+}
+@media (max-width: 600px) {
+  #frame .root .citadel-intro {
+    top: 12%;
+    left: 10%;
+    right: 10%;
+  }
+  #frame .root .citadel-intro .eyebrow {
+    font-size: 7px;
+  }
+  #frame .root .citadel-intro h2 {
+    font-size: 47px;
+    line-height: 1.07;
+    margin: 20px 0 17px;
+  }
+  #frame .root .citadel-intro h2 br {
+    display: block;
+  }
+  #frame .root .citadel-intro h2 em {
+    margin-left: 0;
+  }
+  #frame .root .citadel-intro > p:last-child {
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 240px;
+    margin: auto;
+  }
+  #frame .root .citadel-hill {
+    width: 145%;
+    height: 65%;
+    bottom: 7%;
+  }
+  #frame .root .map-backdrop img {
+    object-fit: cover;
+    opacity: 0.28;
+  }
+  #frame .root .atlas-section {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 29px 55px;
+    gap: 0;
+    overflow: hidden;
+  }
+  #frame .root .atlas-copy {
+    width: 100%;
+    padding-top: 0;
+  }
+  #frame .root .atlas-copy .eyebrow {
+    font-size: 7px;
+  }
+  #frame .root .atlas-copy h2 {
+    font-size: 44px;
+    margin: 20px 0;
+  }
+  #frame .root .atlas-intro {
+    font-size: 17px;
+  }
+  #frame .root .atlas-stops {
+    margin-top: 23px;
+    max-width: none;
+  }
+  #frame .root .atlas-stops button {
+    font-size: 19px;
+    padding: 13px 4px;
+  }
+  #frame .root .atlas-description {
+    font-size: 16px;
+    min-height: 46px;
+  }
+  #frame .root .atlas-preview {
+    height: 150px;
+    margin: 2px 0 0;
+  }
+  #frame .root .atlas-sheet {
+    width: 127%;
+    max-width: 550px;
+    margin: 0 -13.5%;
+    align-self: center;
+    aspect-ratio: 700/640;
+  }
+  #frame .root .atlas-heading {
+    top: 10%;
+    font-size: 21px;
+  }
+  #frame .root .map-compass {
+    right: 15%;
+    top: 11%;
+  }
+  #frame .root .map-pin span {
+    font-size: 13px;
+    padding: 4px 6px;
+  }
+  #frame .root .map-pin i {
+    width: 25px;
+    height: 25px;
+    font-size: 8px;
+  }
+  #frame .root .map-pin {
+    gap: 4px;
+    padding: 7px;
+  }
+  #frame .root .atlas-key {
+    font-size: 6px;
+    letter-spacing: 0.05em;
+    bottom: 10%;
+    gap: 8px;
+  }
+  #frame .root .map-impression {
+    font-size: 12px;
+    bottom: 4%;
+  }
+  #frame .root .postcards-section {
+    padding: 20px 28px 65px;
+  }
+  #frame .root .postcards-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 35px;
+  }
+  #frame .root .postcards-head h2 {
+    font-size: 48px;
+    margin-top: 18px;
+  }
+  #frame .root .postcards-head > p {
+    max-width: 340px;
+    font-size: 17px;
+  }
+  #frame .root .postcards-grid {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    max-width: 450px;
+    margin: auto;
+  }
+  #frame .root .postcard-item:nth-child(1) {
+    rotate: -1.3deg;
+  }
+  #frame .root .postcard-item:nth-child(3) {
+    rotate: 1.3deg;
+  }
+  #frame .root .postcard-caption {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 13px;
+    font-size: 9px;
+  }
+  #frame .root .postcards-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    margin-top: 33px;
+  }
+  #frame .root .postcards-foot > span {
+    font-size: 15px;
+  }
+}
+@media (max-height: 720px) and (min-width: 601px) {
+  #frame .root .citadel-intro {
+    top: 8%;
+  }
+  #frame .root .citadel-intro h2 {
+    font-size: 50px;
+    margin: 12px 0;
+  }
+  #frame .root .citadel-intro > p:last-child {
+    font-size: 15px;
+  }
+  #frame .root .citadel-hill {
+    height: 78%;
+    bottom: -6%;
+  }
+}
+#frame .root .map-backdrop img {
+  opacity: 0.22;
+  object-fit: cover;
+}
+#frame .root .details-map {
+  opacity: 0.12;
+}
+#frame .root .farewell-map {
+  opacity: 0.12;
+}
+#frame .root .atlas-section {
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 5%;
+  padding-bottom: 95px;
+}
+#frame .root .atlas-sheet {
+  width: 100%;
+  margin: 0;
+  aspect-ratio: auto;
+  background: #f4eddf;
+  border: 1px solid #ad916b70;
+  box-shadow: 0 22px 50px -35px #443c2c70;
+  overflow: hidden;
+}
+#frame .root .atlas-map-head {
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px;
+  background: #f8f1e2;
+  border-bottom: 1px solid #bda78365;
+}
+#frame .root .atlas-heading {
+  position: static;
+  text-align: left;
+  font-size: 27px;
+  letter-spacing: 0.17em;
+}
+#frame .root .atlas-heading small {
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  margin-top: 8px;
+}
+#frame .root .map-north {
+  font:
+    12px Arial,
+    sans-serif;
+  color: #5d745f;
+  letter-spacing: 0.1em;
+}
+#frame .root .atlas-map {
+  position: relative;
+  aspect-ratio: 1100/900;
+  width: 100%;
+  isolation: isolate;
+  overflow: hidden;
+}
+#frame .root .atlas-streets {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 1;
+}
+#frame .root .map-pin {
+  width: 30px;
+  height: 30px;
+  display: block;
+  padding: 0;
+  max-width: none;
+  translate: -50% -50%;
+  z-index: 3;
+}
+#frame .root .map-pin i {
+  width: 30px;
+  height: 30px;
+  font-size: 10px;
+  background: #fbf4e5;
+  border: 1px solid #88663e;
+  box-shadow: 0 0 0 5px #f7efdbad;
+}
+#frame .root .map-pin span {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 15px;
+  white-space: nowrap;
+  background: #f9f2e4f5;
+  padding: 4px 8px;
+  border: 1px solid #d8c9aa80;
+  box-shadow: 0 2px 8px #5a4d2810;
+}
+#frame .root .pin-citadel span {
+  top: auto;
+  bottom: 36px;
+}
+#frame .root .map-pin.active i {
+  background: #994d3a;
+  box-shadow: 0 0 0 6px #994d3a23;
+}
+#frame .root .map-pin.active span {
+  border-color: #994d3a70;
+}
+#frame .root .map-scale {
+  position: absolute;
+  left: 5%;
+  bottom: 5%;
+  font:
+    9px Arial,
+    sans-serif;
+  color: #635a46;
+}
+#frame .root .map-scale i {
+  display: block;
+  width: 111px;
+  height: 5px;
+  border: 1px solid #766345;
+  border-top: 0;
+  margin-bottom: 4px;
+}
+#frame .root .atlas-map-foot {
+  padding: 15px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  border-top: 1px solid #bda78365;
+  font:
+    10px/1.5 Arial,
+    sans-serif;
+  color: #5b6853;
+  background: #f8f1e2;
+}
+#frame .root .atlas-map-foot a:last-child {
+  border-bottom: 1px solid #a38c6770;
+}
+#frame .root .map-license {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5px 25px 25px;
+  text-align: center;
+  font:
+    10px/1.7 Arial,
+    sans-serif;
+  color: #756b56;
+}
+#frame .root .map-license a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#frame .root .postcards-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 8%;
+  align-items: center;
+}
+#frame .root .postcard-item:nth-child(1) {
+  rotate: -1.4deg;
+}
+#frame .root .postcard-story {
+  padding: 10px 8% 10px 0;
+}
+#frame .root .paper-edition {
+  font:
+    8px Arial,
+    sans-serif;
+  letter-spacing: 0.2em;
+  color: #8a6c41;
+}
+#frame .root .postcard-story h3 {
+  font-size: 48px;
+  line-height: 1.08;
+  margin: 18px 0 24px;
+  letter-spacing: -0.025em;
+}
+#frame .root .postcard-story h3 em {
+  color: var(--teal);
+}
+#frame .root .postcard-story p {
+  font-size: 18px;
+  line-height: 1.65;
+  margin-bottom: 15px;
+  color: #73634d;
+}
+#frame .root .postcard-caption {
+  font-size: 10px;
+}
+#frame .root .postcard-caption button {
+  font-size: 10px;
+}
+@media (max-width: 900px) {
+  #frame .root .atlas-section {
+    gap: 3%;
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+  #frame .root .atlas-map-head {
+    padding: 17px;
+    height: 89px;
+  }
+  #frame .root .atlas-heading {
+    font-size: 24px;
+  }
+  #frame .root .atlas-map-foot {
+    font-size: 9px;
+    padding: 12px;
+  }
+  #frame .root .postcards-layout {
+    gap: 5%;
+    grid-template-columns: 1.4fr 1fr;
+  }
+  #frame .root .postcard-story h3 {
+    font-size: 40px;
+  }
+  #frame .root .postcard-story p {
+    font-size: 17px;
+  }
+  #frame .root .map-pin span {
+    font-size: 12px;
+  }
+  #frame .root .map-scale i {
+    width: 74px;
+  }
+}
+@media (max-width: 600px) {
+  #frame .root .atlas-section {
+    display: flex;
+    padding: 20px 25px 65px;
+    gap: 10px;
+  }
+  #frame .root .atlas-copy {
+    padding: 0 4px;
+  }
+  #frame .root .atlas-sheet {
+    width: 100%;
+    margin: 0;
+    max-width: none;
+    align-self: stretch;
+  }
+  #frame .root .atlas-map-head {
+    height: 82px;
+    padding: 16px;
+  }
+  #frame .root .atlas-heading {
+    font-size: 23px;
+  }
+  #frame .root .atlas-heading small {
+    font-size: 6px;
+    margin-top: 6px;
+  }
+  #frame .root .atlas-map-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    font-size: 8px;
+  }
+  #frame .root .atlas-map-foot a {
+    width: fit-content;
+  }
+  #frame .root .map-pin {
+    width: 24px;
+    height: 24px;
+  }
+  #frame .root .map-pin i {
+    width: 24px;
+    height: 24px;
+    font-size: 8px;
+  }
+  #frame .root .map-pin span {
+    font-size: 10px;
+    padding: 4px 5px;
+    top: 29px;
+  }
+  #frame .root .pin-citadel span {
+    top: auto;
+    bottom: 30px;
+  }
+  #frame .root .map-scale {
+    font-size: 7px;
+  }
+  #frame .root .map-scale i {
+    width: 57px;
+  }
+  #frame .root .map-north {
+    font-size: 10px;
+  }
+  #frame .root .postcards-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 33px;
+  }
+  #frame .root .postcards-layout .postcard-item {
+    width: 100%;
+  }
+  #frame .root .postcard-story {
+    padding: 0 4px;
+  }
+  #frame .root .postcard-story h3 {
+    font-size: 42px;
+  }
+  #frame .root .postcard-story h3 br {
+    display: none;
+  }
+  #frame .root .postcard-story h3 em {
+    margin-left: 5px;
+  }
+  #frame .root .postcard-story p {
+    font-size: 17px;
+    max-width: 360px;
+  }
+  #frame .root .postcards-section {
+    padding-bottom: 68px;
+  }
+  #frame .root .map-license {
+    font-size: 8px;
+  }
+}
+#frame .root .map-scale {
+  width: 18.4%;
+}
+#frame .root .map-scale i {
+  width: 100% !important;
+}
+
+/* ——— Bahja additions ——— */
+#frame .root {
+  position: relative;
+  overflow-x: clip;
+  background:
+    var(--paper) repeat,
+    var(--cream);
+  background-size: 256px, auto;
+}
+#frame .root[data-script='arabic'],
+#frame .root[data-script='arabic'] .eyebrow,
+#frame .root[data-script='arabic'] .opening-cue,
+#frame .root[data-script='arabic'] label,
+#frame .root[data-script='arabic'] .primary-button {
+  font-family: 'EH Amiri', serif;
+  letter-spacing: 0;
+}
+#frame .root[data-script='arabic'] h1,
+#frame .root[data-script='arabic'] h2,
+#frame .root[data-script='arabic'] .city-caption > p {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+#frame .root[data-script='arabic'] .eyebrow {
+  font-size: 15px;
+}
+#frame .root[data-hydrated][data-phase='closed'] .body {
+  display: none;
+}
+#frame .root .body {
+  position: relative;
+}
+#frame .root .stage img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* The Open button sits where the designer's scroll cue was. */
+#frame .root button.opening-cue {
+  background: #1f454c66;
+  border: 1px solid #fff7de99;
+  border-radius: 999px;
+  padding: 14px 26px 12px;
+  font-size: 11px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: background 0.2s;
+}
+#frame .root button.opening-cue:hover {
+  background: #1f454c99;
+}
+#frame .root[data-script='arabic'] button.opening-cue {
+  font-size: 17px;
+}
+#frame .root .opening-cue i {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+}
+#frame .root .audio {
+  position: fixed;
+  z-index: 60;
+  top: 14px;
+  inset-inline-end: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f8f1e1e6;
+  color: var(--teal);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px #4a3a2020;
+}
+#frame .root .count-border {
+  pointer-events: none;
+}
+#frame .root .detail-actions a {
+  display: inline-block;
+}
+#frame .root .photo-arch {
+  position: relative;
+}
+#frame .root .photo-fill {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+#frame .root .photo-names {
+  margin-top: 18px;
+  font-size: 24px;
+  font-style: italic;
+  color: var(--teal);
+}
+#frame .root .reply-form {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+  margin: 40px auto 0;
+  text-align: start;
+}
+#frame .root .reply-form > label {
+  font-size: 15px;
+}
+#frame .root .reply-form .radio-label {
+  font-size: 16px;
+}
+#frame .root .reply-sent {
+  max-width: 560px;
+  margin: 40px auto 0;
+  text-align: center;
+  font-size: 26px;
+  color: var(--teal);
+}
+#frame .root .reply-error {
+  color: var(--red);
+  font-size: 14px;
+}
+#frame .root .wishes-section {
+  text-align: center;
+}
+#frame .root .wishes-section h2 {
+  margin-top: 12px;
+}
+#frame .root .wishes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 18px;
+  max-width: 1000px;
+  margin: 40px auto 0;
+}
+#frame .root .wish {
+  background: #f8f1e1;
+  border: 1px solid var(--line);
+  border-radius: 140px 140px 10px 10px;
+  padding: 46px 24px 24px;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.55;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+#frame .root .wish footer {
+  margin-top: 14px;
+  color: var(--teal);
+  font-style: italic;
+}
+#frame .root .wishes-empty {
+  font-size: 18px;
+  color: #6f654f;
+}
+#frame .root .farewell {
+  position: relative;
+}
+#frame .root .card-copy,
+#frame .root .welcome-message,
+#frame .root .card-message {
+  overflow-wrap: anywhere;
+}
+
+/* The names stand one under the other on every screen (long names never run side by side over the gate). */
+#frame .root .opening-names h1 {
+  flex-direction: column;
+  gap: 0;
+  font-size: clamp(58px, 7.4vw, 112px);
+  line-height: 1;
+}
+#frame .root .opening-names h1 i {
+  font-size: 0.36em;
+  line-height: 1.2;
+}
+#frame .root .opening-names[data-long] h1 {
+  font-size: clamp(40px, 4.1vw, 62px);
+}
+#frame .root[data-script='arabic'] .opening-names h1 {
+  line-height: 1.25;
+  font-size: clamp(52px, 6.2vw, 96px);
+}
+#frame .root[data-script='arabic'] .opening-names[data-long] h1 {
+  font-size: clamp(38px, 4vw, 60px);
+}
+#frame .root[data-script='arabic'] .occasion {
+  font-family: 'EH Amiri', serif;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+#frame .root .opening-names {
+  top: 10%;
+}
+@media (max-width: 600px) {
+  #frame .root .opening-names[data-long] h1 {
+    font-size: 40px;
+  }
+  #frame .root[data-script='arabic'] .opening-names[data-long] h1 {
+    font-size: 42px;
+  }
+}
+/* The names and the occasion stay readable where they cross the gate's brickwork. */
+#frame .root .opening-names {
+  text-shadow:
+    0 1px 3px #1c3b40cc,
+    0 0 22px #1c3b4099;
+}
+#frame .root .occasion {
+  font-weight: 700;
+}
+#frame .root[data-script='arabic'] .countdown b {
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+#frame .root[data-script='arabic'] .countdown span {
+  display: block;
+  margin-top: 4px;
+  font-family: 'EH Amiri', serif;
+  font-size: 13px;
+  letter-spacing: 0;
+}

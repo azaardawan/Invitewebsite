@@ -1,0 +1,535 @@
+/*
+ * Ever Bloom: the designer's stylesheet (dist/style.css), scoped to the design. The page's states sit on the root:
+ * is-opening (the flowers grow), is-falling (the page shows through), is-open.
+ */
+.page {
+  background: #f5e9e9;
+}
+#frame .root {
+  --ink: #713e4d;
+  --muted: #895d67;
+  --rose: #a05a71;
+  --line: #c99da7;
+  --serif: 'EB Serif', 'EB Amiri', Georgia, serif;
+  --script: 'EB Script', 'EB Amiri', cursive;
+  --ui: 'EB UI', Arial, sans-serif;
+  position: relative;
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.5;
+  background:
+    radial-gradient(ellipse at 5% 15%, #ecb8c240, transparent 45%), radial-gradient(ellipse at 95% 45%, #df9eae33, transparent 50%),
+    repeating-linear-gradient(13deg, #fff0 0 3px, #ffffff0b 4px 5px), #f5e9e9;
+}
+#frame .root[data-script='arabic'] {
+  --serif: 'EB Amiri', serif;
+  --script: 'EB Amiri', serif;
+}
+#frame .root * {
+  box-sizing: border-box;
+}
+#frame .root :is(h1, h2, p) {
+  font-weight: 400;
+}
+#frame .root button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: 12px var(--ui);
+  -webkit-tap-highlight-color: transparent;
+}
+#frame .root button:focus-visible,
+#frame .root a:focus-visible {
+  outline: 2px solid #9c506b;
+  outline-offset: 5px;
+}
+
+/* ---------------------------------------------------------------- the gift and the flowers */
+#frame .root .opening {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+#frame .root .opening-paper {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #faf7ef;
+  transition: opacity 0.4s;
+}
+#frame .root .gift-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(92vw, 520px);
+  min-height: 440px;
+  padding: 0 10px 32px;
+  text-align: center;
+  font: inherit;
+  transition:
+    opacity 0.45s,
+    transform 0.5s;
+}
+#frame .root .gift-art {
+  width: 175px;
+  height: 180px;
+  margin-bottom: 24px;
+  overflow: visible;
+}
+#frame .root .gift-lid {
+  transform-origin: 120px 112px;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#frame .root .gift-button:hover .gift-lid {
+  transform: translateY(-6px) rotate(-3deg);
+}
+#frame .root.is-opening .gift-lid {
+  transform: translateY(-35px) rotate(-12deg);
+}
+#frame .root.is-opening .gift-button {
+  opacity: 0;
+  transform: scale(0.87);
+  pointer-events: none;
+}
+#frame .root.is-falling .opening-paper {
+  opacity: 0;
+}
+#frame .root .gift-title {
+  max-width: 100%;
+  color: #934b62;
+  font-family: var(--script);
+  font-size: 43px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+#frame .root .gift-hint {
+  margin-top: 13px;
+  color: #976975;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+}
+#frame .root .tap {
+  margin-top: 28px;
+  color: #825964;
+  font: 10px var(--ui);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+#frame .root .flowers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- petals drifting over the page */
+#frame .root .petals {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s;
+}
+#frame .root.is-falling .petals,
+#frame .root.is-open .petals {
+  opacity: 1;
+}
+#frame .root .petal {
+  position: absolute;
+  top: -10%;
+  width: 10px;
+  height: 14px;
+  border-radius: 70% 20% 65% 40%;
+  background: radial-gradient(ellipse at 30% 30%, #f6cfd5, #dba4b4);
+  opacity: 0.65;
+  animation: petal-drift 14s linear infinite;
+}
+@keyframes petal-drift {
+  0% {
+    transform: translate3d(-15px, -20px, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(32px, 55vh, 0) rotate(130deg);
+  }
+  100% {
+    transform: translate3d(-10px, 120vh, 0) rotate(290deg);
+  }
+}
+
+/* ---------------------------------------------------------------- the page */
+#frame .root .main {
+  position: relative;
+  z-index: 1;
+}
+#frame .root .intro {
+  min-height: 100svh;
+  padding: 120px 22px 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#frame .root .eyebrow {
+  margin: 0 0 28px;
+  color: #82505d;
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 3px;
+  line-height: 1.8;
+  text-transform: uppercase;
+}
+#frame .root .title {
+  margin: 0 0 12px;
+  color: var(--rose);
+  font-family: var(--script);
+  font-size: clamp(60px, 9vw, 112px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+#frame .root .intro-text {
+  max-width: 370px;
+  margin: 0 0 16px;
+  color: #875762;
+  font-size: 20px;
+  font-style: italic;
+  line-height: 1.6;
+}
+#frame .root .single-flower {
+  width: 90px;
+  height: 90px;
+  margin: 12px 0 42px;
+}
+#frame .root .continue-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  font-size: 14px;
+  font-style: italic;
+  text-decoration: none;
+}
+#frame .root .continue-link span:last-child {
+  font: 25px var(--serif);
+}
+
+/* ---------------------------------------------------------------- the photos: a polaroid collage */
+#frame .root .memories {
+  max-width: 1200px;
+  margin: auto;
+  padding: 65px max(24px, 6vw) 105px;
+  text-align: center;
+}
+#frame .root .memory-title {
+  margin: 0 0 15px;
+  font-size: clamp(40px, 5vw, 66px);
+  font-style: italic;
+  line-height: 1.1;
+}
+#frame .root .section-intro {
+  margin: 0 0 40px;
+  color: var(--muted);
+  font-size: 18px;
+}
+#frame .root .collage-crop {
+  width: min(100%, 460px);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 10px 34px #664e4920;
+  transform: rotate(-1deg);
+}
+#frame .root .collage {
+  position: relative;
+  width: 100%;
+  background: #f6f1ea center / 100% 100% no-repeat;
+  container-type: inline-size;
+}
+#frame .root .collage-photo {
+  position: absolute;
+  display: block;
+  background: linear-gradient(150deg, #efdedb, #e4cfcf);
+}
+#frame .root .collage-top {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#frame .root .collage-names {
+  position: absolute;
+  inset: 6% 6% auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  color: #3c3333;
+  font-family: var(--script);
+  font-size: 11.5cqw;
+  line-height: 1.12;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+#frame .root .collage-names > :last-child {
+  padding-inline-start: 14cqw;
+}
+#frame .root .collage-and {
+  padding-inline-start: 6cqw;
+  font-size: 0.6em;
+  color: var(--rose);
+}
+#frame .root[data-script='arabic'] .collage-names {
+  align-items: center;
+  font-size: 9cqw;
+  line-height: 1.6;
+  text-align: center;
+  inset-inline: 10%;
+}
+#frame .root[data-script='arabic'] .collage-names > :last-child {
+  padding-inline-start: 0;
+}
+
+/* ---------------------------------------------------------------- the letter */
+#frame .root .letter-section {
+  padding: 50px 24px 100px;
+  text-align: center;
+}
+#frame .root .letter-paper {
+  position: relative;
+  width: min(100%, 680px);
+  margin: 42px auto 0;
+  padding: 80px 72px 60px;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, #ab7f6104 4px 5px), #fffcf1;
+  box-shadow: 2px 12px 40px #80615b17;
+  text-align: start;
+  transform: rotate(-0.7deg);
+}
+#frame .root .letter-paper::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid #d9baad66;
+  pointer-events: none;
+}
+#frame .root .salutation {
+  margin: 0 0 28px;
+  font-family: var(--script);
+  font-size: 40px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+#frame .root .letter-body {
+  font-size: 20px;
+  line-height: 1.9;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+#frame .root .signature {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 40px 0 0;
+}
+#frame .root .signature-name {
+  font-family: var(--script);
+  font-size: 40px;
+  line-height: 1.3;
+}
+
+/* ---------------------------------------------------------------- the closing */
+#frame .root .footer {
+  min-height: 480px;
+  padding: 50px 20px 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+#frame .root .footer-bouquet {
+  position: relative;
+  width: 190px;
+  height: 100px;
+  margin-bottom: 26px;
+}
+#frame .root .footer-bouquet span {
+  position: absolute;
+  display: block;
+  width: 85px;
+  height: 85px;
+}
+#frame .root .footer-bouquet span:nth-child(1) {
+  inset-inline-start: 0;
+  top: 14px;
+  transform: rotate(-25deg);
+}
+#frame .root .footer-bouquet span:nth-child(2) {
+  inset-inline-start: 54px;
+  top: 0;
+  width: 95px;
+  height: 95px;
+}
+#frame .root .footer-bouquet span:nth-child(3) {
+  inset-inline-end: 0;
+  top: 18px;
+  width: 72px;
+  height: 72px;
+  transform: rotate(20deg);
+}
+#frame .root .footer-title {
+  margin: 0 0 15px;
+  color: var(--rose);
+  font: clamp(42px, 6.5vw, 76px) / 1.2 var(--script);
+}
+#frame .root .footer-sub {
+  margin: 0 0 45px;
+  font-size: 18px;
+  font-style: italic;
+}
+#frame .root .footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+#frame .root .footer-actions button {
+  min-height: 42px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ba8997;
+}
+#frame .root .tiny-heart {
+  margin-top: 38px;
+  font-size: 23px;
+}
+
+/* Sections appear as they scroll into view. */
+#frame .root .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.85s,
+    transform 0.85s;
+}
+#frame .root .reveal.is-seen {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------- Arabic and Kurdish */
+#frame .root[data-script='arabic'] .eyebrow {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+#frame .root[data-script='arabic'] .gift-title {
+  font-size: 40px;
+  line-height: 1.7;
+}
+#frame .root[data-script='arabic'] .gift-hint {
+  font-size: 18px;
+}
+#frame .root[data-script='arabic'] .tap {
+  font-size: 12px;
+  letter-spacing: 0;
+}
+#frame .root[data-script='arabic'] .title {
+  font-size: clamp(56px, 9vw, 90px);
+  line-height: 1.6;
+}
+#frame .root[data-script='arabic'] .salutation,
+#frame .root[data-script='arabic'] .signature-name {
+  font-size: 32px;
+  line-height: 1.8;
+}
+#frame .root[data-script='arabic'] .footer-title {
+  line-height: 1.7;
+}
+#frame .root[data-script='arabic'] :is(.intro-text, .gift-hint, .memory-title, .footer-sub) {
+  font-style: normal;
+}
+
+/* ---------------------------------------------------------------- phones */
+@media (max-width: 650px) {
+  #frame .root .intro {
+    padding: 110px 24px 55px;
+  }
+  #frame .root .eyebrow {
+    margin-bottom: 26px;
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+  #frame .root .title {
+    font-size: 64px;
+  }
+  #frame .root .intro-text {
+    max-width: 280px;
+    font-size: 18px;
+  }
+  #frame .root .gift-art {
+    width: 148px;
+    height: 152px;
+  }
+  #frame .root .gift-title {
+    font-size: 40px;
+  }
+  #frame .root .memories {
+    padding: 55px 22px 70px;
+  }
+  #frame .root .memory-title {
+    font-size: 44px;
+  }
+  #frame .root .section-intro {
+    margin-bottom: 32px;
+    font-size: 17px;
+  }
+  #frame .root .letter-section {
+    padding: 45px 22px 60px;
+  }
+  #frame .root .letter-paper {
+    margin-top: 30px;
+    padding: 72px 28px 40px;
+  }
+  #frame .root .salutation {
+    font-size: 36px;
+  }
+  #frame .root .letter-body {
+    font-size: 18px;
+    line-height: 1.85;
+  }
+  #frame .root .footer {
+    min-height: 440px;
+    padding: 45px 22px 40px;
+  }
+  #frame .root .footer-title {
+    font-size: 46px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #frame .root * {
+    animation: none !important;
+    transition: none !important;
+  }
+  #frame .root .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  #frame .root .petals {
+    display: none;
+  }
+}

@@ -4,6 +4,7 @@ import { Photo } from './photo';
 import type { InvitationLocale, ThemePhoto } from './types';
 import polaroidsArt from './collages/polaroids.webp';
 import polaroidsTop from './collages/polaroids-top.webp';
+import polaroidsLove from './collages/polaroids-love.webp';
 import storyArt from './collages/story.webp';
 import storyTop from './collages/story-top.webp';
 import wallArt from './collages/wall.webp';
@@ -25,7 +26,7 @@ type Frame = { x: number; y: number; w: number; h: number; rot: number };
  * The three designs: their size, their photo places (the first is the largest) and the output picture. Photos fill
  * the places in order; with fewer photos than places they repeat, so a collage never shows an empty frame.
  */
-export const COLLAGES: Record<CollageKind, { width: number; height: number; photos: number; frames: readonly Frame[]; art: string; top: string; ink: string }> =
+export const COLLAGES: Record<CollageKind, { width: number; height: number; photos: number; frames: readonly Frame[]; art: string; loveArt?: string; top: string; ink: string }> =
   {
     // A3 poster: «Happy Birthday» in script, three polaroids, the cake drawing and the message.
     polaroids: {
@@ -38,6 +39,8 @@ export const COLLAGES: Record<CollageKind, { width: number; height: number; phot
         { x: 506.5, y: 578.8, w: 139.1, h: 237.7, rot: 3 },
       ],
       art: polaroidsArt.src,
+      // Couples and friends: the same paper and frames without the birthday cake and confetti.
+      loveArt: polaroidsLove.src,
       top: polaroidsTop.src,
       ink: '#3c3333',
     },
@@ -109,6 +112,11 @@ export type PrintCollageProps = {
   /** Their day, as the invitation writes it (e.g. «11 December»), or null. */
   date: string | null;
   text: CollageText;
+  /**
+   * Couples and friends (not a birthday): the artwork without its birthday drawings, and `text` carries the names
+   * where the birthday lettering was (an empty line is left out).
+   */
+  love?: boolean;
 };
 
 const PLATFORM_FONTS: { latin: CollageFonts; arabic: CollageFonts } = {
@@ -149,7 +157,7 @@ export function Collage({ fonts, ...p }: PrintCollageProps & { fonts?: { latin: 
         height: '100%',
         overflow: 'hidden',
         containerType: 'size',
-        background: `#f6f1ea url(${c.art}) center / 100% 100% no-repeat`,
+        background: `#f6f1ea url(${p.love && c.loveArt ? c.loveArt : c.art}) center / 100% 100% no-repeat`,
       }}
     >
       {c.frames.map((fr, i) => {
@@ -174,14 +182,20 @@ export function Collage({ fonts, ...p }: PrintCollageProps & { fonts?: { latin: 
               ? { ...pos(60, 80, 540, 330), fontFamily: f.script, lineHeight: 1.5, textAlign: 'center', alignItems: 'center' }
               : { ...pos(50, 70, 660, 330), fontFamily: f.script, lineHeight: 1.05, textAlign: 'start' },
             <>
-              <span style={{ fontSize: X(arabic ? 100 : 160) }}>{p.text.headingTop}</span>
-              <span style={{ fontSize: X(arabic ? 100 : 160), paddingInlineStart: arabic ? 0 : X(120) }}>{p.text.headingBottom}</span>
+              {p.text.headingTop ? <span style={{ fontSize: X(fitSize(p.text.headingTop, arabic ? 100 : 160, arabic ? 540 : 600, arabic)) }}>{p.text.headingTop}</span> : null}
+              {p.text.headingBottom ? (
+                <span style={{ fontSize: X(fitSize(p.text.headingBottom, arabic ? 100 : 160, arabic ? 540 : 540, arabic)), paddingInlineStart: arabic ? 0 : X(120) }}>
+                  {p.text.headingBottom}
+                </span>
+              ) : null}
             </>,
           )}
           {text(
             { ...pos(405, 890, 340, 180), fontFamily: f.body, textAlign: 'center', alignItems: 'center', gap: X(14) },
             <>
-              <span style={{ fontSize: X((p.message ?? p.text.wish).length > 90 ? 19 : 25), lineHeight: 1.35 }}>{clip(p.message ?? p.text.wish, 160)}</span>
+              {p.message || p.text.wish ? (
+                <span style={{ fontSize: X((p.message || p.text.wish).length > 90 ? 19 : 25), lineHeight: 1.35 }}>{clip(p.message || p.text.wish, 160)}</span>
+              ) : null}
               {p.name || p.date ? (
                 <span style={{ fontSize: X(14), fontWeight: 700, letterSpacing: arabic ? 0 : X(1), fontFamily: p.name ? nameFont(p.name) : f.body }}>
                   {[p.name, p.date].filter(Boolean).join(' · ')}
@@ -194,14 +208,18 @@ export function Collage({ fonts, ...p }: PrintCollageProps & { fonts?: { latin: 
 
       {p.kind === 'story' ? (
         <>
-          {text(
-            { ...pos(205, 110, 400, 90), fontFamily: f.display, fontWeight: 700, textAlign: 'center', alignItems: 'center' },
-            <span style={{ fontSize: X(arabic ? 52 : 64), letterSpacing: arabic ? 0 : X(4) }}>{p.text.kicker}</span>,
-          )}
-          {text(
-            { ...pos(90, arabic ? 175 : 190, 630, 150), fontFamily: f.script, fontWeight: 700, textAlign: 'center', alignItems: 'center' },
-            <span style={{ fontSize: X(arabic ? 96 : 150), lineHeight: 1 }}>{p.text.title}</span>,
-          )}
+          {p.text.kicker
+            ? text(
+                { ...pos(205, 110, 400, 90), fontFamily: f.display, fontWeight: 700, textAlign: 'center', alignItems: 'center' },
+                <span style={{ fontSize: X(arabic ? 52 : 64), letterSpacing: arabic ? 0 : X(4) }}>{p.text.kicker}</span>,
+              )
+            : null}
+          {p.text.title
+            ? text(
+                { ...pos(90, arabic ? 175 : 190, 630, 150), fontFamily: f.script, fontWeight: 700, textAlign: 'center', alignItems: 'center' },
+                <span style={{ fontSize: X(fitSize(p.text.title, arabic ? 96 : 150, 630, arabic)), lineHeight: 1 }}>{p.text.title}</span>,
+              )
+            : null}
           {p.name || p.date
             ? text(
                 { ...pos(70, 760, 225, 150), fontFamily: f.body, textAlign: 'center', alignItems: 'center', gap: X(8) },
@@ -214,14 +232,20 @@ export function Collage({ fonts, ...p }: PrintCollageProps & { fonts?: { latin: 
         </>
       ) : null}
 
-      {p.kind === 'wall'
+      {p.kind === 'wall' && p.text.caption
         ? text(
             { ...pos(170, 528, 228, 46), transform: 'rotate(2.75deg)', fontFamily: f.display, fontWeight: 700, textAlign: 'center', alignItems: 'center' },
-            <span style={{ fontSize: X(arabic ? 24 : 26), letterSpacing: arabic ? 0 : X(1.5), whiteSpace: 'nowrap' }}>{p.text.caption}</span>,
+            <span style={{ fontSize: X(Math.min(arabic ? 24 : 26, fitSize(p.text.caption, 26, 228, arabic))), letterSpacing: arabic ? 0 : X(1.5), whiteSpace: 'nowrap' }}>{p.text.caption}</span>,
           )
         : null}
     </div>
   );
+}
+
+/** A heading's size in the artwork's units: `max`, smaller for a long name so it stays within `width`. */
+function fitSize(text: string, max: number, width: number, arabic: boolean) {
+  const em = arabic ? 0.5 : 0.42;
+  return Math.min(max, width / (Math.max(3, Array.from(text).length) * em));
 }
 
 /** A long message, shortened to fit the poster's space (at a word). */
