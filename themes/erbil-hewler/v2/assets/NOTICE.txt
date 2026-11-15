@@ -1,0 +1,7 @@
+Artwork from the designer's Erbil · Hewlêr package (2026-11-14), compressed to WebP.
+
+- city-map.webp, street-map.webp: rasterised from the package's maps, drawn from real OpenStreetMap street and park
+  data. © OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright). The page and the printed
+  postcard credit them.
+- panorama.webp: the watercolour panorama from the package's wedding poster (Erbil-Wedding-Poster.pdf), with its
+  transparency.
