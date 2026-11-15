@@ -17,7 +17,7 @@ import {
 } from '@/theme-sdk';
 import { BORDER } from './border';
 import { PLACES, copyFor, type Copy, type PlaceKey } from './copy';
-import { OPENING_MS, progressAt, sceneAt, sunPoints } from './motion';
+import { OPENING_MS, progressAt, sceneAt } from './motion';
 import archFrame from './assets/arch-frame.webp';
 import citadel from './assets/citadel.webp';
 import cityMap from './assets/city-map.webp';
@@ -49,7 +49,6 @@ const ART: Record<PlaceKey, string> = {
   square: square.src,
   minaret: minaret.src,
 };
-const SUN_FLAG = sunPoints(60, 40, 11, 18);
 
 /* eslint-disable @next/next/no-img-element -- the design's layered watercolours */
 
@@ -221,10 +220,6 @@ export default function ErbilHewler(props: ThemeProps) {
             </div>
             <div className={c('gate-layer')} data-layer="gate" aria-hidden="true">
               <img src={gate.src} alt="" />
-              <div className={c('flag-pole')}>
-                <span />
-                <KurdishFlag className={c('kurdish-flag')} />
-              </div>
             </div>
             <div className={c('foreground', 'foliage-left')} data-layer="foliageLeft" aria-hidden="true">
               <div className={c('leaf-sway')}>
@@ -668,17 +663,6 @@ function FieldError({ id, children }: { id: string; children: ReactNode }) {
 }
 
 /* eslint-enable @next/next/no-img-element */
-
-function KurdishFlag({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 120 80" aria-hidden="true">
-      <path fill="#c23b37" d="M0 0H120V26.667H0z" />
-      <path fill="#fffced" d="M0 26.667H120V53.334H0z" />
-      <path fill="#308254" d="M0 53.334H120V80H0z" />
-      <polygon points={SUN_FLAG} fill="#e8b638" />
-    </svg>
-  );
-}
 
 function Rosette({ className }: { className: string }) {
   return (

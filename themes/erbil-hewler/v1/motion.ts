@@ -111,7 +111,7 @@ export function progressAt(ms: number) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-/** The Kurdish flag's sun (and the brand's): a 21-ray star as polygon points. */
+/** The sun of the design's sandstone ornaments and the printed poster: a 21-ray star as polygon points. */
 export function sunPoints(cx: number, cy: number, inner: number, outer: number, count = 21) {
   let points = '';
   for (let i = 0; i < count * 2; i++) {

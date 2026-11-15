@@ -3,7 +3,7 @@ import { ARCH_OUTLINE } from './outlines';
 
 /**
  * Erbil · Hewlêr: a wedding and engagement invitation through the streets of Erbil, in watercolour (the designer's
- * Erbil package, 2026-11-14). The cover is the citadel gate under a blue sky with the Kurdish flag and the couple's
+ * Erbil package, 2026-11-14). The cover is the citadel gate under a blue sky with the couple's
  * names; Open plays the journey (the designer drove it by scrolling; here it plays in 3.6 s): through the gate, past
  * the Citadel, through Shar Square and the Choli Minaret, onto the arched card. Then the website: the welcome, the city
  * atlas on the real street map (OpenStreetMap), the countdown, the day and the place, the Hewlêr postcard, a photo, the

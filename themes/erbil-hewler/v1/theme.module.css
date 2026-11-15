@@ -224,41 +224,6 @@
   height: 100%;
   object-fit: contain;
 }
-#frame .root .flag-pole {
-  position: absolute;
-  top: 8%;
-  left: 63%;
-  height: 120px;
-  width: 85px;
-  z-index: 4;
-}
-#frame .root .flag-pole > span {
-  height: 100%;
-  width: 2px;
-  background: #6b5741;
-  display: block;
-}
-#frame .root .kurdish-flag {
-  position: absolute;
-  top: 0;
-  left: 2px;
-  width: 64px;
-  height: 43px;
-  transform-origin: left center;
-  filter: drop-shadow(1px 1px 2px #0002);
-  animation: flag 4s ease-in-out infinite;
-  clip-path: polygon(0 0, 33% 3%, 66% 0, 100% 4%, 100% 96%, 66% 100%, 33% 97%, 0 100%);
-}
-@keyframes flag {
-  0%,
-  100% {
-    transform: perspective(160px) rotateY(-18deg) skewY(-3deg);
-  }
-  50% {
-    transform: perspective(160px) rotateY(18deg) skewY(3deg);
-    clip-path: polygon(0 0, 33% 0, 66% 4%, 100% 0, 100% 100%, 66% 96%, 33% 100%, 0 100%);
-  }
-}
 #frame .root .city-world {
   position: absolute;
   inset: 0;
@@ -1155,13 +1120,6 @@
     width: max(190vw, 790px);
     bottom: -13vh;
     aspect-ratio: 3/2;
-  }
-  #frame .root .flag-pole {
-    height: 70px;
-    top: 8%;
-    left: 62%;
-    transform: scale(0.6);
-    transform-origin: left bottom;
   }
   #frame .root .city-square {
     width: 138%;
