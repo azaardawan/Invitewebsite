@@ -42,7 +42,7 @@ export type ProductData = {
   theme: { codeRef: string; props: Omit<PrintExtraProps, 'shape' | 'size'> } | null;
   locale: InvitationLocale;
   /** Photo collages: the customer's photos (full size) and the lines written on them. */
-  collage: Pick<PrintCollageProps, 'photos' | 'name' | 'message' | 'date' | 'text'>;
+  collage: Pick<PrintCollageProps, 'photos' | 'name' | 'message' | 'date' | 'text' | 'love'>;
   /** Couple posters (packages with `couple_poster`): what the design's print/Poster.tsx draws, or null. */
   poster: (Omit<PrintPosterProps, 'orientation' | 'size' | 'main' | 'row' | 'texts'> & { picks: Record<PrintPosterProps['orientation'], Pick<PrintPosterProps, 'main' | 'row' | 'texts'>> }) | null;
 };

@@ -49,6 +49,8 @@ export function productDataFrom(
 ): ProductData {
   const msgs = invitationMessages(props.locale) as unknown as { print: { watermark: string; watermarkNote: string; collage: CollageText } };
   const f = props.fields;
+  // Couples and friends: no birthday wording or drawings on the collages; their names take the lettering's place.
+  const love = props.occasion === 'couples' || props.occasion === 'friends';
   const gender = f.baby_gender === 'boy' || f.baby_gender === 'girl' ? f.baby_gender : null;
   return {
     dir: props.dir,
@@ -66,7 +68,7 @@ export function productDataFrom(
     bottleSize: opts.bottleSize ?? DEFAULT_BOTTLE_SIZE,
     watermark: opts.watermark,
     locale: props.locale,
-    collage: {
+    collage: love ? loveCollage(opts.collagePhotos ?? [], f, props.labels.and) : {
       photos: opts.collagePhotos ?? [],
       name: f.person_1_name ?? f.baby_name ?? null,
       message: f.invitation_message?.trim() || null,
@@ -141,4 +143,19 @@ export async function posterContact(db: DbOrTx): Promise<PrintPosterProps['conta
 export function spacedPhone(e164: string): string {
   const m = /^\+964(\d{3})(\d{3})(\d{4})$/.exec(e164);
   return m ? `+964 ${m[1]} ${m[2]} ${m[3]}` : e164;
+}
+
+/** The collages of a couple's or two friends' page: their names where the birthday lettering was, nothing else. */
+function loveCollage(photos: ThemePhoto[], f: ThemeProps['fields'], and: string) {
+  const one = f.person_1_name?.trim() ?? '';
+  const two = f.person_2_name?.trim() ?? '';
+  const both = [one, two].filter(Boolean).join(` ${and} `);
+  return {
+    photos,
+    name: null,
+    message: null,
+    date: null,
+    love: true,
+    text: { headingTop: one, headingBottom: two ? `${and} ${two}` : '', kicker: '', title: both, caption: both, wish: '' },
+  };
 }

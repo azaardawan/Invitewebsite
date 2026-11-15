@@ -1881,3 +1881,126 @@ this one while the owner hasn't changed it in Admin.
 | 2 | Template editor (`template.music`): the heading over the music choice | الموسيقى في الخلفية | Background music | مۆسیقای پاشبنەما | مۆسیقایا پاشبنەمایێ |
 | 3 | Template editor (`template.musicOn`) | مع موسيقى | With music | لەگەڵ مۆسیقا | دگەل مۆسیقایێ |
 | 4 | Template editor (`template.musicOff`) | بدون موسيقى | No music | بێ مۆسیقا | بێ مۆسیقا |
+
+
+## Batch 60 — Ever Bloom (#28, couples) and Erbil · Hewlêr (#29, weddings): their pages, the printed card and the letter field — ✅ AUTO-APPROVED (2026-11-14, owner checks in Admin → Translations)
+
+Ever Bloom's fixed page texts and the lines the customer may rewrite in place (`themes/ever-bloom/v1/copy.ts`), its
+photo places; the new couples field `letter` (the customer's own letter) and its samples; Erbil · Hewlêr's page texts
+(`themes/erbil-hewler/v1/copy.ts`) and the texts printed on its card and arch card (`print/words.ts`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #28 Ever Bloom: the design’s name | إيفر بلوم | Ever Bloom | ئێڤەر بلووم | ئێڤەر بلووم |
+| 2 | #28 wording `title`: its label in the editor | العنوان | The title | ناونیشان | ناڤونیشان |
+| 3 | #28 wording `intro`: its label in the editor | السطر تحت العنوان | The line under the title | دێڕی ژێر ناونیشان | رێزا ژێر ناڤونیشانی |
+| 4 | #28 wording `memoryTitle`: its label in the editor | عنوان الصور | The photos’ title | ناونیشانی وێنەکان | ناڤونیشانێ وێنەیان |
+| 5 | #28 wording `memoryIntro`: its label in the editor | السطر تحت عنوان الصور | The line under the photos’ title | دێڕی ژێر ناونیشانی وێنەکان | رێزا ژێر ناڤونیشانێ وێنەیان |
+| 6 | #28 wording `salutation`: its label in the editor | بداية الرسالة | The letter’s greeting | سڵاوی نامەکە | سلاڤا نامێ |
+| 7 | #28 wording `signoff`: its label in the editor | ختام الرسالة | The letter’s closing | کۆتاییی نامەکە | دوماهیا نامێ |
+| 8 | #28 wording `footer`: its label in the editor | السطر الأخير | The last line | دوایین دێڕ | دوماهیک رێز |
+| 9 | #28 wording `footerSub`: its label in the editor | تحت السطر الأخير | Under the last line | ژێر دوایین دێڕ | ژێر دوماهیک رێزێ |
+| 10 | #28 wording `title`: the line | منّي إليك. | From me to you. | لە منەوە بۆ تۆ. | ژ من بۆ تە. |
+| 11 | #28 wording `intro`: the line | لكل اللحظات الصغيرة التي تصنع حكايتنا. | For all the little moments that make us, us. | بۆ هەموو ئەو ساتە بچووکانەی چیرۆکەکەمان دروست دەکەن. | بۆ هەمی ئەو دەمێن بچووک یێن چیرۆکا مە چێدکەن. |
+| 12 | #28 wording `memoryTitle`: the line | نحن، في لحظات. | Us, in moments. | ئێمە، لە ساتەکاندا. | ئەم، د دەمان دا. |
+| 13 | #28 wording `memoryIntro`: the line | أيام أتمنى لو تبقى إلى الأبد. | The days I wish I could keep forever. | ئەو ڕۆژانەی خۆزگە بۆ هەمیشە بمانایەتەوە. | ئەو ڕۆژێن من دڤێت هەروهەر بمینن. |
+| 14 | #28 wording `salutation`: the line | حبيبي، | My love, | خۆشەویستەکەم، | خۆشتڤیێ من، |
+| 15 | #28 wording `signoff`: the line | لك دائماً، | Always yours, | هەمیشە هی تۆم، | هەردەم یێ تە مە، |
+| 16 | #28 wording `footer`: the line | سأختارك دائماً. | I’ll always choose you. | هەمیشە تۆ هەڵدەبژێرم. | ئەز هەردەم دێ تە هەلبژێرم. |
+| 17 | #28 wording `footerSub`: the line | في أبسط الأشياء، وفي كل شيء. | In the little things. In everything. | لە بچووکترین شتەکاندا، لە هەموو شتێکدا. | د بچووکترین تشتان دا، د هەمی تشتان دا. |
+| 18 | #28 page text `giftFor` | لك، | For you, | بۆ تۆ، | بۆ تە، |
+| 19 | #28 page text `hint` | مفاجأة صغيرة، لأنك تستحق | a little surprise, just because | سوپرایزێکی بچووک، تەنها لەبەر ئەوەی شایەنی | سوپرایزەکا بچووک، چونکی تو هێژایی |
+| 20 | #28 page text `tap` | اضغط لفتح الهدية | Tap to open | دەست بنێ بۆ کردنەوەی دیارییەکە | دەستێ بدە بۆ ڤەکرنا دیاریێ |
+| 21 | #28 page text `eyebrow` | هدية صغيرة من القلب | A little gift of love | دیارییەکی بچووک لە دڵەوە | دیاریەکا بچووک ژ دلی |
+| 22 | #28 page text `continue` | المزيد من الحب | A little further | خۆشەویستیی زیاتر | ڤیانا پتر |
+| 23 | #28 page text `memories` | عالمنا الصغير | Our little world | جیهانە بچووکەکەمان | جیهانا مە یا بچووک |
+| 24 | #28 page text `letterLabel` | كلمات من القلب | Something I wanted to say | وشەگەلێک لە دڵەوە | پەیڤێن ژ دلی |
+| 25 | #28 page text `replay` | أعد عرض الزهور | Replay the flowers | گوڵەکان دووبارە ببینەوە | گولان جارەکا دی ببینە |
+| 26 | #28 page text `addPhoto` | أضف صورة | Add a photo | وێنەیەک زیاد بکە | وێنەیەکی زێدە بکە |
+| 27 | #28 page text `namePlaceholder` | الاسم | Name | ناو | ناڤ |
+| 28 | #28 page text `letterPlaceholder` | اكتب رسالتك هنا… | Write your letter here… | نامەکەت لێرە بنووسە… | نامەیا خۆ ل ڤێرێ بنڤیسە… |
+| 29 | #28 photo place 1 | الصورة الكبيرة | The big photo | وێنە گەورەکە | وێنێ مەزن |
+| 30 | #28 photo place 2 | الصورة الصغيرة | The small photo | وێنە بچووکەکە | وێنێ بچووک |
+| 31 | #28 photo place 3 | الصورة الطويلة | The tall photo | وێنە درێژەکە | وێنێ درێژ |
+| 32 | #29 Erbil · Hewlêr: the design’s name | هەولێر | Erbil · Hewlêr | هەولێر | هەولێر |
+| 33 | #29 page text `cityLine` | أربيل · كردستان | Erbil · Kurdistan | هەولێر · کوردستان | هەولێر · کوردستان |
+| 34 | #29 page text `wedding` | يحتفلان بزفافهما | are getting married | ئاهەنگی هاوسەرگیرییان دەگێڕن | ئاهەنگا زەواجا خۆ دگێڕن |
+| 35 | #29 page text `engagement` | يحتفلان بخطوبتهما | are getting engaged | ئاهەنگی دەستگیرانییان دەگێڕن | ئاهەنگا دەستگیرانیا خۆ دگێڕن |
+| 36 | #29 page text `cue` | اضغط للفتح | Tap to open | دەست بنێ بۆ کردنەوە | دەستێ بدە بۆ ڤەکرنێ |
+| 37 | #29 page text `citadelEyebrow` | ٠١ · قلعة أربيل | 01 · The Citadel of Erbil | ٠١ · قەڵای هەولێر | ٠١ · کەلها هەولێرێ |
+| 38 | #29 page text `citadelTitle` | قلبُ | The heart | دڵی | دلێ |
+| 39 | #29 page text `citadelEm` | مدينتنا. | of our city. | شارەکەمان. | باژێرێ مە. |
+| 40 | #29 page text `citadelLine` | بعض الأماكن جزءٌ من كل حكاية. | Some places are part of every story. | هەندێک شوێن بەشێکن لە هەموو چیرۆکێک. | هندەک جه پشکەکن ژ هەمی چیرۆکان. |
+| 41 | #29 page text `squareNote` | ساحة شار | Shar Square | گۆڕەپانی شار | گۆڕەپانا شار |
+| 42 | #29 page text `minaretNote` | منارة الجولي | Choli Minaret | منارەی چۆلی | منارا چۆلی |
+| 43 | #29 page text `cityEyebrow` | هنا بدأت حكايتنا | Where our story begins | لێرەوە چیرۆکەکەمان دەست پێدەکات | ژ ڤێرێ چیرۆکا مە دەستپێدکەت |
+| 44 | #29 page text `cityTitle` | في قلب | In the heart | لە دڵی | د دلێ |
+| 45 | #29 page text `cityEm` | هەولێر. | of Hewlêr. | هەولێردا. | هەولێرێ دا. |
+| 46 | #29 page text `together` | مع عائلتينا | Together with our families | لەگەڵ هەردوو خێزانەکەمان | دگەل هەردوو مالباتێن مە |
+| 47 | #29 page text `city` | أربيل، كردستان | Erbil, Kurdistan | هەولێر، کوردستان | هەولێر، کوردستان |
+| 48 | #29 page text `welcomeEyebrow` | شيءٌ من مدينتنا، وعمرٌ معاً. | A little of our city. A lifetime together. | کەمێک لە شارەکەمان، تەمەنێک پێکەوە. | هندەک ژ باژێرێ مە، تەمەنەک پێکڤە. |
+| 49 | #29 page text `welcomeTitle` | حيث جذورنا عميقة، | Where our roots run deep, | لەو شوێنەی ڕەگمان قووڵە، | ل وی جهێ ڕەهێن مە کویرن، |
+| 50 | #29 page text `welcomeEm` | وحيث تبدأ حكايتنا. | and our story begins. | و چیرۆکەکەمان دەست پێدەکات. | و چیرۆکا مە دەستپێدکەت. |
+| 51 | #29 page text `atlasEyebrow` | الشوارع التي جمعتنا | The streets that bring us together | ئەو شەقامانەی کۆمانیان کردەوە | ئەو جادێن ئەم کۆمکرین |
+| 52 | #29 page text `atlasTitle` | مدينةٌ منسوجة | A city woven | شارێک کە چنراوە | باژێرەک یێ هاتییە ڕستن |
+| 53 | #29 page text `atlasEm` | في حكايتنا. | into our story. | لە چیرۆکەکەماندا. | د چیرۆکا مە دا. |
+| 54 | #29 page text `atlasIntro` | شوارع هەولێر المألوفة، من القلعة إلى الساحة القديمة وحديقة المنارة. | The familiar streets of Hewlêr, from the Citadel to the old square and Minaret Park. | شەقامە ناسراوەکانی هەولێر، لە قەڵاوە بۆ گۆڕەپانە کۆنەکە و پارکی منارە. | جادێن نیاسکری یێن هەولێرێ، ژ کەلهێ بۆ گۆڕەپانا کەڤن و پارکا منارێ. |
+| 55 | #29 page text `atlasChoose` | اختر معلماً من المدينة | Choose a city landmark | شوێنەوارێکی شار هەڵبژێرە | جهەکێ دیار ژ باژێری هەلبژێرە |
+| 56 | #29 page text `citadel` | القلعة | The Citadel | قەڵا | کەلها |
+| 57 | #29 page text `square` | ساحة شار | Shar Square | گۆڕەپانی شار | گۆڕەپانا شار |
+| 58 | #29 page text `minaret` | منارة الجولي | Choli Minaret | منارەی چۆلی | منارا چۆلی |
+| 59 | #29 page text `citadelText` | ظلّ الحجر الدافئ الذي يرحّب بنا في بيتنا. | The warm stone silhouette that welcomes us home. | سێبەری بەردە گەرمەکە کە بەخێرهاتنمان دەکات بۆ ماڵەوە. | سیبەرا بەرێ گەرم یا بخێرهاتنا مە دکەت بۆ مالێ. |
+| 60 | #29 page text `squareText` | طوبٌ ذهبي، وماءٌ بارد، ومكانٌ يجمعنا. | Golden brick, cool water, and a place to gather. | خشتی زێڕین، ئاوی فێنک، و شوێنێک بۆ کۆبوونەوە. | خشتێ زێڕین، ئاڤا فێنک، و جهەک بۆ کۆمبوونێ. |
+| 61 | #29 page text `minaretText` | معلمٌ مألوف، مرسومٌ بألوان مدينتنا. | A familiar landmark, drawn in the colours of our city. | شوێنەوارێکی ناسراو، کێشراو بە ڕەنگەکانی شارەکەمان. | جهەکێ دیار و نیاسکری، ب ڕەنگێن باژێرێ مە هاتییە کێشان. |
+| 62 | #29 page text `mapHeading` | هەولێر | Hewlêr | هەولێر | هەولێر |
+| 63 | #29 page text `mapSub` | شوارع ومعالم · أربيل | Streets & landmarks · Erbil | شەقام و شوێنەوارەکان · هەولێر | جادە و جهێن دیار · هەولێر |
+| 64 | #29 page text `north` | ش ↑ | N ↑ | باکوور ↑ | باکوور ↑ |
+| 65 | #29 page text `scale` | ٥٠٠ م | 500 m | ٥٠٠ م | ٥٠٠ م |
+| 66 | #29 page text `mapAlt` | خريطة وسط أربيل بشوارعها والقلعة والحدائق حولها | Map of central Erbil with its streets, the Citadel and the parks around it | نەخشەی ناوەندی هەولێر بە شەقامەکانی، قەڵا و پارکەکانی دەوروبەری | نەخشەیا ناڤەندا هەولێرێ ب جادێن وێ، کەلها و پارکێن دەوروبەر |
+| 67 | #29 page text `googleMaps` | افتح في خرائط Google ↗ | Explore in Google Maps ↗ | لە Google Maps بیبینە ↗ | ل Google Maps ببینە ↗ |
+| 68 | #29 page text `countEyebrow` | كل يومٍ نقترب قليلاً | Every day, a little closer | هەموو ڕۆژێک کەمێک نزیکتر | هەر ڕۆژەکێ هندەکێ نێزیکتر |
+| 69 | #29 page text `countTitle` | حتى نحتفل. | Until we celebrate. | تا ئاهەنگ دەگێڕین. | هەتا ئاهەنگێ دگێڕین. |
+| 70 | #29 page text `detailsEyebrow` | الاحتفال | The celebration | ئاهەنگەکە | ئاهەنگ |
+| 71 | #29 page text `detailsTitle` | اليوم. | The day. | ڕۆژەکە. | ڕۆژ. |
+| 72 | #29 page text `detailsEm` | والمكان. | The place. | شوێنەکە. | جه. |
+| 73 | #29 page text `erbilTime` | بتوقيت أربيل | Erbil time | کاتی هەولێر | دەمێ هەولێرێ |
+| 74 | #29 page text `openLocation` | افتح الموقع ↗ | Open location ↗ | شوێنەکە بکەرەوە ↗ | جهی ڤەکە ↗ |
+| 75 | #29 page text `postcardEyebrow` | بطاقة بريدية من مدينتنا | A postcard from our city | کارتێکی پۆستی لە شارەکەمانەوە | کارتەکا پۆستێ ژ باژێرێ مە |
+| 76 | #29 page text `postcardTitle` | مع الحب، | With love, | بە خۆشەویستییەوە، | ب ڤیان، |
+| 77 | #29 page text `postcardEm` | من هەولێر. | from Hewlêr. | لە هەولێرەوە. | ژ هەولێرێ. |
+| 78 | #29 page text `postcardLine` | القلعة والساحة القديمة ومنارة الجولي، مجتمعةً في ذكرى مرسومة بالألوان المائية. | The Citadel, the old square, and Choli Minaret, gathered in one watercolor keepsake. | قەڵا، گۆڕەپانە کۆنەکە و منارەی چۆلی، کۆکراونەتەوە لە یادگارییەکی ئاوڕەنگدا. | کەلها، گۆڕەپانا کەڤن و منارا چۆلی، د بیرهاتنەکا ئاڤڕەنگ دا کۆمبووینە. |
+| 79 | #29 page text `turnOver` | اضغط على البطاقة لتقلبها | Tap the postcard to turn it over | دەست بنێ بە کارتەکەدا بۆ وەرگێڕانی | دەستێ بدە کارتێ دا بۆ زڤڕاندنێ |
+| 80 | #29 page text `turnLabel` | اقلب بطاقة هەولێر البريدية | Turn over the Hewlêr postcard | کارتی پۆستیی هەولێر وەربگێڕە | کارتا پۆستێ یا هەولێرێ بزڤڕینە |
+| 81 | #29 page text `edition` | إصدار هەولێر | The Hewlêr edition | چاپی هەولێر | چاپا هەولێرێ |
+| 82 | #29 page text `keepTitle` | مدينةٌ | A city to | شارێک | باژێرەک |
+| 83 | #29 page text `keepEm` | نبقيها قريبة. | keep close. | لە نزیکمان بمێنێتەوە. | نێزیکی مە بمینیت. |
+| 84 | #29 page text `keep1` | حجرٌ ذهبي فوق الساحة، وساعةٌ مألوفة، والمنارة ترتفع بجانب طريقٍ هادئ. | Golden stone above the square. A familiar clock. The Minaret rising beside a quiet path. | بەردی زێڕین لە سەر گۆڕەپانەکە، کاتژمێرێکی ناسراو، و منارەکە لە تەنیشت ڕێگایەکی ئارام بەرز دەبێتەوە. | بەرێ زێڕین ل سەر گۆڕەپانێ، دەمژمێرەکا نیاسکری، و منارە ل تەنشت ڕێکەکا ئارام بلند دبیت. |
+| 85 | #29 page text `keep2` | قطعةٌ صغيرة من البيت، جاهزةٌ لتُرسَل. | A little piece of home, ready to send. | پارچەیەکی بچووک لە ماڵەوە، ئامادەیە بۆ ناردن. | پارچەکا بچووک ژ مالێ، ئامادەیە بۆ هنارتنێ. |
+| 86 | #29 page text `photoEyebrow` | أجمل مكانٍ أن نكون معاً | Our favourite place is together | خۆشترین شوێن ئەوەیە کە پێکەوە بین | خۆشترین جه ئەوە کو ئەم پێکڤە بین |
+| 87 | #29 page text `photoTitle` | لحظةٌ، | A moment, | ساتێک، | دەمەک، |
+| 88 | #29 page text `photoEm` | محفوظةٌ إلى الأبد. | kept forever. | بۆ هەمیشە پارێزراو. | بۆ هەروهەر پاراستی. |
+| 89 | #29 page text `replyEyebrow` | حضوركم أجمل هدية | Your presence is our favourite gift | ئامادەبوونتان خۆشترین دیارییە | ئامادەبوونا هەوە خۆشترین دیاریە |
+| 90 | #29 page text `replyTitle` | هل ستكونون | Will you | ئایا دێنە | ئەرێ هوین دێ |
+| 91 | #29 page text `replyEm` | معنا؟ | join us? | لامان؟ | ئێنە نک مە؟ |
+| 92 | #29 page text `wishesEyebrow` | تهانيكم | Your wishes | پیرۆزباییەکانتان | پیرۆزباهیێن هەوە |
+| 93 | #29 page text `farewellEyebrow` | مع الحب، من كردستان | With love, from Kurdistan | بە خۆشەویستییەوە، لە کوردستانەوە | ب ڤیان، ژ کوردستانێ |
+| 94 | #29 page text `farewellTitle` | صحبةٌ طيبة. | Good company. | هاوڕێیەتیی خۆش. | هەڤالینیا خۆش. |
+| 95 | #29 page text `farewellEm` | وبداياتٌ جميلة. | Beautiful beginnings. | سەرەتای جوان. | دەستپێکێن جوان. |
+| 96 | #29 page text `backTop` | العودة إلى البداية ↑ | Back to the beginning ↑ | گەڕانەوە بۆ سەرەتا ↑ | زڤڕین بۆ دەستپێکێ ↑ |
+| 97 | #29 page text `mapLicense` | الخرائط من بيانات شوارع حقيقية. © OpenStreetMap contributors · ODbL | Maps use real street data. © OpenStreetMap contributors · ODbL | نەخشەکان داتای ڕاستەقینەی شەقامەکانن. © OpenStreetMap contributors · ODbL | نەخشە داتایێن ڕاستەقینە یێن جادانن. © OpenStreetMap contributors · ODbL |
+| 98 | #29 printed text `together` | مع عائلتينا | Together with our families | لەگەڵ هەردوو خێزانەکەمان | دگەل هەردوو مالباتێن مە |
+| 99 | #29 printed text `inviteWedding` | ندعوكم لتشاركونا بداية حكايتنا إلى الأبد. | invite you to celebrate the beginning of our forever. | بانگهێشتتان دەکەین بۆ ئاهەنگی سەرەتای هەمیشەییمان. | مە هوین داخوازکرین بۆ ئاهەنگا دەستپێکا هەروهەریا مە. |
+| 100 | #29 printed text `inviteEngagement` | ندعوكم لتشاركونا فرحة خطوبتنا. | invite you to celebrate our engagement. | بانگهێشتتان دەکەین بۆ ئاهەنگی دەستگیرانیمان. | مە هوین داخوازکرین بۆ ئاهەنگا دەستگیرانیا مە. |
+| 101 | #29 printed text `city` | أربيل · كردستان | Erbil · Kurdistan | هەولێر · کوردستان | هەولێر · کوردستان |
+| 102 | #29 printed text `footer` | حيث جذورنا عميقة، وحيث تبدأ حكايتنا | Where our roots run deep & our story begins | لەو شوێنەی ڕەگمان قووڵە و چیرۆکەکەمان دەست پێدەکات | ل وی جهێ ڕەهێن مە کویرن و چیرۆکا مە دەستپێدکەت |
+| 103 | #29 printed text `postcard` | بطاقة بريدية | Postcard | کارتی پۆستی | کارتا پۆستێ |
+| 104 | #29 printed text `from` | من هەولێر، مع الحب | From Hewlêr, with love | لە هەولێرەوە، بە خۆشەویستییەوە | ژ هەولێرێ، ب ڤیان |
+| 105 | #29 printed text `stamp` | هەولێر | Hewlêr | هەولێر | هەولێر |
+| 106 | #29 printed text `stampSub` | كردستان | Kurdistan | کوردستان | کوردستان |
+| 107 | #29 printed text `landmarks` | القلعة · ساحة شار · منارة الجولي | The Citadel · Shar Square · Choli Minaret | قەڵا · گۆڕەپانی شار · منارەی چۆلی | کەلها · گۆڕەپانا شار · منارا چۆلی |
+| 108 | #29 printed text `mapCredit` | بيانات الخريطة © OpenStreetMap contributors | Map data © OpenStreetMap contributors | داتای نەخشە © OpenStreetMap contributors | داتایێن نەخشێ © OpenStreetMap contributors |
+| 109 | #29 photo place 1 | صورتكما | Your photo | وێنەکەتان | وێنێ هەوە |
+| 110 | #29 printed card «arch» | قوس | Arch | کەوانە | کەڤان |
+| 111 | Field `letter` (couples/friends): its label | الرسالة | The letter | نامەکە | نامە |
+| 112 | Sample `invitationSamples.short.letter` | أجمل لحظاتي هي تلك اللحظات الهادئة معك؛ ضحكاتنا وسط الأيام العادية، ومغامراتنا الصغيرة، وكل شيء يصبح أجمل حين تكون بقربي.  لكل الذكريات التي صنعناها، ولكل ما ينتظرنا معاً. | Some of my favourite moments are the quiet ones with you. The laughter in between ordinary days, the little adventures, and the way everything feels softer when you are here.  Here is to all the memories we have made, and all the ones still waiting for us. | جوانترین ساتەکانم ئەو ساتە ئارامانەن کە لەگەڵ تۆدام؛ پێکەنینەکانمان لە نێو ڕۆژە ئاساییەکاندا، گەشتە بچووکەکانمان، و هەموو شتێک کە لە نزیکیی تۆدا جوانتر دەبێت.  بۆ هەموو ئەو یادەوەرییانەی دروستمان کردن، و بۆ هەموو ئەوانەی هێشتا چاوەڕێمانن. | جوانترین دەمێن من ئەو دەمێن ئارامن یێن دگەل تە؛ کەنیێن مە د ناڤ ڕۆژێن ئاسایی دا، گەشتێن مە یێن بچووک، و هەمی تشت کو ل نێزیکی تە جوانتر دبن.  بۆ هەمی ئەو بیرهاتنێن مە چێکرین، و بۆ هەمی ئەوێن هێشتا ل هیڤیا مە. |
+| 113 | Sample `invitationSamples.long.letter` | بعض أجمل لحظاتي هي تلك اللحظات الهادئة معك. ضحكاتنا وسط الأيام العادية، ومغامراتنا الصغيرة، والطريقة التي يصبح بها كل شيء أجمل حين تكون بقربي.  هذه رسالة صغيرة مغلّفة بالزهور: أنت محبوب، ووجودك غالٍ، وأنا ممتن لأن طرقنا التقت.  لكل الذكريات التي صنعناها، ولكل ما ينتظرنا معاً. | Some of my favourite moments are the quiet ones with you. The laughter in between ordinary days. The little adventures. The way everything feels a little softer when you are here.  So here is a small reminder, wrapped in flowers: you are loved, you are appreciated, and I am so glad our paths found each other.  Here is to all the memories we have made, and all the ones still waiting for us. | هەندێک لە جوانترین ساتەکانم ئەو ساتە ئارامانەن کە لەگەڵ تۆدام. پێکەنینەکانمان لە نێو ڕۆژە ئاساییەکاندا، گەشتە بچووکەکانمان، و ئەو شێوەیەی هەموو شتێک لە نزیکیی تۆدا نەرمتر دەبێت.  ئەمە بیرخستنەوەیەکی بچووکە، پێچراو لە گوڵدا: تۆ خۆشەویستی، بوونت بەنرخە، و دڵخۆشم کە ڕێگاکانمان یەکیان گرتەوە.  بۆ هەموو ئەو یادەوەرییانەی دروستمان کردن، و بۆ هەموو ئەوانەی هێشتا چاوەڕێمانن. | هندەک ژ جوانترین دەمێن من ئەو دەمێن ئارامن یێن دگەل تە. کەنیێن مە د ناڤ ڕۆژێن ئاسایی دا، گەشتێن مە یێن بچووک، و ئەو ڕێکا هەمی تشت ل نێزیکی تە نەرمتر دبن.  ئەڤە بیرئینانەکا بچووکە، پێچایی د گولان دا: تو خۆشتڤی یی، هەبوونا تە بها هەیە، و ئەز دلخۆشم کو ڕێکێن مە ئێک گرتن.  بۆ هەمی ئەو بیرهاتنێن مە چێکرین، و بۆ هەمی ئەوێن هێشتا ل هیڤیا مە. |
