@@ -18,9 +18,14 @@ export default async function PasswordPage() {
         <SubmitButton>{t('password.submit')}</SubmitButton>
       </ActionForm>
       {!user.mustChangePassword ? (
-        <Link href="/admin" className="mt-4 inline-block text-sm text-muted underline">
-          {t('nav.dashboard')}
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
+          <Link href="/admin" className="underline">
+            {t('nav.dashboard')}
+          </Link>
+          <Link href="/admin/account/devices" className="underline">
+            {t('devices.heading')}
+          </Link>
+        </div>
       ) : null}
     </AuthCard>
   );

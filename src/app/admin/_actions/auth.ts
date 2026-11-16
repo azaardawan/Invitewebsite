@@ -5,7 +5,10 @@ import { z } from 'zod';
 import { db } from '@/server/db/client';
 import { requestContext } from '@/server/auth/request-context';
 import { changePassword, confirmTotpEnrollment, loginWithPassword, logout, verifySecondFactor } from '@/server/auth/service';
-import { clearSessionCookie, getCurrentAdmin, setSessionCookie } from '@/server/auth/current';
+import { clearDeviceCookie, clearSessionCookie, deviceCookie, getCurrentAdmin, setDeviceCookie, setSessionCookie } from '@/server/auth/current';
+import { forgetDevice, forgetUserDevices } from '@/server/auth/trusted-device';
+import { recordAudit } from '@/server/audit/audit';
+import { revalidatePath } from 'next/cache';
 import { AUTH_STEP_PATHS, requireAdmin } from '@/server/auth/guard';
 import type { ActionState } from './state';
 
@@ -14,9 +17,9 @@ const loginSchema = z.object({ email: z.email().max(254), password: z.string().m
 export async function loginAction(_: ActionState, form: FormData): Promise<ActionState> {
   const parsed = loginSchema.safeParse({ email: form.get('email'), password: form.get('password') });
   if (!parsed.success) return { error: 'login.invalid' };
-  const result = await loginWithPassword(db(), parsed.data, await requestContext());
+  const result = await loginWithPassword(db(), { ...parsed.data, deviceToken: await deviceCookie() }, await requestContext());
   if (!result.ok) return { error: `login.${result.error}` };
-  await setSessionCookie(result.token, { mfaVerified: false });
+  await setSessionCookie(result.token, { mfaVerified: result.mfaVerified });
   redirect(AUTH_STEP_PATHS[result.step]);
 }
 
@@ -26,9 +29,10 @@ export async function verifyAction(_: ActionState, form: FormData): Promise<Acti
   const { session } = await requireAdmin({ steps: ['verify-2fa'] });
   const code = codeSchema.safeParse(form.get('code'));
   if (!code.success) return { error: 'verify.invalid' };
-  const result = await verifySecondFactor(db(), session, code.data, await requestContext());
+  const result = await verifySecondFactor(db(), session, code.data, await requestContext(), { remember: form.get('remember') === 'on' });
   if (!result.ok) return { error: result.error === 'rateLimited' ? 'verify.rateLimited' : 'verify.invalid' };
   await setSessionCookie(result.token, { mfaVerified: true });
+  if (result.deviceToken) await setDeviceCookie(result.deviceToken);
   redirect(`${AUTH_STEP_PATHS[result.step]}${result.usedRecoveryCode ? '?recovery=1' : ''}`);
 }
 
@@ -62,6 +66,31 @@ export async function changePasswordAction(_: ActionState, form: FormData): Prom
   if (!result.ok) return { error: `password.${result.error}` };
   if (user.mustChangePassword) redirect('/admin');
   return { ok: true, message: 'password.saved' };
+}
+
+/** Forgets one of the signed-in admin's remembered devices, or all of them (`all`). */
+export async function forgetDeviceAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin();
+  const all = form.get('all') === '1';
+  const id = z.uuid().safeParse(form.get('id'));
+  if (!all && !id.success) return { error: 'users.errors.invalid' };
+  const ctx = await requestContext();
+  const gone = await db().transaction(async (tx) => {
+    const n = all ? await forgetUserDevices(tx, user.id) : Number(await forgetDevice(tx, user.id, id.data!));
+    if (n)
+      await recordAudit(tx, {
+        actorType: 'ADMIN',
+        actorAdminId: user.id,
+        action: all ? 'auth.devices_forgotten' : 'auth.device_forgotten',
+        objectType: 'admin_user',
+        objectId: user.id,
+        ipHash: ctx.ipHash,
+      });
+    return n;
+  });
+  if (all) await clearDeviceCookie();
+  revalidatePath('/admin/account/devices');
+  return gone ? { ok: true, message: 'devices.forgotten' } : { error: 'users.errors.invalid' };
 }
 
 export async function logoutAction(): Promise<void> {

@@ -12,6 +12,13 @@ export default async function VerifyPage() {
       <p className="mb-4 text-sm text-muted">{t('verify.intro')}</p>
       <ActionForm action={verifyAction} className="space-y-4">
         <Field label={t('verify.code')} name="code" autoComplete="one-time-code" dir="ltr" />
+        <label className="flex items-start gap-2 text-sm">
+          <input type="checkbox" name="remember" className="mt-0.5 size-4 shrink-0 accent-accent" />
+          <span>
+            {t('verify.remember')}
+            <span className="mt-0.5 block text-xs text-muted">{t('verify.rememberHint')}</span>
+          </span>
+        </label>
         <SubmitButton>{t('verify.submit')}</SubmitButton>
       </ActionForm>
     </AuthCard>

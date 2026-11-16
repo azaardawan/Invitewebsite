@@ -5,6 +5,7 @@ import { adminRecoveryCodes, adminUserRoles, adminUsers, roles } from '@/server/
 import { recordAudit } from '@/server/audit/audit';
 import { hashPassword } from '@/server/auth/password';
 import { revokeUserSessions } from '@/server/auth/session';
+import { forgetUserDevices } from '@/server/auth/trusted-device';
 import { randomToken } from '@/lib/crypto';
 
 export type Actor = { adminId: string | null; ipHash: string | null; type?: 'ADMIN' | 'SYSTEM' };
@@ -147,7 +148,10 @@ export async function setUserStatus(
       if (ownRoles.some((r) => r.key === 'OWNER')) throw new AdminUserError('lastOwner');
     }
     await tx.update(adminUsers).set({ status }).where(eq(adminUsers.id, userId));
-    if (status === 'DISABLED') await revokeUserSessions(tx, userId);
+    if (status === 'DISABLED') {
+      await revokeUserSessions(tx, userId);
+      await forgetUserDevices(tx, userId);
+    }
     await recordAudit(tx, {
       ...actorFields(actor),
       action: status === 'DISABLED' ? 'admin_user.disabled' : 'admin_user.enabled',
@@ -172,6 +176,7 @@ export async function resetUserTwoFactor(db: DbOrTx, userId: string, actor: Acto
       .where(eq(adminUsers.id, userId));
     await tx.delete(adminRecoveryCodes).where(eq(adminRecoveryCodes.userId, userId));
     await revokeUserSessions(tx, userId);
+    await forgetUserDevices(tx, userId);
     await recordAudit(tx, {
       ...actorFields(actor),
       action: 'admin_user.2fa_reset',
@@ -195,6 +200,7 @@ export async function resetUserPassword(db: DbOrTx, userId: string, actor: Actor
       .returning({ id: adminUsers.id });
     if (!updated.length) throw new AdminUserError('notFound');
     await revokeUserSessions(tx, userId);
+    await forgetUserDevices(tx, userId);
     await recordAudit(tx, {
       ...actorFields(actor),
       action: 'admin_user.password_reset',

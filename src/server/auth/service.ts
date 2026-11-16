@@ -6,6 +6,7 @@ import { recordAudit } from '@/server/audit/audit';
 import { hashPassword, passwordProblem, verifyAgainstDummy, verifyPassword } from './password';
 import { finishAuthAttempt, startAuthAttempt } from './rate-limit';
 import type { RequestContext } from './request-context';
+import { forgetUserDevices, isTrustedDevice, rememberDevice } from './trusted-device';
 import { createSession, nextAuthStep, revokeSession, revokeUserSessions, type AuthStep, type SessionRecord } from './session';
 import {
   decryptSecret,
@@ -19,13 +20,16 @@ import {
 } from './totp';
 
 export type LoginResult =
-  | { ok: true; token: string; step: AuthStep }
+  | { ok: true; token: string; step: AuthStep; mfaVerified: boolean }
   | { ok: false; error: 'invalid' | 'rateLimited' };
 
-/** Step 1: email + password. Errors are deliberately generic. */
+/**
+ * Step 1: email + password. Errors are deliberately generic. `deviceToken`: the browser's remembered-device cookie;
+ * when it is a live remembered device of this user, the code is not asked for (`trusted-device.ts`).
+ */
 export async function loginWithPassword(
   db: DbOrTx,
-  input: { email: string; password: string },
+  input: { email: string; password: string; deviceToken?: string | null },
   ctx: RequestContext,
 ): Promise<LoginResult> {
   const emailLower = input.email.trim().toLowerCase();
@@ -52,6 +56,23 @@ export async function loginWithPassword(
     return { ok: false, error: 'invalid' };
   }
 
+  if (user.totpEnabledAt && (await isTrustedDevice(db, user.id, input.deviceToken))) {
+    const created = await db.transaction(async (tx) => {
+      const next = await createSession(tx, user.id, { mfaVerified: true, ctx });
+      await tx.update(adminUsers).set({ lastLoginAt: new Date() }).where(eq(adminUsers.id, user.id));
+      await recordAudit(tx, {
+        actorType: 'ADMIN',
+        actorAdminId: user.id,
+        action: 'auth.login_remembered_device',
+        objectType: 'admin_user',
+        objectId: user.id,
+        ipHash: ctx.ipHash,
+      });
+      return next;
+    });
+    return { ok: true, token: created.token, step: nextAuthStep(user, created.session), mfaVerified: true };
+  }
+
   // Every admin must pass a second factor, so a password alone only yields a pending session.
   const { token, session } = await createSession(db, user.id, { mfaVerified: false, ctx });
   await recordAudit(db, {
@@ -62,19 +83,23 @@ export async function loginWithPassword(
     objectId: user.id,
     ipHash: ctx.ipHash,
   });
-  return { ok: true, token, step: nextAuthStep(user, session) };
+  return { ok: true, token, step: nextAuthStep(user, session), mfaVerified: false };
 }
 
 export type SecondFactorResult =
-  | { ok: true; token: string; step: AuthStep; usedRecoveryCode: boolean }
+  | { ok: true; token: string; step: AuthStep; usedRecoveryCode: boolean; deviceToken: string | null }
   | { ok: false; error: 'invalid' | 'rateLimited' | 'notEnrolled' };
 
-/** Step 2: TOTP code or a one-time recovery code. Rotates the session on success. */
+/**
+ * Step 2: TOTP code or a one-time recovery code. Rotates the session on success. `remember`: also remember this device
+ * for 30 days (`deviceToken` goes into its cookie); not with a recovery code, which means the authenticator is gone.
+ */
 export async function verifySecondFactor(
   db: DbOrTx,
   session: SessionRecord,
   code: string,
   ctx: RequestContext,
+  opts: { remember?: boolean } = {},
 ): Promise<SecondFactorResult> {
   const [user] = await db.select().from(adminUsers).where(eq(adminUsers.id, session.userId));
   if (!user?.totpEnabledAt || !user.totpSecretEnc) return { ok: false, error: 'notEnrolled' };
@@ -132,9 +157,21 @@ export async function verifySecondFactor(
       objectId: user.id,
       ipHash: ctx.ipHash,
     });
-    return created;
+    let deviceToken: string | null = null;
+    if (opts.remember && !usedRecoveryCode) {
+      deviceToken = await rememberDevice(tx, user.id, ctx);
+      await recordAudit(tx, {
+        actorType: 'ADMIN',
+        actorAdminId: user.id,
+        action: 'auth.device_remembered',
+        objectType: 'admin_user',
+        objectId: user.id,
+        ipHash: ctx.ipHash,
+      });
+    }
+    return { ...created, deviceToken };
   });
-  return { ok: true, token: next.token, step: nextAuthStep(user, next.session), usedRecoveryCode };
+  return { ok: true, token: next.token, step: nextAuthStep(user, next.session), usedRecoveryCode, deviceToken: next.deviceToken };
 }
 
 /** Starts (or restarts) 2FA enrollment for a user who has not enabled it yet. */
@@ -214,6 +251,7 @@ export async function changePassword(
   await db.transaction(async (tx) => {
     await tx.update(adminUsers).set({ passwordHash, mustChangePassword: false }).where(eq(adminUsers.id, user.id));
     await revokeUserSessions(tx, user.id, session.id);
+    await forgetUserDevices(tx, user.id);
     await recordAudit(tx, {
       actorType: 'ADMIN',
       actorAdminId: user.id,
