@@ -7,6 +7,7 @@ import { env } from '@/server/env';
 
 /** Any https deployment (staging included) gets Secure, `__Secure-` cookies; local http development can't. */
 const secureCookies = () => env().APP_URL.startsWith('https://');
+import { TRUSTED_DEVICE_TTL_MS } from './trusted-device';
 import { validateSessionToken, SESSION_POLICY, type AdminUserRecord, type SessionRecord } from './session';
 
 /**
@@ -25,6 +26,29 @@ export async function setSessionCookie(token: string, opts: { mfaVerified: boole
     path: '/admin',
     maxAge: Math.floor((opts.mfaVerified ? SESSION_POLICY.absoluteTtlMs : SESSION_POLICY.pendingTtlMs) / 1000),
   });
+}
+
+/** The remembered-device cookie (`trusted-device.ts`): as the session cookie, kept for 30 days. */
+export function deviceCookieName() {
+  return secureCookies() ? '__Secure-bahja_admin_device' : 'bahja_admin_device';
+}
+
+export async function deviceCookie(): Promise<string | null> {
+  return (await cookies()).get(deviceCookieName())?.value ?? null;
+}
+
+export async function setDeviceCookie(token: string) {
+  (await cookies()).set(deviceCookieName(), token, {
+    httpOnly: true,
+    secure: secureCookies(),
+    sameSite: 'strict',
+    path: '/admin',
+    maxAge: Math.floor(TRUSTED_DEVICE_TTL_MS / 1000),
+  });
+}
+
+export async function clearDeviceCookie() {
+  (await cookies()).delete({ name: deviceCookieName(), path: '/admin' });
 }
 
 export async function clearSessionCookie() {

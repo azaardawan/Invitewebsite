@@ -29,6 +29,7 @@ export async function signInAsNewOwner(page: Page) {
   await page.getByLabel('تأكيد كلمة المرور الجديدة').fill('Jasmine river gate 2026');
   await page.getByRole('button', { name: 'حفظ' }).click();
   await expect(page).toHaveURL(/\/admin$/);
+  return { email, password: 'Jasmine river gate 2026', secret };
 }
 
 /** Valid silent MP3 (MPEG-1 Layer III frames). */

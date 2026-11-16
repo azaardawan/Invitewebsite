@@ -159,7 +159,9 @@
       "submit": "Verify",
       "invalid": "The code is incorrect or was already used.",
       "rateLimited": "Too many attempts. Please wait 15 minutes.",
-      "recoveryUsed": "A recovery code was used. You now have fewer codes left; the owner can reset your two-step verification to issue new ones."
+      "recoveryUsed": "A recovery code was used. You now have fewer codes left; the owner can reset your two-step verification to issue new ones.",
+      "remember": "Don't ask for a code on this device for 30 days",
+      "rememberHint": "Only on a device that is yours alone. Your password is still needed."
     },
     "setup2fa": {
       "heading": "Turn on two-step verification",
@@ -179,7 +181,7 @@
       "next": "New password",
       "confirm": "Confirm new password",
       "submit": "Save",
-      "saved": "Password changed. Other devices have been signed out.",
+      "saved": "Password changed. Other devices have been signed out, and remembered devices removed.",
       "mismatch": "The passwords do not match.",
       "wrongCurrent": "The current password is incorrect.",
       "sameAsCurrent": "The new password must be different from the current one.",
@@ -1065,6 +1067,18 @@
       "notFound": "Customer not found.",
       "live": "Live",
       "notLive": "Not live"
+    },
+    "devices": {
+      "heading": "Remembered devices",
+      "intro": "On these devices you sign in with your password only, with no code, for 30 days. Remove any device you no longer use or trust. Changing your password removes them all.",
+      "none": "No remembered devices. To add one, tick «Don't ask for a code on this device» when you enter your code.",
+      "unknown": "Unknown device",
+      "thisDevice": "This device",
+      "lastUsed": "Last used {date}",
+      "until": "remembered until {date}",
+      "forget": "Remove",
+      "forgetAll": "Remove all devices",
+      "forgotten": "Removed. That device will be asked for a code again."
     }
   },
   "invitation": {
