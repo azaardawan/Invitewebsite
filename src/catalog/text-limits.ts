@@ -46,6 +46,20 @@ const CHECKED_MAX: Readonly<Record<string, Readonly<Record<string, number>>>> = 
   'winter-flower': { person_1_name: 23, person_2_name: 18 },
 };
 
+/**
+ * The longest any name may be on every design (owner, 2026-11-18: a long name ran off a card; "set a character limit on
+ * all names so this doesn't happen again"). Lowers the Field Library's limit; a design's own lower limit still applies.
+ */
+export const NAME_CEILING: Readonly<Record<string, number>> = {
+  person_1_name: 30,
+  person_2_name: 30,
+  baby_name: 30,
+  mother_name: 30,
+  father_name: 30,
+  person_1_family: 40,
+  person_2_family: 40,
+};
+
 export type CardBackLimits = { title: number; message: number };
 
 /**
@@ -88,12 +102,14 @@ export function textsToShrink(
 }
 
 /**
- * The limit of a text on a design: its usual `max`, or, when the design holds less at its own size, the length that
- * fits written smaller (`smallerTextLimit`), whichever is lower.
+ * The limit of a text on a design: its usual `max` (a name no more than `NAME_CEILING`), or, when the design holds
+ * less at its own size, the length that fits written smaller (`smallerTextLimit`), whichever is lower.
  */
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number): number;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null {
+  const ceiling = NAME_CEILING[key];
+  if (ceiling !== undefined) max = max === null ? ceiling : Math.min(max, ceiling);
   const fits = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
   if (fits === undefined) return max;
   const own = CHECKED_MAX[themeKey!]?.[key] ?? smallerTextLimit(key, fits);

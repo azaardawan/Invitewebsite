@@ -1,5 +1,5 @@
 import 'server-only';
-import { MAIN_CARD, chosenCards } from '@/catalog/features';
+import { MAIN_CARD, chosenCards, shapeFeature, type FeatureKey } from '@/catalog/features';
 import { themeBorder } from '@/server/catalog/border';
 import { and, asc, eq, isNotNull } from 'drizzle-orm';
 import QRCode from 'qrcode';
@@ -196,6 +196,32 @@ export async function cardData(
 
 /** Around a shaped card on its PDF page: room for the print shop to handle it (the cut line runs around the shape). */
 export const SHAPE_MARGIN_MM = 10;
+
+export type CardSideSize = { widthMm: number; heightMm: number };
+/** One printed card a design offers: the A5 card (`a5`) or a shape, the feature that sells it, and its sides' page sizes. */
+export type DesignCard = { key: string; feature: FeatureKey; label: CardShape['label'] | null; front: CardSideSize; back: CardSideSize };
+
+/**
+ * The printed cards a design offers, in order (the card, then its shapes), with each side's page size as the sample
+ * pictures show it (the shapes with their margin). For the design page's «cards in this design» (owner, 2026-11-18).
+ */
+export function designCards(manifest: ThemeManifest): DesignCard[] {
+  const cards: DesignCard[] = [];
+  if (manifest.features.includes('print_card')) {
+    const spec: { size: keyof typeof CARD_SIZES; back?: 'landscape' | 'portrait' } = manifest.print?.card ?? { size: 'A5' };
+    const [w, h] = CARD_SIZES[spec.size];
+    const front = { widthMm: w, heightMm: h };
+    cards.push({ key: 'a5', feature: 'print_card', label: null, front, back: spec.back === 'portrait' ? front : { widthMm: h, heightMm: w } });
+  }
+  for (const shape of manifest.print?.shapes ?? []) {
+    const feature = shapeFeature(shape.key);
+    if (!feature || !manifest.features.includes(feature)) continue;
+    const m = 2 * SHAPE_MARGIN_MM;
+    const front = { widthMm: shape.widthMm + m, heightMm: shape.heightMm + m };
+    cards.push({ key: shape.key, feature, label: shape.label, front, back: shape.backSideways ? { widthMm: front.heightMm, heightMm: front.widthMm } : front });
+  }
+  return cards;
+}
 
 /**
  * A shaped card's two sides: each side's box, cut line and page (with a margin around the shape). The back's cut

@@ -1477,14 +1477,7 @@
     "askThemeText": "Hello Bahja, I have a question about the “{theme}” invitation: {url}",
     "couponLabel": "Coupon code (optional)",
     "couponHint": "If you have a discount code, type it here. The discount is applied when you confirm.",
-    "cardBack": {
-      "heading": "Back of your printed card",
-      "help": "Your printed card has two sides. Write what goes on the back: a big title and a smaller message.",
-      "title": "Big title",
-      "titlePlaceholder": "With love",
-      "message": "Your message",
-      "messagePlaceholder": "Thank you for being part of our happiest day…"
-    },
+    "cardBack": "Back",
     "signature": {
       "heading": "Your signature",
       "help": "Choose one signature or two (for example both of you). Sign with your finger or mouse; you can clear and try again as often as you like.",
@@ -1692,7 +1685,13 @@
       "texts": "The poster’s words",
       "textsHint": "They start from your page’s texts. What you change here changes on this poster only; leave a box empty to leave that text out.",
       "reset": "Back to the page’s text"
-    }
+    },
+    "cardsTitle": "The printed cards in this design",
+    "cardsIntro": "Every card this design offers, front and back, with example names. Yours shows your own names and details.",
+    "cardA5": "Printable card (A5)",
+    "cardFront": "Front",
+    "cardsIncludedIn": "In:",
+    "cardOpen": "opens full size"
   },
   "contact": {
     "title": "Contact us",

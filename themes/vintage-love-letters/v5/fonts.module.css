@@ -1,0 +1,34 @@
+/*
+ * Vintage Love Letters typefaces, from the designer's hand-off (docs/themes/vintage-love-letters/brief.md).
+ * VL Serif: WeddingSerif (the poster's lettering). VL Arabic: Aref Ruqaa. VL Arabic Body: Amiri, which also covers
+ * Kurdish letters Aref Ruqaa lacks (the browser falls back to it letter by letter).
+ * Licences: the owner decided to use them as supplied (2026-10-15). Family names are theme-prefixed.
+ */
+
+@font-face {
+  font-family: 'VL Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-serif.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'VL Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-ruqaa.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'VL Arabic Body';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-arabic-body.woff) format('woff');
+}
+
+.fonts {
+  --vl-type: 'VL Serif', Georgia, serif;
+  --vl-ar: 'VL Arabic', 'VL Arabic Body', serif;
+  --vl-ar-body: 'VL Arabic Body', serif;
+}
