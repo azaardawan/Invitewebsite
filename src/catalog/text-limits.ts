@@ -11,12 +11,14 @@
  */
 export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   bahjaflix: { 'wording.row1': 16, 'wording.row2': 11, 'wording.row3': 10 },
-  'bluebird-garden': { father_name: 11, 'wording.sonOf': 11, card_title: 27, card_message: 61 },
+  'bluebird-garden': { baby_name: 9, father_name: 11, 'wording.sonOf': 11, card_title: 27, card_message: 61 },
   'blush-floral': { person_1_name: 23 },
   'burgundy-lace': { person_1_name: 19, person_2_name: 22, venue_name: 42, invitation_message: 245 },
   'cherry-confetti': { person_1_name: 28 },
+  'cherry-confetti-party': { person_1_name: 25 },
   'delal-bridge': { person_1_name: 23, person_2_name: 18, venue_name: 79 },
   'embroidered-garden': { baby_name: 29, father_name: 27 },
+  'erbil-hewler': { person_1_name: 17, person_2_name: 17 },
   'espresso-ivory': { person_1_name: 24, person_2_name: 34, person_1_family: 42, person_2_family: 42, venue_name: 79, invitation_message: 245 },
   'golden-arch': { invitation_message: 116, 'wording.followLine': 33 },
   'laurel-bloom': { person_1_name: 32, invitation_message: 205 },
@@ -35,9 +37,10 @@ export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, 
  */
 const CHECKED_MAX: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   bahjaflix: { 'wording.row3': 11 },
-  'bluebird-garden': { father_name: 11, 'wording.sonOf': 11 },
+  'bluebird-garden': { baby_name: 9, father_name: 11, 'wording.sonOf': 11 },
   'blush-floral': { person_1_name: 23 },
   'cherry-confetti': { person_1_name: 28 },
+  'erbil-hewler': { person_1_name: 17, person_2_name: 17 },
   'espresso-ivory': { person_2_name: 38, person_1_family: 49, person_2_family: 49 },
   'pink-ribbon': { person_1_name: 28 },
   'pink-ribbon-party': { person_1_name: 36 },
