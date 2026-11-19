@@ -2105,3 +2105,12 @@ description and its six colour sets.
 | 90 | #30 package «VIP»: its description | أربع غرف: المعيشة والنوم ومقهى المطبخ واستوديو التجميل في الطابق العلوي، 12 صورة، 4 رسائل في الأدراج، فيديو على شاشة الثلاجة، كب كيك ومرآة تحمل رسائلك. أربعة ألوان. | Four rooms: the living room, the bedroom, the kitchen café and the vanity studio upstairs, 12 photos, 4 drawer messages, a video on the fridge screen, and a cupcake and a mirror with your notes. Four colours. | چوار ژوور: ژووری دانیشتن، ژووری نووستن، کافێی چێشتخانە و ستۆدیۆی جوانکاری لە نهۆمی سەرەوە، ١٢ وێنە، ٤ نامە لە چەکمەجەکاندا، ڤیدیۆیەک لەسەر شاشەی سەلاجەکە، و کەپ کەیک و ئاوێنەیەک کە نامەکانت هەڵدەگرن. چوار ڕەنگ. | چار ژوور: ژوورا روینشتنێ، ژوورا نڤستنێ، کافێیا مەتبەخێ و ستۆدیۆیا جوانکاریێ ل قاتێ سەرێ، ١٢ وێنە، ٤ نامە د چەکمەجان دا، ڤیدیۆیەک ل سەر شاشا سەلاجێ، و کەپ کەیکەک و نەینکەک کو نامەیێن تە هەلدگرن. چار ڕەنگ. |
 | 91 | #30 package «VVIP»: its name (docs/themes/pink-dreamhouse/PACKAGES.md) | VVIP | VVIP | VVIP | VVIP |
 | 92 | #30 package «VVIP»: its description | البيت كاملاً بست غرف: مع سينما الأصدقاء والجناح السري الذي لا يُفتح إلا بعد العثور على كل الذكريات، 24 صورة، 8 رسائل، 3 فيديوهات، صندوق ذهبي ونهاية احتفالية، موسيقى في الخلفية، وسبعة ألوان. | The whole house of six rooms: with the bestie cinema and the secret suite that opens only once every memory is found, 24 photos, 8 messages, 3 videos, a golden chest and a grand finale, background music, and seven colours. | هەموو خانووەکە بە شەش ژوورەوە: لەگەڵ سینەمای هاوڕێیان و ژووری نهێنی کە تەنها دوای دۆزینەوەی هەموو یادەوەرییەکان دەکرێتەوە، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندووقێکی زێڕین و کۆتاییەکی ئاهەنگئامێز، مۆسیقای پاشبنەما، و حەوت ڕەنگ. | هەمی خانی ب شەش ژووران: دگەل سینەمایا هەڤالان و ژوورا نهێنی کو بتنێ پشتی دیتنا هەمی بیرهاتنان ڤەدبیت، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندوقەکا زێڕین و دووماهیکەکا ئاهەنگی، مۆسیقایا پاشبنەمایێ، و حەفت ڕەنگ. |
+
+## Batch 63 — Royal Rose Crest (#31): the design's name — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+
+Royal Olive Crest in baby pink and rose gold (`themes/royal-rose-crest/v1/manifest.ts`); every other text is Royal
+Olive Crest's, already reviewed.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #31: the design's name | الشعار الملكي الوردي | Royal Rose Crest | دروشمی شاهانەی پەمەیی | نیشانا شاهانە یا پەمبەیی |
