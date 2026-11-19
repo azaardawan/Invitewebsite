@@ -121,6 +121,28 @@ export const adminSessions = pgTable(
   (t) => [index('admin_sessions_user_idx').on(t.userId)],
 );
 
+/**
+ * Devices an admin chose to be remembered on (owner, 2026-11-16): for 30 days a sign-in from that browser needs the
+ * password only, no code. The raw token only ever lives in the device's cookie.
+ */
+export const adminTrustedDevices = pgTable(
+  'admin_trusted_devices',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** SHA-256 of the device token. */
+    tokenHash: text('token_hash').notNull().unique(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    ipHash: text('ip_hash'),
+    userAgent: text('user_agent'),
+  },
+  (t) => [index('admin_trusted_devices_user_idx').on(t.userId)],
+);
+
 export const authAttempts = pgTable(
   'auth_attempts',
   {

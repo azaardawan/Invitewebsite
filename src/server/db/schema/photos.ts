@@ -1,4 +1,5 @@
-import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import type { CoverFocus } from '../../../lib/cover-focus';
 import { assets } from './catalog';
 import { invitations } from './orders';
@@ -30,4 +31,27 @@ export const invitationPhotos = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('invitation_photos_position_idx').on(t.invitationId, t.position), index('invitation_photos_asset_idx').on(t.assetId)],
+);
+
+/**
+ * The customer's further videos (designs with several screens, manifest `videos.max`; packages sell `video_limit`): place
+ * 1 and 2. Place 0 is the first video, on the invitation itself (`invitations.video_asset_id`). Each is its own MP4 and
+ * still, never shared. Personal data: deleted with the photos (housekeeping).
+ */
+export const invitationVideos = pgTable(
+  'invitation_videos',
+  {
+    invitationId: uuid('invitation_id')
+      .notNull()
+      .references(() => invitations.id, { onDelete: 'cascade' }),
+    place: integer('place').notNull(),
+    videoAssetId: uuid('video_asset_id')
+      .notNull()
+      .references(() => assets.id, { onDelete: 'restrict' }),
+    posterAssetId: uuid('poster_asset_id')
+      .notNull()
+      .references(() => assets.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.invitationId, t.place] }), check('invitation_videos_place_range', sql`${t.place} >= 1 and ${t.place} <= 2`)],
 );

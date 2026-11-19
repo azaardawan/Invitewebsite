@@ -51,7 +51,7 @@ product spec's §74 business rules override assumptions.
   customer's photos fill each collage of their package (the order form asks for the largest one's count), drawn by the SDK's
   `<Collage>` (`src/theme-sdk/collage.tsx`), in the design's typefaces when it has `print/Collage.tsx` (THEME_CONTRACT §6).
   Watermarked previews before payment; the JPGs only once paid.
-- Couples (owner, 2026-10-31), and Friends (2026-11-14, the same for two friends): sections that are not an invitation (no date, venue or replies), mainly photos plus one video. A design sold in both reads `props.occasion`.
+- Couples (owner, 2026-10-31), and Friends (2026-11-14, the same for two friends): sections that are not an invitation (no date, venue or replies), mainly photos plus video (a Friends package need not have one, 2026-11-19). A design sold in both reads `props.occasion`.
   Its designs are **template designs** (manifest `editor: 'template'`): the customer fills the design in place
   (`TemplateEditor`, texts saved via `/p|r/[token]/text`, `src/server/template/*`) instead of the order form; the SDK's
   `<EditableText>`, `<PhotoSlot>`, `<VideoSlot>` (THEME_CONTRACT "Template designs"). A package can sell fewer photos
@@ -63,8 +63,14 @@ product spec's §74 business rules override assumptions.
   (manifest `posters.texts`) and its pictures, including a picture uploaded for that poster only (an `invitation_photos` row at
   place 100/101, never listed with the page's photos); drawn by the design's `print/CouplePoster.tsx`, with Bahja's website,
   WhatsApp/phone and Instagram from Settings at the bottom.
+- Several videos (owner, 2026-11-19): a design with more screens declares manifest `videos.max` (2–3) and gets `props.videos`
+  by place; place 0 is `invitations.video_asset_id`, places 1–2 `invitation_videos`; packages sell `video_limit`. Packages
+  can also offer only some of the design's colour sets (`packages.palette_ids`, null = all), copied onto the order.
 - 3D galleries (`<Gallery3D>` in the theme SDK, `src/theme-sdk/gallery3d/*`): the design's glTF model + a `GalleryPlan`; a room is a
   photo set, so packages sell rooms. Always keep a flat version (no WebGL, and the template editor). THEME_CONTRACT §6.
+- 3D worlds (`<World3D>`, `src/theme-sdk/world3d/*`): a small building to walk and play in (#30 Pink Dreamhouse, owner
+  2026-11-19): a `WorldPlan` (floors, stairs as ramps, rooms, photo places, screens, plates, things a tap moves, paint by
+  colour slot); the design answers taps. One model per package size (photos sold: 6 / 12 / 24). THEME_CONTRACT §6.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

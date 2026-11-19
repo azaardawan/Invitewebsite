@@ -378,6 +378,10 @@ function packageFields(form: FormData) {
     lifetime: (form.get('lifetime') ?? undefined) as PackageInput['lifetime'],
     // Empty = as many photos as the design holds.
     photoLimit: form.has('photoLimit') ? (String(form.get('photoLimit') ?? '').trim() === '' ? null : Number(form.get('photoLimit'))) : undefined,
+    // Empty = as many videos as the design has (designs with several screens).
+    videoLimit: form.has('videoLimit') ? (String(form.get('videoLimit') ?? '').trim() === '' ? null : Number(form.get('videoLimit'))) : undefined,
+    // The colour sets ticked (none = all); only when the form shows them.
+    paletteIds: form.has('paletteChoice') ? form.getAll('paletteIds').map(String).filter(Boolean) : undefined,
   };
 }
 

@@ -85,7 +85,7 @@ export async function prestoreSignatures(db: DbOrTx, featureKeys: readonly strin
 export async function extrasUpdate(
   db: DbOrTx,
   inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> &
-    Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes'>> & {
+    Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes' | 'paletteIds'>> & {
     fieldKeys?: readonly string[];
     /** For `wording`: the design's changeable lines, what is stored now, and the invitation's language. */
     wordingLines?: readonly WordingLine[];
@@ -181,7 +181,8 @@ export async function extrasUpdate(
         .select({ colors: themePalettes.colors })
         .from(themePalettes)
         .where(and(eq(themePalettes.id, extras.paletteId), eq(themePalettes.themeId, inv.themeId), eq(themePalettes.status, 'ACTIVE')));
-      if (!p) errors.palette = 'invalid';
+      // Only the package's own colour sets (none chosen in Admin = all).
+      if (!p || (inv.paletteIds?.length && !inv.paletteIds.includes(extras.paletteId))) errors.palette = 'invalid';
       else set.colors = p.colors;
     }
   }

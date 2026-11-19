@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
-import { adminSessions, adminUsers, auditLogs } from '@/server/db/schema';
+import { adminSessions, adminTrustedDevices, adminUsers, auditLogs } from '@/server/db/schema';
+import { TRUSTED_DEVICE_TTL_MS, forgetDevice, listTrustedDevices } from '@/server/auth/trusted-device';
 import {
   beginTotpEnrollment,
   changePassword,
@@ -200,5 +201,99 @@ describe('audit trail for sign-in', () => {
     expect(actions).toEqual(expect.arrayContaining(['admin_user.created', 'auth.password_accepted', 'auth.2fa_enabled']));
     expect(JSON.stringify(rows)).not.toContain(admin.password);
     expect(JSON.stringify(rows)).not.toContain(admin.secret);
+  });
+});
+
+describe('remembered devices', () => {
+  async function remembered() {
+    const admin = await enrolledAdmin();
+    const login = await loginWithPassword(db(), { email: admin.email, password: admin.password }, ctx);
+    if (!login.ok) throw new Error('login failed');
+    expect(login.mfaVerified).toBe(false);
+    // A later time step than enrollment's, so the code is not a replay.
+    const code = totpCode(admin.secret, 1);
+    const verified = await verifySecondFactor(db(), await sessionFor(login.token), code, ctx, { remember: true });
+    if (!verified.ok || !verified.deviceToken) throw new Error('device not remembered');
+    return { ...admin, deviceToken: verified.deviceToken, token: verified.token };
+  }
+
+  it('does not remember a device unless asked', async () => {
+    const admin = await enrolledAdmin();
+    const login = await loginWithPassword(db(), { email: admin.email, password: admin.password }, ctx);
+    if (!login.ok) throw new Error('login failed');
+    const verified = await verifySecondFactor(db(), await sessionFor(login.token), totpCode(admin.secret, 1), ctx);
+    expect(verified.ok && verified.deviceToken).toBeNull();
+    expect(await listTrustedDevices(db(), admin.id)).toHaveLength(0);
+  });
+
+  it('signs in with the password alone on a remembered device, and only stores the token hashed', async () => {
+    const admin = await remembered();
+    const [device] = await listTrustedDevices(db(), admin.id);
+    expect(device!.tokenHash).not.toContain(admin.deviceToken);
+    const again = await loginWithPassword(db(), { email: admin.email, password: admin.password, deviceToken: admin.deviceToken }, ctx);
+    expect(again.ok && again.mfaVerified).toBe(true);
+    expect(again.ok && again.step).toBe('change-password'); // a new admin's temporary password
+    if (!again.ok) return;
+    expect((await sessionFor(again.token)).mfaVerifiedAt).not.toBeNull();
+    const actions = (await db().select().from(auditLogs).where(eq(auditLogs.objectId, admin.id))).map((a) => a.action);
+    expect(actions).toEqual(expect.arrayContaining(['auth.device_remembered', 'auth.login_remembered_device']));
+  });
+
+  it('still needs the right password, and a device only works for its own user', async () => {
+    const admin = await remembered();
+    expect(await loginWithPassword(db(), { email: admin.email, password: 'wrong password!!', deviceToken: admin.deviceToken }, ctx)).toEqual({
+      ok: false,
+      error: 'invalid',
+    });
+    const other = await enrolledAdmin();
+    const login = await loginWithPassword(db(), { email: other.email, password: other.password, deviceToken: admin.deviceToken }, ctx);
+    expect(login.ok && login.mfaVerified).toBe(false);
+    expect(login.ok && login.step).toBe('verify-2fa');
+    const unknown = await loginWithPassword(db(), { email: admin.email, password: admin.password, deviceToken: 'not-a-device' }, ctx);
+    expect(unknown.ok && unknown.mfaVerified).toBe(false);
+  });
+
+  it('asks for the code again after 30 days', async () => {
+    const admin = await remembered();
+    await db()
+      .update(adminTrustedDevices)
+      .set({ expiresAt: new Date(Date.now() - 1000) })
+      .where(eq(adminTrustedDevices.userId, admin.id));
+    const login = await loginWithPassword(db(), { email: admin.email, password: admin.password, deviceToken: admin.deviceToken }, ctx);
+    expect(login.ok && login.mfaVerified).toBe(false);
+    expect(TRUSTED_DEVICE_TTL_MS).toBe(30 * 24 * 60 * 60 * 1000);
+  });
+
+  it('a recovery code does not remember the device', async () => {
+    const admin = await enrolledAdmin();
+    const login = await loginWithPassword(db(), { email: admin.email, password: admin.password }, ctx);
+    if (!login.ok) throw new Error('login failed');
+    const verified = await verifySecondFactor(db(), await sessionFor(login.token), admin.recoveryCodes[0]!, ctx, { remember: true });
+    expect(verified.ok && verified.usedRecoveryCode).toBe(true);
+    expect(verified.ok && verified.deviceToken).toBeNull();
+  });
+
+  it('forgets a removed device, and only its owner can remove it', async () => {
+    const admin = await remembered();
+    const other = await enrolledAdmin();
+    const [device] = await listTrustedDevices(db(), admin.id);
+    expect(await forgetDevice(db(), other.id, device!.id)).toBe(false);
+    expect(await forgetDevice(db(), admin.id, device!.id)).toBe(true);
+    const login = await loginWithPassword(db(), { email: admin.email, password: admin.password, deviceToken: admin.deviceToken }, ctx);
+    expect(login.ok && login.mfaVerified).toBe(false);
+  });
+
+  it('forgets every device when the password changes or the account is disabled', async () => {
+    const admin = await remembered();
+    const changed = await changePassword(db(), await sessionFor(admin.token), { current: admin.password, next: 'A much better passw0rd!' }, ctx);
+    expect(changed.ok).toBe(true);
+    expect(await listTrustedDevices(db(), admin.id)).toHaveLength(0);
+    const login = await loginWithPassword(db(), { email: admin.email, password: 'A much better passw0rd!', deviceToken: admin.deviceToken }, ctx);
+    expect(login.ok && login.mfaVerified).toBe(false);
+
+    const second = await remembered();
+    const owner = await makeAdmin();
+    await setUserStatus(db(), second.id, 'DISABLED', { adminId: owner.id, ipHash: null });
+    expect(await listTrustedDevices(db(), second.id)).toHaveLength(0);
   });
 });

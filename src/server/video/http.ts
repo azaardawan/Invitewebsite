@@ -12,7 +12,7 @@ import { recordAudit } from '@/server/audit/audit';
 import { consumeRateLimit } from '@/server/rate-limit';
 import { MediaError } from '@/server/media/process';
 import { VIDEO_UPLOAD_MAX_BYTES } from '@/server/media/video';
-import { VideoError, removeVideo, setVideo, videoIncluded } from './video';
+import { VideoError, removeVideo, setVideo, videoIncluded, videoPlacesOf } from './video';
 
 type InvitationRow = typeof invitations.$inferSelect;
 
@@ -25,11 +25,14 @@ class TooLarge extends Error {}
 
 /**
  * The customer's own video: POST the file itself as the body to set it (replacing the one before), DELETE to take it
- * away. The body goes straight to a private temporary folder (never held in memory), deleted afterwards. Audited.
+ * away; `?place=n` for a design's further screens (default 0, the first). The body goes straight to a private temporary folder (never held in memory), deleted afterwards. Audited.
  */
 export async function handleVideoRequest(db: DbOrTx, req: Request, inv: InvitationRow | null, ctx: { ipHash: string | null; published: boolean }) {
   if (!inv) return json({ error: 'notFound' }, 404);
   if (!videoIncluded(inv)) return json({ error: 'notIncluded' }, 400);
+  const placeParam = new URL(req.url).searchParams.get('place') ?? '0';
+  const place = /^[0-2]$/.test(placeParam) ? Number(placeParam) : -1;
+  if (place < 0 || place >= (await videoPlacesOf(db, inv))) return json({ error: 'noSuchPlace' }, 400);
   try {
     if (req.method === 'POST') {
       if (ctx.ipHash && !(await consumeRateLimit(db, `videos:ip:${ctx.ipHash}`, UPLOADS_PER_HOUR, 3600))) return json({ error: 'rateLimited' }, 429);
@@ -47,8 +50,8 @@ export async function handleVideoRequest(db: DbOrTx, req: Request, inv: Invitati
         });
         await pipeline(Readable.fromWeb(req.body as WebReadableStream<Uint8Array>), limit, createWriteStream(file));
         if (bytes === 0) return json({ error: 'unsupportedVideo' }, 400);
-        const video = await setVideo(db, inv, file, dir);
-        await audit(db, inv.id, ctx.ipHash, 'video.set', { durationSeconds: video.durationSeconds, published: ctx.published });
+        const video = await setVideo(db, inv, file, dir, place);
+        await audit(db, inv.id, ctx.ipHash, 'video.set', { place, durationSeconds: video.durationSeconds, published: ctx.published });
         return json({ video });
       } catch (e) {
         if (e instanceof TooLarge) return json({ error: 'tooLarge' }, 413);
@@ -58,7 +61,7 @@ export async function handleVideoRequest(db: DbOrTx, req: Request, inv: Invitati
       }
     }
     if (req.method === 'DELETE') {
-      if (await removeVideo(db, inv.id)) await audit(db, inv.id, ctx.ipHash, 'video.removed', { published: ctx.published });
+      if (await removeVideo(db, inv.id, place)) await audit(db, inv.id, ctx.ipHash, 'video.removed', { place, published: ctx.published });
       return json({ ok: true });
     }
     return json({ error: 'method' }, 405);

@@ -406,6 +406,10 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                         : t('themes.photoCount', { n: p.photoLimit ?? manifest.photos.max })
                     }`
                   : ''}
+                {manifest?.videos && p.featureKeys.includes('video') ? ` · ${t('themes.videoCount', { n: Math.min(p.videoLimit ?? manifest.videos.max, manifest.videos.max) })}` : ''}
+                {palettes.length && p.featureKeys.includes('color_choice')
+                  ? ` · ${t('themes.paletteCount', { n: p.paletteIds?.length ? p.paletteIds.filter((id) => palettes.some((x) => x.id === id && x.status === 'ACTIVE')).length : palettes.filter((x) => x.status === 'ACTIVE').length })}`
+                  : ''}
               </p>
               {canManage ? (
                 <MoveButtons
@@ -430,6 +434,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                   </div>
                   <LifetimeChoice value={p.lifetime} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
                   {manifest.photos ? <PhotoLimit value={p.photoLimit} spec={manifest.photos} t={t} /> : null}
+                  {manifest.videos ? <VideoLimit value={p.videoLimit} max={manifest.videos.max} t={t} /> : null}
+                  {palettes.length ? <PaletteChoice palettes={palettes} chosen={p.paletteIds} slots={colorSlots} locale={locale} t={t} /> : null}
                   <PackageContents manifest={manifest} features={p.featureKeys} fields={p.fieldKeys} fieldLabel={fieldLabel} t={t} />
                   <SubmitButton>{t('common.save')}</SubmitButton>
                 </ActionForm>
@@ -457,6 +463,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
                 </div>
                 <LifetimeChoice value={DEFAULT_LIFETIME} label={t('themes.lifetime')} hint={t('themes.lifetimeHint')} option={(l) => tc(`lifetime.${l}`)} />
                 {manifest.photos ? <PhotoLimit value={null} spec={manifest.photos} t={t} /> : null}
+                {manifest.videos ? <VideoLimit value={null} max={manifest.videos.max} t={t} /> : null}
+                {palettes.length ? <PaletteChoice palettes={palettes} chosen={null} slots={colorSlots} locale={locale} t={t} /> : null}
                 <PackageContents manifest={manifest} features={[...manifest.features, ...required]} fields={manifest.fields} fieldLabel={fieldLabel} t={t} />
                 <SubmitButton>{t('common.create')}</SubmitButton>
               </ActionForm>
@@ -591,6 +599,54 @@ function PhotoLimit({ value, spec, t }: { value: number | null; spec: { max: num
       <input name="photoLimit" type="number" min={1} max={spec.max} step={1} defaultValue={value ?? ''} placeholder={String(spec.max)} dir="ltr" className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm" />
       <span className="block text-xs text-muted">{t('themes.photoLimitHint', { max: spec.max })}</span>
     </label>
+  );
+}
+
+/** How many videos the package sells (designs with several screens, manifest `videos.max`); empty = all of them. */
+function VideoLimit({ value, max, t }: { value: number | null; max: number; t: Translate }) {
+  return (
+    <label className="block w-48 space-y-1" data-package-video-limit>
+      <span className="text-sm font-medium">{t('themes.videoLimit')}</span>
+      <input name="videoLimit" type="number" min={1} max={max} step={1} defaultValue={value ?? ''} placeholder={String(max)} dir="ltr" className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm" />
+      <span className="block text-xs text-muted">{t('themes.videoLimitHint', { max })}</span>
+    </label>
+  );
+}
+
+/** The design's colour sets this package offers (packages with colour choice), as ticked swatch chips; none ticked = all. */
+function PaletteChoice({
+  palettes,
+  chosen,
+  slots,
+  locale,
+  t,
+}: {
+  palettes: { id: string; name: Parameters<typeof localized>[0]; colors: Record<string, string>; status: string }[];
+  chosen: string[] | null;
+  slots: { key: string; default: string }[];
+  locale: Parameters<typeof localized>[1];
+  t: Translate;
+}) {
+  const offered = palettes.filter((p) => p.status === 'ACTIVE' || chosen?.includes(p.id));
+  return (
+    <fieldset className="space-y-2" data-package-palettes>
+      <input type="hidden" name="paletteChoice" value="1" />
+      <legend className="text-sm font-medium">{t('themes.paletteChoice')}</legend>
+      <div className="flex flex-wrap gap-2">
+        {offered.map((p) => (
+          <label key={p.id} className="flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface py-1 ps-2 pe-3 text-sm has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/25">
+            <input type="checkbox" name="paletteIds" value={p.id} defaultChecked={!!chosen?.includes(p.id)} className="accent-[var(--color-accent)]" />
+            <span className="flex" aria-hidden>
+              {slots.map((c) => (
+                <span key={c.key} className="-ms-1 size-5 rounded-full border-2 border-surface first:ms-0" style={{ background: p.colors[c.key] ?? c.default }} />
+              ))}
+            </span>
+            {localized(p.name, locale)}
+          </label>
+        ))}
+      </div>
+      <p className="text-xs text-muted">{t('themes.paletteChoiceHint')}</p>
+    </fieldset>
   );
 }
 
