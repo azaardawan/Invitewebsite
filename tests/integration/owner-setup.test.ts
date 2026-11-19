@@ -71,6 +71,21 @@ describe("the owner's chat requests applied on deploy", () => {
     expect(again!.description?.ar).toBe('وصف المالك');
   });
 
+  it('Pink Dreamhouse: its description in four languages and the plan’s six colour sets (all six colours each)', async () => {
+    const { actor } = await activeTheme();
+    const key = uniqueKey('dreamhouse');
+    await syncThemesFromRegistry(db(), [{ ...manifestByCodeRef('pink-dreamhouse@1')!, key }], actor, { complete: false });
+    const setup = { ...OWNER_SETUPS.find((x) => x.themeKey === 'pink-dreamhouse')!, themeKey: key };
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([`${key}: name and description`, `${key}: 6 colour sets`]);
+    const [t] = await db().select().from(themes).where(eq(themes.key, key));
+    expect(Object.keys(t!.description ?? {}).sort()).toEqual(['ar', 'bdn', 'ckb', 'en']);
+    const sets = await db().select().from(themePalettes).where(eq(themePalettes.themeId, t!.id)).orderBy(asc(themePalettes.sortOrder));
+    expect(sets.map((p) => p.name.en)).toEqual(['Rose Cream', 'Lavender Cloud', 'Peach Glow', 'Mint Dream', 'Champagne Twilight', 'Cotton Candy']);
+    const slots = (manifestByCodeRef('pink-dreamhouse@1')!.colors?.slots ?? []).map((x) => x.key).sort();
+    for (const p of sets) expect(Object.keys(p.colors).sort()).toEqual(slots);
+    expect(await applyOwnerSetups(db(), actor, [setup])).toEqual([]);
+  });
+
   it('leave the packages to Admin when the sister design has no prices', async () => {
     const { actor } = await activeTheme();
     const key = uniqueKey('pearl');

@@ -95,6 +95,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
 | `formatNumber(n, locale)` | Arabic-Indic digits for Arabic/Kurdish |
 | `<Gallery3D>` | A walkable 3D gallery of the customer's photos, built from the design's own model (§6, "3D galleries"). With `webglAvailable()` and `useTouchScreen()`. |
+| `<World3D>` | A small walkable 3D building (rooms, stairs, drawers, screens) from the design's own model; the design answers each tap (§6, "3D worlds"). |
 
 ## 4A. Opening animation (required for sellable themes)
 
@@ -326,6 +327,25 @@ Rules:
   at least (a visually hidden list of buttons that walk to each one), so they are reachable without walking, and keep
   any text on solid panels (the 3D view moves behind them). Room names and words can hang in the museum itself (`sign`,
   `plaque` in the plan; `<Gallery3D signs rooms>`).
+
+### 3D worlds (`<World3D>`)
+
+A small building the visitor walks through and plays with (#30 Pink Dreamhouse), from the design's own model, described
+by a `WorldPlan` (`src/theme-sdk/world3d/plan.ts`): where visitors may stand (`surfaces`: flat floors, and `ramp`s for
+stairs, walked step by step), its `rooms` (per floor), its photo places (`photos`, the model's meshes in place order,
+with each one's `frame` and `glass`), its video screens (`screens`, by `props.videos` place), name plates (`texts`, drawn
+on quads in front of the model's own), things a tap moves (`things`: a `drawer` slides out, a `lid` tips open, `lift`,
+`press`, `glow`, a `door` that opens its `gate` in the floor, a `teleport` for stairs), and `paint`: which meshes take
+each colour slot (`props.colors`; the owner's colour sets recolour the whole building).
+
+`<World3D model plan photos videos texts colors look dir reducedMotion onTap …/>` loads three.js only when shown, hides
+photo places without a photo (frame and all), and reports every tap (`onTap`: a photo, a screen, a thing). The design
+decides what each tap means and answers through a ref (`World3DHandle`: `set(key, open)`, `playVideo(place)` (from a
+tap: browsers play sound only then), `pauseVideo`, `muteVideo`, `stopVideo`, which frees the video). Videos are made on
+demand and stopped when the world closes. Rules as for galleries: a flat version (`onUnavailable`) and the editor shows
+the rooms flat; a visually hidden list of buttons for what can be found by walking (photos, drawers, stairs); text over
+the 3D view on solid panels; models without embedded pictures (the site's rules block them); a smaller package never
+downloads the bigger model (#30 ships one model per size).
 
 ### Couple posters (`couple_poster_landscape`, `couple_poster_portrait`)
 

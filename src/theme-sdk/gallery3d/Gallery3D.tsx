@@ -185,7 +185,7 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
 });
 
 /** The on-screen joystick for walking on a touch screen (drag the knob; let go to stop). */
-function Joystick({ className, knobClassName, onMove }: { className?: string; knobClassName?: string; onMove: (x: number, y: number) => void }) {
+export function Joystick({ className, knobClassName, onMove }: { className?: string; knobClassName?: string; onMove: (x: number, y: number) => void }) {
   const ring = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const pointer = useRef<number | null>(null);

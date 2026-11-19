@@ -2004,3 +2004,104 @@ photo places; the new couples field `letter` (the customer's own letter) and its
 | 111 | Field `letter` (couples/friends): its label | الرسالة | The letter | نامەکە | نامە |
 | 112 | Sample `invitationSamples.short.letter` | أجمل لحظاتي هي تلك اللحظات الهادئة معك؛ ضحكاتنا وسط الأيام العادية، ومغامراتنا الصغيرة، وكل شيء يصبح أجمل حين تكون بقربي.  لكل الذكريات التي صنعناها، ولكل ما ينتظرنا معاً. | Some of my favourite moments are the quiet ones with you. The laughter in between ordinary days, the little adventures, and the way everything feels softer when you are here.  Here is to all the memories we have made, and all the ones still waiting for us. | جوانترین ساتەکانم ئەو ساتە ئارامانەن کە لەگەڵ تۆدام؛ پێکەنینەکانمان لە نێو ڕۆژە ئاساییەکاندا، گەشتە بچووکەکانمان، و هەموو شتێک کە لە نزیکیی تۆدا جوانتر دەبێت.  بۆ هەموو ئەو یادەوەرییانەی دروستمان کردن، و بۆ هەموو ئەوانەی هێشتا چاوەڕێمانن. | جوانترین دەمێن من ئەو دەمێن ئارامن یێن دگەل تە؛ کەنیێن مە د ناڤ ڕۆژێن ئاسایی دا، گەشتێن مە یێن بچووک، و هەمی تشت کو ل نێزیکی تە جوانتر دبن.  بۆ هەمی ئەو بیرهاتنێن مە چێکرین، و بۆ هەمی ئەوێن هێشتا ل هیڤیا مە. |
 | 113 | Sample `invitationSamples.long.letter` | بعض أجمل لحظاتي هي تلك اللحظات الهادئة معك. ضحكاتنا وسط الأيام العادية، ومغامراتنا الصغيرة، والطريقة التي يصبح بها كل شيء أجمل حين تكون بقربي.  هذه رسالة صغيرة مغلّفة بالزهور: أنت محبوب، ووجودك غالٍ، وأنا ممتن لأن طرقنا التقت.  لكل الذكريات التي صنعناها، ولكل ما ينتظرنا معاً. | Some of my favourite moments are the quiet ones with you. The laughter in between ordinary days. The little adventures. The way everything feels a little softer when you are here.  So here is a small reminder, wrapped in flowers: you are loved, you are appreciated, and I am so glad our paths found each other.  Here is to all the memories we have made, and all the ones still waiting for us. | هەندێک لە جوانترین ساتەکانم ئەو ساتە ئارامانەن کە لەگەڵ تۆدام. پێکەنینەکانمان لە نێو ڕۆژە ئاساییەکاندا، گەشتە بچووکەکانمان، و ئەو شێوەیەی هەموو شتێک لە نزیکیی تۆدا نەرمتر دەبێت.  ئەمە بیرخستنەوەیەکی بچووکە، پێچراو لە گوڵدا: تۆ خۆشەویستی، بوونت بەنرخە، و دڵخۆشم کە ڕێگاکانمان یەکیان گرتەوە.  بۆ هەموو ئەو یادەوەرییانەی دروستمان کردن، و بۆ هەموو ئەوانەی هێشتا چاوەڕێمانن. | هندەک ژ جوانترین دەمێن من ئەو دەمێن ئارامن یێن دگەل تە. کەنیێن مە د ناڤ ڕۆژێن ئاسایی دا، گەشتێن مە یێن بچووک، و ئەو ڕێکا هەمی تشت ل نێزیکی تە نەرمتر دبن.  ئەڤە بیرئینانەکا بچووکە، پێچایی د گولان دا: تو خۆشتڤی یی، هەبوونا تە بها هەیە، و ئەز دلخۆشم کو ڕێکێن مە ئێک گرتن.  بۆ هەمی ئەو بیرهاتنێن مە چێکرین، و بۆ هەمی ئەوێن هێشتا ل هیڤیا مە. |
+
+## Batch 61 — Pink Dreamhouse (#30, Birthday or Friends): the 3D dollhouse, its rooms, drawers and screens, and its colour sets — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+
+The owner's Pink Dreamhouse (2026-11-19): every text of the design in Sorani and Badini (its name, the page texts, the
+rooms' names, the drawers' default messages and the editor's labels for them, the screens' names, the words on screen), its
+description and its six colour sets.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #30 design name | بيت الأحلام الوردي | Pink Dreamhouse | خانووی خەونی پەمەیی | خانیێ خەونێ پەمبەیی |
+| 2 | #30 page text (`pageTexts.open`) | ادخل البيت | Enter the house | بچۆ ناو خانووەکە | وەرە د ناڤ خانی دا |
+| 3 | #30 page text (`pageTexts.share`) | بيت صغير مليء بالذكريات، لك أنت | A little house full of memories, just for you | خانوویەکی بچووکی پڕ لە یادەوەری، تەنها بۆ تۆ | خانیەکێ بچووک تژی بیرهاتن، بتنێ بۆ تە |
+| 4 | #30 page text (`pageTexts.endedTitle`) | أُغلق هذا البيت | This house has closed | ئەم خانووە داخرا | ئەڤ خانیە هاتە گرتن |
+| 5 | #30 page text (`pageTexts.endedBody`) | شكراً لزيارتكم. هذا البيت لم يعد مفتوحاً. | Thank you for visiting. This house is no longer open. | سوپاس بۆ سەردانەکەتان. ئەم خانووە ئیتر کراوە نییە. | سوپاس بۆ سەرەدانا هەوە. ئەڤ خانیە ئێدی ڤەکری نینە. |
+| 6 | #30 editor label (`wording.room1`) | اسم الغرفة الأولى | The first room’s name | ناوی ژووری یەکەم | ناڤێ ژوورا ئێکێ |
+| 7 | #30 default words (`wording.room1`) | غرفة المعيشة | Birthday Living Room | ژووری دانیشتن | ژوورا روینشتنێ |
+| 8 | #30 editor label (`wording.room2`) | اسم الغرفة الثانية | The second room’s name | ناوی ژووری دووەم | ناڤێ ژوورا دووێ |
+| 9 | #30 default words (`wording.room2`) | غرفة النوم | Bestie Bedroom | ژووری نووستنی هاوڕێ | ژوورا نڤستنێ یا هەڤالێ |
+| 10 | #30 editor label (`wording.room3`) | اسم الغرفة الثالثة | The third room’s name | ناوی ژووری سێیەم | ناڤێ ژوورا سێیێ |
+| 11 | #30 default words (`wording.room3`) | مقهى المطبخ الوردي | Pink Kitchen Café | کافێی چێشتخانەی پەمەیی | کافێیا مەتبەخا پەمبەیی |
+| 12 | #30 editor label (`wording.room4`) | اسم الغرفة الرابعة | The fourth room’s name | ناوی ژووری چوارەم | ناڤێ ژوورا چارێ |
+| 13 | #30 default words (`wording.room4`) | استوديو التجميل | Glam Vanity Studio | ستۆدیۆی جوانکاری | ستۆدیۆیا جوانکاریێ |
+| 14 | #30 editor label (`wording.room5`) | اسم الغرفة الخامسة | The fifth room’s name | ناوی ژووری پێنجەم | ناڤێ ژوورا پێنجێ |
+| 15 | #30 default words (`wording.room5`) | سينما الأصدقاء | Bestie Cinema | سینەمای هاوڕێیان | سینەمایا هەڤالان |
+| 16 | #30 editor label (`wording.room6`) | اسم الغرفة السادسة | The sixth room’s name | ناوی ژووری شەشەم | ناڤێ ژوورا شەشێ |
+| 17 | #30 default words (`wording.room6`) | الجناح السري | Secret Birthday Suite | ژووری نهێنی | ژوورا نهێنی |
+| 18 | #30 editor label (`wording.drawer1`) | رسالة الدرج 1 | Drawer 1’s message | نامەی چەکمەجەی 1 | نامەیا چەکمەجا 1 |
+| 19 | #30 default words (`wording.drawer1`) | أول يوم تعارفنا فيه… ما زلت أبتسم كلما تذكرته. | Remember the day we met? I still smile every time I think of it. | ئەو ڕۆژەت لە بیرە کە یەکترمان ناسی؟ هێشتا هەر کە بیری دەکەمەوە پێدەکەنم. | تە ئەو ڕۆژ ل بیرە دەمێ مە ئێک ناسی؟ هێشتا هەر دەما بیرا وێ دکەم دکەنم. |
+| 20 | #30 editor label (`wording.drawer2`) | رسالة الدرج 2 | Drawer 2’s message | نامەی چەکمەجەی 2 | نامەیا چەکمەجا 2 |
+| 21 | #30 default words (`wording.drawer2`) | شكراً لأنك دائماً بجانبي، في الأيام الحلوة والصعبة. | Thank you for always being there, on the good days and the hard ones. | سوپاس کە هەمیشە لە تەنیشتمی، لە ڕۆژە خۆش و سەختەکاندا. | سوپاس کو هەردەم ل رەخ منی، د ڕۆژێن خۆش و ب زەحمەت دا. |
+| 22 | #30 editor label (`wording.drawer3`) | رسالة الدرج 3 | Drawer 3’s message | نامەی چەکمەجەی 3 | نامەیا چەکمەجا 3 |
+| 23 | #30 default words (`wording.drawer3`) | كل قهوة شربناها معاً كانت حكاية. | Every coffee we shared was a little story. | هەموو قاوەیەک کە پێکەوە خواردمانەوە چیرۆکێک بوو. | هەمی قەهوەیێن مە پێکڤە ڤەخواری چیرۆکەک بوون. |
+| 24 | #30 editor label (`wording.drawer4`) | رسالة الدرج 4 | Drawer 4’s message | نامەی چەکمەجەی 4 | نامەیا چەکمەجا 4 |
+| 25 | #30 default words (`wording.drawer4`) | لا مرآة تُظهر جمالك كما أراه. | You are lovelier than any mirror could ever show. | تۆ لە هەر ئاوێنەیەک جوانتری کە نیشانی بدات. | تو ژ هەر نەینکەکێ جوانتری کو نیشان بدەت. |
+| 26 | #30 editor label (`wording.drawer5`) | رسالة الدرج 5 | Drawer 5’s message | نامەی چەکمەجەی 5 | نامەیا چەکمەجا 5 |
+| 27 | #30 default words (`wording.drawer5`) | فيلمنا المفضل لا يكتمل إلا معك. | Our favourite film is never complete without you. | فیلمە دڵخوازەکەمان بەبێ تۆ تەواو نابێت. | فیلما مە یا دلخواز بێی تە تمام نابیت. |
+| 28 | #30 editor label (`wording.drawer6`) | رسالة الدرج 6 | Drawer 6’s message | نامەی چەکمەجەی 6 | نامەیا چەکمەجا 6 |
+| 29 | #30 default words (`wording.drawer6`) | الضحكات التي تشاركناها هي أغلى ما أملك. | The laughs we shared are my greatest treasure. | ئەو پێکەنینانەی پێکەوە کردمان گرانترین شتی منن. | ئەو کەنیێن مە پێکڤە کرین بهاترین تشتێ منن. |
+| 30 | #30 editor label (`wording.drawer7`) | رسالة الدرج 7 | Drawer 7’s message | نامەی چەکمەجەی 7 | نامەیا چەکمەجا 7 |
+| 31 | #30 default words (`wording.drawer7`) | وُجدت كل الذكريات… حان وقت فتح الصندوق الذهبي. | You found every memory… now open the golden chest. | هەموو یادەوەرییەکانت دۆزییەوە… ئێستا سندووقە زێڕینەکە بکەرەوە. | تە هەمی بیرهاتن دیتن… نوکە سندوقا زێڕین ڤەکە. |
+| 32 | #30 editor label (`wording.drawer8`) | رسالة الدرج 8 | Drawer 8’s message | نامەی چەکمەجەی 8 | نامەیا چەکمەجا 8 |
+| 33 | #30 default words (`wording.drawer8`) | هذا البيت وكل ما فيه صُنع بحب، لك أنت. | This house and everything in it was made with love, for you. | ئەم خانووە و هەموو ئەوەی تێیدایە بە خۆشەویستی دروستکرا، بۆ تۆ. | ئەڤ خانیە و هەمی تشتێن تێدا ب ڤیانێ هاتنە چێکرن، بۆ تە. |
+| 34 | #30 editor label (`wording.gift`) | رسالة الهدية | The gift’s message | نامەی دیارییەکە | نامەیا دیاریێ |
+| 35 | #30 default words (`wording.gift`) | عيد ميلاد سعيد! هذا البيت الصغير مليء بذكرياتنا، وفي كل درج ذكرى تنتظرك. | Happy birthday! This little house is full of our memories. Walk around and open every drawer. | ڕۆژی لەدایکبوونت پیرۆز! ئەم خانووە بچووکە پڕە لە یادەوەرییەکانمان. پیاسەی تێدا بکە و هەموو چەکمەجەیەک بکەرەوە. | ڕۆژا ژدایکبوونا تە پیرۆز بیت! ئەڤ خانیێ بچووک تژیە ژ بیرهاتنێن مە. تێدا بگەڕە و هەمی چەکمەجان ڤەکە. |
+| 36 | #30 editor label (`wording.cupcake`) | ملاحظة الكب كيك | The cupcake’s note | تێبینی کەپ کەیکەکە | تێبینیا کەپ کەیکێ |
+| 37 | #30 default words (`wording.cupcake`) | حلوة مثلك تماماً. | Just as sweet as you. | هێندەی تۆ شیرین. | هندی تە شرین. |
+| 38 | #30 editor label (`wording.mirror`) | رسالة المرآة | The mirror’s message | نامەی ئاوێنەکە | نامەیا نەینکێ |
+| 39 | #30 default words (`wording.mirror`) | هنا… أجمل وجه في هذا البيت. | Look… the loveliest face in this house. | سەیر بکە… جوانترین ڕوو لەم خانووەدا. | بەرێ خۆ بدە… جوانترین ڕوو د ڤی خانی دا. |
+| 40 | #30 editor label (`wording.chest`) | رسالة الصندوق الذهبي | The golden chest’s message | نامەی سندووقە زێڕینەکە | نامەیا سندوقا زێڕین |
+| 41 | #30 default words (`wording.chest`) | كل عام وأنت بألف خير وسعادة. أحبك دائماً. | May every year be brighter and happier for you. Love you always. | هەموو ساڵێک جوانتر و دڵخۆشتر بیت. هەمیشە خۆشم دەوێیت. | هەمی سالان جوانتر و دلخۆشتر بی. هەردەم من تو دڤێی. |
+| 42 | #30 video screen 1's name (`videos.labels`) | شاشة الثلاجة | The fridge screen | شاشەی سەلاجەکە | شاشا سەلاجێ |
+| 43 | #30 video screen 2's name (`videos.labels`) | شاشة السينما | The cinema screen | شاشەی سینەماکە | شاشا سینەمایێ |
+| 44 | #30 video screen 3's name (`videos.labels`) | شاشة الجناح السري | The secret suite’s screen | شاشەی ژووری نهێنی | شاشا ژوورا نهێنی |
+| 45 | #30 for friends: room 1's default name | غرفة المعيشة | Bestie Living Room | ژووری دانیشتنی هاوڕێیان | ژوورا روینشتنێ یا هەڤالان |
+| 46 | #30 for friends: room 6's default name | الجناح السري | Secret Bestie Suite | ژووری نهێنی هاوڕێیان | ژوورا نهێنی یا هەڤالان |
+| 47 | #30 on screen (`welcome`) | بيت صغير مليء بالذكريات | A little house full of memories | خانوویەکی بچووکی پڕ لە یادەوەری | خانیەکێ بچووک تژی بیرهاتن |
+| 48 | #30 on screen (`happyBirthday`) | عيد ميلاد سعيد | Happy birthday | ڕۆژی لەدایکبوونت پیرۆز | ڕۆژا ژدایکبوونا تە پیرۆز بیت |
+| 49 | #30 on screen (`hintKeys`) | امشِ بالأسهم، واسحب لتنظر حولك، واضغط على الأشياء لتفتحها | Walk with the arrow keys, drag to look around, tap things to open them | بە تیرەکان بڕۆ، ڕایبکێشە بۆ سەیرکردنی دەوروبەر، کرتە لە شتەکان بکە بۆ کردنەوەیان | ب تیران بچە، بکێشە دا دەوروبەرێ خۆ ببینی، کرتێ ل تشتان بکە دا ڤەبن |
+| 50 | #30 on screen (`hintTouch`) | امشِ بلوحة اللمس، واسحب لتنظر حولك، واضغط على الأشياء لتفتحها | Walk with the touch pad, drag to look around, tap things to open them | بە پەدی دەستلێدان بڕۆ، ڕایبکێشە بۆ سەیرکردنی دەوروبەر، کرتە لە شتەکان بکە بۆ کردنەوەیان | ب پەدێ دەستلێدانێ بچە، بکێشە دا دەوروبەرێ خۆ ببینی، کرتێ ل تشتان بکە دا ڤەبن |
+| 51 | #30 on screen (`loading`) | نفتح البيت… | Opening the house… | خانووەکە دەکەینەوە… | خانی ڤەدکەین… |
+| 52 | #30 on screen (`rotate`) | أدر هاتفك بالعرض لتتجول في البيت | Turn your phone sideways to walk through the house | مۆبایلەکەت بە پانی بسووڕێنە بۆ پیاسەکردن لە خانووەکەدا | مۆبایلا خۆ ب پانی بزڤڕینە دا د خانی دا بگەڕی |
+| 53 | #30 on screen (`memories`) | {n} من {m} ذكريات | {n} of {m} memories found | {n} لە {m} یادەوەری دۆزرانەوە | {n} ژ {m} بیرهاتن هاتنە دیتن |
+| 54 | #30 on screen (`locked`) | هذا الباب يُفتح عندما تجد كل الذكريات في الأدراج. | This door opens once you have found every memory in the drawers. | ئەم دەرگایە دەکرێتەوە کاتێک هەموو یادەوەرییەکانی ناو چەکمەجەکان دەدۆزیتەوە. | ئەڤ دەرگەهە ڤەدبیت دەمێ تو هەمی بیرهاتنێن د چەکمەجان دا دبینی. |
+| 55 | #30 on screen (`unlocked`) | وجدت كل الذكريات! الجناح السري مفتوح الآن. | You found every memory! The secret suite is open now. | هەموو یادەوەرییەکانت دۆزییەوە! ژووری نهێنی ئێستا کراوەیە. | تە هەمی بیرهاتن دیتن! ژوورا نهێنی نوکە ڤەکریە. |
+| 56 | #30 on screen (`close`) | إغلاق | Close | داخستن | گرتن |
+| 57 | #30 on screen (`play`) | تشغيل | Play | لێدان | لێدان |
+| 58 | #30 on screen (`pause`) | إيقاف مؤقت | Pause | وەستاندن | راوەستاندن |
+| 59 | #30 on screen (`mute`) | كتم الصوت | Mute | بێدەنگکردن | بێدەنگکرن |
+| 60 | #30 on screen (`unmute`) | تشغيل الصوت | Sound on | دەنگ | دەنگ |
+| 61 | #30 on screen (`stopVideo`) | إغلاق الفيديو | Close the video | داخستنی ڤیدیۆکە | گرتنا ڤیدیۆیێ |
+| 62 | #30 on screen (`room`) | غرفة | Room | ژوور | ژوور |
+| 63 | #30 on screen (`drawer`) | درج | Drawer | چەکمەجە | چەکمەجە |
+| 64 | #30 on screen (`fromHeart`) | من القلب | From the heart | لە دڵەوە | ژ دلی |
+| 65 | #30 on screen (`namesHint`) | الاسم | Name | ناو | ناڤ |
+| 66 | #30 on screen (`messageHint`) | رسالتك | Your message | نامەکەت | نامەیا تە |
+| 67 | #30 on screen (`roomHint`) | اسم الغرفة | The room’s name | ناوی ژوورەکە | ناڤێ ژوورێ |
+| 68 | #30 on screen (`textHint`) | اكتب هنا | Write here | لێرە بنووسە | ل ڤێرە بنڤیسە |
+| 69 | #30 on screen (`addPhoto`) | أضف صورة | Add a photo | وێنەیەک زیاد بکە | وێنەیەکی زێدە بکە |
+| 70 | #30 on screen (`addVideo`) | أضف فيديو | Add a video | ڤیدیۆیەک زیاد بکە | ڤیدیۆیەکێ زێدە بکە |
+| 71 | #30 on screen (`mapTitle`) | خريطة البيت | The house | خانووەکە | خانی |
+| 72 | #30 on screen (`editorNote`) | املأ البيت غرفة غرفة: اسمها، صورها، ورسائل أدراجها. | Fill the house room by room: its name, its photos and its drawers’ messages. | خانووەکە ژوور بە ژوور پڕ بکەرەوە: ناوەکەی، وێنەکانی و نامەکانی چەکمەجەکانی. | خانی ژوور ب ژوور تژی بکە: ناڤێ وێ، وێنێن وێ و نامەیێن چەکمەجێن وێ. |
+| 73 | #30 on screen (`drawersTitle`) | رسائل الأدراج | Drawer messages | نامەکانی چەکمەجەکان | نامەیێن چەکمەجان |
+| 74 | #30 on screen (`photosHint`) | الصور معلقة على الجدار الخلفي، من اليسار إلى اليمين. | The photos hang on the back wall, from left to right. | وێنەکان لەسەر دیواری دواوە هەڵواسراون، لە چەپەوە بۆ ڕاست. | وێنە ل سەر دیوارێ پشتێ هاتینە هەلاویستن، ژ چەپێ بۆ راستێ. |
+| 75 | #30 on screen (`floorGround`) | الطابق الأرضي | Ground floor | نهۆمی خوارەوە | قاتێ خوارێ |
+| 76 | #30 on screen (`floorUpper`) | الطابق العلوي | Upstairs | نهۆمی سەرەوە | قاتێ سەرێ |
+| 77 | #30 on screen (`notInPackage`) | ليست في باقتك | Not in your package | لە پاکێجەکەتدا نییە | نە د پاکێجا تە دایە |
+| 78 | #30 on screen, for friends (`happyBirthday`) | إلى صديقي العزيز | For my bestie | بۆ هاوڕێ ئازیزەکەم | بۆ هەڤالێ من یێ شرین |
+| 79 | #30 on screen, for friends (`welcome`) | بيت صغير مليء بذكرياتنا معاً | A little house full of our memories | خانوویەکی بچووکی پڕ لە یادەوەرییەکانمان | خانیەکێ بچووک تژی بیرهاتنێن مە |
+| 80 | #30 description (Admin, owner setup) | بيت دمى وردي ثلاثي الأبعاد يتجوّل فيه صاحب المناسبة من هاتفه أو حاسوبه: صوركم على جدرانه، وفيديوهاتكم على شاشاته، ورسائلكم مخبأة في أدراجه، وهدية وكعكة تنتظرانه، وفي أكبر باقة جناح سري لا يُفتح إلا بعد أن يجد كل الذكريات. | A pink 3D dollhouse the birthday person walks through on their phone or computer: your photos on its walls, your videos on its screens, your messages hidden in its drawers, a gift and a cake waiting, and in the biggest package a secret suite that opens only once every memory has been found. | خانوویەکی بووکەڵەی پەمەیی سێ ڕەهەندی کە خاوەنی بۆنەکە لە مۆبایل یان کۆمپیوتەرەکەیەوە پیاسەی تێدا دەکات: وێنەکانتان لەسەر دیوارەکانی، ڤیدیۆکانتان لەسەر شاشەکانی، نامەکانتان لە چەکمەجەکانیدا شاردراونەتەوە، دیارییەک و کێکێک چاوەڕێی دەکەن، و لە گەورەترین پاکێجدا ژوورێکی نهێنی کە تەنها دوای دۆزینەوەی هەموو یادەوەرییەکان دەکرێتەوە. | خانیەکێ بووکەلێ یێ پەمبەیی یێ سێ ڕەهەندی کو خودانێ بۆنێ ژ مۆبایل یان کۆمپیوتەرا خۆ تێدا دگەڕیت: وێنێن هەوە ل سەر دیوارێن وی، ڤیدیۆیێن هەوە ل سەر شاشێن وی، نامەیێن هەوە د چەکمەجێن وی دا هاتینە ڤەشارتن، دیاریەک و کێکەک ل هیڤیا وی نە، و د مەزنترین پاکێج دا ژوورەکا نهێنی کو بتنێ پشتی دیتنا هەمی بیرهاتنان ڤەدبیت. |
+| 81 | #30 colour set (walls #eca3be) | وردي كريمي | Rose Cream | پەمەیی کرێمی | پەمبەیی کرێمی |
+| 82 | #30 colour set (walls #e3cdec) | سحابة الخزامى | Lavender Cloud | هەوری لاڤەندەر | عەوری لاڤەندەری |
+| 83 | #30 colour set (walls #f9c8b6) | توهج الخوخ | Peach Glow | درەوشانەوەی قۆخ | چریسکا قۆخی |
+| 84 | #30 colour set (walls #c6e8da) | حلم النعناع | Mint Dream | خەونی پونگ | خەونا پونگی |
+| 85 | #30 colour set (walls #ce9dae) | شمبانيا المساء | Champagne Twilight | شامپانیای ئێوارە | شامپانیا ئێڤاری |
+| 86 | #30 colour set (walls #f5c0e9) | غزل البنات | Cotton Candy | شەکرۆکە | شەکرۆک |
+| 87 | #30 package «Basic»: its name (docs/themes/pink-dreamhouse/PACKAGES.md) | أساسية | Basic | سەرەتایی | سەرەتایی |
+| 88 | #30 package «Basic»: its description | غرفة المعيشة وغرفة النوم: 6 صور على الجدران، رسالتان مخبأتان في الأدراج، وهدية تُفتح بتهنئة عيد الميلاد. لونان للاختيار. | The living room and the bedroom: 6 photos on the walls, two messages hidden in the drawers, and a gift that opens with a birthday wish. Two colours to choose from. | ژووری دانیشتن و ژووری نووستن: ٦ وێنە لەسەر دیوارەکان، دوو نامە لە چەکمەجەکاندا شاردراونەتەوە، و دیارییەک کە بە پیرۆزبایی ڕۆژی لەدایکبوون دەکرێتەوە. دوو ڕەنگ بۆ هەڵبژاردن. | ژوورا روینشتنێ و ژوورا نڤستنێ: ٦ وێنە ل سەر دیواران، دوو نامە د چەکمەجان دا هاتینە ڤەشارتن، و دیاریەک ب پیرۆزباهیا ڕۆژا ژدایکبوونێ ڤەدبیت. دوو ڕەنگ بۆ هەلبژارتنێ. |
+| 89 | #30 package «VIP»: its name (docs/themes/pink-dreamhouse/PACKAGES.md) | VIP | VIP | VIP | VIP |
+| 90 | #30 package «VIP»: its description | أربع غرف: المعيشة والنوم ومقهى المطبخ واستوديو التجميل في الطابق العلوي، 12 صورة، 4 رسائل في الأدراج، فيديو على شاشة الثلاجة، كب كيك ومرآة تحمل رسائلك. أربعة ألوان. | Four rooms: the living room, the bedroom, the kitchen café and the vanity studio upstairs, 12 photos, 4 drawer messages, a video on the fridge screen, and a cupcake and a mirror with your notes. Four colours. | چوار ژوور: ژووری دانیشتن، ژووری نووستن، کافێی چێشتخانە و ستۆدیۆی جوانکاری لە نهۆمی سەرەوە، ١٢ وێنە، ٤ نامە لە چەکمەجەکاندا، ڤیدیۆیەک لەسەر شاشەی سەلاجەکە، و کەپ کەیک و ئاوێنەیەک کە نامەکانت هەڵدەگرن. چوار ڕەنگ. | چار ژوور: ژوورا روینشتنێ، ژوورا نڤستنێ، کافێیا مەتبەخێ و ستۆدیۆیا جوانکاریێ ل قاتێ سەرێ، ١٢ وێنە، ٤ نامە د چەکمەجان دا، ڤیدیۆیەک ل سەر شاشا سەلاجێ، و کەپ کەیکەک و نەینکەک کو نامەیێن تە هەلدگرن. چار ڕەنگ. |
+| 91 | #30 package «VVIP»: its name (docs/themes/pink-dreamhouse/PACKAGES.md) | VVIP | VVIP | VVIP | VVIP |
+| 92 | #30 package «VVIP»: its description | البيت كاملاً بست غرف: مع سينما الأصدقاء والجناح السري الذي لا يُفتح إلا بعد العثور على كل الذكريات، 24 صورة، 8 رسائل، 3 فيديوهات، صندوق ذهبي ونهاية احتفالية، موسيقى في الخلفية، وسبعة ألوان. | The whole house of six rooms: with the bestie cinema and the secret suite that opens only once every memory is found, 24 photos, 8 messages, 3 videos, a golden chest and a grand finale, background music, and seven colours. | هەموو خانووەکە بە شەش ژوورەوە: لەگەڵ سینەمای هاوڕێیان و ژووری نهێنی کە تەنها دوای دۆزینەوەی هەموو یادەوەرییەکان دەکرێتەوە، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندووقێکی زێڕین و کۆتاییەکی ئاهەنگئامێز، مۆسیقای پاشبنەما، و حەوت ڕەنگ. | هەمی خانی ب شەش ژووران: دگەل سینەمایا هەڤالان و ژوورا نهێنی کو بتنێ پشتی دیتنا هەمی بیرهاتنان ڤەدبیت، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندوقەکا زێڕین و دووماهیکەکا ئاهەنگی، مۆسیقایا پاشبنەمایێ، و حەفت ڕەنگ. |

@@ -42,8 +42,8 @@ export function makeMp3(seconds = 3): Buffer {
 /** Opens a customer's personal preview (`/p/<token>`) and taps "Open invitation", as a guest would. */
 export async function openPreview(page: Page, previewToken: string) {
   await page.goto(`/p/${previewToken}`);
-  // «Open invitation», or a design's own words (e.g. «Open the museum»).
-  const open = page.getByRole('button', { name: /افتح الدعوة|Open invitation|افتح المتحف|Open the museum/ });
+  // «Open invitation», or a design's own words (e.g. «Open the museum», «Enter the house»).
+  const open = page.getByRole('button', { name: /افتح الدعوة|Open invitation|افتح المتحف|Open the museum|ادخل البيت|Enter the house/ });
   await open.click();
   await expect(open).toHaveCount(0, { timeout: 6_000 });
 }
