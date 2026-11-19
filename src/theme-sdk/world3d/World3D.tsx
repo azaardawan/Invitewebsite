@@ -45,6 +45,8 @@ export type World3DProps = {
   onTap?: (tap: WorldTap) => void;
   onRoom?: (key: string) => void;
   onVideo?: (place: number, state: 'playing' | 'paused' | 'ended') => void;
+  /** The thing of the plan the visitor is next to and facing (the design may offer a button for it), or null. */
+  onNear?: (key: string | null) => void;
 };
 
 /**
@@ -108,6 +110,7 @@ export const World3D = forwardRef<World3DHandle, World3DProps>(function World3D(
           onTap: (t) => callbacks.current.onTap?.(t),
           onRoom: (k) => callbacks.current.onRoom?.(k),
           onVideo: (p, s) => callbacks.current.onVideo?.(p, s),
+          onNear: (k) => callbacks.current.onNear?.(k),
         });
         engine.current = e;
         await e.load();

@@ -16,6 +16,7 @@ import { createDraft } from '@/server/orders/drafts';
 import { invitationRenderData } from '@/server/invitation/load';
 import { setTemplateText } from '@/server/template/text';
 import { customerVideos, deleteVideosOf, removeVideo, setVideo, videoPlaces } from '@/server/video/video';
+import { listPhotos, photoSpec, removePhoto, setPhoto } from '@/server/photos/photos';
 import { randomToken } from '@/lib/crypto';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { activeTheme, testManifest } from '../fixtures';
@@ -49,7 +50,7 @@ beforeAll(async () => {
     features: ['photos', 'video', 'color_choice'],
     editor: 'template',
     validStates: [{ features: ['photos', 'video', 'color_choice'], fields: [...FIELDS] }],
-    photos: { max: 6 },
+    photos: { max: 6, attached: 2 },
     videos: { max: 3, labels: [{ ar: 'الثلاجة', en: 'Fridge' }, { ar: 'السينما', en: 'Cinema' }, { ar: 'الجناح', en: 'Suite' }] },
     colors: { slots: [{ key: 'walls', label: { ar: 'الجدران', en: 'Walls' }, default: '#f6b8cf' }] },
     print: undefined,
@@ -134,5 +135,26 @@ describe('colour sets per package', () => {
     await expect(
       updatePackage(db(), shop.two, { name: { ar: 'VIP', en: 'VIP' }, priceIqd: 30000, fieldKeys: [...FIELDS], featureKeys: ['photos', 'video', 'color_choice'], paletteIds: [foreign] }, shop.actor),
     ).rejects.toMatchObject({ code: 'notValidState' });
+  });
+});
+
+describe('photos attached to things in a design (a drawer’s)', () => {
+  const jpeg = async (color: string) => sharp({ create: { width: 900, height: 1000, channels: 3, background: color } }).jpeg().toBuffer();
+
+  it('have their own places from 50, are optional and on their own, and are not the package’s photos', async () => {
+    const inv = await draft(shop.two);
+    expect((await photoSpec(db(), inv))?.attached).toBe(2);
+    // A drawer's photo, with no photo on the walls: it keeps its place.
+    expect((await setPhoto(db(), inv, 51, await jpeg('#c36'))).position).toBe(51);
+    await expect(setPhoto(db(), inv, 52, await jpeg('#c36'))).rejects.toMatchObject({ code: 'position' });
+    // Not among the design's photos (collages, prints, counts), but given to the design.
+    expect(await listPhotos(db(), inv.id)).toHaveLength(0);
+    expect((await listPhotos(db(), inv.id, { attached: true })).map((p) => p.position)).toEqual([51]);
+    expect((await setPhoto(db(), inv, 0, await jpeg('#36c'))).position).toBe(0);
+    const { props } = await invitationRenderData(db(), inv, 'preview');
+    expect(props.photos.map((p) => p.index)).toEqual([0, 51]);
+    // Removing it moves nothing.
+    await removePhoto(db(), inv.id, 51);
+    expect((await listPhotos(db(), inv.id, { attached: true })).map((p) => p.position)).toEqual([0]);
   });
 });

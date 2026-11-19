@@ -176,9 +176,11 @@ export async function songState(inv: typeof invitations.$inferSelect) {
 export async function photoState(inv: typeof invitations.$inferSelect) {
   const spec = await photoSpec(db(), inv);
   if (!spec) return null;
-  const list = await listPhotos(db(), inv.id);
+  const list = await listPhotos(db(), inv.id, { attached: true });
   return {
     max: spec.max,
+    /** Photos attached to things in the design (e.g. drawers), from ATTACHED_PHOTO_PLACE: each optional, on its own. */
+    attached: spec.attached,
     min: spec.min,
     aspect: spec.aspect,
     aspects: spec.aspects,

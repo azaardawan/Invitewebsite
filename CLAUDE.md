@@ -70,7 +70,9 @@ product spec's §74 business rules override assumptions.
   photo set, so packages sell rooms. Always keep a flat version (no WebGL, and the template editor). THEME_CONTRACT §6.
 - 3D worlds (`<World3D>`, `src/theme-sdk/world3d/*`): a small building to walk and play in (#30 Pink Dreamhouse, owner
   2026-11-19): a `WorldPlan` (floors, stairs as ramps, rooms, photo places, screens, plates, things a tap moves, paint by
-  colour slot); the design answers taps. One model per package size (photos sold: 6 / 12 / 24). THEME_CONTRACT §6.
+  colour slot, textures, ceilings, round parts, built drawers); the design answers taps and `onNear` (an «Open» button).
+  One model per package size (photos sold: 6 / 12 / 24). Photos attached to things (manifest `photos.attached`, places
+  from 50, e.g. a drawer's photo) are optional and not counted in a package's photos. THEME_CONTRACT §6.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

@@ -615,3 +615,58 @@
 .mapClosed text {
   fill: rgba(162, 88, 125, 0.45);
 }
+
+/* By something to open or press: a button for it, above the touch pad. */
+.nearButton {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  min-width: 140px;
+  min-height: 52px;
+  padding: 12px 34px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: var(--pdh-accent);
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 24px rgba(120, 40, 80, 0.35);
+  cursor: pointer;
+}
+
+.notePhoto {
+  display: block;
+  width: min(100%, 280px);
+  aspect-ratio: 0.9;
+  border-radius: 14px;
+  border: 5px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--pdh-gold), 0 10px 24px rgba(80, 30, 55, 0.2);
+  overflow: hidden;
+}
+
+.flatDrawer {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.noteEditPhoto {
+  grid-template-columns: 96px 1fr;
+  align-items: start;
+  column-gap: 12px;
+}
+
+.noteEditPhoto .noteLabel {
+  grid-column: 1 / -1;
+}
+
+.drawerPhoto {
+  width: 96px;
+}
+
+.drawerPhoto .framePhoto {
+  border-width: 3px;
+}

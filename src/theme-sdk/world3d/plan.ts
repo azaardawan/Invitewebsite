@@ -26,8 +26,22 @@ export type WorldRoom = { key: string; rect: Rect; y: number };
  * without moving (a chest's body, when its lid opens).
  */
 type ThingBase = { key: string; node: string; with?: readonly string[]; touch?: readonly string[] };
+/** A box in the world: its two corners. */
+export type Box = { min: readonly [number, number, number]; max: readonly [number, number, number] };
+/**
+ * A drawer drawn by the world instead of the model's (`node` and `with` are then left out): a real drawer (a front with a
+ * knob, sides, a back and a bottom) at `drawer` when closed, in a `housing` (a cabinet, a chest, a table's apron) with an
+ * opening for it, standing where the model's is not (or replacing the model's parts in `hide`). Its front faces the way it
+ * slides; `paint`: the colour slots of its front, its inside, the housing and the knob.
+ */
+export type DrawerBuild = {
+  drawer: Box;
+  housing?: Box;
+  hide?: readonly string[];
+  paint: { front: string; inside: string; housing: string; knob: string };
+};
 export type WorldThing =
-  | (ThingBase & { kind: 'drawer'; slide: readonly [number, number] })
+  | (ThingBase & { kind: 'drawer'; slide: readonly [number, number]; build?: DrawerBuild })
   | (ThingBase & { kind: 'lid' | 'lift' | 'press' | 'glow' })
   | (ThingBase & { kind: 'door'; gate: WorldSurface })
   | (ThingBase & { kind: 'teleport'; to: { x: number; z: number; y: number; yaw: number } });
@@ -60,6 +74,16 @@ export type WorldPlan = {
   things: readonly WorldThing[];
   /** Colour slots (a design's colour sets) → the meshes (name prefixes) painted in that colour. */
   paint?: Readonly<Record<string, readonly string[]>>;
+  /** Colour slots drawn with a texture (`size`: metres one picture of it covers): plaster (walls, ceilings) or tiles. */
+  textures?: Readonly<Record<string, { kind: 'plaster' | 'tiles'; size: number }>>;
+  /** Ceilings the model lacks (flat, facing down), in a colour slot's paint. */
+  ceilings?: { paint: string; at: readonly (Rect & { y: number })[] };
+  /** Meshes (name prefixes) the model draws with few sides, drawn smoothly round instead (in the same box). */
+  round?: { spheres?: readonly string[]; cylinders?: readonly string[]; soft?: readonly string[] };
+  /** Meshes (name prefixes) drawn in a colour of their own that glows (a candle's flame). */
+  glow?: Readonly<Record<string, string>>;
+  /** Photo places moved (up or down, metres) or made smaller, clear of the furniture in front of them; by photo mesh. */
+  photoMoves?: Readonly<Record<string, { dy?: number; scale?: number }>>;
   /** Meshes (name prefixes) left out of the scene, and meshes a visitor can walk through (rugs, thin strings). */
   hidden?: readonly string[];
   passThrough?: readonly string[];
@@ -114,7 +138,9 @@ export function scaledPlan(plan: WorldPlan): WorldPlan {
   const surface = (s: WorldSurface): WorldSurface =>
     'y' in s ? { ...rect(s), y: s.y * k } : { ...rect(s), ramp: { z0: s.ramp.z0 * k, y0: s.ramp.y0 * k, z1: s.ramp.z1 * k, y1: s.ramp.y1 * k } };
   const thing = (t: WorldThing): WorldThing => {
-    if (t.kind === 'drawer') return { ...t, slide: [t.slide[0] * k, t.slide[1] * k] };
+    const box = (b: Box): Box => ({ min: [b.min[0] * k, b.min[1] * k, b.min[2] * k], max: [b.max[0] * k, b.max[1] * k, b.max[2] * k] });
+    if (t.kind === 'drawer')
+      return { ...t, slide: [t.slide[0] * k, t.slide[1] * k], build: t.build ? { ...t.build, drawer: box(t.build.drawer), housing: t.build.housing ? box(t.build.housing) : undefined } : undefined };
     if (t.kind === 'door') return { ...t, gate: surface(t.gate) };
     if (t.kind === 'teleport') return { ...t, to: { ...t.to, x: t.to.x * k, y: t.to.y * k, z: t.to.z * k } };
     return t;
@@ -127,5 +153,7 @@ export function scaledPlan(plan: WorldPlan): WorldPlan {
     rooms: plan.rooms.map((r) => ({ ...r, y: r.y * k, rect: rect(r.rect) })),
     texts: plan.texts.map((t) => ({ ...t, at: [t.at[0] * k, t.at[1] * k, t.at[2] * k] as const, width: t.width * k, height: t.height * k })),
     things: plan.things.map(thing),
+    ceilings: plan.ceilings ? { ...plan.ceilings, at: plan.ceilings.at.map((c) => ({ ...rect(c), y: c.y * k })) } : undefined,
+    photoMoves: plan.photoMoves ? Object.fromEntries(Object.entries(plan.photoMoves).map(([n, m]) => [n, { ...m, dy: (m.dy ?? 0) * k }])) : undefined,
   };
 }

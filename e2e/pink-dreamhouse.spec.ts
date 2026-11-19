@@ -36,6 +36,20 @@ test('the house opens in 3D; drawers hold messages; finding every memory opens t
   await expect(page.locator('[data-house-3d="ready"][data-house-tier="vvip"]')).toBeVisible({ timeout: 60_000 });
   await expect(page.locator('canvas')).toHaveCount(1);
   await page.screenshot({ path: testInfo.outputPath('living-room.png') });
+  // Walking up to the coffee table: a button to open its drawer (the test browser draws slowly: walk a while).
+  await page.mouse.click(5, 790);
+  await page.keyboard.down('ArrowUp');
+  await expect(page.locator('[data-house-near]')).toBeVisible({ timeout: 20_000 });
+  await page.keyboard.up('ArrowUp');
+  await expect(page.locator('[data-house-near]')).toHaveText('Open');
+  await page.locator('[data-house-near]').click();
+  await expect(page.locator('[data-house-card]')).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('near-open.png') });
+  await page.locator('[data-house-card]').getByRole('button', { name: 'Close' }).click();
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.getByRole('button', { name: 'Enter the house' }).click();
+  await expect(page.locator('[data-house-3d="ready"]')).toBeVisible({ timeout: 60_000 });
   await expect(page.locator('[data-house-unlocked="no"]')).toBeVisible();
   // A drawer's message (the sample's words).
   await page.locator('[data-drawer="1"]').dispatchEvent('click');
@@ -106,7 +120,9 @@ test('a Basic package fills two rooms, offers its own colour sets and no video; 
   await page.goto(`/en/order/${basic.previewToken}`);
   const design = page.frameLocator('iframe[data-template-design]');
   await expect(design.locator('[data-house-tier="basic"] [data-house-room]')).toHaveCount(2);
-  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(6);
+  // Six photo places, and a photo for each of its two drawers (optional).
+  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(8);
+  await expect(design.locator('[data-house-drawer-edit] [data-bahja-photo-slot]')).toHaveCount(2);
   await expect(design.locator('[data-bahja-video-slot]')).toHaveCount(0);
   // Only the package's colour set besides the house's own.
   const picker = page.locator('[data-template-colors]');
@@ -118,7 +134,7 @@ test('a Basic package fills two rooms, offers its own colour sets and no video; 
   const vvip = draft('vvip');
   await page.goto(`/en/order/${vvip.previewToken}`);
   await expect(design.locator('[data-house-tier="vvip"] [data-house-room]')).toHaveCount(6);
-  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(24);
+  await expect(design.locator('[data-bahja-photo-slot]')).toHaveCount(24 + 8);
   await expect(design.locator('[data-bahja-video-slot]')).toHaveCount(3);
   await expect(page.locator('[data-template-colors]').getByRole('button')).toHaveCount(7);
   await expect(page.locator('[data-template-videos]')).toContainText('0/3');
@@ -127,6 +143,11 @@ test('a Basic package fills two rooms, offers its own colour sets and no video; 
   await expect(page.locator('[data-template-sheet="video"]')).toContainText('The cinema screen');
   await page.screenshot({ path: testInfo.outputPath('vvip-video-sheet.png') });
   await page.locator('[data-template-sheet="video"]').getByRole('button', { name: /Done/ }).click();
+  // A drawer can hold a photo besides its message: its sheet opens for that drawer's own place.
+  await design.locator('[data-house-drawer-edit="drawer1"] [data-bahja-photo-slot]').click();
+  await expect(page.locator('[data-template-sheet="photo-add"]')).toBeVisible();
+  await page.mouse.click(5, 5);
+  await expect(page.locator('[data-template-sheet]')).toHaveCount(0);
   // A drawer's message is written in place.
   await design.locator('[data-bahja-edit="wording:drawer1"]').click();
   await page.locator('[data-template-text-input]').fill('Our first trip together.');
