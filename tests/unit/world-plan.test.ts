@@ -59,3 +59,15 @@ describe('walking a 3D world', () => {
     expect(tierOf(0, 0, false)).toBe('basic');
   });
 });
+
+describe('a world drawn bigger than its model', () => {
+  it('scales every place in the plan, but not the eye height', async () => {
+    const { scaledPlan } = await import('@/theme-sdk/world3d/plan');
+    const plan = { ...planFor('vvip'), scale: 2 };
+    const big = scaledPlan(plan);
+    expect(big.eye).toBe(plan.eye);
+    expect(big.start.x).toBeCloseTo(plan.start.x * 2);
+    expect(floorAt(big, 9.2 * 2, 2.8 * 2, 3.35 * 2, new Set(['secretDoor']))).toBeCloseTo(6.7);
+    expect(scaledPlan({ ...plan, scale: 1 })).toEqual({ ...plan, scale: 1 });
+  });
+});

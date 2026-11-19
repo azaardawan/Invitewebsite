@@ -91,9 +91,10 @@ surfaces.vip = [...ground, ...stairs, ...vanity];
 surfaces.vvip = [...ground, ...stairs, ...vanity, doorway(4.6, UP), flat(UP, 4.92, 8.88, 0.45, 5.48), flat(UP, 9.52, 13.48, 0.45, 5.48)];
 
 /** Where the visitor starts (the living room, facing the photo wall), and where the stairs' taps take them. */
-const START = { x: 2.45, z: 1.05, y: 0, yaw: Math.atan2(-(2.8 - 2.45), -(4.25 - 1.05)) };
-const UPSTAIRS = { x: 2.0, z: 3.8, y: UP, yaw: Math.PI };
-const DOWNSTAIRS = { x: 2.0, z: 1.45, y: 0, yaw: Math.PI };
+// From the open front of each room, so the whole room is in view.
+const START = { x: 2.9, z: 0.5, y: 0, yaw: Math.PI };
+const UPSTAIRS = { x: 3.0, z: 0.55, y: UP, yaw: Math.PI };
+const DOWNSTAIRS = { x: 2.9, z: 0.5, y: 0, yaw: Math.PI };
 
 const things: WorldThing[] = [
   { key: 'gift', node: 'INT_BIRTHDAY_GIFT_LID', kind: 'lid', touch: ['DECOR_GIFT_BOX', 'DECOR_GIFT_RIBBON'] },
@@ -131,6 +132,9 @@ const withPrefix = (prefix: string, names: string[]) => names.map((n) => prefix 
 export function planFor(tier: Tier): WorldPlan {
   const rooms = ROOMS.filter((r) => TIERS.indexOf(r.tier) <= TIERS.indexOf(tier));
   return {
+    // More spacious (owner, 2026-11-19): a wide view from each room's open front, so the visitor sees the room whole
+    // (drawing the house bigger was tried: the furniture grows with it and crowds the view more).
+    fov: 92,
     start: START,
     eye: EYE,
     surfaces: surfaces[tier],
@@ -150,12 +154,14 @@ export function planFor(tier: Tier): WorldPlan {
     paint: {
       metal: ['FRONT_TRIM', 'PARTITION_GROUND_1_JAMB', 'PARTITION_GROUND_2_JAMB', 'PARTITION_UPPER_1_JAMB', 'PARTITION_UPPER_2_JAMB', 'UPPER_STAIR_RAIL', 'ROOF_GOLD_LINE', 'DRAWER_KNOB', 'NAMEPLATE_FRAME', 'DECOR_STAIR_RAIL_POST'],
       walls: ['WALL_LEFT', 'WALL_RIGHT', ...withPrefix('PARTITION_GROUND_', ['1_FRONT', '1_BACK', '1_LINTEL', '2_FRONT', '2_BACK', '2_LINTEL']), ...withPrefix('PARTITION_UPPER_', ['1_FRONT', '1_BACK', '1_LINTEL', '2_FRONT', '2_BACK', '2_LINTEL'])],
-      'walls-light': ['WALL_BACK'],
-      accent: ['ROOF_TRIM', 'INT_DRAWER', 'DECOR_KITCHEN_UPPER_CABINET', 'DECOR_BED_HEADBOARD', 'DECOR_LIVING_SOFA_BACK', 'INT_SECRET_ROOM_DOOR'],
+      // The roof is the ceiling upstairs: the light wall colour, not the accent.
+      'walls-light': ['WALL_BACK', 'ROOF_TRIM'],
+      accent: ['INT_DRAWER', 'DECOR_KITCHEN_UPPER_CABINET', 'DECOR_BED_HEADBOARD', 'DECOR_LIVING_SOFA_BACK', 'INT_SECRET_ROOM_DOOR'],
       floor: ['FLOOR_'],
       trim: ['FRONT_SILL', 'FRONT_COLUMN', 'CEILING_TRIM'],
     },
-    hidden: ['TEXT_ROOM', 'TEXT_DOOR'],
+    // The ground floor's ceiling trim lies in the upper floor (it flickers there): left out under the upstairs rooms.
+    hidden: ['TEXT_ROOM', 'TEXT_DOOR', ...(tier === 'basic' ? [] : ['CEILING_TRIM_01']), ...(tier === 'vvip' ? ['CEILING_TRIM_02', 'CEILING_TRIM_03'] : [])],
     passThrough: ['RUG_', 'INT_STAIRS_', 'DECOR_BALLOON', 'DECOR_VVIP_LIVING', 'CAKE_FLAME', 'STAIR_STEP', 'STAIR_TREAD', 'DECOR_DOOR_BEDROOM_PLAQUE'],
     sky: '#fbe7ef',
     light: { ambient: 1.25, sun: 1.1, exposure: 1.05 },
