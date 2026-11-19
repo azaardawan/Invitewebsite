@@ -36,9 +36,16 @@ export type WorldThing =
 export type WorldText = { key: string; at: readonly [number, number, number]; normal: readonly [number, number]; width: number; height: number };
 
 export type WorldPlan = {
+  /**
+   * How many times bigger than the model the world is drawn (default 1): roomier rooms and higher ceilings around a
+   * visitor whose eye height stays `eye`. Everything else in the plan is in the model's own metres.
+   */
+  scale?: number;
   start: { x: number; z: number; y: number; yaw: number };
   /** Eye height above the floor. */
   eye: number;
+  /** How wide the view is, in degrees (on a screen held sideways; a little wider held upright). Default 72. */
+  fov?: number;
   surfaces: readonly WorldSurface[];
   rooms: readonly WorldRoom[];
   /**
@@ -97,4 +104,28 @@ export function roomAt(plan: Pick<WorldPlan, 'rooms'>, x: number, z: number, y: 
     if (!best || Math.abs(r.y - y) < Math.abs(best.y - y)) best = r;
   }
   return best;
+}
+
+/** The plan in the world's metres (the model drawn `scale` times bigger); the eye height stays as it is. */
+export function scaledPlan(plan: WorldPlan): WorldPlan {
+  const k = plan.scale ?? 1;
+  if (k === 1) return plan;
+  const rect = <T extends Rect>(r: T): T => ({ ...r, minX: r.minX * k, maxX: r.maxX * k, minZ: r.minZ * k, maxZ: r.maxZ * k });
+  const surface = (s: WorldSurface): WorldSurface =>
+    'y' in s ? { ...rect(s), y: s.y * k } : { ...rect(s), ramp: { z0: s.ramp.z0 * k, y0: s.ramp.y0 * k, z1: s.ramp.z1 * k, y1: s.ramp.y1 * k } };
+  const thing = (t: WorldThing): WorldThing => {
+    if (t.kind === 'drawer') return { ...t, slide: [t.slide[0] * k, t.slide[1] * k] };
+    if (t.kind === 'door') return { ...t, gate: surface(t.gate) };
+    if (t.kind === 'teleport') return { ...t, to: { ...t.to, x: t.to.x * k, y: t.to.y * k, z: t.to.z * k } };
+    return t;
+  };
+  return {
+    ...plan,
+    scale: 1,
+    start: { ...plan.start, x: plan.start.x * k, y: plan.start.y * k, z: plan.start.z * k },
+    surfaces: plan.surfaces.map(surface),
+    rooms: plan.rooms.map((r) => ({ ...r, y: r.y * k, rect: rect(r.rect) })),
+    texts: plan.texts.map((t) => ({ ...t, at: [t.at[0] * k, t.at[1] * k, t.at[2] * k] as const, width: t.width * k, height: t.height * k })),
+    things: plan.things.map(thing),
+  };
 }

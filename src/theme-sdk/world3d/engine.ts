@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { canvasTexture, fitText, framed, loadImage, sameSite } from '../gallery3d/draw';
-import { floorAt, roomAt, type WorldPlan, type WorldText, type WorldThing } from './plan';
+import { floorAt, roomAt, scaledPlan, type WorldPlan, type WorldText, type WorldThing } from './plan';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -78,9 +78,14 @@ export class WorldEngine {
   private fade: HTMLDivElement;
   private disposables: { dispose(): void }[] = [];
 
+  /** How many times bigger than the model the world is drawn (the plan's `scale`). */
+  private size: number;
+
   constructor(options: WorldOptions) {
-    this.o = options;
-    const { plan, container } = options;
+    this.size = options.plan.scale ?? 1;
+    // From here on the plan is in the world's metres.
+    this.o = { ...options, plan: scaledPlan(options.plan) };
+    const { plan, container } = this.o;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -142,6 +147,7 @@ export class WorldEngine {
 
   private build(root: THREE.Object3D) {
     const { plan, colors } = this.o;
+    root.scale.setScalar(this.size);
     root.updateMatrixWorld(true);
     const meshes: THREE.Mesh[] = [];
     root.traverse((o) => {
@@ -591,7 +597,9 @@ export class WorldEngine {
       const len = Math.max(1, Math.hypot(f, s));
       const fx = -Math.sin(this.yaw);
       const fz = -Math.cos(this.yaw);
-      this.step(((fx * f - fz * s) / len) * SPEED * dt, ((fz * f + fx * s) / len) * SPEED * dt);
+      // A bigger world is walked a little faster.
+      const pace = SPEED * Math.sqrt(this.size);
+      this.step(((fx * f - fz * s) / len) * pace * dt, ((fz * f + fx * s) / len) * pace * dt);
     }
     // The eye follows the floor smoothly (stairs).
     const eyeY = this.floorY + this.o.plan.eye;
@@ -633,7 +641,7 @@ export class WorldEngine {
     } else if (k === 'lid') {
       g.rotateX(-1.9 * e);
     } else if (k === 'lift') {
-      g.position.y += 0.28 * e;
+      g.position.y += 0.28 * this.size * e;
       g.rotateY(Math.PI * 2 * e);
     } else if (k === 'press') {
       g.scale.setScalar(1 - 0.12 * Math.sin(Math.PI * e));
@@ -667,7 +675,8 @@ export class WorldEngine {
     const h = el.clientHeight || 1;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
-    this.camera.fov = w < h ? 82 : 72;
+    const fov = this.o.plan.fov ?? 72;
+    this.camera.fov = w < h ? fov + 10 : fov;
     this.camera.updateProjectionMatrix();
     this.dirty = true;
     this.kick();
