@@ -507,7 +507,7 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         {photos.map((p) => (
           <li key={p.index}>
             <button type="button" data-place={p.index} onClick={() => setPhoto(p)}>
-              {p.title ?? `${roomName(props, copy, roomOf(p.index))} ${p.index + 1}`}
+              <Photo photo={p} alt={p.title ?? `${roomName(props, copy, roomOf(p.index))} ${p.index + 1}`} />
             </button>
           </li>
         ))}
