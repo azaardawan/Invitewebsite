@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import type { SealText } from './initials';
 import o from './opening.module.css';
 
 /**
- * The closed envelope: four flaps cut from one picture along its fold lines, the gold wax seal with the
- * couple's initials on top, and the light that opens it. Purely visual; the open button is outside.
+ * The closed envelope: four flaps cut from one picture along its fold lines, the rose gold wax seal with the
+ * couple's initials on top, and the opening (owner, 2026-11-19: "more animated"): the seal glows, a ring of sparkles
+ * bursts from it, the seal cracks in two, petals burst out and drift down as the flaps swing open, and the crowned
+ * crest blooms from the envelope's heart. Purely visual; the open button is outside.
  */
 export function Envelope({ seal, onOpen }: { seal: SealText | null; onOpen: () => void }) {
   return (
@@ -18,10 +20,91 @@ export function Envelope({ seal, onOpen }: { seal: SealText | null; onOpen: () =
         <span className={o.sealArt} />
         {seal ? <SealLetters seal={seal} /> : null}
       </span>
+      {/* After the tap the seal cracks: its two halves fly apart. */}
+      <span className={`${o.seal} ${o.sealHalf} ${o.sealHalfStart}`}>
+        <span className={o.sealArt} />
+        {seal ? <SealLetters seal={seal} /> : null}
+      </span>
+      <span className={`${o.seal} ${o.sealHalf} ${o.sealHalfEnd}`}>
+        <span className={o.sealArt} />
+        {seal ? <SealLetters seal={seal} /> : null}
+      </span>
       <span className={o.shine} />
+      {/* Rose-gold sparkles burst from the seal; petals burst out and drift down; the crest blooms from the heart. */}
+      <span className={o.burst}>
+        {SPARKS.map((s, i) => (
+          <i key={i} className={o.spark} style={s} />
+        ))}
+      </span>
+      <span className={o.petalBurst}>
+        {BURST.map((s, i) => (
+          <i key={i} className={o.petal} style={s} />
+        ))}
+      </span>
+      <span className={o.crestBloom} />
     </div>
   );
 }
+
+/** Rose petals drifting over the closed envelope (looping) and twinkles on it. */
+export function Drift() {
+  return (
+    <div className={o.drift} aria-hidden="true">
+      {DRIFT.map((s, i) => (
+        <i key={i} className={o.driftPetal} style={s} />
+      ))}
+      {TWINKLES.map((s, i) => (
+        <i key={i} className={o.twinkle} style={s} />
+      ))}
+    </div>
+  );
+}
+
+const v = (o: Record<string, string>) => o as CSSProperties;
+/** A repeatable scatter (no Math.random: the server and the browser draw the same). */
+const r = (n: number) => {
+  const x = Math.sin(n * 91.7 + 13.1) * 43758.5453;
+  return x - Math.floor(x);
+};
+const SPARKS = Array.from({ length: 14 }, (_, i) => {
+  const a = (i / 14) * Math.PI * 2 + r(i) * 0.3;
+  const d = 22 + r(i + 40) * 16;
+  return v({
+    '--x': `${(Math.cos(a) * d).toFixed(1)}cqw`,
+    '--y': `${(Math.sin(a) * d).toFixed(1)}cqw`,
+    '--s': `${(0.7 + r(i + 7) * 0.8).toFixed(2)}`,
+    animationDelay: `${(0.18 + r(i + 3) * 0.12).toFixed(2)}s`,
+  });
+});
+const BURST = Array.from({ length: 30 }, (_, i) => {
+  const a = (i / 30) * Math.PI * 2 + r(i + 11) * 0.5;
+  const d = 26 + r(i + 23) * 34;
+  return v({
+    '--x': `${(Math.cos(a) * d).toFixed(1)}cqw`,
+    '--y': `${(Math.sin(a) * d * 0.7).toFixed(1)}cqw`,
+    '--fall': `${(55 + r(i + 5) * 45).toFixed(0)}cqw`,
+    '--spin': `${((r(i + 9) > 0.5 ? 1 : -1) * (260 + r(i + 2) * 320)).toFixed(0)}deg`,
+    '--s': `${(0.7 + r(i + 17) * 0.7).toFixed(2)}`,
+    animationDelay: `${(0.55 + r(i + 31) * 0.3).toFixed(2)}s`,
+  });
+});
+const DRIFT = Array.from({ length: 12 }, (_, i) =>
+  v({
+    left: `${(r(i + 50) * 100).toFixed(1)}%`,
+    '--s': `${(0.6 + r(i + 60) * 0.7).toFixed(2)}`,
+    '--sway': `${(r(i + 70) * 14 - 7).toFixed(1)}vw`,
+    animationDuration: `${(9 + r(i + 80) * 7).toFixed(1)}s`,
+    animationDelay: `-${(r(i + 90) * 14).toFixed(1)}s`,
+  }),
+);
+const TWINKLES = Array.from({ length: 9 }, (_, i) =>
+  v({
+    left: `${(8 + r(i + 100) * 84).toFixed(1)}%`,
+    top: `${(6 + r(i + 110) * 80).toFixed(1)}%`,
+    animationDelay: `-${(r(i + 120) * 3).toFixed(2)}s`,
+    animationDuration: `${(2.2 + r(i + 130) * 1.6).toFixed(1)}s`,
+  }),
+);
 
 /** Fallback script family; the real one follows the invitation's language (fonts.module.css, --font-script). */
 const SCRIPT = '"ROC Script"';

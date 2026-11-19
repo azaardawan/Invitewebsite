@@ -16,7 +16,7 @@ import {
 } from '@/theme-sdk';
 import { copyFor, type Copy } from './copy';
 import { CREST_BORDER } from './border';
-import { Envelope } from './Envelope';
+import { Drift, Envelope } from './Envelope';
 import { sealText, type SealText } from './initials';
 import { nameScale } from './names';
 import fonts from './fonts.module.css';
@@ -29,7 +29,7 @@ type Stage = 'closed' | 'opening' | 'open' | 'done';
 const noop = () => () => {};
 
 /** When the flaps have swung open: the invitation goes live and the song begins. */
-const OPENED_AT_MS = 2050;
+const OPENED_AT_MS = 2650;
 /** Upper bound for the whole opening; if an animation event never arrives, the invitation opens anyway. */
 const OPENING_FAILSAFE_MS = 4500;
 
@@ -92,6 +92,7 @@ export default function RoyalRoseCrest(props: ThemeProps) {
         >
           <div className={o.backdrop} />
           <Envelope seal={seal} onOpen={open} />
+          <Drift />
           <button type="button" className={o.openButton} onClick={open} autoFocus>
             {labels.openInvitation}
           </button>

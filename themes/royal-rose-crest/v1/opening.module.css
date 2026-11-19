@@ -1,10 +1,11 @@
 /*
- * The opening: the envelope fills the screen (its sides are trimmed on narrow phones, it is centred on
- * wider screens). After the tap: gold light sweeps over the embossing (0–0.85 s), the seal glints and lifts
- * away (0.8–1.35 s), light glows from where the flaps meet, the four flaps swing open (1–2.45 s) and the
- * light spreads over the crest page underneath (the dark surround fades as the flaps part). At 2.05 s the invitation is live
- * (names appear, the song begins) and what is left of the overlay fades out.
- * Everything uses transform and opacity only.
+ * The opening (owner, 2026-11-19: "more animated"): the envelope fills the screen (its sides are trimmed on narrow
+ * phones, it is centred on wider screens). Closed: rose petals drift down over it, twinkles glint, the seal glows
+ * softly. After the tap: light sweeps over the embossing and the seal swells and glows (0–0.5 s), a ring of rose-gold
+ * sparkles bursts from it, the seal cracks in two and the halves fly apart (0.5–1.4 s), petals burst out and drift
+ * down (0.55–3 s) while the four flaps swing open one after another (0.75–2.2 s), and the crowned crest blooms from
+ * the envelope's heart (1.5–2.8 s). At 2.65 s the invitation is live (names appear, the song begins) and what is left
+ * of the overlay fades out. Every opening animation ends within 3.1 s. Everything uses transform and opacity only.
  */
 
 .overlay {
@@ -159,29 +160,44 @@
 .overlay[data-stage='opening'] .shine::before {
   animation: roc-shine 0.85s cubic-bezier(0.4, 0, 0.3, 1) forwards;
 }
-.overlay[data-stage='opening'] .sealArt {
-  animation: roc-glint 0.7s ease-in-out 0.15s;
+.overlay[data-stage='opening'] .seal:not(.sealHalf) {
+  animation: roc-seal-pop 0.55s cubic-bezier(0.3, 0, 0.4, 1) forwards;
 }
-.overlay[data-stage='opening'] .seal {
-  animation: roc-seal-lift 0.55s cubic-bezier(0.5, 0, 0.7, 0.4) 0.8s forwards;
+.overlay[data-stage='opening'] .sealHalfStart {
+  animation: roc-split-start 0.95s cubic-bezier(0.25, 0.6, 0.4, 1) 0.5s forwards;
+}
+.overlay[data-stage='opening'] .sealHalfEnd {
+  animation: roc-split-end 0.95s cubic-bezier(0.25, 0.6, 0.4, 1) 0.5s forwards;
 }
 .overlay[data-stage='opening'] .glow {
-  animation: roc-glow 2s ease-out 0.5s forwards;
+  animation: roc-glow 2s ease-out 0.35s forwards;
+}
+.overlay:is([data-stage='opening'], [data-stage='open']) .spark {
+  animation: roc-spark 0.95s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.overlay:is([data-stage='opening'], [data-stage='open']) .petal {
+  animation: roc-petal-burst 2.2s cubic-bezier(0.25, 0.5, 0.45, 1) forwards;
+}
+.overlay:is([data-stage='opening'], [data-stage='open']) .crestBloom {
+  animation: roc-crest-bloom 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) 1.5s forwards;
 }
 .overlay[data-stage='opening'] .flapTop {
-  animation: roc-open-top 1.4s cubic-bezier(0.45, 0.05, 0.35, 1) 1s forwards;
-}
-.overlay[data-stage='opening'] .flapBottom {
-  animation: roc-open-bottom 1.4s cubic-bezier(0.45, 0.05, 0.35, 1) 1.05s forwards;
+  animation: roc-open-top 1.3s cubic-bezier(0.45, 0.05, 0.35, 1) 0.75s forwards;
 }
 .overlay[data-stage='opening'] .flapLeft {
-  animation: roc-open-left 1.3s cubic-bezier(0.45, 0.05, 0.35, 1) 1.15s forwards;
+  animation: roc-open-left 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) 0.95s forwards;
 }
 .overlay[data-stage='opening'] .flapRight {
-  animation: roc-open-right 1.3s cubic-bezier(0.45, 0.05, 0.35, 1) 1.15s forwards;
+  animation: roc-open-right 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) 1s forwards;
+}
+.overlay[data-stage='opening'] .flapBottom {
+  animation: roc-open-bottom 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) 1s forwards;
 }
 .overlay[data-stage='opening'] .backdrop {
-  animation: roc-fade-out 0.5s ease 1s forwards;
+  animation: roc-fade-out 0.6s ease 1.15s forwards;
+}
+.overlay[data-stage='opening'] .drift {
+  animation: roc-fade-out 0.8s ease 0.3s forwards;
 }
 
 /* The invitation is live: whatever is left of the overlay fades away (then it is removed). */
@@ -216,10 +232,129 @@
     filter: brightness(1.35) saturate(1.1);
   }
 }
-@keyframes roc-seal-lift {
-  to {
-    transform: translateY(-9%) scale(1.08);
+@keyframes roc-seal-pop {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  70% {
+    transform: scale(1.1);
+    filter: brightness(1.35) drop-shadow(0 0 12px rgb(255 214 200 / 0.9));
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.12);
+    filter: brightness(1.4);
     opacity: 0;
+  }
+}
+@keyframes roc-split-start {
+  0% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30%, 34%) rotate(-38deg) scale(0.9);
+  }
+}
+@keyframes roc-split-end {
+  0% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(30%, 30%) rotate(34deg) scale(0.9);
+  }
+}
+@keyframes roc-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(var(--s)) rotate(160deg);
+  }
+}
+@keyframes roc-petal-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate3d(1, 0.6, 0.2, 0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  35% {
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(var(--s)) rotate3d(1, 0.6, 0.2, calc(var(--spin) * 0.35));
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x) * 1.2), calc(-50% + var(--y) + var(--fall))) scale(var(--s)) rotate3d(1, 0.6, 0.2, var(--spin));
+  }
+}
+@keyframes roc-crest-bloom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.25);
+    filter: brightness(1.6) drop-shadow(0 0 30px rgb(255 226 214 / 0.9));
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1.05) drop-shadow(0 0 12px rgb(255 226 214 / 0.6));
+  }
+  /* It settles onto the crest page's own crest (about a fifth of the way down), then gives way to it. */
+  90% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 21vh)) scale(0.52);
+    filter: brightness(1) drop-shadow(0 0 0 rgb(255 226 214 / 0));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% - 21vh)) scale(0.52);
+  }
+}
+@keyframes roc-drift {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate3d(1, 0.4, 0.2, 0deg) scale(var(--s));
+  }
+  50% {
+    transform: translate3d(var(--sway), 50vh, 0) rotate3d(1, 0.4, 0.2, 260deg) scale(var(--s));
+  }
+  100% {
+    transform: translate3d(0, 112vh, 0) rotate3d(1, 0.4, 0.2, 520deg) scale(var(--s));
+  }
+}
+@keyframes roc-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+@keyframes roc-seal-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgb(255 214 200 / 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgb(255 214 200 / 0.75));
   }
 }
 @keyframes roc-glow {
@@ -277,12 +412,97 @@
   }
 }
 
+/* ---------------------------------------------------------------- the seal's halves, sparkles, petals, the crest */
+
+.sealHalf {
+  opacity: 0;
+  pointer-events: none;
+}
+/* A jagged crack down the seal's face (its centre is 49.2 % across). */
+.sealHalfStart {
+  clip-path: polygon(0 0, 50% 0, 47.5% 22%, 51% 36%, 46.5% 50%, 50.5% 64%, 47% 80%, 49.5% 100%, 0 100%);
+}
+.sealHalfEnd {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 49.5% 100%, 47% 80%, 50.5% 64%, 46.5% 50%, 51% 36%, 47.5% 22%);
+}
+.overlay[data-stage='closed'] .seal:not(.sealHalf) {
+  animation: roc-seal-breathe 3s ease-in-out infinite;
+}
+.burst,
+.petalBurst {
+  position: absolute;
+  left: 49.2%;
+  top: 44.7%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.spark {
+  position: absolute;
+  width: 4.2cqw;
+  aspect-ratio: 1;
+  opacity: 0;
+  background: radial-gradient(circle, #fff6f0 0 18%, rgb(246 200 180 / 0.9) 30%, rgb(224 150 125 / 0) 70%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+.petal,
+.driftPetal {
+  position: absolute;
+  width: 4.8cqw;
+  height: 6.2cqw;
+  border-radius: 80% 0 80% 0;
+  background: radial-gradient(ellipse at 30% 30%, #ffe9ee 0%, #f2a9bb 45%, #d97692 100%);
+  box-shadow: inset -1px -1px 2px rgb(196 104 128 / 0.35);
+  opacity: 0;
+}
+.crestBloom {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 78cqw;
+  aspect-ratio: 900 / 565;
+  background: url(./assets/crest.webp) center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+}
+.drift {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.driftPetal {
+  top: 0;
+  width: 20px;
+  height: 26px;
+  opacity: 0.9;
+  animation: roc-drift 12s linear infinite;
+}
+.twinkle {
+  position: absolute;
+  width: 14px;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, #fff7f2 0 20%, rgb(246 205 186 / 0.85) 35%, rgb(224 150 125 / 0) 70%);
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  animation: roc-twinkle 2.8s ease-in-out infinite;
+}
+
 /* Reduced motion: no flaps, no light; the envelope simply fades (the platform checks it is gone within 1 s). */
+.reduced .drift,
+.reduced .burst,
+.reduced .petalBurst,
+.reduced .crestBloom {
+  display: none;
+}
 .reduced .openButton {
   animation: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .openButton {
+  .openButton,
+  .seal {
     animation: none;
+  }
+  .drift {
+    display: none;
   }
 }
