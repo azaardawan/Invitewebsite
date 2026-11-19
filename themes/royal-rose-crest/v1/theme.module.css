@@ -764,12 +764,40 @@
   filter: drop-shadow(0 0.6px 0 rgb(255 240 236 / 0.85)) drop-shadow(0 -0.5px 0 rgb(90 36 27 / 0.35));
   pointer-events: none;
 }
-.root[lang|='en'] .heroInitials {
-  font-size: 7.4cqw;
+
+/* The monogram: the letters in calligraphy (fonts.module.css, ROC Mono), the join small between them. Each shield's
+   base size keeps a pair of average letters at 85 % of the shield's width; --fit (initials.ts) shrinks wide pairs. */
+.mono {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'ROC Mono', 'ROC Script Kurdish', var(--font-script);
+  font-weight: 400;
 }
-.root[lang|='en'] .crestInitials {
-  font-size: 11cqw;
+.mono b {
+  font-weight: 400;
 }
-.root[lang|='en'] .messageInitials {
-  font-size: 5.8cqw;
+.mono i {
+  margin: 0 0.06em;
+  font-family: var(--font-text);
+  font-style: normal;
+  font-size: 0.3em;
+  translate: 0 -0.1em;
+}
+.heroInitials {
+  left: 50%;
+  top: 20.4%;
+  max-width: none;
+  font-size: calc(9.8cqw * var(--fit));
+}
+.crestInitials {
+  left: 50%;
+  top: 56%;
+  max-width: none;
+  font-size: calc(13.9cqw * var(--fit));
+}
+.messageInitials {
+  left: 50%;
+  top: 15.6%;
+  max-width: none;
+  font-size: calc(7.9cqw * var(--fit));
 }

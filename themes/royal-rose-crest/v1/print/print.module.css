@@ -286,7 +286,9 @@
   position: absolute;
   z-index: 1;
   translate: -50% -50%;
-  font-family: var(--font-script);
+  display: inline-flex;
+  align-items: center;
+  font-family: 'ROC Mono', 'ROC Script Kurdish', var(--font-script);
   line-height: 1;
   white-space: nowrap;
   background: linear-gradient(172deg, #a8604d 10%, #7a3a2c 45%, #5a241b 70%, #96523f 95%);
@@ -300,11 +302,22 @@
 .cardInitials {
   left: 49.9%;
   top: 13.3%;
-  font-size: 6.6mm;
+  font-size: calc(9.4mm * var(--fit));
 }
 /* Keepsake cover: the shield is 45–54.7 % across, 6–14.3 % down. */
 .coverInitials {
   left: 49.9%;
   top: 10.2%;
-  font-size: 7.4mm;
+  font-size: calc(10.1mm * var(--fit));
+}
+
+.initials b {
+  font-weight: 400;
+}
+.initials i {
+  margin: 0 0.06em;
+  font-family: var(--font-text);
+  font-style: normal;
+  font-size: 0.3em;
+  translate: 0 -0.1em;
 }

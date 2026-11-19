@@ -17,7 +17,7 @@ import {
 import { copyFor, type Copy } from './copy';
 import { CREST_BORDER } from './border';
 import { Drift, Envelope } from './Envelope';
-import { sealText, type SealText } from './initials';
+import { monogram, sealText, type SealText } from './initials';
 import { nameScale } from './names';
 import fonts from './fonts.module.css';
 import o from './opening.module.css';
@@ -451,13 +451,15 @@ function SpeakerIcon({ on }: { on: boolean }) {
   );
 }
 
-/** The couple's initials engraved in the crest's pink shield (the same letters as on the wax seal). */
+/** The couple's monogram engraved in the crest's pink shield: the wax seal's letters, in calligraphy. */
 function CrestInitials({ seal, className }: { seal: SealText | null; className?: string }) {
   if (!seal) return null;
-  const text = 'custom' in seal ? seal.custom : [seal.first, seal.join, seal.second].filter(Boolean).join(' ');
+  const m = monogram(seal);
   return (
-    <span className={className} aria-hidden="true" dir="auto">
-      {text}
+    <span className={`${s.mono} ${className ?? ''}`} style={{ ['--fit' as string]: m.fit.toFixed(3) }} dir={m.rtl ? 'rtl' : 'ltr'} aria-hidden="true">
+      <b>{m.first}</b>
+      {m.join ? <i>{m.join}</i> : null}
+      {m.second ? <b>{m.second}</b> : null}
     </span>
   );
 }

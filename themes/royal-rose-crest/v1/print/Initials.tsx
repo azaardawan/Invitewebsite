@@ -1,8 +1,10 @@
-import { sealText } from '../initials';
+import type { CSSProperties } from 'react';
+import { monogram, sealText } from '../initials';
 
 /**
- * The couple's initials engraved in a printed crest's pink shield, the same letters as the invitation's wax seal.
- * The piece's stylesheet places it (`className`) on its artwork's shield.
+ * The couple's monogram engraved in a printed crest's pink shield: the invitation's wax-seal letters in calligraphy
+ * (ROC Mono), the join small between them. The piece's stylesheet places it (`className`) on its artwork's shield and
+ * sets its base size; `--fit` shrinks a pair of wide letters.
  */
 export function PrintInitials({
   fields,
@@ -15,10 +17,12 @@ export function PrintInitials({
 }) {
   const seal = sealText(fields, join ?? '&');
   if (!seal) return null;
-  const text = 'custom' in seal ? seal.custom : [seal.first, seal.join, seal.second].filter(Boolean).join(' ');
+  const m = monogram(seal);
   return (
-    <span className={className} aria-hidden="true" dir="auto">
-      {text}
+    <span className={className} style={{ '--fit': m.fit.toFixed(3) } as CSSProperties} dir={m.rtl ? 'rtl' : 'ltr'} aria-hidden="true">
+      <b>{m.first}</b>
+      {m.join ? <i>{m.join}</i> : null}
+      {m.second ? <b>{m.second}</b> : null}
     </span>
   );
 }
