@@ -32,7 +32,7 @@ export function useTemplateEditing(): boolean {
 export type EditRequest =
   | { type: 'bahja:edit'; kind: 'text'; key: string; value: string; multiline: boolean }
   | { type: 'bahja:edit'; kind: 'photo'; index: number }
-  | { type: 'bahja:edit'; kind: 'video' };
+  | { type: 'bahja:edit'; kind: 'video'; place: number };
 
 function ask(request: EditRequest) {
   if (window.parent !== window) window.parent.postMessage(request, window.location.origin);
@@ -163,6 +163,7 @@ export function PhotoSlot({
  */
 export function VideoSlot({
   video,
+  place = 0,
   className,
   style,
   fallback,
@@ -170,6 +171,8 @@ export function VideoSlot({
   ...media
 }: {
   video: ThemeVideo | null;
+  /** Its place in `props.videos` (designs with several screens; default 0, the first). */
+  place?: number;
   className?: string;
   style?: CSSProperties;
   fallback?: ReactNode;
@@ -188,11 +191,11 @@ export function VideoSlot({
   const open = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    ask({ type: 'bahja:edit', kind: 'video' });
+    ask({ type: 'bahja:edit', kind: 'video', place });
   };
   return (
     <span
-      data-bahja-video-slot
+      data-bahja-video-slot={place}
       role="button"
       tabIndex={0}
       onClickCapture={open}

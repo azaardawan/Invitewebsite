@@ -113,7 +113,8 @@ const STARTER_SECTIONS: StarterSection[] = [
     // itself), for two friends. A design sold here too ("Also sold in" in Admin) reads `occasion` = 'friends'.
     key: 'friends',
     name: { ar: 'للأصدقاء', en: 'Friends', ckb: 'بۆ هاوڕێیان', bdn: 'بۆ هەڤالان' },
-    requiredFeatures: ['photos', 'video'],
+    // A friends' package need not have a video (owner, 2026-11-19: the Pink Dreamhouse's Basic has none).
+    requiredFeatures: ['photos'],
     fields: [
       { key: 'person_1_name', label: { ar: 'اسم الصديق الأول', en: 'First friend’s name', ckb: 'ناوی هاوڕێی یەکەم', bdn: 'ناڤێ هەڤالێ ئێکێ' } },
       { key: 'person_2_name', label: { ar: 'اسم الصديق الثاني', en: 'Second friend’s name', ckb: 'ناوی هاوڕێی دووەم', bdn: 'ناڤێ هەڤالێ دووێ' } },
@@ -138,7 +139,18 @@ export async function seedCatalog(db: DbOrTx) {
     }
     await seedSubsections(db, s);
   }
+  await relaxFriendsVideo(db);
   await addMissingKurdish(db);
+}
+
+/**
+ * Friends no longer ticks video on every new package (owner, 2026-11-19). A section seeded before keeps the old
+ * default (photos and video) until this changes it, once, and only while the owner hasn't changed it in Admin.
+ */
+async function relaxFriendsVideo(db: DbOrTx) {
+  const [row] = await db.select({ id: sections.id, required: sections.requiredFeatures }).from(sections).where(eq(sections.key, 'friends'));
+  if (!row || [...row.required].sort().join() !== 'photos,video') return;
+  await db.update(sections).set({ requiredFeatures: ['photos'] }).where(eq(sections.id, row.id));
 }
 
 /**

@@ -37,7 +37,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   const common = await getTranslations('common');
   // A template design: its texts, photos and video are filled in place on the next step; here only the language.
   const template = th.manifest.editor === 'template';
-  const extras = await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: template ? undefined : th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes }, pkg.fieldKeys);
+  const extras = await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: template ? undefined : th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes, paletteIds: pkg.paletteIds }, pkg.fieldKeys);
 
   return (
     <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">

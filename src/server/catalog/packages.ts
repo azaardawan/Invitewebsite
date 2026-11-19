@@ -1,8 +1,8 @@
 import 'server-only';
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
-import { packageFeatures, packageFields, packages, sections, themeVersions, themes } from '@/server/db/schema';
+import { packageFeatures, packageFields, packages, sections, themePalettes, themeVersions, themes } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { FEATURE_KEYS, type FeatureKey } from '@/catalog/features';
 import { FIELD_KEYS, type FieldKey } from '@/catalog/fields';
@@ -22,13 +22,24 @@ export const packageInput = z.object({
   lifetime: z.enum(PACKAGE_LIFETIMES).optional(),
   /** How many photos the customer may add (packages with `photos`); null = as many as the design holds; absent = unchanged. */
   photoLimit: z.number().int().min(1).max(50).nullable().optional(),
+  /** How many videos (designs with several screens); null = as many as the design has; absent = unchanged. */
+  videoLimit: z.number().int().min(1).max(3).nullable().optional(),
+  /** The design's colour sets on offer (packages with colour choice); null or none = all; absent = unchanged. */
+  paletteIds: z.array(z.string().uuid()).max(30).nullable().optional(),
   fieldKeys: z.array(z.enum(FIELD_KEYS as [FieldKey, ...FieldKey[]])).min(1),
   featureKeys: z.array(z.enum(FEATURE_KEYS as [FeatureKey, ...FeatureKey[]])),
 });
 export type PackageInput = z.input<typeof packageInput>;
 
 /** Locks the theme row and checks the package shape against its current version. The occasion forces nothing. */
-async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], features: string[], photoLimit?: number | null) {
+async function lockAndValidate(
+  tx: DbOrTx,
+  themeId: string,
+  fields: string[],
+  features: string[],
+  photoLimit?: number | null,
+  more: { videoLimit?: number | null; paletteIds?: string[] | null } = {},
+) {
   const [row] = await tx
     .select({ theme: themes, version: themeVersions, section: sections })
     .from(themes)
@@ -46,6 +57,14 @@ async function lockAndValidate(tx: DbOrTx, themeId: string, fields: string[], fe
   // A design whose photos come in sets (its rows) sells whole sets.
   const set = (row.version.manifest as ThemeManifest).photos?.set;
   if (photoLimit != null && set && photoLimit % set !== 0) throw new CatalogError('notValidState', [`photo limit ${photoLimit} is not a whole number of sets of ${set}`]);
+  // Videos: up to the design's screens (one without `videos`).
+  const videoMax = (row.version.manifest as ThemeManifest).videos?.max ?? 1;
+  if (more.videoLimit != null && more.videoLimit > videoMax) throw new CatalogError('notValidState', [`video limit ${more.videoLimit} is more than the design has (${videoMax})`]);
+  // Colour sets: the design's own.
+  if (more.paletteIds?.length) {
+    const own = await tx.select({ id: themePalettes.id }).from(themePalettes).where(and(eq(themePalettes.themeId, themeId), inArray(themePalettes.id, more.paletteIds)));
+    if (own.length !== new Set(more.paletteIds).size) throw new CatalogError('notValidState', ['a colour set that is not this design’s']);
+  }
   return row;
 }
 
@@ -64,16 +83,35 @@ async function writeShape(tx: DbOrTx, packageId: string, fields: string[], featu
   if (features.length) await tx.insert(packageFeatures).values(features.map((featureKey) => ({ packageId, featureKey })));
 }
 
-function snapshot(p: { name: unknown; description: unknown; priceIqd: number; lifetime: string; photoLimit?: number | null }, fields: string[], features: string[]) {
-  return { name: p.name, description: p.description, priceIqd: p.priceIqd, lifetime: p.lifetime, photoLimit: p.photoLimit ?? null, fieldKeys: [...fields].sort(), featureKeys: [...features].sort() };
+function snapshot(
+  p: { name: unknown; description: unknown; priceIqd: number; lifetime: string; photoLimit?: number | null; videoLimit?: number | null; paletteIds?: string[] | null },
+  fields: string[],
+  features: string[],
+) {
+  return {
+    name: p.name,
+    description: p.description,
+    priceIqd: p.priceIqd,
+    lifetime: p.lifetime,
+    photoLimit: p.photoLimit ?? null,
+    videoLimit: p.videoLimit ?? null,
+    paletteIds: p.paletteIds ?? null,
+    fieldKeys: [...fields].sort(),
+    featureKeys: [...features].sort(),
+  };
 }
+
+/** No colour sets ticked means all of them. */
+const paletteList = (ids: string[] | null | undefined) => (ids?.length ? [...new Set(ids)].sort() : null);
 
 export async function createPackage(db: DbOrTx, themeId: string, input: PackageInput, actor: Actor) {
   const data = packageInput.parse(input);
   const fields = [...new Set(data.fieldKeys)];
   const features = [...new Set(data.featureKeys)];
   return db.transaction(async (tx) => {
-    await lockAndValidate(tx, themeId, fields, features, data.photoLimit);
+    const videoLimit = data.videoLimit ?? null;
+    const paletteIds = paletteList(data.paletteIds);
+    await lockAndValidate(tx, themeId, fields, features, data.photoLimit, { videoLimit, paletteIds });
     if ((await activeCount(tx, themeId)) >= MAX_ACTIVE_PACKAGES) throw new CatalogError('tooManyPackages');
     const [max] = await tx
       .select({ n: sql<number>`coalesce(max(${packages.sortOrder}), -1)::int` })
@@ -81,7 +119,7 @@ export async function createPackage(db: DbOrTx, themeId: string, input: PackageI
       .where(eq(packages.themeId, themeId));
     const [row] = await tx
       .insert(packages)
-      .values({ themeId, name: data.name, description: data.description, priceIqd: data.priceIqd, lifetime: data.lifetime ?? DEFAULT_LIFETIME, photoLimit: data.photoLimit ?? null, sortOrder: (max?.n ?? -1) + 1 })
+      .values({ themeId, name: data.name, description: data.description, priceIqd: data.priceIqd, lifetime: data.lifetime ?? DEFAULT_LIFETIME, photoLimit: data.photoLimit ?? null, videoLimit, paletteIds, sortOrder: (max?.n ?? -1) + 1 })
       .returning();
     await writeShape(tx, row!.id, fields, features);
     await recordAudit(tx, {
@@ -102,14 +140,16 @@ export async function updatePackage(db: DbOrTx, packageId: string, input: Packag
   return db.transaction(async (tx) => {
     const [pkg] = await tx.select().from(packages).where(eq(packages.id, packageId));
     if (!pkg) throw new CatalogError('notFound');
-    await lockAndValidate(tx, pkg.themeId, fields, features, data.photoLimit);
+    const videoLimit = data.videoLimit === undefined ? pkg.videoLimit : data.videoLimit;
+    const paletteIds = data.paletteIds === undefined ? pkg.paletteIds : paletteList(data.paletteIds);
+    await lockAndValidate(tx, pkg.themeId, fields, features, data.photoLimit, { videoLimit, paletteIds });
     const before = (await packagesWithShape(tx, pkg.themeId)).find((p) => p.id === packageId)!;
     // Left out (e.g. older forms): keep the package's online time.
     const lifetime = data.lifetime ?? pkg.lifetime;
     const photoLimit = data.photoLimit === undefined ? pkg.photoLimit : data.photoLimit;
     await tx
       .update(packages)
-      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd, lifetime, photoLimit })
+      .set({ name: data.name, description: data.description, priceIqd: data.priceIqd, lifetime, photoLimit, videoLimit, paletteIds })
       .where(eq(packages.id, packageId));
     await writeShape(tx, packageId, fields, features);
     await assertStillReady(tx, pkg.themeId);
@@ -120,7 +160,7 @@ export async function updatePackage(db: DbOrTx, packageId: string, input: Packag
       objectType: 'package',
       objectId: packageId,
       before: snapshot(before, before.fieldKeys, before.featureKeys),
-      after: snapshot({ ...data, description: data.description, lifetime, photoLimit }, fields, features),
+      after: snapshot({ ...data, description: data.description, lifetime, photoLimit, videoLimit, paletteIds }, fields, features),
     });
   });
 }

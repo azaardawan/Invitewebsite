@@ -91,6 +91,18 @@ beforeAll(async () => {
 });
 
 describe('sections', () => {
+  it('Friends ticks only photos on new packages (no video required); an older seed is changed once, Admin edits kept', async () => {
+    const friends = async () => (await db().select().from(sections).where(eq(sections.key, 'friends')))[0]!;
+    await db().update(sections).set({ requiredFeatures: ['photos', 'video'] }).where(eq(sections.key, 'friends'));
+    await seedCatalog(db());
+    expect((await friends()).requiredFeatures).toEqual(['photos']);
+    // The owner's own choice in Admin stays.
+    await db().update(sections).set({ requiredFeatures: ['music', 'photos', 'video'] }).where(eq(sections.key, 'friends'));
+    await seedCatalog(db());
+    expect((await friends()).requiredFeatures).toEqual(['music', 'photos', 'video']);
+    await db().update(sections).set({ requiredFeatures: ['photos'] }).where(eq(sections.key, 'friends'));
+  });
+
   it('starter sections exist; wedding requires the printable card in every package', async () => {
     const [wedding] = await db().select().from(sections).where(eq(sections.key, 'wedding'));
     expect(wedding?.requiredFeatures).toEqual(['print_card']);

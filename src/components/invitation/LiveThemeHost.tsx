@@ -12,7 +12,7 @@ type LivePhoto = Omit<ThemePhoto, 'label' | 'index' | 'title' | 'caption'> & { t
 type LiveMessage =
   | { type: 'bahja:photos'; photos: LivePhoto[] }
   | { type: 'bahja:show-photo'; index: number }
-  | { type: 'bahja:video'; video: ThemeVideo | null }
+  | { type: 'bahja:video'; video: ThemeVideo | null; place?: number }
   | { type: 'bahja:text'; key: string; value: string };
 
 /**
@@ -24,7 +24,7 @@ type LiveMessage =
  */
 export function LiveThemeHost({ codeRef, props }: { codeRef: string; props: ThemeProps }) {
   const [photos, setPhotos] = useState(props.photos);
-  const [video, setVideo] = useState(props.video);
+  const [videos, setVideos] = useState(props.videos);
   const [fields, setFields] = useState(props.fields);
   const [wording, setWording] = useState(props.wording);
 
@@ -65,7 +65,14 @@ export function LiveThemeHost({ codeRef, props }: { codeRef: string; props: Them
       } else if (m.type === 'bahja:show-photo' && Number.isInteger(m.index)) {
         show(m.index);
       } else if (m.type === 'bahja:video') {
-        setVideo(m.video && typeof m.video.src === 'string' ? m.video : null);
+        // The video at its place (designs with several screens), else the first.
+        const place = Number.isInteger(m.place) ? m.place! : 0;
+        const v = m.video && typeof m.video.src === 'string' ? m.video : null;
+        setVideos((list) => {
+          const next = list.length > place ? [...list] : [...list, ...Array.from({ length: place + 1 - list.length }, () => null)];
+          next[place] = v;
+          return next;
+        });
       } else if (m.type === 'bahja:text' && typeof m.key === 'string' && typeof m.value === 'string') {
         const [kind, key] = m.key.split(':') as [string, string];
         if (kind === 'field') setFields((f) => ({ ...f, [key]: m.value }));
@@ -79,5 +86,5 @@ export function LiveThemeHost({ codeRef, props }: { codeRef: string; props: Them
     };
   }, [props.photos]);
 
-  return <ThemeHost codeRef={codeRef} {...props} photos={photos} video={video} fields={fields} wording={wording} />;
+  return <ThemeHost codeRef={codeRef} {...props} photos={photos} video={videos[0] ?? null} videos={videos} fields={fields} wording={wording} />;
 }

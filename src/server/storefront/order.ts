@@ -11,7 +11,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { invitations, packages, sections, themeVersions, themes, type CardOptions } from '@/server/db/schema';
 import { listPhotos, photoSpec, POSTER_PHOTO_PLACE } from '@/server/photos/photos';
-import { customerVideo, videoIncluded } from '@/server/video/video';
+import { customerVideos, videoIncluded, videoPlaces } from '@/server/video/video';
 import { cardBackPortrait, wordingDefault } from '@/theme-sdk/manifest';
 import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, DesignSwitch, ThemeManifest, WordingLine } from '@/theme-sdk/manifest';
@@ -59,6 +59,7 @@ export async function draftByToken(token: string) {
       cardOptions: inv.cardOptions,
       signatureSrcs: await signatureUrls(db(), inv),
       colors: inv.colors,
+      paletteIds: inv.paletteIds,
       stickerShape: inv.stickerShape,
       cardChoices: inv.cardChoices,
       cardShapes: (row.manifest as ThemeManifest).print?.shapes ?? [],
@@ -152,14 +153,17 @@ export async function templateState(inv: typeof invitations.$inferSelect, manife
       })),
   ];
   const included = videoIncluded(inv);
-  const video = included ? await customerVideo(db(), inv) : null;
+  // Every video place (designs with several screens: as many as the package sells), each screen's name.
+  const videos = included ? await customerVideos(db(), inv, videoPlaces(inv, manifest)) : [];
+  const video = videos[0] ?? null;
+  const videoLabels = videos.map((_, i) => (manifest.videos?.labels?.[i] ? localized(manifest.videos.labels[i]!, locale) : ''));
   // The poster step (couple_poster): the customer's choices so far and the video's still, one of the pictures to choose.
   const posters = hasPosters(inv.featureKeys) ? await posterState(inv, manifest, locale, video?.poster ?? null) : null;
   // Colour choice: the sets to pick from, shown above the design in the editor.
-  const colors = inv.featureKeys.includes('color_choice') ? await paletteChoice(inv.themeId, inv.colors ?? null, locale) : null;
+  const colors = inv.featureKeys.includes('color_choice') ? await paletteChoice(inv.themeId, inv.colors ?? null, locale, inv.paletteIds) : null;
   // Background music (packages with music): on, or off when the customer chose none.
   const music: 'on' | 'off' | null = inv.featureKeys.includes('music') ? (inv.musicOff ? 'off' : 'on') : null;
-  return { texts, videoIncluded: included, video, posters, colors, music };
+  return { texts, videoIncluded: included, video, videos, videoLabels, posters, colors, music };
 }
 
 /** The customer's own song (packages with `custom_music`): theirs so far, and whether the design has one of its own. */
@@ -206,6 +210,8 @@ export async function orderFormExtras(
     cardOptions?: CardOptions | null;
     signatureSrcs?: string[];
     colors?: Record<string, string> | null;
+    /** The colour sets the package offers (null = all). */
+    paletteIds?: readonly string[] | null;
     stickerShape?: 'round' | 'square' | 'both';
     /** The design's shaped cards (manifest `print.shapes`) and the cards chosen (`a5` and/or shape keys). */
     cardShapes?: readonly CardShape[];
@@ -268,7 +274,7 @@ export async function orderFormExtras(
     extras.switches = current.switchDefs.map((d) => ({ key: d.key, label: localized(withKurdishLabel(d.label), locale), on: current.switches?.[d.key] ?? d.default }));
   }
   if (featureKeys.includes('color_choice')) {
-    const choice = await paletteChoice(themeId, current.colors ?? null, locale);
+    const choice = await paletteChoice(themeId, current.colors ?? null, locale, current.paletteIds);
     if (choice) extras.palettes = { current: choice.current, original: choice.original, options: choice.options };
   }
   return extras;
@@ -278,9 +284,11 @@ export async function orderFormExtras(
  * The colour sets a customer may pick (packages with colour choice): each with its name and swatches (one per colour
  * slot of the design), the design's own colours, which one is chosen ('' = the design's own), and the slot's name when
  * the design has one slot (e.g. "The museum's wall colour"). Null when the design has no slots or no sets on offer.
+ * `offered`: the package's own colour sets (null or none = all of them).
  */
-export async function paletteChoice(themeId: string, colors: Record<string, string> | null, locale: Locale) {
-  const [slots, palettes] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
+export async function paletteChoice(themeId: string, colors: Record<string, string> | null, locale: Locale, offered?: readonly string[] | null) {
+  const [slots, all] = await Promise.all([themeColorSlots(db(), themeId), listPalettes(db(), themeId, { activeOnly: true })]);
+  const palettes = offered?.length ? all.filter((p) => offered.includes(p.id)) : all;
   if (!slots.length || !palettes.length) return null;
   const swatches = (c: Record<string, string>) => slots.map((s) => c[s.key] ?? s.default);
   const same = (a: Record<string, string>, b: Record<string, string>) => slots.every((s) => (a[s.key] ?? s.default).toLowerCase() === (b[s.key] ?? s.default).toLowerCase());

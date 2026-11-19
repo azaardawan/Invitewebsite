@@ -97,6 +97,9 @@ export const invitations = pgTable(
     lifetime: text('lifetime', { enum: PACKAGE_LIFETIMES }).notNull().default('30'),
     /** The package's photo limit (null = the design's), copied with the online time so a paid order keeps its own. */
     photoLimit: integer('photo_limit'),
+    /** The package's video limit and colour sets (null = the design's / all), copied the same way. */
+    videoLimit: integer('video_limit'),
+    paletteIds: uuid('palette_ids').array(),
     /** Admin tweaks to the automatic printable card (see CardOptions). */
     /** Chocolate stickers (`sticker` feature): the shape the customer chose; `both` = a round and a square set. */
     stickerShape: text('sticker_shape', { enum: ['round', 'square', 'both'] }).notNull().default('round'),

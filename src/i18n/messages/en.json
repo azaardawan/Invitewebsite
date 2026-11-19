@@ -512,6 +512,12 @@
         "photoSetsLabel": "Photo sets in this package",
         "photoSets": "{n, plural, one {# set} other {# sets}} ({photos} photos)",
         "photoSetsHint": "Each set is one row of {set} photos in the design.",
+        "videoLimit": "Videos in this package",
+        "videoLimitHint": "Leave empty for all of the design’s screens ({max}).",
+        "videoCount": "{n, plural, one {# video} other {# videos}}",
+        "paletteCount": "{n, plural, one {# colour} other {# colours}}",
+        "paletteChoice": "Colour sets offered",
+        "paletteChoiceHint": "None ticked = every colour set.",
         "thumbnails": {
           "heading": "The design's own thumbnail",
           "hint": "Made from the design itself, in the shape of the website's cards, so the whole design shows in the arch. Using it replaces the cover above (you can upload your own again at any time).",

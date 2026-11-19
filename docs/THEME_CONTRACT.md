@@ -82,6 +82,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `switches` | The design's yes/no choices (manifest `switches`) by key: the customer's answer, or the default. Every declared key is present. Also given to print companions and newborn extras. |
 | `photoPlaces` | How many photo places this invitation has: the design's `photos.max`, or fewer when its package sells fewer (Admin → package "Photos in this package"). 0 without `photos`. Template designs show that many frames in the editor; everywhere else draw only `photos`. |
 | `video` | The customer's one video (feature `video`): `{ src, poster, width, height }`, an MP4 of at most a minute (720p, sound as AAC) and a still from it, or null (none yet, samples, or a package without it). Play it with `<VideoSlot>`; show `fallback` (e.g. a photo) when null. |
+| `videos` | Every video place, in order: the customer's video there or null. Designs with several screens declare manifest `videos: { max: 2\|3, labels }` (each screen's name, shown in the editor); a package sells 1…max (Admin, `packages.video_limit`). One place for other designs; `videos[0]` is `video`. Draw each with `<VideoSlot video={props.videos[n]} place={n}>`. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`
@@ -94,6 +95,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `useReducedMotion()` | Must be honored: replace big motion with simple fades or none |
 | `formatNumber(n, locale)` | Arabic-Indic digits for Arabic/Kurdish |
 | `<Gallery3D>` | A walkable 3D gallery of the customer's photos, built from the design's own model (§6, "3D galleries"). With `webglAvailable()` and `useTouchScreen()`. |
+| `<World3D>` | A small walkable 3D building (rooms, stairs, drawers, screens) from the design's own model; the design answers each tap (§6, "3D worlds"). |
 
 ## 4A. Opening animation (required for sellable themes)
 
@@ -264,7 +266,8 @@ everywhere else and become editable only in the editor:
 - `<PhotoSlot index={i} photos={props.photos} className={…} label="…" />` for every photo place, from 0 to
   `photoPlaces - 1` in the editor (`useTemplateEditing()` says when). The frame is `className`. Photos fill places in
   order: in the editor the next free place shows a "+", later ones a faint outline.
-- `<VideoSlot video={props.video} className={…} autoPlay muted loop playsInline fallback={…} />` for the video.
+- `<VideoSlot video={props.video} className={…} autoPlay muted loop playsInline fallback={…} />` for the video
+  (`place={n}` with `props.videos[n]` for a design's further screens).
 
 Each photo has the customer's own `title` and `caption` (`props.photos[i].title`, `.caption`, or null). In the editor the
 design is shown already open (no entrance) and taps never open the design's own views. See `themes/bahjaflix/v1`.
@@ -324,6 +327,25 @@ Rules:
   at least (a visually hidden list of buttons that walk to each one), so they are reachable without walking, and keep
   any text on solid panels (the 3D view moves behind them). Room names and words can hang in the museum itself (`sign`,
   `plaque` in the plan; `<Gallery3D signs rooms>`).
+
+### 3D worlds (`<World3D>`)
+
+A small building the visitor walks through and plays with (#30 Pink Dreamhouse), from the design's own model, described
+by a `WorldPlan` (`src/theme-sdk/world3d/plan.ts`): where visitors may stand (`surfaces`: flat floors, and `ramp`s for
+stairs, walked step by step), its `rooms` (per floor), its photo places (`photos`, the model's meshes in place order,
+with each one's `frame` and `glass`), its video screens (`screens`, by `props.videos` place), name plates (`texts`, drawn
+on quads in front of the model's own), things a tap moves (`things`: a `drawer` slides out, a `lid` tips open, `lift`,
+`press`, `glow`, a `door` that opens its `gate` in the floor, a `teleport` for stairs), and `paint`: which meshes take
+each colour slot (`props.colors`; the owner's colour sets recolour the whole building).
+
+`<World3D model plan photos videos texts colors look dir reducedMotion onTap …/>` loads three.js only when shown, hides
+photo places without a photo (frame and all), and reports every tap (`onTap`: a photo, a screen, a thing). The design
+decides what each tap means and answers through a ref (`World3DHandle`: `set(key, open)`, `playVideo(place)` (from a
+tap: browsers play sound only then), `pauseVideo`, `muteVideo`, `stopVideo`, which frees the video). Videos are made on
+demand and stopped when the world closes. Rules as for galleries: a flat version (`onUnavailable`) and the editor shows
+the rooms flat; a visually hidden list of buttons for what can be found by walking (photos, drawers, stairs); text over
+the 3D view on solid panels; models without embedded pictures (the site's rules block them); a smaller package never
+downloads the bigger model (#30 ships one model per size).
 
 ### Couple posters (`couple_poster_landscape`, `couple_poster_portrait`)
 
