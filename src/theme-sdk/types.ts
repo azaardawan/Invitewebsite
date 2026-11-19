@@ -156,6 +156,12 @@ export type ThemeProps = {
    * null (none added yet, samples, or a package without it). Play it with `<VideoSlot>` from `@/theme-sdk`.
    */
   video: ThemeVideo | null;
+  /**
+   * Every video place, in order (designs with several screens, manifest `videos`; one place otherwise): the customer's
+   * video there, or null. As many as the package sells (empty without `video`); `videos[0]` is `video`. Template
+   * designs draw each with `<VideoSlot place={n}>`.
+   */
+  videos: readonly (ThemeVideo | null)[];
 };
 
 /** The customer's video: where it is, its still, and its pixel size. */

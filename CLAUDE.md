@@ -63,6 +63,9 @@ product spec's §74 business rules override assumptions.
   (manifest `posters.texts`) and its pictures, including a picture uploaded for that poster only (an `invitation_photos` row at
   place 100/101, never listed with the page's photos); drawn by the design's `print/CouplePoster.tsx`, with Bahja's website,
   WhatsApp/phone and Instagram from Settings at the bottom.
+- Several videos (owner, 2026-11-19): a design with more screens declares manifest `videos.max` (2–3) and gets `props.videos`
+  by place; place 0 is `invitations.video_asset_id`, places 1–2 `invitation_videos`; packages sell `video_limit`. Packages
+  can also offer only some of the design's colour sets (`packages.palette_ids`, null = all), copied onto the order.
 - 3D galleries (`<Gallery3D>` in the theme SDK, `src/theme-sdk/gallery3d/*`): the design's glTF model + a `GalleryPlan`; a room is a
   photo set, so packages sell rooms. Always keep a flat version (no WebGL, and the template editor). THEME_CONTRACT §6.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`

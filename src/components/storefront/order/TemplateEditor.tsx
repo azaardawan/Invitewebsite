@@ -69,7 +69,7 @@ type Sheet =
   | { kind: 'photo-add'; index: number }
   | { kind: 'photo-frame'; index: number; isNew: boolean }
   | { kind: 'photo-words'; index: number }
-  | { kind: 'video' };
+  | { kind: 'video'; place: number };
 
 /** The photo the browser sends: at most this many pixels on the long side, as JPEG (quick on mobile data). */
 const SEND_MAX_SIDE = 2400;
@@ -92,7 +92,7 @@ async function shrink(file: File): Promise<Blob> {
 /**
  * The template editor (designs with manifest `editor: 'template'`): the design itself, empty at first, which the
  * customer fills in place. A tap on a text opens a box to write it; a tap on the next empty frame adds a photo, framed
- * in exactly that frame's shape and then given a title and a few words; a tap on the video adds the one video.
+ * in exactly that frame's shape and then given a title and a few words; a tap on a video frame adds its video (designs with several screens have up to three).
  * Everything is saved as it is done (`base`/text, /photos/<n>, /video) and the design redraws at once. The bar at the
  * bottom shows what is filled and leads on (`onSave`'s link) or to a full preview.
  */
@@ -108,6 +108,8 @@ export function TemplateEditor({
   aspects,
   names,
   video: initialVideo,
+  videos: initialVideos,
+  videoLabels,
   videoIncluded,
   colors,
   music,
@@ -129,6 +131,9 @@ export function TemplateEditor({
   aspects: number[];
   names: (string | null)[];
   video: TemplateVideo | null;
+  /** Designs with several screens: every video place (the customer's video there, or null) and each screen's name. */
+  videos?: (TemplateVideo | null)[];
+  videoLabels?: string[];
   videoIncluded: boolean;
   /** Colour choice: the sets to pick from (shown above the design), or null without it. */
   colors?: TemplateColors | null;
@@ -139,7 +144,8 @@ export function TemplateEditor({
   const frame = useRef<HTMLIFrameElement>(null);
   const [texts, setTexts] = useState(initialTexts);
   const [photos, setPhotos] = useState(() => [...initialPhotos].sort((a, b) => a.position - b.position));
-  const [video, setVideo] = useState(initialVideo);
+  const [videos, setVideos] = useState<(TemplateVideo | null)[]>(() => (initialVideos?.length ? initialVideos : [initialVideo]));
+  const setVideoAt = (place: number, v: TemplateVideo | null) => setVideos((list) => list.map((x, i) => (i === place ? v : x)));
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -177,12 +183,13 @@ export function TemplateEditor({
         while (photos.some((p) => p.position === free)) free++;
         setSheet(has ? { kind: 'photo-words', index: m.index } : { kind: 'photo-add', index: Math.min(m.index, free) });
       } else if (m.kind === 'video' && videoIncluded) {
-        setSheet({ kind: 'video' });
+        const place = typeof (m as { place?: unknown }).place === 'number' ? (m as { place: number }).place : 0;
+        if (Number.isInteger(place) && place >= 0 && place < videos.length) setSheet({ kind: 'video', place });
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [texts, photos, maxPhotos, photoSet, videoIncluded]);
+  }, [texts, photos, maxPhotos, photoSet, videoIncluded, videos.length]);
 
   // The page behind stays still while a sheet is open; Escape closes it.
   useEffect(() => {
@@ -316,12 +323,12 @@ export function TemplateEditor({
     [base],
   );
 
-  function uploadVideo(file: File) {
+  function uploadVideo(file: File, place: number) {
     setBusy(true);
     setError(null);
     // XMLHttpRequest for the upload's progress (a minute of video can take a while on mobile data).
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${base}/video`);
+    xhr.open('POST', `${base}/video${place ? `?place=${place}` : ''}`);
     xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
     xhr.upload.onprogress = (e) => e.lengthComputable && setProgress(Math.round((e.loaded / e.total) * 100));
     xhr.onload = () => {
@@ -337,8 +344,8 @@ export function TemplateEditor({
         setError(errorText(data.error));
         return;
       }
-      setVideo(data.video);
-      tell({ type: 'bahja:video', video: data.video });
+      setVideoAt(place, data.video);
+      tell({ type: 'bahja:video', video: data.video, place });
       setSavedAt(Date.now());
     };
     xhr.onerror = () => {
@@ -349,14 +356,14 @@ export function TemplateEditor({
     xhr.send(file);
   }
 
-  async function removeVideo() {
+  async function removeVideo(place: number) {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`${base}/video`, { method: 'DELETE' });
+      const res = await fetch(`${base}/video${place ? `?place=${place}` : ''}`, { method: 'DELETE' });
       if (!res.ok && res.status !== 404) throw new Error();
-      setVideo(null);
-      tell({ type: 'bahja:video', video: null });
+      setVideoAt(place, null);
+      tell({ type: 'bahja:video', video: null, place });
       setSavedAt(Date.now());
     } catch {
       setError(labels.errors.generic);
@@ -369,6 +376,7 @@ export function TemplateEditor({
   const filledTexts = texts.filter((t) => t.value.trim()).length;
   const aspectOf = (i: number) => aspects[i] ?? aspects[0] ?? 0.75;
   const current = sheet && 'index' in sheet ? photos.find((p) => p.position === sheet.index) : undefined;
+  const sheetVideo = sheet?.kind === 'video' ? (videos[sheet.place] ?? null) : null;
 
   return (
     <section className="flex flex-col gap-3" data-template-editor aria-label={labels.hint}>
@@ -441,7 +449,7 @@ export function TemplateEditor({
           className="block h-[78svh] min-h-[560px] w-full border-0 lg:h-[760px]"
           onLoad={() => {
             sendPhotos(photos);
-            tell({ type: 'bahja:video', video });
+            videos.forEach((video, place) => tell({ type: 'bahja:video', video, place }));
             for (const t of texts) if (t.value) tell({ type: 'bahja:text', key: t.key, value: t.value });
           }}
         />
@@ -457,8 +465,15 @@ export function TemplateEditor({
             {labels.photos} <b className="text-heading">{photos.length}</b>/{maxPhotos}
           </span>
           {videoIncluded ? (
-            <span data-template-video={video ? 'yes' : 'no'}>
-              {labels.video} <b className="text-heading">{video ? '✓' : '0/1'}</b>
+            <span data-template-video={videos[0] ? 'yes' : 'no'} data-template-videos={videos.filter(Boolean).length}>
+              {labels.video}{' '}
+              {videos.length > 1 ? (
+                <>
+                  <b className="text-heading">{videos.filter(Boolean).length}</b>/{videos.length}
+                </>
+              ) : (
+                <b className="text-heading">{videos[0] ? '✓' : '0/1'}</b>
+              )}
             </span>
           ) : null}
           {savedAt ? (
@@ -571,11 +586,13 @@ export function TemplateEditor({
             {sheet.kind === 'video' ? (
               <>
                 <div>
-                  <h2 className="text-lg font-semibold text-heading">{labels.videoTitle}</h2>
+                  <h2 className="text-lg font-semibold text-heading">
+                    {videos.length > 1 && videoLabels?.[sheet.place] ? `${labels.videoTitle} · ${videoLabels[sheet.place]}` : labels.videoTitle}
+                  </h2>
                   <p className="mt-1 text-sm text-muted">{labels.videoHint}</p>
                 </div>
-                {video ? (
-                  <video src={video.src} poster={video.poster} controls playsInline className="mx-auto max-h-[40svh] w-full rounded-xl bg-black object-contain" data-template-video-player />
+                {sheetVideo ? (
+                  <video src={sheetVideo.src} poster={sheetVideo.poster} controls playsInline className="mx-auto max-h-[40svh] w-full rounded-xl bg-black object-contain" data-template-video-player />
                 ) : null}
                 {busy ? (
                   <p className="text-center text-sm font-medium text-heading" role="status">
@@ -583,7 +600,7 @@ export function TemplateEditor({
                   </p>
                 ) : null}
                 <label className={`flex cursor-pointer justify-center rounded-full bg-accent px-5 py-3 text-sm font-semibold text-accent-ink ${busy ? 'pointer-events-none opacity-50' : ''}`}>
-                  {video ? labels.replaceVideo : labels.chooseVideo}
+                  {sheetVideo ? labels.replaceVideo : labels.chooseVideo}
                   <input
                     type="file"
                     accept="video/*"
@@ -592,14 +609,14 @@ export function TemplateEditor({
                     disabled={busy}
                     onChange={(e) => {
                       const f = e.target.files?.[0];
-                      if (f) uploadVideo(f);
+                      if (f) uploadVideo(f, sheet.place);
                       e.target.value = '';
                     }}
                   />
                 </label>
                 <div className="flex items-center justify-between text-sm">
-                  {video ? (
-                    <button type="button" className="text-danger underline" disabled={busy} onClick={() => void removeVideo()}>
+                  {sheetVideo ? (
+                    <button type="button" className="text-danger underline" disabled={busy} onClick={() => void removeVideo(sheet.place)}>
                       {labels.removeVideo}
                     </button>
                   ) : (

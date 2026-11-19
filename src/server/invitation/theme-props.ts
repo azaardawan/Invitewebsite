@@ -83,6 +83,9 @@ export function buildThemeProps(input: {
   photoSpec?: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null;
   /** The customer's own video (packages with `video`), or null. */
   video?: { src: string; poster: string; width: number; height: number } | null;
+  /** Every video place (designs with several screens), and how many places the package sells. */
+  videos?: readonly ({ src: string; poster: string; width: number; height: number } | null)[];
+  videoPlaces?: number;
   /** The design's own words for the "Open" button (manifest `pageTexts.open`), for a design that is not an invitation. */
   openLabel?: string | null;
 }): ThemeProps {
@@ -127,7 +130,12 @@ export function buildThemeProps(input: {
     switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),
     photos: resolvePhotos(features, input.mode, input.locale, input.photos ?? [], input.photoSpec ?? null),
     photoPlaces: features.includes('photos') ? (input.photoSpec?.max ?? 0) : 0,
-    video: !features.includes('video') ? null : input.mode === 'sample' ? null : (input.video ?? null),
+    video: !features.includes('video') ? null : input.mode === 'sample' ? null : (input.video ?? input.videos?.[0] ?? null),
+    videos: !features.includes('video')
+      ? []
+      : Array.from({ length: Math.max(1, input.videoPlaces ?? input.videos?.length ?? 1) }, (_, i) =>
+          input.mode === 'sample' ? null : ((i === 0 ? (input.video ?? input.videos?.[0]) : input.videos?.[i]) ?? null),
+        ),
   };
 }
 

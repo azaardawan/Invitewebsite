@@ -414,7 +414,9 @@ export async function setCurrentVersion(db: DbOrTx, themeId: string, versionId: 
           p.status === 'ACTIVE' &&
           (packageShapeProblems(manifest, p.featureKeys, p.fieldKeys).length > 0 ||
             // A package's photo count must fit the version: no more than it holds, whole sets when it has sets.
-            (p.photoLimit != null && (p.photoLimit > (manifest.photos?.max ?? 0) || (manifest.photos?.set ? p.photoLimit % manifest.photos.set !== 0 : false)))),
+            (p.photoLimit != null && (p.photoLimit > (manifest.photos?.max ?? 0) || (manifest.photos?.set ? p.photoLimit % manifest.photos.set !== 0 : false))) ||
+            // Nor more videos than its screens.
+            (p.videoLimit != null && p.videoLimit > (manifest.videos?.max ?? 1))),
       )
       .map((p) => localized(p.name, 'en'));
     if (invalid.length) throw new CatalogError('packagesInvalidForVersion', invalid);

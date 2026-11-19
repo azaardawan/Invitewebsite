@@ -62,7 +62,8 @@ export async function setTemplateText(
         .select({ colors: themePalettes.colors })
         .from(themePalettes)
         .where(and(eq(themePalettes.id, id), eq(themePalettes.themeId, inv.themeId), eq(themePalettes.status, 'ACTIVE')));
-      if (!p) throw new TemplateTextError('invalidChoice');
+      // Only the package's own colour sets (none chosen in Admin = all).
+      if (!p || (inv.paletteIds?.length && !inv.paletteIds.includes(id))) throw new TemplateTextError('invalidChoice');
       colors = p.colors;
     }
     return db.transaction(async (tx) => {

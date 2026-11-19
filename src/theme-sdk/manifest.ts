@@ -123,6 +123,11 @@ export type ThemeManifest = {
    */
   photos?: PhotoSpec;
   /**
+   * Designs with more than one screen for the customer's videos (feature `video`): how many (2 or 3; one without it) and
+   * each screen's name, shown in the editor. Packages sell 1…max (Admin); the design gets `props.videos`, by place.
+   */
+  videos?: VideoSpec;
+  /**
    * `template`: the customer fills the design in place (owner, 2026-10-31): after choosing a package they get the design
    * itself, empty, and tap each text to type it and each frame to add its photo or video; no order form. The design draws
    * its texts with `<EditableText>`, its photos with `<Photo>` (empty frames with `<PhotoSlot>`) and its video with
@@ -157,6 +162,11 @@ export type PosterText = {
 export type PosterSpec = { frames: { landscape: number; portrait: number }; texts: PosterText[] };
 
 export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[]; set?: number };
+
+export type VideoSpec = { max: number; labels?: ThemeText[] };
+
+/** The most videos a design may hold. */
+export const MAX_VIDEOS = 3;
 
 /** The most photos a design may hold. */
 export const MAX_PHOTOS = 50;
@@ -297,6 +307,7 @@ export const manifestSchema = z
         set: z.number().int().min(2).max(MAX_PHOTOS).optional(),
       })
       .optional(),
+    videos: z.object({ max: z.number().int().min(2).max(MAX_VIDEOS), labels: z.array(themeText).max(MAX_VIDEOS).optional() }).optional(),
     editor: z.literal('template').optional(),
     posters: z
       .object({
@@ -349,6 +360,8 @@ export const manifestSchema = z
     if (m.photos && !m.features.includes('photos')) issue('photos are sold with the photos feature: list it in features');
     if (m.photos && (m.photos.min ?? 0) > m.photos.max) issue('photos.min cannot be more than photos.max');
     if (m.photos?.labels && m.photos.labels.length > m.photos.max) issue('photos.labels: more labels than photos.max');
+    if (m.videos && !m.features.includes('video')) issue('videos requires the video feature');
+    if (m.videos?.labels && m.videos.labels.length > m.videos.max) issue('videos.labels: more labels than videos.max');
     if (m.photos?.frames && m.photos.frames.length > m.photos.max) issue('photos.frames: more frames than photos.max');
     if (m.photos?.set && m.photos.max % m.photos.set !== 0) issue('photos.max must be a whole number of photos.set');
     if (m.posters) {

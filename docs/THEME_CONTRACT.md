@@ -82,6 +82,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `switches` | The design's yes/no choices (manifest `switches`) by key: the customer's answer, or the default. Every declared key is present. Also given to print companions and newborn extras. |
 | `photoPlaces` | How many photo places this invitation has: the design's `photos.max`, or fewer when its package sells fewer (Admin → package "Photos in this package"). 0 without `photos`. Template designs show that many frames in the editor; everywhere else draw only `photos`. |
 | `video` | The customer's one video (feature `video`): `{ src, poster, width, height }`, an MP4 of at most a minute (720p, sound as AAC) and a still from it, or null (none yet, samples, or a package without it). Play it with `<VideoSlot>`; show `fallback` (e.g. a photo) when null. |
+| `videos` | Every video place, in order: the customer's video there or null. Designs with several screens declare manifest `videos: { max: 2\|3, labels }` (each screen's name, shown in the editor); a package sells 1…max (Admin, `packages.video_limit`). One place for other designs; `videos[0]` is `video`. Draw each with `<VideoSlot video={props.videos[n]} place={n}>`. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`
@@ -264,7 +265,8 @@ everywhere else and become editable only in the editor:
 - `<PhotoSlot index={i} photos={props.photos} className={…} label="…" />` for every photo place, from 0 to
   `photoPlaces - 1` in the editor (`useTemplateEditing()` says when). The frame is `className`. Photos fill places in
   order: in the editor the next free place shows a "+", later ones a faint outline.
-- `<VideoSlot video={props.video} className={…} autoPlay muted loop playsInline fallback={…} />` for the video.
+- `<VideoSlot video={props.video} className={…} autoPlay muted loop playsInline fallback={…} />` for the video
+  (`place={n}` with `props.videos[n]` for a design's further screens).
 
 Each photo has the customer's own `title` and `caption` (`props.photos[i].title`, `.caption`, or null). In the editor the
 design is shown already open (no entrance) and taps never open the design's own views. See `themes/bahjaflix/v1`.
