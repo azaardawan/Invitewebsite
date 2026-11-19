@@ -174,8 +174,12 @@ export async function cardData(
   // the customer writes for its back (`backMessage`), so neither side gets `invitation_message` (some designs would
   // print it on the front, or on the back when no back message was written). Admin may still write a line for the
   // front of one order's card (`message`) and one extra line.
+  // Owner, 2026-11-19: no family names on the printed cards either (they stay on the online invitation).
   const cardFields = { ...base.fields };
   delete cardFields.invitation_message;
+  delete cardFields.person_1_family;
+  delete cardFields.person_2_family;
+  delete cardFields.family_names;
   const fields = { ...cardFields };
   if (opts.message?.trim()) fields.invitation_message = opts.message.trim();
   const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };

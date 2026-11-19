@@ -16,6 +16,7 @@ import { receiptTokenHash } from '@/server/orders/tokens';
 import { orders } from '@/server/db/schema';
 import { PDFDocument } from 'pdf-lib';
 import { cardData, printData } from '@/server/documents/data';
+import { manifestByCodeRef } from '@/theme-registry';
 import { buildThemeProps } from '@/server/invitation/theme-props';
 import { cardBackPortrait, type ThemeManifest } from '@/theme-sdk/manifest';
 import { printToken, verifyPrintToken } from '@/server/documents/tokens';
@@ -194,6 +195,14 @@ describe('changing the card', () => {
     expect(plain.props.fields.invitation_message).toBeUndefined();
     expect('back' in plain && plain.back.fields.invitation_message).toBeUndefined();
     expect('back' in plain && plain.back.message).toBeNull();
+    // Nor the family names (owner, 2026-11-19).
+    if (plain.kind !== 'card') throw new Error('expected a card');
+    const families = { person_1_family: 'آل الحسيني', person_2_family: 'آل الكركوكي', family_names: 'العائلتان' };
+    const withFamilies = await cardData({ ...plain.props, fields: { ...plain.props.fields, ...families } } as unknown as Parameters<typeof cardData>[0], manifestByCodeRef(plain.codeRef), 'card', {}, null, plain.design);
+    for (const key of Object.keys(families) as (keyof typeof families)[]) {
+      expect(withFamilies.props.fields[key]).toBeUndefined();
+      expect(withFamilies.back.fields[key]).toBeUndefined();
+    }
 
     await updateCardOptions(db(), inv.id, { message: 'دعوة خاصة للأهل', extraLine: 'الدعوة عائلية', showQr: false }, actor);
     const [row] = await db().select().from(invitations).where(eq(invitations.id, inv.id));
