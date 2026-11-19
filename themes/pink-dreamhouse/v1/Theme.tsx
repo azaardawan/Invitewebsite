@@ -5,6 +5,7 @@ import {
   EditableText,
   Photo,
   PhotoSlot,
+  ThemeBorder,
   VideoSlot,
   World3D,
   hasFeature,
@@ -17,6 +18,7 @@ import {
   type World3DHandle,
   type WorldTap,
 } from '@/theme-sdk';
+import { HEART_BORDER } from './border';
 import { copyFor, type Copy } from './copy';
 import { BLUSH, DRAWER_COUNT, DRAWERS, FIRST_PHOTO, MODELS, PHOTO_SET, ROOMS, TIERS, VIDEO_COUNT, planFor, tierOf, type Tier } from './plan';
 import { FRIENDS_ROOM_NAMES, ROOM_NAMES } from './texts';
@@ -152,6 +154,7 @@ function Cover({ props, copy, phase, onOpen }: { props: ThemeProps; copy: Copy; 
   return (
     <div className={c('cover')} data-phase={phase}>
       <div className={c('card')}>
+        <ThemeBorder border={props.border} fallback={HEART_BORDER} medium="screen" />
         <HouseMark />
         <p className={c('eyebrow')}>{copy.happyBirthday}</p>
         {who ? <h1 className={c('names')}>{who}</h1> : null}
@@ -407,6 +410,7 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
       />
 
       <div className={c('welcome', !(active && ready && welcome) && 'welcomeGone')} aria-hidden={!welcome}>
+        <ThemeBorder border={props.border} fallback={HEART_BORDER} medium="screen" />
         <p className={c('eyebrow')}>{copy.happyBirthday}</p>
         {who ? <p className={c('welcomeNames')}>{who}</p> : null}
         <p className={c('welcomeHint')}>{touch ? copy.hintTouch : copy.hintKeys}</p>
@@ -571,6 +575,7 @@ function FlatHouse({ props, copy }: { props: ThemeProps; copy: Copy }) {
   return (
     <div className={c('flat')} data-house-flat>
       <header className={c('flatHeader')}>
+        <ThemeBorder border={props.border} fallback={HEART_BORDER} medium="screen" />
         <HouseMark />
         <p className={c('eyebrow')}>{copy.happyBirthday}</p>
         {who ? <h1 className={c('names')}>{who}</h1> : null}
@@ -626,6 +631,7 @@ function HouseEditor({ props, copy }: { props: ThemeProps; copy: Copy }) {
   return (
     <div className={c('flat', 'editor')} data-house-flat data-house-tier={tier}>
       <header className={c('flatHeader')}>
+        <ThemeBorder border={props.border} fallback={HEART_BORDER} medium="screen" />
         <HouseMark />
         <p className={c('eyebrow')}>{copy.happyBirthday}</p>
         <h1 className={c('names')}>
