@@ -22,16 +22,16 @@ export function sealText(fields: Partial<Record<string, string>>, join: string):
   return { first, join: second ? join : null, second };
 }
 
-/** Rough widths (em) of the monogram's letters in its calligraphy faces, to keep wide pairs inside the shield. */
+/** Rough widths (em) of the monogram's letters (Aref Ruqaa, Pinyon Script), to keep wide pairs inside the shield. */
 const WIDE_LATIN = /[MWmw]/;
 const NARROW_LATIN = /[IJijlt1]/;
 const WIDE_ARABIC = /[سشصضقنيىیئبتثفكکڤطظ]/;
 const ARABIC = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-ﻼ]/;
 function width(ch: string): number {
   if (ARABIC.test(ch)) return WIDE_ARABIC.test(ch) ? 0.95 : 0.55;
-  if (WIDE_LATIN.test(ch)) return 1.05;
-  if (NARROW_LATIN.test(ch)) return 0.5;
-  return 0.75;
+  if (WIDE_LATIN.test(ch)) return 0.9;
+  if (NARROW_LATIN.test(ch)) return 0.45;
+  return 0.6;
 }
 
 /**
@@ -47,6 +47,7 @@ export function monogram(seal: SealText): Monogram {
   }
   // A text-style heart (not the red emoji phones would draw).
   const join = seal.join === '♥' ? '♥︎' : seal.join;
-  const w = width(seal.first) + (seal.second ? width(seal.second) : 0) + (join ? 0.32 : 0);
+  const latin = !ARABIC.test(seal.first + (seal.second ?? ''));
+  const w = width(seal.first) + (seal.second ? width(seal.second) : 0) + (join ? (latin ? 0.55 : 0.32) : latin ? 0.2 : 0);
   return { first: seal.first, join, second: seal.second, rtl: ARABIC.test(seal.first + (seal.second ?? '')), fit: Math.min(1, 1.7 / w) };
 }

@@ -321,3 +321,10 @@
   font-size: 0.3em;
   translate: 0 -0.1em;
 }
+/* Pinyon Script's capitals sweep far to the sides: Latin letters keep a little more room around the join. */
+.initials[dir='ltr'] {
+  gap: 0.2em;
+}
+.initials[dir='ltr'] i {
+  font-size: 0.34em;
+}

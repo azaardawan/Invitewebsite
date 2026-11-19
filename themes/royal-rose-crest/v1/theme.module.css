@@ -801,3 +801,10 @@
   max-width: none;
   font-size: calc(7.9cqw * var(--fit));
 }
+/* Pinyon Script's capitals sweep far to the sides: Latin letters keep a little more room around the join. */
+.mono[dir='ltr'] {
+  gap: 0.2em;
+}
+.mono[dir='ltr'] i {
+  font-size: 0.34em;
+}

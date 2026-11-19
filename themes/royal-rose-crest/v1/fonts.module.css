@@ -109,16 +109,16 @@
 }
 
 /*
- * The crest's monogram (Royal Rose Crest, owner 2026-11-19: "some type of calligraphy"): Gulzar, a Nastaʿlīq
- * calligraphy, for Arabic letters, Parisienne for Latin ones (both SIL OFL 1.1, licence texts in ./fonts/). Kurdish
- * letters Gulzar lacks (ڕ, ڤ) fall back to the Kurdish script face.
+ * The crest's monogram (Royal Rose Crest, owner's choice 2026-11-19): Aref Ruqaa, a Ruqʿah calligraphy, for Arabic
+ * and Kurdish letters (SIL OFL 1.1, licence text in ./fonts/; it has every Kurdish letter) and Pinyon Script, the
+ * design's own script, for Latin ones.
  */
 @font-face {
   font-family: 'ROC Mono';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(./fonts/gulzar-arabic-400-normal.woff2) format('woff2');
+  src: url(./fonts/aref-ruqaa-arabic-700-normal.woff2) format('woff2');
   unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC;
 }
 @font-face {
@@ -126,7 +126,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(./fonts/parisienne-latin-400-normal.woff2) format('woff2');
+  src: url(./fonts/pinyon-script-latin-400-normal.woff2) format('woff2');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
