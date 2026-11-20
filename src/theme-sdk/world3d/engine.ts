@@ -11,7 +11,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { canvasTexture, fitText, framed, loadImage, sameSite } from '../gallery3d/draw';
 import { floorAt, roomAt, scaledPlan, type WorldPlan, type WorldText, type WorldThing } from './plan';
-import { buildDrawer, ceilings, movePhoto, roundify, texturePaint } from './build';
+import { buildDoor, buildDrawer, ceilings, moveParts, movePhoto, outline, roundify, stand, texturePaint } from './build';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -39,8 +39,8 @@ export type WorldOptions = {
   onTap: (tap: WorldTap) => void;
   onRoom: (key: string) => void;
   onVideo: (place: number, state: 'playing' | 'paused' | 'ended') => void;
-  /** The thing the visitor is next to and facing (to offer a button for it), or null. */
-  onNear?: (key: string | null) => void;
+  /** The things the visitor is next to and facing, nearest first (to offer a button for each; none: []). */
+  onNear?: (keys: string[]) => void;
 };
 
 type Moving = { thing: WorldThing; group: THREE.Group; meshes: THREE.Mesh[]; open: boolean; t: number; base: THREE.Matrix4; size: THREE.Vector3; center: THREE.Vector3 };
@@ -72,7 +72,7 @@ export class WorldEngine {
   private keys = new Set<string>();
   private stick = { x: 0, y: 0 };
   private room = '';
-  private near: string | null = null;
+  private near = '';
   private frame = 0;
   private last = 0;
   private dirty = true;
@@ -212,6 +212,14 @@ export class WorldEngine {
         added.push(m);
       }
     }
+    // Parts moved (things that floated, set down on what holds them; buttons against their walls).
+    for (const move of plan.moves ?? []) moveParts(meshes.filter((m) => matches(m.name, move.nodes)), move);
+    // Pedestals the model lacks.
+    for (const s of plan.stands ?? []) {
+      const m = stand(s, paint(s.paint));
+      this.scene.add(m);
+      added.push(m);
+    }
     // Photo places clear of the furniture in front of them.
     for (const [name, move] of Object.entries(plan.photoMoves ?? {})) {
       const main = root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name));
@@ -246,6 +254,11 @@ export class WorldEngine {
     const housings: THREE.Mesh[] = [];
     for (const thing of plan.things) {
       let parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
+      // A door drawn by the world, in a doorway of the model.
+      if (thing.kind === 'door' && thing.build) {
+        parts = buildDoor(thing.build, thing.hinge ?? 'min', paint);
+        for (const m of parts) this.scene.add(m);
+      }
       if (!parts.length) continue;
       // A drawer drawn by the world: the model's drawer (and what it replaces) left out.
       if (thing.kind === 'drawer' && thing.build) {
@@ -261,8 +274,15 @@ export class WorldEngine {
       const box = new THREE.Box3();
       for (const p of parts) box.expandByObject(p);
       const group = new THREE.Group();
-      // Lids tip on their back top edge; everything else turns or moves about its middle.
-      const pivot = thing.kind === 'lid' ? new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y, box.max.z) : box.getCenter(new THREE.Vector3());
+      // Lids tip on their back top edge; doors swing on their hinge edge; everything else turns or moves about its middle.
+      const size = box.getSize(new THREE.Vector3());
+      const along = size.x > size.z ? 'x' : 'z';
+      const pivot =
+        thing.kind === 'lid'
+          ? new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y, box.max.z)
+          : thing.kind === 'door'
+            ? box.getCenter(new THREE.Vector3()).setComponent(along === 'x' ? 0 : 2, (thing.hinge ?? 'min') === 'min' ? box.min[along] : box.max[along])
+            : box.getCenter(new THREE.Vector3());
       group.position.copy(pivot);
       this.scene.add(group);
       group.updateMatrixWorld(true);
@@ -286,7 +306,22 @@ export class WorldEngine {
         const m = o as THREE.Mesh;
         if (m.isMesh && m.material === material) targets.push(m);
       });
-      this.disposables.push(texturePaint(material, targets, spec, this.renderer));
+      void texturePaint(material, targets, spec, this.renderer).then((t) => {
+        if (!t) return;
+        this.disposables.push(t);
+        this.dirty = true;
+        this.kick();
+      });
+    }
+    // Black lines on the edges of what opens, so visitors see what to open.
+    if (plan.outline) {
+      const ink = new THREE.LineBasicMaterial({ color: 0x1a1016 });
+      this.disposables.push(ink);
+      for (const t of this.things.values()) {
+        if (t.thing.kind === 'teleport') continue;
+        for (const m of t.meshes) if (m.visible) outline(m, ink);
+        for (const m of meshes) if (m.visible && matches(m.name, t.thing.touch)) outline(m, ink);
+      }
     }
 
     const tapOnly = new Set([...this.tappable.keys()].filter((m) => this.tappable.get(m)!.kind !== 'thing'));
@@ -711,8 +746,8 @@ export class WorldEngine {
     } else if (k === 'press') {
       g.scale.setScalar(1 - 0.12 * Math.sin(Math.PI * e));
     } else if (k === 'door') {
-      // Slides down into the floor, out of the way.
-      g.position.y -= m.size.y * 0.98 * e;
+      // Swings open on its hinge, like a door.
+      g.rotateY(((m.thing.kind === 'door' && m.thing.hinge === 'max' ? 1 : -1) * Math.PI * 0.55) * e);
     } else if (k === 'glow') {
       const pulse = m.open ? 0.55 + 0.25 * Math.sin(now / 260) : 0;
       for (const mesh of m.meshes) {
@@ -726,27 +761,27 @@ export class WorldEngine {
     g.updateMatrixWorld(true);
   }
 
-  /** Tells the design which thing the visitor is next to and facing (within reach), if any. */
+  /** Tells the design which things the visitor is next to and facing (within reach), nearest first. */
   private checkNear() {
     if (!this.o.onNear) return;
     const fx = -Math.sin(this.yaw);
     const fz = -Math.cos(this.yaw);
-    let best: string | null = null;
-    let bestD = 1.9 * this.size;
+    const reach = 1.9 * this.size;
+    const near: { key: string; d: number }[] = [];
     for (const [key, m] of this.things) {
       if (m.thing.kind === 'teleport' || !m.meshes.some((x) => x.visible)) continue;
       const dx = m.center.x - this.pos.x;
       const dz = m.center.z - this.pos.z;
       const d = Math.hypot(dx, dz);
-      // On this floor, near, and ahead (within about 50° of where the visitor looks).
+      // On this floor, near, and ahead (within about 50° of where the visitor looks), however low it is.
       if (m.center.y < this.floorY - 0.3 || m.center.y > this.floorY + 2.6 * this.size) continue;
-      if (d > bestD || (d > 0.3 && (dx * fx + dz * fz) / d < 0.64)) continue;
-      best = key;
-      bestD = d;
+      if (d > reach || (d > 0.3 && (dx * fx + dz * fz) / d < 0.64)) continue;
+      near.push({ key, d });
     }
-    if (best === this.near) return;
-    this.near = best;
-    this.o.onNear(best);
+    const keys = near.sort((a, b) => a.d - b.d).slice(0, 3).map((n) => n.key);
+    if (keys.join() === this.near) return;
+    this.near = keys.join();
+    this.o.onNear(keys);
   }
 
   /** Tells the design when the visitor walks into another room. */

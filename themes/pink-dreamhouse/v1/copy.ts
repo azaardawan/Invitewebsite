@@ -16,6 +16,10 @@ export type Copy = {
   /** The button by something to open (a drawer, the gift) or to press (a switch). */
   open: string;
   press: string;
+  /** The names of the things on their buttons. */
+  things: { gift: string; door: string; cupcake: string; mirror: string; chest: string; confetti: string; golden: string; projector: string; finale: string };
+  /** In each room: "{n} of {m} opened". */
+  roomCount: string;
   /** The editor: a drawer's photo (it may hold one besides its message). */
   drawerPhoto: string;
   play: string;
@@ -57,6 +61,8 @@ const BIRTHDAY: Record<Locale, Copy> = {
     open: 'فتح',
     press: 'اضغط',
     drawerPhoto: 'صورة في الدرج (اختيارية)',
+    things: { gift: 'الهدية', door: 'الباب', cupcake: 'الكب كيك', mirror: 'المرآة', chest: 'الصندوق الذهبي', confetti: 'زر الاحتفال', golden: 'الزر الذهبي', projector: 'جهاز العرض', finale: 'زر النهاية' },
+    roomCount: 'فُتح {n} من {m} في هذه الغرفة',
     play: 'تشغيل',
     pause: 'إيقاف مؤقت',
     mute: 'كتم الصوت',
@@ -93,6 +99,8 @@ const BIRTHDAY: Record<Locale, Copy> = {
     open: 'Open',
     press: 'Press',
     drawerPhoto: 'A photo in the drawer (optional)',
+    things: { gift: 'Gift', door: 'Door', cupcake: 'Cupcake', mirror: 'Mirror', chest: 'Golden chest', confetti: 'Confetti switch', golden: 'Golden button', projector: 'Projector', finale: 'Final button' },
+    roomCount: '{n} of {m} opened in this room',
     play: 'Play',
     pause: 'Pause',
     mute: 'Mute',
@@ -129,6 +137,8 @@ const BIRTHDAY: Record<Locale, Copy> = {
     open: 'کردنەوە',
     press: 'دابگرە',
     drawerPhoto: 'وێنەیەک لە چەکمەجەکەدا (ئارەزوومەندانە)',
+    things: { gift: 'دیاری', door: 'دەرگا', cupcake: 'کەپ کەیک', mirror: 'ئاوێنە', chest: 'سندووقی زێڕین', confetti: 'دوگمەی ئاهەنگ', golden: 'دوگمەی زێڕین', projector: 'پرۆجێکتەر', finale: 'دوگمەی کۆتایی' },
+    roomCount: '{n} لە {m} کراوەتەوە لەم ژوورەدا',
     play: 'لێدان',
     pause: 'وەستاندن',
     mute: 'بێدەنگکردن',
@@ -165,6 +175,8 @@ const BIRTHDAY: Record<Locale, Copy> = {
     open: 'ڤەکرن',
     press: 'بگڤاشۆ',
     drawerPhoto: 'وێنەیەک د چەکمەجێ دا (ب دلێ خۆ)',
+    things: { gift: 'دیاری', door: 'دەرگەه', cupcake: 'کەپ کەیک', mirror: 'نەینک', chest: 'سندوقا زێڕین', confetti: 'دوگما ئاهەنگێ', golden: 'دوگما زێڕین', projector: 'پرۆجێکتەر', finale: 'دوگما دووماهیێ' },
+    roomCount: '{n} ژ {m} هاتینە ڤەکرن د ڤێ ژوورێ دا',
     play: 'لێدان',
     pause: 'راوەستاندن',
     mute: 'بێدەنگکرن',

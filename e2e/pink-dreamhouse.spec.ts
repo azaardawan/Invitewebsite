@@ -39,11 +39,15 @@ test('the house opens in 3D; drawers hold messages; finding every memory opens t
   // Walking up to the coffee table: a button to open its drawer (the test browser draws slowly: walk a while).
   await page.mouse.click(5, 790);
   await page.keyboard.down('ArrowUp');
-  await expect(page.locator('[data-house-near]')).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('[data-house-near="drawer1"]')).toBeVisible({ timeout: 20_000 });
   await page.keyboard.up('ArrowUp');
-  await expect(page.locator('[data-house-near]')).toHaveText('Open');
-  await page.locator('[data-house-near]').click();
+  // Each thing nearby has its own button, named (no crouching to tap a low drawer).
+  await expect(page.locator('[data-house-near="drawer1"]')).toHaveText('Open · Drawer 1');
+  await expect(page.locator('[data-house-room-count="0/2"]')).toContainText('0 of 2 opened in this room');
+  await page.locator('[data-house-near="drawer1"]').click();
   await expect(page.locator('[data-house-card]')).toBeVisible();
+  // The room's counter counts it.
+  await expect(page.locator('[data-house-room-count="1/2"]')).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('near-open.png') });
   await page.locator('[data-house-card]').getByRole('button', { name: 'Close' }).click();
   await page.evaluate(() => localStorage.clear());
