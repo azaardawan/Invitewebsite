@@ -2106,7 +2106,23 @@ description and its six colour sets.
 | 91 | #30 package «VVIP»: its name (docs/themes/pink-dreamhouse/PACKAGES.md) | VVIP | VVIP | VVIP | VVIP |
 | 92 | #30 package «VVIP»: its description | البيت كاملاً بست غرف: مع سينما الأصدقاء والجناح السري الذي لا يُفتح إلا بعد العثور على كل الذكريات، 24 صورة، 8 رسائل، 3 فيديوهات، صندوق ذهبي ونهاية احتفالية، موسيقى في الخلفية، وسبعة ألوان. | The whole house of six rooms: with the bestie cinema and the secret suite that opens only once every memory is found, 24 photos, 8 messages, 3 videos, a golden chest and a grand finale, background music, and seven colours. | هەموو خانووەکە بە شەش ژوورەوە: لەگەڵ سینەمای هاوڕێیان و ژووری نهێنی کە تەنها دوای دۆزینەوەی هەموو یادەوەرییەکان دەکرێتەوە، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندووقێکی زێڕین و کۆتاییەکی ئاهەنگئامێز، مۆسیقای پاشبنەما، و حەوت ڕەنگ. | هەمی خانی ب شەش ژووران: دگەل سینەمایا هەڤالان و ژوورا نهێنی کو بتنێ پشتی دیتنا هەمی بیرهاتنان ڤەدبیت، ٢٤ وێنە، ٨ نامە، ٣ ڤیدیۆ، سندوقەکا زێڕین و دووماهیکەکا ئاهەنگی، مۆسیقایا پاشبنەمایێ، و حەفت ڕەنگ. |
 
-## Batch 62 — Pink Dreamhouse (#30): the button by a drawer, and a drawer's photo — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+## Batch 62 — Erbil · Hewlêr (#29) v2: the scroll cue and the photo arcade; Ever Bloom (#28) v2: the story and photo-wall places — ✅ AUTO-APPROVED (2026-11-15, owner checks in Admin → Translations)
+
+Erbil v2's cue while the guest scrolls through the journey (`themes/erbil-hewler/v2/copy.ts`, `scrollCue`) and the labels
+of its three arch places (`manifest.ts`); Ever Bloom v2's labels for the places of the story collage and the photo wall
+(`themes/ever-bloom/v2/manifest.ts`; `{n}` is the photo's number).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #29 v2: the cue while scrolling through the journey | مرّر للأسفل لتتجوّل في المدينة | Scroll to explore | بۆ گەشتکردن بەناو شارەکەدا بەرەو خوارەوە بڕۆ | بۆ گەشتێ د ناڤ باژێری دا بەرەڤ خوارێ بچە |
+| 2 | #29 v2 photo place 1 | الصورة الرئيسية (القوس الأوسط) | The main photo (the middle arch) | وێنە سەرەکییەکە (کەوانەی ناوەڕاست) | وێنێ سەرەکی (کەڤانا ناڤەڕاستێ) |
+| 3 | #29 v2 photo place 2 | الصورة الثانية | The second photo | وێنەی دووەم | وێنێ دووێ |
+| 4 | #29 v2 photo place 3 | الصورة الثالثة | The third photo | وێنەی سێیەم | وێنێ سێیێ |
+| 5 | #28 v2 photo places 4–7 | الستوري: صورة {n} | Story: photo {n} | ستۆری: وێنەی {n} | ستۆری: وێنێ {n} |
+| 6 | #28 v2 photo place 8 | جدار الصور: الصورة الوسطى | Photo wall: the middle photo | دیواری وێنە: وێنەی ناوەڕاست | دیوارێ وێنەیان: وێنێ ناڤەڕاستێ |
+| 7 | #28 v2 photo places 9–16 | جدار الصور: صورة {n} | Photo wall: photo {n} | دیواری وێنە: وێنەی {n} | دیوارێ وێنەیان: وێنێ {n} |
+
+## Batch 63 — Pink Dreamhouse (#30): the button by a drawer, and a drawer's photo — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
 
 The owner asked for a button by each drawer (2026-11-19) and for drawers to hold a photo besides their message.
 
