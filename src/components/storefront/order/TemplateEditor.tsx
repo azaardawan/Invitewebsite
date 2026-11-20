@@ -71,6 +71,9 @@ type Sheet =
   | { kind: 'photo-words'; index: number }
   | { kind: 'video'; place: number };
 
+/** The first place of photos attached to things in a design (the theme SDK's ATTACHED_PHOTO_PLACE). */
+const ATTACHED = 50;
+
 /** The photo the browser sends: at most this many pixels on the long side, as JPEG (quick on mobile data). */
 const SEND_MAX_SIDE = 2400;
 async function shrink(file: File): Promise<Blob> {
@@ -104,6 +107,7 @@ export function TemplateEditor({
   texts: initialTexts,
   photos: initialPhotos,
   maxPhotos,
+  attachedPhotos = 0,
   photoSet,
   aspects,
   names,
@@ -126,6 +130,8 @@ export function TemplateEditor({
   texts: TemplateText[];
   photos: TemplatePhoto[];
   maxPhotos: number;
+  /** Photos attached to things in the design (e.g. one per drawer), from place 50: each optional, on its own. */
+  attachedPhotos?: number;
   /** The design's photo sets (manifest `photos.set`; all places are one set without them): each fills on its own. */
   photoSet: number;
   aspects: number[];
@@ -174,6 +180,9 @@ export function TemplateEditor({
         // The text as the design shows it (a design may show its own default, e.g. a museum ordered for friends).
         const shown = (m as { value?: unknown }).value;
         if (text) setSheet({ kind: 'text', text: typeof shown === 'string' && shown ? { ...text, value: shown } : text });
+      } else if (m.kind === 'photo' && typeof m.index === 'number' && m.index >= ATTACHED && m.index < ATTACHED + attachedPhotos) {
+        // A photo attached to something in the design: its own place.
+        setSheet(photos.some((p) => p.position === m.index) ? { kind: 'photo-words', index: m.index } : { kind: 'photo-add', index: m.index });
       } else if (m.kind === 'photo' && typeof m.index === 'number' && m.index >= 0 && m.index < maxPhotos) {
         const has = photos.some((p) => p.position === m.index);
         // Photos fill the places in order: an empty frame takes the next photo.
@@ -189,7 +198,7 @@ export function TemplateEditor({
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [texts, photos, maxPhotos, photoSet, videoIncluded, videos.length]);
+  }, [texts, photos, maxPhotos, attachedPhotos, photoSet, videoIncluded, videos.length]);
 
   // The page behind stays still while a sheet is open; Escape closes it.
   useEffect(() => {
@@ -293,7 +302,8 @@ export function TemplateEditor({
       if (!res.ok && res.status !== 404) throw new Error();
       // The photos after it move up a place, as on the server.
       // The photos after it in its set move up a place, as on the server.
-      const end = (Math.floor(index / photoSet) + 1) * photoSet;
+      // An attached photo (a drawer's) has a place of its own: nothing moves up.
+      const end = index >= ATTACHED ? index + 1 : (Math.floor(index / photoSet) + 1) * photoSet;
       const next = photos.filter((p) => p.position !== index).map((p) => (p.position > index && p.position < end ? { ...p, position: p.position - 1 } : p));
       setPhotos(next);
       sendPhotos(next);
@@ -461,8 +471,8 @@ export function TemplateEditor({
           <span data-template-texts={filledTexts}>
             {labels.texts} <b className="text-heading">{filledTexts}</b>/{texts.length}
           </span>
-          <span data-template-photos={photos.length}>
-            {labels.photos} <b className="text-heading">{photos.length}</b>/{maxPhotos}
+          <span data-template-photos={photos.filter((p) => p.position < ATTACHED).length}>
+            {labels.photos} <b className="text-heading">{photos.filter((p) => p.position < ATTACHED).length}</b>/{maxPhotos}
           </span>
           {videoIncluded ? (
             <span data-template-video={videos[0] ? 'yes' : 'no'} data-template-videos={videos.filter(Boolean).length}>

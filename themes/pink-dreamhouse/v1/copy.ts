@@ -13,6 +13,11 @@ export type Copy = {
   locked: string;
   unlocked: string;
   close: string;
+  /** The button by something to open (a drawer, the gift) or to press (a switch). */
+  open: string;
+  press: string;
+  /** The editor: a drawer's photo (it may hold one besides its message). */
+  drawerPhoto: string;
   play: string;
   pause: string;
   mute: string;
@@ -49,6 +54,9 @@ const BIRTHDAY: Record<Locale, Copy> = {
     locked: 'هذا الباب يُفتح عندما تجد كل الذكريات في الأدراج.',
     unlocked: 'وجدت كل الذكريات! الجناح السري مفتوح الآن.',
     close: 'إغلاق',
+    open: 'فتح',
+    press: 'اضغط',
+    drawerPhoto: 'صورة في الدرج (اختيارية)',
     play: 'تشغيل',
     pause: 'إيقاف مؤقت',
     mute: 'كتم الصوت',
@@ -82,6 +90,9 @@ const BIRTHDAY: Record<Locale, Copy> = {
     locked: 'This door opens once you have found every memory in the drawers.',
     unlocked: 'You found every memory! The secret suite is open now.',
     close: 'Close',
+    open: 'Open',
+    press: 'Press',
+    drawerPhoto: 'A photo in the drawer (optional)',
     play: 'Play',
     pause: 'Pause',
     mute: 'Mute',
@@ -115,6 +126,9 @@ const BIRTHDAY: Record<Locale, Copy> = {
     locked: 'ئەم دەرگایە دەکرێتەوە کاتێک هەموو یادەوەرییەکانی ناو چەکمەجەکان دەدۆزیتەوە.',
     unlocked: 'هەموو یادەوەرییەکانت دۆزییەوە! ژووری نهێنی ئێستا کراوەیە.',
     close: 'داخستن',
+    open: 'کردنەوە',
+    press: 'دابگرە',
+    drawerPhoto: 'وێنەیەک لە چەکمەجەکەدا (ئارەزوومەندانە)',
     play: 'لێدان',
     pause: 'وەستاندن',
     mute: 'بێدەنگکردن',
@@ -148,6 +162,9 @@ const BIRTHDAY: Record<Locale, Copy> = {
     locked: 'ئەڤ دەرگەهە ڤەدبیت دەمێ تو هەمی بیرهاتنێن د چەکمەجان دا دبینی.',
     unlocked: 'تە هەمی بیرهاتن دیتن! ژوورا نهێنی نوکە ڤەکریە.',
     close: 'گرتن',
+    open: 'ڤەکرن',
+    press: 'بگڤاشۆ',
+    drawerPhoto: 'وێنەیەک د چەکمەجێ دا (ب دلێ خۆ)',
     play: 'لێدان',
     pause: 'راوەستاندن',
     mute: 'بێدەنگکرن',

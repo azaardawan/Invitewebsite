@@ -9,7 +9,7 @@ import { messagesFor } from '@/i18n/messages';
 import { eventStartIso, formatEventDate, formatEventTime, safeMapUrl, type CalendarNames } from '@/lib/invitation-format';
 import { DEFAULT_BIRTH_DATE_FORMAT, formatBirthDate, type BirthDateFormat } from '@/lib/birth-date-format';
 import type { InvitationMode, ThemeLabels, ThemeProps } from '@/theme-sdk/types';
-import { wordingDefault, type DesignSwitch, type WordingLine } from '@/theme-sdk/manifest';
+import { wordingDefault, type DesignSwitch, type WordingLine, ATTACHED_PHOTO_PLACE } from '@/theme-sdk/manifest';
 
 type InvitationMessages = ThemeLabels &
   CalendarNames & { previewRibbon: string; sampleRibbon: string; renderError: string; retry: string; previewExpired: string; and: string; youreInvited: string; endedTitle: string; endedBody: string; brand: string };
@@ -148,7 +148,7 @@ export function resolvePhotos(
   mode: InvitationMode,
   locale: Locale,
   photos: readonly { src: string; width: number; height: number; focus: { x: number; y: number; zoom: number }; title?: string | null; caption?: string | null; position?: number }[],
-  spec: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[] } | null,
+  spec: { max: number; labels?: readonly { ar: string; en: string; ckb?: string; bdn?: string }[]; attached?: number } | null,
 ): ThemeProps['photos'] {
   if (!features.includes('photos')) return [];
   const label = (i: number) => {
@@ -161,7 +161,8 @@ export function resolvePhotos(
   // Each photo keeps its place (`index`): in a design with sets a whole set may be empty while a later one is filled.
   return photos
     .map((p, i) => ({ ...p, place: p.position ?? i }))
-    .filter((p) => p.place < (spec?.max ?? Infinity))
+    // The design's places, and the photos attached to things in it (`photos.attached`, from ATTACHED_PHOTO_PLACE).
+    .filter((p) => p.place < (spec?.max ?? Infinity) || (p.place >= ATTACHED_PHOTO_PLACE && p.place < ATTACHED_PHOTO_PLACE + (spec?.attached ?? 0)))
     .map((p) => ({ index: p.place, src: p.src, width: p.width, height: p.height, focus: p.focus, label: label(p.place), title: p.title ?? null, caption: p.caption ?? null }));
 }
 

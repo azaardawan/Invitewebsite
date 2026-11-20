@@ -161,7 +161,21 @@ export type PosterText = {
 };
 export type PosterSpec = { frames: { landscape: number; portrait: number }; texts: PosterText[] };
 
-export type PhotoSpec = { max: number; min?: number; aspect?: number; labels?: ThemeText[]; frames?: { aspect: number }[]; set?: number };
+export type PhotoSpec = {
+  max: number;
+  min?: number;
+  aspect?: number;
+  labels?: ThemeText[];
+  frames?: { aspect: number }[];
+  set?: number;
+  /**
+   * Photos that belong to something in the design rather than to its photo places (e.g. one in each drawer): this many
+   * more places, from ATTACHED_PHOTO_PLACE, each optional and on its own (no sets), not counted in a package's photos.
+   */
+  attached?: number;
+};
+
+export { ATTACHED_PHOTO_PLACE } from './places';
 
 export type VideoSpec = { max: number; labels?: ThemeText[] };
 
@@ -305,6 +319,7 @@ export const manifestSchema = z
         labels: z.array(themeText).max(MAX_PHOTOS).optional(),
         frames: z.array(z.object({ aspect: z.number().min(0.4).max(2.5) })).max(MAX_PHOTOS).optional(),
         set: z.number().int().min(2).max(MAX_PHOTOS).optional(),
+        attached: z.number().int().min(1).max(10).optional(),
       })
       .optional(),
     videos: z.object({ max: z.number().int().min(2).max(MAX_VIDEOS), labels: z.array(themeText).max(MAX_VIDEOS).optional() }).optional(),

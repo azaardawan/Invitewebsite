@@ -2121,3 +2121,13 @@ of its three arch places (`manifest.ts`); Ever Bloom v2's labels for the places 
 | 5 | #28 v2 photo places 4–7 | الستوري: صورة {n} | Story: photo {n} | ستۆری: وێنەی {n} | ستۆری: وێنێ {n} |
 | 6 | #28 v2 photo place 8 | جدار الصور: الصورة الوسطى | Photo wall: the middle photo | دیواری وێنە: وێنەی ناوەڕاست | دیوارێ وێنەیان: وێنێ ناڤەڕاستێ |
 | 7 | #28 v2 photo places 9–16 | جدار الصور: صورة {n} | Photo wall: photo {n} | دیواری وێنە: وێنەی {n} | دیوارێ وێنەیان: وێنێ {n} |
+
+## Batch 63 — Pink Dreamhouse (#30): the button by a drawer, and a drawer's photo — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+
+The owner asked for a button by each drawer (2026-11-19) and for drawers to hold a photo besides their message.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #30 the button by a drawer or the gift (`open`) | فتح | Open | کردنەوە | ڤەکرن |
+| 2 | #30 the button by a switch (`press`) | اضغط | Press | دابگرە | بگڤاشۆ |
+| 3 | #30 editor: a drawer's photo (`drawerPhoto`) | صورة في الدرج (اختيارية) | A photo in the drawer (optional) | وێنەیەک لە چەکمەجەکەدا (ئارەزوومەندانە) | وێنەیەک د چەکمەجێ دا (ب دلێ خۆ) |

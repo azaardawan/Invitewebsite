@@ -11,6 +11,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { canvasTexture, fitText, framed, loadImage, sameSite } from '../gallery3d/draw';
 import { floorAt, roomAt, scaledPlan, type WorldPlan, type WorldText, type WorldThing } from './plan';
+import { buildDrawer, ceilings, movePhoto, roundify, texturePaint } from './build';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -38,9 +39,11 @@ export type WorldOptions = {
   onTap: (tap: WorldTap) => void;
   onRoom: (key: string) => void;
   onVideo: (place: number, state: 'playing' | 'paused' | 'ended') => void;
+  /** The thing the visitor is next to and facing (to offer a button for it), or null. */
+  onNear?: (key: string | null) => void;
 };
 
-type Moving = { thing: WorldThing; group: THREE.Group; meshes: THREE.Mesh[]; open: boolean; t: number; base: THREE.Matrix4; size: THREE.Vector3 };
+type Moving = { thing: WorldThing; group: THREE.Group; meshes: THREE.Mesh[]; open: boolean; t: number; base: THREE.Matrix4; size: THREE.Vector3; center: THREE.Vector3 };
 
 const SPEED = 2.4;
 const RADIUS = 0.32;
@@ -69,6 +72,7 @@ export class WorldEngine {
   private keys = new Set<string>();
   private stick = { x: 0, y: 0 };
   private room = '';
+  private near: string | null = null;
   private frame = 0;
   private last = 0;
   private dirty = true;
@@ -105,7 +109,7 @@ export class WorldEngine {
 
     this.camera.rotation.order = 'YXZ';
     this.scene.background = new THREE.Color(plan.sky);
-    this.scene.add(new THREE.HemisphereLight(0xfff1e9, 0xe9e3ff, plan.light.ambient));
+    this.scene.add(new THREE.HemisphereLight(0xfff1e9, 0xfff4ec, plan.light.ambient));
     const sun = new THREE.DirectionalLight(0xffe8df, plan.light.sun);
     sun.position.set(-4, 9, -6);
     this.scene.add(sun);
@@ -155,6 +159,17 @@ export class WorldEngine {
     });
     // Each paint slot's material (one per colour), and the model's own colours elsewhere, a little satin.
     const paints = new Map<string, THREE.MeshStandardMaterial>();
+    const paint = (slot: string) => {
+      let m = paints.get(slot);
+      if (!m) {
+        // Without an environment to reflect, a metal reads dark: gold is drawn as a bright satin paint.
+        const color = new THREE.Color(colors[slot] ?? '#ffffff');
+        m = new THREE.MeshStandardMaterial({ color, roughness: slot === 'metal' ? 0.45 : 0.78, metalness: 0, flatShading: true });
+        if (slot === 'metal') m.emissive = color.clone().multiplyScalar(0.18);
+        paints.set(slot, m);
+      }
+      return m;
+    };
     for (const mesh of meshes) {
       if (matches(mesh.name, plan.hidden)) {
         mesh.visible = false;
@@ -164,15 +179,7 @@ export class WorldEngine {
       if (!mesh.geometry.attributes.normal) mesh.geometry.computeVertexNormals();
       const slot = Object.entries(plan.paint ?? {}).find(([, prefixes]) => matches(mesh.name, prefixes))?.[0];
       if (slot && colors[slot]) {
-        let m = paints.get(slot);
-        if (!m) {
-          // Without an environment to reflect, a metal reads dark: gold is drawn as a bright satin paint.
-          const color = new THREE.Color(colors[slot]);
-          m = new THREE.MeshStandardMaterial({ color, roughness: slot === 'metal' ? 0.45 : 0.78, metalness: 0, flatShading: true });
-          if (slot === 'metal') m.emissive = color.clone().multiplyScalar(0.18);
-          paints.set(slot, m);
-        }
-        mesh.material = m;
+        mesh.material = paint(slot);
       } else {
         const m = mesh.material as THREE.MeshStandardMaterial;
         if (m.isMeshStandardMaterial) {
@@ -184,6 +191,34 @@ export class WorldEngine {
       }
     }
     this.scene.add(root);
+
+    // Round things drawn smoothly round.
+    for (const mesh of meshes) {
+      if (!mesh.visible) continue;
+      if (matches(mesh.name, plan.round?.spheres)) roundify(mesh, 'sphere');
+      else if (matches(mesh.name, plan.round?.cylinders)) roundify(mesh, 'cylinder');
+      else if (matches(mesh.name, plan.round?.soft)) roundify(mesh, 'soft');
+    }
+    // Things that give light of their own (flames).
+    for (const [prefix, color] of Object.entries(plan.glow ?? {})) {
+      const m = new THREE.MeshBasicMaterial({ color: new THREE.Color(color) });
+      for (const mesh of meshes) if (mesh.visible && matches(mesh.name, [prefix])) mesh.material = m;
+    }
+    // The ceilings the model lacks.
+    const added: THREE.Mesh[] = [];
+    if (plan.ceilings) {
+      for (const m of ceilings(plan.ceilings.at, paint(plan.ceilings.paint))) {
+        this.scene.add(m);
+        added.push(m);
+      }
+    }
+    // Photo places clear of the furniture in front of them.
+    for (const [name, move] of Object.entries(plan.photoMoves ?? {})) {
+      const main = root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name));
+      if (!main) continue;
+      const parts = [main, ...(plan.photoParts ?? []).map((p) => root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name + p.suffix))).filter((o): o is THREE.Object3D => !!o)];
+      movePhoto(parts, new THREE.Box3().setFromObject(main).getCenter(new THREE.Vector3()), move);
+    }
 
     // Photos, screens and plates are not in the way; the plates' words are drawn on the plan's own quads.
     const photoParts = (name: string) => plan.photos.some((p) => (plan.photoParts ?? []).some((s) => name === THREE.PropertyBinding.sanitizeNodeName(p + s.suffix)));
@@ -208,9 +243,21 @@ export class WorldEngine {
     for (const t of plan.texts) this.drawText(t);
 
     // Things that move: each in its own pivot, so the model itself stays as it was.
+    const housings: THREE.Mesh[] = [];
     for (const thing of plan.things) {
-      const parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
+      let parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
       if (!parts.length) continue;
+      // A drawer drawn by the world: the model's drawer (and what it replaces) left out.
+      if (thing.kind === 'drawer' && thing.build) {
+        for (const m of [...parts, ...meshes.filter((x) => matches(x.name, thing.build!.hide))]) m.visible = false;
+        const built = buildDrawer(thing.build, thing.slide, paint);
+        for (const m of [...built.drawer, ...built.housing]) this.scene.add(m);
+        for (const m of built.housing) {
+          this.tappable.set(m, { kind: 'thing', key: thing.key });
+          housings.push(m);
+        }
+        parts = built.drawer;
+      }
       const box = new THREE.Box3();
       for (const p of parts) box.expandByObject(p);
       const group = new THREE.Group();
@@ -224,7 +271,22 @@ export class WorldEngine {
         this.tappable.set(p, { kind: 'thing', key: thing.key });
       }
       for (const m of meshes) if (matches(m.name, thing.touch)) this.tappable.set(m, { kind: 'thing', key: thing.key });
-      this.things.set(thing.key, { thing, group, meshes: parts, open: false, t: 0, base: group.matrix.clone(), size: box.getSize(new THREE.Vector3()) });
+      this.things.set(thing.key, { thing, group, meshes: parts, open: false, t: 0, base: group.matrix.clone(), size: box.getSize(new THREE.Vector3()), center: box.getCenter(new THREE.Vector3()) });
+    }
+    for (const m of [...housings, ...added]) {
+      m.geometry.computeBoundsTree();
+      if (m.name !== 'WORLD_CEILING') this.colliders.push(m);
+    }
+    // Textured paint (plaster, tiles), on the model and on what the world added.
+    for (const [slot, spec] of Object.entries(plan.textures ?? {})) {
+      const material = paints.get(slot);
+      if (!material) continue;
+      const targets: THREE.Mesh[] = [];
+      this.scene.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh && m.material === material) targets.push(m);
+      });
+      this.disposables.push(texturePaint(material, targets, spec, this.renderer));
     }
 
     const tapOnly = new Set([...this.tappable.keys()].filter((m) => this.tappable.get(m)!.kind !== 'thing'));
@@ -618,7 +680,10 @@ export class WorldEngine {
     }
     if (this.playing && !this.playing.video.paused) moving = true;
 
-    if (moving) this.checkRoom();
+    if (moving) {
+      this.checkRoom();
+      this.checkNear();
+    }
     if (moving || this.dirty) {
       this.camera.position.copy(this.pos);
       this.camera.rotation.set(this.pitch, this.yaw, 0);
@@ -659,6 +724,29 @@ export class WorldEngine {
       }
     }
     g.updateMatrixWorld(true);
+  }
+
+  /** Tells the design which thing the visitor is next to and facing (within reach), if any. */
+  private checkNear() {
+    if (!this.o.onNear) return;
+    const fx = -Math.sin(this.yaw);
+    const fz = -Math.cos(this.yaw);
+    let best: string | null = null;
+    let bestD = 1.9 * this.size;
+    for (const [key, m] of this.things) {
+      if (m.thing.kind === 'teleport' || !m.meshes.some((x) => x.visible)) continue;
+      const dx = m.center.x - this.pos.x;
+      const dz = m.center.z - this.pos.z;
+      const d = Math.hypot(dx, dz);
+      // On this floor, near, and ahead (within about 50° of where the visitor looks).
+      if (m.center.y < this.floorY - 0.3 || m.center.y > this.floorY + 2.6 * this.size) continue;
+      if (d > bestD || (d > 0.3 && (dx * fx + dz * fz) / d < 0.64)) continue;
+      best = key;
+      bestD = d;
+    }
+    if (best === this.near) return;
+    this.near = best;
+    this.o.onNear(best);
   }
 
   /** Tells the design when the visitor walks into another room. */
