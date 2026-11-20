@@ -5,7 +5,8 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { decorTexture, tilesTexture, worldUv } from '../gallery3d/decor';
-import type { Box, DrawerBuild, Rect } from './plan';
+import { loadImage } from '../gallery3d/draw';
+import type { Box, DoorBuild, DrawerBuild, Rect } from './plan';
 
 /**
  * A shape drawn smoothly round, in the same box: a sphere (an ellipsoid), an upright cylinder, or a box with soft
@@ -48,7 +49,28 @@ export function roundify(mesh: THREE.Mesh, kind: 'sphere' | 'cylinder' | 'soft')
 }
 
 /** A colour slot's paint with a texture (plaster or tiles), mapped by each surface's place in the world. */
-export function texturePaint(material: THREE.MeshStandardMaterial, meshes: readonly THREE.Mesh[], spec: { kind: 'plaster' | 'tiles'; size: number }, renderer: THREE.WebGLRenderer) {
+export async function texturePaint(
+  material: THREE.MeshStandardMaterial,
+  meshes: readonly THREE.Mesh[],
+  spec: { kind: 'plaster' | 'tiles'; size: number } | { kind: 'image'; src: string; size: number },
+  renderer: THREE.WebGLRenderer,
+): Promise<THREE.Texture | null> {
+  if (spec.kind === 'image') {
+    // The design's own picture (a wallpaper, a floor): light and shade around white, tinted by the paint.
+    const img = await loadImage(spec.src);
+    if (!img) return null;
+    const map = new THREE.Texture(img);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.wrapS = map.wrapT = THREE.RepeatWrapping;
+    map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    map.needsUpdate = true;
+    material.map = map;
+    material.bumpMap = map;
+    material.bumpScale = 0.4;
+    material.needsUpdate = true;
+    for (const m of meshes) worldUv(m, spec.size);
+    return map;
+  }
   // Painted plaster: a fine, even grain (no clouds, no joints); and light tiles with a gentle relief.
   const canvas = spec.kind === 'plaster' ? paintTexture() : tilesTexture('#ffffff', '#efeae3', '#cfc4b6');
   const map = decorTexture(canvas, renderer, true);
@@ -99,6 +121,68 @@ export function ceilings(at: readonly (Rect & { y: number })[], material: THREE.
     mesh.name = 'WORLD_CEILING';
     return mesh;
   });
+}
+
+/** Moves parts of the model by `by` and scales them by `scale` about `pivot` (all in the world). */
+export function moveParts(parts: readonly THREE.Object3D[], move: { by?: readonly [number, number, number]; scale?: number; pivot?: readonly [number, number, number] }) {
+  if (!parts.length) return;
+  const box = new THREE.Box3();
+  for (const p of parts) box.expandByObject(p);
+  const c = move.pivot ? new THREE.Vector3(...move.pivot) : box.getCenter(new THREE.Vector3());
+  const s = move.scale ?? 1;
+  const [dx, dy, dz] = move.by ?? [0, 0, 0];
+  const m = new THREE.Matrix4()
+    .makeTranslation(c.x + dx, c.y + dy, c.z + dz)
+    .multiply(new THREE.Matrix4().makeScale(s, s, s))
+    .multiply(new THREE.Matrix4().makeTranslation(-c.x, -c.y, -c.z));
+  for (const p of parts) {
+    p.updateMatrixWorld(true);
+    const world = m.clone().multiply(p.matrixWorld);
+    const parentInverse = p.parent ? p.parent.matrixWorld.clone().invert() : new THREE.Matrix4();
+    parentInverse.multiply(world).decompose(p.position, p.quaternion, p.scale);
+    p.updateMatrixWorld(true);
+  }
+}
+
+/** A round pedestal (a stand for a cake). */
+export function stand(s: { x: number; z: number; y0: number; y1: number; radius: number }, material: THREE.Material): THREE.Mesh {
+  const geo = new THREE.CylinderGeometry(s.radius * 0.8, s.radius, s.y1 - s.y0, 48);
+  geo.translate(s.x, (s.y0 + s.y1) / 2, s.z);
+  const m = new THREE.Mesh(geo, material);
+  m.name = 'WORLD_STAND';
+  return m;
+}
+
+/** A door in a doorway: its panel with raised panels' lines and a round knob near the far edge from the hinge. */
+export function buildDoor(build: DoorBuild, hinge: 'min' | 'max', paint: (slot: string) => THREE.Material) {
+  const lo = new THREE.Vector3(...build.panel.min);
+  const hi = new THREE.Vector3(...build.panel.max);
+  const size = hi.clone().sub(lo);
+  const wide = size.x > size.z ? 'x' : 'z';
+  const thin = wide === 'x' ? 'z' : 'x';
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(size.x, size.y, size.z), paint(build.paint.panel));
+  panel.position.copy(lo.clone().add(hi).multiplyScalar(0.5));
+  const parts: THREE.Mesh[] = [panel];
+  // A knob on each face, a hand's width from the edge away from the hinge, at hand height.
+  const r = 0.04;
+  for (const side of [-1, 1]) {
+    const knob = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), paint(build.paint.knob));
+    knob.position.copy(panel.position);
+    knob.position.y = lo.y + Math.min(1.0, size.y * 0.42);
+    knob.position[wide] = hinge === 'min' ? hi[wide] - 0.12 : lo[wide] + 0.12;
+    knob.position[thin] = panel.position[thin] + side * (size[thin] / 2 + r * 0.7);
+    parts.push(knob);
+  }
+  return parts;
+}
+
+/** Black lines on a mesh's edges (as its child, so they move with it): something that opens. */
+export function outline(mesh: THREE.Mesh, material: THREE.LineBasicMaterial) {
+  const lines = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, 25), material);
+  lines.name = 'WORLD_OUTLINE';
+  lines.raycast = () => {};
+  mesh.add(lines);
+  return lines;
 }
 
 /** Moves a photo place (and its frame and glass) up or down, and makes it smaller about its middle. */

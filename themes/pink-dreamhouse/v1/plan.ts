@@ -67,7 +67,7 @@ const doorway = (x: number, y: number) => flat(y, x - 0.42, x + 0.42, 2.32, 3.28
 const SECRET_GATE = doorway(9.2, UP);
 
 const surfaces: Record<Tier, WorldSurface[]> = {
-  basic: [flat(0, 0.32, 4.28, 0.45, 5.48), doorway(4.6, 0), flat(0, 4.92, 8.88, 0.45, 5.48)],
+  basic: [flat(0, 0.32, 4.28, 0.45, 5.48), flat(0, 4.92, 8.88, 0.45, 5.48)],
   vip: [],
   vvip: [],
 };
@@ -76,9 +76,7 @@ const ground = [
   flat(0, 1.62, 4.28, 0.45, 5.48),
   flat(0, 0.32, 1.62, 0.45, 0.72),
   flat(0, 0.32, 1.62, 3.98, 5.48),
-  doorway(4.6, 0),
   flat(0, 4.92, 8.88, 0.45, 5.48),
-  doorway(9.2, 0),
   flat(0, 9.52, 13.48, 0.45, 5.48),
 ];
 const stairs: WorldSurface[] = [
@@ -88,7 +86,7 @@ const stairs: WorldSurface[] = [
 // Upstairs, the vanity: clear of the stair rail (x 1.73–1.81, as far back as z 4.15) and the stairwell.
 const vanity = [flat(UP, 1.86, 4.28, 0.45, 5.48), flat(UP, 0.32, 4.28, 4.3, 5.48)];
 surfaces.vip = [...ground, ...stairs, ...vanity];
-surfaces.vvip = [...ground, ...stairs, ...vanity, doorway(4.6, UP), flat(UP, 4.92, 8.88, 0.45, 5.48), flat(UP, 9.52, 13.48, 0.45, 5.48)];
+surfaces.vvip = [...ground, ...stairs, ...vanity, flat(UP, 4.92, 8.88, 0.45, 5.48), flat(UP, 9.52, 13.48, 0.45, 5.48)];
 
 /** Where the visitor starts (the living room, facing the photo wall), and where the stairs' taps take them. */
 // From the open front of each room, so the whole room is in view.
@@ -121,6 +119,25 @@ const DRAWER_BUILDS: DrawerBuild[] = [
 /** Which way each drawer slides out: towards the room's front, or (the two chests) into the room. */
 const DRAWER_SLIDES: [number, number][] = [[0, -0.3], [0, -0.3], [0, -0.3], [0, -0.3], [-0.32, 0], [-0.32, 0], [-0.32, 0], [-0.32, 0]];
 
+/**
+ * Doors in the doorways between rooms (owner, 2026-11-19: "doors need to be opened, not walked through"): a door the
+ * world draws, swinging on its hinge; the doorway can be walked through only once it is open. By the tier they need.
+ */
+const DOOR_PAINT = { panel: 'accent', knob: 'metal' } as const;
+const door = (key: string, x: number, y: number, top: number): WorldThing => ({
+  key,
+  node: '',
+  kind: 'door',
+  hinge: 'min',
+  gate: doorway(x, y),
+  build: { panel: { min: [x - 0.025, y, 2.18], max: [x + 0.025, top, 3.42] }, paint: DOOR_PAINT },
+});
+const DOORS: { thing: WorldThing; tier: Tier }[] = [
+  { thing: door('door1', 4.6, 0, 2.54), tier: 'basic' },
+  { thing: door('door2', 9.2, 0, 2.54), tier: 'vip' },
+  { thing: door('door3', 4.6, UP, 5.89), tier: 'vvip' },
+];
+
 const things: WorldThing[] = [
   { key: 'gift', node: 'INT_BIRTHDAY_GIFT_LID', kind: 'lid', touch: ['DECOR_GIFT_BOX', 'DECOR_GIFT_RIBBON'] },
   ...DRAWERS.map((d, i): WorldThing => ({ key: `drawer${i + 1}`, node: d.node, with: [d.knob], kind: 'drawer', slide: DRAWER_SLIDES[i]!, build: DRAWER_BUILDS[i] })),
@@ -129,7 +146,7 @@ const things: WorldThing[] = [
   { key: 'cupcake', node: 'INT_KITCHEN_CUPCAKE', kind: 'lift' },
   { key: 'mirror', node: 'INT_VANITY_MIRROR', kind: 'glow', touch: ['DECOR_VANITY_MIRROR_FRAME'] },
   { key: 'projector', node: 'INT_CINEMA_PROJECTOR', kind: 'press' },
-  { key: 'secretDoor', node: 'INT_SECRET_ROOM_DOOR', kind: 'door', gate: SECRET_GATE },
+  { key: 'secretDoor', node: 'INT_SECRET_ROOM_DOOR', kind: 'door', hinge: 'min', gate: SECRET_GATE },
   { key: 'chest', node: 'DECOR_SECRET_CHEST_LID', kind: 'lid', touch: ['INT_SECRET_GOLDEN_CHEST'] },
   { key: 'finale', node: 'INT_SECRET_FINAL_BUTTON', kind: 'press' },
   { key: 'stairsUp', node: 'INT_STAIRS_UP_TRIGGER', kind: 'teleport', to: UPSTAIRS },
@@ -140,14 +157,15 @@ const things: WorldThing[] = [
 const plates = (tier: Tier) => {
   const back = (key: RoomKey, x: number, y: number) => ({ key, at: [x, y, 5.522] as const, normal: [0, -1] as const, width: 1.3, height: 0.32 });
   const all = [
-    back('living', 3.08, 2.89),
+    // Every room's name in the middle of its back wall (owner, 2026-11-19), its frame moved with it (`moves`).
+    back('living', 2.3, 2.89),
     back('bedroom', 6.9, 2.9),
     { key: 'bedroom', at: [4.512, 2.79, 2.795] as const, normal: [-1, 0] as const, width: 1.2, height: 0.34 },
     { key: 'bedroom', at: [4.728, 2.79, 2.795] as const, normal: [1, 0] as const, width: 1.2, height: 0.34 },
-    back('kitchen', 11.75, 2.87),
-    back('vanity', 2.38, 6.26),
-    back('cinema', 7.0, 6.28),
-    back('secret', 11.76, 6.31),
+    back('kitchen', 11.5, 2.87),
+    back('vanity', 2.3, 6.26),
+    back('cinema', 6.9, 6.28),
+    back('secret', 11.5, 6.31),
   ];
   return all.filter((t) => TIERS.indexOf(ROOMS.find((r) => r.key === t.key)!.tier) <= TIERS.indexOf(tier));
 };
@@ -165,12 +183,43 @@ function ceilingsOf(tier: Tier) {
 
 const withPrefix = (prefix: string, names: string[]) => names.map((n) => prefix + n);
 
+/** How many times bigger than the model the house is drawn (owner, 2026-11-19: "make it bigger"). */
+export const HOUSE_SIZE = 1.35;
+
+const WALL_STRIPES = new URL('./assets/wall-stripes.webp', import.meta.url).href;
+const WALL_FLORAL = new URL('./assets/wall-floral.webp', import.meta.url).href;
+const FLOOR_OAK = new URL('./assets/floor-oak.webp', import.meta.url).href;
+
+/** Parts of the model moved so nothing floats, and the room names' frames to the middle of their walls (model metres). */
+const MOVES: WorldPlan['moves'] = [
+  { nodes: ['DECOR_LIVING_SOFA', 'DECOR_SOFA_CUSHION'], by: [0, -0.34, 0] },
+  { nodes: ['DECOR_BED_'], by: [0, -0.22, 0] },
+  { nodes: ['DECOR_BEDROOM_LAMP'], by: [0, -0.12, 0] },
+  { nodes: ['DECOR_BEDROOM_STUFFED_TOY'], by: [0, -0.12, 0] },
+  { nodes: ['DECOR_VANITY_LEG'], by: [0, -0.06, 0] },
+  { nodes: ['DECOR_VANITY_STOOL'], by: [0, -0.22, 0] },
+  { nodes: ['DECOR_CINEMA_POPCORN_BOX', 'DECOR_POPCORN'], by: [0, -0.34, 0] },
+  { nodes: ['INT_CINEMA_PROJECTOR'], by: [3.53, -1.47, -0.05] },
+  { nodes: ['INT_SECRET_GOLDEN_CHEST', 'DECOR_SECRET_CHEST_LID'], by: [0, -0.27, 0] },
+  { nodes: ['INT_SECRET_FINAL_BUTTON'], by: [0.36, 0, 0] },
+  { nodes: ['INT_BIRTHDAY_CONFETTI_SWITCH'], by: [0.26, 0, 0] },
+  { nodes: ['INT_GOLDEN_BIRTHDAY_BUTTON'], by: [0.27, 0, 0] },
+  // The cake, a little smaller, on its pedestal in the corner behind the stairs.
+  { nodes: ['DECOR_CAKE_STAND', 'DECOR_BIRTHDAY_CAKE', 'CAKE_CANDLE', 'CAKE_FLAME'], scale: 0.65, pivot: [1.83, 0.57, 4.0], by: [-0.86, -0.02, 0.85] },
+  { nodes: ['NAMEPLATE_FRAME_LIVING'], by: [-0.78, 0, 0] },
+  { nodes: ['NAMEPLATE_FRAME_KITCHEN'], by: [-0.25, 0, 0] },
+  { nodes: ['NAMEPLATE_FRAME_VANITY'], by: [-0.08, 0, 0] },
+  { nodes: ['NAMEPLATE_FRAME_CINEMA'], by: [-0.1, 0, 0] },
+  { nodes: ['NAMEPLATE_FRAME_SECRET'], by: [-0.26, 0, 0] },
+];
+
 export function planFor(tier: Tier): WorldPlan {
   const rooms = ROOMS.filter((r) => TIERS.indexOf(r.tier) <= TIERS.indexOf(tier));
   return {
-    // More spacious (owner, 2026-11-19): a wide view from each room's open front, so the visitor sees the room whole
-    // (drawing the house bigger was tried: the furniture grows with it and crowds the view more).
-    fov: 92,
+    // More spacious (owner, 2026-11-19): the house a third bigger around the visitor, and a wide view from each room's
+    // open front, so the visitor sees the room whole.
+    scale: HOUSE_SIZE,
+    fov: 88,
     start: START,
     eye: EYE,
     surfaces: surfaces[tier],
@@ -185,7 +234,7 @@ export function planFor(tier: Tier): WorldPlan {
     ],
     screens: SCREENS.slice(0, VIDEO_COUNT[tier]),
     texts: plates(tier),
-    things,
+    things: [...things, ...DOORS.filter((d) => TIERS.indexOf(d.tier) <= TIERS.indexOf(tier)).map((d) => d.thing)],
     // The palette's six colours (the order matters: a mesh takes the first slot it matches).
     paint: {
       metal: ['FRONT_TRIM', 'PARTITION_GROUND_1_JAMB', 'PARTITION_GROUND_2_JAMB', 'PARTITION_UPPER_1_JAMB', 'PARTITION_UPPER_2_JAMB', 'UPPER_STAIR_RAIL', 'ROOF_GOLD_LINE', 'DRAWER_KNOB', 'NAMEPLATE_FRAME', 'DECOR_STAIR_RAIL_POST'],
@@ -206,13 +255,28 @@ export function planFor(tier: Tier): WorldPlan {
       'DECOR_WELCOME_HEART',
       'DECOR_BEDROOM_HEART',
       'DECOR_KITCHEN_UPPER_CABINET',
+      // The stairs' two markers floated at their ends: the stairs are walked (and offered as buttons to keyboards).
+      'INT_STAIRS_',
       ...(tier === 'basic' ? [] : ['CEILING_TRIM_01']),
       ...(tier === 'vvip' ? ['CEILING_TRIM_02', 'CEILING_TRIM_03'] : []),
     ],
     passThrough: ['RUG_', 'INT_STAIRS_', 'CAKE_FLAME', 'STAIR_STEP', 'STAIR_TREAD', 'DECOR_DOOR_BEDROOM_PLAQUE'],
     // Textured walls, ceilings and floors (owner, 2026-11-19).
-    textures: { walls: { kind: 'plaster', size: 2.2 }, 'walls-light': { kind: 'plaster', size: 2.2 }, floor: { kind: 'tiles', size: 1.1 } },
-    ceilings: { paint: 'walls-light', at: ceilingsOf(tier) },
+    // The owner's wallpapers (stripes on the side walls, small flowers on the back walls) and a light oak floor, in the
+    // palette's colours; plain painted ceilings.
+    textures: {
+      walls: { kind: 'image', src: WALL_STRIPES, size: 1.3 },
+      'walls-light': { kind: 'image', src: WALL_FLORAL, size: 1.1 },
+      floor: { kind: 'image', src: FLOOR_OAK, size: 1.8 },
+      ceiling: { kind: 'plaster', size: 2.2 },
+    },
+    ceilings: { paint: 'ceiling', at: ceilingsOf(tier) },
+    // Nothing floats (owner, 2026-11-19): each thing set down on what holds it, buttons against their walls, the cake on
+    // a pedestal of its own (it stood in the sofa), the projector on the cinema's chest.
+    moves: MOVES,
+    stands: [{ x: 0.97, z: 4.85, y0: 0, y1: 0.55, radius: 0.32, paint: 'trim' }],
+    // Black lines round what opens, so visitors see what to open.
+    outline: true,
     // Nothing drawn like code: round things smoothly round, soft things with soft edges.
     round: {
       spheres: ['CAKE_FLAME', 'DECOR_BEDROOM_STUFFED_TOY', 'DECOR_CINEMA_BEANBAG', 'DECOR_POPCORN', 'DECOR_MIRROR_BULB'],

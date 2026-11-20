@@ -339,8 +339,11 @@ on quads in front of the model's own), things a tap moves (`things`: a `drawer` 
 each colour slot (`props.colors`; the owner's colour sets recolour the whole building). The plan can also texture a
 paint slot (`textures`: plaster or tiles), add the `ceilings` the model lacks, draw many-sided parts smoothly `round`
 (spheres, cylinders, soft rounded boxes), give flames a `glow`, move photo places clear of furniture (`photoMoves`), and
-draw a drawer itself (`build`: a real drawer with a knob in a housing, instead of the model's). `onNear` tells the design
-which thing the visitor is next to and facing, to offer a button for it (#30: «Open» by a drawer).
+draw a drawer itself (`build`: a real drawer with a knob in a housing, instead of the model's). Doors swing on their
+`hinge`, and a door the model lacks can be drawn in a doorway (`build`), walked through only once open (its `gate`).
+`moves` set floating parts down on what holds them, `stands` add pedestals, `textures` can be the design's own pictures
+(`image`: wallpaper, wood), `outline` draws black lines round what opens. `onNear` lists the things the visitor is next
+to and facing, nearest first, to offer a button for each (#30: «Open · Drawer 1», no crouching for a low one).
 
 Photos attached to things (manifest `photos.attached`, e.g. one per drawer): places from `ATTACHED_PHOTO_PLACE` (50), each
 optional and on its own, not counted in a package's photos nor used by collages or prints; draw them with

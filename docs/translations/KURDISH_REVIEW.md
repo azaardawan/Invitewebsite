@@ -2131,3 +2131,18 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | 1 | #30 the button by a drawer or the gift (`open`) | فتح | Open | کردنەوە | ڤەکرن |
 | 2 | #30 the button by a switch (`press`) | اضغط | Press | دابگرە | بگڤاشۆ |
 | 3 | #30 editor: a drawer's photo (`drawerPhoto`) | صورة في الدرج (اختيارية) | A photo in the drawer (optional) | وێنەیەک لە چەکمەجەکەدا (ئارەزوومەندانە) | وێنەیەک د چەکمەجێ دا (ب دلێ خۆ) |
+
+## Batch 64 — Pink Dreamhouse (#30): the things' names on their buttons, and each room's counter — ✅ AUTO-APPROVED (2026-11-20, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #30 button name (`things.gift`) | الهدية | Gift | دیاری | دیاری |
+| 2 | #30 button name (`things.door`) | الباب | Door | دەرگا | دەرگەه |
+| 3 | #30 button name (`things.cupcake`) | الكب كيك | Cupcake | کەپ کەیک | کەپ کەیک |
+| 4 | #30 button name (`things.mirror`) | المرآة | Mirror | ئاوێنە | نەینک |
+| 5 | #30 button name (`things.chest`) | الصندوق الذهبي | Golden chest | سندووقی زێڕین | سندوقا زێڕین |
+| 6 | #30 button name (`things.confetti`) | زر الاحتفال | Confetti switch | دوگمەی ئاهەنگ | دوگما ئاهەنگێ |
+| 7 | #30 button name (`things.golden`) | الزر الذهبي | Golden button | دوگمەی زێڕین | دوگما زێڕین |
+| 8 | #30 button name (`things.projector`) | جهاز العرض | Projector | پرۆجێکتەر | پرۆجێکتەر |
+| 9 | #30 button name (`things.finale`) | زر النهاية | Final button | دوگمەی کۆتایی | دوگما دووماهیێ |
+| 10 | #30 each room's counter (`roomCount`) | فُتح {n} من {m} في هذه الغرفة | {n} of {m} opened in this room | {n} لە {m} کراوەتەوە لەم ژوورەدا | {n} ژ {m} هاتینە ڤەکرن د ڤێ ژوورێ دا |

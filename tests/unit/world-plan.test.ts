@@ -25,6 +25,14 @@ describe('walking a 3D world', () => {
     expect(surfaceHeight(vvip.surfaces.find((s) => 'ramp' in s)!, 1, 2.175)).toBeCloseTo(1.675, 2);
   });
 
+  it('a doorway between rooms is walked through only once its door is open', () => {
+    expect(floorAt(vvip, 4.6, 2.8, 0)).toBeNull();
+    expect(floorAt(vvip, 4.6, 2.8, 0, new Set(['door1']))).toBe(0);
+    expect(floorAt(vvip, 9.2, 2.8, 0, new Set(['door2']))).toBe(0);
+    // A smaller house has no door into a room it doesn't have.
+    expect(planFor('basic').things.some((t) => t.key === 'door2')).toBe(false);
+  });
+
   it('keeps the secret suite closed until its door is open', () => {
     expect(floorAt(vvip, 9.2, 2.8, 3.35)).toBeNull();
     expect(floorAt(vvip, 9.2, 2.8, 3.35, new Set(['secretDoor']))).toBeCloseTo(3.35);

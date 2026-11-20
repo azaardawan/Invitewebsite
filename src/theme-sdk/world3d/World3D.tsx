@@ -45,8 +45,8 @@ export type World3DProps = {
   onTap?: (tap: WorldTap) => void;
   onRoom?: (key: string) => void;
   onVideo?: (place: number, state: 'playing' | 'paused' | 'ended') => void;
-  /** The thing of the plan the visitor is next to and facing (the design may offer a button for it), or null. */
-  onNear?: (key: string | null) => void;
+  /** The things of the plan the visitor is next to and facing, nearest first (the design may offer a button for each). */
+  onNear?: (keys: string[]) => void;
 };
 
 /**
