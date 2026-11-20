@@ -1,0 +1,20 @@
+/* The designer's typefaces (woff2 of the package's own): P052 roman and italic, and Amiri. */
+@font-face {
+  font-family: 'EH Serif';
+  src: url(./fonts/serif.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EH Serif';
+  src: url(./fonts/serif-italic.woff2) format('woff2');
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EH Amiri';
+  src: url(./fonts/amiri.woff2) format('woff2');
+  font-display: swap;
+}
+.fonts {
+  font-family: 'EH Serif', 'EH Amiri', Georgia, serif;
+}

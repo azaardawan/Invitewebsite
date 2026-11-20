@@ -1,0 +1,30 @@
+/* The designer's typefaces (woff2 of the package's own): P052, Z003 script, Amiri and Noto Sans Arabic. */
+@font-face {
+  font-family: 'EB Serif';
+  src: url(./fonts/serif.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Serif';
+  src: url(./fonts/serif-italic.woff2) format('woff2');
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Script';
+  src: url(./fonts/script.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Amiri';
+  src: url(./fonts/amiri.woff2) format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB UI';
+  src: url(./fonts/arabic-ui.woff2) format('woff2');
+  font-display: swap;
+}
+.fonts {
+  font-family: 'EB Serif', 'EB Amiri', Georgia, serif;
+}
