@@ -2121,3 +2121,12 @@ of its three arch places (`manifest.ts`); Ever Bloom v2's labels for the places 
 | 5 | #28 v2 photo places 4–7 | الستوري: صورة {n} | Story: photo {n} | ستۆری: وێنەی {n} | ستۆری: وێنێ {n} |
 | 6 | #28 v2 photo place 8 | جدار الصور: الصورة الوسطى | Photo wall: the middle photo | دیواری وێنە: وێنەی ناوەڕاست | دیوارێ وێنەیان: وێنێ ناڤەڕاستێ |
 | 7 | #28 v2 photo places 9–16 | جدار الصور: صورة {n} | Photo wall: photo {n} | دیواری وێنە: وێنەی {n} | دیوارێ وێنەیان: وێنێ {n} |
+
+## Batch 63 — Royal Rose Crest (#31): the design's name — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+
+Royal Olive Crest in baby pink and rose gold (`themes/royal-rose-crest/v1/manifest.ts`); every other text is Royal
+Olive Crest's, already reviewed.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #31: the design's name | الشعار الملكي الوردي | Royal Rose Crest | دروشمی شاهانەی پەمەیی | نیشانا شاهانە یا پەمبەیی |

@@ -236,5 +236,11 @@
   "vintage-love-letters@4": [
     "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>em1",
     "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>span1"
+  ],
+  "royal-rose-crest@1": [
+    "ar: cover/on-drawing:div2>div1>main1>div1>div1>footer1>span1>span1",
+    "ar: cover/on-drawing:div2>div1>main1>div1>div1>section1>span1>span1",
+    "ar: on-drawing:div2>div1>main1>div1>div1>footer1>span1>span1",
+    "ar: on-drawing:div2>div1>main1>div1>div1>section1>span1>span1"
   ]
 }
