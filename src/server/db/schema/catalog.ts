@@ -301,6 +301,10 @@ export const packages = pgTable(
      * null = as many as the design holds. The customer may add fewer (owner, 2026-10-31).
      */
     photoLimit: integer('photo_limit'),
+    /** How many videos (packages with `video`, designs with several screens: manifest `videos.max`); null = the design's. */
+    videoLimit: integer('video_limit'),
+    /** The design's colour sets this package offers (packages with `color_choice`); null = all of them. */
+    paletteIds: uuid('palette_ids').array(),
     sortOrder: integer('sort_order').notNull().default(0),
     status: packageStatus('status').notNull().default('ACTIVE'),
     ...timestamps,
@@ -309,6 +313,7 @@ export const packages = pgTable(
     index('packages_theme_idx').on(t.themeId, t.status, t.sortOrder),
     check('packages_price_range', sql`${t.priceIqd} > 0 and ${t.priceIqd} <= 100000000`),
     check('packages_photo_limit_range', sql`${t.photoLimit} is null or (${t.photoLimit} >= 1 and ${t.photoLimit} <= 50)`),
+    check('packages_video_limit_range', sql`${t.videoLimit} is null or (${t.videoLimit} >= 1 and ${t.videoLimit} <= 3)`),
   ],
 );
 

@@ -97,6 +97,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
           texts={template.texts}
           photos={photos.photos}
           maxPhotos={photos.max}
+          attachedPhotos={photos.attached}
           photoSet={photos.set}
           aspects={photos.aspects}
           names={photos.names}
@@ -104,6 +105,8 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
           videoIncluded={template.videoIncluded}
           colors={template.colors}
           music={template.music}
+          videos={template.videos}
+          videoLabels={template.videoLabels}
           labels={templateLabels(ts, !template.posters)}
         />
       </main>

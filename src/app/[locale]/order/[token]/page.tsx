@@ -70,6 +70,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             texts={editor.texts}
             photos={editor.photos.photos}
             maxPhotos={editor.photos.max}
+            attachedPhotos={editor.photos.attached}
             photoSet={editor.photos.set}
             aspects={editor.photos.aspects}
             names={editor.photos.names}
@@ -77,6 +78,8 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
             videoIncluded={editor.videoIncluded}
             colors={editor.colors}
             music={editor.music}
+            videos={editor.videos}
+            videoLabels={editor.videoLabels}
             labels={templateLabels(t)}
           />
         </div>

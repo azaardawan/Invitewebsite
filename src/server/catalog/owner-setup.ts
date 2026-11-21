@@ -101,6 +101,30 @@ export const OWNER_SETUPS: OwnerSetup[] = [
       },
     ],
   },
+  {
+    // Pink Dreamhouse (owner, 2026-11-19): the description, and the colour sets of its plan besides its own Blush
+    // Cream. Packages (Basic 2 rooms / VIP 4 / VVIP 6) are left to Admin with the owner's prices; each ticks the sets it
+    // offers (Basic: Rose Cream; VIP: and Lavender Cloud, Peach Glow; VVIP: all six), docs/themes/pink-dreamhouse/PACKAGES.md.
+    themeKey: 'pink-dreamhouse',
+    workingTitleAr: 'بيت الأحلام الوردي',
+    name: { ar: 'بيت الأحلام الوردي', en: 'Pink Dreamhouse', ckb: 'خانووی خەونی پەمەیی', bdn: 'خانیێ خەونێ پەمبەیی' },
+    description: {
+      ar: 'بيت دمى وردي ثلاثي الأبعاد يتجوّل فيه صاحب المناسبة من هاتفه أو حاسوبه: صوركم على جدرانه، وفيديوهاتكم على شاشاته، ورسائلكم مخبأة في أدراجه، وهدية وكعكة تنتظرانه، وفي أكبر باقة جناح سري لا يُفتح إلا بعد أن يجد كل الذكريات.',
+      en: 'A pink 3D dollhouse the birthday person walks through on their phone or computer: your photos on its walls, your videos on its screens, your messages hidden in its drawers, a gift and a cake waiting, and in the biggest package a secret suite that opens only once every memory has been found.',
+      ckb: 'خانوویەکی بووکەڵەی پەمەیی سێ ڕەهەندی کە خاوەنی بۆنەکە لە مۆبایل یان کۆمپیوتەرەکەیەوە پیاسەی تێدا دەکات: وێنەکانتان لەسەر دیوارەکانی، ڤیدیۆکانتان لەسەر شاشەکانی، نامەکانتان لە چەکمەجەکانیدا شاردراونەتەوە، دیارییەک و کێکێک چاوەڕێی دەکەن، و لە گەورەترین پاکێجدا ژوورێکی نهێنی کە تەنها دوای دۆزینەوەی هەموو یادەوەرییەکان دەکرێتەوە.',
+      bdn: 'خانیەکێ بووکەلێ یێ پەمبەیی یێ سێ ڕەهەندی کو خودانێ بۆنێ ژ مۆبایل یان کۆمپیوتەرا خۆ تێدا دگەڕیت: وێنێن هەوە ل سەر دیوارێن وی، ڤیدیۆیێن هەوە ل سەر شاشێن وی، نامەیێن هەوە د چەکمەجێن وی دا هاتینە ڤەشارتن، دیاریەک و کێکەک ل هیڤیا وی نە، و د مەزنترین پاکێج دا ژوورەکا نهێنی کو بتنێ پشتی دیتنا هەمی بیرهاتنان ڤەدبیت.',
+    },
+    packages: [],
+    // The plan's palettes (specifications/color_palettes.json), by the design's six colour slots.
+    palettes: [
+      { name: { ar: 'وردي كريمي', en: 'Rose Cream', ckb: 'پەمەیی کرێمی', bdn: 'پەمبەیی کرێمی' }, colors: { walls: '#eca3be', 'walls-light': '#fce8e9', accent: '#b74f78', floor: '#f0e7e1', trim: '#fff8f3', metal: '#c7a16a' } },
+      { name: { ar: 'سحابة الخزامى', en: 'Lavender Cloud', ckb: 'هەوری لاڤەندەر', bdn: 'عەوری لاڤەندەری' }, colors: { walls: '#e3cdec', 'walls-light': '#f2e8fa', accent: '#ad83c1', floor: '#ebdcd6', trim: '#fffdfb', metal: '#c7a16a' } },
+      { name: { ar: 'توهج الخوخ', en: 'Peach Glow', ckb: 'درەوشانەوەی قۆخ', bdn: 'چریسکا قۆخی' }, colors: { walls: '#f9c8b6', 'walls-light': '#fff0de', accent: '#ec94a2', floor: '#ebd7c5', trim: '#fffaf4', metal: '#c7a16a' } },
+      { name: { ar: 'حلم النعناع', en: 'Mint Dream', ckb: 'خەونی پونگ', bdn: 'خەونا پونگی' }, colors: { walls: '#c6e8da', 'walls-light': '#effaf5', accent: '#8fbaaa', floor: '#e8e1ce', trim: '#fffdfb', metal: '#d1af75' } },
+      { name: { ar: 'شمبانيا المساء', en: 'Champagne Twilight', ckb: 'شامپانیای ئێوارە', bdn: 'شامپانیا ئێڤاری' }, colors: { walls: '#ce9dae', 'walls-light': '#f2dbe4', accent: '#7d4a68', floor: '#dcc7b4', trim: '#f9f3e9', metal: '#e2bd79' } },
+      { name: { ar: 'غزل البنات', en: 'Cotton Candy', ckb: 'شەکرۆکە', bdn: 'شەکرۆک' }, colors: { walls: '#f5c0e9', 'walls-light': '#dfd2ff', accent: '#c67cb0', floor: '#f2e4dd', trim: '#ffffff', metal: '#e0b5cd' } },
+    ],
+  },
 ];
 
 /** Applies the owner's chat requests that Admin hasn't overtaken yet. Returns what it did, for the deploy log. */

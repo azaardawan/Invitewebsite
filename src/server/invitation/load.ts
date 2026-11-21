@@ -9,7 +9,7 @@ import { buildThemeProps } from './theme-props';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
 import { customSong } from '@/server/music/custom';
-import { customerVideo } from '@/server/video/video';
+import { customerVideos, videoPlaces } from '@/server/video/video';
 import { pageText, type ThemeManifest } from '@/theme-sdk/manifest';
 import type { SignatureStrokes } from '@/lib/signature-strokes';
 
@@ -31,6 +31,9 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
     : [];
   // The customer's own song (packages with `custom_music`) replaces the design's.
   const own = await customSong(db, inv);
+  // The customer's videos, by place (designs with several screens have more than one).
+  const places = videoPlaces(inv, version!.manifest as ThemeManifest);
+  const videos = await customerVideos(db, inv, places);
   return {
     codeRef: version!.codeRef,
     props: buildThemeProps({
@@ -54,9 +57,11 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       wording: inv.wording,
       switchDefs: (version!.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
-      photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id) : [],
+      photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id, { attached: true }) : [],
       photoSpec: limitedPhotoSpec((version!.manifest as ThemeManifest).photos ?? null, inv.photoLimit),
-      video: await customerVideo(db, inv),
+      video: videos[0] ?? null,
+      videos,
+      videoPlaces: places,
       openLabel: pageText(version!.manifest as ThemeManifest, 'open', inv.locale),
     }),
   };

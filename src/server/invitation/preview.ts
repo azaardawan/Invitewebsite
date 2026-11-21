@@ -95,6 +95,8 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     switchDefs: manifest.switches ?? [],
     // A package may sell fewer photos than the design holds (e.g. fewer rooms of a gallery): its preview shows that many.
     photoSpec: manifest.photos && pkg?.photoLimit != null ? { ...manifest.photos, max: Math.min(manifest.photos.max, pkg.photoLimit) } : (manifest.photos ?? null),
+    // As many video places as the package sells (designs with several screens).
+    videoPlaces: Math.min(manifest.videos?.max ?? 1, pkg?.videoLimit ?? manifest.videos?.max ?? 1),
     openLabel: pageText(manifest, 'open', req.locale),
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
   });

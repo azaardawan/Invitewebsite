@@ -170,6 +170,8 @@ export async function storefrontTheme(key: string) {
       lifetime: p.lifetime,
       fieldKeys: p.fieldKeys,
       featureKeys: p.featureKeys,
+      /** The colour sets this package offers (null = all). */
+      paletteIds: p.paletteIds,
       /** Index of this package's designed state, for sample previews. */
       stateIndex: manifest.validStates.findIndex((s) => s.features.length === p.featureKeys.length && s.features.every((f) => p.featureKeys.includes(f)) && s.fields.length === p.fieldKeys.length && s.fields.every((k) => p.fieldKeys.includes(k))),
     })),

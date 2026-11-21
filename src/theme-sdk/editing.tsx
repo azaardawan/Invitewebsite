@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore, type CSSProperties, type ElementType, type MouseEvent, type ReactNode } from 'react';
 import { Photo } from './photo';
+import { ATTACHED_PHOTO_PLACE } from './places';
 import type { ThemePhoto, ThemeVideo } from './types';
 
 /**
@@ -32,7 +33,7 @@ export function useTemplateEditing(): boolean {
 export type EditRequest =
   | { type: 'bahja:edit'; kind: 'text'; key: string; value: string; multiline: boolean }
   | { type: 'bahja:edit'; kind: 'photo'; index: number }
-  | { type: 'bahja:edit'; kind: 'video' };
+  | { type: 'bahja:edit'; kind: 'video'; place: number };
 
 function ask(request: EditRequest) {
   if (window.parent !== window) window.parent.postMessage(request, window.location.origin);
@@ -118,8 +119,8 @@ export function PhotoSlot({
   const on = useTemplateEditing();
   const photo = photos.find((p) => p.index === index);
   if (!on) return photo ? <Photo photo={photo} className={className} style={style} eager={eager} /> : null;
-  // The next free place of this place's set (the whole design without sets).
-  const first = set ? Math.floor(index / set) * set : 0;
+  // The next free place of this place's set (the whole design without sets); an attached photo's place is its own.
+  const first = index >= ATTACHED_PHOTO_PLACE ? index : set ? Math.floor(index / set) * set : 0;
   let free = first;
   while (photos.some((p) => p.index === free)) free++;
   if (!photo && index > free) {
@@ -163,6 +164,7 @@ export function PhotoSlot({
  */
 export function VideoSlot({
   video,
+  place = 0,
   className,
   style,
   fallback,
@@ -170,6 +172,8 @@ export function VideoSlot({
   ...media
 }: {
   video: ThemeVideo | null;
+  /** Its place in `props.videos` (designs with several screens; default 0, the first). */
+  place?: number;
   className?: string;
   style?: CSSProperties;
   fallback?: ReactNode;
@@ -188,11 +192,11 @@ export function VideoSlot({
   const open = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    ask({ type: 'bahja:edit', kind: 'video' });
+    ask({ type: 'bahja:edit', kind: 'video', place });
   };
   return (
     <span
-      data-bahja-video-slot
+      data-bahja-video-slot={place}
       role="button"
       tabIndex={0}
       onClickCapture={open}
