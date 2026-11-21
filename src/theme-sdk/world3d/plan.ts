@@ -102,6 +102,11 @@ export type WorldPlan = {
   /** Meshes (name prefixes) left out of the scene, and meshes a visitor can walk through (rugs, thin strings). */
   hidden?: readonly string[];
   passThrough?: readonly string[];
+  /**
+   * Meshes (name prefixes) a visitor walks past freely though they can be tapped (small things on a table: lipsticks,
+   * candles, popcorn). Floors, ceilings and roofs are never in the way.
+   */
+  walkPast?: readonly string[];
   /** The sky colour seen through openings, and the light. */
   sky: string;
   light: { ambient: number; sun: number; exposure: number };

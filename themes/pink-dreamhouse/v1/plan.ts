@@ -173,8 +173,9 @@ const plates = (tier: Tier) => {
 /** The ceilings: downstairs under the upper floor (round the stairwell), upstairs under the roof. */
 function ceilingsOf(tier: Tier) {
   const c = (y: number, minX: number, maxX: number, minZ: number, maxZ: number) => ({ y, minX, maxX, minZ, maxZ });
-  const DOWN = 3.185;
-  const TOP = 6.57;
+  // A few centimetres under the upper floor and the roof, never on them (two surfaces in one place flicker).
+  const DOWN = 3.15;
+  const TOP = 6.54;
   const living = tier === 'basic' ? [c(DOWN, 0, 4.6, 0, 5.8)] : [c(DOWN, 0, 4.6, 0, 0.58), c(DOWN, 0, 4.6, 4.24, 5.8), c(DOWN, 0, 0.44, 0.58, 4.24), c(DOWN, 1.7, 4.6, 0.58, 4.24)];
   const ground = [...living, c(DOWN, 4.6, 9.2, 0, 5.8), ...(tier === 'basic' ? [] : [c(DOWN, 9.2, 13.8, 0, 5.8)])];
   const upper = tier === 'basic' ? [] : tier === 'vip' ? [c(TOP, 0, 4.6, 0, 5.8)] : [c(TOP, 0, 4.6, 0, 5.8), c(TOP, 4.6, 9.2, 0, 5.8), c(TOP, 9.2, 13.8, 0, 5.8)];
@@ -206,6 +207,11 @@ const MOVES: WorldPlan['moves'] = [
   { nodes: ['INT_GOLDEN_BIRTHDAY_BUTTON'], by: [0.27, 0, 0] },
   // The cake, a little smaller, on its pedestal in the corner behind the stairs.
   { nodes: ['DECOR_CAKE_STAND', 'DECOR_BIRTHDAY_CAKE', 'CAKE_CANDLE', 'CAKE_FLAME'], scale: 0.65, pivot: [1.83, 0.57, 4.0], by: [-0.86, -0.02, 0.85] },
+  // The model's stair steps are overlapping boxes with their sides in one plane (they flickered as visitors moved): each
+  // a hair narrower than the one below it, the top one just under the upper floor.
+  ...Array.from({ length: 11 }, (_, i) => ({ nodes: [`STAIR_STEP_${String(i).padStart(2, '0')}`], scale: 0.998 - i * 0.0012 })),
+  // The gift's lid a little wider than its box, like a real lid (their sides were in one plane).
+  { nodes: ['INT_BIRTHDAY_GIFT_LID'], scale: 1.04 },
   { nodes: ['NAMEPLATE_FRAME_LIVING'], by: [-0.78, 0, 0] },
   { nodes: ['NAMEPLATE_FRAME_KITCHEN'], by: [-0.25, 0, 0] },
   { nodes: ['NAMEPLATE_FRAME_VANITY'], by: [-0.08, 0, 0] },
@@ -261,6 +267,8 @@ export function planFor(tier: Tier): WorldPlan {
       ...(tier === 'vvip' ? ['CEILING_TRIM_02', 'CEILING_TRIM_03'] : []),
     ],
     passThrough: ['RUG_', 'INT_STAIRS_', 'CAKE_FLAME', 'STAIR_STEP', 'STAIR_TREAD', 'DECOR_DOOR_BEDROOM_PLAQUE'],
+    // Small things on tables and cakes never stop a visitor (only the furniture under them does).
+    walkPast: ['DECOR_LIPSTICK', 'DECOR_POPCORN', 'CAKE_CANDLE', 'DECOR_MIRROR_BULB', 'DECOR_BIRTHDAY_CAKE', 'DECOR_GIFT', 'DECOR_KITCHEN_SINK', 'NAMEPLATE_FRAME'],
     // Textured walls, ceilings and floors (owner, 2026-11-19).
     // The owner's wallpapers (stripes on the side walls, small flowers on the back walls) and a light oak floor, in the
     // palette's colours; plain painted ceilings.

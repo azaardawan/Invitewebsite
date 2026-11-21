@@ -58,6 +58,11 @@ export class WorldEngine {
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(72, 1, 0.05, 120);
   private colliders: THREE.Mesh[] = [];
+  /** The footprints of everything in the way (see `touches`), but the things that move. */
+  private solids: THREE.Box3[] = [];
+  private tmpBox = new THREE.Box3();
+  private frameAvg = 16;
+  private framesSince = 0;
   private tappable = new Map<THREE.Object3D, WorldTap>();
   private things = new Map<string, Moving>();
   private screens: (THREE.Mesh | null)[] = [];
@@ -319,8 +324,15 @@ export class WorldEngine {
       this.disposables.push(ink);
       for (const t of this.things.values()) {
         if (t.thing.kind === 'teleport') continue;
-        for (const m of t.meshes) if (m.visible) outline(m, ink);
-        for (const m of meshes) if (m.visible && matches(m.name, t.thing.touch)) outline(m, ink);
+        for (const m of [...t.meshes, ...meshes.filter((x) => matches(x.name, t.thing.touch))]) {
+          if (!m.visible) continue;
+          outline(m, ink);
+          // The faces a hair behind their lines, so the lines don't shimmer as the visitor moves.
+          const mat = m.material as THREE.Material;
+          mat.polygonOffset = true;
+          mat.polygonOffsetFactor = 1;
+          mat.polygonOffsetUnits = 1;
+        }
       }
     }
 
@@ -336,6 +348,13 @@ export class WorldEngine {
         m.geometry.computeBoundsTree();
         if (!this.colliders.includes(m)) this.colliders.push(m);
       }
+    }
+    // What is in the way of walking: the solid parts' footprints (not floors, ceilings or roofs, nor small things).
+    const moving = new Set([...this.things.values()].flatMap((t) => t.meshes));
+    const flat = ['FLOOR', 'CEILING', 'ROOF', 'WORLD_CEILING'];
+    for (const m of this.colliders) {
+      if (moving.has(m) || !m.visible || matches(m.name, flat) || matches(m.name, plan.walkPast)) continue;
+      this.solids.push(new THREE.Box3().setFromObject(m));
     }
   }
 
@@ -632,11 +651,29 @@ export class WorldEngine {
 
   // ---- walking ----
 
-  private blocked(dir: THREE.Vector3, dist: number) {
-    for (const h of [0.3, 0.85, 1.4]) {
-      this.ray.set(new THREE.Vector3(this.pos.x, this.floorY + h, this.pos.z), dir);
-      this.ray.far = dist + RADIUS;
-      if (this.ray.intersectObjects(this.colliders, false).length) return true;
+  /**
+   * Whether a visitor standing at (x, z) on a floor at `y` would touch anything: every solid part of the world is its
+   * footprint (a box on the floor plan, between its bottom and top), and the visitor a circle; only parts between the
+   * ankles and the top of the head count. Boxes rather than rays: nothing thin slips between them, and walls slide.
+   */
+  private touches(x: number, z: number, y: number) {
+    const lo = y + 0.12 * this.size;
+    const hi = y + 1.8;
+    const r = RADIUS;
+    const hit = (b: THREE.Box3) => {
+      if (b.max.y < lo || b.min.y > hi) return false;
+      const dx = Math.max(b.min.x - x, 0, x - b.max.x);
+      const dz = Math.max(b.min.z - z, 0, z - b.max.z);
+      return dx * dx + dz * dz < r * r;
+    };
+    for (const b of this.solids) if (hit(b)) return true;
+    // Things that move (an open door is out of the way).
+    for (const m of this.things.values()) {
+      if (m.thing.kind === 'teleport' || (m.thing.kind === 'door' && m.open)) continue;
+      for (const mesh of m.meshes) {
+        if (!mesh.visible) continue;
+        if (hit(this.tmpBox.setFromObject(mesh))) return true;
+      }
     }
     return false;
   }
@@ -648,12 +685,8 @@ export class WorldEngine {
       if (!len) return false;
       const y = floorAt(this.o.plan, this.pos.x + sx, this.pos.z + sz, this.floorY, this.gates);
       if (y === null) return false;
-      // Low parts on the way up the stairs are the steps themselves: look ahead from the new height.
-      const was = this.floorY;
-      this.floorY = Math.max(was, y);
-      const stop = this.blocked(new THREE.Vector3(sx / len, 0, sz / len), len);
-      this.floorY = was;
-      if (stop) return false;
+      // Already touching something (a door closed on the visitor): any step out is allowed.
+      if (this.touches(this.pos.x + sx, this.pos.z + sz, Math.max(this.floorY, y)) && !this.touches(this.pos.x, this.pos.z, this.floorY)) return false;
       this.pos.x += sx;
       this.pos.z += sz;
       this.floorY = y;
@@ -674,7 +707,9 @@ export class WorldEngine {
   private tick = (now: number) => {
     this.frame = 0;
     if (!this.alive) return;
-    const dt = Math.min((now - this.last) / 1000, 0.05);
+    // Walking keeps its pace on a slower computer too (up to a tenth of a second a frame).
+    const frameMs = now - this.last;
+    const dt = Math.min(frameMs / 1000, 0.1);
     this.last = now;
     let moving = false;
 
@@ -723,6 +758,7 @@ export class WorldEngine {
       this.camera.position.copy(this.pos);
       this.camera.rotation.set(this.pitch, this.yaw, 0);
       this.renderer.render(this.scene, this.camera);
+      if (moving) this.adapt(frameMs);
       this.dirty = false;
     }
     if (moving) this.kick();
@@ -782,6 +818,26 @@ export class WorldEngine {
     if (keys.join() === this.near) return;
     this.near = keys.join();
     this.o.onNear(keys);
+  }
+
+  /**
+   * Keeps walking smooth: when frames come slowly (a computer drawing a large screen), the picture is drawn a little less
+   * sharp, and sharper again when there is time to spare.
+   */
+  private adapt(frameMs: number) {
+    if (frameMs <= 0 || frameMs > 250) return;
+    this.frameAvg = this.frameAvg * 0.92 + frameMs * 0.08;
+    if (++this.framesSince < 45) return;
+    const ratio = this.renderer.getPixelRatio();
+    const best = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    let next = ratio;
+    if (this.frameAvg > 24 && ratio > 0.6) next = Math.max(0.6, ratio - 0.2);
+    else if (this.frameAvg < 13 && ratio < best) next = Math.min(best, ratio + 0.1);
+    if (next !== ratio) {
+      this.renderer.setPixelRatio(next);
+      this.resize();
+      this.framesSince = 0;
+    }
   }
 
   /** Tells the design when the visitor walks into another room. */
