@@ -93,7 +93,7 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
       {cards.length ? (
         <ThemeCards
           cards={cards}
-          labels={{ title: t('cardsTitle'), intro: t('cardsIntro'), front: t('cardFront'), back: t('cardBack'), includedIn: t('cardsIncludedIn'), open: t('cardOpen') }}
+          labels={{ title: t('cardsTitle'), intro: t('cardsIntro'), front: t('cardSideFront'), back: t('cardSideBack'), includedIn: t('cardsIncludedIn'), open: t('cardOpen') }}
         />
       ) : null}
       {whatsapp ? (

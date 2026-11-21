@@ -2153,7 +2153,7 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `store.cardsTitle` | The printed cards in this design | کارتە چاپکراوەکانی ئەم دیزاینە | کارتێن چاپکری یێن ڤی دیزاینی |
 | `store.cardsIntro` | Every card this design offers, front and back, with example names. Yours shows your own names and details. | هەموو ئەو کارتانەی ئەم دیزاینە پێشکەشی دەکات، ڕوو و پشت، بە ناوی نموونە. کارتەکەی ئێوە ناو و وردەکارییەکانی خۆتان پیشان دەدات. | هەمی ئەو کارتێن ئەڤ دیزاینە پێشکێش دکەت، ڕوو و پشت، ب ناڤێن نموونە. کارتا هەوە ناڤ و هویربینیێن هەوە نیشان ددەت. |
 | `store.cardA5` | Printable card (A5) | کارتی چاپ (A5) | کارتا چاپێ (A5) |
-| `store.cardFront` | Front | ڕوو | ڕوو |
-| `store.cardBack` | Back | پشت | پشت |
+| `store.cardSideFront` | Front | ڕوو | ڕوو |
+| `store.cardSideBack` | Back | پشت | پشت |
 | `store.cardsIncludedIn` | In: | لە: | د: |
 | `store.cardOpen` | opens full size | بە قەبارەی تەواو دەکرێتەوە | ب قەبارێ تەمام ڤەدبیت |
