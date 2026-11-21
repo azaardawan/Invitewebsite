@@ -26,11 +26,15 @@ import { accessCodeFor, formatAccessCode } from '@/server/orders/tokens';
 import { Badge, Card } from '@/components/admin/bits';
 import { ActionForm, SubmitButton } from '@/components/admin/forms';
 import { reissueLinksAction } from '@/app/admin/_actions/orders';
+import { guestPhotoSummary } from '@/server/guest-photos/service';
+import { BASE_CAP, DEFAULT_PER_GUEST, PER_GUEST_OPTIONS, STEP } from '@/catalog/guest-photos';
 import {
   cardOptionsAction,
   editInvitationAction,
   extendInvitationAction,
   removePhotoAction,
+  guestPhotosAction,
+  removeGuestPhotoAction,
   removeSongAction,
   removeCustomCardAction,
   guestMessageStatusAction,
@@ -76,6 +80,7 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
   const canModerate = can(authz, 'guests.moderate');
   // The customer's photos (packages with `photos`): looked at here, and taken off when unsuitable.
   const photos = inv.featureKeys.includes('photos') ? await listPhotos(db(), inv.id) : null;
+  const guestPhotos = await guestPhotoSummary(db(), inv.id);
   const canEdit = can(authz, 'invitations.edit');
   const canReissue = can(authz, 'payments.override');
   const to = await getTranslations('admin.orders');
@@ -190,6 +195,86 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
             ) : null}
           </p>
         ))}
+      </Card>
+
+      <Card className="space-y-3" data-admin-guest-photos>
+        <h2 className="font-semibold">{t('guestPhotosTitle')}</h2>
+        {guestPhotos ? (
+          <p className="text-sm text-muted">
+            {t('guestPhotosState', { photos: guestPhotos.total, guests: guestPhotos.groups.length, cap: guestPhotos.cap, perGuest: guestPhotos.perGuest })}
+            {guestPhotos.uploadToken ? (
+              <>
+                {' · '}
+                <a href={`/g/${guestPhotos.uploadToken}`} target="_blank" rel="noopener" className="underline">
+                  {t('guestPhotosPage')}
+                </a>
+              </>
+            ) : null}
+          </p>
+        ) : (
+          <p className="text-sm text-muted">{t('guestPhotosNone')}</p>
+        )}
+        {canEdit ? (
+          <details>
+            <summary className="cursor-pointer text-sm text-accent">{guestPhotos ? t('guestPhotosChange') : t('guestPhotosAdd')}</summary>
+            <ActionForm action={guestPhotosAction} className="mt-3 space-y-3">
+              <input type="hidden" name="id" value={inv.id} />
+              <div className="flex flex-wrap gap-3">
+                <label className="block text-sm">
+                  <span className="mb-1 block">{t('guestPhotosCap', { base: BASE_CAP, step: STEP })}</span>
+                  <input name="cap" inputMode="numeric" dir="ltr" defaultValue={guestPhotos?.cap ?? BASE_CAP} className="w-32 rounded-md border border-line bg-surface px-3 py-2" />
+                </label>
+                <label className="block text-sm">
+                  <span className="mb-1 block">{t('guestPhotosPerGuest')}</span>
+                  <select name="perGuest" defaultValue={guestPhotos?.perGuest ?? DEFAULT_PER_GUEST} className="rounded-md border border-line bg-surface px-3 py-2">
+                    {PER_GUEST_OPTIONS.map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              {reason}
+              <div className="flex flex-wrap gap-2">
+                <SubmitButton>{t('guestPhotosSave')}</SubmitButton>
+                {guestPhotos ? (
+                  <button name="off" value="1" className="rounded-md border border-danger px-4 py-2 text-sm text-danger">
+                    {t('guestPhotosOff')}
+                  </button>
+                ) : null}
+              </div>
+            </ActionForm>
+          </details>
+        ) : null}
+        {guestPhotos?.groups.length ? (
+          <ul className="space-y-3">
+            {guestPhotos.groups.map((g) => (
+              <li key={g.name} className="space-y-2">
+                <p className="text-sm font-medium">
+                  {g.name} · {g.photos.length}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {g.photos.map((p) => (
+                    <div key={p.id} className="w-24 space-y-1 text-xs">
+                      <a href={`/admin/guest-photos/${p.id}`} target="_blank" rel="noopener" className="block aspect-square overflow-hidden rounded border border-line bg-canvas">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- a guest's photo, through Admin */}
+                        <img src={`/admin/guest-photos/${p.id}?thumb=1`} alt={g.name} loading="lazy" className="size-full object-cover" />
+                      </a>
+                      {canEdit ? (
+                        <ActionForm action={removeGuestPhotoAction} confirmMessage={t('photoRemoveConfirm')}>
+                          <input type="hidden" name="id" value={inv.id} />
+                          <input type="hidden" name="photo" value={p.id} />
+                          <SubmitButton tone="danger">{t('photoRemove')}</SubmitButton>
+                        </ActionForm>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </Card>
 
       {photos ? (

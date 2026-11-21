@@ -56,6 +56,7 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
   if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
   if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');
+  if (form.has('gp.sent')) extras.guestPhotos = { on: form.get('gp.on') === '1', cap: Number(str(form, 'gp.cap')), perGuest: Number(str(form, 'gp.perGuest')) };
   // The design's changeable lines: radio `w.<key>` (ar | lang | custom) and the text `w.<key>.text`.
   for (const [k, v] of form.entries()) {
     const key = /^w\.([a-zA-Z0-9]+)$/.exec(k)?.[1];

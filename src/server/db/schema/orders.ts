@@ -151,6 +151,14 @@ export const invitations = pgTable(
     musicOff: boolean('music_off').notNull().default(false),
     /** Edits the customer made themselves after publishing (packages with `self_edit`). */
     selfEdits: integer('self_edits').notNull().default(0),
+    /**
+     * Guest photo sharing (add-on, src/catalog/guest-photos.ts): the most photos all guests may upload and each guest
+     * phone's share, both null when not bought; `guest_photos_token` the unguessable part of the upload page's address
+     * (`/g/<token>`), made when it is bought. The price paid is in the order's snapshot.
+     */
+    guestPhotosCap: integer('guest_photos_cap'),
+    guestPhotosPerGuest: integer('guest_photos_per_guest'),
+    guestPhotosToken: text('guest_photos_token').unique(),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */
     cardCustomKey: text('card_custom_key'),
     /** Optimistic locking for concurrent admin edits. */

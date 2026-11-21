@@ -5,6 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
+import { getSettings } from '@/server/settings/service';
+import { validCap, validPerGuest } from '@/catalog/guest-photos';
+import { removeGuestPhoto, setGuestPhotosByAdmin } from '@/server/guest-photos/service';
 import { requestContext } from '@/server/auth/request-context';
 import {
   changeInvitationMusic,
@@ -187,3 +190,33 @@ export async function removePhotoAction(_: ActionState, form: FormData): Promise
   }
 }
 
+
+/** Add guest photo sharing to an order (or change its size, or take it off). */
+export async function guestPhotosAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  const id = uuid.safeParse(form.get('id'));
+  if (!id.success) return { error: 'invitations.errors.notFound' };
+  const off = form.get('off') === '1';
+  const cap = Number(form.get('cap'));
+  const perGuest = Number(form.get('perGuest'));
+  const { guestPhotos: pricing } = await getSettings(db());
+  if (!off && (!validCap(cap, pricing) || !validPerGuest(perGuest))) return { error: 'invitations.guestPhotosInvalid' };
+  await setGuestPhotosByAdmin(db(), id.data, off ? null : { cap, perGuest }, { adminId: user.id, ipHash: (await requestContext()).ipHash }, reasonOf(form));
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+/** Remove one guest photo (e.g. reported). Audited. */
+export async function removeGuestPhotoAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  const id = uuid.safeParse(form.get('id'));
+  const photo = uuid.safeParse(form.get('photo'));
+  if (!id.success || !photo.success) return { error: 'invitations.errors.notFound' };
+  try {
+    await removeGuestPhoto(db(), id.data, photo.data, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+  } catch {
+    return { error: 'invitations.errors.notFound' };
+  }
+  revalidatePath(`/admin/invitations/${id.data}`);
+  return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}

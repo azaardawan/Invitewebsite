@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
+import { GuestPhotosAddon } from './GuestPhotosAddon';
 import { fieldOptions, INITIALS_MAX, isOptionalField, PLACE_FIELDS, PLACE_TOGGLE, placeChosen, splitInitials } from '@/catalog/fields';
 
 /** `optional`: the customer may leave it empty in this design (the Field Library's optional fields and the design's own). */
@@ -47,6 +48,8 @@ export type OrderFormExtras = {
   switches?: { key: string; label: string; on: boolean }[];
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
+  /** Guest photo sharing (add-on, while the owner offers it): the owner's prices and what is chosen so far. */
+  guestPhotos?: { pricing: { basePriceIqd: number; stepPriceIqd: number; maxCap: number }; current: { cap: number; perGuest: number } | null };
 };
 type State = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };
 
@@ -88,6 +91,9 @@ export function OrderForm({
   const isPlace = (key: string) => optionalPlace && (PLACE_FIELDS as readonly string[]).includes(key);
   const [placeOn, setPlaceOn] = useState(() => placeChosen(values));
   const firstPlace = fields.find((f) => isPlace(f.key))?.key;
+  // The form's parts (owner, 2026-11-21): the online invitation, then the printable card, then the add-ons; headed
+  // when there is more than the invitation.
+  const sections = Boolean(extras.cardShape || extras.cardBack || extras.guestPhotos);
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
@@ -100,6 +106,9 @@ export function OrderForm({
         </p>
       ) : null}
 
+      {sections ? (
+        <h2 className="mt-2 border-b border-line pb-2 font-display text-[26px] font-bold text-heading">{t('formSections.invitation')}</h2>
+      ) : null}
       {occasions?.length ? (
         <fieldset className="flex flex-col gap-3" aria-describedby={errors.occasion ? 'occasion-err' : undefined}>
           <legend className="text-[15px] font-medium text-heading">{t('occasionQuestion')}</legend>
@@ -221,75 +230,6 @@ export function OrderForm({
         );
       })}
 
-      {extras.cardShape ? (
-        <fieldset className="flex flex-col gap-3">
-          <legend className="text-[15px] font-medium text-heading">{t('cardShape.heading')}</legend>
-          <p className="text-sm text-muted">{t('cardShape.help')}</p>
-          {/* Tells the server the section was sent, so ticking nothing is an error rather than "no choice". */}
-          <input type="hidden" name="cardChoicesSent" value="1" />
-          <div className="flex flex-wrap gap-3" data-card-choices>
-            {[{ key: 'a5', label: t('cardShape.card'), widthMm: 148, heightMm: 210, outline: 'M0 0 L148 0 L148 210 L0 210 Z' }, ...extras.cardShape.options].map((o) => (
-              <label
-                key={o.key}
-                className="relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
-              >
-                <input
-                  type="checkbox"
-                  name="cardChoices"
-                  value={o.key}
-                  defaultChecked={(values.cardChoices !== undefined ? values.cardChoices.split(',') : extras.cardShape!.current).includes(o.key)}
-                  className="peer sr-only"
-                />
-                {/* A tick in the corner of each chosen card: several can be chosen. */}
-                <span aria-hidden className="absolute top-2 end-2 hidden size-5 items-center justify-center rounded-full bg-accent text-white peer-checked:flex">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12l5 5 9-10" />
-                  </svg>
-                </span>
-                <svg aria-hidden viewBox={`-2 -2 ${o.widthMm + 4} ${o.heightMm + 4}`} className="h-14 w-14 text-accent" preserveAspectRatio="xMidYMid meet">
-                  <path d={o.outline} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
-                </svg>
-                <span className="text-sm font-medium">{o.label}</span>
-                {o.key !== 'a5' ? (
-                  <span className="text-xs text-muted" dir="ltr">
-                    {t('cardShape.size', { w: Math.round(o.widthMm / 10), h: Math.round(o.heightMm / 10) })}
-                  </span>
-                ) : (
-                  <span className="text-xs text-muted">A5</span>
-                )}
-              </label>
-            ))}
-          </div>
-          {errors.cardChoices ? <p className="text-sm text-danger">{t(errors.cardChoices === 'required' ? 'cardShape.required' : 'fieldErrors.invalidText')}</p> : null}
-        </fieldset>
-      ) : null}
-
-      {extras.sticker ? (
-        <fieldset className="flex flex-col gap-3">
-          <legend className="text-[15px] font-medium text-heading">{t('stickerShape.heading')}</legend>
-          <p className="text-sm text-muted">{t('stickerShape.help')}</p>
-          <div className="flex flex-wrap gap-3">
-            {(['round', 'square', 'both'] as const).map((shape) => (
-              <label
-                key={shape}
-                className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
-              >
-                <input type="radio" name="stickerShape" value={shape} defaultChecked={(values.stickerShape || extras.sticker!.current) === shape} className="sr-only" />
-                {shape === 'both' ? (
-                  <span aria-hidden className="flex gap-1">
-                    <span className="block size-10 rounded-full border-2 border-accent bg-blush" />
-                    <span className="block size-10 rounded-md border-2 border-accent bg-blush" />
-                  </span>
-                ) : (
-                  <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
-                )}
-                <span className="text-sm font-medium">{t(`stickerShape.${shape}`)}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ) : null}
-
       {extras.wording ? <DesignWording extra={extras.wording} lang={lang} values={state.values} errors={errors} /> : null}
 
       {extras.switches?.length ? (
@@ -370,6 +310,91 @@ export function OrderForm({
         />
       ) : null}
 
+      {extras.sticker ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-[15px] font-medium text-heading">{t('stickerShape.heading')}</legend>
+          <p className="text-sm text-muted">{t('stickerShape.help')}</p>
+          <div className="flex flex-wrap gap-3">
+            {(['round', 'square', 'both'] as const).map((shape) => (
+              <label
+                key={shape}
+                className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20"
+              >
+                <input type="radio" name="stickerShape" value={shape} defaultChecked={(values.stickerShape || extras.sticker!.current) === shape} className="sr-only" />
+                {shape === 'both' ? (
+                  <span aria-hidden className="flex gap-1">
+                    <span className="block size-10 rounded-full border-2 border-accent bg-blush" />
+                    <span className="block size-10 rounded-md border-2 border-accent bg-blush" />
+                  </span>
+                ) : (
+                  <span aria-hidden className={`block size-10 border-2 border-accent bg-blush ${shape === 'round' ? 'rounded-full' : 'rounded-md'}`} />
+                )}
+                <span className="text-sm font-medium">{t(`stickerShape.${shape}`)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
+      <div className="flex flex-col gap-2">
+        <label htmlFor="invitationLocale" className="text-[15px] font-medium text-heading">
+          {t('languageLabel')}
+        </label>
+        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} onChange={(e) => setLang(e.target.value as Locale)} className={inputCls}>
+          {locales.map((l) => (
+            <option key={l} value={l}>
+              {localeMeta[l].autonym}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {sections && (extras.cardShape || extras.cardBack) ? (
+        <h2 className="mt-4 border-b border-line pb-2 font-display text-[26px] font-bold text-heading">{t('formSections.card')}</h2>
+      ) : null}
+      {extras.cardShape ? (
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-[15px] font-medium text-heading">{t('cardShape.heading')}</legend>
+          <p className="text-sm text-muted">{t('cardShape.help')}</p>
+          {/* Tells the server the section was sent, so ticking nothing is an error rather than "no choice". */}
+          <input type="hidden" name="cardChoicesSent" value="1" />
+          <div className="flex flex-wrap gap-3" data-card-choices>
+            {[{ key: 'a5', label: t('cardShape.card'), widthMm: 148, heightMm: 210, outline: 'M0 0 L148 0 L148 210 L0 210 Z' }, ...extras.cardShape.options].map((o) => (
+              <label
+                key={o.key}
+                className="relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3 has-[:checked]:border-accent has-[:checked]:ring-2 has-[:checked]:ring-accent/20 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
+              >
+                <input
+                  type="checkbox"
+                  name="cardChoices"
+                  value={o.key}
+                  defaultChecked={(values.cardChoices !== undefined ? values.cardChoices.split(',') : extras.cardShape!.current).includes(o.key)}
+                  className="peer sr-only"
+                />
+                {/* A tick in the corner of each chosen card: several can be chosen. */}
+                <span aria-hidden className="absolute top-2 end-2 hidden size-5 items-center justify-center rounded-full bg-accent text-white peer-checked:flex">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12l5 5 9-10" />
+                  </svg>
+                </span>
+                <svg aria-hidden viewBox={`-2 -2 ${o.widthMm + 4} ${o.heightMm + 4}`} className="h-14 w-14 text-accent" preserveAspectRatio="xMidYMid meet">
+                  <path d={o.outline} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+                </svg>
+                <span className="text-sm font-medium">{o.label}</span>
+                {o.key !== 'a5' ? (
+                  <span className="text-xs text-muted" dir="ltr">
+                    {t('cardShape.size', { w: Math.round(o.widthMm / 10), h: Math.round(o.heightMm / 10) })}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted">A5</span>
+                )}
+              </label>
+            ))}
+          </div>
+          {errors.cardChoices ? <p className="text-sm text-danger">{t(errors.cardChoices === 'required' ? 'cardShape.required' : 'fieldErrors.invalidText')}</p> : null}
+        </fieldset>
+      ) : null}
+
       {extras.cardBack ? (
         <fieldset className="flex flex-col gap-4 rounded-[22px] border border-line bg-paper px-5 py-4">
           <legend className="px-1 text-[15px] font-medium text-heading">{t('cardBack.heading')}</legend>
@@ -410,18 +435,7 @@ export function OrderForm({
         </fieldset>
       ) : null}
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="invitationLocale" className="text-[15px] font-medium text-heading">
-          {t('languageLabel')}
-        </label>
-        <select id="invitationLocale" name="invitationLocale" defaultValue={invitationLocale} onChange={(e) => setLang(e.target.value as Locale)} className={inputCls}>
-          {locales.map((l) => (
-            <option key={l} value={l}>
-              {localeMeta[l].autonym}
-            </option>
-          ))}
-        </select>
-      </div>
+      {extras.guestPhotos ? <GuestPhotosAddon pricing={extras.guestPhotos.pricing} current={extras.guestPhotos.current} error={errors.guestPhotos} /> : null}
 
       <button
         type="submit"
