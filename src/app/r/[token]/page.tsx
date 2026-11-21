@@ -1,3 +1,5 @@
+import { guestPhotoSummary } from '@/server/guest-photos/service';
+import { RemoveGuestPhoto } from '@/components/guest-photos/RemoveGuestPhoto';
 import { ANY_POSTER_FEATURES } from '@/catalog/posters';
 import { after } from 'next/server';
 import { isForever } from '@/catalog/lifetime';
@@ -117,6 +119,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   const names = [v.person_1_name, v.person_2_name].filter(Boolean).join(' ♡ ') || v.baby_name || '';
   const rawDate = v.event_date || v.birth_date || '';
   const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? date(new Date(`${rawDate}T12:00:00Z`)) : '';
+  // Guest photo sharing (add-on): the guests' photos, the ZIP and the photo QR code.
+  const guestPhotos = paid ? await guestPhotoSummary(db(), r.invitation.id) : null;
   const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_') || (ANY_POSTER_FEATURES as readonly string[]).includes(k));
   // The sections a paid customer jumps between (a sticky row of chips; each section scrolls into place below it).
   const nav = paid
@@ -125,6 +129,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         r.invitation.selfEdit.included ? ['edit', t('navEdit')] : null,
         replies ? ['attendance', t('navReplies')] : null,
         r.invitation.hasMessages ? ['guestbook', t('navGuestbook')] : null,
+        guestPhotos ? ['guest-photos', t('navGuestPhotos')] : null,
         files.length ? ['files', t('navFiles')] : null,
         hasExtras ? ['extras', t('navExtras')] : null,
         ['details', t('navDetails')],
@@ -311,6 +316,62 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
               </>
             ) : (
               <p className="text-sm text-muted">{r.invitation.selfEdit.left === 0 ? t('editLimitReached') : t('editClosed')}</p>
+            )}
+          </section>
+        ) : null}
+
+        {guestPhotos ? (
+          <section id="guest-photos" className={`${card} space-y-4 print:hidden`} data-guest-photos>
+            <div className="space-y-1">
+              <h2 className="font-semibold">{t('guestPhotos.title')}</h2>
+              <p className="text-sm text-muted">
+                {t('guestPhotos.count', { photos: guestPhotos.total, guests: guestPhotos.groups.length, cap: guestPhotos.cap })}
+                {guestPhotos.window.closesAt ? ` · ${t(guestPhotos.window.open ? 'guestPhotos.openUntil' : 'guestPhotos.closedOn', { date: date(guestPhotos.window.closesAt) })}` : ''}
+              </p>
+              <div className="h-2 overflow-hidden rounded-full bg-blush">
+                <i className="block h-full bg-accent" style={{ width: `${Math.min(100, (guestPhotos.total / guestPhotos.cap) * 100)}%` }} />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {guestPhotos.total ? (
+                <a href={`/r/${token}/guest-photos/zip`} className="inline-flex h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-accent-ink">
+                  {t('guestPhotos.download')}
+                </a>
+              ) : null}
+              <a href={`/r/${token}/guest-photos/qr`} className="inline-flex h-11 items-center rounded-full border border-accent px-5 text-sm font-semibold text-accent">
+                {t('guestPhotos.qr')}
+              </a>
+            </div>
+            <p className="text-xs text-muted">{t('guestPhotos.help', { perGuest: guestPhotos.perGuest })}</p>
+            {guestPhotos.expiresAt ? <p className="text-xs text-muted">{t('guestPhotos.keptUntil', { date: date(guestPhotos.expiresAt) })}</p> : null}
+            {guestPhotos.groups.length ? (
+              <ul className="space-y-4">
+                {guestPhotos.groups.map((g) => (
+                  <li key={g.name} className="space-y-2 border-t border-line pt-3">
+                    <p className="flex items-center justify-between text-sm">
+                      <b>{g.name}</b>
+                      <span className="rounded-full bg-blush px-2.5 py-0.5 text-xs text-accent">{t('guestPhotos.photos', { n: g.photos.length })}</span>
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                      {g.photos.map((p) => (
+                        <div key={p.id} className="relative aspect-square overflow-hidden rounded-lg bg-blush">
+                          <a href={`/r/${token}/guest-photos/${p.id}?full=1`} target="_blank" rel="noopener">
+                            {p.thumbKey ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={`/r/${token}/guest-photos/${p.id}`} alt={g.name} loading="lazy" className="size-full object-cover" />
+                            ) : (
+                              <span className="flex size-full items-center justify-center p-2 text-center text-xs text-muted">{t('guestPhotos.noPicture')}</span>
+                            )}
+                          </a>
+                          <RemoveGuestPhoto url={`/r/${token}/guest-photos/${p.id}`} label={t('guestPhotos.remove')} confirm={t('guestPhotos.removeConfirm')} />
+                        </div>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-line px-4 py-5 text-center text-sm text-muted">{t('guestPhotos.none')}</p>
             )}
           </section>
         ) : null}

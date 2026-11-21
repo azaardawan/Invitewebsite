@@ -2157,3 +2157,58 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `store.cardSideBack` | Back | پشت | پشت |
 | `store.cardsIncludedIn` | In: | لە: | د: |
 | `store.cardOpen` | opens full size | بە قەبارەی تەواو دەکرێتەوە | ب قەبارێ تەمام ڤەدبیت |
+
+## Batch 66 — guest photo sharing (the order form's add-on and parts, the guests' upload page, the couple's photos on the receipt) — ✅ AUTO-APPROVED (2026-11-21, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `store.formSections.invitation` | Online invitation | بانگهێشتنامەی ئۆنلاین | داخوازنامەیا ئۆنلاین |
+| `store.formSections.card` | Printable card | کارتی چاپکراو | کارتا چاپکری |
+| `store.guestPhotos.addOn` | Add-on | زیادکراو | زێدەکری |
+| `store.guestPhotos.title` | Guest photo sharing | هاوبەشکردنی وێنەی میوانەکان | پارڤەکرنا وێنەیێن مێڤانان |
+| `store.guestPhotos.help` | Guests scan a QR code at your event and send their photos straight to you. You download them all, a folder per guest. | میوانەکان کۆدی QR لە بۆنەکەتان سکان دەکەن و وێنەکانیان ڕاستەوخۆ بۆتان دەنێرن. هەموویان دادەگرن، بۆ هەر میوانێک فۆڵدەرێک. | مێڤان کۆدێ QR ل بۆنا هەوە سکان دکەن و وێنەیێن خۆ ڕاستەوخۆ بۆ هەوە دهنێرن. هوین هەمییان دادگرن، بۆ هەر مێڤانەکی فۆلدەرەک. |
+| `store.guestPhotos.perGuest` | Photos per guest | ژمارەی وێنە بۆ هەر میوانێک | ژمارا وێنەیان بۆ هەر مێڤانەکی |
+| `store.guestPhotos.total` | Photos in total | کۆی وێنەکان | کۆیا وێنەیان |
+| `store.guestPhotos.rate` | +<price></price> per {step} over {base} | +<price></price> بۆ هەر {step} لە سەرووی {base} | +<price></price> بۆ هەر {step} ل سەر {base} |
+| `store.guestPhotos.fewer` | Fewer photos | وێنەی کەمتر | وێنەیێن کێمتر |
+| `store.guestPhotos.more` | More photos | وێنەی زیاتر | وێنەیێن پتر |
+| `store.guestPhotos.price` | Photo sharing | هاوبەشکردنی وێنە | پارڤەکرنا وێنەیان |
+| `store.guestPhotos.includes` | Up to {base} photos at the basic price. You get the photo QR code as a picture, to share or print. | تا {base} وێنە بە نرخی بنەڕەتی. کۆدی QRی وێنەکان وەک وێنەیەک وەردەگرن بۆ هاوبەشکردن یان چاپکردن. | هەتا {base} وێنە ب بهایێ بنەڕەتی. هوین کۆدێ QR یێ وێنەیان وەک وێنەیەکێ وەردگرن بۆ پارڤەکرن یان چاپکرنێ. |
+| `store.guestPhotos.invalid` | Please check the photo sharing choice. | تکایە هەڵبژاردنی هاوبەشکردنی وێنە بپشکنە. | هیڤییە هەلبژارتنا پارڤەکرنا وێنەیان بپشکنن. |
+| `receipt.navGuestPhotos` | Guest photos | وێنەی میوانەکان | وێنەیێن مێڤانان |
+| `receipt.guestPhotos.title` | Your guests' photos | وێنەی میوانەکانتان | وێنەیێن مێڤانێن هەوە |
+| `receipt.guestPhotos.count` | {photos, plural, one {# photo} other {# photos}} from {guests, plural, one {# guest} other {# guests}} · up to {cap} | وێنەکان: {photos} · میوانەکان: {guests} · تا {cap} | وێنە: {photos} · مێڤان: {guests} · هەتا {cap} |
+| `receipt.guestPhotos.openUntil` | open until {date} | بارکردن کراوەیە تا {date} | بارکرن ڤەکرییە هەتا {date} |
+| `receipt.guestPhotos.closedOn` | closed on {date} | بارکردن داخرا لە {date} | بارکرن هاتە گرتن ل {date} |
+| `receipt.guestPhotos.download` | Download all (ZIP, a folder per guest) | داگرتنی هەموو (ZIP، بۆ هەر میوانێک فۆڵدەرێک) | داگرتنا هەمییان (ZIP، بۆ هەر مێڤانەکی فۆلدەرەک) |
+| `receipt.guestPhotos.qr` | Photo QR code (PNG) | کۆدی QRی وێنەکان (PNG) | کۆدێ QR یێ وێنەیان (PNG) |
+| `receipt.guestPhotos.help` | Guests scan the photo QR code, type their name and send up to {perGuest} photos each. Refresh this page to see new ones. | میوانەکان کۆدی QRی وێنەکان سکان دەکەن، ناویان دەنووسن و هەر یەکێک تا {perGuest} وێنە دەنێرێت. ئەم پەڕەیە نوێ بکەنەوە بۆ بینینی وێنە نوێیەکان. | مێڤان کۆدێ QR یێ وێنەیان سکان دکەن، ناڤێ خۆ دنڤیسن و هەر ئێک هەتا {perGuest} وێنەیان دهنێریت. ڤێ پەڕێ نوو بکەن بۆ دیتنا وێنەیێن نوو. |
+| `receipt.guestPhotos.keptUntil` | Photos are kept while your invitation is online, until {date}. Download them before then. | وێنەکان دەمێننەوە تا بانگهێشتنامەکەتان ئۆنلاینە، تا {date}. پێش ئەو کاتە دایانبگرن. | وێنە دمینن هەتا داخوازنامەیا هەوە ئۆنلاین بیت، هەتا {date}. بەری هنگێ دابگرن. |
+| `receipt.guestPhotos.photos` | {n, plural, one {# photo} other {# photos}} | {n, plural, one {# وێنە} other {# وێنە}} | {n, plural, one {# وێنە} other {# وێنە}} |
+| `receipt.guestPhotos.noPicture` | iPhone photo (in the download) | وێنەی ئایفۆن (لە داگرتنەکەدایە) | وێنەیێ ئایفۆنێ (د داگرتنێ دایە) |
+| `receipt.guestPhotos.remove` | Remove this photo | سڕینەوەی ئەم وێنەیە | ژێبرنا ڤێ وێنەی |
+| `receipt.guestPhotos.removeConfirm` | Remove this photo? It can't be brought back. | ئەم وێنەیە بسڕدرێتەوە؟ ناگەڕێتەوە. | ئەڤ وێنەیە بهێتە ژێبرن؟ ناهێتە زڤڕاندن. |
+| `receipt.guestPhotos.none` | No photos yet. Share the photo QR code with your guests. | هێشتا هیچ وێنەیەک نییە. کۆدی QRی وێنەکان لەگەڵ میوانەکانتان هاوبەش بکەن. | هێشتا چ وێنە نینن. کۆدێ QR یێ وێنەیان دگەل مێڤانێن خۆ پارڤە بکەن. |
+| `guestPhotos.shareWith` | Share your photos with | وێنەکانتان هاوبەش بکەن لەگەڵ | وێنەیێن خۆ پارڤە بکەن دگەل |
+| `guestPhotos.onlyThey` | Only they will see them | تەنها ئەوان دەیانبینن | بتنێ ئەو دبینن |
+| `guestPhotos.name` | Your name | ناوتان | ناڤێ هەوە |
+| `guestPhotos.namePlaceholder` | So they know who sent them | بۆ ئەوەی بزانن کێ ناردوویەتی | دا بزانن کێ هنارتینە |
+| `guestPhotos.take` | 📷 Take a photo | 📷 وێنەیەک بگرن | 📷 وێنەیەکێ بگرن |
+| `guestPhotos.choose` | Choose from your phone | لە مۆبایلەکەتان هەڵبژێرن | ژ مۆبایلا خۆ هەلبژێرن |
+| `guestPhotos.yours` | Your photos | وێنەکانتان | وێنەیێن هەوە |
+| `guestPhotos.count` | {n} of {max} | {n} لە {max} | {n} ژ {max} |
+| `guestPhotos.remove` | Remove this photo | سڕینەوەی ئەم وێنەیە | ژێبرنا ڤێ وێنەی |
+| `guestPhotos.removeUntil` | You can remove your own photos until uploading closes on {date}. | دەتوانن وێنەکانی خۆتان بسڕنەوە تا بارکردن دادەخرێت لە {date}. | هوین دشێن وێنەیێن خۆ ژێببەن هەتا بارکرن دهێتە گرتن ل {date}. |
+| `guestPhotos.sending` | Sending… | ناردن… | هنارتن… |
+| `guestPhotos.needName` | Please type your name first. | تکایە سەرەتا ناوتان بنووسن. | هیڤییە بەری هەمییان ناڤێ خۆ بنڤیسن. |
+| `guestPhotos.notYet` | Uploading opens on {date}. | بارکردن لە {date} دەکرێتەوە. | بارکرن ل {date} ڤەدبیت. |
+| `guestPhotos.closed` | Uploading has closed. Thank you! | بارکردنی وێنە داخرا. سوپاس! | بارکرنا وێنەیان هاتە گرتن. سوپاس! |
+| `guestPhotos.noPicture` | iPhone photo (sent) | وێنەی ئایفۆن (نێردرا) | وێنەیێ ئایفۆنێ (هاتە هنارتن) |
+| `guestPhotos.consent` | By uploading, you confirm you took these photos and agree to share them with the couple. Please don't upload photos of anyone who wouldn't want them shared. Photos are kept while the invitation is online, then deleted. | بە بارکردن پشتڕاستی دەکەنەوە کە ئەم وێنانەتان گرتووە و ڕازین بە هاوبەشکردنیان لەگەڵ خاوەنی بۆنەکە. تکایە وێنەی ئەو کەسانە بار مەکەن کە نایانەوێت. وێنەکان دەمێننەوە تا بانگهێشتنامەکە ئۆنلاینە، پاشان دەسڕدرێنەوە. | ب بارکرنێ هوین پشتڕاست دکەن کو هەوە ئەڤ وێنە گرتینە و هوین ڕازینە ب پارڤەکرنا وان دگەل خودانێن بۆنێ. هیڤییە وێنەیێن وان کەسان بار نەکەن یێن نەڤێن. وێنە دمینن هەتا داخوازنامە ئۆنلاین بیت، پاشان دهێنە ژێبرن. |
+| `guestPhotos.errors.full` | The album is full: no more photos can be added. | ئەلبومەکە پڕ بووە: ناتوانرێت وێنەی تر زیاد بکرێت. | ئەلبۆم تژی بوو: چ وێنەیێن دی نائێنە زێدەکرن. |
+| `guestPhotos.errors.shareUsed` | You have sent all your photos. Remove one to send another. | هەموو وێنەکانتان ناردووە. یەکێک بسڕنەوە بۆ ناردنی یەکێکی تر. | هەوە هەمی وێنەیێن خۆ هنارتن. ئێکێ ژێببەن دا ئێکا دی بهنێرن. |
+| `guestPhotos.errors.duplicate` | This photo was already sent. | ئەم وێنەیە پێشتر نێردراوە. | ئەڤ وێنەیە بەری نوکە هاتیە هنارتن. |
+| `guestPhotos.errors.tooBig` | This photo is too large (25 MB at most). | ئەم وێنەیە زۆر گەورەیە (زۆرترین ٢٥ مێگابایت). | ئەڤ وێنەیە گەلەک مەزنە (پتر ژ ٢٥ مێگابایتان نابیت). |
+| `guestPhotos.errors.type` | Only photos can be sent. | تەنها وێنە دەنێردرێت. | بتنێ وێنە دهێنە هنارتن. |
+| `guestPhotos.errors.rateLimited` | Too many photos at once. Please wait a little and try again. | وێنەی زۆر بە یەکجار. کەمێک چاوەڕێ بکەن و دووبارە هەوڵ بدەنەوە. | گەلەک وێنە ب ئێکجار. هندەکێ ب هێڤی بن و دووبارە هەول بدەن. |
+| `guestPhotos.errors.generic` | Something went wrong. Please try again. | هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەنەوە. | خەلەتیەک چێبوو. هیڤییە دووبارە هەول بدەن. |

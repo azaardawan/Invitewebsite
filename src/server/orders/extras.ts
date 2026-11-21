@@ -1,5 +1,8 @@
-import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
+import { validCap, validPerGuest } from '@/catalog/guest-photos';
+import { getSettings } from '@/server/settings/service';
+import { newUploadToken } from '@/server/guest-photos/service';
+import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import { CARD_SHAPE_FEATURES, MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
@@ -50,6 +53,8 @@ export type OrderExtras = {
   birthDateDigits?: string;
   wording?: Record<string, { choice: string; text: string }>;
   switches?: Record<string, boolean>;
+  /** Guest photo sharing (add-on, src/catalog/guest-photos.ts): bought or not, its total and each guest's share. */
+  guestPhotos?: { on: boolean; cap: number; perGuest: number };
 };
 
 /** One changeable line: at most this many characters, on one line, no markup characters. */
@@ -85,7 +90,7 @@ export async function prestoreSignatures(db: DbOrTx, featureKeys: readonly strin
 export async function extrasUpdate(
   db: DbOrTx,
   inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> &
-    Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes' | 'paletteIds'>> & {
+    Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes' | 'paletteIds' | 'guestPhotosToken'>> & {
     fieldKeys?: readonly string[];
     /** For `wording`: the design's changeable lines, what is stored now, and the invitation's language. */
     wordingLines?: readonly WordingLine[];
@@ -117,12 +122,30 @@ export async function extrasUpdate(
       | 'birthDateDigits'
       | 'wording'
       | 'switches'
+      | 'guestPhotosCap'
+      | 'guestPhotosPerGuest'
+      | 'guestPhotosToken'
     >
   > = {};
   const errors: Record<string, string> = {};
   // The design's own limits (src/catalog/text-limits.ts); a text saved before a limit was lowered may stay as it is.
   const [design] = await db.select({ key: themes.key }).from(themes).where(eq(themes.id, inv.themeId));
   const limits = cardBackLimits(design?.key, CARD_BACK_LIMITS);
+
+  // Guest photo sharing: only offered while the owner has it switched on; the price is worked out at checkout.
+  if (extras.guestPhotos) {
+    const { guestPhotos: pricing } = await getSettings(db);
+    const g = extras.guestPhotos;
+    if (!g.on || !pricing.enabled) {
+      set.guestPhotosCap = null;
+      set.guestPhotosPerGuest = null;
+    } else if (!validCap(g.cap, pricing) || !validPerGuest(g.perGuest)) errors.guestPhotos = 'invalid';
+    else {
+      set.guestPhotosCap = g.cap;
+      set.guestPhotosPerGuest = g.perGuest;
+      if (!inv.guestPhotosToken) set.guestPhotosToken = newUploadToken();
+    }
+  }
 
   if (extras.cardBack && inv.featureKeys.includes('print_card')) {
     const title = extras.cardBack.title.trim();

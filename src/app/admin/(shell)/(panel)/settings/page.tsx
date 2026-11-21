@@ -5,14 +5,15 @@ import { getSettings } from '@/server/settings/service';
 import { formatIqd, formatUsd } from '@/lib/currency';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Card } from '@/components/admin/bits';
-import { contactSettingsAction, currencySettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
+import { contactSettingsAction, currencySettingsAction, guestPhotoSettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
+import { BASE_CAP, STEP } from '@/catalog/guest-photos';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 
 export default async function SettingsPage() {
   await requireAdmin({ permission: 'settings.manage' });
   const t = await getTranslations('admin.settings');
   const locale = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-US';
-  const { currency, payment, contact } = await getSettings(db());
+  const { currency, payment, contact, guestPhotos } = await getSettings(db());
   const example = 75000;
 
   return (
@@ -41,6 +42,28 @@ export default async function SettingsPage() {
               })}
             </p>
           ) : null}
+          <SubmitButton>{t('save')}</SubmitButton>
+        </ActionForm>
+      </Card>
+      <Card className="space-y-3" data-guest-photo-settings>
+        <h2 className="text-lg font-semibold">{t('guestPhotosHeading')}</h2>
+        <p className="text-sm text-muted">{t('guestPhotosIntro', { base: BASE_CAP, step: STEP })}</p>
+        <ActionForm action={guestPhotoSettingsAction} className="space-y-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="enabled" defaultChecked={guestPhotos.enabled} />
+            {t('guestPhotosEnabled')}
+          </label>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Field label={t('guestPhotosBase', { base: BASE_CAP })} name="basePriceIqd" inputMode="numeric" dir="ltr" defaultValue={String(guestPhotos.basePriceIqd)} />
+            <Field label={t('guestPhotosStep', { step: STEP })} name="stepPriceIqd" inputMode="numeric" dir="ltr" defaultValue={String(guestPhotos.stepPriceIqd)} />
+            <Field label={t('guestPhotosMax')} name="maxCap" inputMode="numeric" dir="ltr" defaultValue={String(guestPhotos.maxCap)} />
+          </div>
+          <p className="text-sm">
+            {t('guestPhotosExample', {
+              cap: (BASE_CAP + 5 * STEP).toLocaleString(),
+              price: formatIqd(guestPhotos.basePriceIqd + 5 * guestPhotos.stepPriceIqd, locale),
+            })}
+          </p>
           <SubmitButton>{t('save')}</SubmitButton>
         </ActionForm>
       </Card>

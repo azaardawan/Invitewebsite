@@ -10,11 +10,13 @@ import {
   featuredSettings,
   currencySettings,
   paymentSettings,
+  guestPhotoSettings,
   settingsData,
   type ContactSettings,
   type FeaturedSettings,
   type CurrencySettings,
   type PaymentSettings,
+  type GuestPhotoSettings,
   type SettingsData,
 } from './schema';
 
@@ -111,6 +113,20 @@ export async function updateFeaturedThemes(db: DbOrTx, input: FeaturedSettings, 
       before: before.featured,
       after: next,
     });
+    return data;
+  });
+}
+
+/** Guest photo sharing prices (Admin → Settings): the basic price, the rate per 50 photos more, the highest total. */
+export async function updateGuestPhotoSettings(db: DbOrTx, input: GuestPhotoSettings, actor: Actor) {
+  const next = guestPhotoSettings.parse(input);
+  return db.transaction(async (tx) => {
+    await tx.insert(websiteSettings).values({ id: 1 }).onConflictDoNothing();
+    const [row] = await tx.select().from(websiteSettings).where(eq(websiteSettings.id, 1)).for('update');
+    const before = settingsData.parse(row?.data ?? {});
+    const data: SettingsData = { ...before, guestPhotos: next };
+    await tx.update(websiteSettings).set({ data, updatedAt: new Date(), updatedBy: actor.adminId }).where(eq(websiteSettings.id, 1));
+    await recordAudit(tx, { ...auditActor(actor), action: 'settings.guest_photos_updated', objectType: 'website_settings', objectId: '1', before: before.guestPhotos, after: next });
     return data;
   });
 }
