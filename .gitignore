@@ -17,3 +17,6 @@ src/theme-registry/generated.ts
 .storage-test/
 src/theme-registry/loaders.generated.tsx
 src/theme-registry/print.generated.ts
+
+# Built tour models (uploaded in Admin, not kept here)
+tours/*/out/

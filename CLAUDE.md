@@ -75,7 +75,8 @@ product spec's §74 business rules override assumptions.
   from 50, e.g. a drawer's photo) are optional and not counted in a package's photos. THEME_CONTRACT §6.
 - Cafés' virtual tours (owner, 2026-11-21): not designs. Admin → Tours (`tours.manage`) holds each café's own `.glb`, logo,
   buttons and subscription end date; `/tour/<slug>` (for its Instagram bio) walks it full screen (`src/components/tour/*`).
-  How to make a model: `docs/TOURS.md`.
+  How to make a model: `docs/TOURS.md`. A café redrawn from its scan in animation style is built from code in `tours/<café>/`
+  (`node tours/<café>/export.cjs`, e.g. `tours/koupup/`).
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

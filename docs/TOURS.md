@@ -45,3 +45,11 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   supported, Draco and KTX2 are not.
 - Check the result: upload it to a tour that is still off, then open the link from Admin (the "off" page shows to
   visitors until it is turned on, so test with a second, test tour if the café's is already live).
+
+## Cafés rebuilt from a scan
+
+When a café sends a 3D scan, the owner may want it redrawn in the site's animation style rather than shown as scanned
+(owner, 2026-11-21: "make it animation style like the other ones … it looks exactly like the place"). The scan is the
+measuring tape: its floor plan, wall elevations and eye-level views give every wall, opening, level and piece of
+furniture, and the café is rebuilt from code at those positions. Each rebuilt café lives in `tours/<café>/` (the first:
+`tours/koupup/`, see its README); `node tours/<café>/export.cjs` builds the `.glb` to upload in Admin → Tours.
