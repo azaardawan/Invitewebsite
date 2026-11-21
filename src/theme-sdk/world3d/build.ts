@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { decorTexture, tilesTexture, worldUv } from '../gallery3d/decor';
-import { loadImage } from '../gallery3d/draw';
+import { framed, loadImage, wrap } from '../gallery3d/draw';
 import type { Box, DoorBuild, DrawerBuild, Rect } from './plan';
 
 /**
@@ -278,7 +278,103 @@ export function buildDrawer(build: DrawerBuild, slide: readonly [number, number]
     const shade = new THREE.MeshStandardMaterial({ color: 0x5a3a48, roughness: 1 });
     add(housing, slab(...at(out < 0 ? [c.hi[a] - 0.004, c.hi[a]] : [c.lo[a], c.lo[a] + 0.004], [c.lo[b], c.hi[b]], [c.lo.y, c.hi.y]), shade));
   }
-  return { drawer, housing, center: lo.clone().add(hi).multiplyScalar(0.5) };
+  // The inside of the drawer (its floor), for what lies in it, and which way is its back.
+  const [inLo, inHi] = at([front + inward * FRONT, back - inward * T], [lo[b] + T, hi[b] - T], [lo.y + T, lo.y + T]);
+  const backDir = new THREE.Vector3();
+  backDir[a] = inward;
+  return { drawer, housing, center: lo.clone().add(hi).multiplyScalar(0.5), inside: { lo: inLo, hi: inHi, back: backDir } };
 }
 
 export type { Box };
+
+/**
+ * What lies in a drawer: a paper note with its message and, if there is one, a printed photo with a white border, flat
+ * on the drawer's floor and readable from its front (they slide out with it).
+ */
+export async function drawerContents(
+  inside: { lo: THREE.Vector3; hi: THREE.Vector3; back: THREE.Vector3 },
+  contents: { note?: string; photo?: { src: string; focus: { x: number; y: number; zoom: number } } },
+  look: { font: string; ink: string },
+  dir: 'rtl' | 'ltr',
+  renderer: THREE.WebGLRenderer,
+): Promise<THREE.Mesh[]> {
+  const items: ('note' | 'photo')[] = [];
+  const note = contents.note?.trim();
+  if (contents.photo) items.push('photo');
+  if (note) items.push('note');
+  if (!items.length) return [];
+  const along = Math.abs(inside.back.x) > 0 ? 'x' : 'z';
+  const across = along === 'x' ? 'z' : 'x';
+  const depth = inside.hi[along] - inside.lo[along];
+  const width = inside.hi[across] - inside.lo[across];
+  // Side by side across the drawer (a photo and a note), each a little smaller than its half.
+  const slot = width / items.length;
+  const out: THREE.Mesh[] = [];
+  for (const [i, kind] of items.entries()) {
+    const w = Math.min(slot * 0.84, depth * 0.84 * (kind === 'photo' ? 0.85 : 0.78));
+    const h = Math.min(depth * 0.84, w / (kind === 'photo' ? 0.85 : 0.78));
+    let canvas: HTMLCanvasElement;
+    if (kind === 'photo') {
+      const img = await loadImage(contents.photo!.src);
+      if (!img) continue;
+      canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = Math.round(512 / (w / h));
+      const g = canvas.getContext('2d')!;
+      g.fillStyle = '#fdfbf7';
+      g.fillRect(0, 0, canvas.width, canvas.height);
+      const m = 26;
+      const inner = framed(img, (canvas.width - m * 2) / (canvas.height - m * 2.6), canvas.width - m * 2, contents.photo!.focus);
+      g.drawImage(inner, m, m, canvas.width - m * 2, canvas.height - m * 2.6);
+    } else {
+      canvas = noteCanvas(note!, w / h, look, dir);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    const geo = new THREE.PlaneGeometry(w, h);
+    geo.rotateX(-Math.PI / 2);
+    // The top of the paper towards the drawer's back, so it reads from the front.
+    geo.rotateY(Math.atan2(-inside.back.x, -inside.back.z));
+    const c = new THREE.Vector3();
+    c[along] = (inside.lo[along] + inside.hi[along]) / 2;
+    c[across] = inside.lo[across] + slot * (i + 0.5);
+    c.y = inside.lo.y + 0.004 + i * 0.002;
+    geo.translate(c.x, c.y, c.z);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: texture, roughness: 0.9 }));
+    mesh.name = kind === 'photo' ? 'WORLD_DRAWER_PHOTO' : 'WORLD_DRAWER_NOTE';
+    out.push(mesh);
+  }
+  return out;
+}
+
+/** A folded paper note with the message written on it (a few lines, the rest left for the card). */
+function noteCanvas(text: string, aspect: number, look: { font: string; ink: string }, dir: 'rtl' | 'ltr') {
+  const W = 512;
+  const H = Math.round(W / aspect);
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#fffaf2';
+  g.fillRect(0, 0, W, H);
+  // Faint ruled lines and a fold across the middle.
+  g.strokeStyle = 'rgba(160, 120, 140, 0.25)';
+  g.lineWidth = 2;
+  for (let y = 78; y < H - 20; y += 52) {
+    g.beginPath();
+    g.moveTo(30, y);
+    g.lineTo(W - 30, y);
+    g.stroke();
+  }
+  g.fillStyle = 'rgba(0,0,0,0.05)';
+  g.fillRect(0, H / 2 - 2, W, 4);
+  g.fillStyle = look.ink;
+  g.direction = dir;
+  g.textAlign = dir === 'rtl' ? 'right' : 'left';
+  g.textBaseline = 'alphabetic';
+  g.font = `600 38px ${look.font}`;
+  const lines = wrap(g, text, W - 70, Math.max(2, Math.floor((H - 50) / 52)));
+  lines.forEach((line, i) => g.fillText(line, dir === 'rtl' ? W - 35 : 35, 70 + i * 52));
+  return c;
+}

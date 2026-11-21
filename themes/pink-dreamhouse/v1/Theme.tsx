@@ -243,6 +243,14 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
   // The house's photo places (the drawers' own photos are shown when a drawer opens).
   const photos = useMemo(() => props.photos.filter((p) => p.index < ATTACHED_PHOTO_PLACE).sort((a, b) => a.index - b.index), [props.photos]);
   const drawerPhoto = (n: number) => props.photos.find((p) => p.index === ATTACHED_PHOTO_PLACE + n - 1) ?? null;
+  // What lies in each drawer: a paper note with its message, and its photo printed (owner, 2026-11-21).
+  const drawerContents = useMemo(
+    () =>
+      Object.fromEntries(
+        Array.from({ length: DRAWER_COUNT[tier] }, (_, i) => [`drawer${i + 1}`, { note: word(props, `drawer${i + 1}`), photo: props.photos.find((p) => p.index === ATTACHED_PHOTO_PLACE + i) ?? null }]),
+      ),
+    [props, tier],
+  );
   const videos = useMemo(() => (hasFeature(props, 'video') ? props.videos.slice(0, VIDEO_COUNT[tier]) : []), [props, tier]);
   const texts = useMemo(() => Object.fromEntries(ROOMS.map((r, i) => [r.key, roomName(props, copy, i)])), [props, copy]);
   const colors = useMemo(() => colorsOf(props), [props]);
@@ -461,6 +469,7 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
           setRoom(key);
         }}
         onNear={setNear}
+        contents={drawerContents}
         onVideo={onVideo}
       />
 

@@ -11,7 +11,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { canvasTexture, fitText, framed, loadImage, sameSite } from '../gallery3d/draw';
 import { floorAt, roomAt, scaledPlan, type WorldPlan, type WorldText, type WorldThing } from './plan';
-import { buildDoor, buildDrawer, ceilings, moveParts, movePhoto, outline, roundify, stand, texturePaint } from './build';
+import { buildDoor, buildDrawer, ceilings, drawerContents, moveParts, movePhoto, outline, roundify, stand, texturePaint } from './build';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -39,6 +39,8 @@ export type WorldOptions = {
   onTap: (tap: WorldTap) => void;
   onRoom: (key: string) => void;
   onVideo: (place: number, state: 'playing' | 'paused' | 'ended') => void;
+  /** What lies in each drawer (by thing key): a note's words and a photo, drawn as paper in it. */
+  contents?: Readonly<Record<string, { note?: string; photo?: { src: string; focus: { x: number; y: number; zoom: number } } }>>;
   /** The things the visitor is next to and facing, nearest first (to offer a button for each; none: []). */
   onNear?: (keys: string[]) => void;
 };
@@ -257,6 +259,7 @@ export class WorldEngine {
 
     // Things that move: each in its own pivot, so the model itself stays as it was.
     const housings: THREE.Mesh[] = [];
+    const pending: { key: string; inside: ReturnType<typeof buildDrawer>['inside']; contents: NonNullable<WorldOptions['contents']>[string] }[] = [];
     for (const thing of plan.things) {
       let parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
       // A door drawn by the world, in a doorway of the model.
@@ -269,6 +272,8 @@ export class WorldEngine {
       if (thing.kind === 'drawer' && thing.build) {
         for (const m of [...parts, ...meshes.filter((x) => matches(x.name, thing.build!.hide))]) m.visible = false;
         const built = buildDrawer(thing.build, thing.slide, paint);
+        const contents = this.o.contents?.[thing.key];
+        if (contents) pending.push({ key: thing.key, inside: built.inside, contents });
         for (const m of [...built.drawer, ...built.housing]) this.scene.add(m);
         for (const m of built.housing) {
           this.tappable.set(m, { kind: 'thing', key: thing.key });
@@ -348,6 +353,19 @@ export class WorldEngine {
         m.geometry.computeBoundsTree();
         if (!this.colliders.includes(m)) this.colliders.push(m);
       }
+    }
+    // The notes and photos in the drawers, laid in once drawn (they move with their drawer).
+    for (const p of pending) {
+      void drawerContents(p.inside, p.contents, this.o.look, this.o.dir, this.renderer).then((meshes) => {
+        const m = this.things.get(p.key);
+        if (!m || !this.alive) return;
+        for (const mesh of meshes) {
+          m.group.attach(mesh);
+          this.disposables.push((mesh.material as THREE.MeshStandardMaterial).map!);
+        }
+        this.dirty = true;
+        this.kick();
+      });
     }
     // What is in the way of walking: the solid parts' footprints (not floors, ceilings or roofs, nor small things).
     const moving = new Set([...this.things.values()].flatMap((t) => t.meshes));
