@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   const allowed =
     kind === 'audio'
       ? can(current.authz, 'music.manage')
-      : can(current.authz, 'sections.manage') || can(current.authz, 'themes.manage');
+      : can(current.authz, 'sections.manage') || can(current.authz, 'themes.manage') || can(current.authz, 'tours.manage');
   if (!allowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   try {

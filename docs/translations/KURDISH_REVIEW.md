@@ -2212,3 +2212,24 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `guestPhotos.errors.type` | Only photos can be sent. | تەنها وێنە دەنێردرێت. | بتنێ وێنە دهێنە هنارتن. |
 | `guestPhotos.errors.rateLimited` | Too many photos at once. Please wait a little and try again. | وێنەی زۆر بە یەکجار. کەمێک چاوەڕێ بکەن و دووبارە هەوڵ بدەنەوە. | گەلەک وێنە ب ئێکجار. هندەکێ ب هێڤی بن و دووبارە هەول بدەن. |
 | `guestPhotos.errors.generic` | Something went wrong. Please try again. | هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەنەوە. | خەلەتیەک چێبوو. هیڤییە دووبارە هەول بدەن. |
+
+## Batch 67 — cafés' virtual tours (the tour page: loading, how to walk, the café's buttons, the credit, closed and ended) — ✅ AUTO-APPROVED (2026-11-21, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.title` | {name} — virtual tour | {name} — گەشتی ئەلیکترۆنی | {name} — گەشتا ئەلیکترۆنی |
+| `tour.share` | Walk through the place in 3D, from your phone. | بە سێ دووری بە شوێنەکەدا بگەڕێ، لە مۆبایلەکەتەوە. | ب سێ دووری د جهیدا بگەڕە، ژ مۆبایلا خۆ. |
+| `tour.loading` | Getting the place ready… | شوێنەکە ئامادە دەکرێت… | جه دهێتە ئامادەکرن… |
+| `tour.hintTouch` | Drag the round pad to walk, and swipe the screen to look around. | بازنەکە ڕابکێشە بۆ ڕۆیشتن، و شاشەکە بخشێنە بۆ سەیرکردنی دەوروبەر. | بازنێ بکێشە بۆ چوونێ، و شاشێ بخشینە بۆ دیتنا دۆرماندۆر. |
+| `tour.hintKeys` | Walk with the arrow keys or W A S D, and drag to look around. | بە تیرەکان یان W A S D بڕۆ، و ڕایبکێشە بۆ سەیرکردنی دەوروبەر. | ب تیران یان W A S D بچە، و بکێشە بۆ دیتنا دۆرماندۆر. |
+| `tour.noWebgl` | This browser can't show the 3D tour. Try opening the link in Chrome or Safari. | ئەم وێبگەڕە ناتوانێت گەشتە سێ دوورییەکە پیشان بدات. بەستەرەکە لە کرۆم یان سەفاری بکەرەوە. | ئەڤ وێبگەڕە نەشێت گەشتا سێ دووری نیشان بدەت. لینکی د کرۆم یان سەفاری دا ڤەکە. |
+| `tour.failed` | The tour couldn't be opened. Check your connection and try again. | گەشتەکە نەکرایەوە. پەیوەندییەکەت بپشکنە و دووبارە هەوڵ بدەرەوە. | گەشت نەهاتە ڤەکرن. پەیوەندیا خۆ بپشکنە و دووبارە هەول بدە. |
+| `tour.instagram` | Instagram | ئینستاگرام | ئینستاگرام |
+| `tour.location` | Location | شوێن | جه |
+| `tour.menu` | Menu | مینیو | مینیو |
+| `tour.whatsapp` | WhatsApp | واتسئاپ | واتسئاپ |
+| `tour.credit` | Virtual tour by Bahja | گەشتی ئەلیکترۆنی لەلایەن بەهجە | گەشتا ئەلیکترۆنی ژ لایێ بەهجە |
+| `tour.offTitle` | {name} | {name} | {name} |
+| `tour.offBody` | This virtual tour isn't open right now. Please come back later. | ئەم گەشتە ئەلیکترۆنییە ئێستا بەردەست نییە. دواتر بگەڕێوە. | ئەڤ گەشتە ئەلیکترۆنیە نوکە بەردەست نینە. پاشی بزڤڕە. |
+| `tour.endedTitle` | {name} | {name} | {name} |
+| `tour.endedBody` | This virtual tour has ended. | ئەم گەشتە ئەلیکترۆنییە کۆتایی هات. | ئەڤ گەشتە ئەلیکترۆنیە ب دووماهی هات. |

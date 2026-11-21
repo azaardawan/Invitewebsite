@@ -141,7 +141,8 @@
       "analytics": "Analytics",
       "coupons": "Coupons",
       "translations": "Translations",
-      "customers": "Customers"
+      "customers": "Customers",
+      "tours": "Tours"
     },
     "login": {
       "heading": "Sign in",
@@ -571,7 +572,12 @@
         "noColorSlots": "This design's current version has no colour slots.",
         "subsectionMismatch": "That subsection belongs to another section.",
         "duplicateFeatured": "Each design can be chosen only once in the top 3.",
-        "featuredNotActive": "Only designs on sale can be in the top 3."
+        "featuredNotActive": "Only designs on sale can be in the top 3.",
+        "slugTaken": "Another tour already uses this link name.",
+        "noModel": "Upload the 3D model before turning the tour on.",
+        "notGlb": "This file is not a .glb (binary glTF) model.",
+        "invalidTour": "Check the tour's details: the name, the link name (lowercase letters, numbers, dashes), links starting with https:// and the date.",
+        "notImage": "The logo must be an image."
       },
       "preview": {
         "contents": "Preview contents",
@@ -1114,6 +1120,48 @@
       "forget": "Remove",
       "forgetAll": "Remove all devices",
       "forgotten": "Removed. That device will be asked for a code again."
+    },
+    "tours": {
+      "heading": "Virtual tours",
+      "intro": "Cafés' own 3D places. Each tour has a link to put in the café's Instagram bio; visitors walk through the place on Bahja. A tour shows only while it is on and before its end date.",
+      "none": "No tours yet.",
+      "add": "Add a tour",
+      "name": "Café name",
+      "slug": "Link name (lowercase letters, numbers and dashes)",
+      "state": {
+        "live": "Showing",
+        "off": "Off",
+        "ended": "Ended"
+      },
+      "visits": "{n, plural, =0 {No visits yet} one {# visit} other {# visits}}",
+      "endsIn": "{n, plural, =0 {Ends today} one {Ends tomorrow} other {Ends in # days}} ({date})",
+      "endedOn": "Ended on {date}",
+      "noEnd": "No end date",
+      "noModelYet": "No 3D model uploaded yet",
+      "model": "3D model",
+      "modelNow": "Now: {name} ({mb} MB)",
+      "uploadModel": "Upload a .glb model",
+      "uploading": "Uploading…",
+      "modelHint": "A binary glTF (.glb) of at most {mb} MB, in metres, with a node named START where visitors begin. See docs/TOURS.md.",
+      "modelSaved": "Model saved.",
+      "showing": "Showing",
+      "showingHint": "Turn the tour on once its model is uploaded. It turns off by itself after its end date.",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "details": "Details",
+      "endsOn": "Subscription ends on",
+      "endsOnHint": "Leave empty for no end. The tour stops showing after this day (Baghdad time).",
+      "links": {
+        "instagram": "Instagram link",
+        "location": "Location link (Google Maps)",
+        "menu": "Menu link",
+        "whatsapp": "WhatsApp number (with country code)"
+      },
+      "linksHint": "Links start with https://. Empty ones are not shown on the tour.",
+      "logo": "Café logo",
+      "save": "Save",
+      "copy": "Copy",
+      "copied": "Copied"
     }
   },
   "invitation": {
@@ -1821,5 +1869,23 @@
       "rateLimited": "Too many photos at once. Please wait a little and try again.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "tour": {
+    "title": "{name} — virtual tour",
+    "share": "Walk through the place in 3D, from your phone.",
+    "loading": "Getting the place ready…",
+    "hintTouch": "Drag the round pad to walk, and swipe the screen to look around.",
+    "hintKeys": "Walk with the arrow keys or W A S D, and drag to look around.",
+    "noWebgl": "This browser can't show the 3D tour. Try opening the link in Chrome or Safari.",
+    "failed": "The tour couldn't be opened. Check your connection and try again.",
+    "instagram": "Instagram",
+    "location": "Location",
+    "menu": "Menu",
+    "whatsapp": "WhatsApp",
+    "credit": "Virtual tour by Bahja",
+    "offTitle": "{name}",
+    "offBody": "This virtual tour isn't open right now. Please come back later.",
+    "endedTitle": "{name}",
+    "endedBody": "This virtual tour has ended."
   }
 }
