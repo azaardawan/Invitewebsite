@@ -341,6 +341,7 @@ paint slot (`textures`: plaster or tiles), add the `ceilings` the model lacks, d
 (spheres, cylinders, soft rounded boxes), give flames a `glow`, move photo places clear of furniture (`photoMoves`), and
 draw a drawer itself (`build`: a real drawer with a knob in a housing, instead of the model's). Doors swing on their
 `hinge`, and a door the model lacks can be drawn in a doorway (`build`), walked through only once open (its `gate`).
+`<World3D contents>` lays what is in a drawer in it (a paper note with its message, a printed photo).
 `moves` set floating parts down on what holds them, `stands` add pedestals, `textures` can be the design's own pictures
 (`image`: wallpaper, wood), `outline` draws black lines round what opens. `onNear` lists the things the visitor is next
 to and facing, nearest first, to offer a button for each (#30: «Open · Drawer 1», no crouching for a low one).

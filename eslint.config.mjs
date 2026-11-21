@@ -31,5 +31,5 @@ export default defineConfig([
     },
   },
   // .claude/: agent skills (third-party Node scripts, not app code).
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'drizzle/**', '.claude/**']),
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'drizzle/**', '.claude/**', 'tours/**']),
 ]);

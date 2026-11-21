@@ -98,7 +98,7 @@ const DOWNSTAIRS = { x: 2.9, z: 0.5, y: 0, yaw: Math.PI };
  * The drawers as real drawers (owner, 2026-11-19: the model's floated in the air and didn't look like drawers): each a
  * drawer in a housing standing on the floor or under its furniture. By drawer (the order of DRAWERS), in model metres.
  */
-const DRAWER_PAINT = { front: 'accent', inside: 'walls-light', housing: 'trim', knob: 'metal' } as const;
+const DRAWER_PAINT = { front: 'accent', inside: 'trim', housing: 'trim', knob: 'metal' } as const;
 const box = (min: [number, number, number], max: [number, number, number]) => ({ min, max });
 const DRAWER_BUILDS: DrawerBuild[] = [
   // The coffee table's: under its top, between its legs.
@@ -263,6 +263,9 @@ export function planFor(tier: Tier): WorldPlan {
       'DECOR_KITCHEN_UPPER_CABINET',
       // The stairs' two markers floated at their ends: the stairs are walked (and offered as buttons to keyboards).
       'INT_STAIRS_',
+      // No rail or posts on the stairs (owner, 2026-11-21: they glitched; the floor keeps visitors from the stairwell).
+      'DECOR_STAIR_RAIL_POST',
+      'UPPER_STAIR_RAIL',
       ...(tier === 'basic' ? [] : ['CEILING_TRIM_01']),
       ...(tier === 'vvip' ? ['CEILING_TRIM_02', 'CEILING_TRIM_03'] : []),
     ],

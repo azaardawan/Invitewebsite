@@ -12,6 +12,7 @@ export const PERMISSIONS = {
   'themes.manage': 'Configure themes, fields, packages and prices',
   'themes.activate': 'Change theme lifecycle state (activate, archive, restore)',
   'music.manage': 'Upload and assign music',
+  'tours.manage': 'Create and edit virtual tours (cafés), their links and subscriptions',
   'invitations.view': 'View invitations',
   'invitations.edit': 'Edit invitation information',
   'invitations.publish': 'Publish, unpublish and manually publish invitations',

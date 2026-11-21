@@ -1,0 +1,71 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"http://cafe.test/three/build/three.module.js","three/addons/":"http://cafe.test/three/examples/jsm/"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { root } from './lib.js';
+import { signs } from './build.js';
+import './rooms.js';
+try {
+  await signs();
+  // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
+  const start = new THREE.Object3D();
+  start.name = 'START';
+  start.position.set(7.3, -2.86, -3.1);
+  start.rotation.y = Math.PI / 2;
+  root.add(start);
+  const scene0 = new THREE.Scene();
+  scene0.add(root);
+  scene0.updateMatrixWorld(true);
+  // One mesh per material (and per kind: solid, walk-through, invisible wall): a phone draws it in few calls.
+  const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
+  const buckets = new Map();
+  scene0.traverse(o => {
+    if (!o.isMesh) return;
+    let kind = 'S';
+    for (let p = o; p; p = p.parent) { if (/^NOCOLLIDE/i.test(p.name)) kind = 'N'; if (/^COLLIDER/i.test(p.name)) kind = 'C'; }
+    let g = o.geometry.clone();
+    for (const k of Object.keys(g.attributes)) if (!['position','normal','uv'].includes(k)) g.deleteAttribute(k);
+    if (!g.attributes.uv) g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count*2), 2));
+    if (!g.attributes.normal) g.computeVertexNormals();
+    if (!g.index) { const n=g.attributes.position.count; const idx=new Uint32Array(n); for(let i=0;i<n;i++) idx[i]=i; g.setIndex(new THREE.BufferAttribute(idx,1)); }
+    g.clearGroups();
+    g.applyMatrix4(o.matrixWorld);
+    g = mergeVertices(g, 1e-4);
+    const key = o.material.uuid + kind;
+    if (!buckets.has(key)) buckets.set(key, { mat: o.material, kind, geos: [] });
+    buckets.get(key).geos.push(g);
+  });
+  const scene = new THREE.Scene();
+  const out = new THREE.Group(); out.name = 'KOUPUP'; scene.add(out);
+  let n = 0;
+  for (const b of buckets.values()) {
+    // in chunks of under 65,536 points, so each can use small (16-bit) indices
+    let chunk = [], count = 0;
+    const flush = () => {
+      if (!chunk.length) return;
+      const merged = mergeGeometries(chunk, false);
+      merged.setIndex(new THREE.BufferAttribute(Uint16Array.from(merged.index.array), 1));
+      const m = new THREE.Mesh(merged, b.mat);
+      m.name = (b.kind === 'N' ? 'NOCOLLIDE_' : b.kind === 'C' ? 'COLLIDER_' : 'part_') + (n++);
+      out.add(m);
+      chunk = []; count = 0;
+    };
+    for (const g of b.geos) {
+      if (count + g.attributes.position.count > 65000) flush();
+      chunk.push(g); count += g.attributes.position.count;
+    }
+    flush();
+  }
+  const startCopy = new THREE.Object3D(); startCopy.name='START';
+  root.getObjectByName('START').getWorldPosition(startCopy.position);
+  startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
+  scene.updateMatrixWorld(true);
+  let meshes = 0, tris = 0;
+  scene.traverse(o => { if (o.isMesh) { meshes++; const g=o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; } });
+  const glb = await new GLTFExporter().parseAsync(scene, { binary: true, maxTextureSize: 1024 });
+  const bytes = new Uint8Array(glb);
+  let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  window.result = { b64: btoa(s), meshes, tris: Math.round(tris) };
+} catch (e) { window.result = { error: String(e && e.stack || e) }; }
+</script></body></html>
