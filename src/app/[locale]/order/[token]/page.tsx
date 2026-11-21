@@ -141,11 +141,16 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
                 {localized(draft.theme.name, locale)} · {localized(draft.pkg.name, locale)}
               </span>
               {draft.onlineInvitation ? <span className="text-sm text-muted" data-online-for>{common(`onlineFor.${draft.pkg.lifetime}`)}</span> : null}
+              {draft.guestPhotos ? (
+                <span className="text-sm text-muted" data-guest-photos-line>
+                  + {t('guestPhotos.title')} ({draft.guestPhotos.cap.toLocaleString()}) · <Price iqd={draft.guestPhotos.priceIqd} />
+                </span>
+              ) : null}
             </div>
             <div className="flex flex-col items-end">
               <span className="text-xs text-muted">{t('total')}</span>
               <span className="text-lg font-semibold text-accent">
-                <Price iqd={draft.pkg.priceIqd} />
+                <Price iqd={draft.pkg.priceIqd + (draft.guestPhotos?.priceIqd ?? 0)} />
               </span>
             </div>
           </div>

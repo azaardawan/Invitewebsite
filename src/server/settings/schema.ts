@@ -50,11 +50,23 @@ export const featuredSettings = z.object({
   themeIds: z.array(z.uuid()).max(3),
 });
 
+/**
+ * Guest photo sharing (src/catalog/guest-photos.ts): offered at the end of the order form when `enabled`. The basic
+ * price covers 750 photos; each 50 more cost `stepPriceIqd`, up to `maxCap` in total.
+ */
+export const guestPhotoSettings = z.object({
+  enabled: z.boolean(),
+  basePriceIqd: z.number().int().min(0).max(100_000_000),
+  stepPriceIqd: z.number().int().min(0).max(100_000_000),
+  maxCap: z.number().int().min(750).max(20_000),
+});
+
 export const settingsData = z.object({
   currency: currencySettings.default({ usdRateIqd: null }),
   payment: paymentSettings.default({ whatsapp: null, manualInstructions: null }),
   contact: contactSettings.default({ phone: null, email: null, instagram: null, facebook: null, tiktok: null, address: null, hours: null }),
   featured: featuredSettings.default({ themeIds: [] }),
+  guestPhotos: guestPhotoSettings.default({ enabled: false, basePriceIqd: 15_000, stepPriceIqd: 5_000, maxCap: 3_000 }),
 });
 
 export type SettingsData = z.infer<typeof settingsData>;
@@ -62,3 +74,4 @@ export type CurrencySettings = z.infer<typeof currencySettings>;
 export type PaymentSettings = z.infer<typeof paymentSettings>;
 export type ContactSettings = z.infer<typeof contactSettings>;
 export type FeaturedSettings = z.infer<typeof featuredSettings>;
+export type GuestPhotoSettings = z.infer<typeof guestPhotoSettings>;

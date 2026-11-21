@@ -1,4 +1,5 @@
 import 'server-only';
+import { DEFAULT_PER_GUEST, guestPhotoPrice } from '@/catalog/guest-photos';
 import { listPhotos, photoSpec } from '@/server/photos/photos';
 import { and, eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
@@ -105,7 +106,9 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       .insert(customers)
       .values({ name: c.data.name, phoneE164: phone, email: c.data.email })
       .returning();
-    const { currency } = await getSettings(tx);
+    const { currency, guestPhotos: photoPricing } = await getSettings(tx);
+    // Guest photo sharing (add-on): priced from its total at today's rates; never discounted by a coupon.
+    const addOn = inv!.guestPhotosCap ? { cap: inv!.guestPhotosCap, perGuest: inv!.guestPhotosPerGuest ?? DEFAULT_PER_GUEST, priceIqd: guestPhotoPrice(inv!.guestPhotosCap, photoPricing) } : null;
     const snapshot = {
       theme: { id: p.theme.id, key: p.theme.key, name: p.theme.name },
       themeVersion: { id: p.version.id, codeRef: p.version.codeRef },
@@ -128,14 +131,15 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
         listPriceIqd?: number;
         discountIqd?: number;
         couponCode?: string | null;
+        guestPhotos?: { cap: number; perGuest: number; priceIqd: number } | null;
       },
       createdAt: now.toISOString(),
     };
 
     // Coupon: checked and counted inside this transaction; a 100% coupon leaves nothing to pay.
     const coupon = input.couponCode?.trim() ? await redeemCoupon(tx, input.couponCode, p.pkg.priceIqd, now, p.theme.id) : null;
-    const amountIqd = p.pkg.priceIqd - (coupon?.discountIqd ?? 0);
-    snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: p.pkg.priceIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null };
+    const amountIqd = p.pkg.priceIqd - (coupon?.discountIqd ?? 0) + (addOn?.priceIqd ?? 0);
+    snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: p.pkg.priceIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null, guestPhotos: addOn };
 
     // Newborn invitations accept their own terms (once the owner has published them).
     const [section] = inv!.sectionId ? await tx.select({ key: sections.key }).from(sections).where(eq(sections.id, inv!.sectionId)) : [];

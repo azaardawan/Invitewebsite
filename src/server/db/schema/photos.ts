@@ -55,3 +55,29 @@ export const invitationVideos = pgTable(
   },
   (t) => [primaryKey({ columns: [t.invitationId, t.place] }), check('invitation_videos_place_range', sql`${t.place} >= 1 and ${t.place} <= 2`)],
 );
+
+/**
+ * Guests' photos (guest photo sharing, src/catalog/guest-photos.ts): each upload as the guest sent it (original quality,
+ * `storage_key` under `guest-photos/`) and a small JPEG to show the couple (`thumb_key`, null when it could not be
+ * drawn, e.g. an iPhone HEIC). `device_hash` is the hash of the guest's phone token (a cookie), so a phone sees and may
+ * remove its own photos and is held to its share; `sha256` refuses the same photo twice. Personal data: deleted when
+ * the invitation ends (housekeeping).
+ */
+export const guestPhotos = pgTable(
+  'guest_photos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    invitationId: uuid('invitation_id')
+      .notNull()
+      .references(() => invitations.id, { onDelete: 'cascade' }),
+    deviceHash: text('device_hash').notNull(),
+    guestName: text('guest_name').notNull(),
+    storageKey: text('storage_key').notNull(),
+    thumbKey: text('thumb_key'),
+    contentType: text('content_type').notNull(),
+    byteSize: integer('byte_size').notNull(),
+    sha256: text('sha256').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('guest_photos_same_idx').on(t.invitationId, t.sha256), index('guest_photos_device_idx').on(t.invitationId, t.deviceHash)],
+);
