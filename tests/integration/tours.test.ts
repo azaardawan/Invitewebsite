@@ -8,6 +8,8 @@ import { assets, auditLogs, tours } from '@/server/db/schema';
 import { CatalogError } from '@/server/catalog/common';
 import { countTourVisit, createTour, isGlb, publicTour, setTourLive, setTourModel, setTourPrivacy, tourPath, tourState, updateTour, whatsappLink } from '@/server/tours/tours';
 import { tourLocale } from '@/server/tours/locale';
+import { applyOwnerTours } from '@/server/tours/owner-tours';
+import { ilike } from 'drizzle-orm';
 import { mediaServedHere } from '@/server/storage/served-here';
 import { storage } from '@/server/storage';
 import { randomToken } from '@/lib/crypto';
@@ -144,4 +146,17 @@ describe('virtual tours', () => {
     expect(tourLocale('kmr,ar;q=0.5')).toBe('bdn');
     expect(tourLocale('fr-FR,de;q=0.8')).toBe('ar');
   });
+
+  it("uploads the owner's KOUP model to their koup tour once, and switches it on", async () => {
+    const before = await db().select().from(tours).where(ilike(tours.name, 'koup%'));
+    if (!before.some((t) => t.modelAssetId)) await createTour(db(), { name: 'koup', slug: slug(), links: {} }, actor);
+    await applyOwnerTours(db());
+    const after = await db().select().from(tours).where(ilike(tours.name, 'koup%'));
+    const withModel = after.filter((t) => t.modelAssetId);
+    expect(withModel).toHaveLength(1);
+    expect(withModel[0]!.live).toBe(true);
+    // never again: the owner's later changes stay
+    expect(await applyOwnerTours(db())).toEqual([]);
+  });
 });
+

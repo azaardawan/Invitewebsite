@@ -51,7 +51,7 @@ export function TourModelUpload({ tourId, maxMb }: { tourId: string; maxMb: numb
         {progress !== null ? `${t('uploading')} ${progress}%` : t('uploadModel')}
         <input
           type="file"
-          accept=".glb,model/gltf-binary"
+          // No `accept` filter: iPhones don't know the .glb type and would grey the file out; the server checks it is a .glb.
           className="sr-only"
           disabled={progress !== null}
           onChange={(e) => {
