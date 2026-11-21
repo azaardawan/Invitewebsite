@@ -631,4 +631,4 @@
 #frame .si-hero-footer {transform:translateY(18px)}
 #frame .si-animating .si-open-heading {transition:opacity 1.2s 1.2s ease,transform 1.8s 1.2s cubic-bezier(.22,.61,.36,1)}
 #frame .si-animating .si-hero-footer {transition:opacity 1.2s 1.5s ease,transform 1.8s 1.5s cubic-bezier(.22,.61,.36,1)}
-#frame .root[data-phase='open']:not(.si-reduced) .bl-content {animation-duration:1.4s;animation-timing-function:ease}
+#frame .root[data-phase='open']:not(.si-reduced) .bl-content {animation-duration:1s;animation-timing-function:ease}

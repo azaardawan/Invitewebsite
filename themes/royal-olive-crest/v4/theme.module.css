@@ -99,7 +99,7 @@
 .root[data-stage='open'] .heroContent,
 .root[data-stage='done'] .heroContent {
   /* Elegant float (owner, 2026-11-18): slow and soft. */
-  animation: roc-rise 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: roc-rise 1.4s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 @keyframes roc-rise {
   from {

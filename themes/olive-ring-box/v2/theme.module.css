@@ -79,8 +79,8 @@
 .reveal[data-reveal='shown'] {
   transition:
     /* Elegant float (owner, 2026-11-18): slow and soft, not a quick pop. */
-    opacity 1s ease,
-    transform 1.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    opacity 0.7s ease,
+    transform 0.85s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal[data-reveal] {
