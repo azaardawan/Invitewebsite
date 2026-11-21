@@ -730,7 +730,15 @@
       "address": "Address (optional)",
       "hours": "Working hours (optional), e.g. “Every day, 10 am – 10 pm”",
       "invalidPhone": "Please enter a valid phone number.",
-      "invalidContact": "Please check the email and usernames."
+      "invalidContact": "Please check the email and usernames.",
+      "guestPhotosHeading": "Guest photo sharing",
+      "guestPhotosIntro": "An add-on at the end of the order form, never part of a package. The basic price covers {base} photos in total; customers may buy more in steps of {step}. Photos per guest (5, 10 or 15) cost nothing.",
+      "guestPhotosEnabled": "Offer guest photo sharing on the order form",
+      "guestPhotosBase": "Basic price, up to {base} photos (IQD)",
+      "guestPhotosStep": "Price for every {step} photos more (IQD)",
+      "guestPhotosMax": "Most photos a customer can buy",
+      "guestPhotosExample": "Example: {cap} photos cost {price}.",
+      "guestPhotosInvalid": "Please check the prices (whole numbers) and the highest total (750 to 20,000)."
     },
     "orders": {
       "heading": "Orders & invoices",
@@ -914,7 +922,18 @@
         "months": "Months",
         "years": "Years"
       },
-      "extendHelp": "The invitation is online until {until}. The time is added to that date, or to today if it has already ended."
+      "extendHelp": "The invitation is online until {until}. The time is added to that date, or to today if it has already ended.",
+      "guestPhotosTitle": "Guest photo sharing",
+      "guestPhotosState": "{photos} photos from {guests} guests · up to {cap}, {perGuest} per guest",
+      "guestPhotosPage": "Open the upload page",
+      "guestPhotosNone": "Not bought.",
+      "guestPhotosChange": "Change or take off",
+      "guestPhotosAdd": "Add guest photo sharing to this order",
+      "guestPhotosCap": "Photos in total ({base} or more, in steps of {step})",
+      "guestPhotosPerGuest": "Photos per guest",
+      "guestPhotosSave": "Save",
+      "guestPhotosOff": "Take it off",
+      "guestPhotosInvalid": "The total must be 750 or more in steps of 50, up to the highest in Settings."
     },
     "legal": {
       "heading": "Legal policies",
@@ -1354,7 +1373,23 @@
     "detailsTitle": "Order details",
     "heroPaid": "Everything for your celebration is here: the invitation link for your guests, printable cards, edits and replies.",
     "heroPending": "Your order is saved. Once paid, everything arrives here straight away.",
-    "invitationPictureAlt": "The invitation picture, as it shows when shared"
+    "invitationPictureAlt": "The invitation picture, as it shows when shared",
+    "navGuestPhotos": "Guest photos",
+    "guestPhotos": {
+      "title": "Your guests' photos",
+      "count": "{photos, plural, one {# photo} other {# photos}} from {guests, plural, one {# guest} other {# guests}} · up to {cap}",
+      "openUntil": "open until {date}",
+      "closedOn": "closed on {date}",
+      "download": "Download all (ZIP, a folder per guest)",
+      "qr": "Photo QR code (PNG)",
+      "help": "Guests scan the photo QR code, type their name and send up to {perGuest} photos each. Refresh this page to see new ones.",
+      "keptUntil": "Photos are kept while your invitation is online, until {date}. Download them before then.",
+      "photos": "{n, plural, one {# photo} other {# photos}}",
+      "noPicture": "iPhone photo (in the download)",
+      "remove": "Remove this photo",
+      "removeConfirm": "Remove this photo? It can't be brought back.",
+      "none": "No photos yet. Share the photo QR code with your guests."
+    }
   },
   "nav": {
     "home": "Home",
@@ -1715,7 +1750,24 @@
     "cardsIncludedIn": "In:",
     "cardOpen": "opens full size",
     "cardSideFront": "Front",
-    "cardSideBack": "Back"
+    "cardSideBack": "Back",
+    "formSections": {
+      "invitation": "Online invitation",
+      "card": "Printable card"
+    },
+    "guestPhotos": {
+      "addOn": "Add-on",
+      "title": "Guest photo sharing",
+      "help": "Guests scan a QR code at your event and send their photos straight to you. You download them all, a folder per guest.",
+      "perGuest": "Photos per guest",
+      "total": "Photos in total",
+      "rate": "+<price></price> per {step} over {base}",
+      "fewer": "Fewer photos",
+      "more": "More photos",
+      "price": "Photo sharing",
+      "includes": "Up to {base} photos at the basic price. You get the photo QR code as a picture, to share or print.",
+      "invalid": "Please check the photo sharing choice."
+    }
   },
   "contact": {
     "title": "Contact us",
@@ -1741,6 +1793,33 @@
       "invalid": "Please type the 10 digits of your invitation number.",
       "notFound": "We couldn't find this number. Please check it, or contact us on WhatsApp.",
       "rateLimited": "Too many attempts. Please wait an hour and try again."
+    }
+  },
+  "guestPhotos": {
+    "shareWith": "Share your photos with",
+    "onlyThey": "Only they will see them",
+    "name": "Your name",
+    "namePlaceholder": "So they know who sent them",
+    "take": "📷 Take a photo",
+    "choose": "Choose from your phone",
+    "yours": "Your photos",
+    "count": "{n} of {max}",
+    "remove": "Remove this photo",
+    "removeUntil": "You can remove your own photos until uploading closes on {date}.",
+    "sending": "Sending…",
+    "needName": "Please type your name first.",
+    "notYet": "Uploading opens on {date}.",
+    "closed": "Uploading has closed. Thank you!",
+    "noPicture": "iPhone photo (sent)",
+    "consent": "By uploading, you confirm you took these photos and agree to share them with the couple. Please don't upload photos of anyone who wouldn't want them shared. Photos are kept while the invitation is online, then deleted.",
+    "errors": {
+      "full": "The album is full: no more photos can be added.",
+      "shareUsed": "You have sent all your photos. Remove one to send another.",
+      "duplicate": "This photo was already sent.",
+      "tooBig": "This photo is too large (25 MB at most).",
+      "type": "Only photos can be sent.",
+      "rateLimited": "Too many photos at once. Please wait a little and try again.",
+      "generic": "Something went wrong. Please try again."
     }
   }
 }

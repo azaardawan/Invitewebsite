@@ -10,6 +10,8 @@
 const TYPES: Record<string, string> = { webp: 'image/webp', mp3: 'audio/mpeg', mp4: 'video/mp4', jpg: 'image/jpeg' };
 
 export function mediaServedHere(key: string, driver: 'local' | 's3'): string | null {
+  // Guests' photos are private: only the couple's receipt serves them.
+  if (key.startsWith('guest-photos/')) return null;
   const ext = key.split('.').pop() ?? '';
   const type = TYPES[ext];
   if (!type) return null;
