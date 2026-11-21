@@ -16,6 +16,8 @@ import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
 
 const STATUSES = ['DEVELOPMENT', 'READY_FOR_REVIEW', 'ACTIVE', 'ARCHIVED'] as const;
+/** How the list is sorted (owner, 2026-11-21): the shop's order (the default, where designs can be moved), or by name, date or number. */
+const SORTS = ['shop', 'name', 'newest', 'oldest', 'number'] as const;
 
 export default async function ThemesPage({ searchParams }: PageProps<'/admin/themes'>) {
   const { authz } = await requireAdmin({ permission: 'themes.view' });
@@ -25,12 +27,25 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
   const search = typeof params.q === 'string' ? params.q.slice(0, 80) : '';
   const sectionId = z.uuid().safeParse(params.section).data;
   const status = z.enum(STATUSES).safeParse(params.status).data;
-  const [rows, sections, onSale, settings] = await Promise.all([
+  const sort = z.enum(SORTS).catch('shop').parse(params.sort);
+  const [listed, sections, onSale, settings] = await Promise.all([
     listThemes(db(), { search: search || undefined, sectionId, status }),
     listSections(db(), { includeArchived: true }),
     listThemes(db(), { status: 'ACTIVE' }),
     getSettings(db()),
   ]);
+  const byName = new Intl.Collator(locale, { sensitivity: 'base', numeric: true });
+  const num = (key: string) => themeNumber(key) ?? Number.MAX_SAFE_INTEGER;
+  const rows =
+    sort === 'shop'
+      ? listed
+      : [...listed].sort((a, b) =>
+          sort === 'name'
+            ? byName.compare(localized(a.theme.name, locale), localized(b.theme.name, locale))
+            : sort === 'number'
+              ? num(a.theme.key) - num(b.theme.key)
+              : (sort === 'newest' ? -1 : 1) * (a.theme.createdAt.getTime() - b.theme.createdAt.getTime()),
+        );
   const top = settings.featured.themeIds;
   const rankOf = (id: string) => top.indexOf(id) + 1 || null;
   const canManage = can(authz, 'themes.manage');
@@ -102,9 +117,20 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
             </option>
           ))}
         </select>
+        <label className="block">
+          <span className="mb-1 block text-sm">{t('themes.sort')}</span>
+          <select name="sort" defaultValue={sort} className="rounded-md border border-line bg-surface px-3 py-2">
+            {SORTS.map((s) => (
+              <option key={s} value={s}>
+                {t(`themes.sortBy.${s}`)}
+              </option>
+            ))}
+          </select>
+        </label>
         <button className="rounded-md border border-line bg-surface px-4 py-2 text-sm">{t('themes.filter')}</button>
       </form>
 
+      {sort !== 'shop' && canManage ? <p className="text-sm text-muted">{t('themes.sortMoveHint')}</p> : null}
       {rows.length === 0 ? <p className="text-muted">{t('themes.empty')}</p> : null}
       <ul className="space-y-3">
         {rows.map((r) => (
@@ -138,13 +164,16 @@ export default async function ThemesPage({ searchParams }: PageProps<'/admin/the
                     {r.versionRef ?? '—'}
                   </span>
                 </p>
+                {sort === 'newest' || sort === 'oldest' ? (
+                  <p className="text-sm text-muted">{t('themes.addedOn', { date: r.theme.createdAt.toLocaleDateString(locale === 'ar' ? 'ar-IQ' : 'en-GB', { dateStyle: 'medium' }) })}</p>
+                ) : null}
                 <p className="text-sm text-muted">
                   {t('themes.packagesCount')}: {r.activePackages}
                   {r.minPrice ? ` · ${t('themes.fromPrice')} ${formatIqd(Number(r.minPrice), locale)}` : ''} ·{' '}
                   {r.musicTitle ?? t('themes.noMusic')}
                 </p>
               </div>
-              {canManage && r.theme.status !== 'ARCHIVED' ? (
+              {canManage && sort === 'shop' && r.theme.status !== 'ARCHIVED' ? (
                 <MoveButtons action={moveThemeAction} id={r.theme.id} labels={{ up: t('common.moveUp'), down: t('common.moveDown') }} />
               ) : null}
             </Card>

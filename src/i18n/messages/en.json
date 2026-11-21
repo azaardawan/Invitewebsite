@@ -526,7 +526,17 @@
           "useAll": "Use the designs' thumbnails",
           "confirmAll": "Replace the cover of every design that has its own thumbnail?",
           "allDone": "Covers replaced with the designs' thumbnails"
-        }
+        },
+        "sort": "Sort by",
+        "sortBy": {
+          "shop": "Shop order",
+          "name": "Name (A–Z)",
+          "newest": "Newest first",
+          "oldest": "Oldest first",
+          "number": "Design number"
+        },
+        "sortMoveHint": "To move designs up or down in the shop, sort by «Shop order».",
+        "addedOn": "Added {date}"
       },
       "errors": {
         "invalid": "Please check the fields.",
