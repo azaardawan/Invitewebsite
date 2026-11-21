@@ -37,8 +37,8 @@ type Phase = 'closed' | 'opening' | 'open';
 /** From the designer's prototype: the letter has risen and the envelope has dropped away. */
 const OPENING_MS = 3300;
 /** Then the letter dissolves into the page: the poster stays over the page and fades while the page rises in beneath it. */
-/** Long enough for the page's slow float in (theme.module.css `vl-handoff-in`). */
-const HANDOFF_MS = 1600;
+/** The page's soft float in (theme.module.css `vl-handoff-in`); the opening must end within 4 s. */
+const HANDOFF_MS = 700;
 const REDUCED_MS = 100;
 
 const noop = () => () => {};

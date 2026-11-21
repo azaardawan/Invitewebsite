@@ -516,7 +516,7 @@
 #frame .root.vl-handoff .vl-cover {position:absolute;inset:0 0 auto;z-index:30;pointer-events:none;animation:vl-handoff-out .65s cubic-bezier(.4,0,.2,1) forwards}
 #frame .root.vl-handoff .vl-letter {filter:blur(0);transition:filter .5s}
 /* Elegant float (owner, 2026-11-18): the page drifts up slowly and softly. */
-#frame .root.vl-handoff .website {animation:vl-handoff-in 1.6s cubic-bezier(.22,.61,.36,1) both}
+#frame .root.vl-handoff .website {animation:vl-handoff-in .7s cubic-bezier(.22,.61,.36,1) both}
 @keyframes vl-handoff-out {0%{opacity:1;transform:none;filter:blur(0)}100%{opacity:0;transform:translateY(-2%) scale(1.04);filter:blur(3px)}}
 @keyframes vl-handoff-in {0%{opacity:0;transform:translateY(22px)}100%{opacity:1;transform:none}}
 
