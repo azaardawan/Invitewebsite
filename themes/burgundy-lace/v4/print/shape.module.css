@@ -1,0 +1,33 @@
+/*
+ * The wax seal on the printed cards (PrintSeal.tsx): the wax, and the raised initials over its flat face.
+ */
+
+.seal {
+  display: block;
+  position: relative;
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  background: url(../assets/wax-seal.webp) center / contain no-repeat;
+  filter: drop-shadow(0 0.6mm 0.6mm rgb(18 2 4 / 0.45));
+}
+.sealBlank {
+  background-image: url(../assets/wax-seal-blank.webp);
+}
+/* over the seal's flat face (centre 50 % / 49.8 %, 64 % across) */
+.sealFace {
+  position: absolute;
+  left: 18%;
+  top: 17.8%;
+  width: 64%;
+  height: 64%;
+  overflow: visible;
+}
+.sealLetter {
+  font-family: 'BL Ceremony', 'BL Serif', serif;
+}
+[data-script='arabic'] .sealLetter {
+  font-family: 'BL Serif', serif;
+}
+.sealJoin {
+  font-family: 'BL Serif', Georgia, serif;
+}

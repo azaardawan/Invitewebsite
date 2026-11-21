@@ -2146,3 +2146,14 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | 8 | #30 button name (`things.projector`) | جهاز العرض | Projector | پرۆجێکتەر | پرۆجێکتەر |
 | 9 | #30 button name (`things.finale`) | زر النهاية | Final button | دوگمەی کۆتایی | دوگما دووماهیێ |
 | 10 | #30 each room's counter (`roomCount`) | فُتح {n} من {m} في هذه الغرفة | {n} of {m} opened in this room | {n} لە {m} کراوەتەوە لەم ژوورەدا | {n} ژ {m} هاتینە ڤەکرن د ڤێ ژوورێ دا |
+## Batch 65 — the design page's printed cards (front and back of every card a design offers) — ✅ AUTO-APPROVED (2026-11-18, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `store.cardsTitle` | The printed cards in this design | کارتە چاپکراوەکانی ئەم دیزاینە | کارتێن چاپکری یێن ڤی دیزاینی |
+| `store.cardsIntro` | Every card this design offers, front and back, with example names. Yours shows your own names and details. | هەموو ئەو کارتانەی ئەم دیزاینە پێشکەشی دەکات، ڕوو و پشت، بە ناوی نموونە. کارتەکەی ئێوە ناو و وردەکارییەکانی خۆتان پیشان دەدات. | هەمی ئەو کارتێن ئەڤ دیزاینە پێشکێش دکەت، ڕوو و پشت، ب ناڤێن نموونە. کارتا هەوە ناڤ و هویربینیێن هەوە نیشان ددەت. |
+| `store.cardA5` | Printable card (A5) | کارتی چاپ (A5) | کارتا چاپێ (A5) |
+| `store.cardSideFront` | Front | ڕوو | ڕوو |
+| `store.cardSideBack` | Back | پشت | پشت |
+| `store.cardsIncludedIn` | In: | لە: | د: |
+| `store.cardOpen` | opens full size | بە قەبارەی تەواو دەکرێتەوە | ب قەبارێ تەمام ڤەدبیت |

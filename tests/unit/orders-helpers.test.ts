@@ -3,7 +3,7 @@ import { invitationPath, invitationPublicId, orderNumber, PUBLIC_ID_PATTERN, pub
 import { normalizePhone } from '@/lib/phone';
 import { ALWAYS_REQUIRED_FIELDS, fieldValuesFromForm, mayStayEmpty, splitInitials } from '@/catalog/fields';
 import { baghdadToday, validateFieldValues, type FieldDef } from '@/server/orders/validation';
-import { cardBackLimits, smallerTextLimit, textScale, textsToShrink, themeTextLimit, THEME_TEXT_LIMITS } from '@/catalog/text-limits';
+import { cardBackLimits, smallerTextLimit, textScale, textsToShrink, themeTextLimit, THEME_TEXT_LIMITS, NAME_CEILING } from '@/catalog/text-limits';
 
 describe('ids and URLs', () => {
   it('public ids are 10 unambiguous characters', () => {
@@ -122,8 +122,13 @@ describe('invitation field validation', () => {
 
   it('design text limits only ever lower a limit', () => {
     const own = Object.keys(THEME_TEXT_LIMITS)[0];
-    expect(themeTextLimit('no-such-design', 'person_1_name', 40)).toBe(40);
-    expect(themeTextLimit(null, 'person_1_name', null)).toBe(null);
+    expect(themeTextLimit('no-such-design', 'venue_name', 80)).toBe(80);
+    expect(themeTextLimit(null, 'venue_name', null)).toBe(null);
+    // Names never longer than NAME_CEILING on any design (owner, 2026-11-18), whatever the Field Library says.
+    expect(themeTextLimit('no-such-design', 'person_1_name', 40)).toBe(NAME_CEILING.person_1_name);
+    expect(themeTextLimit(null, 'person_2_family', 60)).toBe(NAME_CEILING.person_2_family);
+    expect(themeTextLimit(null, 'father_name', null)).toBe(NAME_CEILING.father_name);
+    expect(themeTextLimit(null, 'baby_name', 12)).toBe(12);
     expect(cardBackLimits('no-such-design', { title: 40, message: 300 })).toEqual({ title: 40, message: 300 });
     // A longer text is written smaller (down to MIN_TEXT_SCALE), so customers may write up to what fits at that size.
     if (own) for (const [key, n] of Object.entries(THEME_TEXT_LIMITS[own]!)) expect(themeTextLimit(own, key, 1000)).toBeGreaterThanOrEqual(n);

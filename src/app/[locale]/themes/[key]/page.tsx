@@ -13,6 +13,8 @@ import { env } from '@/server/env';
 import { RankBadge } from '@/components/storefront/RankBadge';
 import { manifestByCodeRef } from '@/theme-registry';
 import { packageDetailLines } from '@/lib/package-details';
+import { designCards } from '@/server/documents/data';
+import { ThemeCards } from '@/components/storefront/theme/ThemeCards';
 
 export const dynamicParams = true;
 
@@ -41,6 +43,17 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
   const { whatsapp } = await publicContact();
   const fieldLabels = th.fields.map((f) => ({ key: f.key, label: localized(f.label, locale) }));
   const detailWords = { pair: (a: string, b: string) => t('includesPair', { a, b }), when: t('includesWhen') };
+  // The printed cards this design offers, with the packages that include each (owner, 2026-11-18).
+  const manifest = manifestByCodeRef(th.codeRef);
+  const cardQuery = occasion ? `&occasion=${occasion.key}` : '';
+  const cards = (manifest ? designCards(manifest) : [])
+    .map((c) => ({
+      key: c.key,
+      name: c.label ? localized(c.label, locale) : t('cardA5'),
+      packages: th.packages.filter((p) => p.featureKeys.includes(c.feature)).map((p) => localized(p.name, locale)),
+      sides: (['front', 'back'] as const).map((side) => ({ side, ...(side === 'front' ? c.front : c.back), src: `/t/${locale}/${th.key}/card?card=${c.key}&side=${side}${cardQuery}` })),
+    }))
+    .filter((c) => c.packages.length);
   const pageUrl = `${env().APP_URL.replace(/\/$/, '')}${locale === 'ar' ? '' : `/${locale}`}/themes/${th.key}`;
 
   return (
@@ -77,6 +90,12 @@ export default async function ThemePage({ params, searchParams }: PageProps<'/[l
           }))}
         />
       </div>
+      {cards.length ? (
+        <ThemeCards
+          cards={cards}
+          labels={{ title: t('cardsTitle'), intro: t('cardsIntro'), front: t('cardSideFront'), back: t('cardSideBack'), includedIn: t('cardsIncludedIn'), open: t('cardOpen') }}
+        />
+      ) : null}
       {whatsapp ? (
         <p className="mt-10 text-center text-[15px] text-muted">
           {t('askTheme')}{' '}

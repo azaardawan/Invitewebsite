@@ -88,8 +88,9 @@ product spec's §74 business rules override assumptions.
   `e2e/theme-clashes.allow.json`, never a real clash. Customer-text length limits per design: `src/catalog/text-limits.ts`
   (`e2e/text-limits.spec.ts` measures them).
 - The owner chooses per design which fields are required (Admin → the design → Fields, `theme_fields.required`): a theme
-  must leave out a whole part when its field is empty. The invitation's paragraph (`invitation_message`) is never printed
-  on a card; the card's only paragraph is the back's own message.
+  must leave out a whole part when its field is empty. The invitation's paragraph (`invitation_message`) and the family
+  names (owner, 2026-11-19) are never printed on a card; the card's only paragraph is the back's own message. Names have
+  a ceiling on every design (`NAME_CEILING` in `src/catalog/text-limits.ts`).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
