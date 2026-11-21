@@ -256,7 +256,7 @@ export function contactShadow(w, d, x, y, z, ry = 0, block = true) {
     b.name = 'COLLIDER_furniture';
     add(b);
   }
-  return floorDecal(w * 1.35, d * 1.35, shadowMat, x, y + 0.004, z, ry, false, 'NOCOLLIDE_shadow');
+  return floorDecal(w * 1.35, d * 1.35, shadowMat, x, y + 0.02, z, ry, false, 'NOCOLLIDE_shadow');
 }
 
 /** A picture on a wall: a plane facing `facing` (+x, -x, +z, -z). */

@@ -16,11 +16,18 @@ export type TourWords = {
   menu: string;
   whatsapp: string;
   credit: string;
+  rotate: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
 
 const MOTION = '(prefers-reduced-motion: reduce)';
+const PORTRAIT = '(orientation: portrait)';
+const subscribePortrait = (cb: () => void) => {
+  const q = window.matchMedia(PORTRAIT);
+  q.addEventListener('change', cb);
+  return () => q.removeEventListener('change', cb);
+};
 const subscribeMotion = (cb: () => void) => {
   const q = window.matchMedia(MOTION);
   q.addEventListener('change', cb);
@@ -61,6 +68,9 @@ export function TourViewer({
   const engine = useRef<TourEngine | null>(null);
   const touch = useTouchScreen();
   const reducedMotion = useSyncExternalStore(subscribeMotion, () => window.matchMedia(MOTION).matches, () => false);
+  // On a phone the tour is walked held sideways only (owner, 2026-11-22): upright, it asks to be turned.
+  const portrait = useSyncExternalStore(subscribePortrait, () => window.matchMedia(PORTRAIT).matches, () => false);
+  const upright = touch && portrait;
   const [progress, setProgress] = useState(0);
   const [state, setState] = useState<'loading' | 'ready' | 'nowebgl' | 'failed'>('loading');
   const [hint, setHint] = useState(true);
@@ -113,6 +123,7 @@ export function TourViewer({
       <div ref={box} data-testid="tour-canvas" data-state={state} style={{ position: 'absolute', inset: 0 }} onPointerDown={() => setHint(false)}>
         {touch && state === 'ready' ? (
           <Joystick
+            style={{ insetInlineStart: 'auto', insetInlineEnd: 'auto', left: 'auto', right: 'max(24px, env(safe-area-inset-right))', bottom: 'max(28px, env(safe-area-inset-bottom))' }}
             onMove={(x, y) => {
               setHint(false);
               engine.current?.setStick(x, y);
@@ -144,75 +155,63 @@ export function TourViewer({
         </div>
       ) : null}
 
-      {/* The café's bar. */}
+      {/* The café's bar along the top, in one line: its logo and name, then its buttons (owner, 2026-11-22). */}
       {state === 'ready' ? (
         <header
           style={{
-            ...GLASS,
             position: 'absolute',
-            top: 'max(12px, env(safe-area-inset-top))',
-            insetInline: 12,
+            top: 'max(10px, env(safe-area-inset-top))',
+            insetInline: 'max(10px, env(safe-area-inset-left))',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            padding: '8px 12px',
-            borderRadius: 14,
+            gap: 8,
             pointerEvents: 'none',
-            maxWidth: 520,
-            marginInline: 'auto',
           }}
         >
-          {logo ? (
-            // eslint-disable-next-line @next/next/no-img-element -- the café's own logo
-            <img src={logo} alt="" width={36} height={36} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', background: '#fff', flex: 'none' }} />
+          <div style={{ ...GLASS, display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px 6px 6px', paddingInlineStart: 6, borderRadius: 999, minWidth: 0, flex: '0 1 auto' }}>
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element -- the café's own logo
+              <img src={logo} alt="" width={30} height={30} style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', background: '#fff', flex: 'none' }} />
+            ) : null}
+            <h1 style={{ margin: 0, fontSize: 15, fontWeight: 600, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</h1>
+          </div>
+          {buttons.length ? (
+            <nav style={{ display: 'flex', flexWrap: 'nowrap', gap: 6, marginInlineStart: 'auto', overflowX: 'auto', pointerEvents: 'auto', scrollbarWidth: 'none' }}>
+              {buttons.map((k) => (
+                <a
+                  key={k}
+                  href={links[k]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    ...GLASS,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    minHeight: 36,
+                    padding: '6px 12px',
+                    borderRadius: 999,
+                    color: '#fff',
+                    textDecoration: 'none',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    whiteSpace: 'nowrap',
+                    flex: 'none',
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" width={16} height={16} fill="currentColor" aria-hidden>
+                    <path d={ICONS[k]} fillRule="evenodd" />
+                  </svg>
+                  {words[k]}
+                </a>
+              ))}
+            </nav>
           ) : null}
-          <h1 style={{ margin: 0, fontSize: 17, fontWeight: 600, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</h1>
         </header>
       ) : null}
 
-      {/* Its buttons, and the credit. */}
-      <footer
-        style={{
-          position: 'absolute',
-          bottom: 'max(10px, env(safe-area-inset-bottom))',
-          insetInline: 12,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 8,
-          pointerEvents: 'none',
-        }}
-      >
-        {buttons.length ? (
-          <nav style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8, pointerEvents: 'auto' }}>
-            {buttons.map((k) => (
-              <a
-                key={k}
-                href={links[k]}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  ...GLASS,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  minHeight: 40,
-                  padding: '8px 14px',
-                  borderRadius: 999,
-                  color: '#fff',
-                  textDecoration: 'none',
-                  fontSize: 14,
-                  fontWeight: 500,
-                }}
-              >
-                <svg viewBox="0 0 24 24" width={18} height={18} fill="currentColor" aria-hidden>
-                  <path d={ICONS[k]} fillRule="evenodd" />
-                </svg>
-                {words[k]}
-              </a>
-            ))}
-          </nav>
-        ) : null}
+      {/* The credit. */}
+      <footer style={{ position: 'absolute', bottom: 'max(8px, env(safe-area-inset-bottom))', insetInline: 0, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
         <Link
           href="/"
           target="_blank"
@@ -244,6 +243,23 @@ export function TourViewer({
         >
           {touch ? words.hintTouch : words.hintKeys}
         </p>
+      ) : null}
+
+      {upright ? (
+        <div
+          role="alert"
+          data-testid="tour-rotate"
+          style={{ position: 'absolute', inset: 0, zIndex: 5, display: 'grid', placeItems: 'center', background: 'rgba(26,22,19,.94)', padding: 32, textAlign: 'center' }}
+        >
+          <div style={{ display: 'grid', gap: 18, justifyItems: 'center', maxWidth: 280 }}>
+            <svg viewBox="0 0 64 64" width={72} height={72} fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="22" y="8" width="20" height="36" rx="4" />
+              <rect x="14" y="36" width="36" height="20" rx="4" opacity="0.55" />
+              <path d="M50 14a14 14 0 0 1 6 12m0 0-4-3m4 3 3-4" />
+            </svg>
+            <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6 }}>{words.rotate}</p>
+          </div>
+        </div>
       ) : null}
     </div>
   );

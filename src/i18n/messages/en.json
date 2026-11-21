@@ -1894,10 +1894,11 @@
     "location": "Location",
     "menu": "Menu",
     "whatsapp": "WhatsApp",
-    "credit": "Virtual tour by Bahja",
+    "credit": "Virtual tour by Bahjaaa.iq",
     "offTitle": "{name}",
     "offBody": "This virtual tour isn't open right now. Please come back later.",
     "endedTitle": "{name}",
-    "endedBody": "This virtual tour has ended."
+    "endedBody": "This virtual tour has ended.",
+    "rotate": "Turn your phone sideways to walk through the place."
   }
 }

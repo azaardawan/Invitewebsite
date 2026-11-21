@@ -185,7 +185,18 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
 });
 
 /** The on-screen joystick for walking on a touch screen (drag the knob; let go to stop). */
-export function Joystick({ className, knobClassName, onMove }: { className?: string; knobClassName?: string; onMove: (x: number, y: number) => void }) {
+export function Joystick({
+  className,
+  knobClassName,
+  onMove,
+  style,
+}: {
+  className?: string;
+  knobClassName?: string;
+  onMove: (x: number, y: number) => void;
+  /** Where the default ring sits (e.g. the other side); ignored with `className`. */
+  style?: CSSProperties;
+}) {
   const ring = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const pointer = useRef<number | null>(null);
@@ -212,7 +223,7 @@ export function Joystick({ className, knobClassName, onMove }: { className?: str
       ref={ring}
       aria-hidden
       className={className}
-      style={className ? { touchAction: 'none' } : { position: 'absolute', insetInlineStart: 20, bottom: 96, width: 116, height: 116, borderRadius: '50%', border: '1px solid rgba(255,255,255,.35)', background: 'rgba(0,0,0,.25)', touchAction: 'none', zIndex: 2 }}
+      style={className ? { touchAction: 'none' } : { position: 'absolute', insetInlineStart: 20, bottom: 96, width: 116, height: 116, borderRadius: '50%', border: '1px solid rgba(255,255,255,.35)', background: 'rgba(0,0,0,.25)', touchAction: 'none', zIndex: 2, ...style }}
       onPointerDown={(e) => {
         pointer.current = e.pointerId;
         e.currentTarget.setPointerCapture(e.pointerId);

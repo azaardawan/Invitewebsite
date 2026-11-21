@@ -298,20 +298,23 @@ F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 F.bigLeaf(-3.75, FI, 4.95, 0.8, 'terracotta', 0.15);
 
 // ================= Terrace (floor FT) =================
-// the long planter of plants along the lounge's glass
-slab(2.32, 2.85, FT, FT + 0.38, -10.7, -3.6, mat('#f2f0ea', { rough: 0.6 }), 'planter');
-slab(2.32, 2.85, FT, FT + 1.1, -10.7, -3.6, mat('#000000'), 'COLLIDER_planter');
-for (let z = -10.5; z < -3.7; z += 0.45) F.bush(2.58, FT + 0.38, z, 0.28, null, 0, 0, z % 0.9 < 0.45 ? [C.leaf, C.leafLight, '#6b9a3e'] : [C.leafDark, C.leaf, '#8bb35a']);
-// north end: wicker seats round baskets
-F.armchair(3.7, FT, -9.6, Wt, '#c29a64', 0.75).children.forEach((m) => m.material && (m.material = M.weave));
-F.basket(3.35, FT, -10.15, 0.2, 0.42);
-F.basket(3.75, FT, -10.65, 0.18, 0.4, true);
-F.basket(3.55, FT, -8.75, 0.16, 0.38);
+// the row of white ribbed planters along the lounge's glass, planted with a mix of purple Alternanthera 'Purple
+// Knight' and Madagascar periwinkle (owner, 2026-11-22)
+for (let z = -10.7, i = 0; z < -3.65; z += 0.88, i++) {
+  F.ribbedPlanter(2.55, FT, z + 0.42, 0.42, 0.84, 0.3);
+  const flower = (dz, purple) => (purple ? F.purpleKnight : F.periwinkle)(2.55, FT + 0.3, z + 0.42 + dz, 0.27);
+  flower(-0.2, i % 2 === 0);
+  flower(0.2, i % 2 === 1);
+}
+slab(2.32, 2.78, FT, FT + 1.1, -10.7, -3.6, mat('#000000'), 'COLLIDER_planter');
+// by the KOUP pillar: two wooden reclining chairs (one pale, one teak) with a slatted folding table and its ashtray
+F.slatTable(3.42, FT, -10.1, 0.15);
 // two blue armchairs and their little round table
 F.armchair(3.25, FT, -6.75, Wt, '#58708a', 0.8);
 F.armchair(3.15, FT, -5.25, Wt, '#3b4d66', 0.8);
 F.roundTable(3.0, FT, -6.0, 0.22, 0.5, mat('#3f6680'));
-F.bush(2.5, FT, -3.25, 0.45, 'white', 0.25, 0.4);
+F.ribbedPlanter(2.55, FT, -3.25, 0.42, 0.7, 0.3);
+F.periwinkle(2.55, FT + 0.3, -3.25, 0.3);
 // the middle pairs of lounge chairs, facing each other
 F.loungeChair(2.65, FT, -1.35, 0, C.olive);
 F.loungeChair(3.35, FT, -1.35, 0, '#8a8f84');
@@ -320,7 +323,8 @@ F.loungeChair(3.35, FT, 0.45, N, C.navy);
 F.frameTable(3.0, FT, -0.45, 0, 0.5, 0.45);
 F.bigLeaf(2.55, FT, 2.65, 1.25, 'white', 0.22);
 // south: chairs along the wall, planters, metal side tables at the edge
-F.bush(2.55, FT, 5.9, 0.36, 'white', 0.22, 0.42);
+F.ribbedPlanter(2.55, FT, 5.9, 0.42, 0.7, 0.3);
+F.purpleKnight(2.55, FT + 0.3, 5.9, 0.3);
 F.loungeChair(2.6, FT, 6.65, E, C.black);
 F.frameTable(2.6, FT, 7.35, 0, 0.42, 0.42);
 F.loungeChair(2.6, FT, 8.15, E, C.navy);
@@ -335,4 +339,28 @@ F.frameTable(5.15, FT, 7.05, 0, 0.55, 0.6, M.wood);
   cyl(0.15, 0.15, 0.03, M.frame, 0, 0, 0, 20, g);
   cyl(0.015, 0.015, 1.45, M.frame, 0, 0, 0, 8, g);
   cyl(0.12, 0.2, 0.25, mat('#f3ead7', { emissive: '#fff1d2', ei: 0.5 }), 0, 1.4, 0, 20, g);
+}
+
+/** The two wooden reclining chairs (the owner's model, `models/wooden_reclining_chair.glb`), stood upright and sized. */
+export async function terraceChairs() {
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const gltf = await new GLTFLoader().loadAsync('models/wooden_reclining_chair.glb');
+  const LENGTH = 1.45; // a Kentucky-style lounger: about 1.45 m long, 0.6 m wide
+  const place = (x, z, wood) => {
+    const model = gltf.scene.clone(true);
+    // the model lies Z-up with its head at -y: stand it up (head to +z), then turn the head toward the planters (-x)
+    model.rotation.x = -Math.PI / 2;
+    const s = LENGTH / 2.11;
+    model.scale.setScalar(s);
+    const g = group(x, FT, z, -Math.PI / 2, 'reclining_chair');
+    g.add(model);
+    model.position.y = -0.0826 * s; // its feet on the floor
+    model.traverse((o) => {
+      if (!o.isMesh) return;
+      o.material = /cushion|linen/i.test(o.material.name) ? mat('#ece6da', { rough: 0.95 }) : /hook|metal|steel/i.test(o.material.name) ? mat('#9a9a96', { metal: 0.6, rough: 0.4 }) : wood;
+    });
+    contactShadow(0.62, LENGTH, x, FT, z, -Math.PI / 2);
+  };
+  place(3.62, -10.85, M.woodLight);
+  place(3.62, -9.35, M.woodDark);
 }

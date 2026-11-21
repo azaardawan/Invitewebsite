@@ -336,7 +336,7 @@ export function rug(x, y, z, ry, w, d, tex, round = false) {
   m.rotation.x = -Math.PI / 2;
   m.rotation.z = ry;
   m.scale.set(w, d, 1);
-  m.position.set(x, y + 0.006, z);
+  m.position.set(x, y + 0.01, z);
   m.name = 'NOCOLLIDE_rug';
   return add(m);
 }
@@ -358,3 +358,123 @@ export function bottles(g, x0, x1, y, z, colors, r = 0.03, h = 0.22, step = 0.07
   }
 }
 export { GLASS };
+
+// ---------- outside planting (owner, 2026-11-22) ----------
+const ribTex = (() => {
+  const c = document.createElement('canvas');
+  c.width = 128;
+  c.height = 32;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4f3ef';
+  g.fillRect(0, 0, 128, 32);
+  for (let x = 0; x < 128; x += 16) {
+    g.fillStyle = '#dcdad3';
+    g.fillRect(x + 11, 0, 3, 32);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.userData.mimeType = 'image/jpeg';
+  return t;
+})();
+/** A white ribbed plastic planter box (as on the terrace), `len` along z. */
+export function ribbedPlanter(x, y, z, w, len, h) {
+  const g = group(x, y, z, 0, 'planter');
+  const box = rbox(w, h, len, 0.03, mat('#ffffff', { map: ribTex, rough: 0.6 }), 0, 0.02, 0, 0, g);
+  const uv = box.geometry.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * len * 6);
+  rbox(w + 0.03, 0.03, len + 0.03, 0.01, mat('#f7f6f2', { rough: 0.5 }), 0, h, 0, 0, g);
+  rbox(w * 0.8, 0.02, len * 0.9, 0.005, mat('#e9e7e1'), 0, 0, 0, 0, g);
+  const soil = rbox(w - 0.05, 0.02, len - 0.05, 0.005, mat('#4b3626'), 0, h - 0.03, 0, 0, g);
+  soil.name = 'NOCOLLIDE_soil';
+  contactShadow(w, len, x, y, z, 0, false);
+  return g;
+}
+/** Alternanthera dentata 'Purple Knight': a dense mound of deep purple, pointed leaves. */
+export function purpleKnight(x, y, z, r = 0.22) {
+  const g = group(x, y, z, rr(0, 6.28), 'alternanthera');
+  const cols = ['#4a1530', '#5e1d3d', '#6f2a49', '#3a0f25', '#7a3352'];
+  for (let i = 0; i < 26; i++) {
+    const a = rr(0, 6.28),
+      d = rr(0, r * 0.9),
+      h = rr(0.04, r * 1.25) * (1 - (d / r) * 0.45);
+    const m = leafAt(g, rr(0.06, 0.1), rr(0.03, 0.045), cols[i % cols.length], [Math.cos(a) * d, h, Math.sin(a) * d], a + rr(-0.6, 0.6), rr(-0.2, 0.9));
+    m.name = 'NOCOLLIDE_leaf';
+  }
+  ball(r * 0.55, mat('#3d1128', { rough: 0.8 }), 0, r * 0.45, 0, 1.25, 0.8, 1.25, g).name = 'NOCOLLIDE_leaves';
+  return g;
+}
+/** Madagascar periwinkle (Catharanthus roseus): glossy green leaves and five-petalled pink and white flowers. */
+export function periwinkle(x, y, z, r = 0.22) {
+  const g = group(x, y, z, rr(0, 6.28), 'periwinkle');
+  const greens = ['#3f7d35', '#4f8e3e', '#5c9a45', '#356d2e'];
+  for (let i = 0; i < 22; i++) {
+    const a = rr(0, 6.28),
+      d = rr(0, r * 0.9),
+      h = rr(0.05, r * 1.15) * (1 - (d / r) * 0.4);
+    leafAt(g, rr(0.07, 0.1), rr(0.035, 0.05), greens[i % greens.length], [Math.cos(a) * d, h, Math.sin(a) * d], a + rr(-0.6, 0.6), rr(-0.1, 0.7)).name = 'NOCOLLIDE_leaf';
+  }
+  ball(r * 0.55, mat('#3a7231', { rough: 0.7 }), 0, r * 0.45, 0, 1.25, 0.8, 1.25, g).name = 'NOCOLLIDE_leaves';
+  const petals = ['#e2589a', '#ee82b5', '#f6f1f3', '#e2589a', '#d94a8c'];
+  for (let i = 0; i < 11; i++) {
+    const a = rr(0, 6.28),
+      d = rr(0, r * 0.85);
+    flower(g, petals[i % petals.length], [Math.cos(a) * d, r * 0.95 * (1 - (d / r) * 0.35) + 0.03, Math.sin(a) * d]);
+  }
+  return g;
+}
+const petalGeo = new THREE.CircleGeometry(0.014, 6);
+const smallLeafGeo = new THREE.SphereGeometry(1, 6, 4);
+function flower(g, color, pos) {
+  const f = new THREE.Group();
+  f.position.set(...pos);
+  f.rotation.set(-Math.PI / 2 + rr(-0.4, 0.4), 0, rr(0, 6.28));
+  for (let k = 0; k < 5; k++) {
+    const p = new THREE.Mesh(petalGeo, mat(color, { rough: 0.6, side: THREE.DoubleSide }));
+    const a = (k / 5) * Math.PI * 2;
+    p.position.set(Math.cos(a) * 0.014, Math.sin(a) * 0.014, 0);
+    p.scale.set(1.2, 0.9, 1);
+    p.rotation.z = a;
+    p.name = 'NOCOLLIDE_flower';
+    f.add(p);
+  }
+  const eye = new THREE.Mesh(new THREE.CircleGeometry(0.006, 5), mat(color === '#f6f1f3' ? '#d8336f' : '#a61b52', { side: THREE.DoubleSide }));
+  eye.position.z = 0.002;
+  eye.name = 'NOCOLLIDE_flower';
+  f.add(eye);
+  g.add(f);
+}
+function leafAt(g, len, wid, color, pos, yaw, tilt) {
+  const m = new THREE.Mesh(smallLeafGeo, mat(color, { rough: 0.55, side: THREE.DoubleSide }));
+  m.scale.set(wid, 0.01, len / 2);
+  const holder = new THREE.Group();
+  holder.position.set(...pos);
+  holder.rotation.set(0, yaw, 0);
+  const inner = new THREE.Group();
+  inner.rotation.x = -tilt;
+  m.position.z = len / 2;
+  inner.add(m);
+  holder.add(inner);
+  g.add(holder);
+  return m;
+}
+/** The slatted wooden folding table (with crossed legs) and its steel ashtray. */
+export function slatTable(x, y, z, ry, size = 0.46, h = 0.5) {
+  const g = group(x, y, z, ry, 'slat_table');
+  const n = 6,
+    gap = 0.012,
+    sw = (size - gap * (n - 1)) / n;
+  for (let i = 0; i < n; i++) rbox(sw, 0.022, size, 0.005, M.wood, -size / 2 + sw / 2 + i * (sw + gap), h - 0.022, 0, 0, g);
+  for (const sz of [-size / 2 + 0.04, size / 2 - 0.04]) rbox(size, 0.03, 0.03, 0.006, M.woodDark, 0, h - 0.055, sz, 0, g);
+  // crossed (folding) legs on two sides
+  for (const sx of [-size / 2 + 0.03, size / 2 - 0.03]) {
+    rod([sx, 0, -size / 2 + 0.02], [sx, h - 0.055, size / 2 - 0.04], 0.016, M.woodDark, g);
+    rod([sx, 0, size / 2 - 0.02], [sx, h - 0.055, -size / 2 + 0.04], 0.016, M.woodDark, g);
+  }
+  // ashtray
+  const steel = mat('#c4c6c8', { metal: 0.85, rough: 0.25 });
+  cyl(0.065, 0.06, 0.035, steel, 0.06, h, -0.05, 24, g);
+  cyl(0.05, 0.05, 0.002, mat('#8d9093', { metal: 0.6, rough: 0.4 }), 0.06, h + 0.034, -0.05, 24, g);
+  contactShadow(size, size, x, y, z, ry);
+  return g;
+}
