@@ -84,7 +84,11 @@ const nextConfig: NextConfig = {
       { source: '/p/:path*', headers: [noIndex] },
       { source: '/r/:path*', headers: [noIndex] },
       { source: '/t/:path*', headers: [noIndex] },
-      { source: '/tour/:path*', headers: isProd ? [{ key: 'Content-Security-Policy', value: tourCsp }] : [] },
+      // A private tour's link carries its code: never sent on to the sites its buttons open.
+      {
+        source: '/tour/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }, ...(isProd ? [{ key: 'Content-Security-Policy', value: tourCsp }] : [])],
+      },
       // A customer's order screens carry their private preview token in the URL.
       { source: '/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
       { source: '/:locale(en|ckb|bdn)/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },

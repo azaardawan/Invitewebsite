@@ -6,7 +6,10 @@ import { signInAsNewOwner } from './helpers';
  * Cafés' virtual tours (owner, 2026-11-21): the owner adds a café in Admin, uploads its 3D model and turns it on; the
  * link (for the café's Instagram bio) opens a full-screen walk with the café's name and buttons.
  */
-test('the owner publishes a café tour, and visitors walk through it', async ({ page, browser }, testInfo) => {
+/** The model: a stand-in (the museum), or another `.glb` to try (`TOUR_MODEL=<path>`). */
+const MODEL = process.env.TOUR_MODEL ?? 'themes/memory-museum/v2/assets/museum.glb';
+
+test('the owner publishes a café tour with a private link, and visitors walk through it', async ({ page, browser }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
   test.setTimeout(180_000);
   const slug = `cafe-${Date.now().toString(36)}`;
@@ -15,13 +18,18 @@ test('the owner publishes a café tour, and visitors walk through it', async ({ 
   await page.goto('/admin/tours');
   await page.getByLabel('اسم المقهى').fill('Café Roma');
   await page.getByLabel(/^اسم الرابط/).fill(slug);
+  await page.getByRole('checkbox', { name: /^رابط خاص/ }).check();
   await page.getByRole('button', { name: 'إضافة جولة' }).click();
   await page.waitForURL(/\/admin\/tours\/[0-9a-f-]{36}$/);
+  // The private link: the link name and a random code; the bare name opens nothing.
+  const link = new URL((await page.locator('a[href*="/tour/"]').first().getAttribute('href'))!).pathname;
+  expect(link).toMatch(new RegExp(`^/tour/${slug}-[a-z0-9]{16}$`));
 
   // Not shown before it has a model and is turned on.
   const visitor = await browser.newContext({ locale: 'en-US', viewport: { width: 1280, height: 800 } });
   const v = await visitor.newPage();
-  await v.goto(`/tour/${slug}`);
+  expect((await v.goto(`/tour/${slug}`))!.status()).toBe(404);
+  await v.goto(link);
   await expect(v.getByText("This virtual tour isn't open right now.", { exact: false })).toBeVisible();
 
   await page.getByRole('button', { name: 'تفعيل' }).click();
@@ -30,7 +38,7 @@ test('the owner publishes a café tour, and visitors walk through it', async ({ 
   await page.locator('input[type=file][accept*=".glb"]').setInputFiles({
     name: 'roma.glb',
     mimeType: 'model/gltf-binary',
-    buffer: readFileSync('themes/memory-museum/v2/assets/museum.glb'),
+    buffer: readFileSync(MODEL),
   });
   await expect(page.getByText('تم حفظ النموذج.')).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(/roma\.glb/)).toBeVisible();
@@ -44,7 +52,7 @@ test('the owner publishes a café tour, and visitors walk through it', async ({ 
 
   const errors: string[] = [];
   v.on('pageerror', (e) => errors.push(e.message));
-  await v.goto(`/tour/${slug}`);
+  await v.goto(link);
   await expect(v.locator('[data-testid="tour-canvas"][data-state="ready"]')).toBeVisible({ timeout: 60_000 });
   await expect(v.getByRole('heading', { name: 'Café Roma' })).toBeVisible();
   await expect(v.getByRole('link', { name: 'Instagram' })).toHaveAttribute('href', 'https://instagram.com/cafe.roma');
@@ -55,15 +63,20 @@ test('the owner publishes a café tour, and visitors walk through it', async ({ 
   // Walking forward.
   await v.mouse.click(640, 400);
   await v.keyboard.down('ArrowUp');
-  await v.waitForTimeout(1500);
+  await v.waitForTimeout(4000);
   await v.keyboard.up('ArrowUp');
   await v.screenshot({ path: testInfo.outputPath('tour-walked.png') });
+  // Turning round.
+  await v.keyboard.down('ArrowLeft');
+  await v.waitForTimeout(1700);
+  await v.keyboard.up('ArrowLeft');
+  await v.screenshot({ path: testInfo.outputPath('tour-turned.png') });
   expect(errors).toEqual([]);
 
   // On a phone, in Arabic: the pad to walk.
   const phone = await browser.newContext({ locale: 'ar-IQ', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const p = await phone.newPage();
-  await p.goto(`/tour/${slug}`);
+  await p.goto(link);
   await expect(p.locator('[data-testid="tour-canvas"][data-state="ready"]')).toBeVisible({ timeout: 60_000 });
   await expect(p.getByRole('link', { name: 'انستغرام' })).toBeVisible();
   await expect(p.locator('html')).toHaveAttribute('dir', 'rtl');
@@ -73,6 +86,7 @@ test('the owner publishes a café tour, and visitors walk through it', async ({ 
   await page.goto('/admin/tours');
   await expect(page.getByRole('link', { name: 'Café Roma' })).toBeVisible();
   await expect(page.getByText(/ظاهرة/)).toBeVisible();
+  await expect(page.getByText('رابط خاص').first()).toBeVisible();
   await visitor.close();
   await phone.close();
 });

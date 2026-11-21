@@ -1161,7 +1161,19 @@
       "logo": "Café logo",
       "save": "Save",
       "copy": "Copy",
-      "copied": "Copied"
+      "copied": "Copied",
+      "private": "Private link",
+      "privateHint": "The link gets a random code nobody can guess (e.g. /tour/cafe-roma-k3m9…); only people you send it to can open the tour.",
+      "privateBadge": "Private link",
+      "link": "Link",
+      "linkPublic": "Anyone with the link can open the tour. Its link is its name, so it can be guessed.",
+      "linkPrivate": "The link has a random code: only people who have it can open the tour.",
+      "makePrivate": "Make the link private",
+      "makePrivateConfirm": "The tour will open only at its new private link; the current link stops working. Continue?",
+      "makePublic": "Make the link public",
+      "makePublicConfirm": "The tour will open at /tour/<link name>, and the private link stops working. Continue?",
+      "renew": "New private link",
+      "renewConfirm": "A new private link is made and the current one stops working at once. Continue?"
     }
   },
   "invitation": {

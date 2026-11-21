@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { assets, auditLogs, tours } from '@/server/db/schema';
 import { CatalogError } from '@/server/catalog/common';
-import { countTourVisit, createTour, isGlb, publicTour, setTourLive, setTourModel, tourState, updateTour, whatsappLink } from '@/server/tours/tours';
+import { countTourVisit, createTour, isGlb, publicTour, setTourLive, setTourModel, setTourPrivacy, tourPath, tourState, updateTour, whatsappLink } from '@/server/tours/tours';
 import { tourLocale } from '@/server/tours/locale';
 import { mediaServedHere } from '@/server/storage/served-here';
 import { storage } from '@/server/storage';
@@ -101,6 +101,35 @@ describe('virtual tours', () => {
     expect((await publicTour(db(), s, new Date('2026-12-01T00:00:00Z'))).state).toBe('off');
     expect((await publicTour(db(), 'no-such-cafe-here')).state).toBe('missing');
     expect((await publicTour(db(), '../etc')).state).toBe('missing');
+  });
+
+  it('a private link opens the tour only with its code; a new code ends the old link', async () => {
+    const s = slug();
+    const t = await createTour(db(), { name: 'Secret Café', slug: s, links: {}, private: true }, actor);
+    expect(t.privateKey).toMatch(/^[a-z0-9]{16}$/);
+    const link = tourPath(t);
+    expect(link).toBe(`/tour/${s}-${t.privateKey}`);
+    const at = (path: string) => publicTour(db(), path.replace('/tour/', ''));
+    expect((await at(link)).state).toBe('off');
+    expect((await at(`/tour/${s}`)).state).toBe('missing');
+    expect((await at(`/tour/${s}-${'a'.repeat(16)}`)).state).toBe('missing');
+    expect((await at(`${link}x`)).state).toBe('missing');
+
+    const renewed = await setTourPrivacy(db(), t.id, 'renew', actor);
+    expect(renewed.privateKey).not.toBe(t.privateKey);
+    expect((await at(link)).state).toBe('missing');
+    expect((await at(tourPath(renewed))).state).toBe('off');
+    // Asking for private again keeps the code.
+    expect((await setTourPrivacy(db(), t.id, 'private', actor)).privateKey).toBe(renewed.privateKey);
+
+    const open = await setTourPrivacy(db(), t.id, 'public', actor);
+    expect(tourPath(open)).toBe(`/tour/${s}`);
+    expect((await at(`/tour/${s}`)).state).toBe('off');
+    expect((await at(tourPath(renewed))).state).toBe('missing');
+    // The code is never written in the audit log.
+    const audit = await db().select().from(auditLogs).where(eq(auditLogs.objectId, t.id));
+    expect(audit.map((a) => a.action)).toEqual(expect.arrayContaining(['tour.created', 'tour.link_renewed', 'tour.link_public']));
+    expect(JSON.stringify(audit)).not.toContain(renewed.privateKey!);
   });
 
   it('reads the state, WhatsApp links and the page language', () => {

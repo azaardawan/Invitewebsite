@@ -24,6 +24,11 @@ export const tours = pgTable(
     live: boolean('live').notNull().default(false),
     /** When the subscription ends (the tour closes by itself then); null = it doesn't end. */
     endsAt: timestamp('ends_at', { withTimezone: true }),
+    /**
+     * A private link (owner, 2026-11-21): when set, the tour opens only at `/tour/<slug>-<private_key>` (a random code
+     * nobody can guess), never at `/tour/<slug>`. Changing the code ends the old link.
+     */
+    privateKey: text('private_key'),
     visits: integer('visits').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })

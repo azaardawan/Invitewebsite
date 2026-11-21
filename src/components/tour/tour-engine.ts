@@ -43,6 +43,21 @@ const named = (o: THREE.Object3D, prefix: string) => {
   return false;
 };
 
+/**
+ * A scanned place (photogrammetry: Polycam, Luma, RealityScan…) has its light already in its photos, and its materials
+ * left at glTF's defaults (fully metallic, fully rough, a colour picture). Drawn as the photos are (unlit, not
+ * tone-mapped, both sides), it looks as it was shot; lit, it would look dark and metallic. Other materials are kept.
+ */
+function baked(mat: THREE.Material): THREE.Material {
+  const std = mat as THREE.MeshStandardMaterial;
+  if (!std.isMeshStandardMaterial || !std.map || std.metalness !== 1 || std.roughness !== 1 || std.metalnessMap || std.normalMap || std.emissiveMap) return mat;
+  const flat = new THREE.MeshBasicMaterial({ map: std.map, color: std.color, side: THREE.DoubleSide, transparent: std.transparent, alphaTest: std.alphaTest });
+  flat.toneMapped = false;
+  flat.name = std.name;
+  std.dispose();
+  return flat;
+}
+
 export class TourEngine {
   private o: TourOptions;
   private renderer: THREE.WebGLRenderer;
@@ -141,7 +156,8 @@ export class TourEngine {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
       if (named(m, 'COLLIDER')) m.visible = false;
-      const mats = Array.isArray(m.material) ? m.material : [m.material];
+      const mats = (Array.isArray(m.material) ? m.material : [m.material]).map((mat) => baked(mat));
+      m.material = Array.isArray(m.material) ? mats : mats[0]!;
       for (const mat of mats) {
         const map = (mat as THREE.MeshStandardMaterial).map;
         if (map) map.anisotropy = anisotropy;
@@ -184,33 +200,56 @@ export class TourEngine {
   }
 
   /**
-   * Without a START: the open spot (a floor under the visitor's feet with room for them up to their head, nothing within
-   * reach around) nearest the middle of the model, from a grid over its floor plan. Sets the position; the floor's height.
+   * Without a START: the main floor is the level with the most room to stand on (a grid over the model's plan, looking
+   * down through every level: a surface with room for a visitor above it), and visitors start at the open spot of it
+   * nearest its middle, looking the way with the most room. Sets the position and the look; returns the floor's height.
    */
   private openSpot(box: THREE.Box3): number | null {
-    const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
-    const spots: { x: number; z: number; d: number }[] = [];
-    const n = 12;
+    const n = 28;
+    const spots: THREE.Vector3[] = [];
+    this.ray.firstHitOnly = false;
     for (let i = 0; i <= n; i++)
       for (let j = 0; j <= n; j++) {
         const x = box.min.x + (size.x * i) / n;
         const z = box.min.z + (size.z * j) / n;
-        spots.push({ x, z, d: Math.hypot(x - center.x, z - center.z) });
+        this.ray.set(this.v.set(x, box.max.y + 1, z), this.down);
+        this.ray.near = 0;
+        this.ray.far = size.y + 2;
+        let above = Infinity;
+        for (const hit of this.ray.intersectObjects(this.colliders, false)) {
+          if (above - hit.point.y >= EYE + 0.25) spots.push(hit.point.clone());
+          above = hit.point.y;
+        }
       }
-    spots.sort((a, b) => a.d - b.d);
-    const up = new THREE.Vector3(0, 1, 0);
-    for (const { x, z } of spots) {
-      // The lowest storey: looking down from 2 m above the model's lowest point (under its ceilings).
-      const y = this.floorBelow(x, z, box.min.y + Math.min(2, size.y), Infinity);
-      if (y === null) continue;
-      this.ray.set(this.v.set(x, y + 0.1, z), up);
-      this.ray.far = EYE + 0.2;
-      if (this.ray.intersectObjects(this.colliders, false).length) continue;
-      this.pos.set(x, y, z);
-      this.floorY = y;
+    this.ray.firstHitOnly = true;
+    if (!spots.length) return null;
+    // The level (half a metre deep) with the most places to stand.
+    const levels = new Map<number, THREE.Vector3[]>();
+    for (const p of spots) {
+      const k = Math.round(p.y / 0.5);
+      levels.set(k, [...(levels.get(k) ?? []), p]);
+    }
+    const main = [...levels.values()].sort((a, b) => b.length - a.length)[0]!;
+    const middle = main.reduce((m, p) => m.add(p), new THREE.Vector3()).divideScalar(main.length);
+    main.sort((a, b) => Math.hypot(a.x - middle.x, a.z - middle.z) - Math.hypot(b.x - middle.x, b.z - middle.z));
+    for (const p of main) {
+      this.pos.set(p.x, p.y, p.z);
+      this.floorY = p.y;
       if (this.blocked(0.001, 0) || this.blocked(-0.001, 0) || this.blocked(0, 0.001) || this.blocked(0, -0.001)) continue;
-      return y;
+      // Looking the way with the most room (at eye height, up to 30 m).
+      let best = -1;
+      for (let k = 0; k < 16; k++) {
+        const yaw = (k / 16) * Math.PI * 2;
+        this.ray.set(this.v.set(p.x, p.y + EYE, p.z), this.w.set(-Math.sin(yaw), 0, -Math.cos(yaw)));
+        this.ray.far = 30;
+        const d = this.ray.intersectObjects(this.colliders, false)[0]?.distance ?? 30;
+        if (d > best) {
+          best = d;
+          this.yaw = yaw;
+        }
+      }
+      return p.y;
     }
     return null;
   }

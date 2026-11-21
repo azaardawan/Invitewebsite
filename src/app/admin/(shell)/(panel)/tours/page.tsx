@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { db } from '@/server/db/client';
 import { env } from '@/server/env';
 import { requireAdmin } from '@/server/auth/guard';
-import { listTours, tourState } from '@/server/tours/tours';
+import { listTours, tourPath, tourState } from '@/server/tours/tours';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card } from '@/components/admin/bits';
 import { CopyLink } from '@/components/admin/TourModelUpload';
@@ -40,9 +40,12 @@ export default async function ToursPage() {
                   <Link href={`/admin/tours/${tour.id}`} className="font-medium underline">
                     {tour.name}
                   </Link>
-                  <Badge status={TONE[state]}>{t(`state.${state}`)}</Badge>
+                  <span className="flex gap-1">
+                    {tour.privateKey ? <Badge status="READY_FOR_REVIEW">{t('privateBadge')}</Badge> : null}
+                    <Badge status={TONE[state]}>{t(`state.${state}`)}</Badge>
+                  </span>
                 </div>
-                <CopyLink url={`${base}/tour/${tour.slug}`} />
+                <CopyLink url={`${base}${tourPath(tour)}`} />
                 <p className="text-sm text-muted">
                   {t('visits', { n: tour.visits })} ·{' '}
                   {tour.endsAt
@@ -66,6 +69,13 @@ export default async function ToursPage() {
           <p className="text-xs text-muted" dir="ltr">
             {base}/tour/…
           </p>
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" name="private" className="mt-1" />
+            <span>
+              {t('private')}
+              <span className="block text-xs text-muted">{t('privateHint')}</span>
+            </span>
+          </label>
           <SubmitButton>{t('add')}</SubmitButton>
         </ActionForm>
       </Card>

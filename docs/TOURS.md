@@ -9,6 +9,11 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
 - **The link**: `https://<site>/tour/<link-name>`. It shows while the tour is on, has its model, and its end date
   (the end of that day, Baghdad time) has not passed; otherwise a calm page says it is closed or has ended. Unknown
   names are a 404 (misses rate-limited). Every opening counts a visit.
+- **Private link** (owner, 2026-11-21): tick "Private link" when adding a tour (or "Make the link private" on its page)
+  and its address becomes `/tour/<link-name>-<16-letter code>`; the bare `/tour/<link-name>` opens nothing. "New
+  private link" makes a new code and ends the old link at once; "Make the link public" goes back. The code is a secret:
+  the audit log records only whether a tour is private, and the tour pages send no referrer to the sites their buttons
+  open.
 - **The page**: full screen; the café's logo and name at the top, its buttons at the bottom (only those with a link),
   and a small "Virtual tour by Bahja". Visitors walk with the arrow keys / W A S D or the round pad on a phone, and
   drag to look around. Its language follows the visitor's browser (Arabic when it is none of the site's).
@@ -31,6 +36,9 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).
+- **Scans** (Polycam, Luma, RealityScan… exported as `.glb`) work as they are: their colours are baked into their photos,
+  so the page draws them unlit, exactly as shot. Without a `START`, visitors begin on the level with the most room to
+  stand on, near its middle, facing the way with the most room. Holes in a scanned floor stop visitors like an edge.
 - **Light**: the page adds soft daylight. Lamps exported from Blender (point and spot lights) are brought down from
   Blender's units automatically. Baked lighting in the textures looks best on phones.
 - **Weight**: keep textures at 2K or less, JPEG/WebP inside the glTF; meshopt compression (gltfpack `-cc`) is

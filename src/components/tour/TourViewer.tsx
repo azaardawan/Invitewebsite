@@ -216,6 +216,7 @@ export function TourViewer({
         <Link
           href="/"
           target="_blank"
+          rel="noreferrer"
           style={{ ...GLASS, pointerEvents: 'auto', fontSize: 11, color: 'rgba(255,255,255,.9)', textDecoration: 'none', padding: '3px 10px', borderRadius: 999 }}
         >
           {words.credit}

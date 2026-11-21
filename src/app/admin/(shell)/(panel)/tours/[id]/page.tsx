@@ -7,12 +7,12 @@ import { assets } from '@/server/db/schema';
 import { env } from '@/server/env';
 import { requireAdmin } from '@/server/auth/guard';
 import { publicMediaUrl } from '@/server/storage';
-import { getTour, TOUR_MODEL_MAX_BYTES, tourState } from '@/server/tours/tours';
+import { getTour, TOUR_MODEL_MAX_BYTES, tourPath, tourState } from '@/server/tours/tours';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Badge, Card } from '@/components/admin/bits';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { CopyLink, TourModelUpload } from '@/components/admin/TourModelUpload';
-import { tourLiveAction, tourLogoAction, updateTourAction } from '@/app/admin/_actions/tours';
+import { tourLiveAction, tourLogoAction, tourPrivacyAction, updateTourAction } from '@/app/admin/_actions/tours';
 
 const TONE = { live: 'ACTIVE', off: 'DEVELOPMENT', ended: 'ARCHIVED' } as const;
 
@@ -40,9 +40,10 @@ export default async function TourPage(props: PageProps<'/admin/tours/[id]'>) {
         </Link>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold">{tour.name}</h1>
+          {tour.privateKey ? <Badge status="READY_FOR_REVIEW">{t('privateBadge')}</Badge> : null}
           <Badge status={TONE[state]}>{t(`state.${state}`)}</Badge>
         </div>
-        <CopyLink url={`${base}/tour/${tour.slug}`} />
+        <CopyLink url={`${base}${tourPath(tour)}`} />
         <p className="text-sm text-muted">{t('visits', { n: tour.visits })}</p>
       </header>
 
@@ -62,6 +63,33 @@ export default async function TourPage(props: PageProps<'/admin/tours/[id]'>) {
           <input type="hidden" name="live" value={tour.live ? 'false' : 'true'} />
           <SubmitButton tone={tour.live ? 'danger' : 'primary'}>{tour.live ? t('turnOff') : t('turnOn')}</SubmitButton>
         </ActionForm>
+      </Card>
+
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('link')}</h2>
+        <p className="text-sm text-muted">{tour.privateKey ? t('linkPrivate') : t('linkPublic')}</p>
+        <div className="flex flex-wrap gap-3">
+          {tour.privateKey ? (
+            <>
+              <ActionForm action={tourPrivacyAction} confirmMessage={t('renewConfirm')}>
+                <input type="hidden" name="id" value={tour.id} />
+                <input type="hidden" name="mode" value="renew" />
+                <SubmitButton tone="secondary">{t('renew')}</SubmitButton>
+              </ActionForm>
+              <ActionForm action={tourPrivacyAction} confirmMessage={t('makePublicConfirm')}>
+                <input type="hidden" name="id" value={tour.id} />
+                <input type="hidden" name="mode" value="public" />
+                <SubmitButton tone="secondary">{t('makePublic')}</SubmitButton>
+              </ActionForm>
+            </>
+          ) : (
+            <ActionForm action={tourPrivacyAction} confirmMessage={t('makePrivateConfirm')}>
+              <input type="hidden" name="id" value={tour.id} />
+              <input type="hidden" name="mode" value="private" />
+              <SubmitButton tone="secondary">{t('makePrivate')}</SubmitButton>
+            </ActionForm>
+          )}
+        </div>
       </Card>
 
       <Card>

@@ -1,5 +1,5 @@
 import 'server-only';
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 import { desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { assets, tours, type TourLinks } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, CatalogError, type Actor } from '@/server/catalog/common';
 import { publicMediaUrl, storage } from '@/server/storage';
-import { sha256Buffer } from '@/lib/crypto';
+import { safeEqual, sha256Buffer } from '@/lib/crypto';
 
 /**
  * Virtual tours (owner, 2026-11-21): a café's own 3D model, walked through from `/tour/<slug>` (the link in its
@@ -21,6 +21,21 @@ export type Tour = typeof tours.$inferSelect;
 export const TOUR_MODEL_MAX_BYTES = 80 * 1024 * 1024;
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+/** A private link's code: 16 letters and digits (80 bits), nobody can guess it. */
+const PRIVATE_KEY = /^[a-z0-9]{16}$/;
+
+function newPrivateKey(): string {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  // 36 letters: a byte below 252 picks one evenly.
+  let key = '';
+  while (key.length < 16) for (const b of randomBytes(24)) if (b < 252 && key.length < 16) key += alphabet[b % 36];
+  return key;
+}
+
+/** The tour's address on the site: `/tour/<slug>`, or `/tour/<slug>-<code>` for a private link. */
+export function tourPath(t: Pick<Tour, 'slug' | 'privateKey'>): string {
+  return `/tour/${t.slug}${t.privateKey ? `-${t.privateKey}` : ''}`;
+}
 const link = z
   .string()
   .trim()
@@ -32,6 +47,8 @@ export const tourInput = z.object({
   name: z.string().trim().min(1).max(80),
   slug: z.string().trim().toLowerCase().min(3).max(60).regex(SLUG),
   links: z.object({ instagram: link.optional(), location: link.optional(), menu: link.optional(), whatsapp: z.string().trim().max(30).optional() }),
+  /** Only on creating: a private link from the start (see `setTourPrivacy` afterwards). */
+  private: z.boolean().optional(),
   /** YYYY-MM-DD (the end of that day, Baghdad time), or empty for no end. */
   endsOn: z
     .string()
@@ -57,11 +74,12 @@ function parse(input: TourInput) {
   if (!r.success) throw new CatalogError('invalidTour', r.error.issues.map((i) => i.path.join('.') || i.message));
   const { name, slug, links, endsOn } = r.data;
   const clean: TourLinks = Object.fromEntries(Object.entries(links).filter(([, v]) => v)) as TourLinks;
-  return { name, slug, links: clean, endsAt: endsOn ? endOfDay(endsOn) : null };
+  return { data: { name, slug, links: clean, endsAt: endsOn ? endOfDay(endsOn) : null }, private: r.data.private ?? false };
 }
 
-function snapshot(t: Pick<Tour, 'name' | 'slug' | 'links' | 'endsAt' | 'live'>) {
-  return { name: t.name, slug: t.slug, links: t.links, endsAt: t.endsAt?.toISOString() ?? null, live: t.live };
+// The private code is a secret (like a token): only whether there is one is audited.
+function snapshot(t: Pick<Tour, 'name' | 'slug' | 'links' | 'endsAt' | 'live' | 'privateKey'>) {
+  return { name: t.name, slug: t.slug, links: t.links, endsAt: t.endsAt?.toISOString() ?? null, live: t.live, private: !!t.privateKey };
 }
 
 export async function listTours(db: DbOrTx) {
@@ -74,18 +92,21 @@ export async function getTour(db: DbOrTx, id: string) {
 }
 
 export async function createTour(db: DbOrTx, input: TourInput, actor: Actor) {
-  const data = parse(input);
+  const { data, private: isPrivate } = parse(input);
   return db.transaction(async (tx) => {
     const [taken] = await tx.select({ id: tours.id }).from(tours).where(eq(tours.slug, data.slug));
     if (taken) throw new CatalogError('slugTaken');
-    const [row] = await tx.insert(tours).values(data).returning();
+    const [row] = await tx
+      .insert(tours)
+      .values({ ...data, privateKey: isPrivate ? newPrivateKey() : null })
+      .returning();
     await recordAudit(tx, { ...auditActor(actor), action: 'tour.created', objectType: 'tour', objectId: row!.id, after: snapshot(row!) });
     return row!;
   });
 }
 
 export async function updateTour(db: DbOrTx, id: string, input: TourInput, actor: Actor) {
-  const data = parse(input);
+  const { data } = parse(input);
   return db.transaction(async (tx) => {
     const [before] = await tx.select().from(tours).where(eq(tours.id, id)).for('update');
     if (!before) throw new CatalogError('notFound');
@@ -93,6 +114,28 @@ export async function updateTour(db: DbOrTx, id: string, input: TourInput, actor
     if (taken && taken.id !== id) throw new CatalogError('slugTaken');
     const [row] = await tx.update(tours).set(data).where(eq(tours.id, id)).returning();
     await recordAudit(tx, { ...auditActor(actor), action: 'tour.updated', objectType: 'tour', objectId: id, before: snapshot(before), after: snapshot(row!) });
+    return row!;
+  });
+}
+
+/**
+ * Makes the tour's link private (`/tour/<slug>-<code>`), public again (`/tour/<slug>`), or private with a new code
+ * (`renew`: the old private link stops working at once).
+ */
+export async function setTourPrivacy(db: DbOrTx, id: string, mode: 'private' | 'public' | 'renew', actor: Actor) {
+  return db.transaction(async (tx) => {
+    const [before] = await tx.select().from(tours).where(eq(tours.id, id)).for('update');
+    if (!before) throw new CatalogError('notFound');
+    const privateKey = mode === 'public' ? null : mode === 'private' && before.privateKey ? before.privateKey : newPrivateKey();
+    const [row] = await tx.update(tours).set({ privateKey }).where(eq(tours.id, id)).returning();
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: mode === 'public' ? 'tour.link_public' : mode === 'renew' ? 'tour.link_renewed' : 'tour.link_private',
+      objectType: 'tour',
+      objectId: id,
+      before: { private: !!before.privateKey },
+      after: { private: !!privateKey },
+    });
     return row!;
   });
 }
@@ -164,10 +207,24 @@ export function tourState(t: Pick<Tour, 'live' | 'modelAssetId' | 'endsAt'>, now
   return t.live && t.modelAssetId ? 'live' : 'off';
 }
 
-/** A tour for its public page (`/tour/<slug>`): whether it shows, and what the page needs. */
-export async function publicTour(db: DbOrTx, slug: string, now = new Date()) {
-  if (!SLUG.test(slug)) return { state: 'missing' as const };
-  const [t] = await db.select().from(tours).where(eq(tours.slug, slug));
+/**
+ * A tour for its page, from the address's last part: a public tour's slug, or a private tour's `<slug>-<code>` (a
+ * private tour never opens at its bare slug).
+ */
+async function tourAt(db: DbOrTx, path: string) {
+  if (!SLUG.test(path)) return null;
+  const [exact] = await db.select().from(tours).where(eq(tours.slug, path));
+  if (exact && !exact.privateKey) return exact;
+  const cut = path.lastIndexOf('-');
+  const key = path.slice(cut + 1);
+  if (cut < 1 || !PRIVATE_KEY.test(key)) return null;
+  const [t] = await db.select().from(tours).where(eq(tours.slug, path.slice(0, cut)));
+  return t?.privateKey && safeEqual(t.privateKey, key) ? t : null;
+}
+
+/** A tour for its page (`/tour/<slug>`, or a private link): whether it shows, and what the page needs. */
+export async function publicTour(db: DbOrTx, path: string, now = new Date()) {
+  const t = await tourAt(db, path);
   if (!t) return { state: 'missing' as const };
   const state = tourState(t, now);
   if (state !== 'live') return { state, name: t.name };

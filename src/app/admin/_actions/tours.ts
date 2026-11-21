@@ -7,7 +7,7 @@ import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { requestContext } from '@/server/auth/request-context';
 import type { Actor } from '@/server/catalog/common';
-import { createTour, setTourLive, setTourLogo, updateTour, type TourInput } from '@/server/tours/tours';
+import { createTour, setTourLive, setTourLogo, setTourPrivacy, updateTour, type TourInput } from '@/server/tours/tours';
 import { catalogFailure } from './form-helpers';
 import type { ActionState } from './state';
 
@@ -29,6 +29,7 @@ function input(form: FormData): TourInput {
     slug: text(form, 'slug'),
     endsOn: text(form, 'endsOn'),
     links: { instagram: text(form, 'instagram'), location: text(form, 'location'), menu: text(form, 'menu'), whatsapp: text(form, 'whatsapp') },
+    private: form.get('private') === 'on',
   };
 }
 
@@ -70,4 +71,11 @@ export async function tourLogoAction(_: ActionState, form: FormData): Promise<Ac
   const tourId = id(form);
   const asset = text(form, 'assetId');
   return run(() => setTourLogo(db(), tourId, asset ? z.uuid().parse(asset) : null, who), [`/admin/tours/${tourId}`]);
+}
+
+export async function tourPrivacyAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const who = await actor();
+  const tourId = id(form);
+  const mode = z.enum(['private', 'public', 'renew']).parse(form.get('mode'));
+  return run(() => setTourPrivacy(db(), tourId, mode, who).then(() => {}), ['/admin/tours', `/admin/tours/${tourId}`]);
 }
