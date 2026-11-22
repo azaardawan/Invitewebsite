@@ -100,6 +100,92 @@ const artAbstract = drawTex(256, 384, (g, w, h) => {
   g.fillStyle = '#efe7d7';
   g.fillRect(40, 280, 90, 60);
 });
+// the abstract painting above the walnut table (owner's photo): textured cream, a tan band, a dark olive-brown half
+// moon, a small black block, a pale pink-beige base, fine white scratches
+const painting = drawTex(320, 590, (g, w, h) => {
+  g.fillStyle = '#e4dccc';
+  g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) {
+    g.fillStyle = rnd() < 0.5 ? 'rgba(255,255,255,0.18)' : 'rgba(120,100,80,0.10)';
+    g.fillRect(rnd() * w, rnd() * h, 2, 2);
+  }
+  g.fillStyle = '#b39478';
+  g.beginPath();
+  g.moveTo(0, h * 0.24);
+  g.lineTo(w * 0.29, h * 0.26);
+  g.lineTo(w * 0.27, h);
+  g.lineTo(0, h);
+  g.fill();
+  g.fillStyle = '#4c4233';
+  g.beginPath();
+  g.moveTo(w, h * 0.14);
+  g.lineTo(w * 0.86, h * 0.13);
+  g.bezierCurveTo(w * 0.62, h * 0.15, w * 0.58, h * 0.4, w * 0.66, h * 0.52);
+  g.lineTo(w, h * 0.54);
+  g.fill();
+  g.fillStyle = '#ead8cc';
+  g.beginPath();
+  g.moveTo(w * 0.27, h * 0.62);
+  g.bezierCurveTo(w * 0.45, h * 0.58, w * 0.6, h * 0.55, w * 0.7, h * 0.6);
+  g.bezierCurveTo(w * 0.8, h * 0.63, w * 0.9, h * 0.6, w, h * 0.6);
+  g.lineTo(w, h);
+  g.lineTo(w * 0.27, h);
+  g.fill();
+  g.fillStyle = '#141210';
+  g.beginPath();
+  g.moveTo(w * 0.24, h * 0.45);
+  g.lineTo(w * 0.43, h * 0.44);
+  g.lineTo(w * 0.4, h * 0.62);
+  g.lineTo(w * 0.24, h * 0.63);
+  g.fill();
+  g.strokeStyle = 'rgba(255,255,255,0.75)';
+  g.lineWidth = 2;
+  for (const [x0, y0, x1, y1, x2, y2] of [
+    [w * 0.05, h * 0.1, w * 0.4, h * 0.02, w * 0.6, h * 0.12],
+    [w * 0.3, h * 0.37, w * 0.12, h * 0.4, w * 0.02, h * 0.37],
+    [w * 0.55, h * 0.66, w * 0.65, h * 0.82, w * 0.75, h * 0.98],
+    [w * 0.7, h * 0.42, w * 0.78, h * 0.47, w * 0.74, h * 0.5],
+  ]) {
+    g.beginPath();
+    g.moveTo(x0, y0);
+    g.quadraticCurveTo(x1, y1, x2, y2);
+    g.stroke();
+  }
+});
+// the painting of the café on top of the standing AC: the white café, its plants, two people, a tree
+const cafePainting = drawTex(300, 252, (g, w, h) => {
+  g.fillStyle = '#cfe7e6';
+  g.fillRect(0, 0, w, h * 0.55);
+  g.fillStyle = '#f4f1ea';
+  g.fillRect(0, h * 0.55, w, h * 0.45);
+  g.fillStyle = '#fbfaf6';
+  g.strokeStyle = '#3a3a3a';
+  g.lineWidth = 2;
+  g.fillRect(w * 0.12, h * 0.25, w * 0.62, h * 0.45);
+  g.strokeRect(w * 0.12, h * 0.25, w * 0.62, h * 0.45);
+  g.fillStyle = '#dcdcd8';
+  g.fillRect(w * 0.08, h * 0.2, w * 0.7, h * 0.06);
+  g.fillStyle = '#2b2b2b';
+  g.fillRect(w * 0.52, h * 0.45, w * 0.06, h * 0.25);
+  g.fillStyle = '#7a2b2b';
+  g.fillRect(w * 0.6, h * 0.45, w * 0.06, h * 0.25);
+  g.fillStyle = '#4d8a45';
+  for (const [x, r] of [
+    [0.2, 0.05],
+    [0.3, 0.04],
+    [0.42, 0.04],
+  ]) {
+    g.beginPath();
+    g.arc(w * x, h * 0.64, w * r, 0, 7);
+    g.fill();
+  }
+  g.fillStyle = '#6b4a2a';
+  g.fillRect(w * 0.84, h * 0.4, w * 0.025, h * 0.32);
+  g.fillStyle = '#3f8a3d';
+  g.beginPath();
+  g.ellipse(w * 0.855, h * 0.32, w * 0.09, h * 0.14, 0, 0, 7);
+  g.fill();
+});
 const posterKoup = drawTex(256, 384, (g, w, h) => {
   g.fillStyle = '#1e1e1e';
   g.fillRect(0, 0, w, h);
@@ -188,7 +274,7 @@ F.bush(1.55, FI, -3.6, 0.3, 'white', 0.18, 0.3);
 
 // ================= Middle room (floor FI) =================
 // the big live-edge table and its round wooden chairs
-F.liveEdgeTable(-2.45, FI, -1.25, 0, 2.9, 1.15);
+F.walnutTable(-2.45, FI, -1.25, 0, 2.9, 1.1);
 F.roundChair(-3.3, FI, -2.15, 0);
 F.roundChair(-2.4, FI, -2.15, 0);
 F.roundChair(-1.5, FI, -2.15, 0);
@@ -207,58 +293,93 @@ F.loungeChair(-1.85, FI, 2.65, N, C.olive);
 F.loungeChair(-0.75, FI, 2.65, N, C.navy);
 // west wall: the bench, the sign (signs()), the art, plants
 F.boxTable(-3.83, FI, 1.95, 0, 0.45, 2.9, 0.45, M.woodDark, 0.03);
-F.artPanel(artAbstract, 0.85, 1.25, XW + 0.02, 1.1, -0.6, E);
-F.bigLeaf(-3.7, FI, 3.15, 1.1, 'stone', 0.17);
+F.artPanel(painting, 0.95, 1.75, XW + 0.02, FI + 1.78, -1.25, E);
 F.bigLeaf(-3.7, FI, -0.05, 1.0, 'white', 0.16);
 // south side: the standing AC and the display of bags and cups
-F.standingAC(-2.15, FI, 4.35, N);
-F.shelves(-3.92, FI, 4.0, E, 1.0, 1.9, 0.33);
+// against the south wall, side by side (as in the café): the walnut bookshelf (bags and ceramics) and the standing AC
+// with the painting of the café on top; a tall plant in a white pot by the opening to the back
+F.shelves(-2.95, FI, 4.36, N, 0.72, 2.1, 0.34);
+F.toteBag(-3.12, FI + 2.0, 4.22, '-z');
+F.toteBag(-2.8, FI + 2.0, 4.22, '-z');
+F.standingAC(-3.72, FI, 4.37, N);
+F.artPanel(cafePainting, 0.5, 0.42, -3.72, FI + 1.85 + 0.23, 4.42, N);
+F.palm(-2.2, FI, 4.12, 1.3, 'white', 0.13);
 F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 
 // ================= The bar (back area, floor FI) =================
+// (owner's photo, 2026-11-22) a plain sand-coloured counter that starts at the left wall: the espresso machine and its
+// cups on the left block, a glass cake case on the right block; behind, the dark door and the blue drinks fridge
+const SAND = mat('#c9b39a', { rough: 0.7 });
 {
-  // the glass display counter with pastries
-  const g = group(-0.5, FI, 5.45, 0, 'bar_counter');
-  rbox(2.8, 0.95, 0.7, 0.03, mat('#efe1c3'), 0, 0, 0, 0, g);
-  rbox(2.84, 0.04, 0.74, 0.01, M.woodLight, 0, 0.95, 0, 0, g);
-  // its wooden front slats
-  for (let i = 0; i < 13; i++) rbox(0.16, 0.85, 0.02, 0.005, M.woodLight, -1.32 + i * 0.22, 0.05, -0.36, 0, g);
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.32, 0.45), GLASS());
-  glass.position.set(0, 0.99 + 0.16, 0.05);
-  g.add(glass);
-  for (let i = 0; i < 9; i++) {
-    const px = -1.16 + i * 0.29;
-    cyl(0.1, 0.1, 0.015, mat('#e9e2d2'), px, 0.99, 0.05, 20, g);
-    const kind = i % 3;
-    if (kind === 0) cyl(0.075, 0.08, 0.06, mat('#c98b4a'), px, 1.005, 0.05, 20, g);
-    else if (kind === 1) ball(0.06, mat('#e2b770'), px, 1.04, 0.05, 1.2, 0.6, 1, g);
-    else rbox(0.14, 0.05, 0.08, 0.02, mat('#a8643a'), px, 1.005, 0.05, 0, g);
-  }
-  contactShadow(2.8, 0.7, -0.5, FI, 5.45);
+  const g = group(1.27, FI, 5.45, 0, 'bar_counter');
+  rbox(1.66, 1.0, 0.7, 0.015, SAND, 0, 0, 0, 0, g);
+  contactShadow(1.66, 0.7, 1.27, FI, 5.45);
+  // the espresso machine (facing the customers) and the paper cups on it
+  const m = group(1.45, FI + 1.0, 5.4, N, 'espresso');
+  const steel = mat('#cfd2d4', { metal: 0.8, rough: 0.25 });
+  rbox(0.8, 0.4, 0.5, 0.03, steel, 0, 0, 0, 0, m);
+  for (let i = 0; i < 4; i++) rbox(0.74, 0.012, 0.01, 0.003, mat('#8b8f92', { metal: 0.6 }), 0, 0.08 + i * 0.08, 0.255, 0, m);
+  rbox(0.8, 0.05, 0.12, 0.01, mat('#2a2a2a'), 0, 0, 0.3, 0, m);
+  for (const x of [-0.22, 0, 0.22]) cyl(0.035, 0.035, 0.05, mat('#2a2a2a'), x, 0.14, 0.28, 12, m);
+  const cups = [
+    ['#f4f1ea', 0.04],
+    ['#b48a5a', 0.04],
+    ['#f4f1ea', 0.045],
+    ['#5b4032', 0.045],
+    ['#5b4032', 0.045],
+    ['#5b4032', 0.045],
+  ];
+  cups.forEach(([c, r], i) => cyl(r, r * 0.8, 0.28 + (i % 2) * 0.06, mat(c, { rough: 0.8 }), -0.3 + i * 0.12, 0.4, -0.05, 14, m));
+  rbox(0.16, 0.08, 0.1, 0.01, mat('#1f1f1f'), 0.55, 0, 0.05, 0, m); // the card machine
+  const sign = rbox(0.14, 0.12, 0.01, 0.003, mat('#f3efe6'), 0.38, 0, 0.18, 0, m);
+  sign.rotation.x = -0.25;
 }
 {
-  // the back counter: cabinets, the espresso machine, the grinder, syrups
-  const g = group(-0.2, FI, 8.27, 0, 'back_counter');
-  rbox(3.4, 0.9, 0.6, 0.02, mat('#f0e4c8'), 0, 0, 0, 0, g);
-  rbox(3.44, 0.04, 0.64, 0.01, M.woodLight, 0, 0.9, 0, 0, g);
-  for (let i = 0; i < 5; i++) rbox(0.62, 0.01, 0.01, 0.003, mat('#c7b994'), -1.36 + i * 0.68, 0.45, -0.305, 0, g);
-  const machine = group(0.2, FI + 0.94, 8.25, N, 'espresso');
-  rbox(0.62, 0.36, 0.42, 0.04, mat('#c9cbcc', { metal: 0.7, rough: 0.3 }), 0, 0, 0, 0, machine);
-  rbox(0.62, 0.03, 0.42, 0.01, mat('#2c2c2c'), 0, 0.36, 0, 0, machine);
-  for (const x of [-0.16, 0.16]) {
-    cyl(0.035, 0.035, 0.05, mat('#2c2c2c'), x, 0.16, 0.23, 12, machine);
-    rod([x, 0.17, 0.25], [x, 0.17, 0.36], 0.008, mat('#2c2c2c'), machine);
+  // the cake case on its block
+  const g = group(0.04, FI, 5.45, 0, 'cake_case');
+  rbox(0.8, 0.86, 0.68, 0.015, SAND, 0, 0, 0, 0, g);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.46, 0.6), GLASS());
+  glass.position.set(0, 0.86 + 0.23, 0);
+  g.add(glass);
+  for (const [x0, x1, y0, y1, z0, z1] of [
+    [-0.39, 0.39, 0.86, 0.875, -0.3, 0.3],
+    [-0.39, 0.39, 1.31, 1.325, -0.3, 0.3],
+  ])
+    rbox(x1 - x0, y1 - y0, z1 - z0, 0.002, mat('#e9edef', { rough: 0.2 }), (x0 + x1) / 2, y0, 0, 0, g);
+  rbox(0.78, 0.008, 0.58, 0.002, mat('#f6f6f4'), 0, 1.08, 0, 0, g); // the glass shelf
+  // cakes and pastries, cake domes on stands
+  cyl(0.1, 0.1, 0.08, mat('#c98b4a'), -0.2, 0.875, -0.05, 20, g);
+  rbox(0.16, 0.05, 0.08, 0.02, mat('#a8643a'), 0.15, 0.875, 0.05, 0, g);
+  cyl(0.09, 0.09, 0.07, mat('#e2c08a'), 0.05, 1.088, -0.08, 20, g);
+  for (const [cx, cz] of [
+    [-0.18, -0.1],
+    [0.2, 0.08],
+  ]) {
+    cyl(0.012, 0.05, 0.12, mat('#6b4a32'), cx, 1.335, cz, 12, g);
+    cyl(0.1, 0.1, 0.012, mat('#6b4a32'), cx, 1.455, cz, 20, g);
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), GLASS());
+    dome.position.set(cx, FI + 1.467, cz);
+    dome.position.y = 1.467;
+    g.add(dome);
   }
-  for (const x of [-0.2, 0, 0.2]) cyl(0.035, 0.03, 0.06, mat('#f4f1ea'), x, 0.37, -0.05, 14, machine);
-  const grinder = group(-0.55, FI + 0.94, 8.3, 0, 'grinder');
-  rbox(0.2, 0.32, 0.25, 0.04, mat('#2c2c2c'), 0, 0, 0, 0, grinder);
-  cyl(0.1, 0.06, 0.18, GLASS(), 0, 0.32, 0, 16, grinder);
-  F.bottles(group(0.85, FI + 0.94, 8.32, 0), -0.0, 0.5, 0, 0, ['#c4c6c7', '#b8babb', '#d3d5d6']);
-  F.bottles(group(-1.5, FI + 0.94, 8.32, 0), 0, 0.35, 0, 0, ['#c4c6c7', '#8a5b3a', '#d3d5d6']);
+  contactShadow(0.8, 0.68, 0.04, FI, 5.45);
+}
+{
+  // the back counter (short, by the window) with its syrup bottles
+  const g = group(1.5, FI, 8.27, 0, 'back_counter');
+  rbox(1.1, 0.9, 0.6, 0.02, mat('#f0e4c8'), 0, 0, 0, 0, g);
+  rbox(1.14, 0.04, 0.64, 0.01, M.woodLight, 0, 0.9, 0, 0, g);
+  F.bottles(group(1.05, FI + 0.94, 8.32, 0), 0, 0.85, 0, 0, ['#c4c6c7', '#b8babb', '#8a5b3a', '#d3d5d6']);
+}
+{
+  // the split AC on the wall above
+  const g = group(-1.05, FI + 2.28, 8.5, N, 'wall_ac');
+  rbox(0.85, 0.28, 0.2, 0.05, mat('#f6f6f3', { rough: 0.4 }), 0, 0, 0, 0, g);
+  rbox(0.75, 0.02, 0.01, 0.005, mat('#c9cbc8'), 0, 0.05, 0.1, 0, g);
 }
 {
   // the low fridges under the front window, and the shelf of bottles in the window
-  const g = group(1.75, FI, 7.15, Wt, 'fridges');
+  const g = group(1.75, FI, 6.95, Wt, 'fridges');
   for (const dx of [-0.45, 0.45]) {
     rbox(0.88, 0.85, 0.6, 0.02, mat('#1f2226'), dx, 0, 0, 0, g);
     rbox(0.78, 0.7, 0.02, 0.01, GLASS(), dx, 0.08, 0.3, 0, g);
@@ -271,7 +392,7 @@ F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 }
 {
   // the tall drinks fridge (Kafeen)
-  const g = group(-1.95, FI, 7.85, Math.PI / 2, 'drinks_fridge');
+  const g = group(-0.5, FI, 8.27, N, 'drinks_fridge');
   rbox(0.62, 1.95, 0.6, 0.03, mat('#20357a'), 0, 0, 0, 0, g);
   rbox(0.52, 1.45, 0.02, 0.01, GLASS(), 0, 0.12, 0.3, 0, g);
   for (let r = 0; r < 4; r++) for (let k = 0; k < 5; k++) cyl(0.035, 0.035, 0.22, mat(['#f4f4f4', '#2e63c9'][k % 2]), -0.2 + k * 0.1, 0.18 + r * 0.35, 0.15, 10, g);
@@ -281,7 +402,7 @@ F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
     c.fillStyle = '#ffffff';
     c.font = 'bold 34px sans-serif';
     c.textAlign = 'center';
-    c.fillText('KAFEEN', w / 2, 44);
+    c.fillText('KAVIN', w / 2, 44);
   });
   const p = new THREE.Mesh(new THREE.PlaneGeometry(0.56, 0.14), mat('#ffffff', { map: head }));
   p.position.set(0, 1.78, 0.305);
@@ -310,11 +431,11 @@ for (let z = -10.7, i = 0; z < -3.65; z += 0.88, i++) {
 }
 slab(2.32, 2.78, FT, FT + 1.1, -10.7, -3.6, mat('#000000'), 'COLLIDER_planter');
 // by the KOUP pillar: two wooden reclining chairs (one pale, one teak) with a slatted folding table and its ashtray
-F.slatTable(4.82, FT, -9.95, 0.15);
-// two blue armchairs and their little round table
-F.armchair(3.25, FT, -6.75, Wt, '#58708a', 0.8);
-F.armchair(3.15, FT, -5.25, Wt, '#3b4d66', 0.8);
-F.roundTable(3.0, FT, -6.0, 0.22, 0.5, mat('#3f6680'));
+F.slatTable(3.02, FT, -10.05, 0.15, 0.4);
+// a black and an olive lounge chair with a round black table, their backs to the planters
+F.loungeChair(3.4, FT, -6.75, E, C.oliveDark);
+F.loungeChair(3.4, FT, -5.25, E, C.black);
+F.bistroTable(3.4, FT, -6.0, '#1f2124');
 F.ribbedPlanter(2.55, FT, -3.25, 0.42, 0.7, 0.3);
 F.periwinkle(2.55, FT + 0.3, -3.25, 0.3);
 // the middle pairs of lounge chairs, facing each other
@@ -325,16 +446,19 @@ F.loungeChair(3.42, FT, 0.5, N, C.navy);
 F.frameTable(3.03, FT, -0.45, 0, 0.5, 0.45);
 F.bigLeaf(2.55, FT, 2.65, 1.25, 'white', 0.22);
 // south: chairs along the wall, planters, metal side tables at the edge
-F.ribbedPlanter(2.55, FT, 5.9, 0.42, 0.7, 0.3);
-F.purpleKnight(2.55, FT + 0.3, 5.9, 0.3);
-F.loungeChair(2.9, FT, 6.65, E, C.black);
-F.frameTable(2.6, FT, 7.35, 0, 0.42, 0.42);
-F.loungeChair(2.9, FT, 8.15, E, C.navy);
-F.loungeChair(2.9, FT, 9.15, E, '#b9a585');
-F.frameTable(2.6, FT, 9.75, 0, 0.42, 0.42);
-F.armchair(2.7, FT, 10.5, E, C.leatherBrown, 0.75);
-F.frameTable(5.15, FT, 5.55, 0, 0.55, 0.6, M.wood);
-F.frameTable(5.15, FT, 7.05, 0, 0.55, 0.6, M.wood);
+// under the bar's window: black and tan with a round beige table (owner's photos)
+F.loungeChair(2.9, FT, 6.25, E, C.tan);
+F.bistroTable(2.85, FT, 7.0, '#d8d2c6');
+F.loungeChair(2.9, FT, 7.75, E, C.black);
+// in the south corner: two tan and a black round a beige table
+F.loungeChair(2.85, FT, 10.5, E, C.tan);
+F.loungeChair(2.85, FT, 9.35, 0.59, C.tan);
+F.loungeChair(3.9, FT, 9.35, -0.4, C.black);
+F.bistroTable(3.72, FT, 10.55, '#d8d2c6');
+// at the terrace's edge, facing the street: black and tan with a round black table
+F.loungeChair(5.0, FT, 5.55, E, C.black);
+F.bistroTable(5.0, FT, 6.3, '#1f2124');
+F.loungeChair(5.0, FT, 7.05, E, C.tan);
 // a floor lamp by the door
 {
   const g = group(2.55, FT, 4.95, 0, 'floor_lamp');
@@ -384,15 +508,14 @@ export async function terraceChairs() {
     });
     contactShadow(0.62, LENGTH, x, FT, z, ry);
   };
-  // heads toward the planters and turned 45° toward each other: their feet meet at the table (owner, 2026-11-22)
-  place(3.95, -10.62, (-3 * Math.PI) / 4, M.woodLight);
-  place(3.95, -9.25, -Math.PI / 4, M.woodDark);
+  // turned 45° toward each other, the table between them at the back, by their heads (owner, 2026-11-22)
+  place(3.9, -10.75, -Math.PI / 4, M.woodLight);
+  place(3.9, -9.35, (-3 * Math.PI) / 4, M.woodDark);
 }
 
 /** Every lounge chair of the place, from the owner's model: lightened, stood up, sized, and in each chair's colour. */
 export async function loungeChairs() {
   const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-  const { SimplifyModifier } = await import('three/addons/modifiers/SimplifyModifier.js');
   const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
   const gltf = await new GLTFLoader().loadAsync('models/black_lounge_chair.glb');
   gltf.scene.updateMatrixWorld(true);
@@ -409,22 +532,45 @@ export async function loungeChairs() {
     (/cushion/i.test(name) ? parts.cushion : parts.frame).push(g.index ? g.toNonIndexed() : g);
   });
   const frame = mergeVertices(mergeGeometries(parts.frame), 1e-4);
-  let cushion = mergeVertices(mergeGeometries(parts.cushion), 1e-4);
-  cushion = new SimplifyModifier().modify(cushion, Math.floor(cushion.attributes.position.count * 0.9));
-  cushion.computeVertexNormals();
-  console.log('lounge tris', frame.index.count / 3 + cushion.index.count / 3);
+  const sling = mergeGeometries(parts.cushion);
   // Upright already (its parts' own transforms), its back toward +z: turn its front to +z, size it, feet on the floor.
   const S = LOUNGE_SCALE;
-  for (const g of [frame, cushion]) {
+  for (const g of [frame, sling]) {
     g.rotateY(Math.PI);
     g.scale(S, S, S);
     g.translate(0, -0.019 * S, 0);
   }
+  // The model's cushion gives the sling's line (front, low, to back, high); a fluffy leather cushion is made along it
+  // (owner, 2026-11-22: "make them fluffy like actual cushions").
+  const pts = sling.attributes.position;
+  let lo = null,
+    hi = null;
+  for (let i = 0; i < pts.count; i++) {
+    const p = new THREE.Vector3().fromBufferAttribute(pts, i);
+    if (!lo || p.z - p.y > lo.z - lo.y) lo = p; // the front, lowest end
+    if (!hi || p.y - p.z > hi.y - hi.z) hi = p; // the back, highest end
+  }
+  const axis = new THREE.Vector3(0, hi.y - lo.y, hi.z - lo.z);
+  const L = axis.length();
+  axis.normalize();
+  const bins = Array.from({ length: 14 }, () => ({ y: 0, z: 0, n: 0 }));
+  for (let i = 0; i < pts.count; i++) {
+    const y = pts.getY(i),
+      z = pts.getZ(i);
+    const t = ((y - lo.y) * axis.y + (z - lo.z) * axis.z) / L;
+    const k = Math.min(13, Math.max(0, Math.floor(t * 14)));
+    bins[k].y += y;
+    bins[k].z += z;
+    bins[k].n++;
+  }
+  const profile = bins.filter((b) => b.n).map((b) => new THREE.Vector3(0, b.y / b.n + 0.03, b.z / b.n));
+  const cushion = F.fluffyCushion(profile, 0.62, 0.22);
+  console.log('lounge tris', frame.index.count / 3 + cushion.index.count / 3);
   const frameMat = mat('#1d2024', { metal: 0.5, rough: 0.4 });
   for (const c of F.lounges) {
     const g = group(c.x, c.y, c.z, c.ry, 'lounge_chair');
     g.add(new THREE.Mesh(frame, frameMat));
-    g.add(new THREE.Mesh(cushion, mat(c.color, { rough: 0.6 })));
+    g.add(new THREE.Mesh(cushion, mat(c.color, { rough: 0.55, side: THREE.DoubleSide })));
   }
 }
 const LOUNGE_SCALE = 0.85; // 1.23 m long in the model: the place's chairs are about 1.05 m (the scan)

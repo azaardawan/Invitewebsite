@@ -10,6 +10,7 @@ export const C = {
   leatherBrown: '#8a5a3c',
   cognac: '#b4744a',
   peach: '#e0a888',
+  tan: '#b8814f',
   cream: '#ece2cf',
   linen: '#e3d8c3',
   frame: '#1f2124',
@@ -482,5 +483,94 @@ export function slatTable(x, y, z, ry, size = 0.46, h = 0.5) {
   cyl(0.065, 0.06, 0.035, steel, 0.06, h, -0.05, 24, g);
   cyl(0.05, 0.05, 0.002, mat('#8d9093', { metal: 0.6, rough: 0.4 }), 0.06, h + 0.034, -0.05, 24, g);
   contactShadow(size, size, x, y, z, ry);
+  return g;
+}
+
+/** The round bistro table of the terrace: a thin round top on one stem that splits into three curved legs. */
+export function bistroTable(x, y, z, color, r = 0.29, h = 0.6) {
+  const g = group(x, y, z, rr(0, 6.28), 'bistro_table');
+  const m = mat(color, { rough: 0.45, metal: 0.25 });
+  cyl(r, r, 0.022, m, 0, h - 0.022, 0, 36, g);
+  cyl(0.022, 0.022, h * 0.62, m, 0, h * 0.36, 0, 12, g);
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2;
+    const c = Math.cos(a),
+      s = Math.sin(a);
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, h * 0.4, 0),
+      new THREE.Vector3(c * 0.07, h * 0.24, s * 0.07),
+      new THREE.Vector3(c * 0.17, h * 0.08, s * 0.17),
+      new THREE.Vector3(c * 0.25, 0.005, s * 0.25),
+    ]);
+    const leg = new THREE.Mesh(new THREE.TubeGeometry(curve, 12, 0.012, 6, false), m);
+    g.add(leg);
+  }
+  // the ashtray
+  const steel = mat('#c4c6c8', { metal: 0.85, rough: 0.25 });
+  cyl(0.055, 0.05, 0.03, steel, 0.04, h, 0.02, 20, g);
+  contactShadow(r * 2, r * 2, x, y, z);
+  return g;
+}
+
+/** A straight dark walnut table (the long table of the middle room) on two slab legs. */
+const walnutTex = woodTex('#6b4c3c', '#4a3226', '#87695a');
+walnutTex.repeat.set(1, 1);
+export function walnutTable(x, y, z, ry, len, width, h = 0.76) {
+  const g = group(x, y, z, ry, 'walnut_table');
+  const top = rbox(len, 0.045, width, 0.012, mat('#ffffff', { map: walnutTex, rough: 0.5 }), 0, h - 0.045, 0, 0, g);
+  const uv = top.geometry.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * len * 0.8, uv.getY(i) * width * 0.8);
+  for (const lx of [-len / 2 + 0.25, len / 2 - 0.25]) rbox(0.06, h - 0.045, width * 0.82, 0.01, mat('#4e3529', { rough: 0.6 }), lx, 0, 0, 0, g);
+  contactShadow(len, width, x, y, z, ry);
+  return g;
+}
+
+/**
+ * A fluffy leather cushion (the place's lounge chairs) following a sling's curve: `profile` is its middle line from
+ * front to back (points in the chair's own space), `width` across. A soft, rounded pillow: thick in the middle,
+ * closing at its ends, with two sewn folds and fine leather wrinkles.
+ */
+export function fluffyCushion(profile, width, thick = 0.2) {
+  const curve = new THREE.CatmullRomCurve3(profile);
+  const NV = 44,
+    K = 28;
+  const pos = [],
+    idx = [];
+  const p = 3.2; // the cross-section's roundness (a puffy, squarish oval)
+  for (let i = 0; i <= NV; i++) {
+    const v = i / NV;
+    const P = curve.getPointAt(v);
+    const Tn = curve.getTangentAt(v);
+    // the cushion's "up": perpendicular to its line, in the chair's side plane
+    const N = new THREE.Vector3(0, Tn.z, -Tn.y).normalize();
+    if (N.y < 0) N.multiplyScalar(-1);
+    const end = Math.sqrt(Math.max(0, 1 - Math.pow(2 * v - 1, 10)));
+    const fold = 1 - 0.28 * Math.exp(-(((v - 0.42) / 0.03) ** 2)) - 0.2 * Math.exp(-(((v - 0.72) / 0.03) ** 2));
+    const T = thick * end * fold;
+    const W = width * (0.88 + 0.12 * end);
+    for (let k = 0; k < K; k++) {
+      const a = (k / K) * Math.PI * 2;
+      const c = Math.cos(a),
+        s = Math.sin(a);
+      const sx = Math.sign(c) * Math.pow(Math.abs(c), 2 / p);
+      const sy = Math.sign(s) * Math.pow(Math.abs(s), 2 / p);
+      // the top bulges more than the bottom, with soft wrinkles across it
+      const wrinkle = s > 0 ? 0.006 * Math.sin(v * 70 + c * 3) * end : 0;
+      const off = (sy * T) / 2 * (s > 0 ? 1.15 : 0.85) + wrinkle;
+      pos.push(sx * (W / 2) + P.x, P.y + N.y * off, P.z + N.z * off);
+    }
+  }
+  for (let i = 0; i < NV; i++)
+    for (let k = 0; k < K; k++) {
+      const a = i * K + k,
+        b = i * K + ((k + 1) % K),
+        c = (i + 1) * K + k,
+        d = (i + 1) * K + ((k + 1) % K);
+      idx.push(a, c, b, b, c, d);
+    }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
   return g;
 }
