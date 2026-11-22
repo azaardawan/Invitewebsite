@@ -6,7 +6,8 @@
  * The model may name a few things (docs/TOURS.md):
  * - a node `START` (or `SPAWN`): where visitors begin, looking along its −Z (its forward);
  * - meshes whose name begins `NOCOLLIDE`: walked through (plants' leaves, curtains, light beams);
- * - meshes whose name begins `COLLIDER`: invisible walls (kept in the way, never drawn).
+ * - meshes whose name begins `COLLIDER`: invisible walls (kept in the way, never drawn);
+ * - nodes named `HOTSPOT_<key>` (e.g. `HOTSPOT_menu` at a counter): within 1.8 m the page is told (`onSpot`).
  *
  * Loaded on its own (dynamic import) so only the tour page downloads three.js. It draws only when something changes.
  */
@@ -25,6 +26,8 @@ export type TourOptions = {
   model: string;
   reducedMotion: boolean;
   onProgress: (share: number) => void;
+  /** The visitor walked up to (or away from) a spot of the model (a node named `HOTSPOT_<key>`, e.g. the menu). */
+  onSpot?: (key: string | null) => void;
 };
 
 const EYE = 1.6;
@@ -86,6 +89,8 @@ export class TourEngine {
   private drag: { id: number; x: number; y: number } | null = null;
   private env: THREE.Texture | null = null;
   private down = new THREE.Vector3(0, -1, 0);
+  private spots: { key: string; at: THREE.Vector3 }[] = [];
+  private spot: string | null = null;
   private v = new THREE.Vector3();
   private w = new THREE.Vector3();
 
@@ -174,6 +179,12 @@ export class TourEngine {
     root.traverse((o) => {
       const light = o as THREE.PointLight;
       if ((light.isPointLight || (light as unknown as THREE.SpotLight).isSpotLight) && light.intensity > 500) light.intensity *= BLENDER_LAMP;
+    });
+
+    // The spots the page answers (a menu at a counter...).
+    root.traverse((o) => {
+      const m = /^HOTSPOT_(\w+)/.exec(o.name);
+      if (m) this.spots.push({ key: m[1]!.toLowerCase(), at: o.getWorldPosition(new THREE.Vector3()) });
     });
 
     // Where visitors begin: the START node, or an open spot near the middle of the model.
@@ -395,6 +406,7 @@ export class TourEngine {
       this.pos.y = this.o.reducedMotion ? eyeY : this.pos.y + (eyeY - this.pos.y) * (1 - Math.exp(-dt * 14));
       moving = true;
     }
+    if (moving) this.checkSpot();
     if (moving || this.dirty) {
       this.camera.position.copy(this.pos);
       this.camera.rotation.set(this.pitch, this.yaw, 0);
@@ -404,6 +416,20 @@ export class TourEngine {
     }
     if (moving) this.kick();
   };
+
+  /** Tells the page when the visitor is at a spot (on its floor, within 1.8 m), or has left it. */
+  private checkSpot() {
+    if (!this.o.onSpot || !this.spots.length) return;
+    let near: string | null = null;
+    for (const s of this.spots) {
+      if (Math.abs(s.at.y - this.floorY) > 2.2) continue;
+      if (Math.hypot(s.at.x - this.pos.x, s.at.z - this.pos.z) < 1.8) near = s.key;
+    }
+    if (near !== this.spot) {
+      this.spot = near;
+      this.o.onSpot(near);
+    }
+  }
 
   /** Keeps walking smooth on a slow device: draws a little less sharp while frames come slowly. */
   private adapt(frameMs: number) {

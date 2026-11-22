@@ -5,11 +5,13 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { root } from './lib.js';
 import { signs } from './build.js';
-import { terraceChairs, loungeChairs } from './rooms.js';
+import { terraceChairs, loungeChairs, koupCorner, mirrors } from './rooms.js';
 try {
   await signs();
   await terraceChairs();
   await loungeChairs();
+  await koupCorner();
+  await mirrors();
   // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
   const start = new THREE.Object3D();
   start.name = 'START';
@@ -62,6 +64,8 @@ try {
   const startCopy = new THREE.Object3D(); startCopy.name='START';
   root.getObjectByName('START').getWorldPosition(startCopy.position);
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
+  // the tour page's spots (HOTSPOT_<what>, e.g. the menu at the counter): kept as named points
+  root.traverse(o => { if (/^HOTSPOT_/.test(o.name)) { const h = new THREE.Object3D(); h.name = o.name; o.getWorldPosition(h.position); out.add(h); } });
   scene.updateMatrixWorld(true);
   let meshes = 0, tris = 0;
   scene.traverse(o => { if (o.isMesh) { meshes++; const g=o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; } });

@@ -33,6 +33,8 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   preview). Without one, visitors start at the open spot nearest the middle of the lowest floor.
 - **Floors and stairs**: visitors follow any floor below them; a step up of at most 45 cm (stairs, a doorstep), never
   off an edge deeper than 70 cm. Ramps work too.
+- **Spots**: an Empty named `HOTSPOT_menu` (e.g. in front of the counter): a visitor within 1.8 m is offered a
+  "See the menu" button (the tour's Menu link).
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).

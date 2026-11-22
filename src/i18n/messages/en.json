@@ -1899,6 +1899,7 @@
     "offBody": "This virtual tour isn't open right now. Please come back later.",
     "endedTitle": "{name}",
     "endedBody": "This virtual tour has ended.",
-    "rotate": "Turn your phone sideways to walk through the place."
+    "rotate": "Turn your phone sideways to walk through the place.",
+    "seeMenu": "See the menu"
   }
 }

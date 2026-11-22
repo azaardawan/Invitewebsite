@@ -17,6 +17,7 @@ export type TourWords = {
   whatsapp: string;
   credit: string;
   rotate: string;
+  seeMenu: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -74,6 +75,8 @@ export function TourViewer({
   const [progress, setProgress] = useState(0);
   const [state, setState] = useState<'loading' | 'ready' | 'nowebgl' | 'failed'>('loading');
   const [hint, setHint] = useState(true);
+  // the spot the visitor is at (e.g. the counter: its menu)
+  const [spot, setSpot] = useState<string | null>(null);
 
   useEffect(() => {
     const el = box.current;
@@ -87,7 +90,7 @@ export function TourViewer({
         }
         const { TourEngine } = await import('./tour-engine');
         if (cancelled) return;
-        const e = new TourEngine({ container: el, model, reducedMotion, onProgress: (s) => !cancelled && setProgress(s) });
+        const e = new TourEngine({ container: el, model, reducedMotion, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k) });
         engine.current = e;
         await e.load();
         if (!cancelled) setState('ready');
@@ -221,6 +224,39 @@ export function TourViewer({
           {words.credit}
         </Link>
       </footer>
+
+      {/* At the counter: the café's menu (owner, 2026-11-22). */}
+      {state === 'ready' && spot === 'menu' && links.menu ? (
+        <a
+          href={links.menu}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="tour-menu"
+          style={{
+            ...GLASS,
+            position: 'absolute',
+            left: '50%',
+            bottom: 'max(56px, calc(env(safe-area-inset-bottom) + 46px))',
+            transform: 'translateX(-50%)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '12px 20px',
+            borderRadius: 999,
+            color: '#fff',
+            textDecoration: 'none',
+            fontSize: 16,
+            fontWeight: 600,
+            background: 'rgba(20,16,14,.78)',
+            zIndex: 3,
+          }}
+        >
+          <svg viewBox="0 0 24 24" width={20} height={20} fill="currentColor" aria-hidden>
+            <path d={ICONS.menu} fillRule="evenodd" />
+          </svg>
+          {words.seeMenu}
+        </a>
+      ) : null}
 
       {state === 'ready' && hint ? (
         <p
