@@ -35,7 +35,7 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   await page.getByRole('button', { name: 'تفعيل' }).click();
   await expect(page.getByText('ارفع النموذج ثلاثي الأبعاد قبل تفعيل الجولة.')).toBeVisible();
   // A stand-in model (any .glb in metres will do).
-  await page.locator('input[type=file][accept*=".glb"]').setInputFiles({
+  await page.locator('label', { hasText: 'رفع نموذج' }).locator('input[type=file]').setInputFiles({
     name: 'roma.glb',
     mimeType: 'model/gltf-binary',
     buffer: readFileSync(MODEL),
@@ -58,7 +58,7 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   await expect(v.getByRole('link', { name: 'Instagram' })).toHaveAttribute('href', 'https://instagram.com/cafe.roma');
   await expect(v.getByRole('link', { name: 'WhatsApp' })).toHaveAttribute('href', 'https://wa.me/9647701234567');
   await expect(v.getByRole('link', { name: 'Location' })).toHaveCount(0);
-  await expect(v.getByText('Virtual tour by Bahja')).toBeVisible();
+  await expect(v.getByText('Virtual tour by Bahjaaa.iq')).toBeVisible();
   await v.screenshot({ path: testInfo.outputPath('tour-start.png') });
   // Walking forward.
   await v.mouse.click(640, 400);
@@ -73,11 +73,15 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   await v.screenshot({ path: testInfo.outputPath('tour-turned.png') });
   expect(errors).toEqual([]);
 
-  // On a phone, in Arabic: the pad to walk.
+  // On a phone, in Arabic: held upright it asks to be turned sideways; sideways, the pad to walk.
   const phone = await browser.newContext({ locale: 'ar-IQ', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const p = await phone.newPage();
   await p.goto(link);
   await expect(p.locator('[data-testid="tour-canvas"][data-state="ready"]')).toBeVisible({ timeout: 60_000 });
+  await expect(p.getByTestId('tour-rotate')).toBeVisible();
+  await p.screenshot({ path: testInfo.outputPath('tour-phone-upright.png') });
+  await p.setViewportSize({ width: 844, height: 390 });
+  await expect(p.getByTestId('tour-rotate')).toHaveCount(0);
   await expect(p.getByRole('link', { name: 'انستغرام' })).toBeVisible();
   await expect(p.locator('html')).toHaveAttribute('dir', 'rtl');
   await p.screenshot({ path: testInfo.outputPath('tour-phone.png') });
@@ -85,7 +89,7 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   // The Admin list shows it with its visits.
   await page.goto('/admin/tours');
   await expect(page.getByRole('link', { name: 'Café Roma' })).toBeVisible();
-  await expect(page.getByText(/ظاهرة/)).toBeVisible();
+  await expect(page.getByText(/ظاهرة/).first()).toBeVisible();
   await expect(page.getByText('رابط خاص').first()).toBeVisible();
   await visitor.close();
   await phone.close();

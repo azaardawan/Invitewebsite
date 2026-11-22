@@ -223,7 +223,7 @@ for (const s of STAIRS) {
   for (let i = 0; i < n; i++) {
     const top = FT - (i + 1) * rise;
     slab(4.4 + i * run, 4.4 + (i + 1) * run, bottom - 0.4, top, s.z0, s.z1, W.stone, 'step', 1);
-    slab(4.4 + i * run, 4.4 + i * run + 0.03, top - 0.01, top + 0.002, s.z0, s.z1, mat('#b6ab98'), 'NOCOLLIDE_nosing');
+    slab(4.4 + i * run, 4.4 + i * run + 0.03, top - 0.01, top + 0.008, s.z0, s.z1, mat('#b6ab98'), 'NOCOLLIDE_nosing');
   }
   // side walls of the stairs where the terrace is beside them
 }
@@ -296,9 +296,9 @@ for (const [z0, z1] of [
   [-15.5, -3.9],
   [-2.3, 9.95],
 ]) {
-  slab(XEDGE - 0.02, XEDGE + 0.02, -3.5, FT, z0, z1, W.grey, 'terrace_face', 2);
+  slab(XEDGE - 0.02, XEDGE + 0.02, -3.5, FT - 0.01, z0, z1, W.grey, 'terrace_face', 2);
 }
-slab(2.3, XEDGE, -3.5, FT, -15.55, -15.5, W.outer, 'terrace_face', 2);
+slab(2.3, XEDGE, -3.5, FT - 0.01, -15.55, -15.5, W.outer, 'terrace_face', 2);
 
 // The sky, and ground far away (never walked on).
 {
@@ -311,10 +311,10 @@ slab(2.3, XEDGE, -3.5, FT, -15.55, -15.5, W.outer, 'terrace_face', 2);
     g.fillStyle = grd;
     g.fillRect(0, 0, w, h);
   });
-  const m = new THREE.Mesh(new THREE.SphereGeometry(150, 32, 16), mat('#ffffff', { map: sky, basic: true, side: THREE.DoubleSide }));
+  const m = new THREE.Mesh(new THREE.SphereGeometry(80, 32, 16), mat('#ffffff', { map: sky, basic: true, side: THREE.DoubleSide }));
   m.name = 'NOCOLLIDE_sky';
   add(m);
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(140, 48), mat('#cdbfa8', { rough: 1 }));
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(75, 48), mat('#cdbfa8', { rough: 1 }));
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -3.6;
   ground.name = 'NOCOLLIDE_ground';
@@ -338,8 +338,8 @@ export async function signs() {
     g.translate(-(g.boundingBox.max.x + g.boundingBox.min.x) / 2, 0, 0);
     return new THREE.Mesh(g, material);
   };
-  // KOUPUP on the lounge's north wall
-  const k = word('KOUPUP', 0.24, teal);
+  // KOUP on the lounge's north wall (owner: KOUP, not KOUPUP)
+  const k = word('KOUP', 0.24, teal);
   k.position.set(-0.9, FI + 1.78, ZN + 0.005);
   k.name = 'NOCOLLIDE_sign';
   add(k);

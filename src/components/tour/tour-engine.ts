@@ -28,12 +28,14 @@ export type TourOptions = {
 };
 
 const EYE = 1.6;
-const SPEED = 1.9;
+const SPEED = 2.3;
 const RADIUS = 0.3;
 /** The highest step walked up (a stair), and the deepest walked down. */
 const STEP_UP = 0.45;
 const STEP_DOWN = 0.7;
 const MAX_PIXEL_RATIO = 1.5;
+/** The most pixels drawn per frame (a large laptop screen is drawn a little softer, and stays smooth). */
+const PIXEL_BUDGET = 2_000_000;
 /** Blender's exported lamp strengths, to a room's light (as the museum's lamps). */
 const BLENDER_LAMP = 0.0035;
 const KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
@@ -62,7 +64,8 @@ export class TourEngine {
   private o: TourOptions;
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
-  private camera = new THREE.PerspectiveCamera(70, 1, 0.05, 400);
+  // near at 10 cm: enough depth precision that distant floors, rugs and steps never flicker
+  private camera = new THREE.PerspectiveCamera(70, 1, 0.1, 400);
   private colliders: THREE.Mesh[] = [];
   private ray = new THREE.Raycaster();
   private pos = new THREE.Vector3();
@@ -89,7 +92,7 @@ export class TourEngine {
   constructor(options: TourOptions) {
     this.o = options;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
+    this.renderer.setPixelRatio(this.bestRatio());
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1;
@@ -408,7 +411,7 @@ export class TourEngine {
     this.frameAvg = this.frameAvg * 0.92 + frameMs * 0.08;
     if (++this.framesSince < 45) return;
     const ratio = this.renderer.getPixelRatio();
-    const best = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    const best = this.bestRatio();
     let next = ratio;
     if (this.frameAvg > 24 && ratio > 0.6) next = Math.max(0.6, ratio - 0.2);
     else if (this.frameAvg < 13 && ratio < best) next = Math.min(best, ratio + 0.1);
@@ -419,10 +422,19 @@ export class TourEngine {
     }
   }
 
+  /** The sharpest the picture is drawn: the screen's own, at most 1.5, and within the pixel budget for this size. */
+  private bestRatio() {
+    const el = this.o.container;
+    const area = Math.max(1, (el.clientWidth || 1) * (el.clientHeight || 1));
+    return Math.max(0.6, Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO, Math.sqrt(PIXEL_BUDGET / area)));
+  }
+
   private resize() {
     const el = this.o.container;
     const w = el.clientWidth || 1;
     const h = el.clientHeight || 1;
+    const best = this.bestRatio();
+    if (this.renderer.getPixelRatio() > best) this.renderer.setPixelRatio(best);
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.fov = w < h ? 78 : 68;

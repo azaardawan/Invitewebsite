@@ -42,33 +42,15 @@ export const M = {
 const at = (x, y, z, ry, name) => group(x, y, z, ry, name);
 
 // ---------- seats ----------
-/** The low lounge chair of the place: a thin black tube frame and one soft folded cushion (seat and back). */
+/**
+ * The lounge chair of the place (the owner's model, `models/black_lounge_chair.glb`, in many colours): recorded here,
+ * built by `loungeChairs()` (rooms.js) once the model is loaded. A black tube frame and one folded cushion.
+ */
+export const LOUNGE = { width: 0.71, length: 1.05 };
+export const lounges = [];
 export function loungeChair(x, y, z, ry, color) {
-  const g = at(x, y, z, ry, 'lounge_chair');
-  const c = mat(color, { rough: 0.7 });
-  // frame: two side sledges and cross bars
-  for (const sx of [-0.36, 0.36]) {
-    rod([sx, 0.02, 0.38], [sx, 0.02, -0.4], 0.015, M.frame, g);
-    rod([sx, 0.02, 0.38], [sx, 0.32, 0.3], 0.015, M.frame, g);
-    rod([sx, 0.32, 0.3], [sx, 0.3, -0.2], 0.015, M.frame, g);
-    rod([sx, 0.3, -0.2], [sx, 0.72, -0.42], 0.015, M.frame, g);
-    rod([sx, 0.02, -0.4], [sx, 0.3, -0.2], 0.015, M.frame, g);
-  }
-  rod([-0.36, 0.02, 0.38], [0.36, 0.02, 0.38], 0.015, M.frame, g);
-  rod([-0.36, 0.72, -0.42], [0.36, 0.72, -0.42], 0.015, M.frame, g);
-  // cushion
-  // one thick, soft cushion folded over the frame: a sloping seat and a reclined back (a sling chair)
-  const seat = rbox(0.72, 0.2, 0.7, 0.09, c, 0, 0.2, 0.08, 0, g);
-  seat.rotation.x = -0.15; // its front a little higher
-  const back = rbox(0.72, 0.18, 0.66, 0.09, c, 0, 0, 0, 0, g);
-  back.position.set(0, 0.56, -0.42);
-  back.rotation.x = 0.98; // leaning back
-  // a pillow at the top
-  const pillow = rbox(0.6, 0.13, 0.24, 0.06, mat(color, { rough: 0.9 }), 0, 0, 0, 0, g);
-  pillow.position.set(0, 0.86, -0.62);
-  pillow.rotation.x = 0.98;
-  contactShadow(0.75, 0.8, x, y, z, ry);
-  return g;
+  lounges.push({ x, y, z, ry, color });
+  contactShadow(LOUNGE.width, LOUNGE.length, x, y, z, ry);
 }
 
 /** A soft upholstered armchair (the rounded, padded ones). */
@@ -336,7 +318,7 @@ export function rug(x, y, z, ry, w, d, tex, round = false) {
   m.rotation.x = -Math.PI / 2;
   m.rotation.z = ry;
   m.scale.set(w, d, 1);
-  m.position.set(x, y + 0.006, z);
+  m.position.set(x, y + 0.01, z);
   m.name = 'NOCOLLIDE_rug';
   return add(m);
 }
@@ -358,3 +340,147 @@ export function bottles(g, x0, x1, y, z, colors, r = 0.03, h = 0.22, step = 0.07
   }
 }
 export { GLASS };
+
+// ---------- outside planting (owner, 2026-11-22) ----------
+const ribTex = (() => {
+  const c = document.createElement('canvas');
+  c.width = 128;
+  c.height = 32;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4f3ef';
+  g.fillRect(0, 0, 128, 32);
+  for (let x = 0; x < 128; x += 16) {
+    g.fillStyle = '#dcdad3';
+    g.fillRect(x + 11, 0, 3, 32);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.userData.mimeType = 'image/jpeg';
+  return t;
+})();
+/** A white ribbed plastic planter box (as on the terrace), `len` along z. */
+export function ribbedPlanter(x, y, z, w, len, h) {
+  const g = group(x, y, z, 0, 'planter');
+  const box = rbox(w, h, len, 0.03, mat('#ffffff', { map: ribTex, rough: 0.6 }), 0, 0.02, 0, 0, g);
+  const uv = box.geometry.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * len * 6);
+  rbox(w + 0.03, 0.03, len + 0.03, 0.01, mat('#f7f6f2', { rough: 0.5 }), 0, h, 0, 0, g);
+  rbox(w * 0.8, 0.02, len * 0.9, 0.005, mat('#e9e7e1'), 0, 0, 0, 0, g);
+  const soil = rbox(w - 0.05, 0.02, len - 0.05, 0.005, mat('#4b3626'), 0, h - 0.03, 0, 0, g);
+  soil.name = 'NOCOLLIDE_soil';
+  contactShadow(w, len, x, y, z, 0, false);
+  return g;
+}
+/** Alternanthera dentata 'Purple Knight': a dense mound of deep purple leaves in pairs, with small cream flower heads. */
+export function purpleKnight(x, y, z, r = 0.3) {
+  const g = group(x, y, z, rr(0, 6.28), 'alternanthera');
+  const cols = ['#4a1530', '#5e1d3d', '#6f2a49', '#3a0f25', '#7a3352', '#8a3a5c'];
+  ball(r * 0.62, mat('#3d1128', { rough: 0.8 }), 0, r * 0.42, 0, 1.3, 0.75, 1.3, g).name = 'NOCOLLIDE_leaves';
+  for (let i = 0; i < 44; i++) {
+    const a = rr(0, 6.28),
+      d = Math.sqrt(rnd()) * r,
+      h = r * (0.35 + 0.75 * (1 - (d / r) ** 2)) + rr(-0.03, 0.03);
+    const col = cols[i % cols.length];
+    // leaves come in pairs on each stem tip
+    leafAt(g, rr(0.07, 0.11), rr(0.035, 0.05), col, [Math.cos(a) * d, h, Math.sin(a) * d], a + 0.5, rr(-0.1, 0.7)).name = 'NOCOLLIDE_leaf';
+    leafAt(g, rr(0.07, 0.11), rr(0.035, 0.05), col, [Math.cos(a) * d, h, Math.sin(a) * d], a - 0.5, rr(-0.1, 0.7)).name = 'NOCOLLIDE_leaf';
+  }
+  for (let i = 0; i < 9; i++) {
+    const a = rr(0, 6.28),
+      d = Math.sqrt(rnd()) * r * 0.85;
+    ball(0.016, mat('#efe6cf', { rough: 0.8 }), Math.cos(a) * d, r * (0.45 + 0.75 * (1 - (d / r) ** 2)) + 0.03, Math.sin(a) * d, 1, 1.3, 1, g).name = 'NOCOLLIDE_flower';
+  }
+  return g;
+}
+/** Madagascar periwinkle (Catharanthus roseus): glossy green leaves covered in five-petalled pink and white flowers. */
+export function periwinkle(x, y, z, r = 0.3) {
+  const g = group(x, y, z, rr(0, 6.28), 'periwinkle');
+  const greens = ['#3f7d35', '#4f8e3e', '#5c9a45', '#356d2e'];
+  ball(r * 0.62, mat('#3a7231', { rough: 0.6 }), 0, r * 0.42, 0, 1.3, 0.75, 1.3, g).name = 'NOCOLLIDE_leaves';
+  for (let i = 0; i < 34; i++) {
+    const a = rr(0, 6.28),
+      d = Math.sqrt(rnd()) * r,
+      h = r * (0.35 + 0.7 * (1 - (d / r) ** 2)) + rr(-0.03, 0.03);
+    leafAt(g, rr(0.08, 0.12), rr(0.04, 0.055), greens[i % greens.length], [Math.cos(a) * d, h, Math.sin(a) * d], a + rr(-0.6, 0.6), rr(-0.1, 0.6)).name = 'NOCOLLIDE_leaf';
+  }
+  const petals = ['#e2589a', '#ee82b5', '#f7f3f5', '#e2589a', '#d94a8c', '#f2a3c8'];
+  for (let i = 0; i < 26; i++) {
+    const a = rr(0, 6.28),
+      d = Math.sqrt(rnd()) * r * 0.95;
+    flower(g, petals[i % petals.length], [Math.cos(a) * d, r * (0.42 + 0.72 * (1 - (d / r) ** 2)) + 0.035, Math.sin(a) * d], d / r);
+  }
+  return g;
+}
+// a flat leaf (pointed oval, a few triangles) and a five-petalled flower, both drawn flat like a picture book
+const smallLeafGeo = (() => {
+  const s = new THREE.Shape();
+  s.moveTo(0, -1);
+  s.quadraticCurveTo(1, -0.2, 0, 1);
+  s.quadraticCurveTo(-1, -0.2, 0, -1);
+  const g = new THREE.ShapeGeometry(s, 3);
+  g.rotateX(-Math.PI / 2); // lying flat, pointing along z
+  return g;
+})();
+const flowerGeo = (() => {
+  const s = new THREE.Shape();
+  for (let k = 0; k <= 5; k++) {
+    const a = (k / 5) * Math.PI * 2;
+    const b = a + Math.PI / 5;
+    if (k === 0) s.moveTo(Math.cos(a) * 0.034, Math.sin(a) * 0.034);
+    else s.quadraticCurveTo(Math.cos(a - Math.PI / 5) * 0.048, Math.sin(a - Math.PI / 5) * 0.048, Math.cos(a) * 0.034, Math.sin(a) * 0.034);
+    void b;
+  }
+  return new THREE.ShapeGeometry(s, 3);
+})();
+function flower(g, color, pos, out = 0) {
+  const f = new THREE.Group();
+  f.position.set(...pos);
+  // facing up, and outward toward the plant's edge, so they're seen from the side too
+  const a0 = Math.atan2(pos[2], pos[0]);
+  f.rotation.set(-Math.PI / 2 + out * 0.9 * Math.sin(a0) + rr(-0.25, 0.25), 0, 0);
+  f.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), -out * 0.9 * Math.cos(a0));
+  const p = new THREE.Mesh(flowerGeo, mat(color, { rough: 0.6, side: THREE.DoubleSide }));
+  p.rotation.z = rr(0, 6.28);
+  p.name = 'NOCOLLIDE_flower';
+  f.add(p);
+  const eye = new THREE.Mesh(new THREE.CircleGeometry(0.007, 6), mat(color === '#f6f1f3' ? '#d8336f' : '#a61b52', { side: THREE.DoubleSide }));
+  eye.position.z = 0.002;
+  eye.name = 'NOCOLLIDE_flower';
+  f.add(eye);
+  g.add(f);
+}
+function leafAt(g, len, wid, color, pos, yaw, tilt) {
+  const m = new THREE.Mesh(smallLeafGeo, mat(color, { rough: 0.55, side: THREE.DoubleSide }));
+  m.scale.set(wid, 1, len / 2);
+  const holder = new THREE.Group();
+  holder.position.set(...pos);
+  holder.rotation.set(0, yaw, 0);
+  const inner = new THREE.Group();
+  inner.rotation.x = -tilt;
+  m.position.z = len / 2;
+  inner.add(m);
+  holder.add(inner);
+  g.add(holder);
+  return m;
+}
+/** The slatted wooden folding table (with crossed legs) and its steel ashtray. */
+export function slatTable(x, y, z, ry, size = 0.46, h = 0.5) {
+  const g = group(x, y, z, ry, 'slat_table');
+  const n = 6,
+    gap = 0.012,
+    sw = (size - gap * (n - 1)) / n;
+  for (let i = 0; i < n; i++) rbox(sw, 0.022, size, 0.005, M.wood, -size / 2 + sw / 2 + i * (sw + gap), h - 0.022, 0, 0, g);
+  for (const sz of [-size / 2 + 0.04, size / 2 - 0.04]) rbox(size, 0.03, 0.03, 0.006, M.woodDark, 0, h - 0.055, sz, 0, g);
+  // crossed (folding) legs on two sides
+  for (const sx of [-size / 2 + 0.03, size / 2 - 0.03]) {
+    rod([sx, 0, -size / 2 + 0.02], [sx, h - 0.055, size / 2 - 0.04], 0.016, M.woodDark, g);
+    rod([sx, 0, size / 2 - 0.02], [sx, h - 0.055, -size / 2 + 0.04], 0.016, M.woodDark, g);
+  }
+  // ashtray
+  const steel = mat('#c4c6c8', { metal: 0.85, rough: 0.25 });
+  cyl(0.065, 0.06, 0.035, steel, 0.06, h, -0.05, 24, g);
+  cyl(0.05, 0.05, 0.002, mat('#8d9093', { metal: 0.6, rough: 0.4 }), 0.06, h + 0.034, -0.05, 24, g);
+  contactShadow(size, size, x, y, z, ry);
+  return g;
+}

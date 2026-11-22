@@ -2233,3 +2233,10 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `tour.offBody` | This virtual tour isn't open right now. Please come back later. | ئەم گەشتە ئەلیکترۆنییە ئێستا بەردەست نییە. دواتر بگەڕێوە. | ئەڤ گەشتە ئەلیکترۆنیە نوکە بەردەست نینە. پاشی بزڤڕە. |
 | `tour.endedTitle` | {name} | {name} | {name} |
 | `tour.endedBody` | This virtual tour has ended. | ئەم گەشتە ئەلیکترۆنییە کۆتایی هات. | ئەڤ گەشتە ئەلیکترۆنیە ب دووماهی هات. |
+
+## Batch 68 — cafés' virtual tours: turn the phone sideways, and the credit «Bahjaaa.iq» — ✅ AUTO-APPROVED (2026-11-22, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.rotate` | Turn your phone sideways to walk through the place. | مۆبایلەکەت بە پانی بسوڕێنە بۆ گەڕان بە شوێنەکەدا. | مۆبایلا خۆ ب پانی بزڤڕینە بۆ گەڕیانێ د جهیدا. |
+| `tour.credit` | Virtual tour by Bahjaaa.iq | گەشتی ئەلیکترۆنی لەلایەن Bahjaaa.iq | گەشتا ئەلیکترۆنی ژ لایێ Bahjaaa.iq |
