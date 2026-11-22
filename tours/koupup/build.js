@@ -164,9 +164,10 @@ slab(XW, XF, CB - 0.03, CB - 0.005, 4.7, 4.72, W.led, 'led');
 slab(-2.45, -2.3, FI, CB, 5.9, 8.6, W.inner, 'wall_corridor', 2);
 slab(-1.3, XF, FI, CB, 8.6, 8.75, W.inner, 'wall_back', 2);
 {
-  const door = rbox(0.9, 2.05, 0.04, 0.01, F.M.woodLight, -0.65, FI, 8.58);
+  // the dark brown door behind the bar (owner's photo), between the drinks fridge and the syrup counter
+  const door = rbox(0.85, 2.05, 0.04, 0.01, mat('#4f3b2e', { rough: 0.7 }), 0.78, FI, 8.58);
   door.name = 'door_store';
-  cyl(0.025, 0.025, 0.04, mat('#c3c4c2', { metal: 0.8, rough: 0.3 }), -0.3, FI + 1.0, 8.55, 12).rotation.x = Math.PI / 2;
+  cyl(0.025, 0.025, 0.04, mat('#c3c4c2', { metal: 0.8, rough: 0.3 }), 0.45, FI + 1.0, 8.55, 12).rotation.x = Math.PI / 2;
 }
 // Toilets: two small rooms with their doors open.
 // their front wall, with a doorway into each (doors open against the inside wall)

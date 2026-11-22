@@ -5,11 +5,12 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { root } from './lib.js';
 import { signs } from './build.js';
-import { terraceChairs, loungeChairs } from './rooms.js';
+import { terraceChairs, loungeChairs, koupCorner } from './rooms.js';
 try {
   await signs();
   await terraceChairs();
   await loungeChairs();
+  await koupCorner();
   // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
   const start = new THREE.Object3D();
   start.name = 'START';

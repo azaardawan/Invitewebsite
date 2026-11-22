@@ -152,40 +152,6 @@ const painting = drawTex(320, 590, (g, w, h) => {
     g.stroke();
   }
 });
-// the painting of the café on top of the standing AC: the white café, its plants, two people, a tree
-const cafePainting = drawTex(300, 252, (g, w, h) => {
-  g.fillStyle = '#cfe7e6';
-  g.fillRect(0, 0, w, h * 0.55);
-  g.fillStyle = '#f4f1ea';
-  g.fillRect(0, h * 0.55, w, h * 0.45);
-  g.fillStyle = '#fbfaf6';
-  g.strokeStyle = '#3a3a3a';
-  g.lineWidth = 2;
-  g.fillRect(w * 0.12, h * 0.25, w * 0.62, h * 0.45);
-  g.strokeRect(w * 0.12, h * 0.25, w * 0.62, h * 0.45);
-  g.fillStyle = '#dcdcd8';
-  g.fillRect(w * 0.08, h * 0.2, w * 0.7, h * 0.06);
-  g.fillStyle = '#2b2b2b';
-  g.fillRect(w * 0.52, h * 0.45, w * 0.06, h * 0.25);
-  g.fillStyle = '#7a2b2b';
-  g.fillRect(w * 0.6, h * 0.45, w * 0.06, h * 0.25);
-  g.fillStyle = '#4d8a45';
-  for (const [x, r] of [
-    [0.2, 0.05],
-    [0.3, 0.04],
-    [0.42, 0.04],
-  ]) {
-    g.beginPath();
-    g.arc(w * x, h * 0.64, w * r, 0, 7);
-    g.fill();
-  }
-  g.fillStyle = '#6b4a2a';
-  g.fillRect(w * 0.84, h * 0.4, w * 0.025, h * 0.32);
-  g.fillStyle = '#3f8a3d';
-  g.beginPath();
-  g.ellipse(w * 0.855, h * 0.32, w * 0.09, h * 0.14, 0, 0, 7);
-  g.fill();
-});
 const posterKoup = drawTex(256, 384, (g, w, h) => {
   g.fillStyle = '#1e1e1e';
   g.fillRect(0, 0, w, h);
@@ -298,11 +264,7 @@ F.bigLeaf(-3.7, FI, -0.05, 1.0, 'white', 0.16);
 // south side: the standing AC and the display of bags and cups
 // against the south wall, side by side (as in the café): the walnut bookshelf (bags and ceramics) and the standing AC
 // with the painting of the café on top; a tall plant in a white pot by the opening to the back
-F.shelves(-2.95, FI, 4.36, N, 0.72, 2.1, 0.34);
-F.toteBag(-3.12, FI + 2.0, 4.22, '-z');
-F.toteBag(-2.8, FI + 2.0, 4.22, '-z');
 F.standingAC(-3.72, FI, 4.37, N);
-F.artPanel(cafePainting, 0.5, 0.42, -3.72, FI + 1.85 + 0.23, 4.42, N);
 F.palm(-2.2, FI, 4.12, 1.3, 'white', 0.13);
 F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 
@@ -336,17 +298,22 @@ const SAND = mat('#c9b39a', { rough: 0.7 });
 }
 {
   // the cake case on its block
-  const g = group(0.04, FI, 5.45, 0, 'cake_case');
-  rbox(0.8, 0.86, 0.68, 0.015, SAND, 0, 0, 0, 0, g);
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.46, 0.6), GLASS());
+  const g = group(-0.06, FI, 5.45, 0, 'cake_case');
+  rbox(1.0, 0.86, 0.68, 0.015, SAND, 0, 0, 0, 0, g);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.98, 0.46, 0.6), GLASS());
   glass.position.set(0, 0.86 + 0.23, 0);
   g.add(glass);
   for (const [x0, x1, y0, y1, z0, z1] of [
-    [-0.39, 0.39, 0.86, 0.875, -0.3, 0.3],
-    [-0.39, 0.39, 1.31, 1.325, -0.3, 0.3],
+    [-0.49, 0.49, 0.86, 0.875, -0.3, 0.3],
+    [-0.49, 0.49, 1.31, 1.325, -0.3, 0.3],
   ])
     rbox(x1 - x0, y1 - y0, z1 - z0, 0.002, mat('#e9edef', { rough: 0.2 }), (x0 + x1) / 2, y0, 0, 0, g);
-  rbox(0.78, 0.008, 0.58, 0.002, mat('#f6f6f4'), 0, 1.08, 0, 0, g); // the glass shelf
+  rbox(0.98, 0.008, 0.58, 0.002, mat('#f6f6f4'), 0, 1.08, 0, 0, g); // the glass shelf
+  // more sweets: small cakes, a tray of pastries, cups of dessert
+  rbox(0.22, 0.03, 0.14, 0.01, mat('#d9c7a5'), -0.3, 1.088, 0.1, 0, g);
+  for (let i = 0; i < 3; i++) ball(0.028, mat('#c98b4a'), -0.37 + i * 0.07, 1.13, 0.1, 1.2, 0.7, 1, g);
+  for (let i = 0; i < 3; i++) cyl(0.03, 0.025, 0.06, mat('#f3efe6'), 0.32, 0.875, -0.12 + i * 0.09, 12, g);
+  cyl(0.06, 0.06, 0.05, mat('#8a4b2c'), 0.34, 1.088, 0.08, 20, g);
   // cakes and pastries, cake domes on stands
   cyl(0.1, 0.1, 0.08, mat('#c98b4a'), -0.2, 0.875, -0.05, 20, g);
   rbox(0.16, 0.05, 0.08, 0.02, mat('#a8643a'), 0.15, 0.875, 0.05, 0, g);
@@ -362,18 +329,20 @@ const SAND = mat('#c9b39a', { rough: 0.7 });
     dome.position.y = 1.467;
     g.add(dome);
   }
-  contactShadow(0.8, 0.68, 0.04, FI, 5.45);
+  contactShadow(1.0, 0.68, -0.06, FI, 5.45);
 }
+// the bar's side wall, just right of the case (the opening to the back is beyond it)
+slab(-0.75, -0.56, FI, 1.55, 5.12, 8.6, mat('#ffffff', { map: speckleTex('#f1ead9', ['#fbf7ee', '#e4dccb'], 600, 128) }), 'bar_side_wall');
 {
   // the back counter (short, by the window) with its syrup bottles
-  const g = group(1.5, FI, 8.27, 0, 'back_counter');
-  rbox(1.1, 0.9, 0.6, 0.02, mat('#f0e4c8'), 0, 0, 0, 0, g);
-  rbox(1.14, 0.04, 0.64, 0.01, M.woodLight, 0, 0.9, 0, 0, g);
-  F.bottles(group(1.05, FI + 0.94, 8.32, 0), 0, 0.85, 0, 0, ['#c4c6c7', '#b8babb', '#8a5b3a', '#d3d5d6']);
+  const g = group(1.72, FI, 8.27, 0, 'back_counter');
+  rbox(0.66, 0.9, 0.6, 0.02, mat('#f0e4c8'), 0, 0, 0, 0, g);
+  rbox(0.7, 0.04, 0.64, 0.01, M.woodLight, 0, 0.9, 0, 0, g);
+  F.bottles(group(1.45, FI + 0.94, 8.32, 0), 0, 0.5, 0, 0, ['#c4c6c7', '#b8babb', '#8a5b3a', '#d3d5d6']);
 }
 {
   // the split AC on the wall above
-  const g = group(-1.05, FI + 2.28, 8.5, N, 'wall_ac');
+  const g = group(-0.05, FI + 2.28, 8.5, N, 'wall_ac');
   rbox(0.85, 0.28, 0.2, 0.05, mat('#f6f6f3', { rough: 0.4 }), 0, 0, 0, 0, g);
   rbox(0.75, 0.02, 0.01, 0.005, mat('#c9cbc8'), 0, 0.05, 0.1, 0, g);
 }
@@ -392,7 +361,7 @@ const SAND = mat('#c9b39a', { rough: 0.7 });
 }
 {
   // the tall drinks fridge (Kafeen)
-  const g = group(-0.5, FI, 8.27, N, 'drinks_fridge');
+  const g = group(-0.12, FI, 8.27, N, 'drinks_fridge');
   rbox(0.62, 1.95, 0.6, 0.03, mat('#20357a'), 0, 0, 0, 0, g);
   rbox(0.52, 1.45, 0.02, 0.01, GLASS(), 0, 0.12, 0.3, 0, g);
   for (let r = 0; r < 4; r++) for (let k = 0; k < 5; k++) cyl(0.035, 0.035, 0.22, mat(['#f4f4f4', '#2e63c9'][k % 2]), -0.2 + k * 0.1, 0.18 + r * 0.35, 0.15, 10, g);
@@ -508,9 +477,9 @@ export async function terraceChairs() {
     });
     contactShadow(0.62, LENGTH, x, FT, z, ry);
   };
-  // turned 45° toward each other, the table between them at the back, by their heads (owner, 2026-11-22)
-  place(3.9, -10.75, -Math.PI / 4, M.woodLight);
-  place(3.9, -9.35, (-3 * Math.PI) / 4, M.woodDark);
+  // turned 45° toward each other (feet toward each other), the table between them at the back (owner, 2026-11-22)
+  place(3.95, -10.62, (-3 * Math.PI) / 4, M.woodLight);
+  place(3.95, -9.25, -Math.PI / 4, M.woodDark);
 }
 
 /** Every lounge chair of the place, from the owner's model: lightened, stood up, sized, and in each chair's colour. */
@@ -574,3 +543,275 @@ export async function loungeChairs() {
   }
 }
 const LOUNGE_SCALE = 0.85; // 1.23 m long in the model: the place's chairs are about 1.05 m (the scan)
+
+/**
+ * The walnut bookshelf by the standing AC, and the painting of the café on the AC (owner's photos, 2026-11-22). Made
+ * after the signs, once the Arabic typeface is loaded (the totes and the painting carry کوپ).
+ */
+export async function koupCorner() {
+  const walnut = mat('#ffffff', { map: woodTexV('#6a4c3b', '#4b3426', '#8a6b58'), rough: 0.55 });
+  const x = -2.95,
+    z = 4.36,
+    W = 0.72,
+    H = 2.12,
+    D = 0.34;
+  const g = group(x, FI, z, N, 'bookshelf');
+  // sides, top, back panel, the boards
+  rbox(0.03, H, D, 0.004, walnut, -W / 2 + 0.015, 0, 0, 0, g);
+  rbox(0.03, H, D, 0.004, walnut, W / 2 - 0.015, 0, 0, 0, g);
+  rbox(W, 0.03, D, 0.004, walnut, 0, H - 0.03, 0, 0, g);
+  rbox(W - 0.04, H - 0.04, 0.012, 0.003, walnut, 0, 0.02, -D / 2 + 0.008, 0, g);
+  for (const y of [0.02, 0.42, 0.8, 1.17, 1.5]) rbox(W - 0.04, 0.025, D - 0.02, 0.004, walnut, 0, y, 0.005, 0, g);
+  contactShadow(W, D, x, FI, z, N);
+  // the two KOUP totes, hanging on black hooks in the top section
+  const tote = (dark) => {
+    const t = drawTex(256, 384, (c, w, h) => {
+      c.clearRect(0, 0, w, h);
+      const bag = dark ? '#151515' : '#ece4d2';
+      const ink = dark ? '#ece4d2' : '#1d1d1d';
+      // straps
+      c.strokeStyle = bag;
+      c.lineWidth = 12;
+      c.beginPath();
+      c.moveTo(w * 0.26, h * 0.34);
+      c.quadraticCurveTo(w * 0.5, -h * 0.08, w * 0.74, h * 0.34);
+      c.stroke();
+      c.fillStyle = bag;
+      c.fillRect(w * 0.04, h * 0.33, w * 0.92, h * 0.65);
+      c.fillStyle = ink;
+      c.font = 'bold 15px serif';
+      c.fillText('KOUP', w * 0.1, h * 0.42);
+      c.font = 'bold 9px sans-serif';
+      c.fillText('WHERE COFFEE AND', w * 0.38, h * 0.41);
+      c.fillText('CULTURE MEET', w * 0.42, h * 0.44);
+      c.font = '700 20px ar';
+      c.textAlign = 'right';
+      c.fillText('کوپ', w * 0.92, h * 0.43);
+      c.textAlign = 'left';
+      // the nine little drawings (moka pot, map, cup, a slice, a takeaway cup, the bridge, the citadel...)
+      c.strokeStyle = ink;
+      c.fillStyle = ink;
+      c.lineWidth = 2;
+      for (let r = 0; r < 3; r++)
+        for (let k = 0; k < 3; k++) {
+          const cx = w * (0.2 + k * 0.3),
+            cy = h * (0.55 + r * 0.14);
+          const kind = (r * 3 + k) % 5;
+          c.beginPath();
+          if (kind === 0) {
+            c.moveTo(cx - 10, cy + 16);
+            c.lineTo(cx - 6, cy - 4);
+            c.lineTo(cx - 10, cy - 16);
+            c.lineTo(cx + 10, cy - 16);
+            c.lineTo(cx + 6, cy - 4);
+            c.lineTo(cx + 10, cy + 16);
+            c.closePath();
+          } else if (kind === 1) {
+            c.moveTo(cx - 20, cy);
+            c.bezierCurveTo(cx - 10, cy - 16, cx + 6, cy - 6, cx + 20, cy - 12);
+            c.bezierCurveTo(cx + 14, cy + 8, cx - 4, cy + 14, cx - 20, cy);
+          } else if (kind === 2) {
+            c.rect(cx - 9, cy - 14, 18, 26);
+            c.moveTo(cx - 12, cy - 14);
+            c.lineTo(cx + 12, cy - 14);
+          } else if (kind === 3) {
+            c.moveTo(cx - 20, cy + 12);
+            c.lineTo(cx - 8, cy - 12);
+            c.lineTo(cx + 20, cy + 12);
+            c.closePath();
+            c.moveTo(cx - 12, cy + 4);
+            c.arc(cx - 2, cy + 4, 4, 0, 7);
+          } else {
+            c.moveTo(cx - 22, cy + 10);
+            for (let i = 0; i < 4; i++) c.arc(cx - 16 + i * 11, cy + 10, 5, Math.PI, 0);
+            c.moveTo(cx - 22, cy + 10);
+            c.lineTo(cx + 22, cy + 10);
+          }
+          c.stroke();
+        }
+    });
+    t.userData.mimeType = 'image/png';
+    return t;
+  };
+  for (const [dx, dark] of [
+    [-0.16, true],
+    [0.16, false],
+  ]) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(0.29, 0.435), new THREE.MeshStandardMaterial({ map: tote(dark), transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, roughness: 0.9 }));
+    p.position.set(dx, 1.5 + 0.03 + 0.435 / 2 + 0.07, -D / 2 + 0.03);
+    p.name = 'NOCOLLIDE_tote';
+    g.add(p);
+    rbox(0.025, 0.05, 0.03, 0.005, mat('#111111'), dx, 1.5 + 0.03 + 0.435 + 0.05, -D / 2 + 0.02, 0, g); // the hook
+    // folded totes on the board below
+    for (let i = 0; i < 4; i++) rbox(0.26, 0.018, 0.2, 0.004, mat(dark ? '#1a1a1a' : '#e9e1cf'), dx + (i % 2) * 0.008, 1.525 + i * 0.019, 0.02, 0, g);
+  }
+  // the white ceramics on the three lower shelves
+  const white = mat('#f2eee6', { rough: 0.45 });
+  const pieces = [
+    (px, py) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.022, 10, 20), white);
+      m.position.set(px, py + 0.075, 0.02);
+      g.add(m);
+    },
+    (px, py) => ball(0.055, white, px, py + 0.05, 0.02, 1.3, 0.9, 1, g),
+    (px, py) => {
+      cyl(0.03, 0.04, 0.08, white, px, py, 0.02, 14, g);
+      ball(0.035, white, px, py + 0.11, 0.02, 1, 1, 1, g);
+    },
+    (px, py) => ball(0.045, white, px, py + 0.05, 0.02, 1, 1.2, 1, g),
+    (px, py) => cyl(0.04, 0.035, 0.07, white, px, py, 0.02, 16, g),
+    (px, py) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.02, 10, 16, Math.PI), white);
+      m.position.set(px, py + 0.01, 0.02);
+      g.add(m);
+    },
+    (px, py) => cyl(0.022, 0.025, 0.1, white, px, py, 0.02, 12, g),
+  ];
+  [0.445, 0.825, 1.195].forEach((sy, r) => {
+    for (let k = 0; k < 4; k++) pieces[(r * 4 + k) % pieces.length](-0.25 + k * 0.165, sy);
+  });
+  // the painting of the café, leaning on top of the standing AC
+  const art = drawTex(400, 440, (c, w, h) => {
+    c.fillStyle = '#f2f0ea';
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = '#cfe3ea';
+    c.fillRect(0, 0, w, h * 0.42);
+    // birds
+    c.strokeStyle = '#3a3a3a';
+    c.lineWidth = 1.5;
+    for (const [bx, by] of [
+      [0.68, 0.07],
+      [0.82, 0.05],
+    ]) {
+      c.beginPath();
+      c.moveTo(w * bx - 7, h * by);
+      c.quadraticCurveTo(w * bx - 3, h * by - 4, w * bx, h * by);
+      c.quadraticCurveTo(w * bx + 3, h * by - 4, w * bx + 7, h * by);
+      c.stroke();
+    }
+    // trees
+    const tree = (tx, ty, s) => {
+      c.fillStyle = '#5a3a26';
+      c.fillRect(tx - 3, ty, 6, h * 0.36 * s);
+      c.fillStyle = '#3f8a3d';
+      for (let i = 0; i < 6; i++) {
+        c.beginPath();
+        c.ellipse(tx + Math.sin(i * 2.1) * 26 * s, ty - 10 - i * 18 * s, 36 * s * (1 - i * 0.08), 22 * s, 0, 0, 7);
+        c.fill();
+      }
+    };
+    tree(w * 0.06, h * 0.4, 0.8);
+    tree(w * 0.86, h * 0.62, 1);
+    // the café: a white block with a flat roof overhang, its window and awning
+    c.lineWidth = 2;
+    c.strokeStyle = '#6b3f2a';
+    c.fillStyle = '#fbfaf5';
+    c.beginPath();
+    c.moveTo(w * 0.2, h * 0.36);
+    c.lineTo(w * 0.62, h * 0.3);
+    c.lineTo(w * 0.74, h * 0.37);
+    c.lineTo(w * 0.74, h * 0.62);
+    c.lineTo(w * 0.22, h * 0.7);
+    c.closePath();
+    c.fill();
+    c.stroke();
+    c.fillStyle = '#efece4';
+    c.beginPath();
+    c.moveTo(w * 0.16, h * 0.34);
+    c.lineTo(w * 0.36, h * 0.24);
+    c.lineTo(w * 0.64, h * 0.23);
+    c.lineTo(w * 0.76, h * 0.33);
+    c.lineTo(w * 0.62, h * 0.3);
+    c.lineTo(w * 0.2, h * 0.38);
+    c.closePath();
+    c.fill();
+    c.stroke();
+    c.fillStyle = '#9a9a96';
+    c.fillRect(w * 0.48, h * 0.36, w * 0.16, h * 0.03);
+    c.fillStyle = '#e8eef0';
+    c.fillRect(w * 0.5, h * 0.39, w * 0.13, h * 0.13);
+    c.strokeRect(w * 0.5, h * 0.39, w * 0.13, h * 0.13);
+    c.fillStyle = '#6b3f2a';
+    c.font = '700 26px ar';
+    c.fillText('کوپ', w * 0.39, h * 0.47);
+    // the step and the curb
+    c.strokeStyle = '#6b3f2a';
+    c.beginPath();
+    c.moveTo(w * 0.22, h * 0.7);
+    c.lineTo(w * 0.5, h * 0.73);
+    c.lineTo(w * 0.8, h * 0.66);
+    c.stroke();
+    c.fillStyle = '#d8d4cc';
+    c.beginPath();
+    c.moveTo(0, h * 0.82);
+    c.lineTo(w, h * 0.98);
+    c.lineTo(w, h);
+    c.lineTo(0, h * 0.86);
+    c.fill();
+    for (let i = 0; i < 12; i++) {
+      c.beginPath();
+      c.moveTo((w * i) / 12, h * (0.82 + i * 0.0133));
+      c.lineTo((w * i) / 12, h * (0.86 + i * 0.0133));
+      c.stroke();
+    }
+    // the couple at the window: him in black, her in a long red dress
+    c.fillStyle = '#1e1e1e';
+    c.fillRect(w * 0.5, h * 0.49, w * 0.06, h * 0.17);
+    c.beginPath();
+    c.arc(w * 0.53, h * 0.47, 8, 0, 7);
+    c.fill();
+    c.fillStyle = '#8f1f1f';
+    c.beginPath();
+    c.moveTo(w * 0.58, h * 0.49);
+    c.lineTo(w * 0.62, h * 0.49);
+    c.lineTo(w * 0.65, h * 0.67);
+    c.lineTo(w * 0.56, h * 0.67);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#151515';
+    c.beginPath();
+    c.ellipse(w * 0.6, h * 0.47, 8, 14, 0, 0, 7);
+    c.fill();
+    // three potted plants
+    for (const [px, ph] of [
+      [0.27, 0.16],
+      [0.36, 0.1],
+      [0.43, 0.12],
+    ]) {
+      c.fillStyle = '#9a9188';
+      c.fillRect(w * px - 12, h * 0.63, 24, 24);
+      c.fillStyle = '#3f7d35';
+      for (let i = 0; i < 7; i++) {
+        c.beginPath();
+        c.ellipse(w * px + (i - 3) * 4, h * (0.63 - ph * 0.5), 4, h * ph * 0.45, (i - 3) * 0.25, 0, 7);
+        c.fill();
+      }
+    }
+  });
+  // a canvas on a stretcher: a plain box, the painting on its face; leaning a little against the wall
+  const canvasG = group(-3.72, FI + 1.85, 4.47, Math.PI, 'cafe_painting');
+  canvasG.rotation.x = 0.08;
+  rbox(0.5, 0.55, 0.025, 0.004, mat('#efece4'), 0, 0, 0, 0, canvasG);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(0.49, 0.54), mat('#ffffff', { map: art, rough: 0.8 }));
+  face.position.set(0, 0.275, 0.0135);
+  face.name = 'NOCOLLIDE_painting';
+  canvasG.add(face);
+}
+/** Wood with its grain running up (a bookshelf's boards and panels). */
+function woodTexV(base, dark, light) {
+  return drawTex(256, 512, (c, w, h) => {
+    c.fillStyle = base;
+    c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 60; i++) {
+      c.strokeStyle = rnd() < 0.5 ? dark : light;
+      c.globalAlpha = 0.18 + rnd() * 0.22;
+      c.lineWidth = 1 + rnd() * 2.5;
+      const x = rnd() * w;
+      c.beginPath();
+      c.moveTo(x, 0);
+      for (let y = 0; y <= h; y += 32) c.lineTo(x + Math.sin(y / 70 + i) * 3, y);
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+  });
+}
