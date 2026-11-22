@@ -186,19 +186,17 @@ F.rug(0.9, FI, -5.45, 0, 2.0, 3.3, rugBeige);
   g.children.at(-1).material = mat('#ffffff', { map: patterned });
 }
 F.armchair(0.4, FI, -9.55, 0.25, C.navy, 0.78);
-F.stool(1.15, FI, -7.95, C.woodLight);
 F.basket(1.65, FI, -9.2, 0.18, 0.32);
 // round the beige rug
 F.boxTable(0.95, FI, -5.4, 0, 0.75, 0.7, 0.38, M.woodLight, 0.04);
-F.armchair(0.2, FI, -6.2, E, '#e9e4da', 0.78);
 F.armchair(0.2, FI, -4.75, E, '#cfc8bb', 0.78);
 F.armchair(1.4, FI, -6.6, 0.2, C.leatherBrown, 0.85);
 F.armchair(1.45, FI, -4.35, N, C.linen, 0.8);
 F.vase(0.95, FI + 0.38, -5.35, 0.06, 0.22, '#3f4a3c');
-// north-west corner: olive chairs round a glass table
+// north-west corner: olive chairs round a low walnut coffee table
 {
-  const g = group(-2.65, FI, -9.35, 0, 'glass_table');
-  rbox(0.85, 0.02, 0.85, 0.008, GLASS(), 0, 0.36, 0, 0, g);
+  const g = group(-2.65, FI, -9.35, 0, 'coffee_table');
+  rbox(0.85, 0.035, 0.85, 0.008, F.M.walnut, 0, 0.345, 0, 0, g);
   for (const [a, b] of [
     [-1, -1],
     [1, -1],
@@ -210,10 +208,9 @@ F.vase(0.95, FI + 0.38, -5.35, 0.06, 0.22, '#3f4a3c');
 }
 F.loungeChair(-2.05, FI, -10.35, 0.5, C.olive);
 F.loungeChair(-1.4, FI, -9.55, -1.6, C.olive);
-F.loungeChair(-3.6, FI, -9.1, 1.5, C.oliveDark);
-F.loungeChair(-3.15, FI, -8.15, 2.6, C.olive);
+F.loungeChair(-3.35, FI, -8.95, 1.5, C.oliveDark);
+F.loungeChair(-2.95, FI, -7.95, 2.6, C.olive);
 F.loungeChair(-2.3, FI, -8.0, 3.2, C.oliveDark);
-F.frameTable(-3.55, FI, -10.5, 0.3, 0.45, 0.5);
 // west: two puffy sofas, the painted table, the long sofa
 F.puffySofa(-3.2, FI, -6.5, 0, C.cream, 1.75, 0.95);
 F.boxTable(-2.85, FI, -5.5, 0, 1.35, 0.65, 0.4, mat('#ffffff', { map: paintedTop }), 0.04);
@@ -224,18 +221,19 @@ F.palm(-2.45, FI, -10.85, 1.6, 'basket', 0.2);
 F.basket(-1.85, FI, -10.9, 0.15, 0.3);
 F.bush(-1.15, FI, -10.85, 0.22, 'terracotta', 0.14, 0.25, ['#d8c23a', '#e9d65a', C.leaf]);
 F.vase(-0.55, FI, -10.95, 0.1, 0.4, '#d6c2a3');
-F.palm(0.05, FI, -10.85, 1.4, 'basket', 0.18);
-F.pampas(0.75, FI, -10.9, 1.3);
 F.vase(1.35, FI, -10.95, 0.09, 0.45, '#c9a27e');
-F.bigLeaf(1.75, FI, -10.7, 1.4, 'stone', 0.2);
-F.artPanel(posterKoup, 0.45, 0.66, 1.25, 1.15, ZN + 0.02, 0);
+F.artPanel(posterKoup, 0.45, 0.66, 1.55, 1.15, ZN + 0.02, 0);
 // west wall: the shop's tote bags and a plant
 F.toteBag(XW + 0.02, 0.95, -9.4, '+x');
 F.toteBag(XW + 0.02, 0.95, -5.6, '+x');
 F.bigLeaf(-3.75, FI, -7.35, 1.2, 'basket', 0.17);
 // the display shelves and the reception desk at the opening to the middle room
 F.shelves(-2.95, FI, -3.45, 0, 1.3, 2.25, 0.35);
-F.boxTable(0.85, FI, -3.15, 0, 1.3, 0.55, 1.02, M.wood, 0.03);
+F.walnutCabinet(0.85, FI, -3.15, 0, 1.25, 0.55, 1.0);
+F.gramophone(1.12, FI + 1.0, -3.18, -0.5);
+F.blackVase(0.38, FI + 1.0, -3.05);
+F.blackVase(0.6, FI + 1.0, -3.0);
+F.whiteCeramics(0.8, FI + 1.0, -3.2);
 F.bush(1.55, FI, -3.6, 0.3, 'white', 0.18, 0.3);
 
 // ================= Middle room (floor FI) =================
@@ -252,11 +250,15 @@ F.roundChair(1.2, FI, -0.7, E);
 F.loungeChair(1.35, FI, 0.85, Wt, C.cognac);
 F.loungeChair(1.35, FI, 2.2, Wt, C.black);
 // four lounge chairs round a little table
-F.boxTable(-1.3, FI, 1.75, 0, 0.5, 0.55, 0.4, M.woodLight, 0.03);
-F.loungeChair(-1.85, FI, 0.85, 0, C.olive);
-F.loungeChair(-0.75, FI, 0.85, 0, C.black);
-F.loungeChair(-1.85, FI, 2.65, N, C.olive);
-F.loungeChair(-0.75, FI, 2.65, N, C.navy);
+F.walnutCabinet(-1.3, FI, 1.75, 0, 1.2, 0.55, 1.0);
+F.recordPlayer(-1.5, FI + 1.0, 1.72, 0.08);
+F.blanket(-0.92, FI + 1.0, 1.75, -0.05);
+F.loungeChair(-1.95, FI, 0.85, N, C.black);
+F.loungeChair(-0.65, FI, 0.85, N, C.oliveDark);
+F.bistroTable(-1.3, FI, 0.55, '#1f2124');
+F.loungeChair(-1.95, FI, 2.65, 0, C.olive);
+F.loungeChair(-0.65, FI, 2.65, 0, C.navy);
+F.bistroTable(-1.3, FI, 2.95, '#1f2124');
 // west wall: the bench, the sign (signs()), the art, plants
 F.boxTable(-3.83, FI, 1.95, 0, 0.45, 2.9, 0.45, M.woodDark, 0.03);
 F.artPanel(painting, 0.95, 1.75, XW + 0.02, FI + 1.78, -1.25, E);
@@ -269,6 +271,13 @@ F.palm(-2.2, FI, 4.12, 1.3, 'white', 0.13);
 F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 
 // ================= The bar (back area, floor FI) =================
+// the menu: a visitor walking up to the counter is offered it (the tour page shows its button)
+{
+  const spot = new THREE.Object3D();
+  spot.name = 'HOTSPOT_menu';
+  spot.position.set(0.9, FI + 1.0, 4.65);
+  add(spot);
+}
 // (owner's photo, 2026-11-22) a plain sand-coloured counter that starts at the left wall: the espresso machine and its
 // cups on the left block, a glass cake case on the right block; behind, the dark door and the blue drinks fridge
 const SAND = mat('#c9b39a', { rough: 0.7 });
@@ -814,4 +823,65 @@ function woodTexV(base, dark, light) {
     }
     c.globalAlpha = 1;
   });
+}
+
+/**
+ * The owner's four standing mirrors (models/mirrors.glb, 2026-11-22), each in its place: the live-edge timber one on
+ * the lounge's north wall (where the plants were), the olive ring in the north-west corner, the grey and raspberry
+ * rock one by the red rug, the burgundy arch where the white armchair was.
+ */
+export async function mirrors() {
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+  const gltf = await new GLTFLoader().loadAsync('models/mirrors.glb');
+  gltf.scene.updateMatrixWorld(true);
+  // their sculpted frames are very finely made: lightened (the mirror glass itself is a few triangles)
+  const { SimplifyModifier } = await import('three/addons/modifiers/SimplifyModifier.js');
+  const { mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
+  let before = 0,
+    after = 0;
+  gltf.scene.traverse((o) => {
+    if (!o.isMesh) return;
+    const n = o.geometry.attributes.position.count;
+    before += o.geometry.index ? o.geometry.index.count / 3 : n / 3;
+    if (n > 3000) {
+      let g = mergeVertices(o.geometry, 1e-5);
+      g = new SimplifyModifier().modify(g, Math.floor(g.attributes.position.count * 0.75));
+      o.geometry = g;
+    }
+    after += o.geometry.index ? o.geometry.index.count / 3 : o.geometry.attributes.position.count / 3;
+  });
+  console.log('mirror tris', before, '->', after);
+  const byName = {};
+  for (const c of gltf.scene.getObjectByName('world')?.children ?? gltf.scene.children[0].children) byName[c.name] = c;
+  const place = (name, x, z, ry, scale) => {
+    const src = byName[name];
+    const box = new THREE.Box3().setFromObject(src);
+    const centre = box.getCenter(new THREE.Vector3());
+    const inner = new THREE.Group();
+    // its own copy, centred on its middle, standing on the floor, facing +z
+    const copy = src.clone(true);
+    copy.applyMatrix4(src.parent.matrixWorld);
+    inner.add(copy);
+    inner.position.set(-centre.x, -box.min.y, -centre.z);
+    const g = group(x, FI, z, ry, 'mirror');
+    g.scale.setScalar(scale);
+    g.add(inner);
+    copy.traverse((o) => {
+      if (!o.isMesh) return;
+      const m = o.material;
+      if (m.map) m.map.userData.mimeType = 'image/jpeg';
+      if (/Mirror_Reflective/i.test(m.name)) {
+        // a mirror: bright and smooth, catching the room's light
+        m.color.set('#dfe6ea');
+        m.metalness = 1;
+        m.roughness = 0.04;
+      }
+    });
+    const size = box.getSize(new THREE.Vector3()).multiplyScalar(scale);
+    contactShadow(size.x, size.z, x, FI, z, ry);
+  };
+  place('Mirror_04_Live_Edge_Timber', 0.3, ZN + 0.12, 0, 0.8);
+  place('Mirror_01_Olive_Green_Organic_Ring', XW + 0.25, -10.15, Math.PI / 2, 0.8);
+  place('Mirror_03_Gray_Pink_Rock_Horseshoe', 1.7, -7.95, -Math.PI / 2, 0.9);
+  place('Mirror_02_Burgundy_Organic_Arch', 0.2, -6.2, Math.PI / 2, 0.9);
 }

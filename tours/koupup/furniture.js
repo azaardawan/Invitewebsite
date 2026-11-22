@@ -30,7 +30,9 @@ const T = {
   weave: weaveTex('#c29a64', '#8f6a3e'),
   weaveDark: weaveTex('#8f6a3e', '#5e4426'),
 };
+const walnutV = woodTex('#6c4f3f', '#4c3528', '#8a6c5b');
 export const M = {
+  walnut: mat('#ffffff', { map: walnutV, rough: 0.5 }),
   wood: mat('#ffffff', { map: T.wood }),
   woodLight: mat('#ffffff', { map: T.woodLight }),
   woodDark: mat('#ffffff', { map: T.woodDark }),
@@ -572,5 +574,103 @@ export function fluffyCushion(profile, width, thick = 0.2) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
+  return g;
+}
+
+/** A plain walnut block cabinet (the reception block, the block in the middle room). */
+export function walnutCabinet(x, y, z, ry, w, d, h) {
+  const g = group(x, y, z, ry, 'walnut_cabinet');
+  const b = rbox(w, h, d, 0.008, M.walnut, 0, 0, 0, 0, g);
+  const uv = b.geometry.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w * 0.9, uv.getY(i) * h * 0.9);
+  contactShadow(w, d, x, y, z, ry);
+  return g;
+}
+/** The gramophone: a carved dark mahogany base with a brass plate, a turntable, a chrome arm and a golden horn. */
+export function gramophone(x, y, z, ry) {
+  const g = group(x, y, z, ry, 'gramophone');
+  const wood = mat('#4a2418', { rough: 0.45 });
+  const base = cyl(0.21, 0.23, 0.2, wood, 0, 0, 0, 8, g);
+  base.rotation.y = Math.PI / 8;
+  cyl(0.235, 0.235, 0.02, wood, 0, 0, 0, 8, g).rotation.y = Math.PI / 8;
+  cyl(0.215, 0.215, 0.015, wood, 0, 0.2, 0, 8, g).rotation.y = Math.PI / 8;
+  rbox(0.18, 0.1, 0.01, 0.005, mat('#b08d4a', { metal: 0.7, rough: 0.35 }), 0, 0.05, 0.205, 0, g); // the brass plate
+  cyl(0.15, 0.15, 0.012, mat('#1c1c1c', { rough: 0.3 }), 0, 0.215, 0, 32, g); // the record
+  cyl(0.15, 0.15, 0.004, mat('#c9cbcc', { metal: 0.8, rough: 0.3 }), 0, 0.212, 0, 32, g);
+  const chrome = mat('#d3d6d8', { metal: 0.9, rough: 0.2 });
+  rod([0.13, 0.22, -0.12], [0.13, 0.34, -0.12], 0.018, chrome, g);
+  rod([0.13, 0.34, -0.12], [0.0, 0.42, -0.25], 0.022, chrome, g);
+  // the horn: a flaring trumpet, gold outside, dark inside
+  const pts = [];
+  for (let i = 0; i <= 14; i++) {
+    const t = i / 14;
+    pts.push(new THREE.Vector2(0.025 + 0.2 * Math.pow(t, 3), t * 0.55));
+  }
+  const gold = mat('#c9a13b', { metal: 0.95, rough: 0.2 });
+  const horn = new THREE.Mesh(new THREE.LatheGeometry(pts, 28), gold);
+  horn.material = gold;
+  const inside = new THREE.Mesh(new THREE.LatheGeometry(pts.map((p) => new THREE.Vector2(p.x * 0.97, p.y)), 28), mat('#151515', { side: THREE.BackSide }));
+  const hornG = new THREE.Group();
+  hornG.add(horn);
+  hornG.add(inside);
+  hornG.position.set(0.0, 0.42, -0.25);
+  hornG.rotation.set(-Math.PI / 2 - 0.5, 0, 0);
+  // point it up and toward the room
+  hornG.rotation.x = 1.15;
+  g.add(hornG);
+  return g;
+}
+/** A black ribbed vase with a flared neck. */
+export function blackVase(x, y, z) {
+  const g = group(x, y, z, 0, 'vase');
+  const pts = [];
+  for (let i = 0; i <= 16; i++) {
+    const t = i / 16;
+    const r = t < 0.55 ? 0.07 + 0.03 * Math.sin(t * Math.PI * 1.6) : 0.04 + 0.025 * (t - 0.55) * 4;
+    pts.push(new THREE.Vector2(Math.max(0.03, r), t * 0.24));
+  }
+  g.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 18), mat('#191919', { rough: 0.6 })));
+  return g;
+}
+/** Small white ceramics (a ring vase, a little bust) as on the reception block. */
+export function whiteCeramics(x, y, z) {
+  const white = mat('#f2eee6', { rough: 0.45 });
+  const g = group(x, y, z, 0, 'ceramics');
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.02, 10, 18), white);
+  ring.position.set(0, 0.065, 0);
+  g.add(ring);
+  cyl(0.025, 0.035, 0.07, white, 0.17, 0, 0.12, 12, g);
+  ball(0.03, white, 0.17, 0.1, 0.12, 1, 1.1, 1, g);
+  ball(0.025, white, -0.12, 0.03, 0.1, 1, 1.4, 1, g);
+  return g;
+}
+/** A suitcase record player: a wooden case with a black deck and a record. */
+export function recordPlayer(x, y, z, ry) {
+  const g = group(x, y, z, ry, 'record_player');
+  rbox(0.4, 0.11, 0.3, 0.02, mat('#8a4f26', { map: woodTex('#8a4f26', '#5a2f14', '#b06d3a'), rough: 0.4 }), 0, 0, 0, 0, g);
+  rbox(0.38, 0.01, 0.28, 0.005, mat('#1c1c1c'), 0, 0.11, 0, 0, g);
+  cyl(0.11, 0.11, 0.008, mat('#111111', { rough: 0.3 }), -0.04, 0.12, 0, 32, g);
+  cyl(0.03, 0.03, 0.009, mat('#c94a3a'), -0.04, 0.121, 0, 16, g);
+  rod([0.13, 0.13, -0.09], [0.04, 0.13, 0.04], 0.006, mat('#cfd2d4', { metal: 0.8, rough: 0.3 }), g);
+  return g;
+}
+/** A folded blanket, black with a cream border and pattern. */
+export function blanket(x, y, z, ry) {
+  const g = group(x, y, z, ry, 'blanket');
+  const t = drawTex(256, 256, (c, w, h) => {
+    c.fillStyle = '#1c1c1c';
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = '#e8e0cc';
+    c.fillRect(0, h * 0.62, w, h * 0.38);
+    c.strokeStyle = '#e8e0cc';
+    c.lineWidth = 3;
+    for (let i = 0; i < 6; i++) {
+      c.beginPath();
+      c.moveTo(w * 0.1 + i * 35, 0);
+      c.lineTo(w * 0.1 + i * 35, h * 0.6);
+      c.stroke();
+    }
+  });
+  for (let i = 0; i < 4; i++) rbox(0.42, 0.035, 0.3, 0.015, mat('#ffffff', { map: t, rough: 0.9 }), (i % 2) * 0.01, i * 0.034, 0, 0, g);
   return g;
 }
