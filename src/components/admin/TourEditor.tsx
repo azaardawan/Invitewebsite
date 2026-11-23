@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, useTransition, type CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
 import type { TourEngine } from '@/components/tour/tour-engine';
+import { Joystick, useTouchScreen } from '@/theme-sdk/gallery3d/Gallery3D';
 import type { ItemEdit, TourEdits } from '@/components/tour/items';
 import { saveTourEditsAction } from '@/app/admin/_actions/tours';
 
@@ -20,6 +21,7 @@ export function TourEditor({ tourId, name, model, edits: saved }: { tourId: stri
   const t = useTranslations('admin.tours.editor');
   const tc = useTranslations('admin.catalog');
   const box = useRef<HTMLDivElement>(null);
+  const touch = useTouchScreen();
   const engine = useRef<TourEngine | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [progress, setProgress] = useState(0);
@@ -118,6 +120,10 @@ export function TourEditor({ tourId, name, model, edits: saved }: { tourId: stri
   return (
     <div className="fixed inset-0 bg-[#1a1613]" data-testid="tour-editor">
       <div ref={box} className="absolute inset-0" data-state={state} data-testid="tour-editor-canvas" />
+      {/* walking on a phone or tablet: the round pad (as on the tour) */}
+      {touch && state === 'ready' ? (
+        <Joystick style={{ left: 'auto', right: 'auto', insetInlineStart: 24, bottom: 'max(24px, env(safe-area-inset-bottom))', zIndex: 2 }} onMove={(x, y) => engine.current?.setStick(x, y)} />
+      ) : null}
 
       {state !== 'ready' ? (
         <div role="status" className="absolute inset-0 grid place-items-center text-sm text-white">

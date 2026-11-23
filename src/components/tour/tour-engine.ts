@@ -411,8 +411,14 @@ export class TourEngine {
   }
 
   private onDown = (e: PointerEvent) => {
-    // the editor: a handle of the picked item is being dragged (not the view)
-    if (this.gizmo?.axis) return;
+    // the editor: a handle of the picked item is being dragged, not the view (on a touch screen there was no hover
+    // before the touch: the handles are tested here first)
+    const g = this.gizmo;
+    if (g && this.picked) {
+      const r = this.renderer.domElement.getBoundingClientRect();
+      g.pointerHover({ x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -((e.clientY - r.top) / r.height) * 2 + 1, button: e.button } as unknown as PointerEvent);
+      if (g.axis) return;
+    }
     this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
     this.downAt = { x: e.clientX, y: e.clientY };
     this.renderer.domElement.setPointerCapture(e.pointerId);
@@ -756,6 +762,8 @@ export class TourEngine {
         const g = new TransformControls(this.camera, this.renderer.domElement);
         g.setSpace('world');
         g.setTranslationSnap(0.01);
+        // bigger handles on a touch screen (a finger)
+        if (window.matchMedia('(pointer: coarse)').matches) g.setSize(1.5);
         g.setRotationSnap(THREE.MathUtils.degToRad(1));
         g.addEventListener('dragging-changed', (ev) => {
           this.gizmoBusy = !!(ev as unknown as { value: boolean }).value;
