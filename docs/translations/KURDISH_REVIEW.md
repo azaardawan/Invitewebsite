@@ -2263,3 +2263,12 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `tour.putCookie` | Put the cookie down | کووکییەکە دابنێ | کووکیێ دانە |
 | `tour.pickCoffee` | Pick up the coffee | قاوەکە هەڵبگرە | قەهوێ هلگرە |
 | `tour.pickCookie` | Pick up the cookie | کووکییەکە هەڵبگرە | کووکیێ هلگرە |
+
+## Batch 71 — cafés' virtual tours: calling the waiter to your seat — ✅ AUTO-APPROVED (2026-11-23, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.callWaiter` | Call the waiter | بانگی گارسۆنەکە بکە | گازی گارسۆنی بکە |
+| `tour.waiterComing` | The waiter is on his way… | گارسۆنەکە لە ڕێگادایە… | گارسۆن د ڕێکێ دایە… |
+| `tour.waiterBringing` | Your order is on its way… | داواکارییەکەت لە ڕێگادایە… | داخوازیا تە د ڕێکێ دایە… |
+| `tour.noThanks` | No, thanks | نەخێر، سوپاس | نە، سوپاس |

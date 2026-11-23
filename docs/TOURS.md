@@ -53,6 +53,10 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   his round, Empties `CLEANER_stop_<n>` (in order, looping; each faces the way he faces there, its extras' `wipe` the
   seconds he wipes a table there, 0 to walk on). Lines between stops must be clear of furniture; he waits for a visitor
   standing in his way (`src/components/tour/staff.ts`).
+- **Calling the waiter** (owner, 2026-11-23): a seated visitor gets «Call the waiter». He walks to them along the
+  café's walkways, Empties `NAV_<n>` whose extras' `links` list the points reached in a straight, clear line (`NAV_0`
+  is at the counter, where orders are picked up), stands by the seat (each `SEAT_<n>`'s extras `stand`, `[x, y, z]`, and
+  `nav`, its walkway point), takes the order, the barista makes it and hands it to him, and he brings it.
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).

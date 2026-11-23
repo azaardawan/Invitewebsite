@@ -1912,6 +1912,10 @@
     "putCoffee": "Put the coffee down",
     "putCookie": "Put the cookie down",
     "pickCoffee": "Pick up the coffee",
-    "pickCookie": "Pick up the cookie"
+    "pickCookie": "Pick up the cookie",
+    "callWaiter": "Call the waiter",
+    "waiterComing": "The waiter is on his way…",
+    "waiterBringing": "Your order is on its way…",
+    "noThanks": "No, thanks"
   }
 }
