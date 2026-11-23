@@ -12,6 +12,8 @@ Y up). The scan itself is the café's and is not kept in the repository.
   café's style (not a photographed face); the shirt's prints are the owner's photos (`models/shirt_front.jpg`, `shirt_back.jpg`); his
   places (the machine, the cookie pile on the back counter). Every chair is a seat and every table a place to put a
   coffee down (`seat()`, `tableTop()` in `lib.js`; `SEAT_<n>` nodes in the model).
+- The second member of staff (`cleaner()` in `barista.js`): the same shirt in olive green (`models/shirt_*_olive.jpg`),
+  going round the main floor with a cloth and wiping the tables (his round: `CLEANER_stop_<n>`).
 - `lib.js`: shapes, textures and materials. Every piece of furniture gets an invisible block (`COLLIDER_…`) so visitors
   walk round it; leaves, rugs and shadows are `NOCOLLIDE_…`; visitors start at `START` (the foot of the north stairs).
 

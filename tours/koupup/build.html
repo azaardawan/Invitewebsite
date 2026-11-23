@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { root, seats, tables } from './lib.js';
-import { barista } from './barista.js';
+import { barista, cleaner } from './barista.js';
 import { signs } from './build.js';
 import { terraceChairs, loungeChairs, koupCorner, mirrors } from './rooms.js';
 try {
@@ -14,6 +14,7 @@ try {
   await koupCorner();
   await mirrors();
   await barista();
+  await cleaner();
   // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
   const start = new THREE.Object3D();
   start.name = 'START';
@@ -27,8 +28,8 @@ try {
   const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
   const buckets = new Map();
   // the barista is kept as he is (his joints move in the tour), apart from the merge
-  const man = root.getObjectByName('BARISTA');
-  const isMan = (o) => { for (let p = o; p; p = p.parent) if (p === man) return true; return false; };
+  const people = ['BARISTA', 'CLEANER'].map((n) => root.getObjectByName(n));
+  const isMan = (o) => { for (let p = o; p; p = p.parent) if (people.includes(p)) return true; return false; };
   scene0.traverse(o => {
     if (!o.isMesh || isMan(o)) return;
     let kind = 'S';
@@ -71,10 +72,10 @@ try {
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
   // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the barista's places: kept as named points
   root.traverse(o => {
-    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam))/.test(o.name)) return;
-    const h = new THREE.Object3D(); h.name = o.name; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
+    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam)|CLEANER_stop_)/.test(o.name)) return;
+    const h = new THREE.Object3D(); h.name = o.name; h.userData = o.userData; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
   });
-  out.add(man);
+  for (const m of people) out.add(m);
   // the seats (SEAT_<n>): where a visitor sits, the way they face (yaw), the eye above the seat and, when a table is
   // within reach, the spot on it nearest them (where their coffee is put down)
   const v = new THREE.Vector3(), q = new THREE.Vector3();

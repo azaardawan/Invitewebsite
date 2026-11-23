@@ -10,7 +10,8 @@
  * - nodes named `HOTSPOT_<key>` (e.g. `HOTSPOT_menu` at a counter): within 1.8 m the page is told (`onSpot`);
  * - nodes named `SEAT_<n>` (a seat: its extras give `yaw`, the way a seated visitor faces, `eye`, their eye above the
  *   seat, and `table`, the spot nearest them on a table in reach): «Sit down» there;
- * - a barista (`BARISTA`, see barista.ts) at the counter (`HOTSPOT_counter`): «Get a coffee», «Get a cookie».
+ * - a barista (`BARISTA`, see barista.ts) at the counter (`HOTSPOT_counter`): «Get a coffee», «Get a cookie»;
+ * - a member of staff going round wiping the tables (`CLEANER` and his round, see staff.ts).
  *
  * Loaded on its own (dynamic import) so only the tour page downloads three.js. It draws only when something changes.
  */
@@ -198,7 +199,7 @@ export class TourEngine {
         const map = (mat as THREE.MeshStandardMaterial).map;
         if (map) map.anisotropy = anisotropy;
       }
-      if (named(m, 'NOCOLLIDE') || named(m, 'BARISTA')) return;
+      if (named(m, 'NOCOLLIDE') || named(m, 'BARISTA') || named(m, 'CLEANER')) return;
       m.geometry.computeBoundsTree();
       this.colliders.push(m);
     });

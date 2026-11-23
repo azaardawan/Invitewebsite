@@ -92,18 +92,22 @@ function turned(profile, material, open = false) {
   return m;
 }
 
-export async function barista() {
-  const skin = mat(SKIN, { rough: 0.65 });
-  const navy = mat(NAVY, { rough: 0.92 });
-    const jeans = mat(JEANS, { rough: 0.95 });
+/**
+ * A member of staff (owner, 2026-11-23): legs in jeans, the KOUP T-shirt in `shirt`'s colour with its prints, shoulders,
+ * arms and hands; joints named `<P>_torso`, `<P>_head`, `<P>_armL|R`, `<P>_foreL|R`, `<P>_handL|R`, `<P>_legL|R`
+ * (the tour page moves them). Returns the head's joint (each person has their own face) and the skin.
+ */
+async function person(P, x, z, ry, shirtColour, prints, skinColour = SKIN) {
+  const skin = mat(skinColour, { rough: 0.65 });
+  const navy = mat(shirtColour, { rough: 0.92 });
+  const jeans = mat(JEANS, { rough: 0.95 });
 
-  // He stands behind the counter's free end (between the card machine and the cake case), facing the customers.
-  const b = group(0.62, FI, 6.12, Math.PI, 'BARISTA');
+  const b = group(x, FI, z, ry, P);
   // his own soft shadow, moving with him
   const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.5), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
   sh.rotation.x = -Math.PI / 2;
   sh.position.y = 0.006;
-  sh.name = 'BARISTA_shadow';
+  sh.name = `${P}_shadow`;
   b.add(sh);
 
   // legs (dark jeans) and shoes, from the hips
@@ -111,7 +115,7 @@ export async function barista() {
     ['L', 0.095],
     ['R', -0.095],
   ]) {
-    const leg = joint(b, `BARISTA_leg${side}`, x, 0.92, 0);
+    const leg = joint(b, `${P}_leg${side}`, x, 0.92, 0);
     leg.add(turned([[0.07, 0.04], [0.078, -0.05], [0.066, -0.42], [0.055, -0.5], [0.056, -0.62], [0.048, -0.84], [0.046, -0.86]], jeans));
     rbox(0.1, 0.075, 0.27, 0.035, mat('#2a2522', { rough: 0.6 }), 0, -0.92, 0.04, 0, leg);
     rbox(0.104, 0.02, 0.275, 0.008, mat('#e9e4da'), 0, -0.92, 0.04, 0, leg); // the soles
@@ -119,7 +123,7 @@ export async function barista() {
   rbox(0.3, 0.18, 0.2, 0.08, jeans, 0, 0.8, 0, 0, b);
 
   // the torso (the shirt), turning at the waist: chest, then shoulders sloping to the neck
-  const torso = joint(b, 'BARISTA_torso', 0, 0.95, 0);
+  const torso = joint(b, `${P}_torso`, 0, 0.95, 0);
   const shirt = new THREE.Mesh(
     new THREE.LatheGeometry(
       TORSO.map(([r, y]) => new THREE.Vector2(r, y)),
@@ -129,7 +133,7 @@ export async function barista() {
   );
   shirt.scale.z = DEPTH;
   torso.add(shirt);
-  const [front, back] = await Promise.all([loadTex('models/shirt_front.jpg'), loadTex('models/shirt_back.jpg')]);
+  const [front, back] = await Promise.all([loadTex(prints[0]), loadTex(prints[1])]);
   torso.add(print(front, 0.12, 0.082, 0.42, false));
   torso.add(print(back, 0.32, 0.307, 0.27, true));
   // the neck and the shirt's round collar
@@ -149,33 +153,39 @@ export async function barista() {
     ['R', -0.158],
   ]) {
     const sx = Math.sign(x);
-    const arm = joint(torso, `BARISTA_arm${side}`, x, 0.462, 0);
+    const arm = joint(torso, `${P}_arm${side}`, x, 0.462, 0);
     arm.rotation.z = sx * 0.11;
     // the sleeve: its rounded top tucked under the shirt's shoulder, hanging to just above the elbow
     const sleeve = turned([[0.0, 0.05], [0.03, 0.045], [0.052, 0.022], [0.06, -0.02], [0.059, -0.1], [0.058, -0.15], [0.056, -0.162]], navy);
-    sleeve.name = `BARISTA_sleeve${side}`;
+    sleeve.name = `${P}_sleeve${side}`;
     arm.add(sleeve);
     // upper arm: the biceps' gentle swell, narrowing to the elbow
     arm.add(turned([[0.05, -0.04], [0.053, -0.1], [0.05, -0.16], [0.043, -0.24], [0.039, -0.285]], skin));
-    const fore = joint(arm, `BARISTA_fore${side}`, 0, -0.28, 0);
+    const fore = joint(arm, `${P}_fore${side}`, 0, -0.28, 0);
     fore.rotation.x = -0.14;
     // forearm: fuller below the elbow, slim at the wrist
     fore.add(turned([[0.039, 0.012], [0.044, -0.045], [0.041, -0.1], [0.032, -0.19], [0.027, -0.235]], skin));
     // the hand, palm toward the body: palm, four fingers together (slightly curled) and the thumb in front
     const palm = rbox(0.03, 0.085, 0.07, 0.013, skin, 0, -0.31, 0.004, 0, fore);
-    palm.name = `BARISTA_palm${side}`;
+    palm.name = `${P}_palm${side}`;
     const fingers = rbox(0.026, 0.07, 0.066, 0.012, skin, 0, -0.38, 0.002, 0, fore);
     fingers.rotation.z = -sx * 0.18;
     fingers.position.x = -sx * 0.006;
     const thumb = rbox(0.022, 0.05, 0.022, 0.01, skin, -sx * 0.004, -0.315, 0.04, 0, fore);
     thumb.rotation.x = 0.35;
-    joint(fore, `BARISTA_hand${side}`, 0, -0.33, 0.04);
+    joint(fore, `${P}_hand${side}`, 0, -0.33, 0.04);
   }
 
+  const head = joint(torso, `${P}_head`, 0, 0.578, 0.012);
+  return { root: b, head, skin };
+}
+
+export async function barista() {
+  // He stands behind the counter's free end (between the card machine and the cake case), facing the customers.
+  const { head } = await person('BARISTA', 0.62, 6.12, Math.PI, NAVY, ['models/shirt_front.jpg', 'models/shirt_back.jpg']);
   // the head: the barista as the owner's photo shows him (owner, 2026-11-23), drawn in the café's animation style (a
   // photographed face did not suit it): a long oval face, dark hair swept back and to the side with volume on top, a
   // full dark beard and moustache, thick straight brows, hazel-green eyes and the small mole on his right cheek.
-  const head = joint(torso, 'BARISTA_head', 0, 0.578, 0.012);
   const HEAD = [[0, 0], [0.034, 0.004], [0.056, 0.022], [0.068, 0.05], [0.077, 0.085], [0.082, 0.12], [0.082, 0.15], [0.075, 0.18], [0.06, 0.205], [0.035, 0.223], [0, 0.23]];
   const SX = 0.9,
     SZ = 1.04;
@@ -289,4 +299,105 @@ export async function barista() {
       const a = (i / n) * Math.PI * 2 + y * 30;
       cookie(pile, Math.cos(a) * r, y, Math.sin(a) * r, 0.18 * Math.sin(k * 1.7), k);
     }
+}
+
+/**
+ * The second member of staff (owner, 2026-11-23): the same KOUP T-shirt in olive green, a different (cartoon) young man
+ * with short curly hair, who goes round the café with a cloth, wiping the tables. His round is the named points
+ * `CLEANER_stop_<n>` (in order, looping): where he stands, the way he faces (+Z), and `wipe` (seconds; 0 = he walks on).
+ */
+export async function cleaner() {
+  const OLIVE = '#5e6842';
+  const SKIN2 = '#c98e6a';
+  const { head, skin } = await person('CLEANER', -1.3, 1.15, Math.PI, OLIVE, ['models/shirt_front_olive.jpg', 'models/shirt_back_olive.jpg'], SKIN2);
+  // a round, friendly face (one smooth turned shape)
+  const HEAD = [[0, 0], [0.04, 0.004], [0.062, 0.022], [0.074, 0.05], [0.082, 0.085], [0.086, 0.12], [0.085, 0.15], [0.077, 0.18], [0.061, 0.204], [0.036, 0.22], [0, 0.226]];
+  const SX = 0.93,
+    SZ = 1.02;
+  const skull = turned(HEAD.slice().reverse(), skin);
+  skull.scale.set(SX, 1, SZ);
+  head.add(skull);
+  const rAt = (y) => {
+    for (let i = 1; i < HEAD.length; i++) if (y <= HEAD[i][1]) return HEAD[i - 1][0] + ((HEAD[i][0] - HEAD[i - 1][0]) * (y - HEAD[i - 1][1])) / (HEAD[i][1] - HEAD[i - 1][1]);
+    return 0;
+  };
+  const zAt = (x, y) => SZ * Math.sqrt(Math.max(0, rAt(y) ** 2 - (x / SX) ** 2));
+  for (const s of [1, -1]) {
+    ball(0.023, skin, s * 0.079, 0.108, -0.006, 0.45, 1, 0.75, head); // ears
+    const ex = s * 0.031,
+      ey = 0.12;
+    ball(0.0135, mat('#ffffff', { rough: 0.3 }), ex, ey, zAt(ex, ey) - 0.004, 1, 1.1, 0.5, head);
+    ball(0.0088, mat('#3a2416', { rough: 0.25 }), ex, ey - 0.0008, zAt(ex, ey) + 0.0015, 1, 1.1, 0.5, head); // brown eyes
+    ball(0.0025, mat('#ffffff'), ex + 0.003, ey + 0.004, zAt(ex, ey) + 0.0052, 1, 1, 0.6, head);
+    const brow = rbox(0.028, 0.007, 0.008, 0.003, mat('#1c1411'), s * 0.031, 0.142, zAt(s * 0.031, 0.142) - 0.003, 0, head);
+    brow.rotation.z = s * -0.18; // raised, cheerful
+  }
+  ball(0.012, skin, 0, 0.099, zAt(0, 0.099), 0.95, 1.05, 1.05, head); // the nose
+  // a wide, happy smile
+  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.021, 0.0034, 6, 16, Math.PI * 0.8), mat('#7d3329', { rough: 0.5 }));
+  smile.rotation.z = Math.PI + Math.PI * 0.1;
+  smile.position.set(0, 0.076, zAt(0, 0.07) - 0.002);
+  smile.scale.set(1.1, 0.8, 0.6);
+  head.add(smile);
+  // short black curly hair: a close cap, covered in small curls
+  const hair = mat('#1a1411', { rough: 0.85 });
+  const cap = new THREE.Mesh(new THREE.LatheGeometry(HEAD.filter(([, y]) => y >= 0.1).map(([r, y]) => new THREE.Vector2(Math.max(0.0005, r * 1.04), y)), 28), hair);
+  {
+    const p = cap.geometry.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const a = Math.abs(Math.atan2(p.getX(i), p.getZ(i))) / Math.PI;
+      const edge = a < 0.3 ? 0.17 : a < 0.5 ? 0.17 - (a - 0.3) * 0.3 : 0.11 - (a - 0.5) * 0.06;
+      if (p.getY(i) < edge) p.setY(i, edge);
+    }
+    cap.geometry.computeVertexNormals();
+  }
+  cap.scale.set(SX, 1, SZ);
+  head.add(cap);
+  const { mergeGeometries } = await import('three/addons/utils/BufferGeometryUtils.js');
+  const curls = [];
+  for (let i = 0; i < 46; i++) {
+    // curls over the top and the back (golden angle, so they spread evenly)
+    const t = i / 46;
+    const yy = 0.16 + (0.226 - 0.16) * Math.sqrt(1 - t) + 0.004;
+    const a = i * 2.39996;
+    const front = Math.cos(a) > 0.55 && yy < 0.19; // keep the forehead clear
+    if (front) continue;
+    const r = rAt(Math.min(0.222, yy)) * 1.04;
+    curls.push(new THREE.SphereGeometry(0.014, 8, 6).scale(1, 0.8, 1).translate(Math.sin(a) * r * SX, yy, Math.cos(a) * r * SZ));
+  }
+  // one shape for all the curls (one draw on a phone)
+  head.add(new THREE.Mesh(mergeGeometries(curls), hair));
+  // his cloth, in his right hand (light blue)
+  const hand = head.parent.getObjectByName('CLEANER_handR');
+  const cloth = rbox(0.016, 0.11, 0.09, 0.006, mat('#8fc3d6', { rough: 0.95 }), 0, -0.07, 0, 0, hand);
+  cloth.name = 'CLEANER_cloth';
+
+  // his round (FI, the main floor): the middle room's tables, the tall table, the lounge's coffee table, and back
+  const stops = [
+    [-1.3, 1.15, Math.PI, 5], // the first round table (facing it, north)
+    [0.3, 1.15, 0, 0],
+    [0.3, 2.35, 0, 0],
+    [-1.3, 2.35, 0, 5], // the second round table (south)
+    [0.3, 2.35, 0, 0],
+    [0.3, -0.25, 0, 0],
+    [-2.45, -0.4, Math.PI, 6], // the long walnut table
+    [0.35, -0.3, 0, 0],
+    [1.15, -1.3, Math.PI / 2, 4], // the tall table by the window
+    [0.3, -2.4, 0, 0],
+    [-1.0, -3.2, 0, 0],
+    [-1.0, -5.5, 0, 0],
+    [-1.85, -5.5, -Math.PI / 2, 5], // the lounge's coffee table, between the sofas
+    [-1.0, -5.5, 0, 0],
+    [-1.0, -3.2, 0, 0],
+    [0.3, -0.25, 0, 0],
+    [0.3, 1.15, 0, 0],
+  ];
+  stops.forEach(([x, z, ry, wipe], i) => {
+    const o = new THREE.Object3D();
+    o.name = `CLEANER_stop_${i}`;
+    o.position.set(x, FI, z);
+    o.rotation.y = ry;
+    o.userData = { wipe };
+    root.add(o);
+  });
 }
