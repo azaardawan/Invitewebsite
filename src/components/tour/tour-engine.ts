@@ -7,7 +7,10 @@
  * - a node `START` (or `SPAWN`): where visitors begin, looking along its −Z (its forward);
  * - meshes whose name begins `NOCOLLIDE`: walked through (plants' leaves, curtains, light beams);
  * - meshes whose name begins `COLLIDER`: invisible walls (kept in the way, never drawn);
- * - nodes named `HOTSPOT_<key>` (e.g. `HOTSPOT_menu` at a counter): within 1.8 m the page is told (`onSpot`).
+ * - nodes named `HOTSPOT_<key>` (e.g. `HOTSPOT_menu` at a counter): within 1.8 m the page is told (`onSpot`);
+ * - nodes named `SEAT_<n>` (a seat: its extras give `yaw`, the way a seated visitor faces, `eye`, their eye above the
+ *   seat, and `table`, the spot nearest them on a table in reach): «Sit down» there;
+ * - a barista (`BARISTA`, see barista.ts) at the counter (`HOTSPOT_counter`): «Get a coffee», «Get a cookie».
  *
  * Loaded on its own (dynamic import) so only the tour page downloads three.js. It draws only when something changes.
  */
@@ -16,6 +19,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
+import { Visit, type Treat } from './visit';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -28,7 +32,24 @@ export type TourOptions = {
   onProgress: (share: number) => void;
   /** The visitor walked up to (or away from) a spot of the model (a node named `HOTSPOT_<key>`, e.g. the menu). */
   onSpot?: (key: string | null) => void;
+  /** What the visitor can do (sit, order, sip…) changed: the page's buttons. */
+  onActivity?: (a: TourActivity) => void;
 };
+
+export type TourTreat = { left: number; where: 'hand' | 'table'; reach: boolean };
+export type TourActivity = {
+  /** At the counter, the barista free: «Get a coffee», «Get a cookie» (each when it can be asked for). */
+  order: { coffee: boolean; cookie: boolean };
+  /** What the barista is making. */
+  making: Treat | null;
+  coffee: TourTreat | null;
+  cookie: TourTreat | null;
+  /** A seat within reach, or seated. */
+  seat: 'near' | 'seated' | null;
+  /** Something is under way (a sip, a bite, sitting down…): the buttons wait. */
+  busy: boolean;
+};
+type Seat = { at: THREE.Vector3; yaw: number; eye: number; table: THREE.Vector3 | null };
 
 const EYE = 1.6;
 const SPEED = 2.3;
@@ -93,6 +114,13 @@ export class TourEngine {
   private spot: string | null = null;
   private v = new THREE.Vector3();
   private w = new THREE.Vector3();
+  private visit: Visit | null = null;
+  private seats: Seat[] = [];
+  private nearSeat: Seat | null = null;
+  private seated: { seat: Seat; pos: THREE.Vector3; floorY: number } | null = null;
+  /** The eye moving to a seat (or back up). */
+  private glide: { from: THREE.Vector3; to: THREE.Vector3; yaw0: number; yaw1: number; pitch0: number; pitch1: number; t: number; dur: number } | null = null;
+  private activity = '';
 
   constructor(options: TourOptions) {
     this.o = options;
@@ -170,7 +198,7 @@ export class TourEngine {
         const map = (mat as THREE.MeshStandardMaterial).map;
         if (map) map.anisotropy = anisotropy;
       }
-      if (named(m, 'NOCOLLIDE')) return;
+      if (named(m, 'NOCOLLIDE') || named(m, 'BARISTA')) return;
       m.geometry.computeBoundsTree();
       this.colliders.push(m);
     });
@@ -186,6 +214,16 @@ export class TourEngine {
       const m = /^HOTSPOT_(\w+)/.exec(o.name);
       if (m) this.spots.push({ key: m[1]!.toLowerCase(), at: o.getWorldPosition(new THREE.Vector3()) });
     });
+
+    // The seats.
+    root.traverse((o) => {
+      if (!/^SEAT_/.test(o.name)) return;
+      const d = o.userData as { yaw?: number; eye?: number; table?: number[] };
+      const table = Array.isArray(d.table) && d.table.length === 3 ? new THREE.Vector3(...(d.table as [number, number, number])) : null;
+      this.seats.push({ at: o.getWorldPosition(new THREE.Vector3()), yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table });
+    });
+    // The barista and what the visitor is given.
+    this.visit = new Visit(this.scene, this.camera, this.env);
 
     // Where visitors begin: the START node, or an open spot near the middle of the model.
     let start: THREE.Object3D | undefined;
@@ -393,6 +431,8 @@ export class TourEngine {
     if (this.keys.has('ArrowLeft') || this.keys.has('ArrowRight')) moving = true;
     f -= this.stick.y;
     s += this.stick.x;
+    // seated (or sitting down, standing up): looking round only
+    if (this.seated || this.glide) f = s = 0;
     if (f || s) {
       moving = true;
       const len = Math.max(1, Math.hypot(f, s));
@@ -400,26 +440,130 @@ export class TourEngine {
       const fz = -Math.cos(this.yaw);
       this.step(((fx * f - fz * s) / len) * SPEED * dt, ((fz * f + fx * s) / len) * SPEED * dt);
     }
+    // Sitting down or standing up: the eye glides there.
+    const g = this.glide;
+    if (g) {
+      g.t = Math.min(1, g.t + dt / g.dur);
+      const e = g.t * g.t * (3 - 2 * g.t);
+      this.pos.lerpVectors(g.from, g.to, e);
+      this.pos.y += Math.sin(Math.PI * g.t) * 0.08;
+      this.yaw = g.yaw0 + (g.yaw1 - g.yaw0) * e;
+      this.pitch = g.pitch0 + (g.pitch1 - g.pitch0) * e;
+      if (g.t >= 1) {
+        this.glide = null;
+        this.emit();
+      }
+      moving = true;
+    }
     // The eye follows the floor smoothly (stairs).
     const eyeY = this.floorY + EYE;
-    if (Math.abs(this.pos.y - eyeY) > 0.002) {
+    if (!this.seated && !g && Math.abs(this.pos.y - eyeY) > 0.002) {
       this.pos.y = this.o.reducedMotion ? eyeY : this.pos.y + (eyeY - this.pos.y) * (1 - Math.exp(-dt * 14));
       moving = true;
     }
     if (moving) this.checkSpot();
-    if (moving || this.dirty) {
-      this.camera.position.copy(this.pos);
-      this.camera.rotation.set(this.pitch, this.yaw, 0);
+    this.camera.position.copy(this.pos);
+    this.camera.rotation.set(this.pitch, this.yaw, 0);
+    this.camera.updateMatrixWorld();
+    // the barista, and what the visitor holds
+    let alive = false;
+    if (this.visit) {
+      alive = this.visit.update(dt, !!(f || s));
+      if (alive) this.emit();
+    }
+    if (moving || alive || this.dirty) {
       this.renderer.render(this.scene, this.camera);
-      if (moving) this.adapt(frameMs);
+      this.visit?.render(this.renderer);
+      if (moving || alive) this.adapt(frameMs);
       this.dirty = false;
     }
-    if (moving) this.kick();
+    if (moving || alive) this.kick();
   };
+
+  // ---------- sitting, ordering, eating ----------
+
+  /** Tells the page what the visitor can do now (only when it changed). */
+  private emit() {
+    if (!this.o.onActivity || !this.visit) return;
+    const v = this.visit.state(this.pos);
+    const atCounter = this.spot === 'counter' && !this.seated && !this.glide;
+    const a: TourActivity = {
+      order: { coffee: atCounter && this.visit.canOrder('coffee'), cookie: atCounter && this.visit.canOrder('cookie') },
+      making: v.making,
+      coffee: v.coffee,
+      cookie: v.cookie,
+      seat: this.seated ? 'seated' : this.nearSeat && !this.glide ? 'near' : null,
+      busy: v.busy || !!this.glide,
+    };
+    const key = JSON.stringify(a);
+    if (key === this.activity) return;
+    this.activity = key;
+    this.o.onActivity(a);
+  }
+
+  /** Asks the barista for a coffee or a cookie (at the counter). */
+  order(kind: Treat) {
+    if (this.spot !== 'counter' || this.seated || !this.visit?.order(kind)) return;
+    this.emit();
+    this.kick();
+  }
+
+  /** A sip of the coffee, a bite of the cookie. */
+  sip() {
+    if (this.visit?.sip()) this.kick();
+  }
+  bite() {
+    if (this.visit?.bite()) this.kick();
+  }
+
+  /** Sits on the seat in reach: the eye glides down onto it, facing the way the seat faces. */
+  sit() {
+    const seat = this.nearSeat;
+    if (!seat || this.seated || this.glide) return;
+    this.seated = { seat, pos: this.pos.clone(), floorY: this.floorY };
+    const to = seat.at.clone();
+    to.y += seat.eye;
+    this.glideTo(to, seat.yaw, -0.12);
+    this.emit();
+  }
+
+  /** Stands up, back where the visitor was before sitting. */
+  stand() {
+    const s = this.seated;
+    if (!s || this.glide) return;
+    this.seated = null;
+    this.floorY = s.floorY;
+    this.glideTo(s.pos.clone().setY(s.floorY + EYE), this.yaw, 0);
+    this.emit();
+  }
+
+  private glideTo(to: THREE.Vector3, yaw: number, pitch: number) {
+    // the short way round
+    let yaw1 = yaw;
+    while (yaw1 - this.yaw > Math.PI) yaw1 -= Math.PI * 2;
+    while (yaw1 - this.yaw < -Math.PI) yaw1 += Math.PI * 2;
+    this.glide = { from: this.pos.clone(), to, yaw0: this.yaw, yaw1, pitch0: this.pitch, pitch1: pitch, t: 0, dur: this.o.reducedMotion ? 0.01 : 0.8 };
+    this.kick();
+  }
+
+  /** Puts the coffee (or cookie) down on the table by the seat (or on the floor beside it, without one). */
+  putDown(kind: Treat) {
+    const s = this.seated;
+    if (!s || !this.visit || this.glide) return;
+    const fwd = new THREE.Vector3(-Math.sin(s.seat.yaw), 0, -Math.cos(s.seat.yaw));
+    const side = new THREE.Vector3(-fwd.z, 0, fwd.x);
+    const spot = s.seat.table?.clone() ?? s.seat.at.clone().addScaledVector(side, -0.45).addScaledVector(fwd, 0.1).setY(s.floorY);
+    if (this.visit.putDown(kind, spot, side)) this.kick();
+  }
+
+  pickUp(kind: Treat) {
+    if (this.visit?.pickUp(kind)) this.kick();
+  }
 
   /** Tells the page when the visitor is at a spot (on its floor, within 1.8 m), or has left it. */
   private checkSpot() {
-    if (!this.o.onSpot || !this.spots.length) return;
+    this.checkSeat();
+    if (!this.spots.length) return;
     let near: string | null = null;
     for (const s of this.spots) {
       if (Math.abs(s.at.y - this.floorY) > 2.2) continue;
@@ -427,7 +571,27 @@ export class TourEngine {
     }
     if (near !== this.spot) {
       this.spot = near;
-      this.o.onSpot(near);
+      this.o.onSpot?.(near);
+      this.emit();
+    }
+  }
+
+  /** The seat within reach (on this floor, within a metre), when standing. */
+  private checkSeat() {
+    if (this.seated || this.glide) return;
+    let best: Seat | null = null;
+    let bestD = 1.0;
+    for (const s of this.seats) {
+      if (Math.abs(s.at.y - this.floorY) > 1.0) continue;
+      const d = Math.hypot(s.at.x - this.pos.x, s.at.z - this.pos.z);
+      if (d < bestD) {
+        bestD = d;
+        best = s;
+      }
+    }
+    if (best !== this.nearSeat) {
+      this.nearSeat = best;
+      this.emit();
     }
   }
 
@@ -471,6 +635,7 @@ export class TourEngine {
 
   dispose() {
     this.alive = false;
+    this.visit?.dispose();
     if (this.frame) cancelAnimationFrame(this.frame);
     this.observer.disconnect();
     const canvas = this.renderer.domElement;

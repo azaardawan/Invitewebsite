@@ -35,6 +35,19 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   off an edge deeper than 70 cm. Ramps work too.
 - **Spots**: an Empty named `HOTSPOT_menu` (e.g. in front of the counter): a visitor within 1.8 m is offered a
   "See the menu" button (the tour's Menu link).
+- **Seats** (owner, 2026-11-23: "sit down on any chair"): an Empty named `SEAT_<n>` at each seat's sitting spot, at the
+  seat's height. Its custom properties (glTF extras): `yaw` (the way a seated visitor faces, radians, as the tour's look:
+  0 looks along −Z), `eye` (the eye above the seat, default 0.72 m) and `table` (`[x, y, z]`, the spot on a table in
+  reach where their coffee is put down; without one it goes on the floor beside the seat). Within a metre the visitor is
+  offered «Sit down»; seated, they look round, put down and pick up what they hold, and «Stand up».
+- **A barista** (owner, 2026-11-23): a person named `BARISTA` standing behind the counter, facing the customers along
+  his +Z, with joints the page turns: `BARISTA_torso`, `BARISTA_head`, `BARISTA_armL|R` (shoulders),
+  `BARISTA_foreL|R` (elbows), `BARISTA_handL|R` (what he holds), `BARISTA_legL|R` (hips); and his places, Empties:
+  `BARISTA_coffee` (where he makes coffee, its +Z toward the machine), `BARISTA_cookies` (by the cookie pile),
+  `BARISTA_steam` (the machine's steam). With an Empty `HOTSPOT_counter` in front of the counter, a visitor there gets
+  «Get a coffee» / «Get a cookie»: he walks to the machine (or the pile), makes it, walks back and hands it over. The
+  visitor holds it at the bottom of the screen (the cookie in a second hand when they also hold a coffee): five sips,
+  five bites (`src/components/tour/props.ts`). See `tours/koupup/barista.js` for one made from a face scan.
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).

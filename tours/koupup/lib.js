@@ -279,3 +279,18 @@ export const group = (x, y, z, ry = 0, name) => {
   root.add(g);
   return g;
 };
+
+// ---------- for the tour's «Sit down» and «Put it down» ----------
+/**
+ * The places to sit: each chair's group, its seat's height (from the floor), where its front is (`fwd` +1: the group's
+ * +z, −1: its −z), the sitting spot within the group (`dx`, `dz`) and the eye's height above the seat (`eye`).
+ */
+export const seats = [];
+export function seat(g, h, o = {}) {
+  seats.push({ g, h, fwd: o.fwd ?? 1, dx: o.dx ?? 0, dz: o.dz ?? 0.05, eye: o.eye ?? 0.72 });
+}
+/** The table tops a visitor puts their coffee on: the group, the top's height, its half-size (or radius when `round`). */
+export const tables = [];
+export function tableTop(g, h, hw, hd, round = false) {
+  tables.push({ g, h, hw, hd, round });
+}

@@ -3,7 +3,8 @@
 <script type="module">
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
-import { root } from './lib.js';
+import { root, seats, tables } from './lib.js';
+import { barista } from './barista.js';
 import { signs } from './build.js';
 import { terraceChairs, loungeChairs, koupCorner, mirrors } from './rooms.js';
 try {
@@ -12,6 +13,7 @@ try {
   await loungeChairs();
   await koupCorner();
   await mirrors();
+  await barista();
   // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
   const start = new THREE.Object3D();
   start.name = 'START';
@@ -24,8 +26,11 @@ try {
   // One mesh per material (and per kind: solid, walk-through, invisible wall): a phone draws it in few calls.
   const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
   const buckets = new Map();
+  // the barista is kept as he is (his joints move in the tour), apart from the merge
+  const man = root.getObjectByName('BARISTA');
+  const isMan = (o) => { for (let p = o; p; p = p.parent) if (p === man) return true; return false; };
   scene0.traverse(o => {
-    if (!o.isMesh) return;
+    if (!o.isMesh || isMan(o)) return;
     let kind = 'S';
     for (let p = o; p; p = p.parent) { if (/^NOCOLLIDE/i.test(p.name)) kind = 'N'; if (/^COLLIDER/i.test(p.name)) kind = 'C'; }
     let g = o.geometry.clone();
@@ -64,8 +69,39 @@ try {
   const startCopy = new THREE.Object3D(); startCopy.name='START';
   root.getObjectByName('START').getWorldPosition(startCopy.position);
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
-  // the tour page's spots (HOTSPOT_<what>, e.g. the menu at the counter): kept as named points
-  root.traverse(o => { if (/^HOTSPOT_/.test(o.name)) { const h = new THREE.Object3D(); h.name = o.name; o.getWorldPosition(h.position); out.add(h); } });
+  // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the barista's places: kept as named points
+  root.traverse(o => {
+    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam))/.test(o.name)) return;
+    const h = new THREE.Object3D(); h.name = o.name; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
+  });
+  out.add(man);
+  // the seats (SEAT_<n>): where a visitor sits, the way they face (yaw), the eye above the seat and, when a table is
+  // within reach, the spot on it nearest them (where their coffee is put down)
+  const v = new THREE.Vector3(), q = new THREE.Vector3();
+  seats.forEach((s, i) => {
+    const at = s.g.localToWorld(new THREE.Vector3(s.dx, s.h, s.dz * s.fwd));
+    const fwd = new THREE.Vector3(0, 0, s.fwd).transformDirection(s.g.matrixWorld).setY(0).normalize();
+    const floor = s.g.getWorldPosition(new THREE.Vector3()).y;
+    const reach = at.clone().addScaledVector(fwd, 0.45);
+    let best = null;
+    for (const t of tables) {
+      const top = t.g.getWorldPosition(new THREE.Vector3()).y + t.h;
+      if (Math.abs(t.g.getWorldPosition(v).y - floor) > 0.3) continue;
+      const p = t.g.worldToLocal(q.copy(reach));
+      if (t.round) { const r = Math.hypot(p.x, p.z), m = Math.max(0.05, t.hw - 0.09); if (r > m) { p.x *= m / r; p.z *= m / r; } }
+      else { p.x = Math.max(-t.hw + 0.09, Math.min(t.hw - 0.09, p.x)); p.z = Math.max(-t.hd + 0.09, Math.min(t.hd - 0.09, p.z)); }
+      p.y = t.h;
+      const w = t.g.localToWorld(p.clone());
+      const d = Math.hypot(w.x - at.x, w.z - at.z);
+      if (d < 1.05 && (!best || d < best.d)) best = { d, at: [w.x, top, w.z].map(n => Math.round(n * 1000) / 1000) };
+    }
+    const o = new THREE.Object3D();
+    o.name = 'SEAT_' + i;
+    o.position.copy(at);
+    o.userData = { yaw: Math.round(Math.atan2(-fwd.x, -fwd.z) * 1000) / 1000, eye: s.eye, ...(best ? { table: best.at } : {}) };
+    out.add(o);
+  });
+  console.log('seats', seats.length, 'with a table', out.children.filter(o => o.userData.table).length);
   scene.updateMatrixWorld(true);
   let meshes = 0, tris = 0;
   scene.traverse(o => { if (o.isMesh) { meshes++; const g=o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; } });

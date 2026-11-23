@@ -1,6 +1,6 @@
 // Where everything stands, read from the scan's floor plan (metres, the scan's own axes).
 import * as THREE from 'three';
-import { mat, rbox, cyl, rod, ball, slab, drawTex, group, contactShadow, rr, rnd, GLASS, add, speckleTex } from './lib.js';
+import { mat, rbox, cyl, rod, ball, slab, drawTex, group, contactShadow, rr, rnd, GLASS, add, speckleTex, seat } from './lib.js';
 import * as F from './furniture.js';
 const { C, M } = F;
 
@@ -272,10 +272,10 @@ F.palm(-2.2, FI, 4.12, 1.3, 'white', 0.13);
 F.palm(1.65, FI, 3.55, 1.2, 'white', 0.17);
 
 // ================= The bar (back area, floor FI) =================
-// the menu: a visitor walking up to the counter is offered it (the tour page shows its button)
+// the counter: a visitor walking up to it is offered a coffee or a cookie by the barista (the tour page's buttons)
 {
   const spot = new THREE.Object3D();
-  spot.name = 'HOTSPOT_menu';
+  spot.name = 'HOTSPOT_counter';
   spot.position.set(0.9, FI + 1.0, 4.65);
   add(spot);
 }
@@ -480,6 +480,7 @@ export async function terraceChairs() {
     model.scale.setScalar(s);
     const g = group(x, FT, z, ry, 'reclining_chair');
     g.add(model);
+    seat(g, 0.36, { fwd: -1, dz: 0.12, eye: 0.6 }); // lying back, looking toward the feet
     model.position.y = -0.0826 * s; // its feet on the floor
     model.traverse((o) => {
       if (!o.isMesh) return;
@@ -548,6 +549,7 @@ export async function loungeChairs() {
   const frameMat = mat('#1d2024', { metal: 0.5, rough: 0.4 });
   for (const c of F.lounges) {
     const g = group(c.x, c.y, c.z, c.ry, 'lounge_chair');
+    seat(g, 0.4, { dz: 0.08, eye: 0.66 });
     g.add(new THREE.Mesh(frame, frameMat));
     g.add(new THREE.Mesh(cushion, mat(c.color, { rough: 0.55, side: THREE.DoubleSide })));
   }
