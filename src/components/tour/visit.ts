@@ -5,6 +5,7 @@
  */
 import * as THREE from 'three';
 import { Barista } from './barista';
+import { Cleaner } from './staff';
 import { BITES, SIPS, disposeProp, makeCookie, makeCup, makeHand, type Cookie, type Cup } from './props';
 
 export type Treat = 'coffee' | 'cookie';
@@ -39,6 +40,8 @@ const bell = (k: number) => Math.sin(Math.PI * Math.min(1, Math.max(0, k)));
 
 export class Visit {
   readonly barista: Barista | null;
+  /** The member of staff going round the place, wiping the tables. */
+  private cleaner: Cleaner | null;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private hud = new THREE.Scene();
@@ -51,11 +54,15 @@ export class Visit {
   private bob = 0;
   private making: Treat | null = null;
   private v = new THREE.Vector3();
+  private frustum = new THREE.Frustum();
+  private m4 = new THREE.Matrix4();
+  private sphere = new THREE.Sphere();
 
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, env: THREE.Texture | null) {
     this.scene = scene;
     this.camera = camera;
     this.barista = Barista.find(scene);
+    this.cleaner = Cleaner.find(scene);
     this.hud.environment = env;
     this.hud.environmentIntensity = 0.75;
     this.hud.add(new THREE.HemisphereLight(0xfff6ee, 0x8a8178, 0.5));
@@ -191,7 +198,11 @@ export class Visit {
    * the hands bob. Returns whether anything moved (the page draws again).
    */
   update(dt: number, walking: boolean): boolean {
-    let moved = this.barista?.update(dt, this.camera.position) ?? false;
+    // the people move on all the time, but are drawn again only while they are in the picture
+    this.frustum.setFromProjectionMatrix(this.m4.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse));
+    const seen = (at: THREE.Vector3) => this.frustum.intersectsSphere(this.sphere.set(this.v.copy(at).setY(at.y + 1), 1.1));
+    let moved = this.barista?.update(dt, this.camera.position, seen) ?? false;
+    if (this.cleaner?.update(dt, this.camera.position, seen)) moved = true;
     // flights
     for (const f of [...this.flights]) {
       f.t += dt;

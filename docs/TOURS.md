@@ -49,6 +49,10 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   visitor holds it at the bottom of the screen (the cookie in a second hand when they also hold a coffee): five sips,
   five bites (`src/components/tour/props.ts`). See `tours/koupup/barista.js` (a cartoon person in the
   tour's style: owner, 2026-11-23, a photographed face did not suit it).
+- **Staff going round** (owner, 2026-11-23): a person named `CLEANER` with the barista's joints (`CLEANER_torso`, …) and
+  his round, Empties `CLEANER_stop_<n>` (in order, looping; each faces the way he faces there, its extras' `wipe` the
+  seconds he wipes a table there, 0 to walk on). Lines between stops must be clear of furniture; he waits for a visitor
+  standing in his way (`src/components/tour/staff.ts`).
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).

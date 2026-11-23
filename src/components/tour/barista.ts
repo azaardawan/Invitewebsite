@@ -219,7 +219,7 @@ export class Barista {
    * Moves him on by `dt` seconds; `viewer` is where the visitor's eyes are. Returns whether anything of him moved
    * (the page then draws again): always while he works, and while the visitor is near enough to see him breathe.
    */
-  update(dt: number, viewer: THREE.Vector3): boolean {
+  update(dt: number, viewer: THREE.Vector3, seen: (at: THREE.Vector3) => boolean = () => true): boolean {
     this.time += dt;
     // the task at hand
     if (!this.step && this.queue.length) {
@@ -253,7 +253,8 @@ export class Barista {
     const here = this.root.getWorldPosition(this.v);
     const far = Math.hypot(viewer.x - here.x, viewer.z - here.z);
     const active = this.busy || this.puffs.length > 0;
-    if (!active && far > 10) return false;
+    // drawn again only while he can be seen (near, and in the picture) or is working (steam, what he hands over)
+    if (!active && (far > 10 || !seen(here))) return false;
     this.pose(dt, viewer, here, far);
     return true;
   }
