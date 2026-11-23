@@ -6,6 +6,12 @@ import { assets } from './catalog';
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
 
 /**
+ * The owner's changes to the model's items (Admin → Tours → the editor, owner 2026-11-23), by item code: moved by x, y, z
+ * (metres) and turned by ry (radians, round the vertical), from where the model has it.
+ */
+export type TourItemEdits = Record<string, { x?: number; y?: number; z?: number; ry?: number }>;
+
+/**
  * Virtual tours (owner, 2026-11-21): a café's (or any place's) own 3D model, walked through from a link they put in
  * their Instagram bio (`/tour/<slug>`). Sold as a subscription: a tour is shown while it is `live` and before `ends_at`
  * (null = no end). The model (.glb) and the logo are assets; `visits` counts the tour's openings.
@@ -29,6 +35,8 @@ export const tours = pgTable(
      * nobody can guess), never at `/tour/<slug>`. Changing the code ends the old link.
      */
     privateKey: text('private_key'),
+    /** The owner's changes to the model's items (the editor): kept when the model is replaced (items keep their codes). */
+    itemEdits: jsonb('item_edits').$type<TourItemEdits>().notNull().default({}),
     visits: integer('visits').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })

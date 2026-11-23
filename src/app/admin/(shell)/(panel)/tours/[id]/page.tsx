@@ -55,6 +55,17 @@ export default async function TourPage(props: PageProps<'/admin/tours/[id]'>) {
         <TourModelUpload tourId={tour.id} maxMb={TOUR_MODEL_MAX_BYTES / 1048576} />
       </Card>
 
+      {model ? (
+        <Card className="space-y-3">
+          <h2 className="text-lg font-semibold">{t('editorTitle')}</h2>
+          <p className="text-sm text-muted">{t('editorHint')}</p>
+          {/* a full page load: the editor's page allows what drawing the model needs (its own security policy) */}
+          <a href={`/admin/tour-editor/${tour.id}`} className="inline-block rounded-md bg-accent px-3 py-2 text-sm font-medium text-white" data-testid="open-editor">
+            {t('openEditor')}
+          </a>
+        </Card>
+      ) : null}
+
       <Card className="space-y-3">
         <h2 className="text-lg font-semibold">{t('showing')}</h2>
         <p className="text-sm text-muted">{t('showingHint')}</p>

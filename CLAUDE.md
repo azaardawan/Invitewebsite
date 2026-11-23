@@ -79,6 +79,10 @@ product spec's §74 business rules override assumptions.
   (`node tours/<café>/export.cjs`, e.g. `tours/koupup/`). A tour can have a barista (`BARISTA`, «Get a coffee/cookie», sips and
   bites in the visitor's hands, `src/components/tour/visit.ts`), staff going round wiping tables (`CLEANER`, `staff.ts`)
   and seats (`SEAT_<n>`): docs/TOURS.md.
+- **Every 3D space made for the owner has an editor** (owner, 2026-11-23): each piece of furniture and decor is its own
+  item with a permanent code (`ITEM_<code>`, codes kept in `tours/<café>/items.json`, never reused), and the owner moves
+  and turns items in Admin (tours: Admin → Tours → Open the editor, `src/components/admin/TourEditor.tsx`, saved in
+  `tours.item_edits`). When the owner names an item by its code ("#37"), look it up there. docs/TOURS.md.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

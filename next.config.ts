@@ -89,6 +89,8 @@ const nextConfig: NextConfig = {
         source: '/tour/:path*',
         headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }, ...(isProd ? [{ key: 'Content-Security-Policy', value: tourCsp }] : [])],
       },
+      // The tours' editor draws the café's model (as the tour page: its pictures come as blobs, its decoder is WebAssembly).
+      ...(isProd ? [{ source: '/admin/tour-editor/:path*', headers: [{ key: 'Content-Security-Policy', value: tourCsp }] }] : []),
       // A customer's order screens carry their private preview token in the URL.
       { source: '/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
       { source: '/:locale(en|ckb|bdn)/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },

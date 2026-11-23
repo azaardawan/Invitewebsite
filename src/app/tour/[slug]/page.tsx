@@ -65,5 +65,5 @@ export default async function TourPage({ params }: PageProps<'/tour/[slug]'>) {
     );
   }
   await countTourVisit(db(), r.tour.id);
-  return <TourViewer name={r.tour.name} logo={r.tour.logo} model={r.tour.model} links={r.tour.links} words={t} dir={localeMeta[locale].dir} />;
+  return <TourViewer name={r.tour.name} logo={r.tour.logo} model={r.tour.model} links={r.tour.links} edits={r.tour.edits} words={t} dir={localeMeta[locale].dir} />;
 }

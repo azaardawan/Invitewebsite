@@ -70,6 +70,24 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
 - Check the result: upload it to a tour that is still off, then open the link from Admin (the "off" page shows to
   visitors until it is turned on, so test with a second, test tour if the café's is already live).
 
+## Items and the editor (owner, 2026-11-23)
+
+Every piece of furniture and decor of a tour's model is an **item**: a node `ITEM_<code>` (its extras' `label` says what
+it is, e.g. `lounge_chair`) holding that item's meshes, its soft shadow and its invisible block, and its seats
+(`SEAT_<n>`, in the item's own space with extras `local: true`, so they go with it). **Codes are permanent**: a rebuilt
+café keeps them in `tours/<café>/items.json` (an item is known by its kind and first place; a new item gets the next
+number; numbers are never reused). The owner names an item by its code ("move #37 a little left").
+
+**Admin → Tours → the tour → Open the editor** (`/admin/tour-editor/<id>`): the model full screen; click an item to pick
+it, drag its arrows to move it (and up and down) or its ring to turn it, or nudge it with the buttons (1 or 10 cm, 1° or
+15°); «Show items' codes» puts each item's code over it; «Go to item» walks to one by its code. Saved changes
+(`tours.item_edits`, by code: moved by x, y, z in metres, turned by ry in radians; `setTourItemEdits`, audited
+`tour.items_edited`) apply when the tour loads, and stay when the model is replaced (the codes stay). For visitors the
+items are merged again into a few meshes (`src/components/tour/items.ts`). In the editor the staff stand still and you
+walk through walls.
+
+A model made in Blender: name each movable thing `ITEM_<number>` (an Empty holding its parts) to make it editable.
+
 ## Cafés rebuilt from a scan
 
 When a café sends a 3D scan, the owner may want it redrawn in the site's animation style rather than shown as scanned

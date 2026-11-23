@@ -421,6 +421,13 @@
       "when": 1795286748156,
       "tag": "0059_violet_namor",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1795456362632,
+      "tag": "0060_mute_fallen_one",
+      "breakpoints": true
     }
   ]
 }

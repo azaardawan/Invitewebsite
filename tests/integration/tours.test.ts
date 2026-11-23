@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/server/db/client';
 import { assets, auditLogs, tours } from '@/server/db/schema';
 import { CatalogError } from '@/server/catalog/common';
-import { countTourVisit, createTour, isGlb, publicTour, setTourLive, setTourModel, setTourPrivacy, tourPath, tourState, updateTour, whatsappLink } from '@/server/tours/tours';
+import { countTourVisit, createTour, isGlb, publicTour, setTourItemEdits, setTourLive, setTourModel, setTourPrivacy, tourPath, tourState, updateTour, whatsappLink } from '@/server/tours/tours';
 import { tourLocale } from '@/server/tours/locale';
 import { applyOwnerTours } from '@/server/tours/owner-tours';
 import { ilike } from 'drizzle-orm';
@@ -157,6 +157,28 @@ describe('virtual tours', () => {
     expect(withModel[0]!.live).toBe(true);
     // never again: the owner's later changes stay
     expect(await applyOwnerTours(db())).toEqual([]);
+  });
+
+  it("saves the editor's changes to the items (only those moved or turned), audited, and hands them to the tour page", async () => {
+    const t = await createTour(db(), { name: 'Editor Café', slug: slug(), links: {} }, actor);
+    const saved = await setTourItemEdits(db(), t.id, { '12': { x: 0.25, z: -0.1, ry: 0.5 }, '7': {}, '9': { y: 0.0001 } }, actor);
+    expect(saved).toEqual({ '12': { x: 0.25, z: -0.1, ry: 0.5 } });
+    const [row] = await db().select().from(tours).where(eq(tours.id, t.id));
+    expect(row!.itemEdits).toEqual(saved);
+    const audit = await db().select().from(auditLogs).where(eq(auditLogs.objectId, t.id));
+    const a = audit.find((x) => x.action === 'tour.items_edited');
+    expect(a?.after).toMatchObject({ items: 1, changed: ['12'] });
+    // checked: no far-away moves, no odd codes, no unknown fields
+    for (const bad of [{ '1': { x: 80 } }, { 'a b': { x: 1 } }, { '1': { scale: 2 } }, { '1': { x: Number.NaN } }, [1, 2]]) {
+      await expect(setTourItemEdits(db(), t.id, bad, actor)).rejects.toMatchObject({ code: 'invalid' });
+    }
+    // the tour page gets them
+    const file = await onDisk(glb());
+    await setTourModel(db(), t.id, file, actor, 'model.glb');
+    await setTourLive(db(), t.id, true, actor);
+    const pub = await publicTour(db(), t.slug);
+    expect(pub.state).toBe('live');
+    expect(pub.state === 'live' && pub.tour?.edits).toEqual(saved);
   });
 });
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { Joystick, useTouchScreen, webglAvailable } from '@/theme-sdk/gallery3d/Gallery3D';
 import type { TourActivity, TourEngine } from './tour-engine';
+import type { TourEdits } from './items';
 
 export type TourWords = {
   loading: string;
@@ -71,6 +72,7 @@ export function TourViewer({
   logo,
   model,
   links,
+  edits,
   words,
   dir,
 }: {
@@ -78,6 +80,8 @@ export function TourViewer({
   logo: string | null;
   model: string;
   links: TourLinks;
+  /** The owner's changes to the model's items (Admin → Tours → the editor). */
+  edits?: TourEdits;
   words: TourWords;
   dir: 'rtl' | 'ltr';
 }) {
@@ -108,7 +112,7 @@ export function TourViewer({
         }
         const { TourEngine } = await import('./tour-engine');
         if (cancelled) return;
-        const e = new TourEngine({ container: el, model, reducedMotion, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
+        const e = new TourEngine({ container: el, model, reducedMotion, edits, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
         engine.current = e;
         await e.load();
         if (!cancelled) setState('ready');
@@ -125,7 +129,7 @@ export function TourViewer({
       engine.current?.dispose();
       engine.current = null;
     };
-  }, [model, reducedMotion]);
+  }, [model, reducedMotion, edits]);
 
   // The hint goes once the visitor has had time to read it (or starts walking).
   useEffect(() => {

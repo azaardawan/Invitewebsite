@@ -22,6 +22,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { Visit, type Treat } from './visit';
 import type { SeatSpot } from './staff';
+import { applyEdit, collectItems, editOf, mergeItems, type Item, type ItemEdit, type TourEdits } from './items';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -36,6 +37,13 @@ export type TourOptions = {
   onSpot?: (key: string | null) => void;
   /** What the visitor can do (sit, order, sip…) changed: the page's buttons. */
   onActivity?: (a: TourActivity) => void;
+  /** The owner's changes to the model's items (Admin → Tours → the editor), applied when it loads. */
+  edits?: TourEdits;
+  /**
+   * The editor (Admin): the items stay apart, a click picks one (`onSelect`), dragging its handles moves or turns it
+   * (`onChange`); the visitor walks through walls.
+   */
+  editor?: { onSelect: (item: { code: string; label: string } | null) => void; onChange: (code: string, edit: ItemEdit) => void };
 };
 
 export type TourTreat = { left: number; where: 'hand' | 'table'; reach: boolean };
@@ -129,6 +137,14 @@ export class TourEngine {
   /** The eye moving to a seat (or back up). */
   private glide: { from: THREE.Vector3; to: THREE.Vector3; yaw0: number; yaw1: number; pitch0: number; pitch1: number; t: number; dur: number } | null = null;
   private activity = '';
+  private items = new Map<string, Item>();
+  // the editor's
+  private picked: Item | null = null;
+  private gizmo: import('three/addons/controls/TransformControls.js').TransformControls | null = null;
+  private gizmoBusy = false;
+  private labels: THREE.Sprite[] = [];
+  private box: THREE.BoxHelper | null = null;
+  private pointer = new THREE.Vector2();
 
   constructor(options: TourOptions) {
     this.o = options;
@@ -195,6 +211,10 @@ export class TourEngine {
   private build(root: THREE.Object3D) {
     this.scene.add(root);
     root.updateMatrixWorld(true);
+    // The items, where the owner's changes put them; for visitors, merged again into a few meshes.
+    this.items = collectItems(root);
+    for (const item of this.items.values()) applyEdit(item, this.o.edits?.[item.code]);
+    if (this.items.size && !this.o.editor) mergeItems(root, this.items);
     const anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
     root.traverse((o) => {
       const m = o as THREE.Mesh;
@@ -226,11 +246,16 @@ export class TourEngine {
     // The seats.
     root.traverse((o) => {
       if (!/^SEAT_/.test(o.name)) return;
-      const d = o.userData as { yaw?: number; eye?: number; table?: number[]; stand?: number[]; nav?: number };
+      const d = o.userData as { yaw?: number; eye?: number; table?: number[]; tableItem?: string; stand?: number[]; nav?: number; local?: boolean };
       const vec = (a: unknown) => (Array.isArray(a) && a.length === 3 ? new THREE.Vector3(...(a.map(Number) as [number, number, number])) : null);
-      const table = vec(d.table);
+      // `local`: the seat is in its chair's item (it goes with it), its spots in their items
+      const inItem = (v: THREE.Vector3 | null, item: THREE.Object3D | null | undefined) => (v && d.local && item ? item.localToWorld(v) : v);
+      const table = inItem(vec(d.table), d.tableItem ? root.getObjectByName(d.tableItem) : null);
       const at = o.getWorldPosition(new THREE.Vector3());
-      const stand = vec(d.stand);
+      const stand = inItem(vec(d.stand), o.parent);
+      // the way a seated visitor looks: its extras' yaw, or (in an item) the seat's own −Z
+      const look = new THREE.Vector3(0, 0, -1).transformDirection(o.matrixWorld);
+      if (d.yaw === undefined) d.yaw = Math.atan2(-look.x, -look.z);
       // where the waiter stands by it, and the walkway point he comes from
       const spot = stand && Number.isInteger(d.nav) ? { stand, seat: at.clone(), nav: Number(d.nav) } : null;
       this.seats.push({ at, yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table, spot });
@@ -330,6 +355,7 @@ export class TourEngine {
 
   /** Whether walking from here by (dx, dz) runs into something between the knees and the head. */
   private blocked(dx: number, dz: number) {
+    if (this.o.editor) return false;
     const len = Math.hypot(dx, dz);
     if (!len) return false;
     const dir = this.w.set(dx / len, 0, dz / len);
@@ -385,7 +411,10 @@ export class TourEngine {
   }
 
   private onDown = (e: PointerEvent) => {
+    // the editor: a handle of the picked item is being dragged (not the view)
+    if (this.gizmo?.axis) return;
     this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    this.downAt = { x: e.clientX, y: e.clientY };
     this.renderer.domElement.setPointerCapture(e.pointerId);
   };
   private onMove = (e: PointerEvent) => {
@@ -401,8 +430,13 @@ export class TourEngine {
     this.dirty = true;
     this.kick();
   };
-  private onUp = () => {
+  private downAt: { x: number; y: number } | null = null;
+  private onUp = (e: PointerEvent) => {
     this.drag = null;
+    // the editor: a click (not a drag) picks the item under it
+    const d = this.downAt;
+    this.downAt = null;
+    if (this.o.editor && d && e.type === 'pointerup' && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 6 && !this.gizmoBusy) this.pickAt(e.clientX, e.clientY);
   };
   private onKeyDown = (e: KeyboardEvent) => {
     const t = e.target as HTMLElement | null;
@@ -480,7 +514,8 @@ export class TourEngine {
     this.camera.updateMatrixWorld();
     // the barista, and what the visitor holds
     let alive = false;
-    if (this.visit) {
+    // (in the editor the staff stand still: the place is drawn only when something changes)
+    if (this.visit && !this.o.editor) {
       alive = this.visit.update(dt, !!(f || s));
       if (alive) this.emit();
       // the waiter has come to the seat: the visitor looks up at him
@@ -683,8 +718,160 @@ export class TourEngine {
     this.kick();
   }
 
+  // ---------- the editor (Admin) ----------
+
+  /** The model's items (code and what it is), by code. */
+  itemList() {
+    return [...this.items.values()].map((i) => ({ code: i.code, label: i.label })).sort((a, b) => Number(a.code) - Number(b.code) || a.code.localeCompare(b.code));
+  }
+
+  private pickAt(x: number, y: number) {
+    const r = this.renderer.domElement.getBoundingClientRect();
+    this.pointer.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+    const ray = new THREE.Raycaster();
+    ray.setFromCamera(this.pointer, this.camera);
+    const nodes = [...this.items.values()].map((i) => i.node);
+    for (const hit of ray.intersectObjects(nodes, true)) {
+      for (let o: THREE.Object3D | null = hit.object; o; o = o.parent) {
+        const m = /^ITEM_(\w+)/.exec(o.name);
+        if (m) return this.select(m[1]!);
+      }
+    }
+    this.select(null);
+  }
+
+  /** Picks an item (its handles appear on it), or none. */
+  async select(code: string | null) {
+    const item = code ? (this.items.get(code) ?? null) : null;
+    this.picked = item;
+    if (this.box) {
+      this.scene.remove(this.box);
+      this.box.dispose();
+      this.box = null;
+    }
+    if (item) {
+      if (!this.gizmo) {
+        const { TransformControls } = await import('three/addons/controls/TransformControls.js');
+        if (!this.alive) return;
+        const g = new TransformControls(this.camera, this.renderer.domElement);
+        g.setSpace('world');
+        g.setTranslationSnap(0.01);
+        g.setRotationSnap(THREE.MathUtils.degToRad(1));
+        g.addEventListener('dragging-changed', (ev) => {
+          this.gizmoBusy = !!(ev as unknown as { value: boolean }).value;
+        });
+        g.addEventListener('objectChange', () => {
+          if (!this.picked) return;
+          // turned round the vertical only
+          const e = editOf(this.picked);
+          applyEdit(this.picked, e);
+          this.box?.update();
+          this.o.editor?.onChange(this.picked.code, e);
+          this.dirty = true;
+          this.kick();
+        });
+        g.addEventListener('change', () => {
+          this.dirty = true;
+          this.kick();
+        });
+        this.scene.add(g.getHelper());
+        this.gizmo = g;
+        this.setMode('translate');
+      }
+      this.gizmo.attach(item.node);
+      this.box = new THREE.BoxHelper(item.node, 0xffb020);
+      this.scene.add(this.box);
+    } else this.gizmo?.detach();
+    this.o.editor?.onSelect(item ? { code: item.code, label: item.label } : null);
+    this.dirty = true;
+    this.kick();
+  }
+
+  /** The handles: move (on the floor and up), or turn (round the vertical). */
+  setMode(mode: 'translate' | 'rotate') {
+    const g = this.gizmo;
+    if (!g) return;
+    g.setMode(mode);
+    g.showX = g.showZ = mode === 'translate';
+    g.showY = true;
+    this.dirty = true;
+    this.kick();
+  }
+
+  /** Sets an item's change (from the editor's fields and buttons). */
+  setEdit(code: string, edit: ItemEdit) {
+    const item = this.items.get(code);
+    if (!item) return;
+    applyEdit(item, edit);
+    if (item === this.picked) this.box?.update();
+    for (const l of this.labels) if (l.userData.code === code) this.placeLabel(l, item);
+    this.dirty = true;
+    this.kick();
+  }
+
+  /** Walks the visitor to look at an item from a couple of metres away. */
+  focus(code: string) {
+    const item = this.items.get(code);
+    if (!item) return;
+    const box = new THREE.Box3().setFromObject(item.node);
+    const c = box.getCenter(new THREE.Vector3());
+    const dir = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
+    const at = c.clone().addScaledVector(dir, -2.4);
+    const floor = this.floorBelow(at.x, at.z, box.min.y + 1.5, 4);
+    this.floorY = floor ?? box.min.y;
+    this.pos.set(at.x, this.floorY + EYE, at.z);
+    this.pitch = Math.atan2(c.y - this.pos.y, 2.4);
+    this.dirty = true;
+    this.kick();
+  }
+
+  /** Each item's code on a little label over it (to tell which is which). */
+  showCodes(on: boolean) {
+    for (const l of this.labels) {
+      this.scene.remove(l);
+      l.material.map?.dispose();
+      l.material.dispose();
+    }
+    this.labels = [];
+    if (on)
+      for (const item of this.items.values()) {
+        const c = document.createElement('canvas');
+        c.width = 128;
+        c.height = 64;
+        const g = c.getContext('2d')!;
+        g.fillStyle = 'rgba(20,16,14,.82)';
+        g.beginPath();
+        g.roundRect(4, 8, 120, 48, 14);
+        g.fill();
+        g.fillStyle = '#ffd27a';
+        g.font = 'bold 30px system-ui, sans-serif';
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText('#' + item.code, 64, 33);
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+        sprite.scale.set(0.28, 0.14, 1);
+        sprite.renderOrder = 10;
+        sprite.userData.code = item.code;
+        this.placeLabel(sprite, item);
+        this.scene.add(sprite);
+        this.labels.push(sprite);
+      }
+    this.dirty = true;
+    this.kick();
+  }
+
+  private placeLabel(l: THREE.Sprite, item: Item) {
+    const box = new THREE.Box3().setFromObject(item.node);
+    const c = box.getCenter(new THREE.Vector3());
+    l.position.set(c.x, box.max.y + 0.12, c.z);
+  }
+
   dispose() {
     this.alive = false;
+    this.gizmo?.dispose();
+    this.showCodes(false);
     this.visit?.dispose();
     if (this.frame) cancelAnimationFrame(this.frame);
     this.observer.disconnect();

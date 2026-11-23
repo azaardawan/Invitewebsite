@@ -7,7 +7,7 @@ import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { requestContext } from '@/server/auth/request-context';
 import type { Actor } from '@/server/catalog/common';
-import { createTour, setTourLive, setTourLogo, setTourPrivacy, updateTour, type TourInput } from '@/server/tours/tours';
+import { createTour, setTourItemEdits, setTourLive, setTourLogo, setTourPrivacy, updateTour, type TourInput } from '@/server/tours/tours';
 import { catalogFailure } from './form-helpers';
 import type { ActionState } from './state';
 
@@ -78,4 +78,11 @@ export async function tourPrivacyAction(_: ActionState, form: FormData): Promise
   const tourId = id(form);
   const mode = z.enum(['private', 'public', 'renew']).parse(form.get('mode'));
   return run(() => setTourPrivacy(db(), tourId, mode, who).then(() => {}), ['/admin/tours', `/admin/tours/${tourId}`]);
+}
+
+/** Saves the editor's changes to the model's items (owner, 2026-11-23): the whole set, as the editor holds it. */
+export async function saveTourEditsAction(tourId: string, edits: unknown): Promise<ActionState> {
+  const who = await actor();
+  const tid = z.uuid().parse(tourId);
+  return run(() => setTourItemEdits(db(), tid, edits, who).then(() => {}), [`/admin/tours/${tid}`]);
 }

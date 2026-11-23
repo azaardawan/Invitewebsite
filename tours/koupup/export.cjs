@@ -34,5 +34,7 @@ const FILES = {
   }
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, Buffer.from(res.b64, 'base64'));
+  // the items' permanent codes (new items got the next numbers)
+  fs.writeFileSync(path.join(__dirname, 'items.json'), JSON.stringify(res.registry, null, 1) + '\n');
   console.log(`${out}: ${(fs.statSync(out).size / 1048576).toFixed(1)} MB, ${res.meshes} parts, ${res.tris} triangles`);
 })();

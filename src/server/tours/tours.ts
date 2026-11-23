@@ -4,7 +4,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
-import { assets, tours, type TourLinks } from '@/server/db/schema';
+import { assets, tours, type TourItemEdits, type TourLinks } from '@/server/db/schema';
 import { recordAudit } from '@/server/audit/audit';
 import { auditActor, CatalogError, type Actor } from '@/server/catalog/common';
 import { publicMediaUrl, storage } from '@/server/storage';
@@ -243,8 +243,45 @@ export async function publicTour(db: DbOrTx, path: string, now = new Date()) {
       modelBytes: model.bytes,
       logo: logo ? publicMediaUrl(logo.storageKey) : null,
       links: { ...t.links, whatsapp: whatsappLink(t.links.whatsapp) },
+      edits: t.itemEdits ?? {},
     },
   };
+}
+
+const offset = z.number().finite().min(-50).max(50);
+/** An item's change, checked: at most 50 m away, turned at most a full turn; an item's code is a short word. */
+export const tourItemEdits = z
+  .record(z.string().regex(/^\w{1,16}$/), z.object({ x: offset.optional(), y: offset.optional(), z: offset.optional(), ry: z.number().finite().min(-7).max(7).optional() }).strict())
+  .refine((r) => Object.keys(r).length <= 5000);
+
+/**
+ * Saves the owner's changes to the model's items (the editor): only the items actually moved or turned are kept.
+ * Audited (which items changed, and how many are changed in all).
+ */
+export async function setTourItemEdits(db: DbOrTx, id: string, raw: unknown, actor: Actor) {
+  const parsed = tourItemEdits.safeParse(raw);
+  if (!parsed.success) throw new CatalogError('invalid');
+  const edits: TourItemEdits = {};
+  for (const [code, e] of Object.entries(parsed.data)) {
+    const kept = Object.fromEntries(Object.entries(e).filter(([, v]) => typeof v === 'number' && Math.abs(v) >= 0.0005));
+    if (Object.keys(kept).length) edits[code] = kept;
+  }
+  return db.transaction(async (tx) => {
+    const [before] = await tx.select().from(tours).where(eq(tours.id, id)).for('update');
+    if (!before) throw new CatalogError('notFound');
+    await tx.update(tours).set({ itemEdits: edits }).where(eq(tours.id, id));
+    const was = before.itemEdits ?? {};
+    const changed = [...new Set([...Object.keys(was), ...Object.keys(edits)])].filter((c) => JSON.stringify(was[c] ?? null) !== JSON.stringify(edits[c] ?? null));
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: 'tour.items_edited',
+      objectType: 'tour',
+      objectId: id,
+      before: { items: Object.keys(was).length },
+      after: { items: Object.keys(edits).length, changed: changed.slice(0, 200) },
+    });
+    return edits;
+  });
 }
 
 /** Counts a visit (each opening of the page). */
