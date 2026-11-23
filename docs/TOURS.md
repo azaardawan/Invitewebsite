@@ -47,7 +47,8 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   `BARISTA_steam` (the machine's steam). With an Empty `HOTSPOT_counter` in front of the counter, a visitor there gets
   «Get a coffee» / «Get a cookie»: he walks to the machine (or the pile), makes it, walks back and hands it over. The
   visitor holds it at the bottom of the screen (the cookie in a second hand when they also hold a coffee): five sips,
-  five bites (`src/components/tour/props.ts`). See `tours/koupup/barista.js` for one made from a face scan.
+  five bites (`src/components/tour/props.ts`). See `tours/koupup/barista.js` (a cartoon person in the
+  tour's style: owner, 2026-11-23, a photographed face did not suit it).
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).
