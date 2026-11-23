@@ -2246,3 +2246,20 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | Key | English | Sorani (ckb) | Badini (bdn) |
 | --- | --- | --- | --- |
 | `tour.seeMenu` | See the menu | مینیوەکە ببینە | مینیوێ ببینە |
+
+## Batch 70 — cafés' virtual tours: the barista (a coffee, a cookie), sips and bites, sitting down — ✅ AUTO-APPROVED (2026-11-23, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.getCoffee` | Get a coffee | قاوەیەک وەربگرە | قەهوەیەکێ وەرگرە |
+| `tour.getCookie` | Get a cookie | کووکییەک وەربگرە | کووکیەکێ وەرگرە |
+| `tour.makingCoffee` | Your coffee is being made… | قاوەکەت ئامادە دەکرێت… | قەهوا تە دهێتە ئامادەکرن… |
+| `tour.makingCookie` | Your cookie is on its way… | کووکییەکەت لە ڕێگادایە… | کووکیا تە د ڕێکێ دایە… |
+| `tour.sip` | Take a sip | قومێک بخۆرەوە | قومەکێ ڤەخۆ |
+| `tour.bite` | Take a bite | گازێکی لێ بگرە | گەزەکێ لێ بدە |
+| `tour.sit` | Sit down | دابنیشە | ڕوینە |
+| `tour.stand` | Stand up | هەستە | ڕابە |
+| `tour.putCoffee` | Put the coffee down | قاوەکە دابنێ | قەهوێ دانە |
+| `tour.putCookie` | Put the cookie down | کووکییەکە دابنێ | کووکیێ دانە |
+| `tour.pickCoffee` | Pick up the coffee | قاوەکە هەڵبگرە | قەهوێ هلگرە |
+| `tour.pickCookie` | Pick up the cookie | کووکییەکە هەڵبگرە | کووکیێ هلگرە |

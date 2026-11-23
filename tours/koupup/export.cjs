@@ -12,8 +12,11 @@ const FILES = {
 (async () => {
   const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const p = await b.newPage();
-  p.on('pageerror', (e) => console.log('pageerror', e.message));
-  p.on('console', (m) => /tris/.test(m.text()) && console.log(m.text()));
+  p.on('pageerror', (e) => {
+    console.error('pageerror', e.message);
+    process.exit(1);
+  });
+  p.on('console', (m) => /tris|seats/.test(m.text()) && console.log(m.text()));
   await p.route('http://cafe.test/**', (r) => {
     const u = r.request().url().replace('http://cafe.test/', '').split('?')[0];
     const f = u.startsWith('three/') ? path.join(ROOT, 'node_modules', u) : FILES[u] ? path.join(ROOT, FILES[u]) : path.join(__dirname, u);

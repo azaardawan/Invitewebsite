@@ -1900,6 +1900,18 @@
     "endedTitle": "{name}",
     "endedBody": "This virtual tour has ended.",
     "rotate": "Turn your phone sideways to walk through the place.",
-    "seeMenu": "See the menu"
+    "seeMenu": "See the menu",
+    "getCoffee": "Get a coffee",
+    "getCookie": "Get a cookie",
+    "makingCoffee": "Your coffee is being made…",
+    "makingCookie": "Your cookie is on its way…",
+    "sip": "Take a sip",
+    "bite": "Take a bite",
+    "sit": "Sit down",
+    "stand": "Stand up",
+    "putCoffee": "Put the coffee down",
+    "putCookie": "Put the cookie down",
+    "pickCoffee": "Pick up the coffee",
+    "pickCookie": "Pick up the cookie"
   }
 }

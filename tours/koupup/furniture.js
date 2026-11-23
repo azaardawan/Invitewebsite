@@ -1,6 +1,6 @@
 // The café's furniture and things, each built at the floor (y = 0) of its own group, facing +z (its front).
 import * as THREE from 'three';
-import { ball, contactShadow, cyl, group, mat, rbox, rod, rnd, rr, weaveTex, woodTex, drawTex, GLASS, add } from './lib.js';
+import { ball, contactShadow, cyl, group, mat, rbox, rod, rnd, rr, weaveTex, woodTex, drawTex, GLASS, add, seat, tableTop } from './lib.js';
 
 export const C = {
   olive: '#7c7f52',
@@ -65,6 +65,7 @@ export function armchair(x, y, z, ry, color, w = 0.82) {
   rbox(0.18, 0.28, 0.72, 0.08, c, -w / 2 + 0.08, 0.3, 0.02, 0, g);
   rbox(0.18, 0.28, 0.72, 0.08, c, w / 2 - 0.08, 0.3, 0.02, 0, g);
   rbox(w - 0.3, 0.12, 0.55, 0.06, mat(color, { rough: 0.9 }), 0, 0.37, 0.08, 0, g);
+  seat(g, 0.49);
   contactShadow(w, 0.85, x, y, z, ry);
   return g;
 }
@@ -78,6 +79,7 @@ export function puffySofa(x, y, z, ry, color, len = 1.3, depth = 0.95) {
   back.rotation.x = -0.22;
   // the pleats
   for (let i = 1; i < 5; i++) rbox(0.03, 0.02, depth - 0.2, 0.01, mat('#cdbfa6'), -len / 2 + (len * i) / 5, 0.355, 0.12, 0, g);
+  for (const dx of [-len / 4, len / 4]) seat(g, 0.38, { dx, dz: 0.12 });
   contactShadow(len, depth, x, y, z, ry);
   return g;
 }
@@ -95,6 +97,7 @@ export function roundChair(x, y, z, ry) {
     [0, -0.17],
   ])
     rod([lx, 0, lz], [lx * 0.6, 0.45, lz * 0.6], 0.025, M.woodLight, g);
+  seat(g, 0.49, { dz: 0.02 });
   contactShadow(0.45, 0.45, x, y, z, ry);
   return g;
 }
@@ -103,6 +106,7 @@ export function roundChair(x, y, z, ry) {
 export function stool(x, y, z, color = C.woodLight) {
   const g = at(x, y, z, 0, 'stool');
   cyl(0.18, 0.15, 0.45, color === C.woodLight ? M.woodLight : mat(color), 0, 0, 0, 20, g);
+  seat(g, 0.45, { dz: 0 });
   contactShadow(0.36, 0.36, x, y, z);
   return g;
 }
@@ -130,6 +134,7 @@ export function liveEdgeTable(x, y, z, ry, len, width, height = 0.76, thick = 0.
   for (const lx of [-len / 2 + 0.35, len / 2 - 0.35]) {
     rbox(0.16, height - thick, width * 0.7, 0.06, M.woodDark, lx, 0, 0, 0, g);
   }
+  tableTop(g, height + 0.015, len / 2, width / 2);
   contactShadow(len, width, x, y, z, ry);
   return g;
 }
@@ -137,6 +142,7 @@ export function liveEdgeTable(x, y, z, ry, len, width, height = 0.76, thick = 0.
 export function boxTable(x, y, z, ry, w, d, h, material = M.wood, r = 0.03) {
   const g = at(x, y, z, ry, 'table');
   rbox(w, h, d, r, material, 0, 0, 0, 0, g);
+  tableTop(g, h, w / 2, d / 2);
   contactShadow(w, d, x, y, z, ry);
   return g;
 }
@@ -152,6 +158,7 @@ export function frameTable(x, y, z, ry, w = 0.5, h = 0.45, top = M.woodLight) {
     [-1, 1],
   ])
     rod([(a * w) / 2.2, 0, (b * w) / 2.2], [(a * w) / 2.2, h - 0.03, (b * w) / 2.2], 0.012, M.frame, g);
+  tableTop(g, h, w / 2, w / 2);
   contactShadow(w, w, x, y, z, ry);
   return g;
 }
@@ -161,6 +168,7 @@ export function roundTable(x, y, z, r, h, material) {
   cyl(r, r, 0.04, material, 0, h - 0.04, 0, 32, g);
   cyl(0.04, 0.04, h - 0.04, M.frame, 0, 0, 0, 12, g);
   cyl(r * 0.6, r * 0.6, 0.02, M.frame, 0, 0, 0, 24, g);
+  tableTop(g, h, r, r, true);
   contactShadow(r * 2, r * 2, x, y, z);
   return g;
 }
@@ -484,6 +492,7 @@ export function slatTable(x, y, z, ry, size = 0.46, h = 0.5) {
   const steel = mat('#c4c6c8', { metal: 0.85, rough: 0.25 });
   cyl(0.065, 0.06, 0.035, steel, 0.06, h, -0.05, 24, g);
   cyl(0.05, 0.05, 0.002, mat('#8d9093', { metal: 0.6, rough: 0.4 }), 0.06, h + 0.034, -0.05, 24, g);
+  tableTop(g, h, size / 2, size / 2);
   contactShadow(size, size, x, y, z, ry);
   return g;
 }
@@ -510,6 +519,7 @@ export function bistroTable(x, y, z, color, r = 0.29, h = 0.6) {
   // the ashtray
   const steel = mat('#c4c6c8', { metal: 0.85, rough: 0.25 });
   cyl(0.055, 0.05, 0.03, steel, 0.04, h, 0.02, 20, g);
+  tableTop(g, h, r, r, true);
   contactShadow(r * 2, r * 2, x, y, z);
   return g;
 }
@@ -523,6 +533,7 @@ export function walnutTable(x, y, z, ry, len, width, h = 0.76) {
   const uv = top.geometry.attributes.uv;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * len * 0.8, uv.getY(i) * width * 0.8);
   for (const lx of [-len / 2 + 0.25, len / 2 - 0.25]) rbox(0.06, h - 0.045, width * 0.82, 0.01, mat('#4e3529', { rough: 0.6 }), lx, 0, 0, 0, g);
+  tableTop(g, h, len / 2, width / 2);
   contactShadow(len, width, x, y, z, ry);
   return g;
 }

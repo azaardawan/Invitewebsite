@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { Joystick, useTouchScreen, webglAvailable } from '@/theme-sdk/gallery3d/Gallery3D';
-import type { TourEngine } from './tour-engine';
+import type { TourActivity, TourEngine } from './tour-engine';
 
 export type TourWords = {
   loading: string;
@@ -18,6 +18,18 @@ export type TourWords = {
   credit: string;
   rotate: string;
   seeMenu: string;
+  getCoffee: string;
+  getCookie: string;
+  makingCoffee: string;
+  makingCookie: string;
+  sip: string;
+  bite: string;
+  sit: string;
+  stand: string;
+  putCoffee: string;
+  putCookie: string;
+  pickCoffee: string;
+  pickCookie: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -77,6 +89,8 @@ export function TourViewer({
   const [hint, setHint] = useState(true);
   // the spot the visitor is at (e.g. the counter: its menu)
   const [spot, setSpot] = useState<string | null>(null);
+  // what the visitor can do: order at the counter, sip, bite, sit, put down, pick up (owner, 2026-11-23)
+  const [act, setAct] = useState<TourActivity | null>(null);
 
   useEffect(() => {
     const el = box.current;
@@ -90,7 +104,7 @@ export function TourViewer({
         }
         const { TourEngine } = await import('./tour-engine');
         if (cancelled) return;
-        const e = new TourEngine({ container: el, model, reducedMotion, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k) });
+        const e = new TourEngine({ container: el, model, reducedMotion, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
         engine.current = e;
         await e.load();
         if (!cancelled) setState('ready');
@@ -258,6 +272,8 @@ export function TourViewer({
         </a>
       ) : null}
 
+      {state === 'ready' && act ? <Actions act={act} words={words} engine={engine} /> : null}
+
       {state === 'ready' && hint ? (
         <p
           role="status"
@@ -297,6 +313,95 @@ export function TourViewer({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+type Action = { key: string; label: string; icon: string; run: (e: TourEngine) => void };
+
+/**
+ * The visitor's buttons along the bottom (owner, 2026-11-23): at the counter «Get a coffee» / «Get a cookie» (the
+ * barista makes it and hands it over), then «Take a sip» / «Take a bite» (five of each), «Sit down» by a chair, and
+ * seated «Put the coffee down» / «Pick up the coffee». They wait while something is under way.
+ */
+function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; engine: { current: TourEngine | null } }) {
+  const list: Action[] = [];
+  if (act.order.coffee) list.push({ key: 'getCoffee', label: words.getCoffee, icon: '☕', run: (e) => e.order('coffee') });
+  if (act.order.cookie) list.push({ key: 'getCookie', label: words.getCookie, icon: '🍪', run: (e) => e.order('cookie') });
+  if (act.coffee?.where === 'hand') list.push({ key: 'sip', label: words.sip, icon: '☕', run: (e) => e.sip() });
+  if (act.cookie?.where === 'hand') list.push({ key: 'bite', label: words.bite, icon: '🍪', run: (e) => e.bite() });
+  if (act.seat === 'seated' && act.coffee?.where === 'hand') list.push({ key: 'putCoffee', label: words.putCoffee, icon: '⬇', run: (e) => e.putDown('coffee') });
+  if (act.seat === 'seated' && act.cookie?.where === 'hand') list.push({ key: 'putCookie', label: words.putCookie, icon: '⬇', run: (e) => e.putDown('cookie') });
+  if (act.coffee?.where === 'table' && act.coffee.reach) list.push({ key: 'pickCoffee', label: words.pickCoffee, icon: '⬆', run: (e) => e.pickUp('coffee') });
+  if (act.cookie?.where === 'table' && act.cookie.reach) list.push({ key: 'pickCookie', label: words.pickCookie, icon: '⬆', run: (e) => e.pickUp('cookie') });
+  if (act.seat === 'near') list.push({ key: 'sit', label: words.sit, icon: '🪑', run: (e) => e.sit() });
+  if (act.seat === 'seated') list.push({ key: 'stand', label: words.stand, icon: '🚶', run: (e) => e.stand() });
+  const making = act.making === 'coffee' ? words.makingCoffee : act.making === 'cookie' ? words.makingCookie : null;
+  if (!list.length && !making) return null;
+  return (
+    <div
+      data-testid="tour-actions"
+      style={{
+        position: 'absolute',
+        left: '50%',
+        bottom: 'max(40px, calc(env(safe-area-inset-bottom) + 32px))',
+        transform: 'translateX(-50%)',
+        width: 'min(62vw, 640px)',
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 8,
+        zIndex: 3,
+        pointerEvents: 'none',
+      }}
+    >
+      {making ? (
+        <p role="status" style={{ ...GLASS, margin: 0, padding: '9px 16px', borderRadius: 999, fontSize: 14, fontWeight: 500 }}>
+          {making}
+        </p>
+      ) : null}
+      {list.map((a) => {
+        const sips = a.key === 'sip' ? act.coffee?.left : a.key === 'bite' ? act.cookie?.left : undefined;
+        return (
+          <button
+            key={a.key}
+            type="button"
+            data-testid={`tour-${a.key}`}
+            disabled={act.busy}
+            onClick={() => engine.current && a.run(engine.current)}
+            style={{
+              ...GLASS,
+              background: 'rgba(20,16,14,.78)',
+              pointerEvents: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 7,
+              minHeight: 42,
+              padding: '9px 16px',
+              border: '1px solid rgba(255,255,255,.18)',
+              borderRadius: 999,
+              color: '#fff',
+              fontSize: 15,
+              fontWeight: 600,
+              cursor: act.busy ? 'default' : 'pointer',
+              opacity: act.busy ? 0.55 : 1,
+              whiteSpace: 'nowrap',
+              touchAction: 'manipulation',
+            }}
+          >
+            <span aria-hidden>{a.icon}</span>
+            {a.label}
+            {sips !== undefined ? (
+              <span aria-hidden style={{ display: 'inline-flex', gap: 3, marginInlineStart: 2 }}>
+                {/* five sips, five bites (props.ts) */}
+                {Array.from({ length: 5 }, (_, i) => (
+                  <span key={i} style={{ width: 6, height: 6, borderRadius: 3, background: i < sips ? '#fff' : 'rgba(255,255,255,.25)' }} />
+                ))}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 }

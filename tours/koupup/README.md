@@ -8,6 +8,10 @@ Y up). The scan itself is the café's and is not kept in the repository.
   its roof, both staircases, the street, the sky) and the signs (KOUPUP, the KOUP pillar, کوپ).
 - `rooms.js`: where everything stands, room by room (north lounge, middle room, bar, toilets, terrace).
 - `furniture.js`: the furniture kit (lounge chairs, armchairs, sofas, live-edge table, round chairs, plants, shelves…).
+- `barista.js`: the barista (owner, 2026-11-23) behind the counter in the KOUP T-shirt: his face is the owner's scan
+  (`models/barista_face.glb`), the shirt's prints the owner's photos (`models/shirt_front.jpg`, `shirt_back.jpg`); his
+  places (the machine, the cookie pile on the back counter). Every chair is a seat and every table a place to put a
+  coffee down (`seat()`, `tableTop()` in `lib.js`; `SEAT_<n>` nodes in the model).
 - `lib.js`: shapes, textures and materials. Every piece of furniture gets an invisible block (`COLLIDER_…`) so visitors
   walk round it; leaves, rugs and shadows are `NOCOLLIDE_…`; visitors start at `START` (the foot of the north stairs).
 
