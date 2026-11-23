@@ -16,7 +16,7 @@ const FILES = {
     console.error('pageerror', e.message);
     process.exit(1);
   });
-  p.on('console', (m) => /tris|seats/.test(m.text()) && console.log(m.text()));
+  p.on('console', (m) => /tris|seats|walkway|seat at/.test(m.text()) && console.log(m.text()));
   await p.route('http://cafe.test/**', (r) => {
     const u = r.request().url().replace('http://cafe.test/', '').split('?')[0];
     const f = u.startsWith('three/') ? path.join(ROOT, 'node_modules', u) : FILES[u] ? path.join(ROOT, FILES[u]) : path.join(__dirname, u);

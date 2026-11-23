@@ -21,6 +21,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { Visit, type Treat } from './visit';
+import type { SeatSpot } from './staff';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -49,8 +50,14 @@ export type TourActivity = {
   seat: 'near' | 'seated' | null;
   /** Something is under way (a sip, a bite, sitting down…): the buttons wait. */
   busy: boolean;
+  /**
+   * The waiter, for a seated visitor: «Call the waiter» (`call`), on his way (`coming`), by the seat for the order
+   * (`here`, with what can be ordered in `waiterOrder`), fetching or bringing it (`fetching`, `bringing`).
+   */
+  waiter: 'call' | 'coming' | 'here' | 'fetching' | 'bringing' | null;
+  waiterOrder: { coffee: boolean; cookie: boolean };
 };
-type Seat = { at: THREE.Vector3; yaw: number; eye: number; table: THREE.Vector3 | null };
+type Seat = { at: THREE.Vector3; yaw: number; eye: number; table: THREE.Vector3 | null; spot: SeatSpot | null };
 
 const EYE = 1.6;
 const SPEED = 2.3;
@@ -219,9 +226,14 @@ export class TourEngine {
     // The seats.
     root.traverse((o) => {
       if (!/^SEAT_/.test(o.name)) return;
-      const d = o.userData as { yaw?: number; eye?: number; table?: number[] };
-      const table = Array.isArray(d.table) && d.table.length === 3 ? new THREE.Vector3(...(d.table as [number, number, number])) : null;
-      this.seats.push({ at: o.getWorldPosition(new THREE.Vector3()), yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table });
+      const d = o.userData as { yaw?: number; eye?: number; table?: number[]; stand?: number[]; nav?: number };
+      const vec = (a: unknown) => (Array.isArray(a) && a.length === 3 ? new THREE.Vector3(...(a.map(Number) as [number, number, number])) : null);
+      const table = vec(d.table);
+      const at = o.getWorldPosition(new THREE.Vector3());
+      const stand = vec(d.stand);
+      // where the waiter stands by it, and the walkway point he comes from
+      const spot = stand && Number.isInteger(d.nav) ? { stand, seat: at.clone(), nav: Number(d.nav) } : null;
+      this.seats.push({ at, yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table, spot });
     });
     // The barista and what the visitor is given.
     this.visit = new Visit(this.scene, this.camera, this.env);
@@ -471,6 +483,15 @@ export class TourEngine {
     if (this.visit) {
       alive = this.visit.update(dt, !!(f || s));
       if (alive) this.emit();
+      // the waiter has come to the seat: the visitor looks up at him
+      const look = this.visit.lookAt;
+      if (look && this.seated && !this.glide) {
+        this.visit.lookAt = null;
+        const dx = look.x - this.pos.x,
+          dz = look.z - this.pos.z;
+        const pitch = Math.atan2(look.y - this.pos.y, Math.hypot(dx, dz));
+        this.glideTo(this.pos.clone(), Math.atan2(-dx, -dz), THREE.MathUtils.clamp(pitch * 0.75, -0.3, 0.3));
+      } else if (look) this.visit.lookAt = null;
     }
     if (moving || alive || this.dirty) {
       this.renderer.render(this.scene, this.camera);
@@ -495,6 +516,8 @@ export class TourEngine {
       cookie: v.cookie,
       seat: this.seated ? 'seated' : this.nearSeat && !this.glide ? 'near' : null,
       busy: v.busy || !!this.glide,
+      waiter: v.waiter ?? (this.seated && !this.glide && this.visit.canCallWaiter(this.seated.seat.spot) ? 'call' : null),
+      waiterOrder: v.waiterOrder,
     };
     const key = JSON.stringify(a);
     if (key === this.activity) return;
@@ -528,10 +551,36 @@ export class TourEngine {
     this.emit();
   }
 
+  /** Calls the waiter to the seat (seated). */
+  callWaiter() {
+    const spot = this.seated?.seat.spot;
+    if (spot && this.visit?.callWaiter(spot)) {
+      this.emit();
+      this.kick();
+    }
+  }
+
+  /** Gives the waiter the order (he is by the seat). */
+  waiterOrder(kind: Treat) {
+    if (this.visit?.waiterOrder(kind)) {
+      this.emit();
+      this.kick();
+    }
+  }
+
+  /** Nothing after all: the waiter goes back to his round. */
+  dismissWaiter() {
+    this.visit?.dismissWaiter();
+    this.emit();
+    this.kick();
+  }
+
   /** Stands up, back where the visitor was before sitting. */
   stand() {
     const s = this.seated;
     if (!s || this.glide) return;
+    // a waiter on his way for the order is sent back (one already bringing it still hands it over)
+    this.visit?.dismissWaiter();
     this.seated = null;
     this.floorY = s.floorY;
     this.glideTo(s.pos.clone().setY(s.floorY + EYE), this.yaw, 0);

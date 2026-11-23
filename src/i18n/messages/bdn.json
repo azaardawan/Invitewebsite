@@ -866,6 +866,10 @@
     "putCoffee": "قەهوێ دانە",
     "putCookie": "کووکیێ دانە",
     "pickCoffee": "قەهوێ هلگرە",
-    "pickCookie": "کووکیێ هلگرە"
+    "pickCookie": "کووکیێ هلگرە",
+    "callWaiter": "گازی گارسۆنی بکە",
+    "waiterComing": "گارسۆن د ڕێکێ دایە…",
+    "waiterBringing": "داخوازیا تە د ڕێکێ دایە…",
+    "noThanks": "نە، سوپاس"
   }
 }

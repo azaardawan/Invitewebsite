@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { root, seats, tables } from './lib.js';
 import { barista, cleaner } from './barista.js';
+import { walkways } from './nav.js';
 import { signs } from './build.js';
 import { terraceChairs, loungeChairs, koupCorner, mirrors } from './rooms.js';
 try {
@@ -21,6 +22,8 @@ try {
   start.position.set(7.3, -2.86, -3.1);
   start.rotation.y = Math.PI / 2;
   root.add(start);
+  // the waiter's walkways, and how he reaches each seat (before the merge: the furniture's blocks are still apart)
+  const waiterWays = walkways(seats);
   const scene0 = new THREE.Scene();
   scene0.add(root);
   scene0.updateMatrixWorld(true);
@@ -72,7 +75,7 @@ try {
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
   // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the barista's places: kept as named points
   root.traverse(o => {
-    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam)|CLEANER_stop_)/.test(o.name)) return;
+    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam)|CLEANER_stop_|NAV_)/.test(o.name)) return;
     const h = new THREE.Object3D(); h.name = o.name; h.userData = o.userData; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
   });
   for (const m of people) out.add(m);
@@ -99,7 +102,7 @@ try {
     const o = new THREE.Object3D();
     o.name = 'SEAT_' + i;
     o.position.copy(at);
-    o.userData = { yaw: Math.round(Math.atan2(-fwd.x, -fwd.z) * 1000) / 1000, eye: s.eye, ...(best ? { table: best.at } : {}) };
+    o.userData = { yaw: Math.round(Math.atan2(-fwd.x, -fwd.z) * 1000) / 1000, eye: s.eye, ...(best ? { table: best.at } : {}), ...(waiterWays[i] ?? {}) };
     out.add(o);
   });
   console.log('seats', seats.length, 'with a table', out.children.filter(o => o.userData.table).length);

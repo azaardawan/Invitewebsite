@@ -30,6 +30,10 @@ export type TourWords = {
   putCookie: string;
   pickCoffee: string;
   pickCookie: string;
+  callWaiter: string;
+  waiterComing: string;
+  waiterBringing: string;
+  noThanks: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -334,9 +338,23 @@ function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; 
   if (act.seat === 'seated' && act.cookie?.where === 'hand') list.push({ key: 'putCookie', label: words.putCookie, icon: '⬇', run: (e) => e.putDown('cookie') });
   if (act.coffee?.where === 'table' && act.coffee.reach) list.push({ key: 'pickCoffee', label: words.pickCoffee, icon: '⬆', run: (e) => e.pickUp('coffee') });
   if (act.cookie?.where === 'table' && act.cookie.reach) list.push({ key: 'pickCookie', label: words.pickCookie, icon: '⬆', run: (e) => e.pickUp('cookie') });
+  // the waiter, for a seated visitor (owner, 2026-11-23): call him, then order from him at the seat
+  if (act.waiter === 'call') list.push({ key: 'callWaiter', label: words.callWaiter, icon: '🙋', run: (e) => e.callWaiter() });
+  if (act.waiterOrder.coffee) list.push({ key: 'waiterCoffee', label: words.getCoffee, icon: '☕', run: (e) => e.waiterOrder('coffee') });
+  if (act.waiterOrder.cookie) list.push({ key: 'waiterCookie', label: words.getCookie, icon: '🍪', run: (e) => e.waiterOrder('cookie') });
+  if (act.waiter === 'here') list.push({ key: 'noThanks', label: words.noThanks, icon: '👋', run: (e) => e.dismissWaiter() });
   if (act.seat === 'near') list.push({ key: 'sit', label: words.sit, icon: '🪑', run: (e) => e.sit() });
   if (act.seat === 'seated') list.push({ key: 'stand', label: words.stand, icon: '🚶', run: (e) => e.stand() });
-  const making = act.making === 'coffee' ? words.makingCoffee : act.making === 'cookie' ? words.makingCookie : null;
+  const making =
+    act.making === 'coffee'
+      ? words.makingCoffee
+      : act.making === 'cookie'
+        ? words.makingCookie
+        : act.waiter === 'coming'
+          ? words.waiterComing
+          : act.waiter === 'fetching' || act.waiter === 'bringing'
+            ? words.waiterBringing
+            : null;
   if (!list.length && !making) return null;
   return (
     <div

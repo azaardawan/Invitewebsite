@@ -5,7 +5,7 @@
  */
 import * as THREE from 'three';
 import { Barista } from './barista';
-import { Cleaner } from './staff';
+import { Cleaner, type SeatSpot } from './staff';
 import { BITES, SIPS, disposeProp, makeCookie, makeCup, makeHand, type Cookie, type Cup } from './props';
 
 export type Treat = 'coffee' | 'cookie';
@@ -53,6 +53,13 @@ export class Visit {
   private crumbMat = new THREE.MeshStandardMaterial({ color: '#c68a4c', roughness: 0.9 });
   private bob = 0;
   private making: Treat | null = null;
+  /** The waiter serving the seated visitor: on his way, here for the order, fetching it, bringing it. */
+  private waiter: 'coming' | 'here' | 'fetching' | 'bringing' | null = null;
+  private waiterSpot: SeatSpot | null = null;
+  /** Somewhere the visitor's eyes turn to (the waiter's face, when he comes to their seat). */
+  lookAt: THREE.Vector3 | null = null;
+  /** An order waiting at the counter for the barista to be free (or, with no barista, for the waiter to take it). */
+  private pending: { kind: Treat; prop: Cup | Cookie; wait: number } | null = null;
   private v = new THREE.Vector3();
   private frustum = new THREE.Frustum();
   private m4 = new THREE.Matrix4();
@@ -80,7 +87,93 @@ export class Visit {
       return { left: h.left, where: h.where, reach };
     };
     const busy = this.flights.length > 0 || Object.values(this.items).some((h) => h && h.act !== null);
-    return { making: this.making, coffee: one('coffee'), cookie: one('cookie'), busy, serving: !!this.barista };
+    const free = (k: Treat) => {
+      const h = this.items[k];
+      return !h || h.where === 'table' || h.done !== null;
+    };
+    return {
+      making: this.making,
+      coffee: one('coffee'),
+      cookie: one('cookie'),
+      busy,
+      serving: !!this.barista,
+      waiter: this.waiter,
+      waiterOrder: { coffee: this.waiter === 'here' && free('coffee'), cookie: this.waiter === 'here' && free('cookie') },
+    };
+  }
+
+  /** Whether the waiter can be called to this seat (there is one, free, with a way to it). */
+  canCallWaiter(spot: SeatSpot | null) {
+    return !!this.cleaner?.canServe(spot) && !this.waiter;
+  }
+
+  /** The seated visitor calls the waiter: he comes to their seat for the order. */
+  callWaiter(spot: SeatSpot) {
+    if (!this.cleaner || !this.canCallWaiter(spot)) return false;
+    this.waiter = 'coming';
+    this.waiterSpot = spot;
+    this.cleaner.summon(spot, () => {
+      if (this.waiter !== 'coming') return;
+      this.waiter = 'here';
+      this.lookAt = this.cleaner!.facePosition();
+    });
+    return true;
+  }
+
+  /** Never mind (or the visitor stood up before ordering): he goes back to his round. */
+  dismissWaiter() {
+    if (this.waiter !== 'coming' && this.waiter !== 'here') return;
+    this.waiter = null;
+    this.waiterSpot = null;
+    this.cleaner?.resume();
+  }
+
+  /** The order, given to the waiter at the seat: he fetches it at the counter (the barista makes it) and brings it. */
+  waiterOrder(kind: Treat) {
+    const spot = this.waiterSpot;
+    const h = this.items[kind];
+    if (this.waiter !== 'here' || !spot || !this.cleaner || (h && h.where !== 'table' && h.done === null)) return false;
+    this.waiter = 'fetching';
+    const cleaner = this.cleaner;
+    cleaner.fetch(() => {
+      this.pending = { kind, prop: kind === 'coffee' ? makeCup() : makeCookie(), wait: 0 };
+    });
+    return true;
+  }
+
+  /** The order goes into the waiter's hand, and he brings it to the seat. */
+  private toWaiter(kind: Treat, prop: Cup | Cookie) {
+    const cleaner = this.cleaner!;
+    const spot = this.waiterSpot!;
+    const done = () => {
+      cleaner.hold(prop);
+      this.waiter = 'bringing';
+      cleaner.bring(spot, (p) => {
+        this.waiter = null;
+        this.waiterSpot = null;
+        const old = this.items[kind];
+        if (old) this.drop(old);
+        this.handOver(kind, p as Cup | Cookie, false);
+      });
+    };
+    if (prop.parent) this.fly(prop, () => ({ at: cleaner.handPosition(), q: new THREE.Quaternion() }), done, 0.6);
+    else done();
+  }
+
+  /** At the counter: the barista makes the waiter's order when he is free (without a barista, it is ready at once). */
+  private serveCounter(dt: number) {
+    const p = this.pending;
+    if (!p) return;
+    if (this.barista?.can(p.kind)) {
+      if (this.barista.busy || this.making) return;
+      this.pending = null;
+      this.barista.order(p.kind, p.prop, (prop) => this.toWaiter(p.kind, prop as Cup | Cookie));
+    } else {
+      p.wait += dt;
+      if (p.wait < 1.5) return;
+      this.pending = null;
+      this.toWaiter(p.kind, p.prop);
+    }
   }
 
   /** Whether the barista can be asked for one now (he is free, and the visitor's hand for it is free). */
@@ -101,8 +194,8 @@ export class Visit {
   }
 
   /** He holds it out: it comes to the visitor's hand. */
-  private handOver(kind: Treat, prop: Cup | Cookie) {
-    this.making = null;
+  private handOver(kind: Treat, prop: Cup | Cookie, own = true) {
+    if (own) this.making = null;
     const h: Held = { kind, left: kind === 'coffee' ? SIPS : BITES, where: 'flying', prop, holder: new THREE.Group(), side: 0, act: null, acted: false, done: null };
     this.items[kind] = h;
     this.fly(prop, () => this.handTarget(h), () => this.toHand(h), 0.75);
@@ -203,6 +296,8 @@ export class Visit {
     const seen = (at: THREE.Vector3) => this.frustum.intersectsSphere(this.sphere.set(this.v.copy(at).setY(at.y + 1), 1.1));
     let moved = this.barista?.update(dt, this.camera.position, seen) ?? false;
     if (this.cleaner?.update(dt, this.camera.position, seen)) moved = true;
+    this.serveCounter(dt);
+    if (this.waiter || this.pending) moved = true;
     // flights
     for (const f of [...this.flights]) {
       f.t += dt;
