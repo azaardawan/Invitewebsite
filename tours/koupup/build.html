@@ -98,6 +98,7 @@ try {
     node.userData = { label: g.name || 'item' };
     g.getWorldPosition(node.position);
     g.getWorldQuaternion(node.quaternion);
+    g.getWorldScale(node.scale); // its size too (the small mirrors are scaled down)
     out.add(node);
     itemNode.set(g, node);
   }
