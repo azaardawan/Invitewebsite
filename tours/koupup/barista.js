@@ -2,13 +2,13 @@
 // (the tour page's «Get a coffee» / «Get a cookie»), makes their coffee at the machine or fetches a cookie from the pile
 // on the back counter and hands it over. The tour page moves him (src/components/tour/barista.ts) by his joints' names.
 //
-// He is a cartoon person in the café's animation style (owner, 2026-11-23: a photographed face didn't suit it); the
-// shirt's prints are the owner's photos of the shirt (`models/shirt_front.jpg`, `shirt_back.jpg`).
+// He is drawn in the café's animation style after the owner's photo of him (owner, 2026-11-23: a photographed face
+// didn't suit it); the shirt's prints are the owner's photos of the shirt (`models/shirt_front.jpg`, `shirt_back.jpg`).
 import * as THREE from 'three';
 import { root, mat, cyl, ball, rbox, group, shadowTex } from './lib.js';
 
 const FI = -1.24;
-const SKIN = '#e6b596';
+const SKIN = '#e2b192';
 const NAVY = '#222a3e';
 const JEANS = '#3b3e45';
 
@@ -172,58 +172,96 @@ export async function barista() {
     joint(fore, `BARISTA_hand${side}`, 0, -0.33, 0.04);
   }
 
-  // the head: a friendly cartoon face in the café's animation style (owner, 2026-11-23: not a photo). One smooth
-  // turned shape (a rounded chin, full cheeks, the crown), a little narrower than deep.
+  // the head: the barista as the owner's photo shows him (owner, 2026-11-23), drawn in the café's animation style (a
+  // photographed face did not suit it): a long oval face, dark hair swept back and to the side with volume on top, a
+  // full dark beard and moustache, thick straight brows, hazel-green eyes and the small mole on his right cheek.
   const head = joint(torso, 'BARISTA_head', 0, 0.578, 0.012);
-  const HEAD = [[0, 0], [0.036, 0.003], [0.06, 0.02], [0.071, 0.05], [0.081, 0.085], [0.086, 0.12], [0.085, 0.15], [0.077, 0.18], [0.061, 0.204], [0.036, 0.221], [0, 0.227]];
+  const HEAD = [[0, 0], [0.034, 0.004], [0.056, 0.022], [0.068, 0.05], [0.077, 0.085], [0.082, 0.12], [0.082, 0.15], [0.075, 0.18], [0.06, 0.205], [0.035, 0.223], [0, 0.23]];
+  const SX = 0.9,
+    SZ = 1.04;
   const face = mat(SKIN, { rough: 0.6 });
-  const skull = turned(HEAD.slice().reverse().map(([r, y]) => [r, y]), face);
-  skull.scale.set(0.92, 1, 1.04);
+  const skull = turned(HEAD.slice().reverse(), face);
+  skull.scale.set(SX, 1, SZ);
   head.add(skull);
   // where the face's surface is at height y, x across (to set the eyes, nose and mouth on it)
   const rAt = (y) => {
     for (let i = 1; i < HEAD.length; i++) if (y <= HEAD[i][1]) return HEAD[i - 1][0] + ((HEAD[i][0] - HEAD[i - 1][0]) * (y - HEAD[i - 1][1])) / (HEAD[i][1] - HEAD[i - 1][1]);
     return 0;
   };
-  const zAt = (x, y) => 1.04 * Math.sqrt(Math.max(0, rAt(y) ** 2 - (x / 0.92) ** 2));
+  const zAt = (x, y, grow = 1) => SZ * Math.sqrt(Math.max(0, (rAt(y) * grow) ** 2 - (x / SX) ** 2));
+  const dark = mat('#1d1512', { rough: 0.8 });
+  // a piece of the head's own shape, a little proud of it (beard, hair), round the front (`phi0`…`phi1`, 0 = the front)
+  const shell = (y0, y1, grow, phi0, phi1, material) => {
+    const pts = HEAD.filter(([, y]) => y >= y0 && y <= y1).map(([r, y]) => new THREE.Vector2(r * grow, y));
+    const m = new THREE.Mesh(new THREE.LatheGeometry(pts, 24, phi0, phi1 - phi0), material);
+    m.scale.set(SX, 1, SZ);
+    head.add(m);
+    return m;
+  };
   for (const s of [1, -1]) {
-    ball(0.022, face, s * 0.079, 0.108, -0.006, 0.45, 1, 0.75, head); // ears
-    const ex = s * 0.031,
-      ey = 0.118;
-    const white = ball(0.0135, mat('#ffffff', { rough: 0.3 }), ex, ey, zAt(ex, ey) - 0.004, 1, 1.15, 0.5, head);
+    ball(0.022, face, s * 0.074, 0.112, -0.006, 0.45, 1, 0.75, head); // ears
+    const ex = s * 0.03,
+      ey = 0.122;
+    const white = ball(0.013, mat('#ffffff', { rough: 0.3 }), ex, ey, zAt(ex, ey) - 0.004, 1.1, 0.85, 0.5, head);
     white.name = 'BARISTA_eye';
-    ball(0.0088, mat('#3a2618', { rough: 0.25 }), ex, ey - 0.001, zAt(ex, ey) + 0.0015, 1, 1.1, 0.5, head); // iris
-    ball(0.0026, mat('#ffffff'), ex + 0.003, ey + 0.004, zAt(ex, ey) + 0.0052, 1, 1, 0.6, head); // the eye's shine
-    const brow = rbox(0.03, 0.007, 0.008, 0.003, mat('#4a2e1c'), s * 0.032, 0.143, zAt(s * 0.032, 0.143) - 0.002, 0, head);
-    brow.rotation.z = s * -0.1;
-    ball(0.012, mat('#ec9f8a', { rough: 0.8 }), s * 0.05, 0.088, zAt(s * 0.05, 0.088) - 0.005, 1.1, 0.7, 0.4, head); // a little blush
+    ball(0.0078, mat('#6e6b45', { rough: 0.25 }), ex, ey - 0.0005, zAt(ex, ey) + 0.0015, 1, 1.05, 0.5, head); // hazel-green
+    ball(0.0042, mat('#1a1410'), ex, ey - 0.0005, zAt(ex, ey) + 0.004, 1, 1, 0.5, head); // pupil
+    ball(0.0022, mat('#ffffff'), ex + 0.0028, ey + 0.003, zAt(ex, ey) + 0.0058, 1, 1, 0.6, head); // the eye's shine
+    const brow = rbox(0.032, 0.009, 0.009, 0.004, dark, s * 0.03, 0.139, zAt(s * 0.03, 0.139) - 0.003, 0, head);
+    brow.rotation.z = s * 0.06;
   }
-  ball(0.012, face, 0, 0.098, zAt(0, 0.098) + 0.002, 0.9, 1, 1.1, head); // the nose
-  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.0032, 6, 16, Math.PI * 0.7), mat('#8c3c33', { rough: 0.5 }));
-  smile.rotation.z = Math.PI + Math.PI * 0.15;
-  smile.position.set(0, 0.074, zAt(0, 0.07) - 0.001);
-  smile.scale.set(1.15, 0.75, 0.6);
-  head.add(smile);
-  // short chestnut hair: the crown and the back of the head, swept up at the front
-  const hairMat = mat('#6a4128', { rough: 0.75 });
-  const crown = HEAD.filter(([, y]) => y >= 0.14);
-  const top = turned(crown.slice().reverse(), hairMat);
-  top.scale.set(0.92 * 1.06, 1.0, 1.04 * 1.05);
-  top.position.y = 0.004;
-  head.add(top);
-  const backHair = new THREE.Mesh(
+  ball(0.0105, face, 0, 0.101, zAt(0, 0.101), 0.8, 1.25, 1.0, head); // the nose
+  ball(0.0035, mat('#3a2a22'), -0.05, 0.094, zAt(-0.05, 0.094) + 0.0005, 1, 1, 0.5, head); // the mole on his right cheek
+  // the full beard and moustache: jaw, chin and upper lip, its top edge low on the cheeks and rising to the ears
+  const beardMat = mat('#2c211b', { rough: 0.95 });
+  const beard = shell(0, 0.125, 1.06, -Math.PI * 0.6, Math.PI * 0.6, beardMat);
+  {
+    const p = beard.geometry.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const a = Math.abs(Math.atan2(p.getX(i), p.getZ(i))) / Math.PI; // 0 the front, 0.5 the side
+      // the moustache (front), the cheek line (lowest a little off the front), up to the sideburns (sides)
+      const top = a < 0.1 ? 0.092 : a < 0.3 ? 0.092 - (a - 0.1) * 0.04 : 0.084 + (a - 0.3) * 0.13;
+      if (p.getY(i) > top) p.setY(i, top);
+    }
+    beard.geometry.computeVertexNormals();
+  }
+  // the lips between moustache and beard
+  ball(0.012, mat('#b9746a', { rough: 0.5 }), 0, 0.072, zAt(0, 0.072, 1.06) + 0.001, 1.45, 0.42, 0.45, head);
+  // the hair: near-black, short at the sides, full on top, swept back and over to his left
+  const hairMat = mat('#1f1713', { rough: 0.7 });
+  // the crown, its edge following his hairline: nearly straight across the forehead, a little higher at the temples
+  const top = new THREE.Mesh(
     new THREE.LatheGeometry(
-      HEAD.filter(([, y]) => y >= 0.07).map(([r, y]) => new THREE.Vector2(r * 1.05, y)),
-      18,
-      Math.PI * 0.6,
-      Math.PI * 0.8,
+      HEAD.filter(([, y]) => y >= 0.12).map(([r, y]) => new THREE.Vector2(Math.max(0.0005, r * 1.065), y)),
+      36,
     ),
     hairMat,
   );
-  backHair.scale.set(0.92, 1, 1.04);
-  head.add(backHair);
-  ball(0.04, hairMat, 0.01, 0.214, 0.045, 1.55, 0.38, 1.0, head).rotation.z = 0.1; // the quiff, swept up at the front
-  for (const s of [1, -1]) rbox(0.01, 0.03, 0.02, 0.004, hairMat, s * 0.078, 0.122, 0.018, 0, head); // sideburns
+  {
+    const p = top.geometry.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const a = Math.abs(Math.atan2(p.getX(i), p.getZ(i))) / Math.PI;
+      const edge = a < 0.16 ? 0.162 + a * 0.04 : a < 0.4 ? 0.168 - (a - 0.16) * 0.21 : 0.118;
+      if (p.getY(i) < edge) p.setY(i, edge);
+    }
+    top.geometry.computeVertexNormals();
+  }
+  top.scale.set(SX, 1.06, SZ);
+  head.add(top);
+  // the sides (short, behind the ears) and the back, down to the nape
+  const sides = shell(0.035, 0.23, 1.05, Math.PI * 0.42, Math.PI * 1.58, hairMat);
+  {
+    const p = sides.geometry.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const a = Math.abs(Math.atan2(p.getX(i), p.getZ(i))) / Math.PI; // 0.42 by the temple … 1 the back
+      const low = a < 0.55 ? 0.11 : 0.11 - (a - 0.55) * 0.15;
+      if (p.getY(i) < low) p.setY(i, low);
+    }
+    sides.geometry.computeVertexNormals();
+  }
+  // on top: full and high at the front, combed straight back and a little over to his left
+  const lock = ball(0.05, hairMat, 0.01, 0.214, 0.012, 1.3, 0.45, 1.55, head);
+  lock.rotation.set(-0.25, 0, -0.1);
 
   // where he works: the coffee machine (facing it) and the cookie pile on the back counter; the steam's place
   const station = (name, x, z, ry, y = FI) => {
