@@ -253,12 +253,13 @@ F.loungeChair(1.35, FI, 2.2, Wt, C.black);
 F.walnutCabinet(-1.3, FI, 1.75, 0, 1.2, 0.55, 1.0);
 F.recordPlayer(-1.5, FI + 1.0, 1.72, 0.08);
 F.blanket(-0.92, FI + 1.0, 1.75, -0.05);
-F.loungeChair(-1.95, FI, 0.85, N, C.black);
-F.loungeChair(-0.65, FI, 0.85, N, C.oliveDark);
-F.bistroTable(-1.3, FI, 0.55, '#1f2124');
-F.loungeChair(-1.95, FI, 2.65, 0, C.olive);
-F.loungeChair(-0.65, FI, 2.65, 0, C.navy);
-F.bistroTable(-1.3, FI, 2.95, '#1f2124');
+// on each side of it, two chairs facing each other across a round black table (owner, 2026-11-23)
+F.loungeChair(-2.15, FI, 0.6, E, C.black);
+F.bistroTable(-1.3, FI, 0.6, '#1f2124');
+F.loungeChair(-0.45, FI, 0.6, Wt, C.oliveDark);
+F.loungeChair(-2.15, FI, 2.9, E, C.olive);
+F.bistroTable(-1.3, FI, 2.9, '#1f2124');
+F.loungeChair(-0.45, FI, 2.9, Wt, C.navy);
 // west wall: the bench, the sign (signs()), the art, plants
 F.boxTable(-3.83, FI, 1.95, 0, 0.45, 2.9, 0.45, M.woodDark, 0.03);
 F.artPanel(painting, 0.95, 1.75, XW + 0.02, FI + 1.78, -1.25, E);
