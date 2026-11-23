@@ -881,7 +881,8 @@ export async function mirrors() {
     contactShadow(size.x, size.z, x, FI, z, ry);
   };
   place('Mirror_04_Live_Edge_Timber', 0.3, ZN + 0.12, 0, 0.8);
-  place('Mirror_01_Olive_Green_Organic_Ring', XW + 0.25, -10.15, Math.PI / 2, 0.8);
-  place('Mirror_03_Gray_Pink_Rock_Horseshoe', 1.7, -7.95, -Math.PI / 2, 0.9);
-  place('Mirror_02_Burgundy_Organic_Arch', 0.2, -6.2, Math.PI / 2, 0.9);
+  // the other three are small, standing about as high as a thigh (0.8 m; owner, 2026-11-23)
+  place('Mirror_01_Olive_Green_Organic_Ring', XW + 0.15, -10.15, Math.PI / 2, 0.8 / 1.72);
+  place('Mirror_03_Gray_Pink_Rock_Horseshoe', 1.8, -7.95, -Math.PI / 2, 0.8 / 1.89);
+  place('Mirror_02_Burgundy_Organic_Arch', 0.2, -6.2, Math.PI / 2, 0.8 / 1.76);
 }
