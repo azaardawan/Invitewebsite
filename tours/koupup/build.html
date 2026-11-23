@@ -27,12 +27,50 @@ try {
   const scene0 = new THREE.Scene();
   scene0.add(root);
   scene0.updateMatrixWorld(true);
-  // One mesh per material (and per kind: solid, walk-through, invisible wall): a phone draws it in few calls.
   const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
-  const buckets = new Map();
-  // the barista is kept as he is (his joints move in the tour), apart from the merge
+  // the barista and the waiter are kept as they are (their joints move in the tour), apart from the merge
   const people = ['BARISTA', 'CLEANER'].map((n) => root.getObjectByName(n));
   const isMan = (o) => { for (let p = o; p; p = p.parent) if (people.includes(p)) return true; return false; };
+
+  // ---- the items (owner, 2026-11-23): every piece of furniture and decor is its own item with a permanent code, so
+  // the owner can move and turn it in Admin → Tours → the editor, and name it by its code ("#37") ----
+  // loose pictures, signs and rugs become items too
+  for (const m of [...root.children]) {
+    if (!m.isMesh || !/^NOCOLLIDE_(rug|picture|sign)/.test(m.name)) continue;
+    const g = new THREE.Group();
+    g.name = m.name.replace('NOCOLLIDE_', '');
+    g.position.copy(m.position);
+    root.add(g);
+    g.updateMatrixWorld(true);
+    g.attach(m);
+  }
+  const hasMesh = (o) => { let y = false; o.traverse((x) => (y ||= x.isMesh)); return y; };
+  const items = root.children.filter((o) => o.isGroup && !people.includes(o) && hasMesh(o));
+  // the soft shadow and the invisible block made at an item's place go with it
+  for (const m of [...root.children]) {
+    if (!m.isMesh || !/^(NOCOLLIDE_shadow|COLLIDER_furniture)$/.test(m.name)) continue;
+    const g = items.find((g) => Math.abs(g.position.x - m.position.x) < 0.06 && Math.abs(g.position.z - m.position.z) < 0.06 && Math.abs(g.position.y - m.position.y) < 0.6);
+    if (g) g.attach(m);
+  }
+  // permanent codes: an item keeps its code from build to build (items.json, by its kind and first place); a new item
+  // gets the next free number; numbers are never reused
+  let registry = { next: 1, codes: {} };
+  try { const r = await fetch('items.json'); if (r.ok) registry = await r.json(); } catch {}
+  const used = new Set();
+  const codeOf = new Map();
+  for (const g of items) {
+    const p = g.position;
+    let fp = `${g.name || 'item'}@${p.x.toFixed(2)},${p.y.toFixed(2)},${p.z.toFixed(2)}`;
+    for (let k = 2; used.has(fp); k++) fp = fp.replace(/(~\d+)?$/, `~${k}`);
+    used.add(fp);
+    if (!(fp in registry.codes)) registry.codes[fp] = registry.next++;
+    codeOf.set(g, registry.codes[fp]);
+  }
+  const itemOf = (o) => { for (let p = o; p; p = p.parent) if (codeOf.has(p)) return p; return null; };
+
+  // One mesh per material (and per kind: solid, walk-through, invisible wall): a phone draws it in few calls. Each
+  // item's are merged on their own (the tour merges them all again once the owner's changes are applied).
+  const buckets = new Map();
   scene0.traverse(o => {
     if (!o.isMesh || isMan(o)) return;
     let kind = 'S';
@@ -44,13 +82,25 @@ try {
     if (!g.index) { const n=g.attributes.position.count; const idx=new Uint32Array(n); for(let i=0;i<n;i++) idx[i]=i; g.setIndex(new THREE.BufferAttribute(idx,1)); }
     g.clearGroups();
     g.applyMatrix4(o.matrixWorld);
+    const item = itemOf(o);
+    if (item) g.applyMatrix4(item.matrixWorld.clone().invert()); // in the item's own space
     g = mergeVertices(g, 1e-4);
-    const key = o.material.uuid + kind;
-    if (!buckets.has(key)) buckets.set(key, { mat: o.material, kind, geos: [] });
+    const key = (item ? codeOf.get(item) : '') + '|' + o.material.uuid + kind;
+    if (!buckets.has(key)) buckets.set(key, { mat: o.material, kind, item, geos: [] });
     buckets.get(key).geos.push(g);
   });
   const scene = new THREE.Scene();
   const out = new THREE.Group(); out.name = 'KOUPUP'; scene.add(out);
+  const itemNode = new Map();
+  for (const g of items) {
+    const node = new THREE.Group();
+    node.name = 'ITEM_' + codeOf.get(g);
+    node.userData = { label: g.name || 'item' };
+    g.getWorldPosition(node.position);
+    g.getWorldQuaternion(node.quaternion);
+    out.add(node);
+    itemNode.set(g, node);
+  }
   let n = 0;
   for (const b of buckets.values()) {
     // in chunks of under 65,536 points, so each can use small (16-bit) indices
@@ -61,7 +111,7 @@ try {
       merged.setIndex(new THREE.BufferAttribute(Uint16Array.from(merged.index.array), 1));
       const m = new THREE.Mesh(merged, b.mat);
       m.name = (b.kind === 'N' ? 'NOCOLLIDE_' : b.kind === 'C' ? 'COLLIDER_' : 'part_') + (n++);
-      out.add(m);
+      (b.item ? itemNode.get(b.item) : out).add(m);
       chunk = []; count = 0;
     };
     for (const g of b.geos) {
@@ -73,14 +123,16 @@ try {
   const startCopy = new THREE.Object3D(); startCopy.name='START';
   root.getObjectByName('START').getWorldPosition(startCopy.position);
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
-  // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the barista's places: kept as named points
+  // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the staff's places: kept as named points
   root.traverse(o => {
     if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam)|CLEANER_stop_|NAV_)/.test(o.name)) return;
     const h = new THREE.Object3D(); h.name = o.name; h.userData = o.userData; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
   });
   for (const m of people) out.add(m);
-  // the seats (SEAT_<n>): where a visitor sits, the way they face (yaw), the eye above the seat and, when a table is
-  // within reach, the spot on it nearest them (where their coffee is put down)
+  // the seats (SEAT_<n>), in their chair's item (they go with it): where a visitor sits, looking along its −Z; the eye
+  // above the seat; the spot nearest them on a table in reach (`table`, in that table's item `tableItem`), where their
+  // coffee is put down; where the waiter stands by it (`stand`, in the chair's item) and his walkway point (`nav`)
+  const round3 = (v) => [v.x, v.y, v.z].map(n => Math.round(n * 1000) / 1000);
   const v = new THREE.Vector3(), q = new THREE.Vector3();
   seats.forEach((s, i) => {
     const at = s.g.localToWorld(new THREE.Vector3(s.dx, s.h, s.dz * s.fwd));
@@ -89,7 +141,6 @@ try {
     const reach = at.clone().addScaledVector(fwd, 0.45);
     let best = null;
     for (const t of tables) {
-      const top = t.g.getWorldPosition(new THREE.Vector3()).y + t.h;
       if (Math.abs(t.g.getWorldPosition(v).y - floor) > 0.3) continue;
       const p = t.g.worldToLocal(q.copy(reach));
       if (t.round) { const r = Math.hypot(p.x, p.z), m = Math.max(0.05, t.hw - 0.09); if (r > m) { p.x *= m / r; p.z *= m / r; } }
@@ -97,21 +148,37 @@ try {
       p.y = t.h;
       const w = t.g.localToWorld(p.clone());
       const d = Math.hypot(w.x - at.x, w.z - at.z);
-      if (d < 1.05 && (!best || d < best.d)) best = { d, at: [w.x, top, w.z].map(n => Math.round(n * 1000) / 1000) };
+      if (d < 1.05 && (!best || d < best.d)) best = { d, t, local: p.clone() };
     }
+    const item = itemNode.get(s.g);
     const o = new THREE.Object3D();
     o.name = 'SEAT_' + i;
     o.position.copy(at);
-    o.userData = { yaw: Math.round(Math.atan2(-fwd.x, -fwd.z) * 1000) / 1000, eye: s.eye, ...(best ? { table: best.at } : {}), ...(waiterWays[i] ?? {}) };
-    out.add(o);
+    o.rotation.y = Math.atan2(-fwd.x, -fwd.z);
+    const extras = { eye: s.eye, local: true };
+    if (best) {
+      const tItem = itemNode.get(best.t.g);
+      // the table spot, in the table's item (the table's own group is that item: its space is the item's)
+      Object.assign(extras, tItem ? { table: round3(best.local), tableItem: tItem.name } : { table: round3(best.t.g.localToWorld(best.local)) });
+    }
+    const way = waiterWays[i];
+    if (way) {
+      const stand = new THREE.Vector3(...way.stand);
+      Object.assign(extras, { nav: way.nav, stand: round3(item ? item.worldToLocal(stand.clone()) : stand) });
+    }
+    o.userData = extras;
+    if (item) {
+      item.updateMatrixWorld(true);
+      item.attach(o);
+    } else out.add(o);
   });
-  console.log('seats', seats.length, 'with a table', out.children.filter(o => o.userData.table).length);
+  console.log('seats', seats.length, 'items', items.length);
   scene.updateMatrixWorld(true);
   let meshes = 0, tris = 0;
   scene.traverse(o => { if (o.isMesh) { meshes++; const g=o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; } });
   const glb = await new GLTFExporter().parseAsync(scene, { binary: true, maxTextureSize: 1024 });
   const bytes = new Uint8Array(glb);
   let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-  window.result = { b64: btoa(s), meshes, tris: Math.round(tris) };
+  window.result = { b64: btoa(s), meshes, tris: Math.round(tris), registry };
 } catch (e) { window.result = { error: String(e && e.stack || e) }; }
 </script></body></html>

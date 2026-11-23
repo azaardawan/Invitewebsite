@@ -17,6 +17,9 @@ Y up). The scan itself is the café's and is not kept in the repository.
 - `lib.js`: shapes, textures and materials. Every piece of furniture gets an invisible block (`COLLIDER_…`) so visitors
   walk round it; leaves, rugs and shadows are `NOCOLLIDE_…`; visitors start at `START` (the foot of the north stairs).
 
+Items: every piece of furniture and decor is an item `ITEM_<code>` the owner can move and turn in Admin → Tours → the
+editor; the codes are kept in `items.json` (never reuse a number; a moved item in code gets a new one).
+
 Build: `node tours/koupup/export.cjs` → `tours/koupup/out/koupup.glb` (about 6.5 MB), then upload it in Admin → Tours.
 Measured levels (scan coordinates): inside floor −1.24, terrace −1.45, inside ceiling 1.90 (LED cove at 1.62),
 terrace roof 1.65, bar 1.55, toilets 1.20; the street falls from −2.5 (north) to −3.15 (south).

@@ -1173,7 +1173,37 @@
       "makePublic": "Make the link public",
       "makePublicConfirm": "The tour will open at /tour/<link name>, and the private link stops working. Continue?",
       "renew": "New private link",
-      "renewConfirm": "A new private link is made and the current one stops working at once. Continue?"
+      "renewConfirm": "A new private link is made and the current one stops working at once. Continue?",
+      "editorTitle": "Editor: move and turn items",
+      "editorHint": "Every piece of furniture and decor has its own code (#37). Open the editor to move or turn any of them; visitors see your changes once saved.",
+      "openEditor": "Open the editor",
+      "editor": {
+        "heading": "Editor",
+        "loading": "Loading the place…",
+        "failed": "The 3D place couldn't be opened here.",
+        "noModel": "Upload the 3D model first.",
+        "showCodes": "Show items' codes",
+        "goTo": "Go to item",
+        "unsaved": "Unsaved changes",
+        "allSaved": "All saved",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved: visitors now see the place as you set it.",
+        "saveFailed": "The changes couldn't be saved. Try again.",
+        "noSuchItem": "There is no item #{code}.",
+        "move": "Move",
+        "turn": "Turn",
+        "axis": {
+          "x": "Left–right",
+          "y": "Up–down",
+          "z": "Front–back"
+        },
+        "cm": "Distances in centimetres from where the model has it.",
+        "turnBy": "Turned by",
+        "resetItem": "Put this item back",
+        "hint": "Click any item to pick it, then drag its arrows to move it or its ring to turn it. Walk with W A S D or the arrow keys, and drag to look around. Turn on the codes to see each item's number.",
+        "changed": "{n, plural, one {# item changed} other {# items changed}}"
+      }
     }
   },
   "invitation": {
