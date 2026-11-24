@@ -70,6 +70,28 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
 - Check the result: upload it to a tour that is still off, then open the link from Admin (the "off" page shows to
   visitors until it is turned on, so test with a second, test tour if the café's is already live).
 
+## People (owner, 2026-11-24: the character and NPC interaction skills)
+
+The staff are skinned bodies on one skeleton (`tours/koupup/people.js`; the bone names are in its header and in
+`src/components/tour/character.ts`): an adult man of about 1.80 m, ~7.6 heads; shoulders, elbows, wrists, two-part
+fingers and an opposable thumb, hips, knees and ankles bend the skin smoothly. Faces have eyes that turn to look,
+lids that blink, brows and a mouth for expression; a café's people keep their own faces (`eyes()` adds the parts).
+
+Each frame a person is posed by layers in a fixed order (`Character.update`): rest pose → the walk (the gait advances
+with the distance actually walked, so the feet keep pace with the floor; knees lift the swinging foot; heel strike and
+push-off) → bending and crouching → looking (head, then eyes) → each arm's two-bone IK toward its target (the elbow
+bending down and out; weights eased in and out) → the fingers' pose (relaxed, grip, pinch, flat) → blinking and the face.
+
+What they do is a script of steps (`interaction.ts`): walk to a place (turning first, slowing to a stop), step up to
+within reach, take (the hand reaches the thing's holding point; it is held only on contact), put down (its base on the
+surface), carry (upright, in front), and hand over (held out where both hands can reach; it changes hands when the
+receiver's hand is on it; nobody comes, it is put down for them). Every step has a time limit. A held thing stays in the
+world and follows its hand's socket each frame, so changing hands never moves it. The visitor's own hands
+(`makeFPHand`, the same anatomy) reach, close, carry, set down and pick up the same way, in the camera's space.
+
+`?debug=1` on a tour's link shows each hand's socket (green) and target (red) and keeps the measured error of every
+contact in `window.tourContacts` (all within about 1 cm in the checks of 2026-11-24).
+
 ## Items and the editor (owner, 2026-11-23)
 
 Every piece of furniture and decor of a tour's model is an **item**: a node `ITEM_<code>` (its extras' `label` says what

@@ -112,7 +112,7 @@ export function TourViewer({
         }
         const { TourEngine } = await import('./tour-engine');
         if (cancelled) return;
-        const e = new TourEngine({ container: el, model, reducedMotion, edits, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
+        const e = new TourEngine({ container: el, model, reducedMotion, edits, debug: new URLSearchParams(window.location.search).get('debug') === '1', onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
         engine.current = e;
         await e.load();
         if (!cancelled) setState('ready');

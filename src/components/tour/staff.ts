@@ -1,76 +1,48 @@
 /**
- * A café tour's waiter (owner, 2026-11-23): a person in the model named `CLEANER` with the barista's joints
- * (`CLEANER_torso`, `CLEANER_head`, `CLEANER_armL|R`, `CLEANER_foreL|R`, `CLEANER_handR`, `CLEANER_legL|R`), who goes
- * round the place wiping the tables: his round is the points `CLEANER_stop_<n>` (in order, looping; each faces the way
- * he faces there, its extras' `wipe` the seconds he wipes a table there, 0 to walk on). He waits, looking at them, when
- * a visitor stands in his way.
+ * A café tour's waiter (owner, 2026-11-23; rebuilt 2026-11-24 with the character and NPC interaction skills): a person
+ * of the model named `CLEANER` (skeleton as in character.ts) who goes round the place wiping the tables: his round is
+ * the points `CLEANER_stop_<n>` (in order, looping; each faces the way he faces there, its extras' `wipe` the seconds he
+ * wipes the table there, 0 to walk on). Wiping, his hand (the cloth under it) is on the table's top, found by looking
+ * down at it, and goes round in circles; the other hand rests on the edge. He waits for a visitor in his way.
  *
- * A seated visitor can call him (the page's «Call the waiter»): he leaves his round and walks to them along the
- * café's walkways (`NAV_<n>`, extras `links`), takes their order, fetches it at the counter (`NAV_0`) and brings it,
- * then goes back to his round.
+ * A seated visitor can call him: he walks to them along the café's walkways (`NAV_<n>`, extras `links`), takes the
+ * order, goes to the counter (`NAV_0`, then up to it), takes the order from the barista hand to hand, carries it back
+ * upright, steps up to the visitor and holds it out until their hand has it; then back to his round.
  */
 import * as THREE from 'three';
+import { Character } from './character';
+import { Actor, CONTACT, HOLD, type Kind } from './interaction';
 
-const WALK = 0.75; // m/s: an unhurried round
-const HURRY = 1.0; // m/s: on his way to a visitor
-const TURN = 3.2; // rad/s
-const JOINTS = ['torso', 'head', 'armL', 'armR', 'foreL', 'foreR', 'handR', 'legL', 'legR'] as const;
-type Joint = (typeof JOINTS)[number];
-/** Somewhere to go: where, the way to face there, how long to stay (wiping a table, or just waiting), then what. */
-type Goal = { at: THREE.Vector3; yaw?: number; stay?: number; wipe?: boolean; serving?: boolean; done?: () => void };
 /** Where the waiter stands by a seat, and the walkway point he comes from. */
 export type SeatSpot = { stand: THREE.Vector3; seat: THREE.Vector3; nav: number };
+type Stop = { at: THREE.Vector3; yaw: number; wipe: number };
+/** The height of what is under a point (a table's top), looking down from `from`; null if nothing. */
+export type SurfaceAt = (x: number, z: number, from: number) => number | null;
 
-function angleTo(a: number, b: number) {
-  let d = (b - a) % (Math.PI * 2);
-  if (d > Math.PI) d -= Math.PI * 2;
-  if (d < -Math.PI) d += Math.PI * 2;
-  return d;
-}
+const WALK = 0.75;
+const HURRY = 1.0;
 
 export class Cleaner {
-  private root: THREE.Object3D;
-  private j: Record<Joint, THREE.Object3D>;
-  private rest = new Map<THREE.Object3D, THREE.Euler>();
-  private stops: Goal[];
-  private nextStop = 0;
+  private a: Actor;
+  private stops: Stop[];
+  private next = 1;
   private nav: { at: THREE.Vector3; links: number[] }[];
-  private goals: Goal[] = [];
-  private phase: 'turn' | 'walk' | 'face' | 'stay' = 'turn';
-  private stayed = 0;
-  /** On his round, or serving a visitor (no round until he is done). */
   private serving = false;
-  private yaw: number;
-  private baseY: number;
-  private time = 0;
-  private walkPhase = 0;
-  private walking = 0;
-  private wiping = 0;
-  private look = 0;
-  private held: THREE.Object3D | null = null;
-  private cloth: THREE.Object3D | null;
-  private v = new THREE.Vector3();
-  private q = new THREE.Quaternion();
-  private q2 = new THREE.Quaternion();
+  private surface: SurfaceAt;
+  private viewer = new THREE.Vector3();
+  private wiping = false;
 
-  static find(scene: THREE.Object3D): Cleaner | null {
-    const root = scene.getObjectByName('CLEANER');
-    if (!root) return null;
-    const j = {} as Record<Joint, THREE.Object3D>;
-    for (const k of JOINTS) {
-      const o = root.getObjectByName(`CLEANER_${k}`);
-      if (!o) return null;
-      j[k] = o;
-    }
-    const stops: { n: number; s: Goal }[] = [];
+  static find(scene: THREE.Object3D, surface: SurfaceAt): Cleaner | null {
+    const ch = Character.find(scene, 'CLEANER');
+    if (!ch) return null;
+    const stops: { n: number; s: Stop }[] = [];
     const nav: { n: number; at: THREE.Vector3; links: number[] }[] = [];
     scene.traverse((o) => {
       let m = /^CLEANER_stop_(\d+)/.exec(o.name);
       if (m) {
         const at = o.getWorldPosition(new THREE.Vector3());
-        const fwd = new THREE.Vector3(0, 0, 1).transformDirection(o.matrixWorld);
-        const wipe = Number((o.userData as { wipe?: number }).wipe) || 0;
-        stops.push({ n: Number(m[1]), s: { at, yaw: wipe ? Math.atan2(fwd.x, fwd.z) : undefined, stay: wipe, wipe: wipe > 0 } });
+        const f = new THREE.Vector3(0, 0, 1).transformDirection(o.matrixWorld);
+        stops.push({ n: Number(m[1]), s: { at, yaw: Math.atan2(f.x, f.z), wipe: Number((o.userData as { wipe?: number }).wipe) || 0 } });
       }
       m = /^NAV_(\d+)/.exec(o.name);
       if (m) {
@@ -79,50 +51,113 @@ export class Cleaner {
       }
     });
     if (stops.length < 2) return null;
-    const navList: { at: THREE.Vector3; links: number[] }[] = [];
-    for (const p of nav) navList[p.n] = { at: p.at, links: p.links };
+    const list: { at: THREE.Vector3; links: number[] }[] = [];
+    for (const p of nav) list[p.n] = { at: p.at, links: p.links };
     return new Cleaner(
-      root,
-      j,
-      stops.sort((a, b) => a.n - b.n).map((x) => x.s),
-      navList,
+      ch,
+      stops.sort((x, y) => x.n - y.n).map((x) => x.s),
+      list,
+      surface,
     );
   }
 
-  private constructor(root: THREE.Object3D, j: Record<Joint, THREE.Object3D>, stops: Goal[], nav: { at: THREE.Vector3; links: number[] }[]) {
-    this.root = root;
-    this.j = j;
+  private constructor(ch: Character, stops: Stop[], nav: { at: THREE.Vector3; links: number[] }[], surface: SurfaceAt) {
+    this.a = new Actor(ch);
     this.stops = stops;
     this.nav = nav;
-    this.cloth = root.getObjectByName('CLEANER_cloth') ?? null;
-    for (const o of Object.values(j)) this.rest.set(o, o.rotation.clone());
-    const fwd = new THREE.Vector3(0, 0, 1).transformDirection(root.matrixWorld);
-    this.yaw = Math.atan2(fwd.x, fwd.z);
-    this.baseY = root.position.y;
+    this.surface = surface;
     // he begins at his first stop, wiping
-    this.goals.push(stops[0]!);
-    this.nextStop = 1;
-    this.phase = 'face';
+    this.a.then(...this.wipe(stops[0]!));
   }
 
-  /** Whether he can serve seated visitors (the model has walkways, a counter and a way to the seat). */
+  /** His person (for the debug view). */
+  get character() {
+    return this.a.ch;
+  }
+
   canServe(spot: SeatSpot | null) {
     return !!spot && this.nav.length > 1 && !!this.nav[0] && !!this.nav[spot.nav];
   }
-
   get busy() {
     return this.serving;
   }
 
-  private get here() {
-    return this.root.getWorldPosition(this.v);
+  // ---------- the round ----------
+
+  /** Someone in his way: a visitor just ahead of him, close (he waits). */
+  private blocked = () => {
+    const p = this.a.position;
+    const f = new THREE.Vector3(Math.sin(this.a.yaw), 0, Math.cos(this.a.yaw));
+    const to = this.viewer.clone().sub(p).setY(0);
+    return !this.serving && to.length() < 0.9 && to.dot(f) > 0;
+  };
+
+  private wipe(stop: Stop) {
+    const a = this.a;
+    const f = () => new THREE.Vector3(Math.sin(stop.yaw), 0, Math.cos(stop.yaw));
+    let top: number | null = null;
+    return [
+      a.face(() => stop.yaw),
+      {
+        limit: stop.wipe,
+        start: () => {
+          // the table's top in front of him
+          const p = stop.at.clone().addScaledVector(f(), 0.5);
+          const t = this.surface(p.x, p.z, stop.at.y + 1.3);
+          top = t !== null && t > stop.at.y + 0.25 && t < stop.at.y + 1.15 ? t : null;
+          this.wiping = top !== null;
+          if (top === null) return;
+          // lower tables: he bends more, and bends his knees
+          const h = top - stop.at.y;
+          a.ch.lean = THREE.MathUtils.clamp((0.95 - h) * 1.1, 0.15, 0.75);
+          a.ch.crouch = h < 0.55 ? 0.35 : 0;
+          a.ch.look(stop.at.clone().addScaledVector(f(), 0.5).setY(top));
+        },
+        run: (_dt: number, t: number) => {
+          if (top === null) return t > 1;
+          const fwd = f();
+          const side = new THREE.Vector3(fwd.z, 0, -fwd.x); // his left
+          // the cloth goes round in circles on the top (the hand palm down, the socket under the palm)
+          const c = stop.at.clone().addScaledVector(fwd, 0.45).addScaledVector(side, -0.08);
+          c.addScaledVector(fwd, Math.sin(t * 5) * 0.07).addScaledVector(side, Math.cos(t * 5) * 0.09);
+          c.y = top + 0.026 - 0.058; // the palm (with the cloth) on the top: the socket is 5.8 cm under the wrist
+          a.ch.reach.R = { at: c, quat: palmDown('R', stop.yaw), weight: 1 };
+          a.ch.hand.R = 'flat';
+          // the other hand flat on the table near its edge
+          const l = stop.at.clone().addScaledVector(fwd, 0.36).addScaledVector(side, 0.22);
+          l.y = top + 0.014 - 0.058;
+          a.ch.reach.L = { at: l, quat: palmDown('L', stop.yaw), weight: 0.9 };
+          a.ch.hand.L = 'flat';
+          return false;
+        },
+        end: () => {
+          this.wiping = false;
+          a.ch.reach.L = a.ch.reach.R = null;
+          a.ch.hand.L = a.ch.hand.R = 'relaxed';
+          a.ch.lean = 0;
+          a.ch.crouch = 0;
+          a.ch.look(null);
+        },
+      },
+      { run: (_d: number, t: number) => t > 0.35 },
+    ];
   }
 
-  /** The walkway points from the one nearest him to point `to` (the shortest way, by distance). */
+  private roundOn() {
+    if (this.serving || this.a.busy) return;
+    const stop = this.stops[this.next]!;
+    this.next = (this.next + 1) % this.stops.length;
+    this.a.then(...this.a.walkTo(() => stop.at, WALK, this.blocked));
+    if (stop.wipe) this.a.then(...this.wipe(stop));
+  }
+
+  // ---------- serving ----------
+
+  /** The walkway points from the one nearest him to point `to` (the shortest way). */
   private route(to: number): THREE.Vector3[] {
-    const here = this.here.clone();
-    let from = -1;
-    let best = Infinity;
+    const here = this.a.position;
+    let from = -1,
+      best = Infinity;
     this.nav.forEach((p, i) => {
       if (!p) return;
       const d = p.at.distanceTo(here);
@@ -132,7 +167,6 @@ export class Cleaner {
       }
     });
     if (from < 0 || !this.nav[to]) return [];
-    // Dijkstra over a handful of points
     const dist = this.nav.map(() => Infinity);
     const prev: number[] = this.nav.map(() => -1);
     const open = new Set<number>([from]);
@@ -158,213 +192,135 @@ export class Cleaner {
     return path;
   }
 
-  /** Leaves what he is doing and walks along the walkways to `to` (via its walkway point `nav`), then `then`. */
-  private goTo(nav: number, last: Goal) {
-    this.goals = [...this.route(nav).map((at) => ({ at, serving: true })), { ...last, serving: true }];
-    this.phase = 'turn';
+  private goVia(nav: number, last: THREE.Vector3) {
+    for (const p of this.route(nav)) this.a.then(...this.a.walkTo(() => p, HURRY));
+    this.a.then(...this.a.walkTo(() => last, HURRY));
   }
 
-  /** A seated visitor calls him: he comes to their seat (`arrived` once he stands by it, facing them). */
+  /** A seated visitor calls him: he comes to stand by their seat, facing them (`arrived`). */
   summon(spot: SeatSpot, arrived: () => void) {
     this.serving = true;
-    if (this.held) this.held.removeFromParent();
-    this.held = null;
-    const yaw = Math.atan2(spot.seat.x - spot.stand.x, spot.seat.z - spot.stand.z);
-    this.goTo(spot.nav, { at: spot.stand.clone(), yaw, done: arrived });
+    this.a.clear();
+    this.a.ch.reach.L = this.a.ch.reach.R = null;
+    this.a.ch.lean = this.a.ch.crouch = 0;
+    this.goVia(spot.nav, spot.stand);
+    this.a.then(this.a.face(() => yawTo(spot.stand, spot.seat)), { run: () => (arrived(), true) });
   }
 
-  /** Off to the counter for the order: `pickUp` is called there (it gives him the order with `hold`). */
-  fetch(pickUp: () => void) {
-    this.goTo(0, { at: this.nav[0]!.at.clone(), yaw: 0, stay: 0, done: pickUp });
+  /** Off to the counter for the order: up to the counter's front, facing the barista; then `there()`. */
+  fetch(there: () => void) {
+    const n0 = this.nav[0]!.at;
+    // up to the counter's front edge (from the walkway point, toward the barista's side)
+    const up = n0.clone().add(new THREE.Vector3(-0.06, 0, 0.42));
+    this.goVia(0, up);
+    this.a.then(this.a.face(() => 0), { run: () => (there(), true) });
   }
 
-  /** He takes it in his hand (the cloth goes in his pocket). */
-  hold(prop: THREE.Object3D) {
-    this.held = prop;
-    this.j.handR.add(prop);
-    prop.position.set(0, -0.02, 0.03);
-    if (this.cloth) this.cloth.visible = false;
+  /** Where his hand meets an order handed to him over the counter: half way between him and the giver, chest-high. */
+  meetAtCounter(giver?: THREE.Vector3) {
+    const p = this.a.position;
+    if (!giver) return p.clone().add(new THREE.Vector3(0.04, 1.16, 0.5));
+    return p.clone().lerp(giver, 0.5).setY(p.y + 1.16);
   }
 
-  /** Where his face is (a seated visitor turns to look at him when he comes). */
-  facePosition() {
-    this.root.updateMatrixWorld(true);
-    return this.j.head.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, -0.05, 0));
+  /** Takes an order waiting on the counter in front of him (his hand reaches it, then it is held). */
+  pick(prop: THREE.Object3D, kind: Kind) {
+    this.a.then(...this.a.take('R', prop, kind, 0.25));
   }
 
-  /** The world position of his right hand (where an order is handed to him). */
-  handPosition() {
-    this.root.updateMatrixWorld(true);
-    return this.j.handR.getWorldPosition(new THREE.Vector3());
+  /** His hand taking an order held out to him at `at` (called each frame): true once it is in his hand. */
+  receive(prop: THREE.Object3D, kind: Kind, at: THREE.Vector3) {
+    this.a.ch.reach.R = { at, quat: this.a.ch.handFacing('R', kind === 'coffee' ? 'cup' : 'cookie', this.a.yaw), socket: HOLD[kind].socket, weight: 1 };
+    this.a.ch.lean = this.a.leanFor('R', at);
+    this.a.ch.hand.R = 'relaxed';
+    if (!this.a.ch.touches('R', at, CONTACT * 1.6, HOLD[kind].socket)) return false;
+    this.a.held.R = { prop, kind, settle: 0, fromQ: prop.getWorldQuaternion(new THREE.Quaternion()) };
+    this.a.ch.reach.R = null;
+    this.a.ch.lean = 0;
+    return true;
   }
 
-  /** Back to the seat with it: `give` is told when he holds it out (the prop is then the page's). */
-  bring(spot: SeatSpot, give: (prop: THREE.Object3D) => void) {
-    const yaw = Math.atan2(spot.seat.x - spot.stand.x, spot.seat.z - spot.stand.z);
-    this.goTo(spot.nav, {
-      at: spot.stand.clone(),
-      yaw,
-      stay: 0.6,
-      done: () => {
-        const p = this.held;
-        this.held = null;
-        if (p) {
-          this.root.parent!.attach(p);
-          give(p);
-        }
-        this.resume();
+  /**
+   * Brings the order to the seat: he steps up close to the visitor and holds it out to where their hand will meet it
+   * (`meet()`); `taken(prop, at)` is their hand taking it. Not taken (they left), it goes on their table (`spot`).
+   */
+  bring(spot: SeatSpot, meet: () => THREE.Vector3 | null, taken: (prop: THREE.Object3D, at: THREE.Vector3) => boolean, table: () => THREE.Vector3, done: (prop: THREE.Object3D | null) => void) {
+    // closer than where he took the order: about 0.65 m from the seat, on the same side
+    const dir = spot.stand.clone().sub(spot.seat).setY(0).normalize();
+    const close = spot.seat.clone().setY(spot.stand.y).addScaledVector(dir, 0.65);
+    this.goVia(spot.nav, spot.stand);
+    this.a.then(...this.a.walkTo(() => close, 0.5), this.a.face(() => yawTo(close, spot.seat)));
+    let given: THREE.Object3D | null = null;
+    this.a.then(
+      ...this.a.handOver(
+        'R',
+        meet,
+        (prop, at) => {
+          const ok = taken(prop, at);
+          if (ok) given = prop;
+          return ok;
+        },
+        table,
+        (prop) => {
+          given = null;
+          done(prop);
+        },
+      ),
+      ...this.a.walkTo(() => spot.stand, 0.5),
+      {
+        run: () => {
+          if (given) done(null);
+          this.resume();
+          return true;
+        },
       },
-    });
+    );
   }
 
-  /** Back to his round (from where he stands, along the walkways to the next table). */
+  /** Back to his round (along the walkways to the next table). */
   resume() {
     this.serving = false;
-    if (this.cloth) this.cloth.visible = true;
-    if (this.held) {
-      this.held.removeFromParent();
-      this.held = null;
-    }
-    const stop = this.stops[this.nextStop]!;
-    // the walkway point nearest his next table, then the table
+    this.a.clear();
+    this.a.ch.reach.L = this.a.ch.reach.R = null;
+    const stop = this.stops[this.next]!;
     let near = 0;
     this.nav.forEach((p, i) => {
       if (p && p.at.distanceTo(stop.at) < this.nav[near]!.at.distanceTo(stop.at)) near = i;
     });
-    this.goals = this.route(near).map((at) => ({ at }));
-    this.phase = 'turn';
+    for (const p of this.route(near)) this.a.then(...this.a.walkTo(() => p, WALK));
   }
 
-  /** Moves him on by `dt`; `viewer` is the visitor's eye. Returns whether he is near enough to be seen (draw again). */
+  /** The world position of his face (a seated visitor looks up at him). */
+  facePosition() {
+    return this.a.ch.bone('head').getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.1, 0));
+  }
+
   update(dt: number, viewer: THREE.Vector3, seen: (at: THREE.Vector3) => boolean = () => true): boolean {
-    this.time += dt;
-    if (!this.goals.length && !this.serving) {
-      // on his round: the next table
-      this.goals.push(this.stops[this.nextStop]!);
-      this.nextStop = (this.nextStop + 1) % this.stops.length;
-      this.phase = 'turn';
-    }
-    const here = this.here.clone();
-    const toViewer = Math.hypot(viewer.x - here.x, viewer.z - here.z);
-    this.walking = 0;
-    this.wiping = 0;
-    const goal = this.goals[0];
-    if (!goal) {
-      // serving: standing by the visitor's seat (taking the order) or at the counter (waiting for it)
-      if (toViewer > 12 || !seen(here)) return false;
-      this.pose(dt, viewer, here, toViewer);
-      return true;
-    }
-    const turnTo = (yaw: number) => {
-      const d = angleTo(this.yaw, yaw);
-      const step = TURN * dt;
-      if (Math.abs(d) <= step) {
-        this.yaw = yaw;
-        return true;
-      }
-      this.yaw += Math.sign(d) * step;
-      return false;
-    };
-    const finish = () => {
-      this.goals.shift();
-      this.phase = 'turn';
-      goal.done?.();
-    };
-    if (this.phase === 'turn') {
-      const dx = goal.at.x - here.x,
-        dz = goal.at.z - here.z;
-      if (Math.hypot(dx, dz) < 0.02 || turnTo(Math.atan2(dx, dz))) this.phase = 'walk';
-    } else if (this.phase === 'walk') {
-      const dx = goal.at.x - here.x,
-        dz = goal.at.z - here.z;
-      const d = Math.hypot(dx, dz);
-      // a visitor in his way (just ahead): he waits for them (not the visitor he is serving, at their seat)
-      const ahead = ((viewer.x - here.x) * dx + (viewer.z - here.z) * dz) / Math.max(d, 1e-6);
-      const blocked = !goal.serving && toViewer < 0.9 && ahead > 0;
-      if (!blocked) {
-        const step = Math.min(d, (this.serving ? HURRY : WALK) * dt);
-        // up and down a step (the terrace's door): his height follows the way's
-        const k = d > 1e-6 ? step / d : 1;
-        this.moveTo(here.clone().set(here.x + dx * k, here.y + (goal.at.y - here.y) * k, here.z + dz * k));
-        this.walking = 1;
-        if (d - step < 0.01) {
-          if (goal.yaw !== undefined) this.phase = 'face';
-          else if (goal.stay) {
-            this.phase = 'stay';
-            this.stayed = 0;
-          } else finish();
-        }
-      }
-    } else if (this.phase === 'face') {
-      if (turnTo(goal.yaw!)) {
-        this.phase = 'stay';
-        this.stayed = 0;
-      }
-    } else {
-      this.stayed += dt;
-      const stay = goal.stay ?? 0;
-      if (goal.wipe) this.wiping = Math.min(1, this.stayed * 3, Math.max(0, (stay - this.stayed) * 3));
-      if (this.stayed >= stay && (stay > 0 || goal.done || !goal.serving)) finish();
-    }
-    // drawn again only while he can be seen: near, and in the picture
-    if (toViewer > 12 || !seen(here)) return false;
-    this.pose(dt, viewer, here, toViewer);
+    this.viewer.copy(viewer);
+    if (!this.a.busy && !this.serving) this.roundOn();
+    const a = this.a;
+    if (a.held.R) a.carry('R');
+    const here = a.position;
+    const far = Math.hypot(viewer.x - here.x, viewer.z - here.z);
+    if (!this.wiping) a.ch.look(far < 4 ? viewer : null);
+    a.ch.smile = far < 3 ? 0.8 : 0.5;
+    a.update(dt);
+    if (far > 12 || !seen(here)) return this.serving;
     return true;
   }
+}
 
-  private moveTo(world: THREE.Vector3) {
-    const p = this.root.parent;
-    this.root.position.copy(p ? p.worldToLocal(world.clone()) : world);
-    this.baseY = this.root.position.y;
-  }
+function yawTo(from: THREE.Vector3, to: THREE.Vector3) {
+  return Math.atan2(to.x - from.x, to.z - from.z);
+}
 
-  private pose(dt: number, viewer: THREE.Vector3, here: THREE.Vector3, far: number) {
-    for (const [o, e] of this.rest) o.rotation.copy(e);
-    const j = this.j;
-    this.root.rotation.set(0, this.yaw, 0);
-    this.root.position.y = this.baseY;
-    const t = this.time;
-    j.torso.scale.set(1, 1 + Math.sin(t * 2.1) * 0.006, 1);
-    if (this.walking) {
-      this.walkPhase += dt * (this.serving ? 8 : 6.5);
-      const s = Math.sin(this.walkPhase);
-      j.legL.rotation.x += s * 0.4;
-      j.legR.rotation.x -= s * 0.4;
-      j.armL.rotation.x -= s * 0.28;
-      if (!this.held) j.armR.rotation.x += s * 0.2;
-      j.foreR.rotation.x -= 0.35; // the cloth held a little forward
-      this.root.position.y += (Math.abs(Math.cos(this.walkPhase)) - 0.5) * 0.012;
-    }
-    if (this.held) {
-      // carrying an order: the hand up in front of him
-      j.armR.rotation.x -= 0.4;
-      j.foreR.rotation.x -= 1.0;
-    }
-    if (this.wiping) {
-      // bent over the table, the cloth going round in circles; the other hand on the table's edge
-      const w = this.wiping;
-      j.torso.rotation.x += 0.38 * w;
-      j.armR.rotation.x -= (0.95 + Math.sin(t * 6) * 0.18) * w;
-      j.armR.rotation.z += Math.cos(t * 6) * 0.22 * w;
-      j.foreR.rotation.x -= 0.35 * w;
-      j.armL.rotation.x -= 0.7 * w;
-      j.foreL.rotation.x -= 0.2 * w;
-      j.head.rotation.x += 0.25 * w;
-    }
-    // he looks at a visitor nearby (while not busy wiping)
-    let want = 0;
-    if (far < 4 && this.wiping < 0.5) {
-      const d = angleTo(this.yaw, Math.atan2(viewer.x - here.x, viewer.z - here.z));
-      if (Math.abs(d) < 1.6) want = THREE.MathUtils.clamp(d, -0.8, 0.8);
-    }
-    this.look += (want - this.look) * (1 - Math.exp(-dt * 4));
-    j.head.rotation.y += this.look;
-    // what he carries stays upright
-    if (this.held) {
-      this.root.updateMatrixWorld(true);
-      j.handR.getWorldQuaternion(this.q).invert();
-      this.root.getWorldQuaternion(this.q2);
-      this.held.quaternion.copy(this.q.multiply(this.q2));
-    }
-  }
+/** A hand flat, palm down, the fingers ahead (for wiping, or resting on a table), for the way he faces. */
+function palmDown(side: 'L' | 'R', yaw: number) {
+  const sx = side === 'L' ? 1 : -1;
+  // body frame: fingers (−Y) ahead, palm face (−sx·X) down: X = sx·up, Y = −ahead, Z = X × Y
+  const x = new THREE.Vector3(0, sx, 0);
+  const y = new THREE.Vector3(0, 0, -1);
+  const z = new THREE.Vector3().crossVectors(x, y);
+  const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+  return new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw).multiply(q);
 }

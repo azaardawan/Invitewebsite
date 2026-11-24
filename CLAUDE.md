@@ -87,7 +87,13 @@ product spec's §74 business rules override assumptions.
   anatomy, skeletal rigging, character animation, NPC behavior or object interactions (e.g. the tours' barista and
   waiter, `tours/<café>/barista.js`, `src/components/tour/barista.ts|staff.ts|visit.ts`), always consult and apply both
   skills: `character-anatomy-animation` and `npc-interaction-animation`. They are mandatory quality standards for all
-  character-related development in this project.
+  character-related development in this project. Build on the reusable system (2026-11-24): bodies are skinned on a
+  real skeleton (`tours/koupup/people.js`: spine, neck, shoulders, elbows, wrists, two-part fingers and thumb, hips,
+  knees, ankles; eyes, lids, brows); `src/components/tour/character.ts` poses them by layers (walk driven by the
+  distance walked, two-bone arm IK from `ik.ts`, finger poses, gaze, blinking); `interaction.ts` has the steps (walk,
+  approach within reach, take, place on a surface, carry, hand over on contact). Nothing changes hands without a hand
+  on it, and nothing flies; held things follow their hand's socket in the world. `?debug=1` on a tour shows sockets and
+  reach targets and logs each contact's error (`window.tourContacts`); `tests/unit/tour-ik.test.ts` tests the arithmetic.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

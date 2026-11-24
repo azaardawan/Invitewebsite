@@ -126,7 +126,7 @@ try {
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
   // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the staff's places: kept as named points
   root.traverse(o => {
-    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam)|CLEANER_stop_|NAV_)/.test(o.name)) return;
+    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam|cups|fill|handout|pile)|CLEANER_stop_|NAV_)/.test(o.name)) return;
     const h = new THREE.Object3D(); h.name = o.name; h.userData = o.userData; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
   });
   for (const m of people) out.add(m);
