@@ -16,6 +16,11 @@ Y up). The scan itself is the café's and is not kept in the repository.
   coffee down (`seat()`, `tableTop()` in `lib.js`; `SEAT_<n>` nodes in the model).
 - The second member of staff (`cleaner()` in `barista.js`): the same shirt in olive green (`models/shirt_*_olive.jpg`),
   going round the main floor with a cloth and wiping the tables (his round: `CLEANER_stop_<n>`).
+- `bar.js` and `menu.json` (owner, 2026-11-24): KOUP's menu (`menu/make.py` reads the café's online menu,
+  https://koupofficial.com/azadi, and writes `menu.json` with how each drink is made, and `menu/photos.jpg`), the syrup
+  rack along the window (labelled KOUP bottles and jars), the cold station (clear cups, garnish tray, milk, soda, water,
+  ice, blender), the pitcher and cups at the espresso machine (turned to face the barista), the till, and the café's
+  paper menu on every table.
 - `lib.js`: shapes, textures and materials. Every piece of furniture gets an invisible block (`COLLIDER_…`) so visitors
   walk round it; leaves, rugs and shadows are `NOCOLLIDE_…`; visitors start at `START` (the foot of the north stairs).
 

@@ -11,7 +11,7 @@
  */
 import * as THREE from 'three';
 import { Character } from './character';
-import { Actor, CONTACT, HOLD, type Kind } from './interaction';
+import { Actor, CONTACT, HOLD, type Kind, type Pay } from './interaction';
 
 /** Where the waiter stands by a seat, and the walkway point he comes from. */
 export type SeatSpot = { stand: THREE.Vector3; seat: THREE.Vector3; nav: number };
@@ -19,8 +19,9 @@ type Stop = { at: THREE.Vector3; yaw: number; wipe: number };
 /** The height of what is under a point (a table's top), looking down from `from`; null if nothing. */
 export type SurfaceAt = (x: number, z: number, from: number) => number | null;
 
-const WALK = 0.75;
-const HURRY = 1.0;
+/** His pace (m/s): going round, and serving (a brisk walk, as waiters do). */
+const WALK = 1.1;
+const HURRY = 1.3;
 
 export class Cleaner {
   private a: Actor;
@@ -145,9 +146,15 @@ export class Cleaner {
 
   private roundOn() {
     if (this.serving || this.a.busy) return;
-    const stop = this.stops[this.next]!;
-    this.next = (this.next + 1) % this.stops.length;
-    this.a.then(...this.a.walkTo(() => stop.at, WALK, this.blocked));
+    // on through the stops he only passes (no stop at each), to the next table he wipes
+    const path: THREE.Vector3[] = [];
+    let stop: Stop;
+    do {
+      stop = this.stops[this.next]!;
+      this.next = (this.next + 1) % this.stops.length;
+      path.push(stop.at);
+    } while (!stop.wipe && path.length < this.stops.length);
+    this.a.then(...this.a.walkPath(() => path, WALK, this.blocked));
     if (stop.wipe) this.a.then(...this.wipe(stop));
   }
 
@@ -192,9 +199,9 @@ export class Cleaner {
     return path;
   }
 
+  /** Along the walkways to point `nav`, then on to `last`, in one walk (no stop at each point). */
   private goVia(nav: number, last: THREE.Vector3) {
-    for (const p of this.route(nav)) this.a.then(...this.a.walkTo(() => p, HURRY));
-    this.a.then(...this.a.walkTo(() => last, HURRY));
+    this.a.then(...this.a.walkPath(() => [...this.route(nav), last], HURRY));
   }
 
   /** A seated visitor calls him: he comes to stand by their seat, facing them (`arrived`). */
@@ -205,6 +212,20 @@ export class Cleaner {
     this.a.ch.lean = this.a.ch.crouch = 0;
     this.goVia(spot.nav, spot.stand);
     this.a.then(this.a.face(() => yawTo(spot.stand, spot.seat)), { run: () => (arrived(), true) });
+  }
+
+  /** He takes the order: a nod (the head down and up), then `then()`. */
+  nod(then: () => void) {
+    const head = this.a.ch;
+    this.a.then({
+      limit: 1.1,
+      run: (_d, t) => {
+        head.look(this.viewer.clone().add(new THREE.Vector3(0, -0.35 * Math.sin(Math.min(1, t / 0.9) * Math.PI), 0)));
+        head.smile = 1;
+        return t > 1;
+      },
+      end: then,
+    });
   }
 
   /** Off to the counter for the order: up to the counter's front, facing the barista; then `there()`. */
@@ -230,7 +251,7 @@ export class Cleaner {
 
   /** His hand taking an order held out to him at `at` (called each frame): true once it is in his hand. */
   receive(prop: THREE.Object3D, kind: Kind, at: THREE.Vector3) {
-    this.a.ch.reach.R = { at, quat: this.a.ch.handFacing('R', kind === 'coffee' ? 'cup' : 'cookie', this.a.yaw), socket: HOLD[kind].socket, weight: 1 };
+    this.a.ch.reach.R = { at, quat: this.a.holdQuat('R', kind), socket: HOLD[kind].socket, weight: 1 };
     this.a.ch.lean = this.a.leanFor('R', at);
     this.a.ch.hand.R = 'relaxed';
     if (!this.a.ch.touches('R', at, CONTACT * 1.6, HOLD[kind].socket)) return false;
@@ -244,12 +265,12 @@ export class Cleaner {
    * Brings the order to the seat: he steps up close to the visitor and holds it out to where their hand will meet it
    * (`meet()`); `taken(prop, at)` is their hand taking it. Not taken (they left), it goes on their table (`spot`).
    */
-  bring(spot: SeatSpot, meet: () => THREE.Vector3 | null, taken: (prop: THREE.Object3D, at: THREE.Vector3) => boolean, table: () => THREE.Vector3, done: (prop: THREE.Object3D | null) => void) {
+  bring(spot: SeatSpot, meet: () => THREE.Vector3 | null, taken: (prop: THREE.Object3D, at: THREE.Vector3) => boolean, table: () => THREE.Vector3, done: (prop: THREE.Object3D | null) => void, pay?: Pay) {
     // closer than where he took the order: about 0.65 m from the seat, on the same side
     const dir = spot.stand.clone().sub(spot.seat).setY(0).normalize();
     const close = spot.seat.clone().setY(spot.stand.y).addScaledVector(dir, 0.65);
     this.goVia(spot.nav, spot.stand);
-    this.a.then(...this.a.walkTo(() => close, 0.5), this.a.face(() => yawTo(close, spot.seat)));
+    this.a.then(...this.a.walkTo(() => close, 0.7), this.a.face(() => yawTo(close, spot.seat)));
     let given: THREE.Object3D | null = null;
     this.a.then(
       ...this.a.handOver(
@@ -265,8 +286,12 @@ export class Cleaner {
           given = null;
           done(prop);
         },
+        8,
+        pay,
       ),
-      ...this.a.walkTo(() => spot.stand, 0.5),
+      // the money in his pocket (the hand to the front pocket of his trousers; there it is gone)
+      ...Actor.onlyIf(() => this.a.held.L?.kind === 'cash', this.a.putAway('L', () => this.pocket(), (cash) => cash.removeFromParent())),
+      ...this.a.walkTo(() => spot.stand, 0.8),
       {
         run: () => {
           if (given) done(null);
@@ -287,7 +312,12 @@ export class Cleaner {
     this.nav.forEach((p, i) => {
       if (p && p.at.distanceTo(stop.at) < this.nav[near]!.at.distanceTo(stop.at)) near = i;
     });
-    for (const p of this.route(near)) this.a.then(...this.a.walkTo(() => p, WALK));
+    this.a.then(...this.a.walkPath(() => this.route(near), WALK));
+  }
+
+  /** His left front trouser pocket (world). */
+  private pocket() {
+    return this.a.ch.root.localToWorld(new THREE.Vector3(0.17, 0.93, 0.1));
   }
 
   /** The world position of his face (a seated visitor looks up at him). */

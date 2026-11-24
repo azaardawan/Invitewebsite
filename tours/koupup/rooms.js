@@ -286,13 +286,33 @@ const SAND = mat('#c9b39a', { rough: 0.7 });
   const g = group(1.27, FI, 5.45, 0, 'bar_counter');
   rbox(1.66, 1.0, 0.7, 0.015, SAND, 0, 0, 0, 0, g);
   contactShadow(1.66, 0.7, 1.27, FI, 5.45);
-  // the espresso machine (facing the customers) and the paper cups on it
-  const m = group(1.45, FI + 1.0, 5.4, N, 'espresso');
+  // the espresso machine and the paper cups on it; its group heads, drip tray, steam wand and hot water face the barista
+  // (owner, 2026-11-24: he makes every drink of the menu at it), its back panel the customers
+  const m = group(1.45, FI + 1.0, 5.4, 0, 'espresso');
   const steel = mat('#cfd2d4', { metal: 0.8, rough: 0.25 });
+  const black = mat('#2a2a2a');
   rbox(0.8, 0.4, 0.5, 0.03, steel, 0, 0, 0, 0, m);
-  for (let i = 0; i < 4; i++) rbox(0.74, 0.012, 0.01, 0.003, mat('#8b8f92', { metal: 0.6 }), 0, 0.08 + i * 0.08, 0.255, 0, m);
-  rbox(0.8, 0.05, 0.12, 0.01, mat('#2a2a2a'), 0, 0, 0.3, 0, m);
-  for (const x of [-0.22, 0, 0.22]) cyl(0.035, 0.035, 0.05, mat('#2a2a2a'), x, 0.14, 0.28, 12, m);
+  for (let i = 0; i < 4; i++) rbox(0.74, 0.012, 0.01, 0.003, mat('#8b8f92', { metal: 0.6 }), 0, 0.3 + i * 0.022, -0.255, 0, m);
+  // the drip tray (cups stand on it under the group heads), the group heads and their handles
+  rbox(0.8, 0.05, 0.14, 0.01, mat('#3a3c3e', { metal: 0.5, rough: 0.4 }), 0, 0, 0.31, 0, m);
+  rbox(0.78, 0.004, 0.12, 0.002, mat('#8b8f92', { metal: 0.7, rough: 0.3 }), 0, 0.05, 0.31, 0, m);
+  for (const x of [-0.22, 0, 0.22]) {
+    cyl(0.04, 0.04, 0.035, steel, x, 0.265, 0.29, 16, m);
+    cyl(0.035, 0.03, 0.03, black, x, 0.238, 0.29, 16, m);
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.13, 10), black);
+    handle.position.set(x, 0.25, 0.37);
+    handle.rotation.x = Math.PI / 2 - 0.25;
+    m.add(handle);
+    cyl(0.016, 0.016, 0.01, mat('#d8dadc', { metal: 0.8, rough: 0.2 }), x, 0.37, 0.252, 12, m).rotation.x = Math.PI / 2; // the button
+  }
+  // the steam wand (left) and the hot water tap (right)
+  for (const [x, len] of [
+    [-0.35, 0.18],
+    [0.35, 0.09],
+  ]) {
+    cyl(0.012, 0.012, 0.05, steel, x, 0.275, 0.27, 10, m).rotation.x = Math.PI / 2;
+    cyl(0.006, 0.006, len, steel, x, 0.3 - len, 0.3, 10, m);
+  }
   const cups = [
     ['#f4f1ea', 0.04],
     ['#b48a5a', 0.04],
@@ -301,10 +321,10 @@ const SAND = mat('#c9b39a', { rough: 0.7 });
     ['#5b4032', 0.045],
     ['#5b4032', 0.045],
   ];
-  cups.forEach(([c, r], i) => cyl(r, r * 0.8, 0.28 + (i % 2) * 0.06, mat(c, { rough: 0.8 }), -0.3 + i * 0.12, 0.4, -0.05, 14, m));
-  rbox(0.16, 0.08, 0.1, 0.01, mat('#1f1f1f'), 0.55, 0, 0.05, 0, m); // the card machine
-  const sign = rbox(0.14, 0.12, 0.01, 0.003, mat('#f3efe6'), 0.38, 0, 0.18, 0, m);
-  sign.rotation.x = -0.25;
+  cups.forEach(([c, r], i) => cyl(r, r * 0.8, 0.28 + (i % 2) * 0.06, mat(c, { rough: 0.8 }), 0.3 - i * 0.12, 0.4, 0.05, 14, m));
+  rbox(0.16, 0.08, 0.1, 0.01, mat('#1f1f1f'), -0.55, 0, -0.05, 0, m); // the card machine
+  const sign = rbox(0.14, 0.12, 0.01, 0.003, mat('#f3efe6'), -0.38, 0, -0.18, 0, m);
+  sign.rotation.x = 0.25;
 }
 {
   // the cake case on its block
@@ -367,7 +387,7 @@ slab(-0.75, -0.56, FI, 1.55, 5.12, 8.6, mat('#ffffff', { map: speckleTex('#f1ead
         cyl(0.03, 0.03, 0.2, mat(['#e03b3b', '#3b7be0', '#e8c23a', '#46a35a'][(k + r) % 4]), dx - 0.3 + k * 0.12, 0.12 + r * 0.33, 0.18, 10, g);
   }
   rbox(1.8, 0.04, 0.62, 0.01, M.woodLight, 0, 0.85, 0, 0, g);
-  F.bottles(group(1.9, FI + 0.89, 6.1, Wt), 0, 1.6, 0, 0, ['#4a6b3a', '#8a5b3a', '#d6c9a3', '#3c3c3c'], 0.03, 0.26, 0.11);
+  // (the syrup bottles along the window: bar.js)
 }
 {
   // the tall drinks fridge (Kafeen)

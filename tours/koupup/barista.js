@@ -130,35 +130,9 @@ export async function barista() {
     o.rotation.y = ry;
     root.add(o);
   };
-  station('BARISTA_coffee', 1.45, 6.05, Math.PI);
+  station('BARISTA_coffee', 1.45, 5.96, Math.PI);
   station('BARISTA_cookies', 1.12, 7.72, 0.76);
-  station('BARISTA_steam', 1.45, 5.45, 0, FI + 1.42);
-  // the stack of clean cups beside the machine (he takes the top one), the spot where he sets a cup to fill it, and
-  // where he puts an order on the counter for a visitor standing back (the counter's free end, in front of him)
-  const CUP = { r0: 0.03, r1: 0.043, h: 0.085 };
-  const stack = group(1.98, FI + 1.0, 5.66, 0, 'cup_stack');
-  // two stay in the stack; the tour puts the top one (the one he takes) on them
-  for (let i = 0; i < 2; i++) {
-    const c = new THREE.Mesh(
-      new THREE.LatheGeometry(
-        [
-          [0.0005, 0],
-          [CUP.r0 - 0.004, 0],
-          [CUP.r0, 0.004],
-          [CUP.r1, CUP.h],
-          [CUP.r1 - 0.004, CUP.h],
-          [CUP.r0 - 0.004, 0.008],
-          [0.0005, 0.008],
-        ].map(([r, y]) => new THREE.Vector2(r, y)),
-        24,
-      ),
-      mat('#f7f5f0', { rough: 0.35 }),
-    );
-    c.position.y = i * 0.032; // nested, each sitting in the one below
-    stack.add(c);
-  }
-  station('BARISTA_cups', 1.98, 5.66, 0, FI + 1.0 + 2 * 0.032 + 0.0001);
-  station('BARISTA_fill', 1.62, 5.73, 0, FI + 1.0);
+  // (the machine's places, the cups and the syrup bottles: bar.js)
   station('BARISTA_handout', 0.64, 5.5, 0, FI + 1.0);
   // the top of the cookie pile (he takes the one lying there)
   station('BARISTA_pile', 1.55, 8.12, 0, FI + 0.94 + 0.081);

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { Joystick, useTouchScreen, webglAvailable } from '@/theme-sdk/gallery3d/Gallery3D';
 import type { TourActivity, TourEngine } from './tour-engine';
+import type { Menu, MenuItem } from './menu';
 import type { TourEdits } from './items';
 
 export type TourWords = {
@@ -19,10 +20,6 @@ export type TourWords = {
   credit: string;
   rotate: string;
   seeMenu: string;
-  getCoffee: string;
-  getCookie: string;
-  makingCoffee: string;
-  makingCookie: string;
   sip: string;
   bite: string;
   sit: string;
@@ -31,10 +28,18 @@ export type TourWords = {
   putCookie: string;
   pickCoffee: string;
   pickCookie: string;
-  callWaiter: string;
   waiterComing: string;
   waiterBringing: string;
-  noThanks: string;
+  order: string;
+  orderPrice: string;
+  making: string;
+  paying: string;
+  takeIt: string;
+  sitToOrder: string;
+  handsFull: string;
+  currency: string;
+  close: string;
+  waiterBrings: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -99,6 +104,9 @@ export function TourViewer({
   const [spot, setSpot] = useState<string | null>(null);
   // what the visitor can do: order at the counter, sip, bite, sit, put down, pick up (owner, 2026-11-23)
   const [act, setAct] = useState<TourActivity | null>(null);
+  // the café's menu (owner, 2026-11-24: KOUP's), open over the place
+  const [menu, setMenu] = useState<{ menu: Menu; photos: string | null } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const el = box.current;
@@ -112,10 +120,16 @@ export function TourViewer({
         }
         const { TourEngine } = await import('./tour-engine');
         if (cancelled) return;
-        const e = new TourEngine({ container: el, model, reducedMotion, edits, debug: new URLSearchParams(window.location.search).get('debug') === '1', onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
+        const debug = new URLSearchParams(window.location.search).get('debug') === '1';
+        const e = new TourEngine({ container: el, model, reducedMotion, edits, debug, onProgress: (s) => !cancelled && setProgress(s), onSpot: (k) => !cancelled && setSpot(k), onActivity: (a) => !cancelled && setAct(a) });
         engine.current = e;
+        // the debug view: the engine at hand (to put the visitor somewhere: `debugGo`)
+        if (debug) (window as unknown as { tourEngine: TourEngine }).tourEngine = e;
         await e.load();
-        if (!cancelled) setState('ready');
+        if (!cancelled) {
+          setMenu(e.menu);
+          setState('ready');
+        }
       } catch (err) {
         if (cancelled) return;
         console.warn('tour unavailable', err);
@@ -280,7 +294,23 @@ export function TourViewer({
         </a>
       ) : null}
 
-      {state === 'ready' && act ? <Actions act={act} words={words} engine={engine} /> : null}
+      {state === 'ready' && act ? <Actions act={act} words={words} engine={engine} onMenu={() => setMenuOpen(true)} /> : null}
+
+      {state === 'ready' && act && menu && menuOpen && act.menu ? (
+        <MenuSheet
+          name={name}
+          menu={menu.menu}
+          photos={menu.photos}
+          variant={act.menu}
+          act={act}
+          words={words}
+          onClose={() => setMenuOpen(false)}
+          onOrder={(id) => {
+            engine.current?.orderItem(id);
+            setMenuOpen(false);
+          }}
+        />
+      ) : null}
 
       {state === 'ready' && hint ? (
         <p
@@ -327,38 +357,38 @@ export function TourViewer({
 
 type Action = { key: string; label: string; icon: string; run: (e: TourEngine) => void };
 
+/** A price in the café's money: "4,500 IQD". */
+const money = (n: number, words: TourWords) => `${n.toLocaleString('en-US')} ${words.currency}`;
+
 /**
- * The visitor's buttons along the bottom (owner, 2026-11-23): at the counter «Get a coffee» / «Get a cookie» (the
- * barista makes it and hands it over), then «Take a sip» / «Take a bite» (five of each), «Sit down» by a chair, and
- * seated «Put the coffee down» / «Pick up the coffee». They wait while something is under way.
+ * The visitor's buttons along the bottom (owner, 2026-11-23; the menu 2026-11-24): «See the menu» at the counter (the
+ * barista makes what is chosen) or at a table (seated, the waiter brings it); then «Take a sip» / «Take a bite» (five
+ * of each), «Sit down» by a chair, and seated «Put the drink down» / «Pick up the drink». They wait while something is
+ * under way; a line above says how the order is going.
  */
-function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; engine: { current: TourEngine | null } }) {
-  const list: Action[] = [];
-  if (act.order.coffee) list.push({ key: 'getCoffee', label: words.getCoffee, icon: '☕', run: (e) => e.order('coffee') });
-  if (act.order.cookie) list.push({ key: 'getCookie', label: words.getCookie, icon: '🍪', run: (e) => e.order('cookie') });
-  if (act.coffee?.where === 'hand') list.push({ key: 'sip', label: words.sip, icon: '☕', run: (e) => e.sip() });
+function Actions({ act, words, engine, onMenu }: { act: TourActivity; words: TourWords; engine: { current: TourEngine | null }; onMenu: () => void }) {
+  const list: (Action & { open?: boolean })[] = [];
+  if (act.menu && !act.order) list.push({ key: 'openMenu', label: words.seeMenu, icon: '📋', run: () => onMenu(), open: true });
+  if (act.coffee?.where === 'hand') list.push({ key: 'sip', label: words.sip, icon: '🥤', run: (e) => e.sip() });
   if (act.cookie?.where === 'hand') list.push({ key: 'bite', label: words.bite, icon: '🍪', run: (e) => e.bite() });
   if (act.seat === 'seated' && act.coffee?.where === 'hand') list.push({ key: 'putCoffee', label: words.putCoffee, icon: '⬇', run: (e) => e.putDown('coffee') });
   if (act.seat === 'seated' && act.cookie?.where === 'hand') list.push({ key: 'putCookie', label: words.putCookie, icon: '⬇', run: (e) => e.putDown('cookie') });
   if (act.coffee?.where === 'table' && act.coffee.reach) list.push({ key: 'pickCoffee', label: words.pickCoffee, icon: '⬆', run: (e) => e.pickUp('coffee') });
   if (act.cookie?.where === 'table' && act.cookie.reach) list.push({ key: 'pickCookie', label: words.pickCookie, icon: '⬆', run: (e) => e.pickUp('cookie') });
-  // the waiter, for a seated visitor (owner, 2026-11-23): call him, then order from him at the seat
-  if (act.waiter === 'call') list.push({ key: 'callWaiter', label: words.callWaiter, icon: '🙋', run: (e) => e.callWaiter() });
-  if (act.waiterOrder.coffee) list.push({ key: 'waiterCoffee', label: words.getCoffee, icon: '☕', run: (e) => e.waiterOrder('coffee') });
-  if (act.waiterOrder.cookie) list.push({ key: 'waiterCookie', label: words.getCookie, icon: '🍪', run: (e) => e.waiterOrder('cookie') });
-  if (act.waiter === 'here') list.push({ key: 'noThanks', label: words.noThanks, icon: '👋', run: (e) => e.dismissWaiter() });
   if (act.seat === 'near') list.push({ key: 'sit', label: words.sit, icon: '🪑', run: (e) => e.sit() });
   if (act.seat === 'seated') list.push({ key: 'stand', label: words.stand, icon: '🚶', run: (e) => e.stand() });
-  const making =
-    act.making === 'coffee'
-      ? words.makingCoffee
-      : act.making === 'cookie'
-        ? words.makingCookie
+  const o = act.order;
+  const making = !o
+    ? null
+    : o.stage === 'pay'
+      ? words.paying.replace('{price}', money(o.price, words))
+      : o.stage === 'ready'
+        ? words.takeIt.replace('{item}', o.name)
         : act.waiter === 'coming'
           ? words.waiterComing
           : act.waiter === 'fetching' || act.waiter === 'bringing'
             ? words.waiterBringing
-            : null;
+            : words.making.replace('{item}', o.name);
   if (!list.length && !making) return null;
   return (
     <div
@@ -378,22 +408,23 @@ function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; 
       }}
     >
       {making ? (
-        <p role="status" style={{ ...GLASS, margin: 0, padding: '9px 16px', borderRadius: 999, fontSize: 14, fontWeight: 500 }}>
+        <p role="status" data-testid="tour-order-status" style={{ ...GLASS, margin: 0, padding: '9px 16px', borderRadius: 999, fontSize: 14, fontWeight: 500 }}>
           {making}
         </p>
       ) : null}
       {list.map((a) => {
         const sips = a.key === 'sip' ? act.coffee?.left : a.key === 'bite' ? act.cookie?.left : undefined;
+        const off = act.busy && !a.open;
         return (
           <button
             key={a.key}
             type="button"
             data-testid={`tour-${a.key}`}
-            disabled={act.busy}
+            disabled={off}
             onClick={() => engine.current && a.run(engine.current)}
             style={{
               ...GLASS,
-              background: 'rgba(20,16,14,.78)',
+              background: a.open ? 'rgba(249,249,239,.95)' : 'rgba(20,16,14,.78)',
               pointerEvents: 'auto',
               display: 'inline-flex',
               alignItems: 'center',
@@ -402,11 +433,11 @@ function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; 
               padding: '9px 16px',
               border: '1px solid rgba(255,255,255,.18)',
               borderRadius: 999,
-              color: '#fff',
+              color: a.open ? '#3a2a22' : '#fff',
               fontSize: 15,
               fontWeight: 600,
-              cursor: act.busy ? 'default' : 'pointer',
-              opacity: act.busy ? 0.55 : 1,
+              cursor: off ? 'default' : 'pointer',
+              opacity: off ? 0.55 : 1,
               whiteSpace: 'nowrap',
               touchAction: 'manipulation',
             }}
@@ -424,6 +455,179 @@ function Actions({ act, words, engine }: { act: TourActivity; words: TourWords; 
           </button>
         );
       })}
+    </div>
+  );
+}
+
+const CREAM = '#f9f9ef';
+const INK = '#3a2a22';
+const LINE = '#e4ddd2';
+
+/**
+ * The café's menu over the place (owner, 2026-11-24): at the counter as the café's own online menu (its categories,
+ * each drink's photo, name and price); at a table as its paper menu (the café's name, a band of diamonds, the items in
+ * lines with their prices). Choosing an item and «Order» gives the order: to the barista at the counter, to the waiter
+ * when seated (standing by a table, it is only read). An item is greyed out while the hand it goes in is full.
+ */
+function MenuSheet({
+  name,
+  menu,
+  photos,
+  variant,
+  act,
+  words,
+  onClose,
+  onOrder,
+}: {
+  name: string;
+  menu: Menu;
+  photos: string | null;
+  variant: 'counter' | 'table';
+  act: TourActivity;
+  words: TourWords;
+  onClose: () => void;
+  onOrder: (id: number) => void;
+}) {
+  const cats = menu.categories.filter((c) => menu.items.some((i) => i.cat === c.id));
+  const [cat, setCat] = useState(cats[0]?.id ?? '');
+  const [pick, setPick] = useState<MenuItem | null>(null);
+  const close = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    close.current?.focus();
+    const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [onClose]);
+  const free = (i: MenuItem) => (i.cup === 'cookie' ? act.free.cookie : act.free.coffee);
+  const seatedOrCounter = variant === 'counter' || act.seat === 'seated';
+  const paper = variant === 'table';
+  const TILE = 88;
+  const photo = (i: MenuItem): CSSProperties | null =>
+    photos && i.photo >= 0
+      ? {
+          backgroundImage: `url(${photos})`,
+          backgroundSize: `${menu.cols * TILE}px auto`,
+          backgroundPosition: `${-(i.photo % menu.cols) * TILE}px ${-Math.floor(i.photo / menu.cols) * TILE}px`,
+          backgroundRepeat: 'no-repeat',
+        }
+      : null;
+  const itemButton = (i: MenuItem, n: number) => {
+    const ok = free(i);
+    const on = pick?.id === i.id;
+    const ph = photo(i);
+    return (
+      <button
+        key={i.id}
+        type="button"
+        data-testid={`tour-menu-item-${i.id}`}
+        aria-pressed={on}
+        disabled={!ok}
+        title={ok ? undefined : words.handsFull}
+        onClick={() => setPick(i)}
+        style={
+          paper
+            ? { display: 'flex', alignItems: 'baseline', gap: 8, width: '100%', padding: '7px 4px', background: on ? '#efe7da' : 'transparent', border: 0, borderBottom: `1px solid ${LINE}`, color: INK, font: 'inherit', fontSize: 15, cursor: ok ? 'pointer' : 'default', opacity: ok ? 1 : 0.45, textAlign: 'start' }
+            : { display: 'grid', justifyItems: 'center', gap: 4, padding: '8px 6px 10px', background: on ? '#efe7da' : '#fff', border: `2px solid ${on ? '#8a5a3a' : 'transparent'}`, borderRadius: 16, color: INK, font: 'inherit', cursor: ok ? 'pointer' : 'default', opacity: ok ? 1 : 0.45, boxShadow: '0 1px 3px rgba(58,42,34,.12)' }
+        }
+      >
+        {paper ? (
+          <>
+            <span style={{ fontSize: 11, color: '#8a7a70', minWidth: 18 }}>{String(n + 1).padStart(2, '0')}</span>
+            <span style={{ flex: 1, fontWeight: 600 }}>
+              {i.name}
+              {i.local ? <span style={{ fontWeight: 400, color: '#8a7a70' }}> {i.local}</span> : null}
+            </span>
+            <span style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{i.price.toLocaleString('en-US')}</span>
+          </>
+        ) : (
+          <>
+            {ph ? <span aria-hidden style={{ ...ph, width: TILE, height: TILE, borderRadius: 12 }} /> : <span aria-hidden style={{ fontSize: 40, lineHeight: `${TILE}px` }}>{i.cup === 'cookie' ? '🍪' : '🥤'}</span>}
+            <span style={{ fontSize: 13.5, fontWeight: 600, lineHeight: 1.25, textAlign: 'center' }}>{i.name}</span>
+            <span style={{ fontSize: 12.5, color: '#8a6a52', fontVariantNumeric: 'tabular-nums' }}>{money(i.price, words)}</span>
+          </>
+        )}
+      </button>
+    );
+  };
+  const bar = !seatedOrCounter ? words.sitToOrder : pick && !free(pick) ? words.handsFull : null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={words.menu}
+      data-testid="tour-menu-sheet"
+      data-variant={variant}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'grid', placeItems: 'center', background: 'rgba(20,16,14,.45)', padding: 'max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left))' }}
+    >
+      <div
+        style={{
+          width: 'min(760px, 100%)',
+          maxHeight: '100%',
+          display: 'grid',
+          gridTemplateRows: 'auto auto 1fr auto',
+          background: paper ? '#fbfaf6' : CREAM,
+          color: INK,
+          borderRadius: paper ? 6 : 24,
+          border: paper ? `2px solid ${INK}` : 0,
+          boxShadow: '0 18px 50px rgba(0,0,0,.35)',
+          overflow: 'hidden',
+        }}
+      >
+        <header style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px 8px 18px' }}>
+          <h2 style={{ margin: 0, flex: 1, fontFamily: paper ? 'Georgia, "Times New Roman", serif' : 'inherit', fontWeight: paper ? 400 : 700, fontSize: paper ? 30 : 20, letterSpacing: paper ? 2 : 0 }}>
+            {paper ? name.toUpperCase() : name}
+            <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: 13, fontWeight: 500, letterSpacing: 0, marginInlineStart: 10, color: '#8a7a70' }}>{words.menu}</span>
+          </h2>
+          <button ref={close} type="button" onClick={onClose} aria-label={words.close} data-testid="tour-menu-close" style={{ width: 40, height: 40, borderRadius: 20, border: `1px solid ${LINE}`, background: '#fff', color: INK, fontSize: 18, cursor: 'pointer' }}>
+            ✕
+          </button>
+        </header>
+        {paper ? (
+          // the band of diamonds of the café's printed menu
+          <div aria-hidden style={{ height: 22, margin: '0 16px 6px', background: `${INK} repeating-linear-gradient(90deg, transparent 0 6px, rgba(243,237,228,.9) 6px 7px, transparent 7px 13px)` }} />
+        ) : (
+          <nav aria-label={words.menu} style={{ display: 'flex', gap: 6, overflowX: 'auto', padding: '2px 14px 10px', scrollbarWidth: 'none' }}>
+            {cats.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={cat === c.id}
+                onClick={() => setCat(c.id)}
+                style={{ flex: 'none', padding: '7px 14px', borderRadius: 999, border: `1px solid ${cat === c.id ? INK : LINE}`, background: cat === c.id ? INK : '#fff', color: cat === c.id ? CREAM : INK, font: 'inherit', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </nav>
+        )}
+        <div style={{ overflowY: 'auto', padding: paper ? '4px 18px 12px' : '0 14px 12px', minHeight: 0 }}>
+          {paper ? (
+            <div style={{ columnWidth: 220, columnGap: 22 }}>
+              {cats.map((c) => (
+                <section key={c.id} style={{ breakInside: 'avoid', marginBottom: 14 }}>
+                  <h3 style={{ margin: '6px 0 4px', textAlign: 'center', fontSize: 14, fontWeight: 600, letterSpacing: 1, borderBottom: `2px solid ${INK}`, paddingBottom: 4 }}>{c.label.toUpperCase()}</h3>
+                  {menu.items.filter((i) => i.cat === c.id).map(itemButton)}
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${TILE + 30}px, 1fr))`, gap: 10 }}>{menu.items.filter((i) => i.cat === cat).map(itemButton)}</div>
+          )}
+        </div>
+        <footer style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderTop: `1px solid ${LINE}`, background: paper ? '#fbfaf6' : CREAM }}>
+          <p style={{ margin: 0, flex: 1, fontSize: 13.5, color: '#6b5a50' }}>{bar ?? (variant === 'table' ? words.waiterBrings : pick ? `${pick.name}${pick.local ? ' ' + pick.local : ''}` : '')}</p>
+          <button
+            type="button"
+            data-testid="tour-menu-order"
+            disabled={!pick || !!bar || !act.canOrder}
+            onClick={() => pick && onOrder(pick.id)}
+            style={{ minHeight: 44, padding: '10px 20px', borderRadius: 999, border: 0, background: INK, color: CREAM, font: 'inherit', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: !pick || bar || !act.canOrder ? 0.45 : 1, whiteSpace: 'nowrap' }}
+          >
+            {pick ? words.orderPrice.replace('{price}', money(pick.price, words)) : words.order}
+          </button>
+        </footer>
+      </div>
     </div>
   );
 }

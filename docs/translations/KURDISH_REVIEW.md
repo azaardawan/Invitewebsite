@@ -2272,3 +2272,22 @@ The owner asked for a button by each drawer (2026-11-19) and for drawers to hold
 | `tour.waiterComing` | The waiter is on his way… | گارسۆنەکە لە ڕێگادایە… | گارسۆن د ڕێکێ دایە… |
 | `tour.waiterBringing` | Your order is on its way… | داواکارییەکەت لە ڕێگادایە… | داخوازیا تە د ڕێکێ دایە… |
 | `tour.noThanks` | No, thanks | نەخێر، سوپاس | نە، سوپاس |
+
+## Batch 72 — cafés' virtual tours: the café's menu (ordering, paying, the paper menu on the tables) — ✅ AUTO-APPROVED (2026-11-24, owner checks in Admin → Translations)
+
+Replaces `tour.getCoffee`, `tour.getCookie`, `tour.makingCoffee`, `tour.makingCookie`, `tour.callWaiter` and `tour.noThanks` (removed).
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.order` | Order | داوا بکە | داخاز بکە |
+| `tour.orderPrice` | Order · {price} | داوا بکە · {price} | داخاز بکە · {price} |
+| `tour.making` | Your {item} is being made… | {item}ەکەت ئامادە دەکرێت… | {item}یا تە دهێتە ئامادەکرن… |
+| `tour.paying` | Paying {price}… | {price} دەدەیت… | تو {price} ددەی… |
+| `tour.takeIt` | Take your {item} | {item}ەکەت وەربگرە | {item}یا خۆ وەرگرە |
+| `tour.sitToOrder` | Sit at the table to order | بۆ داواکردن لەسەر مێزەکە دابنیشە | بۆ داخازکرنێ ل سەر مێزێ ڕوینە |
+| `tour.handsFull` | Your hands are full | دەستەکانت پڕن | دەستێن تە تژینە |
+| `tour.currency` | IQD | دینار | دینار |
+| `tour.close` | Close | داخستن | گرتن |
+| `tour.waiterBrings` | The waiter will bring it to your table | گارسۆنەکە بۆ سەر مێزەکەت دەیهێنێت | گارسۆن دێ بۆ سەر مێزا تە ئینیت |
+| `tour.putCoffee` | Put the drink down | خواردنەوەکە دابنێ | ڤەخوارنێ دانە |
+| `tour.pickCoffee` | Pick up the drink | خواردنەوەکە هەڵبگرە | ڤەخوارنێ هلگرە |
