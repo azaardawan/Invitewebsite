@@ -83,6 +83,11 @@ product spec's §74 business rules override assumptions.
   item with a permanent code (`ITEM_<code>`, codes kept in `tours/<café>/items.json`, never reused), and the owner moves
   and turns items in Admin (tours: Admin → Tours → Open the editor, `src/components/admin/TourEditor.tsx`, saved in
   `tours.item_edits`). When the owner names an item by its code ("#37"), look it up there. docs/TOURS.md.
+- **Characters: two mandatory skills** (owner, 2026-11-24): whenever working on human characters, facial design, body
+  anatomy, skeletal rigging, character animation, NPC behavior or object interactions (e.g. the tours' barista and
+  waiter, `tours/<café>/barista.js`, `src/components/tour/barista.ts|staff.ts|visit.ts`), always consult and apply both
+  skills: `character-anatomy-animation` and `npc-interaction-animation`. They are mandatory quality standards for all
+  character-related development in this project.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
