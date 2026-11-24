@@ -4,6 +4,9 @@
  * the tours' soft animation style, so every café's barista hands over the same ones.
  */
 import * as THREE from 'three';
+import { HAND_POSES, type HandPose as BodyPose } from './character';
+
+export type HandPose = BodyPose | 'open';
 
 export const SIPS = 5;
 export const BITES = 5;
@@ -185,45 +188,104 @@ export function makeCookie(): Cookie {
 }
 
 // ---------- the visitor's hands ----------
-function capsule(r: number, len: number, m: THREE.Material) {
-  return new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 4, 10), m);
-}
+export type FPHand = THREE.Group & {
+  userData: { sx: number; pose: (name: HandPose, dt: number) => void; aim: (elbow: THREE.Vector3) => void; grip: THREE.Vector3; pinch: THREE.Vector3 };
+};
 
 /**
- * The visitor's hand holding a cup (round its body, the fingers across its front) or a cookie (pinched at its bottom),
- * with the wrist and a bit of sleeve going down out of the picture. `side` 1: the right hand, −1: the left.
- * The hand is placed round a thing at the group's origin (a cup standing on it, a cookie centred on it).
+ * The visitor's own hand (owner, 2026-11-24, the character skill): the same anatomy as the staff's (a palm with the
+ * ball of the thumb, four fingers of two parts, an opposable thumb), with the wrist, forearm and sleeve going out of
+ * the picture. Its origin is the wrist; its axes as theirs (−Y the fingers, +Z the thumb side, the palm's face toward
+ * −sx·X). `right`: the right hand. `pose(name, dt)` eases the fingers to a pose (open to reach, grip a cup, pinch a
+ * cookie); `grip` and `pinch` are the sockets where a held thing's holding point sits.
  */
-export function makeHand(side: 1 | -1, grip: 'cup' | 'cookie'): THREE.Group {
-  const g = new THREE.Group();
-  const skin = mat(SKIN, 0.7);
-  const add = (m: THREE.Object3D, x: number, y: number, z: number, rx = 0, ry = 0, rz = 0) => {
-    m.position.set(x * side, y, z);
-    m.rotation.set(rx, ry * side, rz * side);
-    g.add(m);
-    return m;
+export function makeFPHand(right: boolean): FPHand {
+  const sx = right ? -1 : 1;
+  const g = new THREE.Group() as FPHand;
+  const skin = mat(SKIN, 0.62);
+  const palm = new THREE.Mesh(new THREE.SphereGeometry(0.5, 18, 12), skin);
+  palm.scale.set(0.028, 0.107, 0.078);
+  palm.position.set(0, -0.051, 0.002);
+  g.add(palm);
+  const thenar = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 8), skin);
+  thenar.scale.set(0.9, 1.4, 1);
+  thenar.position.set(-sx * 0.006, -0.04, 0.022);
+  g.add(thenar);
+  const FING = [
+    { z: 0.024, len: [0.044, 0.044], r: 0.0088 },
+    { z: 0.008, len: [0.048, 0.048], r: 0.0092 },
+    { z: -0.008, len: [0.045, 0.044], r: 0.0088 },
+    { z: -0.023, len: [0.036, 0.034], r: 0.0075 },
+  ];
+  const seg = (len: number, r: number) => {
+    const geo = new THREE.CapsuleGeometry(r, Math.max(0.001, len - r * 1.2), 4, 10);
+    geo.translate(0, -len / 2, 0);
+    return new THREE.Mesh(geo, skin);
   };
-  if (grip === 'cup') {
-    // the palm on the cup's outer side, four fingers curling across its front, the thumb over the top edge
-    add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.082, 0.07), skin), 0.058, 0.04, 0.004);
-    for (let i = 0; i < 4; i++) {
-      const f = capsule(0.0085, 0.05, skin);
-      add(f, 0.024, 0.066 - i * 0.017, 0.038, 0, 0, Math.PI / 2 + 0.12 * side);
-    }
-    add(capsule(0.009, 0.034, skin), 0.035, 0.074, -0.012, 0.4, 0, 0.9);
-    // the wrist and the sleeve, toward the bottom corner of the picture
-    add(capsule(0.024, 0.12, skin), 0.09, -0.04, 0.03, 0.5, 0, 0.55);
-    add(new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.04, 0.16, 16), mat(SLEEVE, 0.95)), 0.15, -0.14, 0.08, 0.5, 0, 0.55);
-  } else {
-    // thumb in front, two fingers behind: the cookie held at its bottom edge
-    add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.065, 0.028), skin), 0.012, -0.072, -0.012, 0.15, 0, -0.25);
-    add(capsule(0.0095, 0.03, skin), 0.004, -0.046, 0.013, 0.2, 0, -0.35);
-    for (let i = 0; i < 3; i++) add(capsule(0.0088, 0.036, skin), -0.012 + i * 0.016, -0.04, -0.016, -0.3, 0, -0.15);
-    add(capsule(0.022, 0.12, skin), 0.05, -0.15, 0.0, 0.25, 0, -0.45);
-    add(new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.038, 0.16, 16), mat(SLEEVE, 0.95)), 0.1, -0.26, 0.02, 0.25, 0, -0.45);
-  }
+  const fingers = FING.map((f) => {
+    const a = new THREE.Group();
+    a.position.set(0, -0.095, f.z);
+    a.add(seg(f.len[0]!, f.r));
+    const b = new THREE.Group();
+    b.position.y = -f.len[0]!;
+    b.add(seg(f.len[1]!, f.r * 0.92));
+    a.add(b);
+    g.add(a);
+    return [a, b] as const;
+  });
+  const ta = new THREE.Group();
+  ta.position.set(-sx * 0.012, -0.028, 0.03);
+  const taRest = new THREE.Euler(-0.5, 0, -sx * 0.25);
+  const tma = seg(0.034, 0.011);
+  ta.add(tma);
+  const tb = new THREE.Group();
+  tb.position.y = -0.036;
+  tb.add(seg(0.028, 0.0095));
+  ta.add(tb);
+  g.add(ta);
+  // the forearm and the sleeve, from the wrist back toward the elbow (out of the picture)
+  // (narrowing to the wrist; turned each frame toward the elbow, out of the picture: `aim`)
+  const foreGeo = new THREE.CylinderGeometry(0.036, 0.027, 0.26, 16);
+  foreGeo.translate(0, 0.13, 0);
+  const fore = new THREE.Mesh(foreGeo, skin);
+  g.add(fore);
+  const sleeveGeo = new THREE.CylinderGeometry(0.052, 0.046, 0.24, 18);
+  sleeveGeo.translate(0, 0.34, 0);
+  const sleeve = new THREE.Mesh(sleeveGeo, mat(SLEEVE, 0.95));
+  g.add(sleeve);
+  const up = new THREE.Vector3(0, 1, 0);
+  const now = structuredClone(HAND_POSES.relaxed);
+  const q = new THREE.Quaternion(),
+    e = new THREE.Euler();
+  g.userData = {
+    sx,
+    aim: (elbow) => {
+      const d = elbow.clone().normalize();
+      fore.quaternion.setFromUnitVectors(up, d);
+      sleeve.quaternion.copy(fore.quaternion);
+    },
+    grip: new THREE.Vector3(-sx * 0.058, -0.062, 0),
+    pinch: new THREE.Vector3(-sx * 0.022, -0.115, 0.03),
+    pose: (name, dt) => {
+      const want = name === 'open' ? OPEN : HAND_POSES[name];
+      const k = dt > 0 ? 1 - Math.pow(0.5, dt / 0.06) : 1;
+      now.f.forEach((f, i) => {
+        f[0] += (want.f[i]![0] - f[0]) * k;
+        f[1] += (want.f[i]![1] - f[1]) * k;
+        fingers[i]![0].quaternion.setFromEuler(e.set(0, 0, -sx * f[0]));
+        fingers[i]![1].quaternion.setFromEuler(e.set(0, 0, -sx * f[1]));
+      });
+      now.t[0] += (want.t[0] - now.t[0]) * k;
+      now.t[1] += (want.t[1] - now.t[1]) * k;
+      ta.quaternion.setFromEuler(taRest).multiply(q.setFromEuler(e.set(0, 0, -sx * now.t[0])));
+      tb.quaternion.setFromEuler(e.set(-now.t[1] * 0.4, 0, -sx * now.t[1]));
+    },
+  };
+  g.userData.pose('relaxed', 0);
   return g;
 }
+/** Fingers a little open, reaching for something. */
+const OPEN = { f: [[0.18, 0.2], [0.2, 0.22], [0.24, 0.26], [0.3, 0.3]] as [number, number][], t: [0.05, 0.1] as [number, number] };
 
 /** Frees what a prop made (its shapes; the shared materials stay for the next one). */
 export function disposeProp(o: THREE.Object3D) {

@@ -37,6 +37,8 @@ export type TourOptions = {
   onSpot?: (key: string | null) => void;
   /** What the visitor can do (sit, order, sip…) changed: the page's buttons. */
   onActivity?: (a: TourActivity) => void;
+  /** The debug view of the staff's hands (sockets, reach targets, contact errors): `?debug=1` on the link. */
+  debug?: boolean;
   /** The owner's changes to the model's items (Admin → Tours → the editor), applied when it loads. */
   edits?: TourEdits;
   /**
@@ -261,7 +263,7 @@ export class TourEngine {
       this.seats.push({ at, yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table, spot });
     });
     // The barista and what the visitor is given.
-    this.visit = new Visit(this.scene, this.camera, this.env);
+    this.visit = new Visit(this.scene, this.camera, this.env, (x, z, from) => this.surfaceBelow(x, z, from), !!this.o.debug);
 
     // Where visitors begin: the START node, or an open spot near the middle of the model.
     let start: THREE.Object3D | undefined;
@@ -351,6 +353,15 @@ export class TourEngine {
     this.ray.far = depth;
     const hit = this.ray.intersectObjects(this.colliders, false)[0];
     return hit ? hit.point.y : null;
+  }
+
+  /** The top of what is really there under (x, z) (a table's top), looking down from `from`: invisible walls ignored. */
+  private surfaceBelow(x: number, z: number, from: number): number | null {
+    this.ray.set(this.v.set(x, from, z), this.down);
+    this.ray.near = 0;
+    this.ray.far = 2.5;
+    for (const hit of this.ray.intersectObjects(this.colliders, false)) if (!named(hit.object, 'COLLIDER')) return hit.point.y;
+    return null;
   }
 
   /** Whether walking from here by (dx, dz) runs into something between the knees and the head. */
@@ -586,6 +597,7 @@ export class TourEngine {
     const seat = this.nearSeat;
     if (!seat || this.seated || this.glide) return;
     this.seated = { seat, pos: this.pos.clone(), floorY: this.floorY };
+    if (this.visit) this.visit.seated = true;
     const to = seat.at.clone();
     to.y += seat.eye;
     this.glideTo(to, seat.yaw, -0.12);
@@ -595,7 +607,7 @@ export class TourEngine {
   /** Calls the waiter to the seat (seated). */
   callWaiter() {
     const spot = this.seated?.seat.spot;
-    if (spot && this.visit?.callWaiter(spot)) {
+    if (spot && this.visit?.callWaiter(spot, this.seated?.seat.table ?? null)) {
       this.emit();
       this.kick();
     }
@@ -623,6 +635,7 @@ export class TourEngine {
     // a waiter on his way for the order is sent back (one already bringing it still hands it over)
     this.visit?.dismissWaiter();
     this.seated = null;
+    if (this.visit) this.visit.seated = false;
     this.floorY = s.floorY;
     this.glideTo(s.pos.clone().setY(s.floorY + EYE), this.yaw, 0);
     this.emit();

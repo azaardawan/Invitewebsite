@@ -1,53 +1,76 @@
 /**
- * What a visitor has in a café's tour (owner, 2026-11-23): the coffee and the cookie the barista hands them, held in
- * their own hands at the bottom of the picture (drawn over the place, never into a wall), a sip or a bite at a time
- * (`SIPS`, `BITES`), put down on the table by their seat and picked up again.
+ * What a visitor has in a café's tour (owner, 2026-11-23; rebuilt 2026-11-24 with the character and NPC interaction
+ * skills): the coffee and the cookie, in their own hands at the bottom of the picture (drawn over the place, never
+ * into a wall), a sip or a bite at a time (`SIPS`, `BITES`), put down on the table by their seat and picked up again.
+ *
+ * Nothing flies: every change of hands is a hand reaching. The barista (or the waiter) holds an order out; the
+ * visitor's hand comes up, reaches it, the fingers close, and only then is it theirs (it doesn't move as it changes
+ * hands); their hand brings it back. Putting down: the hand takes it to the table, sets it on the top and opens.
+ * Picking up: the hand reaches it on the table. The visitor's hands are in the picture's own space (the camera's), a
+ * world point reached is converted to it each frame (the hand meets the thing where it is seen).
  */
 import * as THREE from 'three';
 import { Barista } from './barista';
-import { Cleaner, type SeatSpot } from './staff';
-import { BITES, SIPS, disposeProp, makeCookie, makeCup, makeHand, type Cookie, type Cup } from './props';
+import { Cleaner, type SeatSpot, type SurfaceAt } from './staff';
+import { BITES, SIPS, disposeProp, makeCookie, makeCup, makeFPHand, type Cookie, type Cup, type FPHand } from './props';
+import { holdingQuat } from './character';
+import { Actor, CONTACTS, HOLD, logContact } from './interaction';
+import { approach } from './ik';
 
 export type Treat = 'coffee' | 'cookie';
-type Where = 'barista' | 'flying' | 'hand' | 'table';
+type Where = 'staff' | 'reaching' | 'hand' | 'placing' | 'table';
 type Held = {
   kind: Treat;
   /** Sips (or bites) left. */
   left: number;
   where: Where;
   prop: Cup | Cookie;
-  /** In the hand: the hand and the prop (in the picture's own space). */
-  holder: THREE.Group;
+  /** The visitor's hand holding it (or reaching for it), and which hand. */
+  hand: FPHand | null;
   side: 1 | -1 | 0;
+  /** Where the hand's holding point is now (camera space), and how the thing is turned there (camera space). */
+  grip: THREE.Vector3;
+  itemQ: THREE.Quaternion;
+  /** A world point the hand is reaching (to take it there, or to put it down there). */
+  target: (() => THREE.Vector3) | null;
+  /** Putting down: where its base goes, and how it is turned there (world). */
+  place: { at: THREE.Vector3; q: THREE.Quaternion } | null;
   /** A sip or a bite under way (0…1). */
   act: number | null;
   acted: boolean;
   /** Finished (empty, eaten): going out of the picture, then gone. */
   done: number | null;
 };
-type Flight = { obj: THREE.Object3D; from: THREE.Vector3; q0: THREE.Quaternion; to: () => { at: THREE.Vector3; q: THREE.Quaternion }; t: number; dur: number; end: () => void };
 
-/** Where each hand holds things in the picture (camera space), and how it is turned. */
+/** Where each hand holds things in the picture (camera space: its holding point), and how the hand is turned. */
 const SLOT = {
-  1: { at: new THREE.Vector3(0.2, -0.2, -0.46), rot: new THREE.Euler(0.12, -0.3, 0.04) },
-  [-1]: { at: new THREE.Vector3(-0.2, -0.185, -0.46), rot: new THREE.Euler(0.1, 0.32, -0.04) },
+  1: new THREE.Vector3(0.19, -0.17, -0.46),
+  [-1]: new THREE.Vector3(-0.19, -0.16, -0.46),
 } as const;
-const MOUTH: Record<Treat, THREE.Vector3> = { coffee: new THREE.Vector3(0.015, -0.085, -0.2), cookie: new THREE.Vector3(0.0, -0.035, -0.17) };
+/** The holding point at the mouth (a sip, a bite). */
+const MOUTH: Record<Treat, THREE.Vector3> = { coffee: new THREE.Vector3(0.025, -0.06, -0.2), cookie: new THREE.Vector3(0.0, -0.045, -0.165) };
 const DOWN = new THREE.Vector3(0, -0.42, 0.05);
 const ACT_TIME = 1.25;
+/** How far a visitor's hand reaches from their eye (metres). */
+const REACH = 0.9;
+/** A hand's contact: within this of where it reaches (metres). */
+const TOUCH = 0.02;
+const Y = new THREE.Vector3(0, 1, 0);
+const TURN = new THREE.Quaternion().setFromAxisAngle(Y, Math.PI); // the body's frame (+Z ahead) to the camera's (−Z)
 
 const bell = (k: number) => Math.sin(Math.PI * Math.min(1, Math.max(0, k)));
 
 export class Visit {
   readonly barista: Barista | null;
-  /** The member of staff going round the place, wiping the tables. */
+  /** The waiter going round the place, wiping the tables. */
   private cleaner: Cleaner | null;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private hud = new THREE.Scene();
   private hudCam = new THREE.PerspectiveCamera(70, 1, 0.01, 10);
   private items: Record<Treat, Held | null> = { coffee: null, cookie: null };
-  private flights: Flight[] = [];
+  /** Hands going back down after letting something go. */
+  private leaving: { hand: FPHand; t: number }[] = [];
   private crumbs: { m: THREE.Mesh; v: THREE.Vector3; age: number }[] = [];
   private crumbGeo = new THREE.SphereGeometry(0.0035, 6, 4);
   private crumbMat = new THREE.MeshStandardMaterial({ color: '#c68a4c', roughness: 0.9 });
@@ -56,37 +79,58 @@ export class Visit {
   /** The waiter serving the seated visitor: on his way, here for the order, fetching it, bringing it. */
   private waiter: 'coming' | 'here' | 'fetching' | 'bringing' | null = null;
   private waiterSpot: SeatSpot | null = null;
+  private waiterTable: THREE.Vector3 | null = null;
   /** Somewhere the visitor's eyes turn to (the waiter's face, when he comes to their seat). */
   lookAt: THREE.Vector3 | null = null;
-  /** An order waiting at the counter for the barista to be free (or, with no barista, for the waiter to take it). */
-  private pending: { kind: Treat; prop: Cup | Cookie; wait: number } | null = null;
+  /** An order waiting at the counter for the barista to be free. */
+  private pending: { kind: Treat; prop: Cup | Cookie } | null = null;
+  /** Whether the visitor is seated (the waiter hands it to them only then). */
+  seated = false;
   private v = new THREE.Vector3();
   private frustum = new THREE.Frustum();
   private m4 = new THREE.Matrix4();
   private sphere = new THREE.Sphere();
 
-  constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, env: THREE.Texture | null) {
+  /** The debug view (`?debug=1`): each hand's socket (green) and where it reaches (red), and the contacts' errors. */
+  private debug: THREE.Mesh[] | null = null;
+
+  constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, env: THREE.Texture | null, surface: SurfaceAt, debug = false) {
     this.scene = scene;
     this.camera = camera;
     this.barista = Barista.find(scene);
-    this.cleaner = Cleaner.find(scene);
+    this.cleaner = Cleaner.find(scene, surface);
     this.hud.environment = env;
     this.hud.environmentIntensity = 0.75;
     this.hud.add(new THREE.HemisphereLight(0xfff6ee, 0x8a8178, 0.5));
     const sun = new THREE.DirectionalLight(0xfff1e2, 0.8);
     sun.position.set(0.4, 1, 0.6);
     this.hud.add(sun);
+    if (debug) {
+      const geo = new THREE.SphereGeometry(0.012, 8, 6);
+      const green = new THREE.MeshBasicMaterial({ color: '#19c25a', depthTest: false });
+      const red = new THREE.MeshBasicMaterial({ color: '#e0342c', depthTest: false });
+      this.debug = Array.from({ length: 8 }, (_, i) => {
+        const m = new THREE.Mesh(geo, i % 2 ? red : green);
+        m.renderOrder = 20;
+        scene.add(m);
+        return m;
+      });
+      (window as unknown as { tourContacts: typeof CONTACTS }).tourContacts = CONTACTS;
+    }
   }
 
-  /** What the visitor has, for the page's buttons. `near`: where the visitor is (things on a table within reach). */
+  // ---------- what the page shows ----------
+
+  /** What the visitor has, for the page's buttons. `near`: where the visitor's eye is. */
   state(near: THREE.Vector3) {
     const one = (k: Treat) => {
       const h = this.items[k];
       if (!h || h.done !== null || (h.where !== 'hand' && h.where !== 'table')) return null;
-      const reach = h.where === 'table' && Math.hypot(h.prop.position.x - near.x, h.prop.position.z - near.z) < 1.5 && Math.abs(h.prop.position.y - near.y) < 1.6;
-      return { left: h.left, where: h.where, reach };
+      const p = Actor.holdPoint(h.prop, k);
+      const reach = h.where === 'table' && p.distanceTo(near) < REACH;
+      return { left: h.left, where: h.where as 'hand' | 'table', reach };
     };
-    const busy = this.flights.length > 0 || Object.values(this.items).some((h) => h && h.act !== null);
+    const busy = Object.values(this.items).some((h) => h && (h.act !== null || h.where === 'reaching' || h.where === 'placing'));
     const free = (k: Treat) => {
       const h = this.items[k];
       return !h || h.where === 'table' || h.done !== null;
@@ -102,16 +146,64 @@ export class Visit {
     };
   }
 
-  /** Whether the waiter can be called to this seat (there is one, free, with a way to it). */
+  // ---------- the barista ----------
+
+  /** Whether the barista can be asked for one now (he is free, and the visitor's hand for it is free). */
+  canOrder(kind: Treat) {
+    const h = this.items[kind];
+    return !!this.barista?.can(kind) && !this.barista.busy && !this.making && !this.pending && (!h || h.where === 'table' || h.done !== null);
+  }
+
+  order(kind: Treat) {
+    if (!this.canOrder(kind) || !this.barista) return false;
+    const old = this.items[kind];
+    if (old) this.drop(old);
+    const prop = kind === 'coffee' ? makeCup() : makeCookie();
+    const ok = this.barista.order(kind, prop, this.scene, {
+      // over the counter's middle, if the visitor is near enough to reach it; else he puts it on the counter
+      meet: () => this.counterMeet(),
+      taken: (p, at) => this.receive(kind, p as Cup | Cookie, at),
+      placed: (p) => {
+        this.making = null;
+        this.items[kind] = this.held(kind, p as Cup | Cookie, 'table');
+      },
+    });
+    if (ok) this.making = kind;
+    return ok;
+  }
+
+  /**
+   * Where two hands meet to pass something: part of the way from the giver's shoulder to the visitor's hand at rest, so
+   * both can reach it (null when they are too far apart: each arm reaches about 0.6 m).
+   */
+  private meetBetween(shoulder: THREE.Vector3): THREE.Vector3 | null {
+    const hand = this.camera.localToWorld(SLOT[1].clone());
+    const d = shoulder.distanceTo(hand);
+    if (d > 1.15) return null;
+    const meet = shoulder.clone().lerp(hand, 0.5);
+    // a little below both: the giver's hand comes forward and down, the visitor's up
+    meet.y = Math.min(meet.y, shoulder.y - 0.18);
+    return meet;
+  }
+
+  /** Where the visitor's hand meets an order held out over the counter (null: too far, it goes on the counter). */
+  private counterMeet(): THREE.Vector3 | null {
+    if (!this.barista || this.seated) return null;
+    return this.meetBetween(this.barista.character.shoulder('R'));
+  }
+
+  // ---------- the waiter ----------
+
   canCallWaiter(spot: SeatSpot | null) {
     return !!this.cleaner?.canServe(spot) && !this.waiter;
   }
 
-  /** The seated visitor calls the waiter: he comes to their seat for the order. */
-  callWaiter(spot: SeatSpot) {
+  /** The seated visitor calls the waiter: he comes to their seat for the order (`table`: their table's spot). */
+  callWaiter(spot: SeatSpot, table: THREE.Vector3 | null) {
     if (!this.cleaner || !this.canCallWaiter(spot)) return false;
     this.waiter = 'coming';
     this.waiterSpot = spot;
+    this.waiterTable = table;
     this.cleaner.summon(spot, () => {
       if (this.waiter !== 'coming') return;
       this.waiter = 'here';
@@ -120,7 +212,6 @@ export class Visit {
     return true;
   }
 
-  /** Never mind (or the visitor stood up before ordering): he goes back to his round. */
   dismissWaiter() {
     if (this.waiter !== 'coming' && this.waiter !== 'here') return;
     this.waiter = null;
@@ -134,97 +225,109 @@ export class Visit {
     const h = this.items[kind];
     if (this.waiter !== 'here' || !spot || !this.cleaner || (h && h.where !== 'table' && h.done === null)) return false;
     this.waiter = 'fetching';
-    const cleaner = this.cleaner;
-    cleaner.fetch(() => {
-      this.pending = { kind, prop: kind === 'coffee' ? makeCup() : makeCookie(), wait: 0 };
+    this.cleaner.fetch(() => {
+      this.pending = { kind, prop: kind === 'coffee' ? makeCup() : makeCookie() };
     });
     return true;
   }
 
-  /** The order goes into the waiter's hand, and he brings it to the seat. */
-  private toWaiter(kind: Treat, prop: Cup | Cookie) {
-    const cleaner = this.cleaner!;
-    const spot = this.waiterSpot!;
-    const done = () => {
-      cleaner.hold(prop);
-      this.waiter = 'bringing';
-      cleaner.bring(spot, (p) => {
-        this.waiter = null;
-        this.waiterSpot = null;
-        const old = this.items[kind];
-        if (old) this.drop(old);
-        this.handOver(kind, p as Cup | Cookie, false);
-      });
-    };
-    if (prop.parent) this.fly(prop, () => ({ at: cleaner.handPosition(), q: new THREE.Quaternion() }), done, 0.6);
-    else done();
-  }
-
-  /** At the counter: the barista makes the waiter's order when he is free (without a barista, it is ready at once). */
-  private serveCounter(dt: number) {
+  /** At the counter: the barista makes the waiter's order when he is free, and hands it to him over the counter. */
+  private serveCounter() {
     const p = this.pending;
-    if (!p) return;
+    const cleaner = this.cleaner;
+    if (!p || !cleaner) return;
+    const bring = () => {
+      this.waiter = 'bringing';
+      this.bring(p.kind);
+    };
     if (this.barista?.can(p.kind)) {
       if (this.barista.busy || this.making) return;
       this.pending = null;
-      this.barista.order(p.kind, p.prop, (prop) => this.toWaiter(p.kind, prop as Cup | Cookie));
+      this.barista.order(p.kind, p.prop, this.scene, {
+        meet: () => cleaner.meetAtCounter(this.barista!.position),
+        taken: (prop, at) => {
+          const ok = cleaner.receive(prop, p.kind, at);
+          if (ok) bring();
+          return ok;
+        },
+        // not taken in time: on the counter; he picks it up from there
+        placed: (prop) => {
+          cleaner.pick(prop, p.kind);
+          bring();
+        },
+      });
     } else {
-      p.wait += dt;
-      if (p.wait < 1.5) return;
+      // no barista: it is waiting on the counter, in front of him
       this.pending = null;
-      this.toWaiter(p.kind, p.prop);
+      p.prop.position.copy(cleaner.meetAtCounter()).setY(cleaner.meetAtCounter().y - 0.16);
+      this.scene.add(p.prop);
+      cleaner.pick(p.prop, p.kind);
+      bring();
     }
   }
 
-  /** Whether the barista can be asked for one now (he is free, and the visitor's hand for it is free). */
-  canOrder(kind: Treat) {
-    const h = this.items[kind];
-    return !!this.barista?.can(kind) && !this.barista.busy && !this.making && (!h || h.where === 'table' || h.done !== null);
+  private bring(kind: Treat) {
+    const spot = this.waiterSpot!;
+    this.cleaner!.bring(
+      spot,
+      () => this.seatMeet(),
+      (p, at) => this.receive(kind, p as Cup | Cookie, at),
+      () => this.waiterTable ?? spot.seat.clone().setY(spot.stand.y + 0.72),
+      (placed) => {
+        this.waiter = null;
+        this.waiterSpot = null;
+        if (placed) this.items[kind] = this.held(kind, placed as Cup | Cookie, 'table');
+      },
+    );
   }
 
-  order(kind: Treat) {
-    if (!this.canOrder(kind) || !this.barista) return false;
-    // a fresh one: the old one left on a table is cleared away
-    const old = this.items[kind];
-    if (old) this.drop(old);
-    const prop = kind === 'coffee' ? makeCup() : makeCookie();
-    const ok = this.barista.order(kind, prop, (p) => this.handOver(kind, p as Cup | Cookie));
-    if (ok) this.making = kind;
-    return ok;
+  /** Where the seated visitor's hand meets what the waiter holds out. */
+  private seatMeet(): THREE.Vector3 | null {
+    if (!this.seated || !this.cleaner) return null;
+    return this.meetBetween(this.cleaner.character.shoulder('R'));
   }
 
-  /** He holds it out: it comes to the visitor's hand. */
-  private handOver(kind: Treat, prop: Cup | Cookie, own = true) {
-    if (own) this.making = null;
-    const h: Held = { kind, left: kind === 'coffee' ? SIPS : BITES, where: 'flying', prop, holder: new THREE.Group(), side: 0, act: null, acted: false, done: null };
-    this.items[kind] = h;
-    this.fly(prop, () => this.handTarget(h), () => this.toHand(h), 0.75);
-  }
+  // ---------- the visitor's hands ----------
 
-  /** Where a held thing is in the world (to fly to): in front of the visitor, at its hand's place. */
-  private handTarget(h: Held) {
-    const side = this.sideFor(h.kind, true);
-    const at = this.camera.localToWorld(SLOT[side].at.clone());
-    return { at, q: this.camera.quaternion.clone() };
-  }
-
-  private toHand(h: Held) {
-    h.where = 'hand';
-    h.prop.removeFromParent();
-    h.prop.position.set(0, 0, 0);
-    h.prop.quaternion.identity();
-    if (h.kind === 'coffee') h.prop.rotation.y = Math.PI / 2 + 0.5; // the handle behind the hand
-    h.holder.add(h.prop);
-    h.side = 0;
-    this.hud.add(h.holder);
-    this.layout(0, true);
+  private held(kind: Treat, prop: Cup | Cookie, where: Where): Held {
+    return { kind, left: kind === 'coffee' ? SIPS : BITES, where, prop, hand: null, side: 0, grip: new THREE.Vector3(), itemQ: new THREE.Quaternion(), target: null, place: null, act: null, acted: false, done: null };
   }
 
   /** Which hand: the right, or the left for the cookie when the coffee is in the right (owner: "a second hand"). */
-  private sideFor(kind: Treat, coming = false): 1 | -1 {
+  private sideFor(kind: Treat): 1 | -1 {
     const other = this.items[kind === 'coffee' ? 'cookie' : 'coffee'];
-    const both = other && (other.where === 'hand' || (coming && other.where === 'flying')) && other.done === null;
+    const both = other && other.hand && other.done === null && (other.where === 'hand' || other.where === 'reaching' || other.where === 'placing');
     return both && kind === 'cookie' ? -1 : 1;
+  }
+
+  /** A hand (for side `side`) for this item, coming up from below the picture. */
+  private newHand(h: Held) {
+    const side = this.sideFor(h.kind);
+    const hand = makeFPHand(side === 1);
+    this.hud.add(hand);
+    h.hand = hand;
+    h.side = side;
+    h.grip.copy(SLOT[side]).add(DOWN);
+    h.itemQ.identity();
+  }
+
+  /**
+   * The visitor's hand taking `prop` held out at `at` (world), called each frame by the giver: the hand reaches it,
+   * the fingers close; true once it is in the hand (it is the visitor's then).
+   */
+  private receive(kind: Treat, prop: Cup | Cookie, at: THREE.Vector3) {
+    let h = this.items[kind];
+    if (!h || h.prop !== prop) {
+      if (h) this.drop(h);
+      h = this.held(kind, prop, 'reaching');
+      this.items[kind] = h;
+      if (kind === this.making) this.making = null;
+    }
+    if (h.where === 'hand') return true;
+    if (!h.hand) this.newHand(h);
+    const target = at.clone();
+    h.target = () => target;
+    return false;
   }
 
   sip() {
@@ -241,83 +344,76 @@ export class Visit {
     return true;
   }
 
-  /** Puts it down at `spot` (a table by the seat), the cookie beside the coffee (`side`: along the table's edge). */
+  /** Puts it down at `spot` (a table by the seat; the cookie beside the coffee, `side` along the table's edge). */
   putDown(kind: Treat, spot: THREE.Vector3, side: THREE.Vector3) {
     const h = this.items[kind];
     if (!h || h.where !== 'hand' || h.act !== null || h.done !== null) return false;
     const at = spot.clone();
-    if (kind === 'cookie') at.addScaledVector(side, 0.14).y += 0.007;
     const q = new THREE.Quaternion();
-    if (kind === 'cookie') q.setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0.4));
-    else q.setFromEuler(new THREE.Euler(0, Math.atan2(side.x, side.z), 0));
-    h.where = 'flying';
-    // from the hand, as it is seen, into the world
-    this.camera.updateMatrixWorld();
-    h.prop.position.copy(this.camera.localToWorld(h.holder.position.clone()));
-    const own = h.prop.quaternion.clone();
-    h.prop.quaternion.copy(this.camera.quaternion).multiply(h.holder.quaternion).multiply(own);
-    this.scene.add(h.prop);
-    h.holder.removeFromParent();
-    this.fly(h.prop, () => ({ at, q }), () => (h.where = 'table'), 0.55);
-    this.layout(0, false);
+    if (kind === 'cookie') {
+      at.addScaledVector(side, 0.14).y += 0.0075;
+      q.setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0.4));
+    } else q.setFromAxisAngle(Y, Math.atan2(side.x, side.z));
+    h.where = 'placing';
+    h.place = { at, q };
+    h.target = () => HOLD[kind].at.clone().applyQuaternion(q).add(at);
     return true;
   }
 
+  /** Picks it up from the table: the hand reaches it there. */
   pickUp(kind: Treat) {
     const h = this.items[kind];
     if (!h || h.where !== 'table') return false;
-    h.where = 'flying';
-    this.fly(h.prop, () => this.handTarget(h), () => this.toHand(h), 0.55);
+    h.where = 'reaching';
+    h.target = () => Actor.holdPoint(h.prop, kind);
+    this.newHand(h);
     return true;
-  }
-
-  private fly(obj: THREE.Object3D, to: Flight['to'], end: () => void, dur: number) {
-    if (obj.parent !== this.scene) this.scene.attach(obj);
-    this.flights.push({ obj, from: obj.position.clone(), q0: obj.quaternion.clone(), to, t: 0, dur, end });
   }
 
   /** Gone for good (finished, or cleared from a table). */
   private drop(h: Held) {
     disposeProp(h.prop);
-    h.holder.traverse((o) => {
+    if (h.hand) this.disposeHand(h.hand);
+    if (this.items[h.kind] === h) this.items[h.kind] = null;
+  }
+  private disposeHand(hand: FPHand) {
+    hand.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
     });
-    h.holder.removeFromParent();
-    if (this.items[h.kind] === h) this.items[h.kind] = null;
+    hand.removeFromParent();
   }
 
   /**
-   * Moves everything on by `dt` (the barista, flights, sips and bites, the hands easing to their places). `walking`:
-   * the hands bob. Returns whether anything moved (the page draws again).
+   * Moves everything on by `dt` (the staff, the hands reaching, sips and bites). `walking`: the hands bob. Returns
+   * whether anything moved (the page draws again).
    */
   update(dt: number, walking: boolean): boolean {
+    this.camera.updateMatrixWorld();
     // the people move on all the time, but are drawn again only while they are in the picture
     this.frustum.setFromProjectionMatrix(this.m4.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse));
     const seen = (at: THREE.Vector3) => this.frustum.intersectsSphere(this.sphere.set(this.v.copy(at).setY(at.y + 1), 1.1));
     let moved = this.barista?.update(dt, this.camera.position, seen) ?? false;
     if (this.cleaner?.update(dt, this.camera.position, seen)) moved = true;
-    this.serveCounter(dt);
+    this.serveCounter();
     if (this.waiter || this.pending) moved = true;
-    // flights
-    for (const f of [...this.flights]) {
-      f.t += dt;
-      const k = Math.min(1, f.t / f.dur);
-      const e = k * k * (3 - 2 * k);
-      const { at, q } = f.to();
-      f.obj.position.lerpVectors(f.from, at, e);
-      f.obj.position.y += Math.sin(Math.PI * k) * 0.12;
-      f.obj.quaternion.slerpQuaternions(f.q0, q, e);
-      if (k >= 1) {
-        this.flights.splice(this.flights.indexOf(f), 1);
-        f.obj.position.copy(at);
-        f.obj.quaternion.copy(q);
-        f.end();
-      }
-      moved = true;
+    if (this.debug) {
+      const pts = [...(this.barista?.character.debugPoints() ?? []), ...(this.cleaner?.character.debugPoints() ?? [])];
+      this.debug.forEach((m, i) => {
+        const p = pts[i >> 1];
+        const at = p ? (i % 2 ? p.target : p.socket) : null;
+        m.visible = !!at;
+        if (at) m.position.copy(at);
+      });
     }
     if (walking) this.bob += dt * 8;
     if (this.layout(dt, walking)) moved = true;
-    // crumbs
+    for (const l of this.leaving) {
+      l.t += dt;
+      l.hand.position.addScaledVector(DOWN, dt * 1.6);
+    }
+    for (const l of this.leaving.filter((x) => x.t > 0.45)) this.disposeHand(l.hand);
+    this.leaving = this.leaving.filter((x) => x.t <= 0.45);
+    if (this.leaving.length) moved = true;
     for (const c of this.crumbs) {
       c.age += dt;
       c.v.y -= 2.5 * dt;
@@ -329,78 +425,126 @@ export class Visit {
     return moved;
   }
 
-  /** Each hand to its place (and a sip or a bite under way). Returns whether a hand is still moving. */
+  /** Each hand: reaching, holding (a sip, a bite), putting down. Returns whether a hand is still moving. */
   private layout(dt: number, walking: boolean) {
     let moving = false;
+    const camQ = this.camera.quaternion;
     for (const h of Object.values(this.items)) {
-      if (!h || h.where !== 'hand') continue;
-      const side = this.sideFor(h.kind);
-      if (side !== h.side) {
-        // the hand that holds it (a right or a left one)
-        for (const c of [...h.holder.children]) {
-          if (c === h.prop) continue;
-          c.removeFromParent();
-          c.traverse((o) => {
-            if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
-          });
-        }
-        h.holder.add(makeHand(side, h.kind === 'coffee' ? 'cup' : 'cookie'));
-        if (h.side === 0) {
-          // arriving: from below the picture
-          h.holder.position.copy(SLOT[side].at).add(DOWN);
-          h.holder.rotation.copy(SLOT[side].rot);
-        }
-        h.side = side;
-      }
-      const slot = SLOT[side];
-      const target = this.v.copy(slot.at);
-      let tilt = 0;
-      if (h.act !== null) {
-        h.act = Math.min(1, h.act + dt / ACT_TIME);
-        const b = bell(h.act);
-        target.lerp(MOUTH[h.kind], b);
-        tilt = b;
-        if (!h.acted && h.act >= 0.5) {
-          h.acted = true;
-          h.left -= 1;
-          if (h.kind === 'coffee') (h.prop as Cup).userData.setLevel(h.left / SIPS);
-          else {
-            (h.prop as Cookie).userData.setBites(BITES - h.left);
-            this.crumble(h.holder);
+      if (!h || !h.hand || (h.where !== 'hand' && h.where !== 'reaching' && h.where !== 'placing')) continue;
+      const hand = h.hand;
+      const sx = hand.userData.sx;
+      const hold = HOLD[h.kind];
+      let target: THREE.Vector3;
+      let wantQ = new THREE.Quaternion();
+      let speed = 0.11;
+      if (h.where === 'reaching' || h.where === 'placing') {
+        // a world point, where it is seen (the camera's space)
+        target = this.camera.worldToLocal(h.target!());
+        if (h.where === 'placing') wantQ = camQ.clone().invert().multiply(h.place!.q);
+        else wantQ.copy(h.itemQ);
+        speed = 0.09;
+        hand.userData.pose(h.where === 'reaching' ? 'open' : hold.hand, dt);
+      } else {
+        target = SLOT[h.side as 1 | -1].clone();
+        hand.userData.pose(hold.hand, dt);
+        if (h.act !== null) {
+          h.act = Math.min(1, h.act + dt / ACT_TIME);
+          const b = bell(h.act);
+          target.lerp(MOUTH[h.kind], b);
+          // a sip tips the cup's rim to the mouth; a bite turns the cookie's top to it
+          wantQ.setFromAxisAngle(new THREE.Vector3(1, 0, 0), (h.kind === 'coffee' ? 1.05 : 0.35) * b);
+          speed = 0.04;
+          if (!h.acted && h.act >= 0.5) {
+            h.acted = true;
+            h.left -= 1;
+            if (h.kind === 'coffee') (h.prop as Cup).userData.setLevel(h.left / SIPS);
+            else {
+              (h.prop as Cookie).userData.setBites(BITES - h.left);
+              this.crumble(h.grip);
+            }
           }
+          if (h.act >= 1) {
+            h.act = null;
+            if (h.left <= 0) h.done = 0;
+          }
+          moving = true;
+        } else if (walking) target.y += Math.sin(this.bob) * 0.006;
+        if (h.done !== null) {
+          h.done += dt;
+          target.add(DOWN);
+          if (h.done > (h.kind === 'coffee' ? 1.1 : 0.4)) {
+            this.drop(h);
+            continue;
+          }
+          moving = true;
         }
-        if (h.act >= 1) {
-          h.act = null;
-          if (h.left <= 0) h.done = 0;
-        }
-        moving = true;
-      } else if (walking) target.y += Math.sin(this.bob) * 0.006;
-      if (h.done !== null) {
-        h.done += dt;
-        target.add(DOWN);
-        if (h.done > (h.kind === 'coffee' ? 1.1 : 0.4)) {
-          this.drop(h);
-          continue;
-        }
-        moving = true;
       }
-      const ease = dt ? 1 - Math.exp(-dt * (h.act !== null ? 30 : 9)) : 1;
-      if (h.holder.position.distanceToSquared(target) > 1e-8) {
-        h.holder.position.lerp(target, ease);
-        moving = true;
+      // the holding point and the thing's turn, eased (frame-rate independent)
+      h.grip.set(approach(h.grip.x, target.x, dt, speed), approach(h.grip.y, target.y, dt, speed), approach(h.grip.z, target.z, dt, speed));
+      h.itemQ.slerp(wantQ, 1 - Math.pow(0.5, dt / 0.1));
+      if (h.grip.distanceTo(target) > 0.0005) moving = true;
+      // the hand round the holding point: as one holds it (turned with it), its socket on that point
+      const handQ = h.itemQ.clone().multiply(TURN).multiply(holdingQuat(sx, h.kind === 'coffee' ? 'cup' : 'cookie'));
+      const socket = hold.socket === 'grip' ? hand.userData.grip : hand.userData.pinch;
+      hand.quaternion.copy(handQ);
+      hand.position.copy(h.grip).sub(socket.clone().applyQuaternion(handQ));
+      // the forearm toward the elbow: low, out to the side and a little back (out of the picture)
+      const elbow = new THREE.Vector3(-sx * 0.3, -0.52, -0.12).sub(hand.position).applyQuaternion(handQ.clone().invert());
+      hand.userData.aim(elbow);
+      // the thing in the hand (in the picture's space)
+      if (h.where === 'hand' || h.where === 'placing') {
+        h.prop.quaternion.copy(h.itemQ);
+        h.prop.position.copy(h.grip).sub(hold.at.clone().applyQuaternion(h.itemQ));
       }
-      // a sip tips the cup toward the mouth; a bite turns the cookie's top to it
-      const rx = slot.rot.x + (h.kind === 'coffee' ? 1.05 : 0.35) * tilt;
-      const ry = slot.rot.y * (1 - tilt);
-      h.holder.rotation.set(h.holder.rotation.x + (rx - h.holder.rotation.x) * ease, h.holder.rotation.y + (ry - h.holder.rotation.y) * ease, slot.rot.z);
+      // contact: the hand has reached the thing (take it), or the table (let it go)
+      if ((h.where === 'reaching' || h.where === 'placing') && h.grip.distanceTo(target) < TOUCH) {
+        logContact(`${h.where === 'reaching' ? 'visitor takes' : 'visitor puts down'} ${h.kind}`, 'VISITOR', h.grip.distanceTo(target));
+        if (h.where === 'reaching') this.takeIntoHand(h);
+        else this.letGo(h);
+      }
     }
     return moving;
   }
 
-  private crumble(holder: THREE.Group) {
+  /** The fingers have closed on it: it goes into the visitor's hand, exactly where it is (then into the hold). */
+  private takeIntoHand(h: Held) {
+    const camQ = this.camera.quaternion;
+    const worldQ = h.prop.getWorldQuaternion(new THREE.Quaternion());
+    h.prop.removeFromParent();
+    this.hud.add(h.prop);
+    h.itemQ.copy(camQ.clone().invert().multiply(worldQ));
+    h.where = 'hand';
+    h.target = null;
+    // seated (having looked up at the waiter): the eyes come back down to the table
+    if (this.seated) {
+      const ahead = new THREE.Vector3(0, 0, -1).applyQuaternion(camQ).setY(0).normalize();
+      this.lookAt = this.camera.position.clone().add(ahead).add(new THREE.Vector3(0, -0.15, 0));
+    }
+  }
+
+  /** On the table: it is put where it was set, its base on the top; the hand opens and goes back down. */
+  private letGo(h: Held) {
+    const p = h.place!;
+    h.prop.removeFromParent();
+    this.scene.add(h.prop);
+    h.prop.position.copy(p.at);
+    h.prop.quaternion.copy(p.q);
+    h.prop.updateMatrixWorld(true);
+    h.where = 'table';
+    h.place = null;
+    h.target = null;
+    if (h.hand) {
+      h.hand.userData.pose('open', 0.05);
+      this.leaving.push({ hand: h.hand, t: 0 });
+      h.hand = null;
+    }
+    h.side = 0;
+  }
+
+  private crumble(at: THREE.Vector3) {
     for (let i = 0; i < 5; i++) {
       const m = new THREE.Mesh(this.crumbGeo, this.crumbMat);
-      m.position.copy(holder.position).add(this.v.set((Math.random() - 0.5) * 0.03, 0.035, 0.01));
+      m.position.copy(at).add(this.v.set((Math.random() - 0.5) * 0.03, 0.035, 0.01));
       this.hud.add(m);
       this.crumbs.push({ m, v: new THREE.Vector3((Math.random() - 0.5) * 0.15, 0.1 + Math.random() * 0.15, 0.05), age: 0 });
     }
@@ -408,7 +552,7 @@ export class Visit {
 
   /** Draws the hands over the place (after it): never cut by a wall the visitor stands against. */
   render(renderer: THREE.WebGLRenderer) {
-    if (!Object.values(this.items).some((h) => h && h.where === 'hand') && !this.crumbs.length) return;
+    if (!Object.values(this.items).some((h) => h && h.hand) && !this.leaving.length && !this.crumbs.length) return;
     this.hudCam.fov = this.camera.fov;
     this.hudCam.aspect = this.camera.aspect;
     this.hudCam.updateProjectionMatrix();
@@ -421,7 +565,7 @@ export class Visit {
 
   dispose() {
     for (const h of Object.values(this.items)) if (h) this.drop(h);
-    for (const f of this.flights) disposeProp(f.obj);
+    for (const l of this.leaving) this.disposeHand(l.hand);
     this.barista?.dispose();
     this.crumbGeo.dispose();
     this.crumbMat.dispose();

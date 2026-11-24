@@ -5,60 +5,13 @@
 // He is drawn in the café's animation style after the owner's photo of him (owner, 2026-11-23: a photographed face
 // didn't suit it); the shirt's prints are the owner's photos of the shirt (`models/shirt_front.jpg`, `shirt_back.jpg`).
 import * as THREE from 'three';
-import { root, mat, cyl, ball, rbox, group, shadowTex } from './lib.js';
+import { root, mat, cyl, ball, group } from './lib.js';
+import { person, eyes } from './people.js';
 
 const FI = -1.24;
 const SKIN = '#e2b192';
 const NAVY = '#222a3e';
 const JEANS = '#3b3e45';
-
-/** A joint: an empty group at (x, y, z) of its parent, named so the tour page can turn it. */
-function joint(parent, name, x, y, z) {
-  const j = new THREE.Group();
-  j.name = name;
-  j.position.set(x, y, z);
-  parent.add(j);
-  return j;
-}
-
-// The shirt: a soft T-shirt torso (a turned profile, flattened front to back).
-const TORSO = [
-  [0.188, -0.08],
-  [0.192, 0.0],
-  [0.182, 0.14],
-  [0.188, 0.28],
-  [0.198, 0.38],
-  [0.2, 0.44],
-  [0.188, 0.49],
-  [0.15, 0.525],
-  [0.09, 0.552],
-  [0.06, 0.562],
-];
-const DEPTH = 0.6;
-const radiusAt = (y) => {
-  for (let i = 1; i < TORSO.length; i++) {
-    const [r0, y0] = TORSO[i - 1],
-      [r1, y1] = TORSO[i];
-    if (y <= y1) return r0 + ((r1 - r0) * (y - y0)) / (y1 - y0);
-  }
-  return TORSO[TORSO.length - 1][0];
-};
-/** A print laid on the shirt's curve (front: +z, back: −z), `w` × `h` m, its middle at height `y` of the torso. */
-function print(tex, w, h, y, back) {
-  const g = new THREE.PlaneGeometry(w, h, 16, 8);
-  const p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) {
-    const x = p.getX(i),
-      yy = p.getY(i) + y;
-    const a = radiusAt(yy);
-    const z = DEPTH * a * Math.sqrt(Math.max(0, 1 - (x / a) ** 2)) + 0.003;
-    p.setXYZ(i, back ? -x : x, yy, back ? -z : z);
-  }
-  g.computeVertexNormals();
-  const m = new THREE.Mesh(g, mat('#ffffff', { map: tex, rough: 0.9 }));
-  m.name = 'BARISTA_print';
-  return m;
-}
 
 /** The cookies' look (as the tour page's cookie): golden, with chocolate chips. */
 export const COOKIE = '#c68a4c';
@@ -74,13 +27,6 @@ function cookie(parent, x, y, z, rx, ry) {
   }
 }
 
-async function loadTex(url) {
-  const t = await new THREE.TextureLoader().loadAsync(url);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.userData.mimeType = 'image/jpeg';
-  return t;
-}
-
 /** A turned shape (an arm, a sleeve) from its outline, top to bottom: `[radius, height]` pairs, closed at both ends. */
 function turned(profile, material, open = false) {
   const pts = profile.map(([r, y]) => new THREE.Vector2(Math.max(0.0005, r), y)).reverse();
@@ -92,97 +38,9 @@ function turned(profile, material, open = false) {
   return m;
 }
 
-/**
- * A member of staff (owner, 2026-11-23): legs in jeans, the KOUP T-shirt in `shirt`'s colour with its prints, shoulders,
- * arms and hands; joints named `<P>_torso`, `<P>_head`, `<P>_armL|R`, `<P>_foreL|R`, `<P>_handL|R`, `<P>_legL|R`
- * (the tour page moves them). Returns the head's joint (each person has their own face) and the skin.
- */
-async function person(P, x, z, ry, shirtColour, prints, skinColour = SKIN) {
-  const skin = mat(skinColour, { rough: 0.65 });
-  const navy = mat(shirtColour, { rough: 0.92 });
-  const jeans = mat(JEANS, { rough: 0.95 });
-
-  const b = group(x, FI, z, ry, P);
-  // his own soft shadow, moving with him
-  const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.5), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false }));
-  sh.rotation.x = -Math.PI / 2;
-  sh.position.y = 0.006;
-  sh.name = `${P}_shadow`;
-  b.add(sh);
-
-  // legs (dark jeans) and shoes, from the hips
-  for (const [side, x] of [
-    ['L', 0.095],
-    ['R', -0.095],
-  ]) {
-    const leg = joint(b, `${P}_leg${side}`, x, 0.92, 0);
-    leg.add(turned([[0.07, 0.04], [0.078, -0.05], [0.066, -0.42], [0.055, -0.5], [0.056, -0.62], [0.048, -0.84], [0.046, -0.86]], jeans));
-    rbox(0.1, 0.075, 0.27, 0.035, mat('#2a2522', { rough: 0.6 }), 0, -0.92, 0.04, 0, leg);
-    rbox(0.104, 0.02, 0.275, 0.008, mat('#e9e4da'), 0, -0.92, 0.04, 0, leg); // the soles
-  }
-  rbox(0.3, 0.18, 0.2, 0.08, jeans, 0, 0.8, 0, 0, b);
-
-  // the torso (the shirt), turning at the waist: chest, then shoulders sloping to the neck
-  const torso = joint(b, `${P}_torso`, 0, 0.95, 0);
-  const shirt = new THREE.Mesh(
-    new THREE.LatheGeometry(
-      TORSO.map(([r, y]) => new THREE.Vector2(r, y)),
-      32,
-    ),
-    navy,
-  );
-  shirt.scale.z = DEPTH;
-  torso.add(shirt);
-  const [front, back] = await Promise.all([loadTex(prints[0]), loadTex(prints[1])]);
-  torso.add(print(front, 0.12, 0.082, 0.42, false));
-  torso.add(print(back, 0.32, 0.307, 0.27, true));
-  // the neck and the shirt's round collar
-  const neck = turned([[0.05, 0.08], [0.052, 0.0], [0.058, -0.04]], skin);
-  neck.position.y = 0.6;
-  torso.add(neck);
-  const collar = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.011, 8, 28), navy);
-  collar.rotation.x = Math.PI / 2;
-  collar.scale.set(1, 0.85, 1);
-  collar.position.y = 0.566;
-  torso.add(collar);
-
-  // arms: a rounded shoulder (in the shirt), a short sleeve, a real upper arm, elbow, forearm and wrist, and a hand
-  // with its fingers and thumb (a socket in each hand for a cup or a cookie)
-  for (const [side, x] of [
-    ['L', 0.158],
-    ['R', -0.158],
-  ]) {
-    const sx = Math.sign(x);
-    const arm = joint(torso, `${P}_arm${side}`, x, 0.462, 0);
-    arm.rotation.z = sx * 0.11;
-    // the sleeve: its rounded top tucked under the shirt's shoulder, hanging to just above the elbow
-    const sleeve = turned([[0.0, 0.05], [0.03, 0.045], [0.052, 0.022], [0.06, -0.02], [0.059, -0.1], [0.058, -0.15], [0.056, -0.162]], navy);
-    sleeve.name = `${P}_sleeve${side}`;
-    arm.add(sleeve);
-    // upper arm: the biceps' gentle swell, narrowing to the elbow
-    arm.add(turned([[0.05, -0.04], [0.053, -0.1], [0.05, -0.16], [0.043, -0.24], [0.039, -0.285]], skin));
-    const fore = joint(arm, `${P}_fore${side}`, 0, -0.28, 0);
-    fore.rotation.x = -0.14;
-    // forearm: fuller below the elbow, slim at the wrist
-    fore.add(turned([[0.039, 0.012], [0.044, -0.045], [0.041, -0.1], [0.032, -0.19], [0.027, -0.235]], skin));
-    // the hand, palm toward the body: palm, four fingers together (slightly curled) and the thumb in front
-    const palm = rbox(0.03, 0.085, 0.07, 0.013, skin, 0, -0.31, 0.004, 0, fore);
-    palm.name = `${P}_palm${side}`;
-    const fingers = rbox(0.026, 0.07, 0.066, 0.012, skin, 0, -0.38, 0.002, 0, fore);
-    fingers.rotation.z = -sx * 0.18;
-    fingers.position.x = -sx * 0.006;
-    const thumb = rbox(0.022, 0.05, 0.022, 0.01, skin, -sx * 0.004, -0.315, 0.04, 0, fore);
-    thumb.rotation.x = 0.35;
-    joint(fore, `${P}_hand${side}`, 0, -0.33, 0.04);
-  }
-
-  const head = joint(torso, `${P}_head`, 0, 0.578, 0.012);
-  return { root: b, head, skin };
-}
-
 export async function barista() {
   // He stands behind the counter's free end (between the card machine and the cake case), facing the customers.
-  const { head } = await person('BARISTA', 0.62, 6.12, Math.PI, NAVY, ['models/shirt_front.jpg', 'models/shirt_back.jpg']);
+  const { head } = await person('BARISTA', 0.62, 6.12, Math.PI, NAVY, ['models/shirt_front.jpg', 'models/shirt_back.jpg'], SKIN);
   // the head: the barista as the owner's photo shows him (owner, 2026-11-23), drawn in the café's animation style (a
   // photographed face did not suit it): a long oval face, dark hair swept back and to the side with volume on top, a
   // full dark beard and moustache, thick straight brows, hazel-green eyes and the small mole on his right cheek.
@@ -208,18 +66,9 @@ export async function barista() {
     head.add(m);
     return m;
   };
-  for (const s of [1, -1]) {
-    ball(0.022, face, s * 0.074, 0.112, -0.006, 0.45, 1, 0.75, head); // ears
-    const ex = s * 0.03,
-      ey = 0.122;
-    const white = ball(0.013, mat('#ffffff', { rough: 0.3 }), ex, ey, zAt(ex, ey) - 0.004, 1.1, 0.85, 0.5, head);
-    white.name = 'BARISTA_eye';
-    ball(0.0078, mat('#6e6b45', { rough: 0.25 }), ex, ey - 0.0005, zAt(ex, ey) + 0.0015, 1, 1.05, 0.5, head); // hazel-green
-    ball(0.0042, mat('#1a1410'), ex, ey - 0.0005, zAt(ex, ey) + 0.004, 1, 1, 0.5, head); // pupil
-    ball(0.0022, mat('#ffffff'), ex + 0.0028, ey + 0.003, zAt(ex, ey) + 0.0058, 1, 1, 0.6, head); // the eye's shine
-    const brow = rbox(0.032, 0.009, 0.009, 0.004, dark, s * 0.03, 0.139, zAt(s * 0.03, 0.139) - 0.003, 0, head);
-    brow.rotation.z = s * 0.06;
-  }
+  for (const s of [1, -1]) ball(0.022, face, s * 0.074, 0.112, -0.006, 0.45, 1, 0.75, head); // ears
+  // hazel-green eyes with lids that blink, thick straight brows
+  eyes(head, 'BARISTA', zAt, { ex: 0.03, ey: 0.122, iris: '#6e6b45', lid: SKIN, brow: [0.032, 0.009, 0.06, '#1d1512'], browY: 0.139 });
   ball(0.0105, face, 0, 0.101, zAt(0, 0.101), 0.8, 1.25, 1.0, head); // the nose
   ball(0.0035, mat('#3a2a22'), -0.05, 0.094, zAt(-0.05, 0.094) + 0.0005, 1, 1, 0.5, head); // the mole on his right cheek
   // the full beard and moustache: jaw, chin and upper lip, its top edge low on the cheeks and rising to the ears
@@ -236,7 +85,7 @@ export async function barista() {
     beard.geometry.computeVertexNormals();
   }
   // the lips between moustache and beard
-  ball(0.012, mat('#b9746a', { rough: 0.5 }), 0, 0.072, zAt(0, 0.072, 1.06) + 0.001, 1.45, 0.42, 0.45, head);
+  ball(0.012, mat('#b9746a', { rough: 0.5 }), 0, 0.072, zAt(0, 0.072, 1.06) + 0.001, 1.45, 0.42, 0.45, head).name = 'BARISTA_mouth';
   // the hair: near-black, short at the sides, full on top, swept back and over to his left
   const hairMat = mat('#1f1713', { rough: 0.7 });
   // the crown, its edge following his hairline: nearly straight across the forehead, a little higher at the temples
@@ -284,6 +133,35 @@ export async function barista() {
   station('BARISTA_coffee', 1.45, 6.05, Math.PI);
   station('BARISTA_cookies', 1.12, 7.72, 0.76);
   station('BARISTA_steam', 1.45, 5.45, 0, FI + 1.42);
+  // the stack of clean cups beside the machine (he takes the top one), the spot where he sets a cup to fill it, and
+  // where he puts an order on the counter for a visitor standing back (the counter's free end, in front of him)
+  const CUP = { r0: 0.03, r1: 0.043, h: 0.085 };
+  const stack = group(1.98, FI + 1.0, 5.66, 0, 'cup_stack');
+  // two stay in the stack; the tour puts the top one (the one he takes) on them
+  for (let i = 0; i < 2; i++) {
+    const c = new THREE.Mesh(
+      new THREE.LatheGeometry(
+        [
+          [0.0005, 0],
+          [CUP.r0 - 0.004, 0],
+          [CUP.r0, 0.004],
+          [CUP.r1, CUP.h],
+          [CUP.r1 - 0.004, CUP.h],
+          [CUP.r0 - 0.004, 0.008],
+          [0.0005, 0.008],
+        ].map(([r, y]) => new THREE.Vector2(r, y)),
+        24,
+      ),
+      mat('#f7f5f0', { rough: 0.35 }),
+    );
+    c.position.y = i * 0.032; // nested, each sitting in the one below
+    stack.add(c);
+  }
+  station('BARISTA_cups', 1.98, 5.66, 0, FI + 1.0 + 2 * 0.032 + 0.0001);
+  station('BARISTA_fill', 1.62, 5.73, 0, FI + 1.0);
+  station('BARISTA_handout', 0.64, 5.5, 0, FI + 1.0);
+  // the top of the cookie pile (he takes the one lying there)
+  station('BARISTA_pile', 1.55, 8.12, 0, FI + 0.94 + 0.081);
 
   // the pile of cookies on the back counter, on a wooden board
   const pile = group(1.55, FI + 0.94, 8.12, 0, 'cookie_pile');
@@ -322,22 +200,16 @@ export async function cleaner() {
     return 0;
   };
   const zAt = (x, y) => SZ * Math.sqrt(Math.max(0, rAt(y) ** 2 - (x / SX) ** 2));
-  for (const s of [1, -1]) {
-    ball(0.023, skin, s * 0.079, 0.108, -0.006, 0.45, 1, 0.75, head); // ears
-    const ex = s * 0.031,
-      ey = 0.12;
-    ball(0.0135, mat('#ffffff', { rough: 0.3 }), ex, ey, zAt(ex, ey) - 0.004, 1, 1.1, 0.5, head);
-    ball(0.0088, mat('#3a2416', { rough: 0.25 }), ex, ey - 0.0008, zAt(ex, ey) + 0.0015, 1, 1.1, 0.5, head); // brown eyes
-    ball(0.0025, mat('#ffffff'), ex + 0.003, ey + 0.004, zAt(ex, ey) + 0.0052, 1, 1, 0.6, head);
-    const brow = rbox(0.028, 0.007, 0.008, 0.003, mat('#1c1411'), s * 0.031, 0.142, zAt(s * 0.031, 0.142) - 0.003, 0, head);
-    brow.rotation.z = s * -0.18; // raised, cheerful
-  }
+  for (const s of [1, -1]) ball(0.023, skin, s * 0.079, 0.108, -0.006, 0.45, 1, 0.75, head); // ears
+  // brown eyes with lids that blink, cheerful raised brows
+  eyes(head, 'CLEANER', zAt, { ex: 0.031, ey: 0.12, iris: '#3a2416', lid: SKIN2, brow: [0.028, 0.007, -0.18, '#1c1411'], browY: 0.142 });
   ball(0.012, skin, 0, 0.099, zAt(0, 0.099), 0.95, 1.05, 1.05, head); // the nose
   // a wide, happy smile
   const smile = new THREE.Mesh(new THREE.TorusGeometry(0.021, 0.0034, 6, 16, Math.PI * 0.8), mat('#7d3329', { rough: 0.5 }));
   smile.rotation.z = Math.PI + Math.PI * 0.1;
   smile.position.set(0, 0.076, zAt(0, 0.07) - 0.002);
   smile.scale.set(1.1, 0.8, 0.6);
+  smile.name = 'CLEANER_mouth';
   head.add(smile);
   // short black curly hair: a close cap, covered in small curls
   const hair = mat('#1a1411', { rough: 0.85 });
@@ -368,9 +240,12 @@ export async function cleaner() {
   // one shape for all the curls (one draw on a phone)
   head.add(new THREE.Mesh(mergeGeometries(curls), hair));
   // his cloth, in his right hand (light blue)
-  const hand = head.parent.getObjectByName('CLEANER_handR');
-  const cloth = rbox(0.016, 0.11, 0.09, 0.006, mat('#8fc3d6', { rough: 0.95 }), 0, -0.07, 0, 0, hand);
+  // his cloth, folded in his right palm (light blue): under the palm's face, so it is between his hand and a table
+  const wrist = root.getObjectByName('CLEANER_wristR');
+  const cloth = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.1, 0.085), mat('#8fc3d6', { rough: 0.95 }));
+  cloth.position.set(0.022, -0.06, 0.0); // the right hand's palm faces +x
   cloth.name = 'CLEANER_cloth';
+  wrist.add(cloth);
 
   // his round (FI, the main floor): the middle room's tables, the tall table, the lounge's coffee table, and back
   const stops = [
