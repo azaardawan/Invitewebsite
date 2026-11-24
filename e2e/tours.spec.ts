@@ -11,7 +11,7 @@ const MODEL = process.env.TOUR_MODEL ?? 'themes/memory-museum/v2/assets/museum.g
 
 test('the owner publishes a café tour with a private link, and visitors walk through it', async ({ page, browser }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'stateful flow runs once');
-  test.setTimeout(180_000);
+  test.setTimeout(/koupup/.test(MODEL) ? 600_000 : 180_000);
   const slug = `cafe-${Date.now().toString(36)}`;
 
   await signInAsNewOwner(page);
@@ -72,6 +72,36 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   await v.keyboard.up('ArrowLeft');
   await v.screenshot({ path: testInfo.outputPath('tour-turned.png') });
   expect(errors).toEqual([]);
+
+  // KOUP's model (TOUR_MODEL=tours/koupup/koupup.glb): its menu at the counter, the barista making an order, the paper
+  // menu on a table (owner, 2026-11-24). The debug view puts the visitor at the counter and by a table.
+  if (/koupup/.test(MODEL)) {
+    await v.goto(`${link}?debug=1`);
+    await expect(v.locator('[data-testid="tour-canvas"][data-state="ready"]')).toBeVisible({ timeout: 60_000 });
+    const go = (x: number, z: number, yaw: number) => v.evaluate(([x, z, yaw]) => (window as unknown as { tourEngine: { debugGo: (x: number, z: number, y: number) => void } }).tourEngine.debugGo(x!, z!, yaw!), [x, z, yaw]);
+    await go(0.75, 4.75, Math.PI);
+    await v.getByTestId('tour-openMenu').click();
+    const sheet = v.getByTestId('tour-menu-sheet');
+    await expect(sheet).toHaveAttribute('data-variant', 'counter');
+    await expect(sheet.getByRole('button', { name: 'Iced Coffee' })).toBeVisible();
+    await v.screenshot({ path: testInfo.outputPath('tour-menu-counter.png') });
+    await sheet.getByTestId('tour-menu-item-26').click();
+    await expect(v.getByTestId('tour-menu-order')).toHaveText(/4,500 IQD/);
+    await v.screenshot({ path: testInfo.outputPath('tour-menu-chosen.png') });
+    await v.getByTestId('tour-menu-order').click();
+    await expect(v.getByTestId('tour-order-status')).toContainText('Caramel Latte');
+    // the barista makes it, takes the money, hands it over
+    await expect(v.getByTestId('tour-sip')).toBeVisible({ timeout: 150_000 });
+    await v.screenshot({ path: testInfo.outputPath('tour-menu-served.png') });
+    // a table's paper menu: read standing, ordered from seated
+    await go(-0.45, 1.25, 0);
+    await v.getByTestId('tour-openMenu').click();
+    await expect(v.getByTestId('tour-menu-sheet')).toHaveAttribute('data-variant', 'table');
+    await expect(v.getByTestId('tour-menu-order')).toBeDisabled();
+    await v.screenshot({ path: testInfo.outputPath('tour-menu-paper.png') });
+    await v.getByTestId('tour-menu-close').click();
+    expect(errors).toEqual([]);
+  }
 
   // On a phone, in Arabic: held upright it asks to be turned sideways; sideways, the pad to walk.
   const phone = await browser.newContext({ locale: 'ar-IQ', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });

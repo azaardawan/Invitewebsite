@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { root, seats, tables } from './lib.js';
 import { barista, cleaner } from './barista.js';
+import { bar } from './bar.js';
 import { walkways } from './nav.js';
 import { signs } from './build.js';
 import { terraceChairs, loungeChairs, koupCorner, mirrors } from './rooms.js';
@@ -16,6 +17,8 @@ try {
   await mirrors();
   await barista();
   await cleaner();
+  // the bar's tools, KOUP's menu (and its paper on every table)
+  const papers = await bar();
   // Where visitors begin: on the pavement at the foot of the north stairs, looking at the café.
   const start = new THREE.Object3D();
   start.name = 'START';
@@ -30,6 +33,8 @@ try {
   const { mergeGeometries, mergeVertices } = await import('three/addons/utils/BufferGeometryUtils.js');
   // the barista and the waiter are kept as they are (their joints move in the tour), apart from the merge
   const people = ['BARISTA', 'CLEANER'].map((n) => root.getObjectByName(n));
+  // and the things they pick up (the bottles, the pitcher, the jug, the scoop, the till's drawer)
+  for (const o of root.children) if (/^PROP_/.test(o.name)) people.push(o);
   const isMan = (o) => { for (let p = o; p; p = p.parent) if (people.includes(p)) return true; return false; };
 
   // ---- the items (owner, 2026-11-23): every piece of furniture and decor is its own item with a permanent code, so
@@ -126,7 +131,7 @@ try {
   startCopy.rotation.y = Math.PI / 2; out.add(startCopy);
   // the tour page's spots (HOTSPOT_<what>, e.g. the counter) and the staff's places: kept as named points
   root.traverse(o => {
-    if (!/^(HOTSPOT_|BARISTA_(coffee|cookies|steam|cups|fill|handout|pile)|CLEANER_stop_|NAV_)/.test(o.name)) return;
+    if (!/^(HOTSPOT_|BARISTA_\w+$|CLEANER_stop_|NAV_|MENU$)/.test(o.name) || isMan(o)) return;
     const h = new THREE.Object3D(); h.name = o.name; h.userData = o.userData; o.getWorldPosition(h.position); o.getWorldQuaternion(h.quaternion); out.add(h);
   });
   for (const m of people) out.add(m);
@@ -173,7 +178,20 @@ try {
       item.attach(o);
     } else out.add(o);
   });
-  console.log('seats', seats.length, 'items', items.length);
+  // the paper menus (MENU_<n>), in their table's item: where a visitor reads one and orders
+  papers.forEach((p, i) => {
+    const item = itemNode.get(p.g);
+    const o = new THREE.Object3D();
+    o.name = 'MENU_' + i;
+    o.position.copy(p.g.localToWorld(p.at.clone()));
+    o.userData = { paper: true };
+    if (item) {
+      item.updateMatrixWorld(true);
+      item.attach(o);
+      o.userData.local = true;
+    } else out.add(o);
+  });
+  console.log('seats', seats.length, 'items', items.length, 'menus', papers.length);
   scene.updateMatrixWorld(true);
   let meshes = 0, tris = 0;
   scene.traverse(o => { if (o.isMesh) { meshes++; const g=o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; } });

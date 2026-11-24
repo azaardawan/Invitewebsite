@@ -13,7 +13,7 @@
  * then whatever is held (it follows its socket).
  */
 import * as THREE from 'three';
-import { advanceGait, approach, elbowFor, gaitPose } from './ik';
+import { advanceGait, ampFor, approach, elbowFor, gaitPose } from './ik';
 
 export type Side = 'L' | 'R';
 export type HandPose = 'relaxed' | 'grip' | 'pinch' | 'flat';
@@ -56,6 +56,8 @@ export class Character {
   private face: { eyes: THREE.Object3D[]; lids: THREE.Object3D[]; brows: THREE.Object3D[]; mouth?: THREE.Object3D } = { eyes: [], lids: [], brows: [] };
   // the layers' state
   private phase = 0;
+  /** How far the legs swing (longer steps walking faster: `ampFor`). */
+  private amp = 1;
   private walkW = 0;
   private walkTarget = 0;
   private time = Math.random() * 10;
@@ -150,13 +152,14 @@ export class Character {
   /** Walking at `speed` m/s for `dt` s (0 = standing): the legs keep pace with the ground (no sliding feet). */
   walk(speed: number, dt: number) {
     this.walkTarget = speed > 0.02 ? 1 : 0;
-    this.phase = advanceGait(this.phase, speed * dt);
+    if (speed > 0.02) this.amp = approach(this.amp, ampFor(speed), dt, 0.25);
+    this.phase = advanceGait(this.phase, speed * dt, this.amp);
   }
   /** A few steps on the spot while turning (`radians` turned this frame). */
   turnSteps(radians: number) {
     if (Math.abs(radians) < 1e-4) return;
     this.walkTarget = Math.max(this.walkTarget, 0.55);
-    this.phase = advanceGait(this.phase, Math.abs(radians) * 0.22);
+    this.phase = advanceGait(this.phase, Math.abs(radians) * 0.22, this.amp);
   }
   look(target: THREE.Vector3 | null) {
     this.lookAt = target;
@@ -175,7 +178,7 @@ export class Character {
     this.walkW = approach(this.walkW, this.walkTarget, dt, 0.12);
     if (this.walkTarget === 0 && this.walkW < 0.02) this.walkW = 0;
     this.walkTarget = 0;
-    const g = gaitPose(this.phase, this.walkW);
+    const g = gaitPose(this.phase, this.walkW, this.amp);
     for (const s of SIDES) {
       const leg = this.legs[s];
       const p = s === 'L' ? g.L : g.R;

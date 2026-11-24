@@ -40,23 +40,33 @@ visitors walk through the place on Bahja. Sold as a subscription (paid outside t
   0 looks along −Z), `eye` (the eye above the seat, default 0.72 m) and `table` (`[x, y, z]`, the spot on a table in
   reach where their coffee is put down; without one it goes on the floor beside the seat). Within a metre the visitor is
   offered «Sit down»; seated, they look round, put down and pick up what they hold, and «Stand up».
-- **A barista** (owner, 2026-11-23): a person named `BARISTA` standing behind the counter, facing the customers along
-  his +Z, with joints the page turns: `BARISTA_torso`, `BARISTA_head`, `BARISTA_armL|R` (shoulders),
-  `BARISTA_foreL|R` (elbows), `BARISTA_handL|R` (what he holds), `BARISTA_legL|R` (hips); and his places, Empties:
-  `BARISTA_coffee` (where he makes coffee, its +Z toward the machine), `BARISTA_cookies` (by the cookie pile),
-  `BARISTA_steam` (the machine's steam). With an Empty `HOTSPOT_counter` in front of the counter, a visitor there gets
-  «Get a coffee» / «Get a cookie»: he walks to the machine (or the pile), makes it, walks back and hands it over. The
-  visitor holds it at the bottom of the screen (the cookie in a second hand when they also hold a coffee): five sips,
-  five bites (`src/components/tour/props.ts`). See `tours/koupup/barista.js` (a cartoon person in the
-  tour's style: owner, 2026-11-23, a photographed face did not suit it).
+- **A barista** (owner, 2026-11-23): a person named `BARISTA` (the skeleton of «People» below) standing behind the
+  counter, facing the customers along his +Z; his places are Empties (`BARISTA_coffee`, where he stands at the machine,
+  `BARISTA_cookies` by the cookie pile, and those of «The café's menu» below). With an Empty `HOTSPOT_counter` in front
+  of the counter, a visitor there can order from the menu. The visitor holds what they get at the bottom of the screen
+  (the cookie in a second hand when they also hold a drink): five sips, five bites (`src/components/tour/props.ts`). See
+  `tours/koupup/barista.js` (a cartoon person in the tour's style: owner, 2026-11-23, a photographed face did not suit
+  it).
 - **Staff going round** (owner, 2026-11-23): a person named `CLEANER` with the barista's joints (`CLEANER_torso`, …) and
   his round, Empties `CLEANER_stop_<n>` (in order, looping; each faces the way he faces there, its extras' `wipe` the
   seconds he wipes a table there, 0 to walk on). Lines between stops must be clear of furniture; he waits for a visitor
   standing in his way (`src/components/tour/staff.ts`).
-- **Calling the waiter** (owner, 2026-11-23): a seated visitor gets «Call the waiter». He walks to them along the
-  café's walkways, Empties `NAV_<n>` whose extras' `links` list the points reached in a straight, clear line (`NAV_0`
-  is at the counter, where orders are picked up), stands by the seat (each `SEAT_<n>`'s extras `stand`, `[x, y, z]`, and
-  `nav`, its walkway point), takes the order, the barista makes it and hands it to him, and he brings it.
+- **The café's menu** (owner, 2026-11-24): an Empty `MENU` whose extras hold the menu (`menu`: categories, items with
+  their prices and how each is made; `photos`: one picture of the items' photos as a data URL) — for KOUP,
+  `tours/koupup/menu.json`, from the café's own online menu (re-run its builder when the café changes it). At the
+  counter «See the menu» opens it (the café's photos); a drink chosen and «Order», the barista makes it step by step
+  (`make`: the shot under the group head, hot water, milk steamed in the pitcher at the wand and poured with its pattern,
+  a syrup from its bottle in the rack, milk, soda, water or tea poured, ice scooped, the blender, a slice or mint from
+  the tray, a dusting, crumbs or a drizzle), in the café's own cup (espresso, hot, iced: `src/components/tour/drink.ts`).
+  He holds out his free hand: the visitor's hand comes up with the exact money in Iraqi dinar notes and puts it in it;
+  then it takes the order. The money goes in the till's drawer. The things he picks up are named `PROP_bottle_<key>`,
+  `PROP_pitcher`, `PROP_jug`, `PROP_scoop`, `PROP_drawer`; his places `BARISTA_<place>` (`src/components/tour/barista.ts`).
+- **The paper menu on the tables**: an Empty `MENU_<n>` on each table (in its item); standing by one, «See the menu»
+  reads it (as the café's printed menu); seated, ordering from it brings the waiter: he walks to them along the café's
+  walkways, Empties `NAV_<n>` whose extras' `links` list the points reached in a straight, clear line (`NAV_0` is at the
+  counter, where orders are picked up), stands by the seat (each `SEAT_<n>`'s extras `stand`, `[x, y, z]`, and `nav`, its
+  walkway point), takes the order (a nod), the barista makes it and hands it to him, and he brings it; the visitor pays
+  him, and the money goes in his pocket.
 - **Walls**: every mesh stops visitors (between their knees and head). Name a mesh `NOCOLLIDE…` to walk through it
   (leaves, curtains, a light's beam). Name a mesh `COLLIDER…` for an invisible wall (e.g. to keep visitors off a terrace
   edge or behind the counter).
@@ -91,6 +101,10 @@ world and follows its hand's socket each frame, so changing hands never moves it
 
 `?debug=1` on a tour's link shows each hand's socket (green) and target (red) and keeps the measured error of every
 contact in `window.tourContacts` (all within about 1 cm in the checks of 2026-11-24).
+
+The staff walk at a person's pace (the waiter 1.1 m/s going round, 1.3 m/s serving), with longer and quicker steps the
+faster they go (`ampFor` in `ik.ts`), and along a whole way at once (`walkPath`): turning as they walk and rounding the
+corners, slowing only for a sharp turn and at the end.
 
 ## Items and the editor (owner, 2026-11-23)
 

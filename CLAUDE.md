@@ -78,7 +78,10 @@ product spec's §74 business rules override assumptions.
   How to make a model: `docs/TOURS.md`. A café redrawn from its scan in animation style is built from code in `tours/<café>/`
   (`node tours/<café>/export.cjs`, e.g. `tours/koupup/`). A tour can have a barista (`BARISTA`, «Get a coffee/cookie», sips and
   bites in the visitor's hands, `src/components/tour/visit.ts`), staff going round wiping tables (`CLEANER`, `staff.ts`)
-  and seats (`SEAT_<n>`): docs/TOURS.md.
+  and seats (`SEAT_<n>`): docs/TOURS.md. A café's menu rides in its model (`MENU`, e.g. `tours/koupup/menu.json` from
+  the café's own online menu by `tours/koupup/menu/make.py`): visitors order from it at the counter or from the paper menu
+  on a table (seated: the waiter), the barista makes each drink by its recipe steps and they pay in dinar notes
+  (`src/components/tour/menu.ts|drink.ts|barista.ts`).
 - **Every 3D space made for the owner has an editor** (owner, 2026-11-23): each piece of furniture and decor is its own
   item with a permanent code (`ITEM_<code>`, codes kept in `tours/<café>/items.json`, never reused), and the owner moves
   and turns items in Admin (tours: Admin → Tours → Open the editor, `src/components/admin/TourEditor.tsx`, saved in

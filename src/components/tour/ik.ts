@@ -33,10 +33,21 @@ export function elbowFor(s: THREE.Vector3, target: THREE.Vector3, a: number, b: 
 export const GAIT = { hip: 0.36, knee: 0.95, leg: 0.85 };
 /** Metres walked in one whole cycle (two steps): each step about 2·leg·sin(hip). */
 export const STRIDE = 2 * 2 * GAIT.leg * Math.sin(GAIT.hip);
+/** The cycle's length when the legs swing `amp` times as far (longer steps walking faster). */
+export function strideFor(amp: number) {
+  return 2 * 2 * GAIT.leg * Math.sin(GAIT.hip * amp);
+}
+/**
+ * How far the legs swing at a walking speed (m/s), relative to `GAIT.hip`: people walk faster with longer steps and
+ * quicker ones (about 76 steps a minute at 0.5 m/s, 100 at 1 m/s, 110 at 1.3 m/s).
+ */
+export function ampFor(speed: number) {
+  return Math.min(1.25, Math.max(0.6, 0.3 + 0.7 * speed));
+}
 
 /** How far through the walk (radians) after walking `metres` more: the legs keep pace with the ground. */
-export function advanceGait(phase: number, metres: number) {
-  return (phase + (metres / STRIDE) * Math.PI * 2) % (Math.PI * 2);
+export function advanceGait(phase: number, metres: number, amp = 1) {
+  return (phase + (metres / strideFor(amp)) * Math.PI * 2) % (Math.PI * 2);
 }
 
 /**
@@ -46,12 +57,12 @@ export function advanceGait(phase: number, metres: number) {
  * left leg is forward at phase π/2; the right is half a cycle behind; each arm swings with the opposite leg (`armL`,
  * `armR`: forward swing, radians). The pelvis bobs (`bob`, metres), lowest as the feet pass.
  */
-export function gaitPose(phase: number, w: number) {
+export function gaitPose(phase: number, w: number, amp = 1) {
   const leg = (p: number) => {
-    const fwd = GAIT.hip * Math.sin(p); // the thigh's swing forward
+    const fwd = GAIT.hip * amp * Math.sin(p); // the thigh's swing forward
     // the knee lifts the foot through the swing (the thigh moving forward), nearly straight in the stance
     const swing = Math.max(0, Math.cos(p));
-    const knee = 0.08 + GAIT.knee * swing ** 1.6 + 0.12 * Math.max(0, Math.sin(p)) ** 2;
+    const knee = 0.08 + GAIT.knee * (0.75 + 0.25 * amp) * swing ** 1.6 + 0.12 * Math.max(0, Math.sin(p)) ** 2;
     const thigh = -fwd;
     const shin = knee;
     // level: the foot turns back what the thigh and shin turned; then the heel strike and the push-off

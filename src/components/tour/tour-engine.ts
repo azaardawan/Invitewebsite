@@ -10,7 +10,8 @@
  * - nodes named `HOTSPOT_<key>` (e.g. `HOTSPOT_menu` at a counter): within 1.8 m the page is told (`onSpot`);
  * - nodes named `SEAT_<n>` (a seat: its extras give `yaw`, the way a seated visitor faces, `eye`, their eye above the
  *   seat, and `table`, the spot nearest them on a table in reach): «Sit down» there;
- * - a barista (`BARISTA`, see barista.ts) at the counter (`HOTSPOT_counter`): «Get a coffee», «Get a cookie»;
+ * - a barista (`BARISTA`, see barista.ts) at the counter (`HOTSPOT_counter`): the café's menu (`MENU`, see menu.ts) to
+ *   order from; its paper on the tables (`MENU_<n>`): seated, the waiter brings the order;
  * - a member of staff going round wiping the tables (`CLEANER` and his round, see staff.ts).
  *
  * Loaded on its own (dynamic import) so only the tour page downloads three.js. It draws only when something changes.
@@ -21,6 +22,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { Visit, type Treat } from './visit';
+import type { Menu } from './menu';
 import type { SeatSpot } from './staff';
 import { applyEdit, collectItems, editOf, mergeItems, type Item, type ItemEdit, type TourEdits } from './items';
 
@@ -48,24 +50,26 @@ export type TourOptions = {
   editor?: { onSelect: (item: { code: string; label: string } | null) => void; onChange: (code: string, edit: ItemEdit) => void };
 };
 
-export type TourTreat = { left: number; where: 'hand' | 'table'; reach: boolean };
+export type TourTreat = { left: number; where: 'hand' | 'table'; reach: boolean; name: string };
 export type TourActivity = {
-  /** At the counter, the barista free: «Get a coffee», «Get a cookie» (each when it can be asked for). */
-  order: { coffee: boolean; cookie: boolean };
-  /** What the barista is making. */
-  making: Treat | null;
+  /**
+   * The café's menu can be opened: at the counter, ordering from the barista (`counter`), or at a table, reading its
+   * paper menu (`table`: seated, the waiter brings the order; standing, it is only read).
+   */
+  menu: 'counter' | 'table' | null;
+  /** Whether an order can be given now, and which hand is free for it (a drink, something to eat). */
+  canOrder: boolean;
+  free: { coffee: boolean; cookie: boolean };
+  /** The order under way: what, its price, and where it is (being made, being paid for, ready to take). */
+  order: { id: number; name: string; price: number; stage: 'making' | 'pay' | 'ready'; by: 'barista' | 'waiter' } | null;
   coffee: TourTreat | null;
   cookie: TourTreat | null;
   /** A seat within reach, or seated. */
   seat: 'near' | 'seated' | null;
   /** Something is under way (a sip, a bite, sitting down…): the buttons wait. */
   busy: boolean;
-  /**
-   * The waiter, for a seated visitor: «Call the waiter» (`call`), on his way (`coming`), by the seat for the order
-   * (`here`, with what can be ordered in `waiterOrder`), fetching or bringing it (`fetching`, `bringing`).
-   */
-  waiter: 'call' | 'coming' | 'here' | 'fetching' | 'bringing' | null;
-  waiterOrder: { coffee: boolean; cookie: boolean };
+  /** The waiter, for a seated visitor's order: on his way (`coming`), by the seat (`here`), fetching or bringing it. */
+  waiter: 'coming' | 'here' | 'fetching' | 'bringing' | null;
 };
 type Seat = { at: THREE.Vector3; yaw: number; eye: number; table: THREE.Vector3 | null; spot: SeatSpot | null };
 
@@ -133,6 +137,8 @@ export class TourEngine {
   private v = new THREE.Vector3();
   private w = new THREE.Vector3();
   private visit: Visit | null = null;
+  /** Where the paper menus lie (world). */
+  private papers: THREE.Vector3[] = [];
   private seats: Seat[] = [];
   private nearSeat: Seat | null = null;
   private seated: { seat: Seat; pos: THREE.Vector3; floorY: number } | null = null;
@@ -261,6 +267,10 @@ export class TourEngine {
       // where the waiter stands by it, and the walkway point he comes from
       const spot = stand && Number.isInteger(d.nav) ? { stand, seat: at.clone(), nav: Number(d.nav) } : null;
       this.seats.push({ at, yaw: Number(d.yaw) || 0, eye: Number(d.eye) || 0.72, table, spot });
+    });
+    // The paper menus on the tables.
+    root.traverse((o) => {
+      if (/^MENU_\d+$/.test(o.name)) this.papers.push(o.getWorldPosition(new THREE.Vector3()));
     });
     // The barista and what the visitor is given.
     this.visit = new Visit(this.scene, this.camera, this.env, (x, z, from) => this.surfaceBelow(x, z, from), !!this.o.debug);
@@ -533,7 +543,9 @@ export class TourEngine {
     let alive = false;
     // (in the editor the staff stand still: the place is drawn only when something changes)
     if (this.visit && !this.o.editor) {
-      alive = this.visit.update(dt, !!(f || s));
+      // a slow frame (a slow phone): the staff catch up in small steps, keeping their pace (up to half a second)
+      const staffDt = Math.min(frameMs / 1000, 0.5);
+      for (let t = 0; t < staffDt - 1e-6; t += 0.05) if (this.visit.update(Math.min(0.05, staffDt - t), !!(f || s))) alive = true;
       if (alive) this.emit();
       // the waiter has come to the seat: the visitor looks up at him
       const look = this.visit.lookAt;
@@ -560,16 +572,21 @@ export class TourEngine {
   private emit() {
     if (!this.o.onActivity || !this.visit) return;
     const v = this.visit.state(this.pos);
-    const atCounter = this.spot === 'counter' && !this.seated && !this.glide;
+    const atCounter = this.spot === 'counter' && !this.seated && !this.glide && !!this.visit.barista;
+    const seatSpot = this.seated?.seat.spot ?? null;
+    const atTable = (this.seated && this.visit.canServe(seatSpot)) || (!this.seated && this.nearPaper());
+    const free = { coffee: !v.coffee || v.coffee.where === 'table', cookie: !v.cookie || v.cookie.where === 'table' };
+    const canOrder = !v.order && !this.glide && (atCounter ? !this.visit.barista!.busy : !!this.seated && this.visit.canCallWaiter(seatSpot));
     const a: TourActivity = {
-      order: { coffee: atCounter && this.visit.canOrder('coffee'), cookie: atCounter && this.visit.canOrder('cookie') },
-      making: v.making,
+      menu: atCounter ? 'counter' : atTable ? 'table' : null,
+      canOrder,
+      free,
+      order: v.order ? { id: v.order.item.id, name: v.order.item.name, price: v.order.price, stage: v.order.stage, by: v.order.by } : null,
       coffee: v.coffee,
       cookie: v.cookie,
       seat: this.seated ? 'seated' : this.nearSeat && !this.glide ? 'near' : null,
       busy: v.busy || !!this.glide,
-      waiter: v.waiter ?? (this.seated && !this.glide && this.visit.canCallWaiter(this.seated.seat.spot) ? 'call' : null),
-      waiterOrder: v.waiterOrder,
+      waiter: v.waiter,
     };
     const key = JSON.stringify(a);
     if (key === this.activity) return;
@@ -577,11 +594,46 @@ export class TourEngine {
     this.o.onActivity(a);
   }
 
-  /** Asks the barista for a coffee or a cookie (at the counter). */
-  order(kind: Treat) {
-    if (this.spot !== 'counter' || this.seated || !this.visit?.order(kind)) return;
-    this.emit();
+  /** A paper menu on a table within reach (on this floor, 1.3 m). */
+  private nearPaper() {
+    return this.papers.some((p) => Math.abs(p.y - this.floorY) < 1.4 && Math.hypot(p.x - this.pos.x, p.z - this.pos.z) < 1.3);
+  }
+
+  /** The debug view (`?debug=1`) only: puts the visitor at a place (x, z on the floor there), looking along `yaw`. */
+  debugGo(x: number, z: number, yaw: number, pitch = -0.1) {
+    if (!this.o.debug) return;
+    this.pos.x = x;
+    this.pos.z = z;
+    const f = this.floorBelow(x, z, this.pos.y + 1, 6);
+    if (f !== null) this.floorY = f;
+    this.pos.y = this.floorY + EYE;
+    this.yaw = yaw;
+    this.pitch = pitch;
+    this.checkSpot();
+    this.dirty = true;
     this.kick();
+  }
+
+  /** The café's menu (and its photos), once loaded. */
+  get menu(): { menu: Menu; photos: string | null } | null {
+    return this.visit ? { menu: this.visit.menu, photos: this.visit.photos } : null;
+  }
+
+  /**
+   * Orders an item of the menu: at the counter from the barista; seated, from the waiter (he comes for the order,
+   * fetches it and brings it).
+   */
+  orderItem(id: number) {
+    if (!this.visit || this.glide) return;
+    let ok = false;
+    if (this.seated) {
+      const spot = this.seated.seat.spot;
+      ok = !!spot && this.visit.callWaiter(spot, this.seated.seat.table ?? null, id);
+    } else if (this.spot === 'counter') ok = this.visit.order(id);
+    if (ok) {
+      this.emit();
+      this.kick();
+    }
   }
 
   /** A sip of the coffee, a bite of the cookie. */
@@ -602,23 +654,6 @@ export class TourEngine {
     to.y += seat.eye;
     this.glideTo(to, seat.yaw, -0.12);
     this.emit();
-  }
-
-  /** Calls the waiter to the seat (seated). */
-  callWaiter() {
-    const spot = this.seated?.seat.spot;
-    if (spot && this.visit?.callWaiter(spot, this.seated?.seat.table ?? null)) {
-      this.emit();
-      this.kick();
-    }
-  }
-
-  /** Gives the waiter the order (he is by the seat). */
-  waiterOrder(kind: Treat) {
-    if (this.visit?.waiterOrder(kind)) {
-      this.emit();
-      this.kick();
-    }
   }
 
   /** Nothing after all: the waiter goes back to his round. */
