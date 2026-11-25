@@ -60,13 +60,13 @@ FONT_FILES = {
 SVG_WREATH, SVG_DIVIDER, SVG_VENUE = "wreath.svg", "divider.svg", "venue.svg"
 
 # Layout (metres, card centred on the origin, facing +Z)
-DATE_CENTER, DATE_SIZE, DATE_MAX_WIDTH = (0.0, -0.255), 0.052, 0.80   # size = digit height
+DATE_CENTER, DATE_SIZE, DATE_MAX_WIDTH = (0.0, -0.255), 0.056, 0.80   # size = digit height
 HEART_CENTER, HEART_WIDTH = (0.0, -0.345), 0.068
 DEBOSS_DEPTH = 0.0007     # letterpress depth of the pressed-in lettering
 
 # Embroidery
 THREAD_RADIUS = 0.00065   # base radius of the gold thread tube
-CORD_TWIST = 0.0016       # length of one twist of the gold cord
+CORD_TWIST = 0.0030       # length of one twist of the gold cord
 SAMPLE_STEP = 0.0007      # point spacing along stitch paths
 KIND_HEART_SATIN, KIND_CORD = 2.0, 3.0   # stitch kind, stored in point radius
 
@@ -300,7 +300,7 @@ def make_linen_material():
         L.new(texco.outputs["Object"], w.inputs["Vector"])
         return w
 
-    warp, weft = wave("X", 210.0, 2.2), wave("Y", 195.0, 2.6)
+    warp, weft = wave("X", 112.0, 2.0), wave("Y", 104.0, 2.4)
 
     def math(op, a, b, c=None):
         m = N.new("ShaderNodeMath")
@@ -320,7 +320,7 @@ def make_linen_material():
     weave = math("MULTIPLY_ADD", under, 0.6, over)
 
     slub = N.new("ShaderNodeTexNoise")          # thick/thin slubs along threads
-    slub.inputs["Scale"].default_value = 60.0
+    slub.inputs["Scale"].default_value = 38.0
     slub.inputs["Detail"].default_value = 4.0
     L.new(texco.outputs["Object"], slub.inputs["Vector"])
     grain = N.new("ShaderNodeTexNoise")         # fibre grain
@@ -340,7 +340,7 @@ def make_linen_material():
     fade = N.new("ShaderNodeMapRange")
     fade.clamp = True
     L.new(sock(cam.outputs, "View Distance"), fade.inputs[0])
-    fade.inputs[1].default_value, fade.inputs[2].default_value = 0.7, 1.8
+    fade.inputs[1].default_value, fade.inputs[2].default_value = 1.2, 2.6
     fade.inputs[3].default_value, fade.inputs[4].default_value = 1.0, 0.0
     fine = math("MULTIPLY", fine, fade.outputs[0])
     # Far away, a softer and larger cross-hatch keeps the card reading as linen.
@@ -352,7 +352,7 @@ def make_linen_material():
     height = math("MULTIPLY_ADD", sock(slub.outputs, "Fac"), 0.5, height)
 
     bump = N.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.95
+    bump.inputs["Strength"].default_value = 0.6
     bump.inputs["Distance"].default_value = 0.0009
     L.new(height, bump.inputs["Height"])
     L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
@@ -1174,7 +1174,7 @@ def build_stitch_node_group(thread_mat):
     b_fac = math_node("SINE", math_node("MULTIPLY", sock(sparam.outputs, "Factor"), math.pi))
     b_fac = math_node("POWER", b_fac, 0.3)
     bump = math_node("MULTIPLY_ADD", is_cord, math_node("SUBTRACT", b_len, b_fac), b_fac)
-    mult = math_node("MULTIPLY_ADD", is_heart, 0.35, math_node("MULTIPLY_ADD", is_cord, 0.55, 1.0))
+    mult = math_node("MULTIPLY_ADD", is_heart, 0.35, math_node("MULTIPLY_ADD", is_cord, 1.3, 1.0))
 
     geo = store(delete.outputs[0], "stitch_bump", bump, "POINT", 0)
 
@@ -1233,8 +1233,9 @@ def progress_identifier(ng):
 # --------------------------------------------------------------------------------------
 # Needle, thread & presser foot rig
 # --------------------------------------------------------------------------------------
-EYE_HEIGHT = 0.0175        # needle eye above the tip
-NEEDLE_UP, NEEDLE_DOWN = 0.008, -0.0012     # tip height above the stitch point (local Z)
+RIG_SCALE = 2.4            # the machine parts read at the wider camera distance
+EYE_HEIGHT = 0.0175        # needle eye above the tip (rig units)
+NEEDLE_UP, NEEDLE_DOWN = 0.008 / RIG_SCALE, -0.0012 / RIG_SCALE   # tip travel (rig units)
 THREAD_SIDE = 0.00095      # lower thread runs just beside the needle, towards the camera
 
 
@@ -1284,6 +1285,7 @@ def build_needle_rig(col, chrome, steel, thread_mat):
     ctrl = link(bpy.data.objects.new("NeedleRig_Controller", None), col)
     ctrl.empty_display_type = "ARROWS"
     ctrl.empty_display_size = 0.03
+    ctrl.scale = (RIG_SCALE, RIG_SCALE, RIG_SCALE)   # tip stays on the controller's origin
 
     # --- needle: tip at local origin, pointing down -Z --------------------------------
     bm = bmesh.new()
@@ -1342,9 +1344,8 @@ def build_needle_rig(col, chrome, steel, thread_mat):
 
     # --- presser foot: hovering behind-right of the needle, never over the active stitch -
     bm = bmesh.new()
-    _box(bm, (0.010, 0.022, 0.0016), (0.0, 0.0, 0.0))                          # sole
-    _box(bm, (0.010, 0.009, 0.0016), (0.0, 0.0135, 0.0022), (math.radians(-35), "X"))  # toe
-    _box(bm, (0.0035, 0.004, 0.012), (0.0, -0.002, 0.0068))                    # ankle
+    _box(bm, (0.009, 0.012, 0.010), (0.0, 0.0, 0.005))                         # foot block
+    _box(bm, (0.009, 0.006, 0.004), (0.0, 0.008, 0.0025), (math.radians(-25), "X"))  # toe
     _box(bm, (0.006, 0.006, 0.050), (0.002, -0.003, 0.038), mat_index=1)       # shank
     _cyl(bm, 0.0022, 0.0022, 0.050, 0.057, x=0.0065, y=-0.003, mat_index=1, segments=24,
          axis=Matrix.Rotation(math.radians(90), 4, "Y"))                       # thumb screw
@@ -1368,10 +1369,11 @@ def _aim(ob, loc, target):
     ob.rotation_euler = look_rotation(loc, target).to_euler()
 
 
-def setup_lights(col):
-    # Low raking warm key (sun): grazes the weave and throws shadows off the gold relief.
+def setup_lights(col, focus):
+    """Lights that bake_lighting() animates. Close-up: a soft warm pool of light follows the
+    needle and the rest of the card falls into shadow (like the reference). Full card: even."""
+    # Low raking warm key (sun): grazes the weave and throws shadows off the relief.
     sun_d = bpy.data.lights.new("Key_Raking", "SUN")
-    sun_d.energy = 4.2
     sun_d.color = (1.0, 0.80, 0.58)
     set_attr(sun_d, "angle", math.radians(2.5))
     set_attr(sun_d, "use_shadow", True)
@@ -1380,18 +1382,49 @@ def setup_lights(col):
     el, az = math.radians(21.0), math.radians(148.0)
     _aim(sun, Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el))) * 5, (0, 0, 0))
 
-    def area(name, loc, size, energy, color):
+    def area(name, loc, size, color):
         ld = bpy.data.lights.new(name, "AREA")
         ld.shape = "DISK"
         ld.size = size
-        ld.energy = energy
         ld.color = color
         set_attr(ld, "use_shadow", True)
         ob = link(bpy.data.objects.new(name, ld), col)
         _aim(ob, Vector(loc), (0, 0, 0))
+        return ob
 
-    area("Fill_Warm", (1.8, -1.6, 2.4), 3.0, 140.0, (1.0, 0.88, 0.72))     # lifts the shadows
-    area("Top_Glint", (0.4, -2.8, 3.0), 3.0, 120.0, (1.0, 0.88, 0.70))     # gold glints, off-axis
+    area("Fill_Warm", (1.8, -1.6, 2.4), 3.0, (1.0, 0.88, 0.72))     # lifts the shadows
+    area("Top_Glint", (0.4, -2.8, 3.0), 3.0, (1.0, 0.88, 0.70))     # gold glints, off-axis
+
+    # Pool of light riding with the needle (child of the focus target), from the upper left:
+    # a close soft point light, so the card falls off into warm shadow with distance.
+    pool_d = bpy.data.lights.new("Key_Pool", "POINT")
+    pool_d.color = (1.0, 0.77, 0.56)
+    set_attr(pool_d, "shadow_soft_size", 0.07)
+    set_attr(pool_d, "use_shadow", True)
+    pool = link(bpy.data.objects.new("Key_Pool", pool_d), col)
+    pool.parent = focus
+    pool.location = (-0.05, 0.26, 0.21)
+
+
+# light energy (W, or W/m2 for the sun) in the close-up and in the full-card view
+LIGHT_LEVELS = {"Key_Pool": (11.0, 0.0), "Key_Raking": (0.45, 4.2),
+                "Fill_Warm": (10.0, 140.0), "Top_Glint": (8.0, 120.0)}
+WORLD_LEVELS = (0.23, 0.55)
+
+
+def bake_lighting(scene):
+    for f in range(FRAME_START, FRAME_END + 1):
+        u = 0.0 if f <= CAM_CLOSE_END else smootherstep(
+            (f - CAM_CLOSE_END) / float(PULLBACK_END - CAM_CLOSE_END))
+        if f not in (FRAME_START, FRAME_END) and not (CAM_CLOSE_END - 1 <= f <= PULLBACK_END + 1):
+            continue                                   # only key where the light changes
+        for name, (close, full) in LIGHT_LEVELS.items():
+            ld = bpy.data.lights[name]
+            ld.energy = lerp(close, full, u)
+            ld.keyframe_insert("energy", frame=f)
+        bg = scene.world.node_tree.nodes.get("Background")
+        bg.inputs["Strength"].default_value = lerp(WORLD_LEVELS[0], WORLD_LEVELS[1], u)
+        bg.inputs["Strength"].keyframe_insert("default_value", frame=f)
 
 
 def build_camera(col):
@@ -1559,7 +1592,7 @@ def main():
         ink = make_ink_material()
         thread_mat = make_thread_material()
         chrome = make_simple_material("Needle_Chrome", (0.86, 0.87, 0.89, 1.0), 1.0, 0.14)
-        steel = make_simple_material("Machine_Steel", (0.66, 0.64, 0.61, 1.0), 1.0, 0.28)
+        steel = make_simple_material("Machine_Steel", (0.62, 0.60, 0.57, 1.0), 1.0, 0.24)
 
         cutter = make_deboss_cutter(col_emboss, ink)
         build_card(linen, col_card, cutter)
@@ -1595,8 +1628,9 @@ def main():
 
         # --- rig, lights, camera, animation -------------------------------------------
         rig = build_needle_rig(col_rig, chrome, steel, thread_mat)
-        setup_lights(col_light)
         cam, focus = build_camera(col_light)
+        setup_lights(col_light, focus)
+        bake_lighting(scene)
         bake_animation(scene, sampler, stitch, mod, ident, rig, cam, focus)
 
         scene.frame_set(FRAME_START)
