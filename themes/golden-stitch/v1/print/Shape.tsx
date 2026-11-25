@@ -1,15 +1,16 @@
 import type { PrintShapeProps } from '@/theme-sdk';
 import fonts from '../fonts.module.css';
 import heart from '../assets/heart-sketch.webp';
-import { PrintDivider, StackedNames } from './Ornaments';
+import { PrintDivider, QrCodes, StackedNames } from './Ornaments';
 import p from './print.module.css';
 
 /**
  * The arch card (manifest `print.shapes`, feature `card_arch`), on the owner's scalloped arch artwork (the same on both
  * sides; the outline is symmetric). Front: the names stacked, the divider, the date and the sketched heart. Back: the
- * customer's title and message in italics, a heart between two short rules, and the QR code. Transparent outside the arch.
+ * customer's title and message in italics, a heart between two short rules, and at the bottom the QR code (two side
+ * by side when the customer bought guest photo sharing). Transparent outside the arch.
  */
-export default function Shape({ side, dir, lang, fields, event, labels, title, message, qrDataUrl, extraLine }: PrintShapeProps) {
+export default function Shape({ side, dir, lang, fields, event, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine }: PrintShapeProps) {
   return (
     <div className={`${fonts.fonts} ${p.arch}`} dir={dir} lang={lang}>
       {side === 'front' ? (
@@ -36,13 +37,7 @@ export default function Shape({ side, dir, lang, fields, event, labels, title, m
             <HeartOutline />
             <span />
           </p>
-          {qrDataUrl ? (
-            <figure className={`${p.qr} ${p.archQr}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}
-              <img src={qrDataUrl} alt="" width={60} height={60} />
-              <figcaption>{labels.scanToOpen}</figcaption>
-            </figure>
-          ) : null}
+          <QrCodes qr={qrDataUrl} photoQr={photoQrDataUrl} labels={labels} className={p.archQrs} />
         </div>
       )}
     </div>

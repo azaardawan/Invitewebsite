@@ -1269,6 +1269,7 @@
     "brand": "Bahja",
     "print": {
       "scanToOpen": "Scan to open the invitation",
+      "scanToSharePhotos": "Scan to share your photos",
       "keepsakeTitle": "Messages of love",
       "keepsakeEmpty": "No messages yet.",
       "cardBackTitle": "With love",

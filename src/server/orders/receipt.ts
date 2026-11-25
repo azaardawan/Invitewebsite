@@ -64,6 +64,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       cards: cardDetails.map((c) => c.key),
       /** The A5 card's back is upright like its front (manifest `print.card.back`), else landscape. */
       cardBackPortrait: cardBackPortrait(manifest),
+      /** The design's own note for its customers (manifest `pageTexts.notice`), in every language it has. */
+      notice: manifest?.pageTexts?.notice ?? null,
       /** Each shaped card's name in the design's languages (the A5 card has none). */
       cardLabels: Object.fromEntries(cardDetails.filter((c) => c.shape).map((c) => [c.key, c.shape!.label])),
       /** Newborn extras in the package (story, sticker, bottle_label) and the sticker shape chosen. */

@@ -2331,3 +2331,13 @@ reference stay in Arabic in every language.
 | 21 | #32: `weddingOf` | حفل زفاف | The Wedding of | زەماوەندی | داوەتا |
 | 22 | #32: `skipFilm` | تخطّي | Skip | تێپەڕاندن | دەرباز بکە |
 | 23 | #32: `keepsakeSub` | تهاني الأهل والأحبة | Wishes from family and friends | پیرۆزبایی خێزان و خۆشەویستان | پیرۆزباهیێن مالباتێ و هەڤالان |
+
+## Batch 75 — Golden Stitch (#32): the 10-minute film notice, and the guests' photo QR code on printed cards — ✅ AUTO-APPROVED (2026-11-25, owner checks in Admin → Translations)
+
+The notice is the design's own (`themes/golden-stitch/v1/manifest.ts`, `pageTexts.notice`), shown on its order form and receipt.
+The caption sits under the second QR code on a card's back when the customer bought guest photo sharing (`invitation.print.scanToSharePhotos`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: notice on the order form and receipt | بعد الدفع نصنع فيلم التطريز الخاص بكم بأسمائكم وتاريخكم، ويستغرق ذلك حوالي ١٠ دقائق. لا تقلقوا: ابقوا في الصفحة أو عودوا بعد قليل وستجدون دعوتكم جاهزة. | After payment we make your own stitched film with your names and date. It takes about 10 minutes, so don't worry: stay on this page or come back shortly and your invitation will be ready. | دوای پارەدان فیلمی دروومانەکەتان بە ناو و بەرواری خۆتان دروست دەکەین، نزیکەی ١٠ خولەک دەخایەنێت. نیگەران مەبن: لەم پەڕەیەدا بمێننەوە یان کەمێکی تر بگەڕێنەوە و بانگهێشتنامەکەتان ئامادە دەبێت. | پشتی پارەدانێ ئەم فیلمێ دروومانا هەوە ب ناڤ و دیرۆکا هەوە چێدکەین، نێزیکی ١٠ خولەکان دڤێت. خەمێ نەخۆن: ل ڤێ پەڕێ بمینن یان پشتی کێمەکێ ڤەگەڕن و داخوازنامەیا هەوە دێ یا ئامادە بیت. |
+| 2 | `invitation.print.scanToSharePhotos` (caption under the photo QR) | امسح الرمز لمشاركة صوركم | Scan to share your photos | کۆدەکە سکان بکە بۆ ناردنی وێنەکانتان | کۆدی سکان بکە بۆ هنارتنا وێنەیێن هەوە |

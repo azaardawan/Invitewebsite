@@ -22,7 +22,7 @@ import type { ExtrasLook } from '@/server/db/schema';
 import { tintedLook } from '@/components/print/look';
 
 type InvitationRow = typeof invitations.$inferSelect;
-type PrintMessages = { scanToOpen: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string; watermark: string; watermarkNote: string };
+type PrintMessages = { scanToOpen: string; scanToSharePhotos: string; keepsakeTitle: string; keepsakeEmpty: string; cardBackTitle: string; watermark: string; watermarkNote: string };
 
 /**
  * Page size for Chromium. The card page is exactly the trim size (A5 = 148 × 210 mm) and the theme's
@@ -34,6 +34,11 @@ const CARD_SIZES = { A5: [148, 210], '5x7': [127, 178] } as const;
 
 export function invitationUrl(inv: Pick<InvitationRow, 'slug' | 'publicId'>): string {
   return `${env().APP_URL.replace(/\/$/, '')}${invitationPath(inv.slug, inv.publicId)}`;
+}
+
+/** The guests' photo upload page, when the customer bought guest photo sharing; null otherwise. */
+export function guestPhotosUrl(inv: Pick<InvitationRow, 'guestPhotosToken' | 'guestPhotosCap'>): string | null {
+  return inv.guestPhotosToken && inv.guestPhotosCap !== null ? `${env().APP_URL.replace(/\/$/, '')}/g/${inv.guestPhotosToken}` : null;
 }
 
 export async function visibleMessages(db: DbOrTx, invitationId: string, locale: Locale): Promise<KeepsakeMessage[]> {
@@ -108,7 +113,9 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     const cards = chosenCards(inv.featureKeys, inv.cardChoices, shapes.map((x) => x.key));
     const card = pick.card && cards.includes(pick.card) ? pick.card : cards[0]!;
     const shape = card === MAIN_CARD ? null : (shapes.find((x) => x.key === card) ?? null);
-    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape)) };
+    // The second QR code (owner, 2026-11-25): guests send the couple their photos, when the customer bought it.
+    const photoQrUrl = opts.showQr !== false ? guestPhotosUrl(inv) : null;
+    return { codeRef, ...(await cardData(theme, manifest, kind, opts, qrUrl, { front: artwork.front, back: artwork.back }, artwork.look, shape, photoQrUrl)) };
   }
   const { base } = printBase(theme);
   const props: KeepsakeProps = { ...base, messages: await visibleMessages(db, inv.id, inv.locale) };
@@ -117,13 +124,14 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
 
 /** The props every print design shares, from the invitation's theme props. */
 function printBase(theme: ThemeProps) {
-  const { cardBackTitle, scanToOpen, keepsakeTitle, keepsakeEmpty } = (invitationMessages(theme.locale) as unknown as { print: PrintMessages }).print;
+  const { cardBackTitle, scanToOpen, scanToSharePhotos, keepsakeTitle, keepsakeEmpty } = (invitationMessages(theme.locale) as unknown as { print: PrintMessages }).print;
   const labels: PrintLabels = {
     date: theme.labels.date,
     time: theme.labels.time,
     venue: theme.labels.venue,
     and: theme.labels.and,
     scanToOpen,
+    scanToSharePhotos,
     keepsakeTitle,
     keepsakeEmpty,
     itsABoy: theme.labels.itsABoy,
@@ -164,12 +172,16 @@ export async function cardData(
   ownerLook: ExtrasLook | null = null,
   /** The shaped card (leaf, heart…) this file is for, or null for the A5 card. */
   shape: CardShape | null = null,
+  /** The guests' photo upload page, for the second QR code; null when the customer has only the invitation's. */
+  photoQrUrl: string | null = null,
 ) {
   const { base, cardBackTitle } = printBase(theme);
   const spec = manifest?.print?.card ?? { size: 'A5' as const, bleedMm: 3, qr: true };
   const [w, h] = CARD_SIZES[spec.size];
   // In the design's colours when it sets them (scanners read any strong contrast), otherwise black on white.
-  const qrDataUrl = spec.qr && qrUrl ? await QRCode.toDataURL(qrUrl, { margin: 0, width: 384, errorCorrectionLevel: 'M', ...(spec.qrColors ? { color: spec.qrColors } : {}) }) : null;
+  const qrOf = (url: string | null) =>
+    spec.qr && url ? QRCode.toDataURL(url, { margin: 0, width: 384, errorCorrectionLevel: 'M', ...(spec.qrColors ? { color: spec.qrColors } : {}) }) : null;
+  const [qrDataUrl, photoQrDataUrl] = await Promise.all([qrOf(qrUrl), qrOf(photoQrUrl)]);
   // Owner, 2026-11-11: the invitation's paragraph is never printed on the card. The card's only paragraph is the one
   // the customer writes for its back (`backMessage`), so neither side gets `invitation_message` (some designs would
   // print it on the front, or on the back when no back message was written). Admin may still write a line for the
@@ -182,9 +194,9 @@ export async function cardData(
   delete cardFields.family_names;
   const fields = { ...cardFields };
   if (opts.message?.trim()) fields.invitation_message = opts.message.trim();
-  const props: PrintCardProps = { ...base, fields, qrDataUrl, extraLine: opts.extraLine?.trim() || null };
+  const props: PrintCardProps = { ...base, fields, qrDataUrl, photoQrDataUrl, extraLine: opts.extraLine?.trim() || null };
   // The back: the customer's big title (or a default) and smaller message.
-  const back: PrintCardBackProps = { ...base, fields: cardFields, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null, qrDataUrl };
+  const back: PrintCardBackProps = { ...base, fields: cardFields, title: opts.backTitle?.trim() || cardBackTitle, message: opts.backMessage?.trim() || null, qrDataUrl, photoQrDataUrl };
   const page: PageSpec =
     kind === 'card'
       ? { width: `${w}mm`, height: `${h}mm`, margin: '0', cropMm: spec.bleedMm }

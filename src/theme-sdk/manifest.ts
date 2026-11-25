@@ -212,7 +212,17 @@ export type DesignSwitch = {
 };
 
 /** A line's default text for an invitation language: its version where `defaultIn` lists the language, else the Arabic. */
-export type PageTexts = { open?: ThemeText; share?: ThemeText; endedTitle?: ThemeText; endedBody?: ThemeText };
+export type PageTexts = {
+  open?: ThemeText;
+  share?: ThemeText;
+  endedTitle?: ThemeText;
+  endedBody?: ThemeText;
+  /**
+   * A short note for customers of this design, shown on its order form and on the receipt (e.g. Golden Stitch: the
+   * couple's own film takes about ten minutes to make after payment).
+   */
+  notice?: ThemeText;
+};
 
 /** A design's own page text (`pageTexts[key]`) in `locale` (the Arabic when there is no Kurdish), or null. */
 export function pageText(manifest: Pick<ThemeManifest, 'pageTexts'> | null | undefined, key: keyof PageTexts, locale: string): string | null {
@@ -343,7 +353,7 @@ export const manifestSchema = z
       })
       .optional(),
     internal: z.boolean().optional(),
-    pageTexts: z.object({ open: themeText.optional(), share: themeText.optional(), endedTitle: themeText.optional(), endedBody: themeText.optional() }).optional(),
+    pageTexts: z.object({ open: themeText.optional(), share: themeText.optional(), endedTitle: themeText.optional(), endedBody: themeText.optional(), notice: themeText.optional() }).optional(),
   })
   .superRefine((m, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: 'custom', message });

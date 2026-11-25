@@ -62,6 +62,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
         </Link>
       </div>
 
+      {th.manifest.pageTexts?.notice ? (
+        <p role="note" className="mt-4 rounded-[22px] border border-accent/40 bg-blush px-5 py-4 text-[15px] leading-relaxed text-heading" data-design-notice>
+          {localized(th.manifest.pageTexts.notice, locale)}
+        </p>
+      ) : null}
+
       <div className="mt-8">
         <OrderForm
           action={startOrderAction}

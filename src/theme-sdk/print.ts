@@ -20,6 +20,8 @@ export type PrintLabels = {
   and: string;
   /** Caption under the QR code. */
   scanToOpen: string;
+  /** Caption under the photo QR code (`photoQrDataUrl`). */
+  scanToSharePhotos: string;
   /** Keepsake title, e.g. "Messages of love". */
   keepsakeTitle: string;
   /** Shown when a keepsake has no messages. */
@@ -60,6 +62,8 @@ type PrintBase = {
 export type PrintCardProps = PrintBase & {
   /** QR code image (data URL) linking to the online invitation; null when the theme or the team turns it off. */
   qrDataUrl: string | null;
+  /** The guests' photo QR code (data URL; the customer bought guest photo sharing), or null. See `PrintCardBackProps`. */
+  photoQrDataUrl: string | null;
   /** One extra line the team added for this card only (e.g. "Family invitation"); null when none. Print it near the details. */
   extraLine: string | null;
 };
@@ -79,6 +83,12 @@ export type PrintCardBackProps = PrintBase & {
    * room prints it here instead (and leaves it off its front).
    */
   qrDataUrl: string | null;
+  /**
+   * A second QR code, for guests to send the couple their photos (owner, 2026-11-25: a customer has one QR code, or two
+   * when they bought guest photo sharing), or null. Print it beside the invitation's QR (caption
+   * `labels.scanToSharePhotos`); designs that don't draw it themselves simply leave it out.
+   */
+  photoQrDataUrl: string | null;
 };
 
 /**
@@ -97,6 +107,8 @@ export type PrintShapeProps = PrintBase & {
   outline: string;
   /** QR code to the online invitation, or null; the design prints it on the side it chooses. */
   qrDataUrl: string | null;
+  /** The guests' photo QR code, or null (see `PrintCardBackProps`); printed beside the invitation's QR. */
+  photoQrDataUrl: string | null;
   /** Front: one extra line the team added, or null. */
   extraLine: string | null;
   /** Back: the big title (the customer's, or a default) and the smaller message (or null). */

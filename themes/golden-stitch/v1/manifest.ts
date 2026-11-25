@@ -48,6 +48,16 @@ export default defineTheme({
       fields: [...allFields],
     },
   ],
+  // Owner, 2026-11-25: the couple's own film is made after payment and takes about ten minutes; say so on the order
+  // form and the receipt, so nobody gives up waiting.
+  pageTexts: {
+    notice: {
+      ar: 'بعد الدفع نصنع فيلم التطريز الخاص بكم بأسمائكم وتاريخكم، ويستغرق ذلك حوالي ١٠ دقائق. لا تقلقوا: ابقوا في الصفحة أو عودوا بعد قليل وستجدون دعوتكم جاهزة.',
+      en: "After payment we make your own stitched film with your names and date. It takes about 10 minutes, so don't worry: stay on this page or come back shortly and your invitation will be ready.",
+      ckb: 'دوای پارەدان فیلمی دروومانەکەتان بە ناو و بەرواری خۆتان دروست دەکەین، نزیکەی ١٠ خولەک دەخایەنێت. نیگەران مەبن: لەم پەڕەیەدا بمێننەوە یان کەمێکی تر بگەڕێنەوە و بانگهێشتنامەکەتان ئامادە دەبێت.',
+      bdn: 'پشتی پارەدانێ ئەم فیلمێ دروومانا هەوە ب ناڤ و دیرۆکا هەوە چێدکەین، نێزیکی ١٠ خولەکان دڤێت. خەمێ نەخۆن: ل ڤێ پەڕێ بمینن یان پشتی کێمەکێ ڤەگەڕن و داخوازنامەیا هەوە دێ یا ئامادە بیت.',
+    },
+  },
   // The Quran verse page (Ar-Rum 30:21) can be left out; the verse itself is never changed.
   switches: [
     {

@@ -22,6 +22,8 @@ const query = z.object({
   names: z.enum(['short', 'long']).optional(),
   /** `1`: a sample message on the back (the long one with `names=long`), to check it fits. */
   msg: z.literal('1').optional(),
+  /** `1`: also the guests' photo QR code (customers who bought guest photo sharing have two). */
+  photos: z.literal('1').optional(),
   v: z.coerce.number().int().min(1).optional(),
   /** Texts to try (JSON, `parseTextProbe`): the automatic text-length checks. */
   try: z.string().max(8000).optional(),
@@ -57,6 +59,7 @@ export default async function CardSamplePreview({ params, searchParams }: PagePr
     await themeCardDesign(db(), sample.theme.id),
     null,
     shape ?? null,
+    q.data.photos ? 'https://bahjaaa.com/g/sample' : null,
   );
   return <CardPages codeRef={sample.version.codeRef} data={data} view={q.data.side} png={q.data.png === '1'} />;
 }

@@ -50,3 +50,36 @@ export function StackedNames({ one, two, and, className }: { one?: string; two?:
     </h1>
   );
 }
+
+/**
+ * The QR codes at the bottom of a card's back: the invitation's, and the guests' photo QR beside it when the customer
+ * bought guest photo sharing (one or two codes).
+ */
+export function QrCodes({
+  qr,
+  photoQr,
+  labels,
+  className = '',
+}: {
+  qr: string | null;
+  photoQr: string | null;
+  labels: { scanToOpen: string; scanToSharePhotos: string };
+  className?: string;
+}) {
+  const codes = [
+    qr ? { src: qr, caption: labels.scanToOpen } : null,
+    photoQr ? { src: photoQr, caption: labels.scanToSharePhotos } : null,
+  ].filter((c) => c !== null);
+  if (!codes.length) return null;
+  return (
+    <div className={`${p.qrs} ${className}`} data-count={codes.length}>
+      {codes.map((c) => (
+        <figure key={c.caption} className={p.qr}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- print document, data URL */}
+          <img src={c.src} alt="" width={64} height={64} />
+          <figcaption>{c.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
