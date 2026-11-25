@@ -14,6 +14,7 @@
  */
 import * as THREE from 'three';
 import { advanceGait, ampFor, approach, elbowFor, gaitPose } from './ik';
+import { preShape, type GripFit } from './grip';
 
 export type Side = 'L' | 'R';
 export type HandPose = 'relaxed' | 'grip' | 'pinch' | 'flat';
@@ -77,7 +78,13 @@ export class Character {
   private reachW: Record<Side, number> = { L: 0, R: 0 };
   private lastReach: Record<Side, Reach | null> = { L: null, R: null };
   hand: Record<Side, HandPose> = { L: 'relaxed', R: 'relaxed' };
-  private handNow: Record<Side, { f: [number, number][]; t: [number, number] }>;
+  /**
+   * The grip fitted to what each hand holds or reaches for (grip.ts; null: the fixed poses): where the thing sits in
+   * the hand, and how far each finger closes on it.
+   */
+  fit: Record<Side, GripFit | null> = { L: null, R: null };
+  /** Each hand's fingers now (`ts`: the thumb swung sideways, fitted grips only). */
+  private handNow: Record<Side, { f: [number, number][]; t: [number, number]; ts?: number }>;
   /** A smile (0…1) and the brows lifted (0…1), eased. */
   smile = 0.4;
   brows = 0;
@@ -174,6 +181,11 @@ export class Character {
       o.scale.copy(r.s);
     }
     const b = this.b;
+    // the sockets where the fitted grips put what is held (before the reach, which places the socket)
+    for (const s of SIDES) {
+      const f = this.fit[s];
+      if (f) (f.socketKind === 'grip' ? this.arms[s].grip : this.arms[s].pinch).position.copy(f.socket);
+    }
     // ---- the walk ----
     this.walkW = approach(this.walkW, this.walkTarget, dt, 0.12);
     if (this.walkTarget === 0 && this.walkW < 0.02) this.walkW = 0;
@@ -249,7 +261,9 @@ export class Character {
     // ---- the fingers ----
     for (const s of SIDES) {
       const a = this.arms[s];
-      const want = POSES[this.hand[s]];
+      const fit = this.fit[s];
+      // a fitted grip: closed on the thing, or opened round it while reaching for it
+      const want = fit && (this.hand[s] === 'grip' || this.hand[s] === 'pinch') ? fit : fit && this.hand[s] === 'relaxed' ? preShape(fit) : POSES[this.hand[s]];
       const now = this.handNow[s];
       now.f.forEach((f, i) => {
         f[0] = approach(f[0], want.f[i]![0], dt, 0.06);
@@ -260,7 +274,8 @@ export class Character {
       });
       now.t[0] = approach(now.t[0], want.t[0], dt, 0.06);
       now.t[1] = approach(now.t[1], want.t[1], dt, 0.06);
-      this.turn(a.thumb[0], 0, 0, -a.sx * now.t[0]);
+      now.ts = approach(now.ts ?? 0, (want as { ts?: number }).ts ?? 0, dt, 0.06);
+      this.turn(a.thumb[0], now.ts, 0, -a.sx * now.t[0]);
       this.turn(a.thumb[1], -now.t[1] * 0.4, 0, -a.sx * now.t[1]);
     }
     // ---- the face: blinking now and then (both eyes), the smile and the brows ----
@@ -340,6 +355,21 @@ export class Character {
   /** A shoulder's joint (world): where a reach is measured from. */
   shoulder(side: Side) {
     return this.arms[side].arm.getWorldPosition(new THREE.Vector3());
+  }
+
+  /** Puts a hand's fingers in a pose at once (a flat thing just taken: open round it as it actually lies). */
+  snapHand(s: Side, pose: { f: [number, number][]; t: [number, number]; ts?: number }) {
+    this.handNow[s] = structuredClone(pose);
+  }
+
+  /** How far a hand's reach has come in (0…1: the arm and the wrist turned all the way). */
+  reachWeight(s: Side) {
+    return this.reachW[s];
+  }
+
+  /** A hand's finger and thumb bones (to measure how near they are to what it holds). */
+  handBones(s: Side) {
+    return { f: this.arms[s].fingers, t: this.arms[s].thumb };
   }
 
   /** For the debug view: each hand's socket and where it reaches (world). */

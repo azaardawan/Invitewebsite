@@ -5,6 +5,7 @@
  */
 import * as THREE from 'three';
 import { HAND_POSES, type HandPose as BodyPose } from './character';
+import { preShape, type GripFit } from './grip';
 
 export type HandPose = BodyPose | 'open';
 
@@ -189,7 +190,14 @@ export function makeCookie(): Cookie {
 
 // ---------- the visitor's hands ----------
 export type FPHand = THREE.Group & {
-  userData: { sx: number; pose: (name: HandPose, dt: number) => void; aim: (elbow: THREE.Vector3) => void; grip: THREE.Vector3; pinch: THREE.Vector3 };
+  userData: {
+    sx: number;
+    pose: (name: HandPose, dt: number, fit?: GripFit | null) => void;
+    aim: (elbow: THREE.Vector3) => void;
+    grip: THREE.Vector3;
+    pinch: THREE.Vector3;
+    bones: { f: [THREE.Object3D, THREE.Object3D][]; t: [THREE.Object3D, THREE.Object3D] };
+  };
 };
 
 /**
@@ -255,6 +263,7 @@ export function makeFPHand(right: boolean): FPHand {
   g.add(sleeve);
   const up = new THREE.Vector3(0, 1, 0);
   const now = structuredClone(HAND_POSES.relaxed);
+  let spread = 0;
   const q = new THREE.Quaternion(),
     e = new THREE.Euler();
   g.userData = {
@@ -266,8 +275,10 @@ export function makeFPHand(right: boolean): FPHand {
     },
     grip: new THREE.Vector3(-sx * 0.058, -0.062, 0),
     pinch: new THREE.Vector3(-sx * 0.022, -0.115, 0.03),
-    pose: (name, dt) => {
-      const want = name === 'open' ? OPEN : HAND_POSES[name];
+    bones: { f: fingers.map((f) => [f[0], f[1]] as [THREE.Object3D, THREE.Object3D]), t: [ta, tb] },
+    pose: (name, dt, fit) => {
+      // a grip fitted to what it holds (grip.ts), or the fixed poses
+      const want = name === 'open' ? (fit ? preShape(fit) : OPEN) : fit && (name === 'grip' || name === 'pinch') ? fit : HAND_POSES[name];
       const k = dt > 0 ? 1 - Math.pow(0.5, dt / 0.06) : 1;
       now.f.forEach((f, i) => {
         f[0] += (want.f[i]![0] - f[0]) * k;
@@ -277,7 +288,9 @@ export function makeFPHand(right: boolean): FPHand {
       });
       now.t[0] += (want.t[0] - now.t[0]) * k;
       now.t[1] += (want.t[1] - now.t[1]) * k;
-      ta.quaternion.setFromEuler(taRest).multiply(q.setFromEuler(e.set(0, 0, -sx * now.t[0])));
+      // (the thumb swung sideways: fitted grips only)
+      spread += (((want as { ts?: number }).ts ?? 0) - spread) * k;
+      ta.quaternion.setFromEuler(taRest).multiply(q.setFromEuler(e.set(spread, 0, -sx * now.t[0])));
       tb.quaternion.setFromEuler(e.set(-now.t[1] * 0.4, 0, -sx * now.t[1]));
     },
   };

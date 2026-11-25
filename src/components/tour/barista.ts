@@ -462,6 +462,10 @@ export class Barista {
   get character() {
     return this.a.ch;
   }
+  /** What he does and holds (for the debug view's measurements). */
+  get actor() {
+    return this.a;
+  }
 
   /** Where an order waits on the counter for a visitor standing back (world, on the counter's top). */
   get handout() {

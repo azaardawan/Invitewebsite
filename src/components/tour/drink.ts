@@ -453,7 +453,7 @@ export function makeCash(notes: number[]): Cash {
     m.rotation.z = -a;
     g.add(m);
   });
-  g.userData = { notes, hold: new THREE.Vector3(0, 0.012, 0) };
+  g.userData = { notes, hold: new THREE.Vector3(0, 0.012, 0), grip: { type: 'slab', t: 0.006, R: 0.042, c: [0, 0.034, 0] } };
   return g;
 }
 
@@ -462,6 +462,6 @@ export function makeGarnish(gName: Garnish): THREE.Group {
   const g = new THREE.Group();
   addTopping(g, gName === 'mint' ? 'mint' : gName === 'lemon' ? 'lemon' : 'lime', undefined, 0.03);
   g.children.forEach((c) => c.position.set(0, 0, 0));
-  g.userData = { hold: new THREE.Vector3(0, 0, 0) };
+  g.userData = { hold: new THREE.Vector3(0, 0, 0), grip: { type: 'slab', t: 0.005, R: 0.018 } };
   return g;
 }

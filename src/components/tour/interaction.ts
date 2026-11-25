@@ -9,8 +9,9 @@
  * (never parented to a bone): changing hands keeps it exactly where it is.
  */
 import * as THREE from 'three';
-import { Character, type Side } from './character';
+import { Character, holdingQuat, type Side } from './character';
 import { approach } from './ik';
+import { fitGrip, fitGripOn, holdIn, preShape, shapeOf, uprightHold, type GripFit } from './grip';
 
 /**
  * What a hand holds: a drink in its cup (`coffee`, any drink), a cookie, the barista's tools (a syrup `bottle` or a jar,
@@ -39,9 +40,16 @@ export const handKind = (k: Kind): 'cup' | 'cookie' => (k === 'cookie' || k === 
 export const CONTACT = 0.025;
 
 /** Someone paying as they are given their order: where his hand meets their money, and their hand letting it go. */
-export type Pay = { meet: () => THREE.Vector3 | null; given: (at: THREE.Vector3) => THREE.Object3D | null; paid?: (cash: THREE.Object3D) => void };
+export type Pay = {
+  meet: () => THREE.Vector3 | null;
+  given: (at: THREE.Vector3) => THREE.Object3D | null;
+  paid?: (cash: THREE.Object3D) => void;
+  /** How the money is turned as it is held out (world): his hand shapes itself for it. */
+  facing?: () => THREE.Quaternion | null;
+};
 
-export type Step = { start?: () => void; run: (dt: number, t: number) => boolean; end?: () => void; limit?: number };
+/** A step of a script; `label`: what he is doing then (for the debug view's measurements). */
+export type Step = { start?: () => void; run: (dt: number, t: number) => boolean; end?: () => void; limit?: number; label?: string };
 
 /**
  * Every contact made (opt-in debugging, `?debug=1` on a tour's link): what, by whom, and how far the hand's socket was
@@ -61,8 +69,10 @@ export class Actor {
   private t = 0;
   yaw: number;
   /** Things held, following their sockets. */
-  held: Record<Side, { prop: THREE.Object3D; kind: Kind; settle?: number; fromQ?: THREE.Quaternion; tilt?: number } | null> = { L: null, R: null };
+  held: Record<Side, { prop: THREE.Object3D; kind: Kind; settle?: number; fromQ?: THREE.Quaternion; tilt?: number; rel?: THREE.Quaternion } | null> = { L: null, R: null };
   private v = new THREE.Vector3();
+  /** What each hand is reaching to take (its grip is fitted to it before the fingers close). */
+  aim: Record<Side, { prop: THREE.Object3D; kind: Kind; facing?: () => THREE.Quaternion | null } | null> = { L: null, R: null };
   /**
    * Where he stands to work at a point (behind a counter: on his line along it, facing it), and the corners he goes
    * round on the way; null: just within reach of it.
@@ -78,6 +88,10 @@ export class Actor {
   get busy() {
     return !!this.step || this.steps.length > 0;
   }
+  /** What he is doing now (for the debug view): the step's label, or holding. */
+  get phase() {
+    return this.step?.label ?? 'holding';
+  }
   get position() {
     return this.ch.root.getWorldPosition(new THREE.Vector3());
   }
@@ -86,6 +100,7 @@ export class Actor {
   }
   /** Drops what is planned (what he holds stays held). */
   clear() {
+    this.aim = { L: null, R: null };
     this.steps = [];
     this.step?.end?.();
     this.step = null;
@@ -110,10 +125,25 @@ export class Actor {
       }
     }
     this.ch.root.rotation.set(0, this.yaw, 0);
+    // each hand's grip fitted to what it holds or reaches for (grip.ts; the demo's switch)
+    for (const side of ['L', 'R'] as Side[]) {
+      const held = this.held[side];
+      const aim = this.aim[side];
+      let fit: GripFit | null = null;
+      if (fitGripOn() && held) fit = fitFor(side === 'L' ? 1 : -1, held.prop, held.kind, held.rel);
+      else if (fitGripOn() && aim) {
+        // reaching for it: shaped for how it will sit in the hand (a flat thing as it lies, the hand as it will be turned)
+        const thingQ = aim.facing ? aim.facing() : aim.prop.getWorldQuaternion(new THREE.Quaternion());
+        const flat = shapeOf(aim.prop, aim.kind)?.type === 'slab';
+        fit = fitFor(side === 'L' ? 1 : -1, aim.prop, aim.kind, flat && thingQ ? this.holdQuat(side, aim.kind).invert().multiply(thingQ) : undefined);
+      }
+      this.ch.fit[side] = fit;
+    }
     // the fingers close on what each hand holds
     for (const side of ['L', 'R'] as Side[]) {
       const h = this.held[side];
-      if (h) this.ch.hand[side] = HOLD[h.kind].hand;
+      // (the fitted grips: open round it while it settles into the hand, then closed on it)
+      if (h) this.ch.hand[side] = this.ch.fit[side] && (h.settle ?? 1) < 1 ? 'relaxed' : HOLD[h.kind].hand;
     }
     this.ch.update(dt);
     this.follow();
@@ -126,7 +156,8 @@ export class Actor {
       if (!h) continue;
       const hold = HOLD[h.kind];
       const at = this.ch.socket(side, hold.socket).getWorldPosition(this.v);
-      const q = this.tipped(h.tilt ?? 0);
+      // held fast in the hand as the hand is turned (the fitted grips), or upright as he faces
+      const q = fitGripOn() && this.ch.fit[side] ? (h.rel ? this.wristQ(side).multiply(h.rel) : this.inHand(side, h.kind)) : this.tipped(h.tilt ?? 0);
       // just taken: it turns into the hand's hold over a moment (no snap)
       if (h.fromQ && (h.settle ?? 1) < 1) {
         h.settle = Math.min(1, (h.settle ?? 0) + this.lastDt / 0.25);
@@ -141,6 +172,30 @@ export class Actor {
   /** Where a thing's holding point is, in the world (where a hand reaches to take it). */
   static holdPoint(prop: THREE.Object3D, kind: Kind) {
     return holdAt(prop, kind).applyQuaternion(prop.getWorldQuaternion(new THREE.Quaternion())).add(prop.getWorldPosition(new THREE.Vector3()));
+  }
+
+  private wristQ(side: Side) {
+    return this.ch.bone(`wrist${side}`).getWorldQuaternion(new THREE.Quaternion());
+  }
+  /**
+   * Taking a thing (the fitted grips): a flat thing is held as it was taken (its turn in the hand kept, `rel`), the
+   * fingers fitted to it so; a cup or bottle upright in the hand.
+   */
+  heldAs(side: Side, prop: THREE.Object3D, kind: Kind) {
+    const fitted = fitGripOn() && !!this.ch.fit[side];
+    const flat = shapeOf(prop, kind)?.type === 'slab';
+    const propQ = prop.getWorldQuaternion(new THREE.Quaternion());
+    const rel = fitted && flat ? this.wristQ(side).invert().multiply(propQ) : undefined;
+    // the fingers open round it as it actually lies in the hand, then close on it
+    const fit = rel && fitFor(side === 'L' ? 1 : -1, prop, kind, rel);
+    if (fit) this.ch.snapHand(side, preShape(fit));
+    return { prop, kind, settle: fitted ? 1 : 0, fromQ: propQ, rel };
+  }
+
+  /** A thing's turn held fast in a hand: the hand as it is turned now, less the hand's turn round such a thing. */
+  inHand(side: Side, kind: Kind) {
+    const wristQ = this.ch.bone(`wrist${side}`).getWorldQuaternion(new THREE.Quaternion());
+    return wristQ.multiply(holdingQuat(side === 'L' ? 1 : -1, handKind(kind)).invert());
   }
 
   /** The way he faces, tipped forward by `tilt` (radians: a bottle pouring, its top toward what he faces). */
@@ -220,6 +275,7 @@ export class Actor {
       }),
       {
         limit: 60,
+        label: 'walk',
         run: (dt) => {
           if (!pts.length) return true;
           const p = this.position;
@@ -262,8 +318,9 @@ export class Actor {
   }
 
   /** Reaches a hand's socket to a point (world) and holds it there for `hold` seconds (or until `until()`). */
-  reach(side: Side, at: () => THREE.Vector3, opts: { quat?: () => THREE.Quaternion; socket?: 'grip' | 'pinch'; lean?: number; until?: () => boolean; limit?: number } = {}): Step {
+  reach(side: Side, at: () => THREE.Vector3, opts: { quat?: () => THREE.Quaternion; socket?: 'grip' | 'pinch'; lean?: number; until?: () => boolean; limit?: number; label?: string } = {}): Step {
     return {
+      label: opts.label,
       limit: opts.limit ?? 2.5,
       start: () => {
         this.ch.lean = opts.lean ?? 0;
@@ -271,7 +328,8 @@ export class Actor {
       run: () => {
         this.ch.reach[side] = { at: at(), quat: opts.quat?.(), socket: opts.socket, weight: 1 };
         this.ch.lean = (opts.lean ?? 0) + this.leanFor(side, at());
-        const arrived = this.ch.touches(side, at(), CONTACT, opts.socket);
+        // (the fitted grips: only with the wrist turned all the way, so the hand is round it as it closes)
+        const arrived = this.ch.touches(side, at(), CONTACT, opts.socket) && (!this.ch.fit[side] || this.ch.reachWeight(side) > 0.97);
         return opts.until ? arrived && opts.until() : arrived;
       },
     };
@@ -355,6 +413,7 @@ export class Actor {
       ...this.approach(rim, 0.36),
       {
         limit: 2.4,
+        label: 'pour',
         run: (dt) => {
           tilt = approach(tilt, tip(), dt, 0.12);
           arm();
@@ -364,6 +423,7 @@ export class Actor {
       },
       {
         limit: time + 0.6,
+        label: 'pour',
         run: (_dt, t) => {
           arm();
           flow(Math.min(1, t / time), mouthWorld());
@@ -435,14 +495,22 @@ export class Actor {
     const hold = HOLD[kind];
     return [
       ...this.approach(() => Actor.holdPoint(prop, kind)),
-      { start: () => (this.ch.hand[side] = 'relaxed'), run: () => true },
+      {
+        start: () => {
+          this.ch.hand[side] = 'relaxed';
+          this.aim[side] = { prop, kind };
+        },
+        run: () => true,
+      },
       this.reach(side, () => Actor.holdPoint(prop, kind), { socket: hold.socket, quat: () => this.holdQuat(side, kind), lean }),
       {
         run: () => {
           logContact(`take ${kind}`, this.ch.root.name, this.ch.socket(side, hold.socket).getWorldPosition(new THREE.Vector3()).distanceTo(Actor.holdPoint(prop, kind)));
-          this.held[side] = { prop, kind, settle: 0, fromQ: prop.getWorldQuaternion(new THREE.Quaternion()) };
+          this.held[side] = this.heldAs(side, prop, kind);
+          this.aim[side] = null;
           return true;
         },
+        label: 'take',
       },
       // a moment for the fingers to close before lifting
       { run: (_dt, t) => t > 0.18 },
@@ -466,6 +534,7 @@ export class Actor {
         socket: HOLD[kind].socket,
         quat: () => this.holdQuat(side, kind),
         lean,
+        label: 'put down',
       }),
       {
         run: () => {
@@ -516,6 +585,7 @@ export class Actor {
       ...(pay ? this.takeMoney(other, pay, patience) : []),
       {
         limit: patience,
+        label: 'hand over',
         start: () => {
           gaveUp = !meet();
         },
@@ -560,19 +630,25 @@ export class Actor {
    * (`pay.given(at)` returns them once they touch his fingers' tips: then they are his, where they are).
    */
   takeMoney(side: Side, pay: Pay, patience = 8): Step[] {
+    // (the fitted grips: the hand shaped for notes as it reaches for them)
+    const notes = new THREE.Object3D();
+    notes.userData = { hold: new THREE.Vector3(0, 0.012, 0) };
     return [
       {
         limit: patience,
+        label: 'take money',
+        start: () => (this.aim[side] = { prop: notes, kind: 'cash', facing: pay.facing }),
+        end: () => (this.aim[side] = null),
         run: () => {
           const at = pay.meet();
           if (!at) return true;
           this.ch.reach[side] = { at, quat: this.holdQuat(side, 'cash'), socket: 'pinch', weight: 1 };
           this.ch.hand[side] = 'relaxed';
-          if (!this.ch.touches(side, at, CONTACT * 2, 'pinch')) return false;
+          if (!this.ch.touches(side, at, CONTACT * 2, 'pinch') || (this.ch.fit[side] && this.ch.reachWeight(side) < 0.97)) return false;
           const cash = pay.given(this.ch.socket(side, 'pinch').getWorldPosition(new THREE.Vector3()));
           if (!cash) return false;
           logContact('take cash', this.ch.root.name, this.ch.socket(side, 'pinch').getWorldPosition(new THREE.Vector3()).distanceTo(at));
-          this.held[side] = { prop: cash, kind: 'cash', settle: 0, fromQ: cash.getWorldQuaternion(new THREE.Quaternion()) };
+          this.held[side] = this.heldAs(side, cash, 'cash');
           pay.paid?.(cash);
           return true;
         },
@@ -596,7 +672,8 @@ export class Actor {
     const sx = side === 'L' ? 1 : -1;
     const local = new THREE.Vector3(sx * 0.14, 1.03, 0.3);
     const at = this.ch.root.localToWorld(local);
-    this.ch.reach[side] = { at, quat: this.holdQuat(side, h.kind), socket: HOLD[h.kind].socket, weight: 0.85 };
+    // (the fitted grips: the hand fully turned to it, so what it holds stays upright)
+    this.ch.reach[side] = { at, quat: this.holdQuat(side, h.kind), socket: HOLD[h.kind].socket, weight: fitGripOn() ? 1 : 0.85 };
   }
 }
 
@@ -605,4 +682,24 @@ function angleBetween(a: number, b: number) {
   if (d > Math.PI) d -= Math.PI * 2;
   if (d < -Math.PI) d += Math.PI * 2;
   return d;
+}
+
+/** A hand's grip fitted to a thing it holds (`sx` +1 the left hand), or null when the thing has no grip shape. */
+export function fitFor(sx: number, prop: THREE.Object3D, kind: Kind, rel?: THREE.Quaternion): GripFit | null {
+  const shape = shapeOf(prop, kind);
+  if (!shape) return null;
+  if (shape.type === 'cyl') return fitGrip(sx, shape, uprightHold(shape));
+  // a flat thing held as it was taken
+  if (rel) return fitGrip(sx, shape, holdIn(new THREE.Quaternion(), rel, holdAt(prop, kind)));
+  // a flat thing: as it is turned in the hand (upright, facing ahead: the hand turned as `holdingQuat`)
+  const handQ = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(...holdAxes(sx)));
+  return fitGrip(sx, shape, holdIn(handQ, new THREE.Quaternion(), holdAt(prop, kind)));
+}
+/** The axes of `holdingQuat(sx, 'cookie')` (kept here to avoid importing the character into the grip's maths). */
+function holdAxes(sx: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3] {
+  const up = new THREE.Vector3(0, 1, 0);
+  const fingers = new THREE.Vector3(-sx, 0.25, 0.35).normalize();
+  const y = fingers.clone().negate();
+  const z = up.clone().addScaledVector(y, -up.dot(y)).normalize();
+  return [new THREE.Vector3().crossVectors(y, z), y, z];
 }
