@@ -379,6 +379,29 @@ def make_linen_material():
     return mat
 
 
+def make_emblem_material():
+    """Champagne-gold relief for the divider's star (same gold as the thread)."""
+    mat = bpy.data.materials.new("Gold_Emblem")
+    nt, bsdf, _ = principled(mat)
+    N, L = nt.nodes, nt.links
+    texco = N.new("ShaderNodeTexCoord")
+    grain = N.new("ShaderNodeTexNoise")
+    grain.inputs["Scale"].default_value = 900.0
+    grain.inputs["Detail"].default_value = 6.0
+    L.new(texco.outputs["Object"], grain.inputs["Vector"])
+    col = ramp(nt, hex_to_linear(THREAD_BODY), hex_to_linear(THREAD_HIGH), 0.35, 0.7)
+    L.new(sock(grain.outputs, "Fac"), sock(col.inputs, "Fac"))
+    L.new(col.outputs["Color"], bsdf.inputs["Base Color"])
+    bump = N.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.15
+    bump.inputs["Distance"].default_value = 0.0002
+    L.new(sock(grain.outputs, "Fac"), bump.inputs["Height"])
+    L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    bsdf.inputs["Metallic"].default_value = 0.9
+    bsdf.inputs["Roughness"].default_value = 0.3
+    return mat
+
+
 def make_ink_material():
     """Matte antique-bronze letterpress ink: lettering floors, walls and printed ornaments."""
     mat = bpy.data.materials.new("Bronze_Ink")
@@ -674,7 +697,11 @@ ORNAMENT = dict(extrude=0.00025, bevel=0.0, bevel_res=0)   # printed flush with 
 
 
 def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
-                            extrude=0.00025, bevel=0.0, bevel_res=0):
+                            extrude=0.00025, bevel=0.0, bevel_res=0,
+                            keep=None, scale_about=None, raised=False):
+    """keep(points) -> bool picks paths by their SVG anchor points; scale_about=((x, y), k)
+    enlarges them around an SVG point; raised=True sits the relief on the linen instead of
+    printing it flush."""
     path = os.path.join(BASE_DIR, filename)
     if not os.path.isfile(path):
         log(f"WARNING: {filename} not found in {BASE_DIR}; skipped")
@@ -686,6 +713,9 @@ def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
     cx, cy = center_xy
 
     def to_world(p):
+        if scale_about:
+            (ox, oy), k = scale_about
+            p = (ox + (p[0] - ox) * k, oy + (p[1] - oy) * k)
         return Vector(((p[0] - vx - vw / 2) * s + cx, -(p[1] - vy - vh / 2) * s + cy, 0.0))
 
     tmp_col = bpy.data.collections.new(name + "_tmp")
@@ -699,6 +729,10 @@ def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
         except ValueError as exc:
             log(f"WARNING: {filename}: {exc}")
             continue
+        if keep is not None:
+            anchors = [seg[2] if seg[0] == "L" else seg[3] for _, segs in subpaths for seg in segs]
+            if not keep(anchors):
+                continue
         cu = bpy.data.curves.new(f"{name}_p", "CURVE")
         cu.dimensions = "2D"
         cu.fill_mode = "BOTH"
@@ -772,7 +806,10 @@ def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
 
     final.materials.append(mat)
     obj = link(bpy.data.objects.new(name, final), col)
-    obj.location.z = 0.00006 - extrude - bevel        # ink stands ~0.06 mm proud of the linen
+    if raised:
+        obj.location.z = extrude + bevel                # relief standing on the linen
+    else:
+        obj.location.z = 0.00006 - extrude - bevel    # ink stands ~0.06 mm proud of the linen
     log(f"{filename}: {len(temp_objs)} paths -> {len(final.vertices)} vertices")
     return obj
 
@@ -1607,7 +1644,15 @@ def main():
         add_text("Name_Yuval", "Yuval", 0.0, 0.135, 0.13, col_emboss)
         add_text("Name_Amp", "&", 0.0, 0.035, 0.085, col_emboss)
         add_text("Name_Mevorah", "Mevorah", 0.0, -0.07, 0.13, col_emboss)
-        import_svg_as_gold_mesh(SVG_DIVIDER, "Divider", (0.0, -0.165), 0.56, ink, col_emboss, **ORNAMENT)
+        # divider: thin lines printed in ink; its star a larger raised gold emblem (as in the reference)
+        def is_star(points):
+            return all(abs(x - 400.0) <= 47.0 for x, _ in points)
+
+        import_svg_as_gold_mesh(SVG_DIVIDER, "Divider", (0.0, -0.165), 0.56, ink, col_emboss,
+                                keep=lambda pts: not is_star(pts), **ORNAMENT)
+        import_svg_as_gold_mesh(SVG_DIVIDER, "Divider_Star", (0.0, -0.165), 0.56, make_emblem_material(),
+                                col_emboss, extrude=0.0007, bevel=0.0005, bevel_res=2,
+                                keep=is_star, scale_about=((400.0, 50.0), 1.35), raised=True)
         add_text("OurForeverBegins", "OUR FOREVER BEGINS", 0.0, -0.458, 0.034, col_emboss, spacing=1.8)
         import_svg_as_gold_mesh(SVG_VENUE, "Venue", (0.0, -CARD_H / 2 + 0.225), CARD_W, ink,
                                 col_emboss, **ORNAMENT)
