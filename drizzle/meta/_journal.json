@@ -428,6 +428,13 @@
       "when": 1795456362632,
       "tag": "0060_mute_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795636324497,
+      "tag": "0061_nifty_rockslide",
+      "breakpoints": true
     }
   ]
 }

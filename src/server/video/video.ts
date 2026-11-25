@@ -176,7 +176,9 @@ export async function deleteOrphanVideoFiles(db: DbOrTx, now = new Date()) {
     .where(isNotNull(invitations.videoAssetId))
     .union(db.select({ id: invitations.videoPosterAssetId }).from(invitations).where(isNotNull(invitations.videoPosterAssetId)))
     .union(db.select({ id: invitationVideos.videoAssetId }).from(invitationVideos))
-    .union(db.select({ id: invitationVideos.posterAssetId }).from(invitationVideos));
+    .union(db.select({ id: invitationVideos.posterAssetId }).from(invitationVideos))
+    // The couples' opening films (src/server/film/film.ts) are stored with the videos too.
+    .union(db.select({ id: invitations.filmAssetId }).from(invitations).where(isNotNull(invitations.filmAssetId)));
   const orphans = await db
     .select({ id: assets.id })
     .from(assets)

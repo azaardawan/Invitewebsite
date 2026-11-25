@@ -88,6 +88,13 @@ export type ThemeManifest = {
    */
   onlineInvitation?: boolean;
   /**
+   * `true`: the design opens with a film made for each couple by the invite renderer (renderer/): their names,
+   * initials and date stitched on linen. The platform asks for it once the order is paid and again whenever the names
+   * or the date change (src/server/film/film.ts), and gives it to the design as `props.film` when it is ready (about
+   * ten minutes). Samples and previews have none: the design shows its own sample film.
+   */
+  film?: boolean;
+  /**
    * The platform's words around a design that is not an invitation (e.g. a museum of the couple's photos), replacing
    * "Open invitation" on the button (`labels.openInvitation`), the text under the link when it is shared, and the page
    * shown once the link has ended. Each is optional (the invitation's words otherwise).
@@ -212,7 +219,17 @@ export type DesignSwitch = {
 };
 
 /** A line's default text for an invitation language: its version where `defaultIn` lists the language, else the Arabic. */
-export type PageTexts = { open?: ThemeText; share?: ThemeText; endedTitle?: ThemeText; endedBody?: ThemeText };
+export type PageTexts = {
+  open?: ThemeText;
+  share?: ThemeText;
+  endedTitle?: ThemeText;
+  endedBody?: ThemeText;
+  /**
+   * A short note for customers of this design, shown on its order form and on the receipt (e.g. Golden Stitch: the
+   * couple's own film takes about ten minutes to make after payment).
+   */
+  notice?: ThemeText;
+};
 
 /** A design's own page text (`pageTexts[key]`) in `locale` (the Arabic when there is no Kurdish), or null. */
 export function pageText(manifest: Pick<ThemeManifest, 'pageTexts'> | null | undefined, key: keyof PageTexts, locale: string): string | null {
@@ -291,6 +308,7 @@ export const manifestSchema = z
       })
       .optional(),
     onlineInvitation: z.boolean().optional(),
+    film: z.boolean().optional(),
     sample: z.object({ locale: z.enum(['ar', 'en', 'ckb', 'bdn']).optional(), names: z.literal('kurdish').optional() }).optional(),
     wording: z
       .array(
@@ -343,7 +361,7 @@ export const manifestSchema = z
       })
       .optional(),
     internal: z.boolean().optional(),
-    pageTexts: z.object({ open: themeText.optional(), share: themeText.optional(), endedTitle: themeText.optional(), endedBody: themeText.optional() }).optional(),
+    pageTexts: z.object({ open: themeText.optional(), share: themeText.optional(), endedTitle: themeText.optional(), endedBody: themeText.optional(), notice: themeText.optional() }).optional(),
   })
   .superRefine((m, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: 'custom', message });

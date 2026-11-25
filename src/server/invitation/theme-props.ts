@@ -86,6 +86,8 @@ export function buildThemeProps(input: {
   /** Every video place (designs with several screens), and how many places the package sells. */
   videos?: readonly ({ src: string; poster: string; width: number; height: number } | null)[];
   videoPlaces?: number;
+  /** The couple's own opening film (designs with manifest `film`), once made; live invitations only. */
+  filmSrc?: string | null;
   /** The design's own words for the "Open" button (manifest `pageTexts.open`), for a design that is not an invitation. */
   openLabel?: string | null;
 }): ThemeProps {
@@ -136,6 +138,7 @@ export function buildThemeProps(input: {
       : Array.from({ length: Math.max(1, input.videoPlaces ?? input.videos?.length ?? 1) }, (_, i) =>
           input.mode === 'sample' ? null : ((i === 0 ? (input.video ?? input.videos?.[0]) : input.videos?.[i]) ?? null),
         ),
+    film: input.mode === 'live' && input.filmSrc ? { src: input.filmSrc } : null,
   };
 }
 

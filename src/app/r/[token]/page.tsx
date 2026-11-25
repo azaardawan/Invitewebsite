@@ -197,6 +197,11 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
             ) : null}
           </p>
           <p className="max-w-sm text-sm leading-relaxed">{paid ? t('heroPaid') : t('heroPending')}</p>
+          {r.invitation.notice ? (
+            <p role="note" className="max-w-sm rounded-2xl border border-accent/40 bg-surface/80 px-4 py-3 text-sm leading-relaxed font-medium" data-design-notice>
+              {localized(r.invitation.notice, locale)}
+            </p>
+          ) : null}
         </div>
       </header>
 

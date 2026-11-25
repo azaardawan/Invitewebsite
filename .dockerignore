@@ -9,3 +9,6 @@ node_modules
 test-results
 playwright-report
 tsconfig.tsbuildinfo
+
+# Blender invite renderer (separate Railway service)
+renderer

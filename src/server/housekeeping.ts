@@ -10,6 +10,7 @@ import { deleteOrphanPhotoFiles, deletePhotosOf } from '@/server/photos/photos';
 import { deleteEndedGuestPhotos } from '@/server/guest-photos/service';
 import { deleteCustomSongsOf, deleteOrphanSongFiles } from '@/server/music/custom';
 import { deleteOrphanVideoFiles, deleteVideosOf } from '@/server/video/video';
+import { deleteFilmsOf } from '@/server/film/film';
 import { deleteOrphanSignatures } from '@/server/media/assets';
 
 /** Guest replies and keepsakes are deleted this long after an invitation ends (privacy policy). */
@@ -73,6 +74,8 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   // The customer's own songs go with them.
   const songsDeleted = (await deleteCustomSongsOf(db, personalIds)) + (await deleteOrphanSongFiles(db, now));
   // And their videos (packages with `video`).
+  // And the couples' opening films (their names: designs with manifest `film`), before the orphan sweep.
+  const filmsDeleted = await deleteFilmsOf(db, personalIds);
   const videosDeleted = (await deleteVideosOf(db, personalIds)) + (await deleteOrphanVideoFiles(db, now));
 
   // Signature drawings no invitation uses any more (redrawn or cleared).
@@ -130,5 +133,5 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   if (stale.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, stale.map((d) => d.id)));
 
   await pruneRateLimits(db, now);
-  return { guestPhotosDeleted, repliesDeleted, keepsakesDeleted, documentsDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted, videosDeleted, signaturesDeleted, webhookEventsDeleted: webhookEvents.length };
+  return { guestPhotosDeleted, repliesDeleted, keepsakesDeleted, documentsDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted, videosDeleted, filmsDeleted, signaturesDeleted, webhookEventsDeleted: webhookEvents.length };
 }

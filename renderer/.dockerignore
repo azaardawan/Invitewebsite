@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.blend
+*.blend1
+*.mp4
+render/
+README.md

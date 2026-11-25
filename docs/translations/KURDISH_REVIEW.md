@@ -2300,3 +2300,44 @@ Olive Crest's, already reviewed.
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #31: the design's name | الشعار الملكي الوردي | Royal Rose Crest | دروشمی شاهانەی پەمەیی | نیشانا شاهانە یا پەمبەیی |
+
+## Batch 74 — Golden Stitch (#32): the design's pages, order form and printed cards — ✅ AUTO-APPROVED (2026-11-25, owner checks in Admin → Translations)
+
+The design's own wording (`themes/golden-stitch/v1/copy.ts`) and its manifest (`manifest.ts`). The Quran verse and its
+reference stay in Arabic in every language.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: the design's name | الغرزة الذهبية | Golden Stitch | دروومانی زێڕین | دروومانا زێڕین |
+| 2 | #32: order form switch | إظهار صفحة الآية الكريمة | Show the Quran verse page | پەڕەی ئایەتی پیرۆز نیشان بدە | پەڕا ئایەتا پیرۆز نیشان بدە |
+| 3 | #32: order form, changeable line | التحية فوق رسالتكم | Greeting above your note | سڵاو لە سەرووی نامەکەتان | سلاڤ ل سەر نامەیا هەوە |
+| 4 | #32: the greeting (default) | ضيوفنا الأعزاء، | Dear Our Cherished Guests, | میوانە خۆشەویستەکانمان، | مێڤانێن مە یێن خۆشتڤی، |
+| 5 | #32: printed arch card (shape name) | بطاقة القوس | Arch card | کارتی کەوانە | کارتا کەڤانی |
+| 6 | #32: `togetherWith` | بحضور عائلتيهما | Together with their families | لەگەڵ هەردوو بنەماڵەکەیان | دگەل هەردوو مالباتێن وان |
+| 7 | #32: `groomFamily` | عائلة العريس | The Family of the Groom | بنەماڵەی زاوا | مالباتا زاڤای |
+| 8 | #32: `brideFamily` | عائلة العروس | The Family of the Bride | بنەماڵەی بووک | مالباتا بویکێ |
+| 9 | #32: `request` | يتشرّفون بدعوتكم لحضور حفل زفاف | Request the honor of your presence at the wedding celebration of | شانازی بە بانگهێشتکردنتان دەکەن بۆ ئاهەنگی زەماوەندی | شانازیێ ب داخوازکرنا هەوە دکەن بۆ ئاهەنگا داوەتا |
+| 10 | #32: `verseTitle` | آية كريمة | Quran Verse | ئایەتی پیرۆز | ئایەتا پیرۆز |
+| 11 | #32: `noteTitle` | كلمة منّا إليكم | A Personal Note From Us | چەند وشەیەک لە ئێمەوە | چەند پەیڤەک ژ مە |
+| 12 | #32: `detailsTitle` | تفاصيل الحفل | The Wedding Details | وردەکاریی ئاهەنگ | هوورگلیێن ئاهەنگێ |
+| 13 | #32: `countdownTitle` | العدّ التنازلي | Countdown | ژماردنی پێچەوانە | ژمارتنا بەرەڤاژی |
+| 14 | #32: `countdownSub` | لحفل زفافنا | To Our Wedding | بۆ زەماوەندەکەمان | بۆ داوەتا مە |
+| 15 | #32: `untilWeSay` | حتى نقول | Until We Say | تا دەڵێین | هەتا دبێژین |
+| 16 | #32: `iDo` | نعم | I Do | بەڵێ | بەلێ |
+| 17 | #32: `congratsTitle` | رسائل التهنئة | Congratulations Messages | نامەکانی پیرۆزبایی | نامێن پیرۆزباهیێ |
+| 18 | #32: `congratsIntro` | اترك تهنئتك وأمنياتك الصادقة للعروسين | Leave your congratulations and heartfelt wishes for the couple | پیرۆزبایی و هیوا دڵسۆزەکانت بۆ بووک و زاوا بنووسە | پیرۆزباهی و هیڤیێن خۆ یێن دلسۆز بۆ بویک و زاڤای بنڤیسە |
+| 19 | #32: `messagePlaceholder` | اكتب رسالتك… | Write your message… | نامەکەت بنووسە… | نامەیا خۆ بنڤیسە… |
+| 20 | #32: `thanks` | شكرًا لكونكم جزءًا من يومنا المميّز. | Thank you for being a part of our special day. | سوپاس بۆ ئەوەی بەشێک بوون لە ڕۆژە تایبەتەکەمان. | سوپاس بۆ هندێ کو هوین بەشەک بوون ژ رۆژا مە یا تایبەت. |
+| 21 | #32: `weddingOf` | حفل زفاف | The Wedding of | زەماوەندی | داوەتا |
+| 22 | #32: `skipFilm` | تخطّي | Skip | تێپەڕاندن | دەرباز بکە |
+| 23 | #32: `keepsakeSub` | تهاني الأهل والأحبة | Wishes from family and friends | پیرۆزبایی خێزان و خۆشەویستان | پیرۆزباهیێن مالباتێ و هەڤالان |
+
+## Batch 75 — Golden Stitch (#32): the 10-minute film notice, and the guests' photo QR code on printed cards — ✅ AUTO-APPROVED (2026-11-25, owner checks in Admin → Translations)
+
+The notice is the design's own (`themes/golden-stitch/v1/manifest.ts`, `pageTexts.notice`), shown on its order form and receipt.
+The caption sits under the second QR code on a card's back when the customer bought guest photo sharing (`invitation.print.scanToSharePhotos`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: notice on the order form and receipt | بعد الدفع نصنع فيلم التطريز الخاص بكم بأسمائكم وتاريخكم، ويستغرق ذلك حوالي ١٠ دقائق. لا تقلقوا: ابقوا في الصفحة أو عودوا بعد قليل وستجدون دعوتكم جاهزة. | After payment we make your own stitched film with your names and date. It takes about 10 minutes, so don't worry: stay on this page or come back shortly and your invitation will be ready. | دوای پارەدان فیلمی دروومانەکەتان بە ناو و بەرواری خۆتان دروست دەکەین، نزیکەی ١٠ خولەک دەخایەنێت. نیگەران مەبن: لەم پەڕەیەدا بمێننەوە یان کەمێکی تر بگەڕێنەوە و بانگهێشتنامەکەتان ئامادە دەبێت. | پشتی پارەدانێ ئەم فیلمێ دروومانا هەوە ب ناڤ و دیرۆکا هەوە چێدکەین، نێزیکی ١٠ خولەکان دڤێت. خەمێ نەخۆن: ل ڤێ پەڕێ بمینن یان پشتی کێمەکێ ڤەگەڕن و داخوازنامەیا هەوە دێ یا ئامادە بیت. |
+| 2 | `invitation.print.scanToSharePhotos` (caption under the photo QR) | امسح الرمز لمشاركة صوركم | Scan to share your photos | کۆدەکە سکان بکە بۆ ناردنی وێنەکانتان | کۆدی سکان بکە بۆ هنارتنا وێنەیێن هەوە |
