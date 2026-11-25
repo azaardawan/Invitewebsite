@@ -18,6 +18,7 @@ import { BITES, SIPS, disposeProp, makeCookie, makeFPHand, type Cookie, type FPH
 import { makeCash, makeDrink, type Cash, type Drink } from './drink';
 import { holdingQuat } from './character';
 import { Actor, CONTACTS, HOLD, holdAt, logContact, type Pay } from './interaction';
+import { FINGER_LOG, fingerClearance, fingerClearances, fitGrip, fitGripOn, holdIn, logFingers, setFitGrip, shapeOf, uprightHold, type GripFit } from './grip';
 import { approach } from './ik';
 import { notesFor, readMenu, slotOf, type Menu, type MenuItem } from './menu';
 
@@ -46,6 +47,8 @@ type Held = {
   acted: boolean;
   /** Finished (empty, eaten): going out of the picture, then gone. */
   done: number | null;
+  /** How long the reaching hand's fingers have been opening (the fitted grips: it takes once they are open). */
+  openT?: number;
 };
 
 /** Where each hand holds things in the picture (camera space: its holding point), and how the hand is turned. */
@@ -130,6 +133,8 @@ export class Visit {
     this.camera = camera;
     this.barista = Barista.find(scene);
     this.cleaner = Cleaner.find(scene, surface);
+    // the demo's switch (owner, 2026-11-25): hands fitted to what they hold, only for a model that asks for it
+    setFitGrip(!!(scene.getObjectByName('TOUR_FEATURES')?.userData as { fitGrip?: boolean } | undefined)?.fitGrip);
     const m = readMenu(scene);
     this.menu = m?.menu ?? PLAIN;
     this.photos = m?.photos ?? null;
@@ -150,6 +155,18 @@ export class Visit {
         return m;
       });
       (window as unknown as { tourContacts: typeof CONTACTS }).tourContacts = CONTACTS;
+      // the fingers' least distance to what each hand holds, by who, what and when (negative: a finger inside it)
+      const w = window as unknown as { tourFingers: typeof FINGER_LOG; tourFitGrip: (on: boolean) => void };
+      w.tourFingers = FINGER_LOG;
+      w.tourFitGrip = (on) => setFitGrip(on);
+      // finger by finger, a member of staff's hand on what it holds (and what he is doing)
+      (window as unknown as { tourFingerDetail: (who: string, side: 'L' | 'R') => unknown }).tourFingerDetail = (who, side) => {
+        const a = who === 'CLEANER' ? this.cleaner?.actor : this.barista?.actor;
+        const h = a?.held[side];
+        const shape = h && shapeOf(h.prop, h.kind);
+        if (!a || !h || !shape) return null;
+        return { phase: a.phase, kind: h.kind, settle: h.settle, rel: !!h.rel, pose: a.ch.hand[side], fingers: fingerClearances(a.ch.handBones(side), h.prop, shape) };
+      };
     }
   }
 
@@ -253,6 +270,8 @@ export class Visit {
         }
         return at;
       },
+      // the notes as the visitor holds them out (the place's space), for his hand to shape itself for them
+      facing: () => (this.cash ? this.camera.quaternion.clone().multiply(this.cash.prop.quaternion) : null),
       given: (at) => {
         const c = this.cash;
         if (!c || c.where !== 'offering') return null;
@@ -506,6 +525,7 @@ export class Visit {
     const h = this.items[kind];
     if (!h || h.where !== 'table') return false;
     h.where = 'reaching';
+    h.openT = 0;
     h.target = () => Actor.holdPoint(h.prop, kind);
     this.newHand(h);
     return true;
@@ -538,6 +558,20 @@ export class Visit {
     this.serveCounter();
     if (this.waiter || this.pending || this.current) moved = true;
     if (this.debug) {
+      // the staff's fingers on what they hold
+      for (const [who, a] of [
+        ['BARISTA', this.barista?.actor],
+        ['CLEANER', this.cleaner?.actor],
+      ] as const) {
+        if (!a) continue;
+        for (const side of ['L', 'R'] as const) {
+          const held = a.held[side];
+          const shape = held && shapeOf(held.prop, held.kind);
+          if (!held || !shape) continue;
+          const what = held.kind === 'coffee' ? ((held.prop.userData as { kind?: string }).kind ?? 'cup') : held.kind === 'bottle' ? ((held.prop.userData as { shape?: string }).shape ?? 'bottle') : held.kind;
+          logFingers(who, what, a.phase, fingerClearance(a.ch.handBones(side), held.prop, shape));
+        }
+      }
       const pts = [...(this.barista?.character.debugPoints() ?? []), ...(this.cleaner?.character.debugPoints() ?? [])];
       this.debug.forEach((m, i) => {
         const p = pts[i >> 1];
@@ -578,6 +612,15 @@ export class Visit {
     return m;
   }
 
+  /** A visitor's hand's grip fitted to what it holds (null: the fixed poses; the demo's switch is off). */
+  private fpFit(h: Held, sx: number): GripFit | null {
+    if (!fitGripOn()) return null;
+    const shape = shapeOf(h.prop, h.kind);
+    if (!shape) return null;
+    if (shape.type === 'cyl') return fitGrip(sx, shape, uprightHold(shape));
+    return fitGrip(sx, shape, holdIn(TURN.clone().multiply(holdingQuat(sx, 'cookie')), new THREE.Quaternion(), holdAt(h.prop, h.kind)));
+  }
+
   /** Each hand: reaching, holding (a sip, a bite), putting down, paying. Returns whether a hand is still moving. */
   private layout(dt: number, walking: boolean) {
     let moving = false;
@@ -593,19 +636,25 @@ export class Visit {
       const hand = h.hand;
       const sx = hand.userData.sx;
       const hold = HOLD[h.kind];
+      // the grip fitted to it (the demo's switch), else the fixed poses
+      const fit = this.fpFit(h, sx);
       let target: THREE.Vector3;
       let wantQ = new THREE.Quaternion();
       let speed = 0.11;
       if (h.where === 'reaching' || h.where === 'placing' || h.where === 'offering') {
         // a world point, where it is seen (the camera's space)
-        target = this.camera.worldToLocal(h.target!());
+        target = this.camera.worldToLocal(h.target!().clone());
         if (h.where === 'placing') wantQ = camQ.clone().invert().multiply(h.place!.q);
-        else wantQ.copy(h.itemQ);
+        else if (h.where === 'reaching' && fit && fit.socketKind === 'pinch' && h.prop.parent !== this.hud) {
+          // a flat thing: the hand turns to it as it is held out (or lies), so it is in the hand as it will be held
+          wantQ = camQ.clone().invert().multiply(h.prop.getWorldQuaternion(new THREE.Quaternion()));
+          h.itemQ.copy(wantQ);
+        } else wantQ.copy(h.itemQ);
         speed = 0.09;
-        hand.userData.pose(h.where === 'reaching' && h.kind !== 'cash' ? 'open' : hold.hand, dt);
+        hand.userData.pose(h.where === 'reaching' && h.kind !== 'cash' ? 'open' : hold.hand, dt, fit);
       } else {
         target = SLOT[h.side as 1 | -1].clone();
-        hand.userData.pose(hold.hand, dt);
+        hand.userData.pose(hold.hand, dt, fit);
         if (h.act !== null && h.kind !== 'cash') {
           h.act = Math.min(1, h.act + dt / ACT_TIME);
           const b = bell(h.act);
@@ -644,7 +693,7 @@ export class Visit {
       if (h.grip.distanceTo(target) > 0.0005) moving = true;
       // the hand round the holding point: as one holds it (turned with it), its socket on that point
       const handQ = h.itemQ.clone().multiply(TURN).multiply(holdingQuat(sx, h.kind === 'coffee' ? 'cup' : 'cookie'));
-      const socket = hold.socket === 'grip' ? hand.userData.grip : hand.userData.pinch;
+      const socket = fit ? fit.socket : hold.socket === 'grip' ? hand.userData.grip : hand.userData.pinch;
       hand.quaternion.copy(handQ);
       hand.position.copy(h.grip).sub(socket.clone().applyQuaternion(handQ));
       // the forearm toward the elbow: low, out to the side and a little back (out of the picture)
@@ -655,8 +704,19 @@ export class Visit {
         h.prop.quaternion.copy(h.itemQ);
         h.prop.position.copy(h.grip).sub(holdAt(h.prop, h.kind).applyQuaternion(h.itemQ));
       }
+      // the debug view: how near the fingers are to what the hand holds (negative: inside it)
+      if (this.debug && (h.where === 'hand' || h.where === 'placing' || h.where === 'offering')) {
+        const shape = shapeOf(h.prop, h.kind);
+        if (shape) {
+          hand.updateMatrixWorld(true);
+          const phase = h.kind === 'cash' ? 'pay' : h.where === 'placing' ? 'put down' : h.act !== null ? (h.kind === 'coffee' ? 'sip' : 'bite') : 'holding';
+          logFingers('VISITOR', h.kind === 'coffee' ? (h.item?.cup ?? 'cup') : h.kind, phase, fingerClearance(hand.userData.bones, h.prop, shape));
+        }
+      }
       // contact: the hand has reached the thing (take it), the table (let it go), or his hand (the money)
-      if ((h.where === 'reaching' || h.where === 'placing') && h.grip.distanceTo(target) < TOUCH) {
+      if (h.where === 'reaching') h.openT = (h.openT ?? 0) + dt;
+      const opened = !fit || h.kind === 'cash' || (h.openT ?? 0) > 0.2;
+      if ((h.where === 'reaching' || h.where === 'placing') && h.grip.distanceTo(target) < TOUCH && (h.where === 'placing' || opened)) {
         if (h.kind === 'cash') {
           h.where = 'offering';
           continue;

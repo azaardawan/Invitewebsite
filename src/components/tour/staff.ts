@@ -75,6 +75,10 @@ export class Cleaner {
   get character() {
     return this.a.ch;
   }
+  /** What he does and holds (for the debug view's measurements). */
+  get actor() {
+    return this.a;
+  }
 
   canServe(spot: SeatSpot | null) {
     return !!spot && this.nav.length > 1 && !!this.nav[0] && !!this.nav[spot.nav];
@@ -254,8 +258,12 @@ export class Cleaner {
     this.a.ch.reach.R = { at, quat: this.a.holdQuat('R', kind), socket: HOLD[kind].socket, weight: 1 };
     this.a.ch.lean = this.a.leanFor('R', at);
     this.a.ch.hand.R = 'relaxed';
+    // (the fitted grips: his hand shaped for it as it comes, and turned all the way before it closes)
+    this.a.aim.R = { prop, kind };
     if (!this.a.ch.touches('R', at, CONTACT * 1.6, HOLD[kind].socket)) return false;
-    this.a.held.R = { prop, kind, settle: 0, fromQ: prop.getWorldQuaternion(new THREE.Quaternion()) };
+    if (this.a.ch.fit.R && this.a.ch.reachWeight('R') < 0.97) return false;
+    this.a.aim.R = null;
+    this.a.held.R = this.a.heldAs('R', prop, kind);
     this.a.ch.reach.R = null;
     this.a.ch.lean = 0;
     return true;

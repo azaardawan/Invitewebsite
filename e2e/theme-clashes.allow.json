@@ -122,6 +122,11 @@
     "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span2|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
     "ar: overlap:div2>div1>article1>main1>section1>div4>div1>h11|div2>div1>article1>main1>section1>div4>div1>p4"
   ],
+  "bluebird-garden@6": [
+    "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span1|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
+    "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span2|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
+    "ar: overlap:div2>div1>article1>main1>section1>div4>div1>h11|div2>div1>article1>main1>section1>div4>div1>p4"
+  ],
   "blush-floral@3": [
     "ar: over-picture:div2>div1>article1>div1>footer1>p2|div2>div1>article1>div1>footer1>svg2",
     "ar: overlap:div2>div1>article1>div1>section2>div1>div1>div1>p1|div2>div1>article1>div1>section2>div1>div1>div1>span1",
@@ -225,6 +230,11 @@
     "en: overlap:div2>div1>article1>div1>section7>div1>div1>form1>div1>label1|div2>div1>article1>div1>section7>div1>div1>form1>h31"
   ],
   "rosebird-garden@5": [
+    "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span1|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
+    "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span2|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
+    "ar: overlap:div2>div1>article1>main1>section1>div4>div1>h11|div2>div1>article1>main1>section1>div4>div1>p4"
+  ],
+  "rosebird-garden@6": [
     "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span1|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
     "ar: overlap:div2>div1>article1>main1>div1>section2>div1>div2>span2|div2>div1>article1>main1>div1>section2>div1>div2>strong1",
     "ar: overlap:div2>div1>article1>main1>section1>div4>div1>h11|div2>div1>article1>main1>section1>div4>div1>p4"

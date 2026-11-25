@@ -1,0 +1,9 @@
+Fonts in this folder (from the designer's package, converted to woff2 without changes to the glyphs):
+
+- amiri.woff2: Amiri, Copyright 2010-2022 The Amiri Project Authors (https://github.com/aliftype/amiri).
+  SIL Open Font License 1.1 (https://openfontlicense.org).
+- arabic-ui.woff2: Noto Sans Arabic, Copyright 2022 The Noto Project Authors (https://github.com/notofonts/arabic).
+  SIL Open Font License 1.1 (https://openfontlicense.org).
+- serif.woff2, serif-italic.woff2: P052 (URW base 35), Copyright 2014 by (URW)++ Design & Development.
+  GNU AGPL v3 with the font exception (https://github.com/ArtifexSoftware/urw-base35-fonts): embedding the fonts in a
+  document or web page does not by itself make that document subject to the AGPL.
