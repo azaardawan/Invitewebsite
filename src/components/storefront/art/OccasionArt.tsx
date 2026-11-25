@@ -1,5 +1,8 @@
-/** Owner-supplied artwork (transparent WebP, 320 px: sharp at 2× for the 140 px tile, in `public/occasion-art/`), keyed by occasion. */
-const ART = ['wedding', 'engagement', 'graduation', 'birthday', 'newborn'] as const;
+/**
+ * Owner-supplied artwork (transparent WebP, 320 px: sharp at 2× for the 140 px tile, in `public/occasion-art/`), keyed by
+ * occasion. Couples (two hearts) and Friends (two friends laughing) drawn in the same style, chosen by the owner (2026-11-19).
+ */
+const ART = ['wedding', 'engagement', 'graduation', 'birthday', 'newborn', 'couples', 'friends'] as const;
 type ArtKey = (typeof ART)[number];
 
 /** Built-in occasion for a section key. The newborn section is created in Admin, so its key may vary. */
@@ -31,6 +34,8 @@ export function occasionTone(sectionKey: string, index: number) {
     graduation: 'bg-plum text-accent-ink',
     birthday: 'bg-sand text-heading',
     newborn: 'bg-paper text-heading border border-line',
+    couples: 'bg-blush text-accent-deep',
+    friends: 'bg-sand text-heading',
   };
   const fallback = ['bg-paper text-heading border border-line', 'bg-blush text-accent-deep', 'bg-sand text-heading'];
   const key = artKey(sectionKey);

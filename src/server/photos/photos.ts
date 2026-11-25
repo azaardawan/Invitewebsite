@@ -7,7 +7,7 @@ import { storage, publicMediaUrl } from '@/server/storage';
 import { sha256Buffer } from '@/lib/crypto';
 import { normalizeCoverFocus, type CoverFocus } from '@/lib/cover-focus';
 import { manifestByCodeRef } from '@/theme-registry';
-import { DEFAULT_PHOTO_ASPECT, type PhotoSpec, type ThemeManifest } from '@/theme-sdk/manifest';
+import { ATTACHED_PHOTO_PLACE, DEFAULT_PHOTO_ASPECT, type PhotoSpec, type ThemeManifest } from '@/theme-sdk/manifest';
 import { processPhoto } from '@/server/media/process';
 import { collagePhotoCount } from '@/catalog/collages';
 
@@ -30,7 +30,7 @@ const PHOTO_PREFIX = 'photos/';
 export async function photoSpec(
   db: DbOrTx,
   inv: Pick<InvitationRow, 'themeVersionId' | 'featureKeys'> & Partial<Pick<InvitationRow, 'photoLimit'>>,
-): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[]; set: number }) | null> {
+): Promise<(Required<Pick<PhotoSpec, 'max' | 'min' | 'aspect'>> & Pick<PhotoSpec, 'labels'> & { aspects: number[]; set: number; attached: number }) | null> {
   const collage = collagePhotoCount(inv.featureKeys);
   let spec: PhotoSpec | undefined;
   if (inv.featureKeys.includes('photos')) {
@@ -46,7 +46,7 @@ export async function photoSpec(
   const aspects = Array.from({ length: max }, (_, i) => (i < own ? (spec?.frames?.[i]?.aspect ?? aspect) : COLLAGE_PHOTO_ASPECT));
   // Places in sets (a design's rows): each set fills on its own. Without sets, all places are one set.
   const set = spec?.set && own % spec.set === 0 && max === own ? spec.set : max;
-  return { max, min: Math.min(spec?.min ?? 0, own), aspect, labels: spec?.labels, aspects, set };
+  return { max, min: Math.min(spec?.min ?? 0, own), aspect, labels: spec?.labels, aspects, set, attached: spec?.attached ?? 0 };
 }
 
 /** The places of the set that place `position` belongs to: [first, end). */
@@ -79,8 +79,11 @@ export type InvitationPhoto = {
 export const POSTER_PHOTO_PLACE = { landscape: 100, portrait: 101 } as const;
 const FIRST_POSTER_PLACE = 100;
 
-/** An invitation's photos in the design's order (`posters`: instead, the pictures uploaded for the posters only). */
-export async function listPhotos(db: DbOrTx, invitationId: string, opts: { posters?: boolean } = {}): Promise<InvitationPhoto[]> {
+/**
+ * An invitation's photos in the design's order (`posters`: instead, the pictures uploaded for the posters only;
+ * `attached`: with the photos attached to things in the design, from ATTACHED_PHOTO_PLACE, which are left out otherwise).
+ */
+export async function listPhotos(db: DbOrTx, invitationId: string, opts: { posters?: boolean; attached?: boolean } = {}): Promise<InvitationPhoto[]> {
   const rows = await db
     .select({ photo: invitationPhotos, display: assets })
     .from(invitationPhotos)
@@ -88,7 +91,7 @@ export async function listPhotos(db: DbOrTx, invitationId: string, opts: { poste
     .where(
       and(
         eq(invitationPhotos.invitationId, invitationId),
-        opts.posters ? gte(invitationPhotos.position, FIRST_POSTER_PLACE) : lt(invitationPhotos.position, FIRST_POSTER_PLACE),
+        opts.posters ? gte(invitationPhotos.position, FIRST_POSTER_PLACE) : lt(invitationPhotos.position, opts.attached ? FIRST_POSTER_PLACE : ATTACHED_PHOTO_PLACE),
       ),
     )
     .orderBy(asc(invitationPhotos.position));
@@ -159,6 +162,8 @@ export async function setPosterPhoto(db: DbOrTx, inv: InvitationRow, orientation
 async function placeFor(db: DbOrTx, inv: InvitationRow, position: number) {
   const spec = await photoSpec(db, inv);
   if (!spec) throw new PhotoError('notIncluded');
+  // A photo attached to something in the design (e.g. a drawer's): its own place, nothing moves.
+  if (Number.isInteger(position) && position >= ATTACHED_PHOTO_PLACE && position < ATTACHED_PHOTO_PLACE + spec.attached) return position;
   if (!Number.isInteger(position) || position < 0 || position >= spec.max) throw new PhotoError('position');
   // Photos fill the places of their set in order: a new one goes in the set's next free place (at most), never
   // leaving a gap inside a set (a design without sets is one set). An empty set may wait while a later one fills.
@@ -188,7 +193,7 @@ async function storePhotoAt(db: DbOrTx, inv: InvitationRow, position: number, in
     return prev;
   });
   if (old) await deletePhotoFiles(db, [old.assetId, old.displayAssetId]);
-  return (await listPhotos(db, inv.id, opts)).find((p) => p.position === position)!;
+  return (await listPhotos(db, inv.id, { ...opts, attached: true })).find((p) => p.position === position)!;
 }
 
 /** Where a photo sits in its frame (moved and zoomed by the customer). */
@@ -218,8 +223,8 @@ export async function removePhoto(db: DbOrTx, invitationId: string, position: nu
 
 /** Moves every photo after `position` in its set up one place (one by one, in order, so places stay unique). */
 export async function closeGap(tx: DbOrTx, invitationId: string, position: number) {
-  // A poster's own picture has a place of its own: nothing moves.
-  if (position >= FIRST_POSTER_PLACE) return;
+  // A poster's own picture, or a photo attached to something in the design, has a place of its own: nothing moves.
+  if (position >= ATTACHED_PHOTO_PLACE) return;
   const [inv] = await tx.select().from(invitations).where(eq(invitations.id, invitationId));
   const spec = inv ? await photoSpec(tx, inv) : null;
   const { end } = setOf(position, spec?.set ?? Number.MAX_SAFE_INTEGER);

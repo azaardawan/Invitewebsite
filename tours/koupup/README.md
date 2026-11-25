@@ -1,0 +1,32 @@
+# KOUPUP café: virtual tour model
+
+The owner's 3D scan of the café (`21_11_2026.glb`, 2026-11-21) rebuilt in the site's animation style, to scale: every
+wall, opening, level, step and piece of furniture stands where the scan has it, in the scan's own coordinates (metres,
+Y up). The scan itself is the café's and is not kept in the repository.
+
+- `build.js`: the building (floors, walls, the glass front and its door, ceilings with their LED coves, the terrace and
+  its roof, both staircases, the street, the sky) and the signs (KOUPUP, the KOUP pillar, کوپ).
+- `rooms.js`: where everything stands, room by room (north lounge, middle room, bar, toilets, terrace).
+- `furniture.js`: the furniture kit (lounge chairs, armchairs, sofas, live-edge table, round chairs, plants, shelves…).
+- `people.js`: the staff's skinned bodies on one skeleton (hands with fingers, knees, ankles; eyes, lids, brows), see
+  docs/TOURS.md "People".
+- `barista.js`: the barista (owner, 2026-11-23) behind the counter in the KOUP T-shirt, a cartoon person in the
+  café's style (not a photographed face); the shirt's prints are the owner's photos (`models/shirt_front.jpg`, `shirt_back.jpg`); his
+  places (the machine, the cookie pile on the back counter). Every chair is a seat and every table a place to put a
+  coffee down (`seat()`, `tableTop()` in `lib.js`; `SEAT_<n>` nodes in the model).
+- The second member of staff (`cleaner()` in `barista.js`): the same shirt in olive green (`models/shirt_*_olive.jpg`),
+  going round the main floor with a cloth and wiping the tables (his round: `CLEANER_stop_<n>`).
+- `bar.js` and `menu.json` (owner, 2026-11-24): KOUP's menu (`menu/make.py` reads the café's online menu,
+  https://koupofficial.com/azadi, and writes `menu.json` with how each drink is made, and `menu/photos.jpg`), the syrup
+  rack along the window (labelled KOUP bottles and jars), the cold station (clear cups, garnish tray, milk, soda, water,
+  ice, blender), the pitcher and cups at the espresso machine (turned to face the barista), the till, and the café's
+  paper menu on every table.
+- `lib.js`: shapes, textures and materials. Every piece of furniture gets an invisible block (`COLLIDER_…`) so visitors
+  walk round it; leaves, rugs and shadows are `NOCOLLIDE_…`; visitors start at `START` (the foot of the north stairs).
+
+Items: every piece of furniture and decor is an item `ITEM_<code>` the owner can move and turn in Admin → Tours → the
+editor; the codes are kept in `items.json` (never reuse a number; a moved item in code gets a new one).
+
+Build: `node tours/koupup/export.cjs` → `tours/koupup/out/koupup.glb` (about 6.5 MB), then upload it in Admin → Tours.
+Measured levels (scan coordinates): inside floor −1.24, terrace −1.45, inside ceiling 1.90 (LED cove at 1.62),
+terrace roof 1.65, bar 1.55, toilets 1.20; the street falls from −2.5 (north) to −3.15 (south).

@@ -11,12 +11,14 @@
  */
 export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   bahjaflix: { 'wording.row1': 16, 'wording.row2': 11, 'wording.row3': 10 },
-  'bluebird-garden': { father_name: 11, 'wording.sonOf': 11, card_title: 27, card_message: 61 },
+  'bluebird-garden': { baby_name: 9, father_name: 11, 'wording.sonOf': 11, card_title: 27, card_message: 61 },
   'blush-floral': { person_1_name: 23 },
   'burgundy-lace': { person_1_name: 19, person_2_name: 22, venue_name: 42, invitation_message: 245 },
   'cherry-confetti': { person_1_name: 28 },
+  'cherry-confetti-party': { person_1_name: 25 },
   'delal-bridge': { person_1_name: 23, person_2_name: 18, venue_name: 79 },
   'embroidered-garden': { baby_name: 29, father_name: 27 },
+  'erbil-hewler': { person_1_name: 17, person_2_name: 17 },
   'espresso-ivory': { person_1_name: 24, person_2_name: 34, person_1_family: 42, person_2_family: 42, venue_name: 79, invitation_message: 245 },
   'golden-arch': { invitation_message: 116, 'wording.followLine': 33 },
   'laurel-bloom': { person_1_name: 32, invitation_message: 205 },
@@ -36,15 +38,30 @@ export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, 
  */
 const CHECKED_MAX: Readonly<Record<string, Readonly<Record<string, number>>>> = {
   bahjaflix: { 'wording.row3': 11 },
-  'bluebird-garden': { father_name: 11, 'wording.sonOf': 11 },
+  'bluebird-garden': { baby_name: 9, father_name: 11, 'wording.sonOf': 11 },
   'blush-floral': { person_1_name: 23 },
   'cherry-confetti': { person_1_name: 28 },
+  'erbil-hewler': { person_1_name: 17, person_2_name: 17 },
   'espresso-ivory': { person_2_name: 38, person_1_family: 49, person_2_family: 49 },
   'pink-ribbon': { person_1_name: 28 },
   'pink-ribbon-party': { person_1_name: 36 },
   'rosebird-garden': { baby_name: 10, father_name: 10, 'wording.sonOf': 9 },
   'vintage-love-letters': { venue_name: 78 },
   'winter-flower': { person_1_name: 23, person_2_name: 18 },
+};
+
+/**
+ * The longest any name may be on every design (owner, 2026-11-18: a long name ran off a card; "set a character limit on
+ * all names so this doesn't happen again"). Lowers the Field Library's limit; a design's own lower limit still applies.
+ */
+export const NAME_CEILING: Readonly<Record<string, number>> = {
+  person_1_name: 30,
+  person_2_name: 30,
+  baby_name: 30,
+  mother_name: 30,
+  father_name: 30,
+  person_1_family: 40,
+  person_2_family: 40,
 };
 
 export type CardBackLimits = { title: number; message: number };
@@ -89,12 +106,14 @@ export function textsToShrink(
 }
 
 /**
- * The limit of a text on a design: its usual `max`, or, when the design holds less at its own size, the length that
- * fits written smaller (`smallerTextLimit`), whichever is lower.
+ * The limit of a text on a design: its usual `max` (a name no more than `NAME_CEILING`), or, when the design holds
+ * less at its own size, the length that fits written smaller (`smallerTextLimit`), whichever is lower.
  */
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number): number;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null;
 export function themeTextLimit(themeKey: string | null | undefined, key: string, max: number | null): number | null {
+  const ceiling = NAME_CEILING[key];
+  if (ceiling !== undefined) max = max === null ? ceiling : Math.min(max, ceiling);
   const fits = themeKey ? THEME_TEXT_LIMITS[themeKey]?.[key] : undefined;
   if (fits === undefined) return max;
   const own = CHECKED_MAX[themeKey!]?.[key] ?? smallerTextLimit(key, fits);

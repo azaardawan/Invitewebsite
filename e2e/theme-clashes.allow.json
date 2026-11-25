@@ -242,5 +242,25 @@
     "ar: cover/on-drawing:div2>div1>main1>div1>div1>section1>span1>span1",
     "ar: on-drawing:div2>div1>main1>div1>div1>footer1>span1>span1",
     "ar: on-drawing:div2>div1>main1>div1>div1>section1>span1>span1"
+  ],
+  "olive-ring-box@2": [
+    "ar: cover/overlap:div2>div1>main1>section4>div1>div1>div1>span1|div2>div1>main1>section4>div1>div1>div1>span2",
+    "ar: cover/overlap:div2>div1>main1>section4>div1>div1>div2>span1|div2>div1>main1>section4>div1>div1>div2>span2",
+    "ar: cover/overlap:div2>div1>main1>section4>div1>div1>div3>span1|div2>div1>main1>section4>div1>div1>div3>span2",
+    "ar: overlap:div2>div1>main1>section1>h11>span1|div2>div1>main1>section1>h11>span2",
+    "ar: overlap:div2>div1>main1>section1>h11>span2|div2>div1>main1>section1>h11>span4",
+    "ar: overlap:div2>div1>main1>section4>div1>div1>div1>span1|div2>div1>main1>section4>div1>div1>div1>span2",
+    "ar: overlap:div2>div1>main1>section4>div1>div1>div2>span1|div2>div1>main1>section4>div1>div1>div2>span2",
+    "ar: overlap:div2>div1>main1>section4>div1>div1>div3>span1|div2>div1>main1>section4>div1>div1>div3>span2",
+    "en: cover/over-picture:div2>div1>main1>footer1>p2|div2>div1>main1>div1>img2",
+    "en: cover/overlap:div2>div1>main1>section4>div1>div1>div1>span1|div2>div1>main1>section4>div1>div1>div1>span2",
+    "en: cover/overlap:div2>div1>main1>section4>div1>div1>div3>span1|div2>div1>main1>section4>div1>div1>div3>span2",
+    "en: over-picture:div2>div1>main1>footer1>p2|div2>div1>main1>div1>img2",
+    "en: overlap:div2>div1>main1>section4>div1>div1>div1>span1|div2>div1>main1>section4>div1>div1>div1>span2",
+    "en: overlap:div2>div1>main1>section4>div1>div1>div3>span1|div2>div1>main1>section4>div1>div1>div3>span2"
+  ],
+  "vintage-love-letters@5": [
+    "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>em1",
+    "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>span1"
   ]
 }

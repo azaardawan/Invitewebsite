@@ -57,7 +57,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       wording: inv.wording,
       switchDefs: (version!.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
-      photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id) : [],
+      photos: inv.featureKeys.includes('photos') ? await listPhotos(db, inv.id, { attached: true }) : [],
       photoSpec: limitedPhotoSpec((version!.manifest as ThemeManifest).photos ?? null, inv.photoLimit),
       video: videos[0] ?? null,
       videos,

@@ -2,6 +2,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { test, type Page } from '@playwright/test';
 import { generatedManifests } from '../src/theme-registry/generated';
 import { STANDARD_FIELDS } from '../src/catalog/fields';
+import { NAME_CEILING } from '../src/catalog/text-limits';
 import ar from '../src/i18n/messages/ar.json' with { type: 'json' };
 import en from '../src/i18n/messages/en.json' with { type: 'json' };
 import { signInAsNewOwner } from './helpers';
@@ -106,7 +107,8 @@ for (const m of manifests) {
     const probes: Probe[] = [];
     for (const f of m.fields) {
       const spec = STANDARD_FIELDS[f as keyof typeof STANDARD_FIELDS] as { type: string; maxLength?: number };
-      if ((spec.type === 'text' || spec.type === 'longtext') && spec.maxLength) probes.push({ key: f, kind: 'field', max: spec.maxLength, long: spec.type === 'longtext' || spec.maxLength > 80 });
+      if ((spec.type === 'text' || spec.type === 'longtext') && spec.maxLength)
+        probes.push({ key: f, kind: 'field', max: Math.min(spec.maxLength, NAME_CEILING[f] ?? Infinity), long: spec.type === 'longtext' || spec.maxLength > 80 });
     }
     for (const w of m.wording ?? []) if (w.custom !== false) probes.push({ key: w.key, kind: 'wording', max: w.maxLength, long: w.maxLength > 60 });
     if (m.print?.card) {

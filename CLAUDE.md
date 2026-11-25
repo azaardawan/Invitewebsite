@@ -70,7 +70,33 @@ product spec's §74 business rules override assumptions.
   photo set, so packages sell rooms. Always keep a flat version (no WebGL, and the template editor). THEME_CONTRACT §6.
 - 3D worlds (`<World3D>`, `src/theme-sdk/world3d/*`): a small building to walk and play in (#30 Pink Dreamhouse, owner
   2026-11-19): a `WorldPlan` (floors, stairs as ramps, rooms, photo places, screens, plates, things a tap moves, paint by
-  colour slot); the design answers taps. One model per package size (photos sold: 6 / 12 / 24). THEME_CONTRACT §6.
+  colour slot, textures, ceilings, round parts, built drawers); the design answers taps and `onNear` (an «Open» button).
+  One model per package size (photos sold: 6 / 12 / 24). Photos attached to things (manifest `photos.attached`, places
+  from 50, e.g. a drawer's photo) are optional and not counted in a package's photos. THEME_CONTRACT §6.
+- Cafés' virtual tours (owner, 2026-11-21): not designs. Admin → Tours (`tours.manage`) holds each café's own `.glb`, logo,
+  buttons and subscription end date; `/tour/<slug>` (for its Instagram bio) walks it full screen (`src/components/tour/*`).
+  How to make a model: `docs/TOURS.md`. A café redrawn from its scan in animation style is built from code in `tours/<café>/`
+  (`node tours/<café>/export.cjs`, e.g. `tours/koupup/`). A tour can have a barista (`BARISTA`, «Get a coffee/cookie», sips and
+  bites in the visitor's hands, `src/components/tour/visit.ts`), staff going round wiping tables (`CLEANER`, `staff.ts`)
+  and seats (`SEAT_<n>`): docs/TOURS.md. A café's menu rides in its model (`MENU`, e.g. `tours/koupup/menu.json` from
+  the café's own online menu by `tours/koupup/menu/make.py`): visitors order from it at the counter or from the paper menu
+  on a table (seated: the waiter), the barista makes each drink by its recipe steps and they pay in dinar notes
+  (`src/components/tour/menu.ts|drink.ts|barista.ts`).
+- **Every 3D space made for the owner has an editor** (owner, 2026-11-23): each piece of furniture and decor is its own
+  item with a permanent code (`ITEM_<code>`, codes kept in `tours/<café>/items.json`, never reused), and the owner moves
+  and turns items in Admin (tours: Admin → Tours → Open the editor, `src/components/admin/TourEditor.tsx`, saved in
+  `tours.item_edits`). When the owner names an item by its code ("#37"), look it up there. docs/TOURS.md.
+- **Characters: two mandatory skills** (owner, 2026-11-24): whenever working on human characters, facial design, body
+  anatomy, skeletal rigging, character animation, NPC behavior or object interactions (e.g. the tours' barista and
+  waiter, `tours/<café>/barista.js`, `src/components/tour/barista.ts|staff.ts|visit.ts`), always consult and apply both
+  skills: `character-anatomy-animation` and `npc-interaction-animation`. They are mandatory quality standards for all
+  character-related development in this project. Build on the reusable system (2026-11-24): bodies are skinned on a
+  real skeleton (`tours/koupup/people.js`: spine, neck, shoulders, elbows, wrists, two-part fingers and thumb, hips,
+  knees, ankles; eyes, lids, brows); `src/components/tour/character.ts` poses them by layers (walk driven by the
+  distance walked, two-bone arm IK from `ik.ts`, finger poses, gaze, blinking); `interaction.ts` has the steps (walk,
+  approach within reach, take, place on a surface, carry, hand over on contact). Nothing changes hands without a hand
+  on it, and nothing flies; held things follow their hand's socket in the world. `?debug=1` on a tour shows sockets and
+  reach targets and logs each contact's error (`window.tourContacts`); `tests/unit/tour-ik.test.ts` tests the arithmetic.
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.
@@ -86,8 +112,9 @@ product spec's §74 business rules override assumptions.
   `e2e/theme-clashes.allow.json`, never a real clash. Customer-text length limits per design: `src/catalog/text-limits.ts`
   (`e2e/text-limits.spec.ts` measures them).
 - The owner chooses per design which fields are required (Admin → the design → Fields, `theme_fields.required`): a theme
-  must leave out a whole part when its field is empty. The invitation's paragraph (`invitation_message`) is never printed
-  on a card; the card's only paragraph is the back's own message.
+  must leave out a whole part when its field is empty. The invitation's paragraph (`invitation_message`) and the family
+  names (owner, 2026-11-19) are never printed on a card; the card's only paragraph is the back's own message. Names have
+  a ceiling on every design (`NAME_CEILING` in `src/catalog/text-limits.ts`).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

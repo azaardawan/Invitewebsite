@@ -1,0 +1,282 @@
+/*
+ * Print companions. Physical units only; the owner's artwork fills each page edge to edge (into the
+ * bleed), all text stays inside the safe area. No animation, no fixed positioning (except the border).
+ */
+
+.card,
+.back,
+.keepsake {
+  color: #39412d;
+  font-family: var(--font-text);
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.keepsake * {
+  box-sizing: border-box;
+}
+
+/* Names in calligraphy: card front and keepsake cover. */
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 40pt;
+  line-height: 1.18;
+  color: #4a5228;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.and {
+  font-family: var(--font-text);
+  font-size: 17pt;
+  line-height: 1.2;
+  color: #8c6c2c;
+}
+
+/* ---------------------------------------------------------------- A5 card front (trim 148 × 210 mm + 3 mm bleed) */
+
+.card {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  background: #f6eedc url(../assets/card-front.webp) center / 100% 100% no-repeat;
+}
+.cardSafe {
+  position: absolute;
+  /* below the crest and its rule, above the bottom ornament, clear of the corner flourishes */
+  inset: 62mm 17mm 25mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.cardMessage {
+  max-width: 106mm;
+  margin: 0;
+  font-size: 11.5pt;
+  line-height: 1.75;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.cardMessage[data-long] {
+  font-size: 10pt;
+  line-height: 1.65;
+}
+.cardDetails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2mm 8mm;
+  margin: 0;
+}
+.cardDetails dt {
+  font-size: 9pt;
+  font-weight: 600;
+  color: #8c6c2c;
+}
+.cardDetails dd {
+  margin: 0.6mm 0 0;
+  font-size: 12.5pt;
+  font-weight: 600;
+}
+.cardVenue {
+  flex-basis: 100%;
+  /* v3 (owner, 2026-11-01): the venue sits a little lower, apart from the date and time. */
+  margin-top: 2.5mm;
+}
+/*
+ * v3 (owner, 2026-11-01): the date and time sit a little to the right of centre, balancing the empty space on the
+ * right and giving the left more air. Only that row moves (the venue below stays centred, a little lower).
+ */
+.cardDetails > div:not(.cardVenue) {
+  position: relative;
+  left: 5mm;
+}
+.cardExtra {
+  margin: 0;
+  font-size: 10pt;
+  font-style: italic;
+  color: #5b5f45;
+}
+/* A short thank-you title above the names (wording.cardThanks). */
+.cardThanks {
+  max-width: 100mm;
+  margin: 0 0 3mm;
+  font-family: var(--font-script);
+  font-size: 32pt;
+  line-height: 1.3;
+  color: #8c6c2c;
+  text-wrap: balance;
+}
+/* Bottom right corner, clear of the bottom ornament and the bottom left corner flourish (bleed included). */
+.cardQr {
+  position: absolute;
+  right: 13mm;
+  bottom: 15mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+  margin: 0;
+}
+.cardQr img {
+  width: 18mm;
+  height: 18mm;
+}
+.cardQr figcaption {
+  font-size: 7pt;
+  color: #5b5f45;
+}
+
+/* ---------------------------------------------------------------- A5 card back, landscape (216 × 154 mm with bleed) */
+
+.back {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  background: #f6eedc url(../assets/card-back.webp) center / 100% 100% no-repeat;
+}
+.backSafe {
+  position: absolute;
+  inset: 24mm 30mm 24mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4mm;
+}
+.backTitle {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 36pt;
+  line-height: 1.3;
+  color: #4a5228;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.backMessage {
+  max-width: 130mm;
+  margin: 0;
+  font-size: 13pt;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.backRule,
+.closingRule {
+  display: block;
+  width: 46mm;
+  height: 6mm;
+  background: url(../assets/divider.webp) center / contain no-repeat;
+}
+.backNames {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 24pt;
+  color: #8c6c2c;
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: #f6eedc url(../assets/keepsake-cover.webp) center / 100% 100% no-repeat;
+  break-after: page;
+}
+.coverInner {
+  position: absolute;
+  inset: 92mm 30mm 50mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6mm;
+}
+.coverEyebrow {
+  margin: 0;
+  font-size: 13pt;
+  font-weight: 600;
+  color: #8c6c2c;
+}
+.coverDate {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: 16pt;
+  color: #4a5228;
+}
+.coverSub {
+  margin: 0;
+  font-size: 12pt;
+  color: #5b5f45;
+}
+.messages {
+  /*
+   * Pages have no margins (the border runs along the paper edges). This padding is repeated on every
+   * page the messages flow onto (clone), keeping text clear of the corner flourishes.
+   */
+  padding: 34mm 24mm 34mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: #f8f1e2;
+}
+.messagesTitle {
+  margin: 0 0 9mm;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: 24pt;
+  color: #4a5228;
+}
+.empty {
+  margin: 0;
+  font-size: 12pt;
+  color: #5b5f45;
+}
+.message {
+  margin: 0 0 6mm;
+  padding: 5mm 7mm;
+  border: 0.3mm solid rgb(201 164 92 / 0.7);
+  border-radius: 4mm;
+  background: #fbf6ec;
+  break-inside: avoid;
+}
+.messageText {
+  margin: 0;
+  font-size: 12pt;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.messageFrom {
+  margin: 2mm 0 0;
+  font-size: 10.5pt;
+  font-weight: 600;
+  color: #8c6c2c;
+}
+.closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3mm;
+  margin-top: 10mm;
+  font-size: 12pt;
+  color: #5b5f45;
+  break-inside: avoid;
+}
+.closing p {
+  margin: 0;
+}

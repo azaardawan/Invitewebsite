@@ -2122,7 +2122,177 @@ of its three arch places (`manifest.ts`); Ever Bloom v2's labels for the places 
 | 6 | #28 v2 photo place 8 | جدار الصور: الصورة الوسطى | Photo wall: the middle photo | دیواری وێنە: وێنەی ناوەڕاست | دیوارێ وێنەیان: وێنێ ناڤەڕاستێ |
 | 7 | #28 v2 photo places 9–16 | جدار الصور: صورة {n} | Photo wall: photo {n} | دیواری وێنە: وێنەی {n} | دیوارێ وێنەیان: وێنێ {n} |
 
-## Batch 63 — Royal Rose Crest (#31): the design's name — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+## Batch 63 — Pink Dreamhouse (#30): the button by a drawer, and a drawer's photo — ✅ AUTO-APPROVED (2026-11-19, owner checks in Admin → Translations)
+
+The owner asked for a button by each drawer (2026-11-19) and for drawers to hold a photo besides their message.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #30 the button by a drawer or the gift (`open`) | فتح | Open | کردنەوە | ڤەکرن |
+| 2 | #30 the button by a switch (`press`) | اضغط | Press | دابگرە | بگڤاشۆ |
+| 3 | #30 editor: a drawer's photo (`drawerPhoto`) | صورة في الدرج (اختيارية) | A photo in the drawer (optional) | وێنەیەک لە چەکمەجەکەدا (ئارەزوومەندانە) | وێنەیەک د چەکمەجێ دا (ب دلێ خۆ) |
+
+## Batch 64 — Pink Dreamhouse (#30): the things' names on their buttons, and each room's counter — ✅ AUTO-APPROVED (2026-11-20, owner checks in Admin → Translations)
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #30 button name (`things.gift`) | الهدية | Gift | دیاری | دیاری |
+| 2 | #30 button name (`things.door`) | الباب | Door | دەرگا | دەرگەه |
+| 3 | #30 button name (`things.cupcake`) | الكب كيك | Cupcake | کەپ کەیک | کەپ کەیک |
+| 4 | #30 button name (`things.mirror`) | المرآة | Mirror | ئاوێنە | نەینک |
+| 5 | #30 button name (`things.chest`) | الصندوق الذهبي | Golden chest | سندووقی زێڕین | سندوقا زێڕین |
+| 6 | #30 button name (`things.confetti`) | زر الاحتفال | Confetti switch | دوگمەی ئاهەنگ | دوگما ئاهەنگێ |
+| 7 | #30 button name (`things.golden`) | الزر الذهبي | Golden button | دوگمەی زێڕین | دوگما زێڕین |
+| 8 | #30 button name (`things.projector`) | جهاز العرض | Projector | پرۆجێکتەر | پرۆجێکتەر |
+| 9 | #30 button name (`things.finale`) | زر النهاية | Final button | دوگمەی کۆتایی | دوگما دووماهیێ |
+| 10 | #30 each room's counter (`roomCount`) | فُتح {n} من {m} في هذه الغرفة | {n} of {m} opened in this room | {n} لە {m} کراوەتەوە لەم ژوورەدا | {n} ژ {m} هاتینە ڤەکرن د ڤێ ژوورێ دا |
+## Batch 65 — the design page's printed cards (front and back of every card a design offers) — ✅ AUTO-APPROVED (2026-11-18, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `store.cardsTitle` | The printed cards in this design | کارتە چاپکراوەکانی ئەم دیزاینە | کارتێن چاپکری یێن ڤی دیزاینی |
+| `store.cardsIntro` | Every card this design offers, front and back, with example names. Yours shows your own names and details. | هەموو ئەو کارتانەی ئەم دیزاینە پێشکەشی دەکات، ڕوو و پشت، بە ناوی نموونە. کارتەکەی ئێوە ناو و وردەکارییەکانی خۆتان پیشان دەدات. | هەمی ئەو کارتێن ئەڤ دیزاینە پێشکێش دکەت، ڕوو و پشت، ب ناڤێن نموونە. کارتا هەوە ناڤ و هویربینیێن هەوە نیشان ددەت. |
+| `store.cardA5` | Printable card (A5) | کارتی چاپ (A5) | کارتا چاپێ (A5) |
+| `store.cardSideFront` | Front | ڕوو | ڕوو |
+| `store.cardSideBack` | Back | پشت | پشت |
+| `store.cardsIncludedIn` | In: | لە: | د: |
+| `store.cardOpen` | opens full size | بە قەبارەی تەواو دەکرێتەوە | ب قەبارێ تەمام ڤەدبیت |
+
+## Batch 66 — guest photo sharing (the order form's add-on and parts, the guests' upload page, the couple's photos on the receipt) — ✅ AUTO-APPROVED (2026-11-21, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `store.formSections.invitation` | Online invitation | بانگهێشتنامەی ئۆنلاین | داخوازنامەیا ئۆنلاین |
+| `store.formSections.card` | Printable card | کارتی چاپکراو | کارتا چاپکری |
+| `store.guestPhotos.addOn` | Add-on | زیادکراو | زێدەکری |
+| `store.guestPhotos.title` | Guest photo sharing | هاوبەشکردنی وێنەی میوانەکان | پارڤەکرنا وێنەیێن مێڤانان |
+| `store.guestPhotos.help` | Guests scan a QR code at your event and send their photos straight to you. You download them all, a folder per guest. | میوانەکان کۆدی QR لە بۆنەکەتان سکان دەکەن و وێنەکانیان ڕاستەوخۆ بۆتان دەنێرن. هەموویان دادەگرن، بۆ هەر میوانێک فۆڵدەرێک. | مێڤان کۆدێ QR ل بۆنا هەوە سکان دکەن و وێنەیێن خۆ ڕاستەوخۆ بۆ هەوە دهنێرن. هوین هەمییان دادگرن، بۆ هەر مێڤانەکی فۆلدەرەک. |
+| `store.guestPhotos.perGuest` | Photos per guest | ژمارەی وێنە بۆ هەر میوانێک | ژمارا وێنەیان بۆ هەر مێڤانەکی |
+| `store.guestPhotos.total` | Photos in total | کۆی وێنەکان | کۆیا وێنەیان |
+| `store.guestPhotos.rate` | +<price></price> per {step} over {base} | +<price></price> بۆ هەر {step} لە سەرووی {base} | +<price></price> بۆ هەر {step} ل سەر {base} |
+| `store.guestPhotos.fewer` | Fewer photos | وێنەی کەمتر | وێنەیێن کێمتر |
+| `store.guestPhotos.more` | More photos | وێنەی زیاتر | وێنەیێن پتر |
+| `store.guestPhotos.price` | Photo sharing | هاوبەشکردنی وێنە | پارڤەکرنا وێنەیان |
+| `store.guestPhotos.includes` | Up to {base} photos at the basic price. You get the photo QR code as a picture, to share or print. | تا {base} وێنە بە نرخی بنەڕەتی. کۆدی QRی وێنەکان وەک وێنەیەک وەردەگرن بۆ هاوبەشکردن یان چاپکردن. | هەتا {base} وێنە ب بهایێ بنەڕەتی. هوین کۆدێ QR یێ وێنەیان وەک وێنەیەکێ وەردگرن بۆ پارڤەکرن یان چاپکرنێ. |
+| `store.guestPhotos.invalid` | Please check the photo sharing choice. | تکایە هەڵبژاردنی هاوبەشکردنی وێنە بپشکنە. | هیڤییە هەلبژارتنا پارڤەکرنا وێنەیان بپشکنن. |
+| `receipt.navGuestPhotos` | Guest photos | وێنەی میوانەکان | وێنەیێن مێڤانان |
+| `receipt.guestPhotos.title` | Your guests' photos | وێنەی میوانەکانتان | وێنەیێن مێڤانێن هەوە |
+| `receipt.guestPhotos.count` | {photos, plural, one {# photo} other {# photos}} from {guests, plural, one {# guest} other {# guests}} · up to {cap} | وێنەکان: {photos} · میوانەکان: {guests} · تا {cap} | وێنە: {photos} · مێڤان: {guests} · هەتا {cap} |
+| `receipt.guestPhotos.openUntil` | open until {date} | بارکردن کراوەیە تا {date} | بارکرن ڤەکرییە هەتا {date} |
+| `receipt.guestPhotos.closedOn` | closed on {date} | بارکردن داخرا لە {date} | بارکرن هاتە گرتن ل {date} |
+| `receipt.guestPhotos.download` | Download all (ZIP, a folder per guest) | داگرتنی هەموو (ZIP، بۆ هەر میوانێک فۆڵدەرێک) | داگرتنا هەمییان (ZIP، بۆ هەر مێڤانەکی فۆلدەرەک) |
+| `receipt.guestPhotos.qr` | Photo QR code (PNG) | کۆدی QRی وێنەکان (PNG) | کۆدێ QR یێ وێنەیان (PNG) |
+| `receipt.guestPhotos.help` | Guests scan the photo QR code, type their name and send up to {perGuest} photos each. Refresh this page to see new ones. | میوانەکان کۆدی QRی وێنەکان سکان دەکەن، ناویان دەنووسن و هەر یەکێک تا {perGuest} وێنە دەنێرێت. ئەم پەڕەیە نوێ بکەنەوە بۆ بینینی وێنە نوێیەکان. | مێڤان کۆدێ QR یێ وێنەیان سکان دکەن، ناڤێ خۆ دنڤیسن و هەر ئێک هەتا {perGuest} وێنەیان دهنێریت. ڤێ پەڕێ نوو بکەن بۆ دیتنا وێنەیێن نوو. |
+| `receipt.guestPhotos.keptUntil` | Photos are kept while your invitation is online, until {date}. Download them before then. | وێنەکان دەمێننەوە تا بانگهێشتنامەکەتان ئۆنلاینە، تا {date}. پێش ئەو کاتە دایانبگرن. | وێنە دمینن هەتا داخوازنامەیا هەوە ئۆنلاین بیت، هەتا {date}. بەری هنگێ دابگرن. |
+| `receipt.guestPhotos.photos` | {n, plural, one {# photo} other {# photos}} | {n, plural, one {# وێنە} other {# وێنە}} | {n, plural, one {# وێنە} other {# وێنە}} |
+| `receipt.guestPhotos.noPicture` | iPhone photo (in the download) | وێنەی ئایفۆن (لە داگرتنەکەدایە) | وێنەیێ ئایفۆنێ (د داگرتنێ دایە) |
+| `receipt.guestPhotos.remove` | Remove this photo | سڕینەوەی ئەم وێنەیە | ژێبرنا ڤێ وێنەی |
+| `receipt.guestPhotos.removeConfirm` | Remove this photo? It can't be brought back. | ئەم وێنەیە بسڕدرێتەوە؟ ناگەڕێتەوە. | ئەڤ وێنەیە بهێتە ژێبرن؟ ناهێتە زڤڕاندن. |
+| `receipt.guestPhotos.none` | No photos yet. Share the photo QR code with your guests. | هێشتا هیچ وێنەیەک نییە. کۆدی QRی وێنەکان لەگەڵ میوانەکانتان هاوبەش بکەن. | هێشتا چ وێنە نینن. کۆدێ QR یێ وێنەیان دگەل مێڤانێن خۆ پارڤە بکەن. |
+| `guestPhotos.shareWith` | Share your photos with | وێنەکانتان هاوبەش بکەن لەگەڵ | وێنەیێن خۆ پارڤە بکەن دگەل |
+| `guestPhotos.onlyThey` | Only they will see them | تەنها ئەوان دەیانبینن | بتنێ ئەو دبینن |
+| `guestPhotos.name` | Your name | ناوتان | ناڤێ هەوە |
+| `guestPhotos.namePlaceholder` | So they know who sent them | بۆ ئەوەی بزانن کێ ناردوویەتی | دا بزانن کێ هنارتینە |
+| `guestPhotos.take` | 📷 Take a photo | 📷 وێنەیەک بگرن | 📷 وێنەیەکێ بگرن |
+| `guestPhotos.choose` | Choose from your phone | لە مۆبایلەکەتان هەڵبژێرن | ژ مۆبایلا خۆ هەلبژێرن |
+| `guestPhotos.yours` | Your photos | وێنەکانتان | وێنەیێن هەوە |
+| `guestPhotos.count` | {n} of {max} | {n} لە {max} | {n} ژ {max} |
+| `guestPhotos.remove` | Remove this photo | سڕینەوەی ئەم وێنەیە | ژێبرنا ڤێ وێنەی |
+| `guestPhotos.removeUntil` | You can remove your own photos until uploading closes on {date}. | دەتوانن وێنەکانی خۆتان بسڕنەوە تا بارکردن دادەخرێت لە {date}. | هوین دشێن وێنەیێن خۆ ژێببەن هەتا بارکرن دهێتە گرتن ل {date}. |
+| `guestPhotos.sending` | Sending… | ناردن… | هنارتن… |
+| `guestPhotos.needName` | Please type your name first. | تکایە سەرەتا ناوتان بنووسن. | هیڤییە بەری هەمییان ناڤێ خۆ بنڤیسن. |
+| `guestPhotos.notYet` | Uploading opens on {date}. | بارکردن لە {date} دەکرێتەوە. | بارکرن ل {date} ڤەدبیت. |
+| `guestPhotos.closed` | Uploading has closed. Thank you! | بارکردنی وێنە داخرا. سوپاس! | بارکرنا وێنەیان هاتە گرتن. سوپاس! |
+| `guestPhotos.noPicture` | iPhone photo (sent) | وێنەی ئایفۆن (نێردرا) | وێنەیێ ئایفۆنێ (هاتە هنارتن) |
+| `guestPhotos.consent` | By uploading, you confirm you took these photos and agree to share them with the couple. Please don't upload photos of anyone who wouldn't want them shared. Photos are kept while the invitation is online, then deleted. | بە بارکردن پشتڕاستی دەکەنەوە کە ئەم وێنانەتان گرتووە و ڕازین بە هاوبەشکردنیان لەگەڵ خاوەنی بۆنەکە. تکایە وێنەی ئەو کەسانە بار مەکەن کە نایانەوێت. وێنەکان دەمێننەوە تا بانگهێشتنامەکە ئۆنلاینە، پاشان دەسڕدرێنەوە. | ب بارکرنێ هوین پشتڕاست دکەن کو هەوە ئەڤ وێنە گرتینە و هوین ڕازینە ب پارڤەکرنا وان دگەل خودانێن بۆنێ. هیڤییە وێنەیێن وان کەسان بار نەکەن یێن نەڤێن. وێنە دمینن هەتا داخوازنامە ئۆنلاین بیت، پاشان دهێنە ژێبرن. |
+| `guestPhotos.errors.full` | The album is full: no more photos can be added. | ئەلبومەکە پڕ بووە: ناتوانرێت وێنەی تر زیاد بکرێت. | ئەلبۆم تژی بوو: چ وێنەیێن دی نائێنە زێدەکرن. |
+| `guestPhotos.errors.shareUsed` | You have sent all your photos. Remove one to send another. | هەموو وێنەکانتان ناردووە. یەکێک بسڕنەوە بۆ ناردنی یەکێکی تر. | هەوە هەمی وێنەیێن خۆ هنارتن. ئێکێ ژێببەن دا ئێکا دی بهنێرن. |
+| `guestPhotos.errors.duplicate` | This photo was already sent. | ئەم وێنەیە پێشتر نێردراوە. | ئەڤ وێنەیە بەری نوکە هاتیە هنارتن. |
+| `guestPhotos.errors.tooBig` | This photo is too large (25 MB at most). | ئەم وێنەیە زۆر گەورەیە (زۆرترین ٢٥ مێگابایت). | ئەڤ وێنەیە گەلەک مەزنە (پتر ژ ٢٥ مێگابایتان نابیت). |
+| `guestPhotos.errors.type` | Only photos can be sent. | تەنها وێنە دەنێردرێت. | بتنێ وێنە دهێنە هنارتن. |
+| `guestPhotos.errors.rateLimited` | Too many photos at once. Please wait a little and try again. | وێنەی زۆر بە یەکجار. کەمێک چاوەڕێ بکەن و دووبارە هەوڵ بدەنەوە. | گەلەک وێنە ب ئێکجار. هندەکێ ب هێڤی بن و دووبارە هەول بدەن. |
+| `guestPhotos.errors.generic` | Something went wrong. Please try again. | هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەنەوە. | خەلەتیەک چێبوو. هیڤییە دووبارە هەول بدەن. |
+
+## Batch 67 — cafés' virtual tours (the tour page: loading, how to walk, the café's buttons, the credit, closed and ended) — ✅ AUTO-APPROVED (2026-11-21, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.title` | {name} — virtual tour | {name} — گەشتی ئەلیکترۆنی | {name} — گەشتا ئەلیکترۆنی |
+| `tour.share` | Walk through the place in 3D, from your phone. | بە سێ دووری بە شوێنەکەدا بگەڕێ، لە مۆبایلەکەتەوە. | ب سێ دووری د جهیدا بگەڕە، ژ مۆبایلا خۆ. |
+| `tour.loading` | Getting the place ready… | شوێنەکە ئامادە دەکرێت… | جه دهێتە ئامادەکرن… |
+| `tour.hintTouch` | Drag the round pad to walk, and swipe the screen to look around. | بازنەکە ڕابکێشە بۆ ڕۆیشتن، و شاشەکە بخشێنە بۆ سەیرکردنی دەوروبەر. | بازنێ بکێشە بۆ چوونێ، و شاشێ بخشینە بۆ دیتنا دۆرماندۆر. |
+| `tour.hintKeys` | Walk with the arrow keys or W A S D, and drag to look around. | بە تیرەکان یان W A S D بڕۆ، و ڕایبکێشە بۆ سەیرکردنی دەوروبەر. | ب تیران یان W A S D بچە، و بکێشە بۆ دیتنا دۆرماندۆر. |
+| `tour.noWebgl` | This browser can't show the 3D tour. Try opening the link in Chrome or Safari. | ئەم وێبگەڕە ناتوانێت گەشتە سێ دوورییەکە پیشان بدات. بەستەرەکە لە کرۆم یان سەفاری بکەرەوە. | ئەڤ وێبگەڕە نەشێت گەشتا سێ دووری نیشان بدەت. لینکی د کرۆم یان سەفاری دا ڤەکە. |
+| `tour.failed` | The tour couldn't be opened. Check your connection and try again. | گەشتەکە نەکرایەوە. پەیوەندییەکەت بپشکنە و دووبارە هەوڵ بدەرەوە. | گەشت نەهاتە ڤەکرن. پەیوەندیا خۆ بپشکنە و دووبارە هەول بدە. |
+| `tour.instagram` | Instagram | ئینستاگرام | ئینستاگرام |
+| `tour.location` | Location | شوێن | جه |
+| `tour.menu` | Menu | مینیو | مینیو |
+| `tour.whatsapp` | WhatsApp | واتسئاپ | واتسئاپ |
+| `tour.credit` | Virtual tour by Bahja | گەشتی ئەلیکترۆنی لەلایەن بەهجە | گەشتا ئەلیکترۆنی ژ لایێ بەهجە |
+| `tour.offTitle` | {name} | {name} | {name} |
+| `tour.offBody` | This virtual tour isn't open right now. Please come back later. | ئەم گەشتە ئەلیکترۆنییە ئێستا بەردەست نییە. دواتر بگەڕێوە. | ئەڤ گەشتە ئەلیکترۆنیە نوکە بەردەست نینە. پاشی بزڤڕە. |
+| `tour.endedTitle` | {name} | {name} | {name} |
+| `tour.endedBody` | This virtual tour has ended. | ئەم گەشتە ئەلیکترۆنییە کۆتایی هات. | ئەڤ گەشتە ئەلیکترۆنیە ب دووماهی هات. |
+
+## Batch 68 — cafés' virtual tours: turn the phone sideways, and the credit «Bahjaaa.iq» — ✅ AUTO-APPROVED (2026-11-22, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.rotate` | Turn your phone sideways to walk through the place. | مۆبایلەکەت بە پانی بسوڕێنە بۆ گەڕان بە شوێنەکەدا. | مۆبایلا خۆ ب پانی بزڤڕینە بۆ گەڕیانێ د جهیدا. |
+| `tour.credit` | Virtual tour by Bahjaaa.iq | گەشتی ئەلیکترۆنی لەلایەن Bahjaaa.iq | گەشتا ئەلیکترۆنی ژ لایێ Bahjaaa.iq |
+
+## Batch 69 — cafés' virtual tours: the menu at the counter — ✅ AUTO-APPROVED (2026-11-22, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.seeMenu` | See the menu | مینیوەکە ببینە | مینیوێ ببینە |
+
+## Batch 70 — cafés' virtual tours: the barista (a coffee, a cookie), sips and bites, sitting down — ✅ AUTO-APPROVED (2026-11-23, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.getCoffee` | Get a coffee | قاوەیەک وەربگرە | قەهوەیەکێ وەرگرە |
+| `tour.getCookie` | Get a cookie | کووکییەک وەربگرە | کووکیەکێ وەرگرە |
+| `tour.makingCoffee` | Your coffee is being made… | قاوەکەت ئامادە دەکرێت… | قەهوا تە دهێتە ئامادەکرن… |
+| `tour.makingCookie` | Your cookie is on its way… | کووکییەکەت لە ڕێگادایە… | کووکیا تە د ڕێکێ دایە… |
+| `tour.sip` | Take a sip | قومێک بخۆرەوە | قومەکێ ڤەخۆ |
+| `tour.bite` | Take a bite | گازێکی لێ بگرە | گەزەکێ لێ بدە |
+| `tour.sit` | Sit down | دابنیشە | ڕوینە |
+| `tour.stand` | Stand up | هەستە | ڕابە |
+| `tour.putCoffee` | Put the coffee down | قاوەکە دابنێ | قەهوێ دانە |
+| `tour.putCookie` | Put the cookie down | کووکییەکە دابنێ | کووکیێ دانە |
+| `tour.pickCoffee` | Pick up the coffee | قاوەکە هەڵبگرە | قەهوێ هلگرە |
+| `tour.pickCookie` | Pick up the cookie | کووکییەکە هەڵبگرە | کووکیێ هلگرە |
+
+## Batch 71 — cafés' virtual tours: calling the waiter to your seat — ✅ AUTO-APPROVED (2026-11-23, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.callWaiter` | Call the waiter | بانگی گارسۆنەکە بکە | گازی گارسۆنی بکە |
+| `tour.waiterComing` | The waiter is on his way… | گارسۆنەکە لە ڕێگادایە… | گارسۆن د ڕێکێ دایە… |
+| `tour.waiterBringing` | Your order is on its way… | داواکارییەکەت لە ڕێگادایە… | داخوازیا تە د ڕێکێ دایە… |
+| `tour.noThanks` | No, thanks | نەخێر، سوپاس | نە، سوپاس |
+
+## Batch 72 — cafés' virtual tours: the café's menu (ordering, paying, the paper menu on the tables) — ✅ AUTO-APPROVED (2026-11-24, owner checks in Admin → Translations)
+
+Replaces `tour.getCoffee`, `tour.getCookie`, `tour.makingCoffee`, `tour.makingCookie`, `tour.callWaiter` and `tour.noThanks` (removed).
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.order` | Order | داوا بکە | داخاز بکە |
+| `tour.orderPrice` | Order · {price} | داوا بکە · {price} | داخاز بکە · {price} |
+| `tour.making` | Your {item} is being made… | {item}ەکەت ئامادە دەکرێت… | {item}یا تە دهێتە ئامادەکرن… |
+| `tour.paying` | Paying {price}… | {price} دەدەیت… | تو {price} ددەی… |
+| `tour.takeIt` | Take your {item} | {item}ەکەت وەربگرە | {item}یا خۆ وەرگرە |
+| `tour.sitToOrder` | Sit at the table to order | بۆ داواکردن لەسەر مێزەکە دابنیشە | بۆ داخازکرنێ ل سەر مێزێ ڕوینە |
+| `tour.handsFull` | Your hands are full | دەستەکانت پڕن | دەستێن تە تژینە |
+| `tour.currency` | IQD | دینار | دینار |
+| `tour.close` | Close | داخستن | گرتن |
+| `tour.waiterBrings` | The waiter will bring it to your table | گارسۆنەکە بۆ سەر مێزەکەت دەیهێنێت | گارسۆن دێ بۆ سەر مێزا تە ئینیت |
+| `tour.putCoffee` | Put the drink down | خواردنەوەکە دابنێ | ڤەخوارنێ دانە |
+| `tour.pickCoffee` | Pick up the drink | خواردنەوەکە هەڵبگرە | ڤەخوارنێ هلگرە |
+
+## Batch 73 — Royal Rose Crest (#31): the design's name — ✅ AUTO-APPROVED (2026-11-25, owner checks in Admin → Translations)
 
 Royal Olive Crest in baby pink and rose gold (`themes/royal-rose-crest/v1/manifest.ts`); every other text is Royal
 Olive Crest's, already reviewed.

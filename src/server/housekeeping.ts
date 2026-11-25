@@ -7,6 +7,7 @@ import { pruneRateLimits } from '@/server/rate-limit';
 import { storage } from '@/server/storage';
 import { ensureDocument } from '@/server/documents/documents';
 import { deleteOrphanPhotoFiles, deletePhotosOf } from '@/server/photos/photos';
+import { deleteEndedGuestPhotos } from '@/server/guest-photos/service';
 import { deleteCustomSongsOf, deleteOrphanSongFiles } from '@/server/music/custom';
 import { deleteOrphanVideoFiles, deleteVideosOf } from '@/server/video/video';
 import { deleteOrphanSignatures } from '@/server/media/assets';
@@ -67,6 +68,8 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   // The customer's photos: with the guest data, 12 months after the invitation ended; and those of orders never
   // paid, 30 days after their preview link expired. Then any photo file no invitation uses.
   const photosDeleted = (await deletePhotosOf(db, personalIds)) + (await deleteOrphanPhotoFiles(db, now));
+  // Guests' photos (guest photo sharing): kept while the invitation is online, then deleted (owner, 2026-11-21).
+  const guestPhotosDeleted = await deleteEndedGuestPhotos(db, now);
   // The customer's own songs go with them.
   const songsDeleted = (await deleteCustomSongsOf(db, personalIds)) + (await deleteOrphanSongFiles(db, now));
   // And their videos (packages with `video`).
@@ -127,5 +130,5 @@ export async function runHousekeeping(db: DbOrTx, now = new Date(), opts: { prep
   if (stale.length) await db.delete(generatedDocuments).where(inArray(generatedDocuments.id, stale.map((d) => d.id)));
 
   await pruneRateLimits(db, now);
-  return { repliesDeleted, keepsakesDeleted, documentsDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted, videosDeleted, signaturesDeleted, webhookEventsDeleted: webhookEvents.length };
+  return { guestPhotosDeleted, repliesDeleted, keepsakesDeleted, documentsDeleted, keepsakesPrepared, analyticsDeleted: analytics.length, previewsDeleted: stale.length, photosDeleted, songsDeleted, videosDeleted, signaturesDeleted, webhookEventsDeleted: webhookEvents.length };
 }

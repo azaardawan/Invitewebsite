@@ -1,0 +1,1 @@
+ALTER TABLE "tours" ADD COLUMN "item_edits" jsonb DEFAULT '{}'::jsonb NOT NULL;

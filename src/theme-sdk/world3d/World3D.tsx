@@ -45,6 +45,10 @@ export type World3DProps = {
   onTap?: (tap: WorldTap) => void;
   onRoom?: (key: string) => void;
   onVideo?: (place: number, state: 'playing' | 'paused' | 'ended') => void;
+  /** What lies in each drawer (by thing key): its note's words and its photo, drawn as paper in it. */
+  contents?: Readonly<Record<string, { note?: string; photo?: ThemePhoto | null }>>;
+  /** The things of the plan the visitor is next to and facing, nearest first (the design may offer a button for each). */
+  onNear?: (keys: string[]) => void;
 };
 
 /**
@@ -77,7 +81,7 @@ export const World3D = forwardRef<World3DHandle, World3DProps>(function World3D(
   );
 
   // One scene per set of photos, videos, words and colours: rebuilt only when what is shown changes.
-  const key = JSON.stringify([photos.map((p) => [p.index, p.src, p.focus]), videos.map((v) => v?.src ?? null), texts, colors, plan.start]);
+  const key = JSON.stringify([photos.map((p) => [p.index, p.src, p.focus]), videos.map((v) => v?.src ?? null), texts, colors, plan.start, props.contents ?? null]);
 
   useEffect(() => {
     const el = box.current;
@@ -108,6 +112,10 @@ export const World3D = forwardRef<World3DHandle, World3DProps>(function World3D(
           onTap: (t) => callbacks.current.onTap?.(t),
           onRoom: (k) => callbacks.current.onRoom?.(k),
           onVideo: (p, s) => callbacks.current.onVideo?.(p, s),
+          onNear: (k) => callbacks.current.onNear?.(k),
+          contents: Object.fromEntries(
+            Object.entries(props.contents ?? {}).map(([k, v]) => [k, { note: v.note, photo: v.photo ? { src: v.photo.src, focus: v.photo.focus } : undefined }]),
+          ),
         });
         engine.current = e;
         await e.load();

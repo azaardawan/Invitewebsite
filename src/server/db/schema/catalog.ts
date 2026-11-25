@@ -27,7 +27,8 @@ export const experienceType = pgEnum('experience_type', ['INVITATION']);
 export const themeStatus = pgEnum('theme_status', ['DEVELOPMENT', 'READY_FOR_REVIEW', 'ACTIVE', 'ARCHIVED']);
 export const packageStatus = pgEnum('package_status', ['ACTIVE', 'ARCHIVED']);
 export const musicStatus = pgEnum('music_status', ['ACTIVE', 'ARCHIVED']);
-export const assetKind = pgEnum('asset_kind', ['IMAGE', 'AUDIO', 'VIDEO']);
+/** MODEL: a 3D model (.glb), e.g. a café's virtual tour. */
+export const assetKind = pgEnum('asset_kind', ['IMAGE', 'AUDIO', 'VIDEO', 'MODEL']);
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
+  ATTACHED_PHOTO_PLACE,
   EditableText,
   Photo,
   PhotoSlot,
@@ -65,16 +66,40 @@ function colorsOf(props: ThemeProps): Record<string, string> {
   return { ...BLUSH, ...props.colors };
 }
 
+/** The things that open (besides the drawers), each with its room: counted in the room's counter. */
+const OPENABLES = [
+  { key: 'gift', room: 'living' },
+  { key: 'cupcake', room: 'kitchen' },
+  { key: 'mirror', room: 'vanity' },
+  { key: 'chest', room: 'secret' },
+];
+/** Keys counted as opened (drawers by '#'). */
+const COUNTED = new Set(['drawer#', 'gift', 'cupcake', 'mirror', 'chest']);
+
+/** A thing's name on its button. */
+function thingName(copy: Copy, key: string) {
+  const drawer = /^drawer(\d)$/.exec(key);
+  if (drawer) return `${copy.drawer} ${drawer[1]}`;
+  if (/^door\d$/.test(key) || key === 'secretDoor') return copy.things.door;
+  return copy.things[key as keyof Copy['things']] ?? '';
+}
+
 // ---- what the visitor has found, kept for their next visit ----
 
-type Found = { drawers: number[]; gift: boolean; chest: boolean };
-const EMPTY: Found = { drawers: [], gift: false, chest: false };
+/** What the visitor has opened: the drawers (for the suite), and every thing that opens (for the rooms' counters). */
+type Found = { drawers: number[]; gift: boolean; chest: boolean; opened: string[] };
+const EMPTY: Found = { drawers: [], gift: false, chest: false, opened: [] };
 const storeKey = () => `pdh:${window.location.pathname}`;
 function readFound(): Found {
   try {
     const raw = window.localStorage.getItem(storeKey());
     const v = raw ? (JSON.parse(raw) as Partial<Found>) : null;
-    return { drawers: Array.isArray(v?.drawers) ? v.drawers.filter((n) => Number.isInteger(n)) : [], gift: !!v?.gift, chest: !!v?.chest };
+    return {
+      drawers: Array.isArray(v?.drawers) ? v.drawers.filter((n) => Number.isInteger(n)) : [],
+      gift: !!v?.gift,
+      chest: !!v?.chest,
+      opened: Array.isArray(v?.opened) ? v.opened.filter((k): k is string => typeof k === 'string') : [],
+    };
   } catch {
     return EMPTY;
   }
@@ -168,7 +193,7 @@ function Cover({ props, copy, phase, onOpen }: { props: ThemeProps; copy: Copy; 
   );
 }
 
-type Card = { title: string; body: string } | null;
+type Card = { title: string; body: string; photo?: ThemePhoto | null } | null;
 
 /** Bursts of confetti over the house (none with reduced motion). */
 function Confetti({ burst, big }: { burst: number; big: boolean }) {
@@ -215,7 +240,17 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
   const who = names(props);
   const message = props.fields.invitation_message?.trim() ?? '';
 
-  const photos = useMemo(() => [...props.photos].sort((a, b) => a.index - b.index), [props.photos]);
+  // The house's photo places (the drawers' own photos are shown when a drawer opens).
+  const photos = useMemo(() => props.photos.filter((p) => p.index < ATTACHED_PHOTO_PLACE).sort((a, b) => a.index - b.index), [props.photos]);
+  const drawerPhoto = (n: number) => props.photos.find((p) => p.index === ATTACHED_PHOTO_PLACE + n - 1) ?? null;
+  // What lies in each drawer: a paper note with its message, and its photo printed (owner, 2026-11-21).
+  const drawerContents = useMemo(
+    () =>
+      Object.fromEntries(
+        Array.from({ length: DRAWER_COUNT[tier] }, (_, i) => [`drawer${i + 1}`, { note: word(props, `drawer${i + 1}`), photo: props.photos.find((p) => p.index === ATTACHED_PHOTO_PLACE + i) ?? null }]),
+      ),
+    [props, tier],
+  );
   const videos = useMemo(() => (hasFeature(props, 'video') ? props.videos.slice(0, VIDEO_COUNT[tier]) : []), [props, tier]);
   const texts = useMemo(() => Object.fromEntries(ROOMS.map((r, i) => [r.key, roomName(props, copy, i)])), [props, copy]);
   const colors = useMemo(() => colorsOf(props), [props]);
@@ -247,16 +282,32 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
   useEffect(() => {
     if (!ready || !unlocked) return;
     announced.current = true;
+    opened.current.add('secretDoor');
     world.current?.set('secretDoor', true);
   }, [ready, unlocked]);
 
   // What is open in the house right now (drawers, the gift's lid…), to close it on a second tap.
   const opened = useRef(new Set<string>());
+  const [openKeys, setOpenKeys] = useState<ReadonlySet<string>>(new Set());
   const toggle = (key: string, open: boolean) => {
     if (open) opened.current.add(key);
     else opened.current.delete(key);
+    if (open && COUNTED.has(key.replace(/\d$/, '#'))) remember((f) => (f.opened.includes(key) ? f : { ...f, opened: [...f.opened, key] }));
+    setOpenKeys(new Set(opened.current));
     world.current?.set(key, open);
   };
+  // The things the visitor is next to and facing: a button for each (owner, 2026-11-19: "Open" by a drawer, without
+  // having to crouch to tap a low one).
+  const [near, setNear] = useState<string[]>([]);
+  const [room, setRoom] = useState<string>('living');
+  const usable = (key: string) => {
+    const drawer = /^drawer(\d)$/.exec(key);
+    if (drawer) return Number(drawer[1]) <= drawers;
+    if (key === 'gift' || /^door\d$/.test(key)) return true;
+    if (key === 'confetti' || key === 'cupcake' || key === 'mirror') return tier !== 'basic';
+    return tier === 'vvip' && ['golden', 'projector', 'secretDoor', 'chest', 'finale'].includes(key);
+  };
+  const PRESSED = ['confetti', 'golden', 'projector', 'finale'];
 
   const onTap = (tap: WorldTap) => {
     setWelcome(false);
@@ -278,11 +329,11 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         const after = needed.every((x) => x === n || found.drawers.includes(x));
         if (tier === 'vvip' && !before && after && !announced.current) {
           announced.current = true;
-          setCard({ title: copy.unlocked, body: word(props, key) });
+          setCard({ title: copy.unlocked, body: word(props, key), photo: drawerPhoto(n) });
           celebrate(true);
           return;
         }
-        setCard({ title: `${copy.drawer} ${n}`, body: word(props, key) });
+        setCard({ title: `${copy.drawer} ${n}`, body: word(props, key), photo: drawerPhoto(n) });
       }
       return;
     }
@@ -320,7 +371,7 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         return playVideo(1);
       case 'secretDoor':
         if (tier !== 'vvip') return;
-        if (unlocked) return world.current?.set(key, true);
+        if (unlocked) return toggle(key, !opened.current.has(key));
         return setCard({ title: copy.memories.replace('{n}', String(needed.filter((n) => found.drawers.includes(n)).length)).replace('{m}', String(needed.length)), body: copy.locked });
       case 'chest': {
         if (tier !== 'vvip') return;
@@ -339,6 +390,11 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         press(key);
         celebrate(true);
         return setCard({ title: who ? `${copy.happyBirthday}, ${who}!` : copy.happyBirthday, body: message || word(props, 'chest') });
+      case 'door1':
+      case 'door2':
+      case 'door3':
+        // A door between rooms: opened (and closed) like a door.
+        return toggle(key, !opened.current.has(key));
       case 'stairsUp':
       case 'stairsDown':
         if (tier === 'basic') return;
@@ -383,6 +439,9 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
   }, [active, ready, welcome]);
 
   const foundCount = needed.filter((n) => found.drawers.includes(n)).length;
+  // The things of the room the visitor is in that open, and how many of them they have opened.
+  const roomItems = [...OPENABLES.filter((o) => o.room === room && usable(o.key)), ...DRAWERS.slice(0, drawers).flatMap((d, i) => (d.room === room ? [{ key: `drawer${i + 1}`, room }] : []))];
+  const roomOpened = roomItems.filter((o) => found.opened.includes(o.key) || (o.key.startsWith('drawer') && found.drawers.includes(Number(o.key.slice(6)))) || (o.key === 'gift' && found.gift) || (o.key === 'chest' && found.chest)).length;
   const allDrawers = Array.from({ length: drawers }, (_, i) => i + 1);
 
   return (
@@ -405,7 +464,12 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         onReady={() => setReady(true)}
         onUnavailable={onUnavailable}
         onTap={onTap}
-        onRoom={() => setWelcome(false)}
+        onRoom={(key) => {
+          setWelcome(false);
+          setRoom(key);
+        }}
+        onNear={setNear}
+        contents={drawerContents}
         onVideo={onVideo}
       />
 
@@ -416,11 +480,21 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         <p className={c('welcomeHint')}>{touch ? copy.hintTouch : copy.hintKeys}</p>
       </div>
 
-      {/* How many memories are found (the biggest house opens its secret suite with them). */}
-      {active && ready && tier === 'vvip' && foundCount > 0 ? (
-        <p className={c('counter')} role="status" data-house-found={foundCount}>
-          {copy.memories.replace('{n}', String(foundCount)).replace('{m}', String(needed.length))}
-        </p>
+      {/* In each room, how many of its things the visitor has opened (owner, 2026-11-19); and in the biggest house, the
+          memories found towards the secret suite. */}
+      {active && ready ? (
+        <div className={c('counters')}>
+          {roomItems.length ? (
+            <p className={c('counter')} role="status" data-house-room-count={`${roomOpened}/${roomItems.length}`}>
+              {copy.roomCount.replace('{n}', String(roomOpened)).replace('{m}', String(roomItems.length))}
+            </p>
+          ) : null}
+          {tier === 'vvip' && foundCount > 0 ? (
+            <p className={c('counter')} data-house-found={foundCount}>
+              {copy.memories.replace('{n}', String(foundCount)).replace('{m}', String(needed.length))}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       {music.available && active ? (
@@ -464,12 +538,25 @@ function HouseWalk({ props, copy, reduced, active, onUnavailable }: { props: The
         </div>
       ) : null}
 
+      {/* By something to open or press: a button for it (it can be tapped in the house too). */}
+      {active && ready && !card && !photo && near.some(usable) ? (
+        <div className={c('nearButtons')}>
+          {near.filter(usable).map((key) => (
+            <button key={key} type="button" className={c('nearButton')} data-house-near={key} onClick={() => onTap({ kind: 'thing', key })}>
+              {PRESSED.includes(key) ? copy.press : openKeys.has(key) ? copy.close : copy.open}
+              <span className={c('nearName')}> · {thingName(copy, key)}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <Confetti burst={burst.n} big={burst.big} />
 
       {card ? (
         <div className={c('sheet')} role="dialog" aria-modal="true" aria-label={card.title} onClick={() => setCard(null)} data-house-card>
           <div className={c('note')} onClick={(e) => e.stopPropagation()}>
             <p className={c('noteTitle')}>{card.title}</p>
+            {card.photo ? <Photo photo={card.photo} className={c('notePhoto')} /> : null}
             {card.body ? <p className={c('noteBody')}>{card.body}</p> : null}
             <button type="button" className={c('pill')} onClick={() => setCard(null)}>
               {copy.close}
@@ -605,13 +692,16 @@ function FlatHouse({ props, copy }: { props: ThemeProps; copy: Copy }) {
               </div>
             ) : null}
             {place >= 0 && videos[place] ? <VideoSlot video={videos[place]!} place={place} className={c('videoBox')} controls playsInline /> : null}
-            {[...drawersIn(tier, room.key).map((n) => `drawer${n}`), ...(extra ? [extra] : [])].map((k) =>
-              word(props, k).trim() ? (
-                <p key={k} className={c('flatNote')}>
-                  {word(props, k)}
-                </p>
-              ) : null,
-            )}
+            {[...drawersIn(tier, room.key).map((n) => `drawer${n}`), ...(extra ? [extra] : [])].map((k) => {
+              const n = /^drawer(\d)$/.exec(k);
+              const own = n ? props.photos.find((p) => p.index === ATTACHED_PHOTO_PLACE + Number(n[1]) - 1) : undefined;
+              return word(props, k).trim() || own ? (
+                <div key={k} className={c('flatDrawer')}>
+                  {own ? <Photo photo={own} className={c('notePhoto')} /> : null}
+                  {word(props, k).trim() ? <p className={c('flatNote')}>{word(props, k)}</p> : null}
+                </div>
+              ) : null;
+            })}
           </section>
         );
       })}
@@ -673,9 +763,18 @@ function HouseEditor({ props, copy }: { props: ThemeProps; copy: Copy }) {
             {place >= 0 && place < videos.length ? (
               <VideoSlot video={videos[place] ?? null} place={place} className={c('videoBox')} controls playsInline label={copy.addVideo} />
             ) : null}
-            {[...drawersIn(tier, room.key).map((n) => ({ key: `drawer${n}`, label: `${copy.drawer} ${n}` })), ...extras.map((k) => ({ key: k, label: copy.fromHeart }))].map((t) => (
-              <div key={t.key} className={c('noteEdit')}>
+            {[
+              ...drawersIn(tier, room.key).map((n) => ({ key: `drawer${n}`, label: `${copy.drawer} ${n}`, place: ATTACHED_PHOTO_PLACE + n - 1 })),
+              ...extras.map((k) => ({ key: k, label: copy.fromHeart, place: -1 })),
+            ].map((t) => (
+              <div key={t.key} className={c('noteEdit', t.place >= 0 && 'noteEditPhoto')} data-house-drawer-edit={t.place >= 0 ? t.key : undefined}>
                 <span className={c('noteLabel')}>{t.label}</span>
+                {/* A drawer holds a message, and a photo if the customer adds one (owner, 2026-11-19). */}
+                {t.place >= 0 ? (
+                  <div className={c('drawerPhoto')}>
+                    <PhotoSlot index={t.place} photos={props.photos} className={c('framePhoto')} label={copy.drawerPhoto} />
+                  </div>
+                ) : null}
                 <EditableText id={`wording:${t.key}`} value={word(props, t.key)} placeholder={copy.textHint} as="p" className={c('noteText')} multiline />
               </div>
             ))}

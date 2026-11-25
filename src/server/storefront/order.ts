@@ -1,5 +1,7 @@
-import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import 'server-only';
+import { DEFAULT_PER_GUEST, guestPhotoPrice } from '@/catalog/guest-photos';
+import { getSettings } from '@/server/settings/service';
+import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
 import { posterTextDefault } from '@/lib/poster-texts';
 import type { CoverFocus } from '@/lib/cover-focus';
@@ -71,8 +73,11 @@ export async function draftByToken(token: string) {
       wording: inv.wording,
       switchDefs: (row.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
+      guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, perGuest: inv.guestPhotosPerGuest ?? DEFAULT_PER_GUEST } : null,
     },
     fieldKeys: inv.fieldKeys,
+    /** Guest photo sharing chosen on the form (its price is added at checkout), or null. */
+    guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, priceIqd: guestPhotoPrice(inv.guestPhotosCap, (await getSettings(db())).guestPhotos) } : null,
     theme: { key: row.theme.key, name: row.theme.name },
     /** False for a design sold only as files (no online invitation). */
     onlineInvitation: manifestByCodeRef(row.codeRef)?.onlineInvitation !== false,
@@ -176,9 +181,11 @@ export async function songState(inv: typeof invitations.$inferSelect) {
 export async function photoState(inv: typeof invitations.$inferSelect) {
   const spec = await photoSpec(db(), inv);
   if (!spec) return null;
-  const list = await listPhotos(db(), inv.id);
+  const list = await listPhotos(db(), inv.id, { attached: true });
   return {
     max: spec.max,
+    /** Photos attached to things in the design (e.g. drawers), from ATTACHED_PHOTO_PLACE: each optional, on its own. */
+    attached: spec.attached,
     min: spec.min,
     aspect: spec.aspect,
     aspects: spec.aspects,
@@ -224,6 +231,8 @@ export async function orderFormExtras(
     /** The design's yes/no choices (manifest `switches`) and the customer's answers so far. */
     switchDefs?: readonly DesignSwitch[];
     switches?: Record<string, boolean>;
+    /** Guest photo sharing chosen so far (null = not). */
+    guestPhotos?: { cap: number; perGuest: number } | null;
   } = {},
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
@@ -276,6 +285,14 @@ export async function orderFormExtras(
   if (featureKeys.includes('color_choice')) {
     const choice = await paletteChoice(themeId, current.colors ?? null, locale, current.paletteIds);
     if (choice) extras.palettes = { current: choice.current, original: choice.original, options: choice.options };
+  }
+  // Guest photo sharing: an add-on at the end of the form while the owner offers it (Admin → Settings).
+  const { guestPhotos: pricing } = await getSettings(db());
+  if (pricing.enabled || current.guestPhotos) {
+    extras.guestPhotos = {
+      pricing: { basePriceIqd: pricing.basePriceIqd, stepPriceIqd: pricing.stepPriceIqd, maxCap: pricing.maxCap },
+      current: current.guestPhotos ?? null,
+    };
   }
   return extras;
 }

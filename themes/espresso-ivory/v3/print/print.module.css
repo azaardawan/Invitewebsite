@@ -1,0 +1,381 @@
+/*
+ * Espresso & Ivory print companions: the design's "Print card" screen (espresso paper, fine gold frame, the
+ * ivory card with the names, details and QR) laid out on A5 + 3 mm bleed, plus its landscape back and the A4 keepsake.
+ * Physical units only; text stays inside the 5 mm safe area.
+ */
+
+.card,
+.back,
+.keepsake {
+  --wine: #2b1b16;
+  --paper: #f4ecdf;
+  --ink: #39231c;
+  --thread: #d4bd8a;
+  font-family: 'EI Serif', Georgia, serif;
+  text-align: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.back *,
+.keepsake * {
+  box-sizing: border-box;
+}
+.card p,
+.back p,
+.keepsake p,
+.card h1,
+.back h1,
+.keepsake h1,
+.keepsake h2 {
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------- frame: top and bottom rules (the sides are the border) */
+
+.frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.keepsake .frame {
+  position: fixed;
+}
+.rules,
+.rulesInner {
+  position: absolute;
+  inset: 4mm;
+  border-block: 0.25mm solid #d4bd8a80;
+}
+.rulesInner {
+  inset: 5.25mm;
+  border-color: #d4bd8a40;
+}
+
+/* ---------------------------------------------------------------- the lace square with the names */
+
+.lace {
+  position: relative;
+  width: 66mm;
+  aspect-ratio: 430 / 655;
+  flex-shrink: 0;
+  background: url(../assets/ivory-card.webp) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 1mm 0.8mm #11070333);
+}
+.laceNames {
+  position: absolute;
+  inset: 24% 16%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--ink);
+  font-family: 'EI Ceremony', 'EI Script', serif;
+  font-size: 30pt;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.laceNames em {
+  font-family: 'EI Serif', Georgia, serif;
+  font-style: italic;
+  font-size: 0.42em;
+  margin: 1.5mm 0 0.5mm;
+}
+[data-script='arabic'] .laceNames {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-size: 32pt;
+  line-height: 1.45;
+}
+[data-script='arabic'] .laceNames em {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-style: normal;
+  font-size: 0.55em;
+  margin: 0;
+}
+.laceNames[data-long] {
+  font-family: 'EI Serif', Georgia, serif;
+  font-size: 17pt;
+}
+
+.rule {
+  position: relative;
+  width: 26mm;
+  height: 5mm;
+  flex-shrink: 0;
+  color: var(--paper);
+}
+.rule::before,
+.rule::after {
+  content: '';
+  position: absolute;
+  top: 2.4mm;
+  width: 9.5mm;
+  border-top: 0.25mm solid currentColor;
+  opacity: 0.65;
+}
+.rule::before {
+  left: 0;
+}
+.rule::after {
+  right: 0;
+}
+.rule > span {
+  position: absolute;
+  left: 11.6mm;
+  top: 1.2mm;
+  width: 2.6mm;
+  height: 2.6mm;
+  border: 0.25mm solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.75;
+}
+
+/* ---------------------------------------------------------------- A5 card front (148 × 210 mm + 3 mm bleed) */
+
+.card {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+  background: var(--wine) url(../assets/espresso-paper.webp) center / cover;
+  color: var(--paper);
+}
+.cardSafe {
+  position: absolute;
+  inset: 17mm 20mm 15mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+}
+.kicker {
+  font-size: 10pt;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+[data-script='arabic'] .kicker {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-size: 17pt;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.cardMessage {
+  max-width: 100mm;
+  font-size: 13pt;
+  line-height: 1.55;
+  font-style: italic;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+[data-script='arabic'] .cardMessage {
+  font-style: normal;
+  font-size: 14pt;
+  line-height: 1.75;
+}
+.cardMessage[data-long] {
+  font-size: 10.5pt;
+}
+.cardDate {
+  font-size: 17pt;
+  line-height: 1.45;
+}
+.cardTime {
+  font-size: 12pt;
+  letter-spacing: 0.06em;
+}
+.cardVenue {
+  max-width: 100mm;
+  font-size: 14pt;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.cardExtra {
+  font-size: 11pt;
+  font-style: italic;
+}
+.cardQr {
+  margin: 1mm 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+  flex-shrink: 0;
+}
+.cardQr img {
+  width: 17mm;
+  height: 17mm;
+  padding: 1mm;
+  background: var(--paper);
+  outline: 0.25mm solid #b9a386;
+  outline-offset: 0.8mm;
+}
+.cardQr figcaption {
+  font-size: 7.5pt;
+  letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------------- A5 card back, landscape (216 × 154 mm) */
+
+.back {
+  position: relative;
+  width: 216mm;
+  height: 154mm;
+  overflow: hidden;
+  background: var(--wine) url(../assets/espresso-paper.webp) center / cover;
+  color: var(--paper);
+}
+.backSafe {
+  position: absolute;
+  inset: 22mm 34mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5mm;
+}
+.backTitle {
+  font-family: 'EI Script', 'EI Serif', serif;
+  font-size: 40pt;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+[data-script='arabic'] .backTitle {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-size: 34pt;
+  line-height: 1.5;
+}
+.backMessage {
+  max-width: 130mm;
+  font-size: 13pt;
+  line-height: 1.65;
+  font-style: italic;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+[data-script='arabic'] .backMessage {
+  font-style: normal;
+  font-size: 14pt;
+  line-height: 1.8;
+}
+.backNames {
+  font-family: 'EI Script', 'EI Serif', serif;
+  font-size: 22pt;
+  line-height: 1.3;
+}
+[data-script='arabic'] .backNames {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-size: 20pt;
+}
+.backSignature {
+  max-height: 22mm;
+  max-width: 60mm;
+  filter: invert(1);
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+
+.keepsake {
+  color: var(--ink);
+}
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: var(--wine) url(../assets/espresso-paper.webp) center / cover;
+  color: var(--paper);
+  break-after: page;
+}
+.coverInner {
+  position: absolute;
+  inset: 36mm 30mm;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8mm;
+}
+.cover .lace {
+  width: 86mm;
+}
+.cover .laceNames {
+  font-size: 38pt;
+}
+[data-script='arabic'] .cover .laceNames {
+  font-size: 40pt;
+}
+.coverDate {
+  font-size: 18pt;
+}
+.coverSub {
+  font-size: 13pt;
+  font-style: italic;
+}
+[data-script='arabic'] .coverSub {
+  font-style: normal;
+  font-size: 15pt;
+}
+.messages {
+  padding: 36mm 26mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: var(--paper);
+  min-height: 297mm;
+}
+.messagesTitle {
+  margin: 0 0 10mm;
+  font-family: 'EI Script', 'EI Serif', serif;
+  font-size: 30pt;
+  color: var(--ink);
+}
+[data-script='arabic'] .messagesTitle {
+  font-family: 'EI Ruqaa', 'EI Serif', serif;
+  font-size: 26pt;
+}
+.empty {
+  font-size: 13pt;
+}
+.message {
+  break-inside: avoid;
+  margin: 0 auto 7mm;
+  max-width: 140mm;
+  padding: 6mm 8mm;
+  border: 0.3mm solid #ad967680;
+  outline: 0.3mm solid #c8b69955;
+  outline-offset: -1.6mm;
+  background: #fffdf6;
+}
+.messageText {
+  font-size: 12.5pt;
+  line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.messageFrom {
+  margin-top: 2.5mm !important;
+  font-size: 11pt;
+  opacity: 0.8;
+}
+.closing {
+  margin-top: 12mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4mm;
+  font-size: 13pt;
+  font-style: italic;
+  break-inside: avoid;
+}
+.closing .rule {
+  color: var(--ink);
+}

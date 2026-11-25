@@ -83,7 +83,8 @@ export default defineTheme({
     })),
   ],
   // 24 places: three in each of the four smaller rooms, six in the cinema and the suite; they fill by threes.
-  photos: { max: 24, set: PHOTO_SET, aspect: PHOTO_ASPECT },
+  // And a photo in each drawer, if the customer adds one (owner, 2026-11-19): places 50–57, not counted in a package.
+  photos: { max: 24, set: PHOTO_SET, aspect: PHOTO_ASPECT, attached: 8 },
   // The fridge (VIP), the cinema and the suite (VVIP).
   videos: {
     max: 3,

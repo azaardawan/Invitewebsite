@@ -11,6 +11,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh';
 import { canvasTexture, fitText, framed, loadImage, sameSite } from '../gallery3d/draw';
 import { floorAt, roomAt, scaledPlan, type WorldPlan, type WorldText, type WorldThing } from './plan';
+import { buildDoor, buildDrawer, ceilings, drawerContents, moveParts, movePhoto, outline, roundify, stand, texturePaint } from './build';
 
 THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -38,9 +39,13 @@ export type WorldOptions = {
   onTap: (tap: WorldTap) => void;
   onRoom: (key: string) => void;
   onVideo: (place: number, state: 'playing' | 'paused' | 'ended') => void;
+  /** What lies in each drawer (by thing key): a note's words and a photo, drawn as paper in it. */
+  contents?: Readonly<Record<string, { note?: string; photo?: { src: string; focus: { x: number; y: number; zoom: number } } }>>;
+  /** The things the visitor is next to and facing, nearest first (to offer a button for each; none: []). */
+  onNear?: (keys: string[]) => void;
 };
 
-type Moving = { thing: WorldThing; group: THREE.Group; meshes: THREE.Mesh[]; open: boolean; t: number; base: THREE.Matrix4; size: THREE.Vector3 };
+type Moving = { thing: WorldThing; group: THREE.Group; meshes: THREE.Mesh[]; open: boolean; t: number; base: THREE.Matrix4; size: THREE.Vector3; center: THREE.Vector3 };
 
 const SPEED = 2.4;
 const RADIUS = 0.32;
@@ -55,6 +60,11 @@ export class WorldEngine {
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(72, 1, 0.05, 120);
   private colliders: THREE.Mesh[] = [];
+  /** The footprints of everything in the way (see `touches`), but the things that move. */
+  private solids: THREE.Box3[] = [];
+  private tmpBox = new THREE.Box3();
+  private frameAvg = 16;
+  private framesSince = 0;
   private tappable = new Map<THREE.Object3D, WorldTap>();
   private things = new Map<string, Moving>();
   private screens: (THREE.Mesh | null)[] = [];
@@ -69,6 +79,7 @@ export class WorldEngine {
   private keys = new Set<string>();
   private stick = { x: 0, y: 0 };
   private room = '';
+  private near = '';
   private frame = 0;
   private last = 0;
   private dirty = true;
@@ -105,7 +116,7 @@ export class WorldEngine {
 
     this.camera.rotation.order = 'YXZ';
     this.scene.background = new THREE.Color(plan.sky);
-    this.scene.add(new THREE.HemisphereLight(0xfff1e9, 0xe9e3ff, plan.light.ambient));
+    this.scene.add(new THREE.HemisphereLight(0xfff1e9, 0xfff4ec, plan.light.ambient));
     const sun = new THREE.DirectionalLight(0xffe8df, plan.light.sun);
     sun.position.set(-4, 9, -6);
     this.scene.add(sun);
@@ -155,6 +166,17 @@ export class WorldEngine {
     });
     // Each paint slot's material (one per colour), and the model's own colours elsewhere, a little satin.
     const paints = new Map<string, THREE.MeshStandardMaterial>();
+    const paint = (slot: string) => {
+      let m = paints.get(slot);
+      if (!m) {
+        // Without an environment to reflect, a metal reads dark: gold is drawn as a bright satin paint.
+        const color = new THREE.Color(colors[slot] ?? '#ffffff');
+        m = new THREE.MeshStandardMaterial({ color, roughness: slot === 'metal' ? 0.45 : 0.78, metalness: 0, flatShading: true });
+        if (slot === 'metal') m.emissive = color.clone().multiplyScalar(0.18);
+        paints.set(slot, m);
+      }
+      return m;
+    };
     for (const mesh of meshes) {
       if (matches(mesh.name, plan.hidden)) {
         mesh.visible = false;
@@ -164,15 +186,7 @@ export class WorldEngine {
       if (!mesh.geometry.attributes.normal) mesh.geometry.computeVertexNormals();
       const slot = Object.entries(plan.paint ?? {}).find(([, prefixes]) => matches(mesh.name, prefixes))?.[0];
       if (slot && colors[slot]) {
-        let m = paints.get(slot);
-        if (!m) {
-          // Without an environment to reflect, a metal reads dark: gold is drawn as a bright satin paint.
-          const color = new THREE.Color(colors[slot]);
-          m = new THREE.MeshStandardMaterial({ color, roughness: slot === 'metal' ? 0.45 : 0.78, metalness: 0, flatShading: true });
-          if (slot === 'metal') m.emissive = color.clone().multiplyScalar(0.18);
-          paints.set(slot, m);
-        }
-        mesh.material = m;
+        mesh.material = paint(slot);
       } else {
         const m = mesh.material as THREE.MeshStandardMaterial;
         if (m.isMeshStandardMaterial) {
@@ -184,6 +198,42 @@ export class WorldEngine {
       }
     }
     this.scene.add(root);
+
+    // Round things drawn smoothly round.
+    for (const mesh of meshes) {
+      if (!mesh.visible) continue;
+      if (matches(mesh.name, plan.round?.spheres)) roundify(mesh, 'sphere');
+      else if (matches(mesh.name, plan.round?.cylinders)) roundify(mesh, 'cylinder');
+      else if (matches(mesh.name, plan.round?.soft)) roundify(mesh, 'soft');
+    }
+    // Things that give light of their own (flames).
+    for (const [prefix, color] of Object.entries(plan.glow ?? {})) {
+      const m = new THREE.MeshBasicMaterial({ color: new THREE.Color(color) });
+      for (const mesh of meshes) if (mesh.visible && matches(mesh.name, [prefix])) mesh.material = m;
+    }
+    // The ceilings the model lacks.
+    const added: THREE.Mesh[] = [];
+    if (plan.ceilings) {
+      for (const m of ceilings(plan.ceilings.at, paint(plan.ceilings.paint))) {
+        this.scene.add(m);
+        added.push(m);
+      }
+    }
+    // Parts moved (things that floated, set down on what holds them; buttons against their walls).
+    for (const move of plan.moves ?? []) moveParts(meshes.filter((m) => matches(m.name, move.nodes)), move);
+    // Pedestals the model lacks.
+    for (const s of plan.stands ?? []) {
+      const m = stand(s, paint(s.paint));
+      this.scene.add(m);
+      added.push(m);
+    }
+    // Photo places clear of the furniture in front of them.
+    for (const [name, move] of Object.entries(plan.photoMoves ?? {})) {
+      const main = root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name));
+      if (!main) continue;
+      const parts = [main, ...(plan.photoParts ?? []).map((p) => root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(name + p.suffix))).filter((o): o is THREE.Object3D => !!o)];
+      movePhoto(parts, new THREE.Box3().setFromObject(main).getCenter(new THREE.Vector3()), move);
+    }
 
     // Photos, screens and plates are not in the way; the plates' words are drawn on the plan's own quads.
     const photoParts = (name: string) => plan.photos.some((p) => (plan.photoParts ?? []).some((s) => name === THREE.PropertyBinding.sanitizeNodeName(p + s.suffix)));
@@ -208,14 +258,41 @@ export class WorldEngine {
     for (const t of plan.texts) this.drawText(t);
 
     // Things that move: each in its own pivot, so the model itself stays as it was.
+    const housings: THREE.Mesh[] = [];
+    const pending: { key: string; inside: ReturnType<typeof buildDrawer>['inside']; contents: NonNullable<WorldOptions['contents']>[string] }[] = [];
     for (const thing of plan.things) {
-      const parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
+      let parts = meshes.filter((m) => m.name === THREE.PropertyBinding.sanitizeNodeName(thing.node) || matches(m.name, thing.with));
+      // A door drawn by the world, in a doorway of the model.
+      if (thing.kind === 'door' && thing.build) {
+        parts = buildDoor(thing.build, thing.hinge ?? 'min', paint);
+        for (const m of parts) this.scene.add(m);
+      }
       if (!parts.length) continue;
+      // A drawer drawn by the world: the model's drawer (and what it replaces) left out.
+      if (thing.kind === 'drawer' && thing.build) {
+        for (const m of [...parts, ...meshes.filter((x) => matches(x.name, thing.build!.hide))]) m.visible = false;
+        const built = buildDrawer(thing.build, thing.slide, paint);
+        const contents = this.o.contents?.[thing.key];
+        if (contents) pending.push({ key: thing.key, inside: built.inside, contents });
+        for (const m of [...built.drawer, ...built.housing]) this.scene.add(m);
+        for (const m of built.housing) {
+          this.tappable.set(m, { kind: 'thing', key: thing.key });
+          housings.push(m);
+        }
+        parts = built.drawer;
+      }
       const box = new THREE.Box3();
       for (const p of parts) box.expandByObject(p);
       const group = new THREE.Group();
-      // Lids tip on their back top edge; everything else turns or moves about its middle.
-      const pivot = thing.kind === 'lid' ? new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y, box.max.z) : box.getCenter(new THREE.Vector3());
+      // Lids tip on their back top edge; doors swing on their hinge edge; everything else turns or moves about its middle.
+      const size = box.getSize(new THREE.Vector3());
+      const along = size.x > size.z ? 'x' : 'z';
+      const pivot =
+        thing.kind === 'lid'
+          ? new THREE.Vector3((box.min.x + box.max.x) / 2, box.max.y, box.max.z)
+          : thing.kind === 'door'
+            ? box.getCenter(new THREE.Vector3()).setComponent(along === 'x' ? 0 : 2, (thing.hinge ?? 'min') === 'min' ? box.min[along] : box.max[along])
+            : box.getCenter(new THREE.Vector3());
       group.position.copy(pivot);
       this.scene.add(group);
       group.updateMatrixWorld(true);
@@ -224,7 +301,44 @@ export class WorldEngine {
         this.tappable.set(p, { kind: 'thing', key: thing.key });
       }
       for (const m of meshes) if (matches(m.name, thing.touch)) this.tappable.set(m, { kind: 'thing', key: thing.key });
-      this.things.set(thing.key, { thing, group, meshes: parts, open: false, t: 0, base: group.matrix.clone(), size: box.getSize(new THREE.Vector3()) });
+      this.things.set(thing.key, { thing, group, meshes: parts, open: false, t: 0, base: group.matrix.clone(), size: box.getSize(new THREE.Vector3()), center: box.getCenter(new THREE.Vector3()) });
+    }
+    for (const m of [...housings, ...added]) {
+      m.geometry.computeBoundsTree();
+      if (m.name !== 'WORLD_CEILING') this.colliders.push(m);
+    }
+    // Textured paint (plaster, tiles), on the model and on what the world added.
+    for (const [slot, spec] of Object.entries(plan.textures ?? {})) {
+      const material = paints.get(slot);
+      if (!material) continue;
+      const targets: THREE.Mesh[] = [];
+      this.scene.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh && m.material === material) targets.push(m);
+      });
+      void texturePaint(material, targets, spec, this.renderer).then((t) => {
+        if (!t) return;
+        this.disposables.push(t);
+        this.dirty = true;
+        this.kick();
+      });
+    }
+    // Black lines on the edges of what opens, so visitors see what to open.
+    if (plan.outline) {
+      const ink = new THREE.LineBasicMaterial({ color: 0x1a1016 });
+      this.disposables.push(ink);
+      for (const t of this.things.values()) {
+        if (t.thing.kind === 'teleport') continue;
+        for (const m of [...t.meshes, ...meshes.filter((x) => matches(x.name, t.thing.touch))]) {
+          if (!m.visible) continue;
+          outline(m, ink);
+          // The faces a hair behind their lines, so the lines don't shimmer as the visitor moves.
+          const mat = m.material as THREE.Material;
+          mat.polygonOffset = true;
+          mat.polygonOffsetFactor = 1;
+          mat.polygonOffsetUnits = 1;
+        }
+      }
     }
 
     const tapOnly = new Set([...this.tappable.keys()].filter((m) => this.tappable.get(m)!.kind !== 'thing'));
@@ -239,6 +353,26 @@ export class WorldEngine {
         m.geometry.computeBoundsTree();
         if (!this.colliders.includes(m)) this.colliders.push(m);
       }
+    }
+    // The notes and photos in the drawers, laid in once drawn (they move with their drawer).
+    for (const p of pending) {
+      void drawerContents(p.inside, p.contents, this.o.look, this.o.dir, this.renderer).then((meshes) => {
+        const m = this.things.get(p.key);
+        if (!m || !this.alive) return;
+        for (const mesh of meshes) {
+          m.group.attach(mesh);
+          this.disposables.push((mesh.material as THREE.MeshStandardMaterial).map!);
+        }
+        this.dirty = true;
+        this.kick();
+      });
+    }
+    // What is in the way of walking: the solid parts' footprints (not floors, ceilings or roofs, nor small things).
+    const moving = new Set([...this.things.values()].flatMap((t) => t.meshes));
+    const flat = ['FLOOR', 'CEILING', 'ROOF', 'WORLD_CEILING'];
+    for (const m of this.colliders) {
+      if (moving.has(m) || !m.visible || matches(m.name, flat) || matches(m.name, plan.walkPast)) continue;
+      this.solids.push(new THREE.Box3().setFromObject(m));
     }
   }
 
@@ -535,11 +669,29 @@ export class WorldEngine {
 
   // ---- walking ----
 
-  private blocked(dir: THREE.Vector3, dist: number) {
-    for (const h of [0.3, 0.85, 1.4]) {
-      this.ray.set(new THREE.Vector3(this.pos.x, this.floorY + h, this.pos.z), dir);
-      this.ray.far = dist + RADIUS;
-      if (this.ray.intersectObjects(this.colliders, false).length) return true;
+  /**
+   * Whether a visitor standing at (x, z) on a floor at `y` would touch anything: every solid part of the world is its
+   * footprint (a box on the floor plan, between its bottom and top), and the visitor a circle; only parts between the
+   * ankles and the top of the head count. Boxes rather than rays: nothing thin slips between them, and walls slide.
+   */
+  private touches(x: number, z: number, y: number) {
+    const lo = y + 0.12 * this.size;
+    const hi = y + 1.8;
+    const r = RADIUS;
+    const hit = (b: THREE.Box3) => {
+      if (b.max.y < lo || b.min.y > hi) return false;
+      const dx = Math.max(b.min.x - x, 0, x - b.max.x);
+      const dz = Math.max(b.min.z - z, 0, z - b.max.z);
+      return dx * dx + dz * dz < r * r;
+    };
+    for (const b of this.solids) if (hit(b)) return true;
+    // Things that move (an open door is out of the way).
+    for (const m of this.things.values()) {
+      if (m.thing.kind === 'teleport' || (m.thing.kind === 'door' && m.open)) continue;
+      for (const mesh of m.meshes) {
+        if (!mesh.visible) continue;
+        if (hit(this.tmpBox.setFromObject(mesh))) return true;
+      }
     }
     return false;
   }
@@ -551,12 +703,8 @@ export class WorldEngine {
       if (!len) return false;
       const y = floorAt(this.o.plan, this.pos.x + sx, this.pos.z + sz, this.floorY, this.gates);
       if (y === null) return false;
-      // Low parts on the way up the stairs are the steps themselves: look ahead from the new height.
-      const was = this.floorY;
-      this.floorY = Math.max(was, y);
-      const stop = this.blocked(new THREE.Vector3(sx / len, 0, sz / len), len);
-      this.floorY = was;
-      if (stop) return false;
+      // Already touching something (a door closed on the visitor): any step out is allowed.
+      if (this.touches(this.pos.x + sx, this.pos.z + sz, Math.max(this.floorY, y)) && !this.touches(this.pos.x, this.pos.z, this.floorY)) return false;
       this.pos.x += sx;
       this.pos.z += sz;
       this.floorY = y;
@@ -577,7 +725,9 @@ export class WorldEngine {
   private tick = (now: number) => {
     this.frame = 0;
     if (!this.alive) return;
-    const dt = Math.min((now - this.last) / 1000, 0.05);
+    // Walking keeps its pace on a slower computer too (up to a tenth of a second a frame).
+    const frameMs = now - this.last;
+    const dt = Math.min(frameMs / 1000, 0.1);
     this.last = now;
     let moving = false;
 
@@ -618,11 +768,15 @@ export class WorldEngine {
     }
     if (this.playing && !this.playing.video.paused) moving = true;
 
-    if (moving) this.checkRoom();
+    if (moving) {
+      this.checkRoom();
+      this.checkNear();
+    }
     if (moving || this.dirty) {
       this.camera.position.copy(this.pos);
       this.camera.rotation.set(this.pitch, this.yaw, 0);
       this.renderer.render(this.scene, this.camera);
+      if (moving) this.adapt(frameMs);
       this.dirty = false;
     }
     if (moving) this.kick();
@@ -646,8 +800,8 @@ export class WorldEngine {
     } else if (k === 'press') {
       g.scale.setScalar(1 - 0.12 * Math.sin(Math.PI * e));
     } else if (k === 'door') {
-      // Slides down into the floor, out of the way.
-      g.position.y -= m.size.y * 0.98 * e;
+      // Swings open on its hinge, like a door.
+      g.rotateY(((m.thing.kind === 'door' && m.thing.hinge === 'max' ? 1 : -1) * Math.PI * 0.55) * e);
     } else if (k === 'glow') {
       const pulse = m.open ? 0.55 + 0.25 * Math.sin(now / 260) : 0;
       for (const mesh of m.meshes) {
@@ -659,6 +813,49 @@ export class WorldEngine {
       }
     }
     g.updateMatrixWorld(true);
+  }
+
+  /** Tells the design which things the visitor is next to and facing (within reach), nearest first. */
+  private checkNear() {
+    if (!this.o.onNear) return;
+    const fx = -Math.sin(this.yaw);
+    const fz = -Math.cos(this.yaw);
+    const reach = 1.9 * this.size;
+    const near: { key: string; d: number }[] = [];
+    for (const [key, m] of this.things) {
+      if (m.thing.kind === 'teleport' || !m.meshes.some((x) => x.visible)) continue;
+      const dx = m.center.x - this.pos.x;
+      const dz = m.center.z - this.pos.z;
+      const d = Math.hypot(dx, dz);
+      // On this floor, near, and ahead (within about 50° of where the visitor looks), however low it is.
+      if (m.center.y < this.floorY - 0.3 || m.center.y > this.floorY + 2.6 * this.size) continue;
+      if (d > reach || (d > 0.3 && (dx * fx + dz * fz) / d < 0.64)) continue;
+      near.push({ key, d });
+    }
+    const keys = near.sort((a, b) => a.d - b.d).slice(0, 3).map((n) => n.key);
+    if (keys.join() === this.near) return;
+    this.near = keys.join();
+    this.o.onNear(keys);
+  }
+
+  /**
+   * Keeps walking smooth: when frames come slowly (a computer drawing a large screen), the picture is drawn a little less
+   * sharp, and sharper again when there is time to spare.
+   */
+  private adapt(frameMs: number) {
+    if (frameMs <= 0 || frameMs > 250) return;
+    this.frameAvg = this.frameAvg * 0.92 + frameMs * 0.08;
+    if (++this.framesSince < 45) return;
+    const ratio = this.renderer.getPixelRatio();
+    const best = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+    let next = ratio;
+    if (this.frameAvg > 24 && ratio > 0.6) next = Math.max(0.6, ratio - 0.2);
+    else if (this.frameAvg < 13 && ratio < best) next = Math.min(best, ratio + 0.1);
+    if (next !== ratio) {
+      this.renderer.setPixelRatio(next);
+      this.resize();
+      this.framesSince = 0;
+    }
   }
 
   /** Tells the design when the visitor walks into another room. */

@@ -12,6 +12,7 @@ import { syncThemesFromRegistry } from '../src/server/catalog/themes';
 import { themeManifests } from '../src/theme-registry';
 import { addKurdishNames } from '../src/server/catalog/kurdish-names';
 import { applyOwnerSetups } from '../src/server/catalog/owner-setup';
+import { applyOwnerTours } from '../src/server/tours/owner-tours';
 
 try {
   await seedRbac(db());
@@ -27,6 +28,7 @@ try {
   console.log('Theme sync:', JSON.stringify(report));
   console.log(`Kurdish added to ${await addKurdishNames(db())} design/package name(s).`);
   for (const line of await applyOwnerSetups(db(), { adminId: null, ipHash: null })) console.log(`Owner setup: ${line}`);
+  for (const line of await applyOwnerTours(db())) console.log(`Owner tour: ${line}`);
   if (report.conflicts.length) {
     console.error(`ERROR: activated theme versions changed in code: ${report.conflicts.join(', ')}. Create a new version folder instead.`);
     process.exitCode = 1;

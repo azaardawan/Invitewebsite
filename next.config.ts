@@ -25,6 +25,14 @@ const csp = [
   "base-uri 'self'",
 ].join('; ');
 
+/**
+ * Cafés' virtual tours (`/tour/<slug>`): the 3D model's own pictures are read from `blob:` addresses, and a compressed
+ * model is unpacked by a small WebAssembly decoder (meshopt). Only these pages allow them (the later header wins).
+ */
+const tourCsp = csp
+  .replace("connect-src 'self'", "connect-src 'self' blob:")
+  .replace("script-src 'self'", "script-src 'self' 'wasm-unsafe-eval'");
+
 const baseSecurityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -76,6 +84,13 @@ const nextConfig: NextConfig = {
       { source: '/p/:path*', headers: [noIndex] },
       { source: '/r/:path*', headers: [noIndex] },
       { source: '/t/:path*', headers: [noIndex] },
+      // A private tour's link carries its code: never sent on to the sites its buttons open.
+      {
+        source: '/tour/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }, ...(isProd ? [{ key: 'Content-Security-Policy', value: tourCsp }] : [])],
+      },
+      // The tours' editor draws the café's model (as the tour page: its pictures come as blobs, its decoder is WebAssembly).
+      ...(isProd ? [{ source: '/admin/tour-editor/:path*', headers: [{ key: 'Content-Security-Policy', value: tourCsp }] }] : []),
       // A customer's order screens carry their private preview token in the URL.
       { source: '/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
       { source: '/:locale(en|ckb|bdn)/order/:path*', headers: [noIndex, { key: 'Cache-Control', value: 'no-store' }, { key: 'Referrer-Policy', value: 'no-referrer' }] },
