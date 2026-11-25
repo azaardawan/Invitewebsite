@@ -27,6 +27,7 @@ export const THEME_TEXT_LIMITS: Readonly<Record<string, Readonly<Record<string, 
   'pink-ribbon-party': { person_1_name: 36 },
   'rosebird-garden': { baby_name: 10, father_name: 10, 'wording.sonOf': 8, card_title: 13, card_message: 96 },
   'royal-olive-crest': { venue_name: 47 },
+  'royal-rose-crest': { venue_name: 47 },
   'vintage-love-letters': { person_1_name: 11, person_2_name: 19, venue_name: 74 },
   'winter-flower': { person_1_name: 21, person_2_name: 15 },
 };
