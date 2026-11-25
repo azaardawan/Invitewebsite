@@ -3,8 +3,9 @@ make_needle_sound.py - synthesise the sewing-machine sound for the save-the-date
 
 The needle pierces once every 4 frames (30 fps) over frames 1-225, then the rig lifts away
 (frames 225-255). That timing is the same for every invitation, so one track fits them all.
-Each stitch: a fine needle tick, a soft puff of the linen and a faint tug of the thread; one small
-click when the needle lifts away. No motor hum, so it sounds like a light hand needle, not a machine.
+Each stitch: a short, mid-pitched click of the needle through the card (modelled on the reference
+reel's needle: ~3 ms long, centred around 4 kHz), slightly uneven like a hand-guided needle, with
+about a third of the strokes passing silently; one small click when the needle lifts away.
 
 Pure Python (no numpy), so it runs anywhere:  python3 make_needle_sound.py needle.wav
 """
@@ -58,14 +59,31 @@ def build(seed=435):
             return state[0] * math.exp(-t / tau)
         return fn
 
-    # --- per stitch: a light needle, not a machine ------------------------------------
+    # --- per stitch: a short, mid-pitched needle click (matched to the reference reel:
+    # ~2.7 ms decay, energy centred around 4 kHz, mostly 1-3 kHz), slightly uneven ----------
+    def click(scale, tilt):
+        """A metal needle through card: a few damped resonances plus a grain of noise."""
+        modes = [(2050.0 * tilt, 0.55), (3200.0 * tilt, 0.38), (4900.0 * tilt, 0.26), (7400.0, 0.09)]
+        phases = [rng.uniform(0, 2 * math.pi) for _ in modes]
+        grain = burst(0.0011, 0.55)
+
+        def fn(t):
+            ring = sum(a * math.sin(2 * math.pi * f * t + ph) for (f, a), ph in zip(modes, phases))
+            return scale * (ring * math.exp(-t / 0.0011) + 0.35 * grain(t))
+        return fn
+
+    skipped = False
     for k, td in enumerate(needle_down_times()):
-        jitter = rng.uniform(-0.002, 0.002)
-        pan = 0.08 * math.sin(k * 0.7)
-        amp = 0.85 + 0.15 * rng.random()
-        add(td + jitter, 0.02, burst(0.0022, 0.95), 0.5 * amp - pan, 0.5 * amp + pan)  # fine needle tick
-        add(td + 0.004 + jitter, 0.06, burst(0.012, 0.12), 0.10 * amp, 0.10 * amp)    # soft fabric puff
-        add(td + 0.055 + jitter, 0.015, burst(0.0016, 0.9), 0.10 + pan, 0.10 - pan)   # thread tug
+        # about a third of the strokes pass without an audible click (never two in a row), so
+        # the rhythm is ~5 clicks/s and uneven, like the reference, yet each click is on a stroke
+        if k > 0 and not skipped and rng.random() < 0.32:
+            skipped = True
+            continue
+        skipped = False
+        jitter = rng.uniform(-0.006, 0.006)
+        pan = 0.10 * math.sin(k * 0.7)
+        amp = rng.uniform(0.65, 1.0)
+        add(td + jitter, 0.014, click(amp, rng.uniform(0.92, 1.08)), 0.5 - pan, 0.5 + pan)
 
     # --- the needle lifts away: one small click, no motor, no whoosh ---------------------
     add(t_of(STITCH_END_FRAME + 1), 0.02, burst(0.003, 0.8), 0.12, 0.11)

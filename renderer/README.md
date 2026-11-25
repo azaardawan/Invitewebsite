@@ -26,11 +26,11 @@ GET  /health
 ```
 
 **Sound.** Every video has the sewing-machine sound (`make_needle_sound.py`, built into the
-image as `needle.wav`): a fine tick, a soft puff of linen and a thread tug on every stitch.
+image as `needle.wav`): short mid-pitched needle clicks, uneven at about 5 a second, modelled on the reference reel.
 Optional music plays under it (`audio_mix.py`): `"music": "song.mp3"` for a file in `music/`,
 or `"music_url"` for a link on a host listed in `MUSIC_URL_HOSTS`. Whatever the song's own
-loudness, it is set 7 LU under the needle and ducked while the needle sews (measured: the
-needle stays 11+ LU above the music throughout the stitching).
+loudness, it is set 12 LU under the needle and ducked while the needle sews (measured: the
+needle stays 9.5+ LU above the music throughout the stitching, 15 LU on average).
 
 Poll `GET /jobs/{id}` every 10–20 s. A full render takes roughly 20 minutes per 4 vCPUs at
 720×1280. The service sleeps when idle (Railway serverless), so the first request after a quiet

@@ -15,7 +15,7 @@ import shutil
 import subprocess
 
 NEEDLE_LUFS = -18.0           # integrated loudness of the needle sound in the final mix
-MUSIC_BELOW_NEEDLE = 7.0      # music sits this many LU under the needle (before ducking)
+MUSIC_BELOW_NEEDLE = 12.0     # music sits this many LU under the needle (before ducking)
 DURATION = 345 / 30           # 11.5 s
 
 
