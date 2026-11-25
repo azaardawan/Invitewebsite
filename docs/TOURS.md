@@ -106,6 +106,20 @@ The staff walk at a person's pace (the waiter 1.1 m/s going round, 1.3 m/s servi
 faster they go (`ampFor` in `ik.ts`), and along a whole way at once (`walkPath`): turning as they walk and rounding the
 corners, slowing only for a sharp turn and at the end.
 
+### Hands that fit what they hold (owner, 2026-11-25: demo, `tours/koupup-v2/`)
+
+Behind a switch only a demo model turns on (a node `TOUR_FEATURES` with extras `fitGrip: true`), a hand holds each thing
+by that thing's own grip shape (`src/components/tour/grip.ts`, the shapes in `shapeOf`):
+
+- **Round things** (a cup by its size at the holding height and its taper; bottles, jars, the milk carton, the pitcher,
+  the jug) sit against the palm by their size. Each finger and the thumb close until 3 mm (`GAP`) from the side; for
+  wide things the thumb opens out first.
+- **Flat things** (a cookie, the notes) are pinched as they were taken, every finger 3 mm off them.
+
+It works the same for the staff and for the visitor's own hands. A held thing moves rigidly with the hand. A hand shapes
+itself for what it is about to take, and closes only once its wrist has fully turned. `?debug=1` measures each
+finger's distance to what is held, every frame, in `window.tourFingers` (by who, what and when; negative means inside).
+
 ## Items and the editor (owner, 2026-11-23)
 
 Every piece of furniture and decor of a tour's model is an **item**: a node `ITEM_<code>` (its extras' `label` says what
