@@ -28,6 +28,7 @@ const ar = {
   thanks: 'شكرًا لكونكم جزءًا من يومنا المميّز.',
   weddingOf: 'حفل زفاف',
   skipFilm: 'تخطّي',
+  soundOn: 'تشغيل الصوت',
   keepsakeSub: 'تهاني الأهل والأحبة',
 } as const;
 
@@ -55,6 +56,7 @@ const en: Copy = {
   thanks: 'Thank you for being a part of our special day.',
   weddingOf: 'The Wedding of',
   skipFilm: 'Skip',
+  soundOn: 'Tap for sound',
   keepsakeSub: 'Wishes from family and friends',
 };
 
@@ -79,6 +81,7 @@ const ckb: Copy = {
   thanks: 'سوپاس بۆ ئەوەی بەشێک بوون لە ڕۆژە تایبەتەکەمان.',
   weddingOf: 'زەماوەندی',
   skipFilm: 'تێپەڕاندن',
+  soundOn: 'دەنگ لێبدە',
   keepsakeSub: 'پیرۆزبایی خێزان و خۆشەویستان',
 };
 
@@ -103,6 +106,7 @@ const bdn: Copy = {
   thanks: 'سوپاس بۆ هندێ کو هوین بەشەک بوون ژ رۆژا مە یا تایبەت.',
   weddingOf: 'داوەتا',
   skipFilm: 'دەرباز بکە',
+  soundOn: 'دەنگی لێبدە',
   keepsakeSub: 'پیرۆزباهیێن مالباتێ و هەڤالان',
 };
 

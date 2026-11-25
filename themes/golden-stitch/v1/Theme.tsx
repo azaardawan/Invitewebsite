@@ -32,13 +32,12 @@ import s from './theme.module.css';
 const SAMPLE_FILM = new URL('./assets/sample-film.mp4', import.meta.url).href;
 
 /**
- * cover → film (the cover fades, the needle stitches the date and the heart) → pages (the film fades out).
- * Without a film (none yet, a phone that can't play it, reduced motion) the cover opens straight onto the pages.
+ * The invitation opens on its own straight into the film (owner, 2026-11-25: no Open button for this design): the
+ * needle stitches the date and the heart, then the pages appear. Browsers only start a video by itself without sound,
+ * so it plays muted with a "sound" button (a tap anywhere on the film works too) unless the browser allows sound.
+ * Without a film (not made yet, a phone that can't play it) or with reduced motion: straight to the pages.
  */
-type Stage = 'cover' | 'film' | 'pages';
-
-/** The cover's fade (the opening animation the platform checks: well under 4 s). */
-const COVER_FADE_MS = 900;
+type Stage = 'film' | 'pages';
 
 const noop = () => () => {};
 
@@ -47,49 +46,66 @@ export default function GoldenStitch(props: ThemeProps) {
   const t = copyFor(locale);
   const reduced = useReducedMotion();
   const music = useMusic();
-  const [stage, setStage] = useState<Stage>('cover');
-  const [opening, setOpening] = useState(false);
+  // The couple's own film is made after payment (manifest `film`, about ten minutes); until it is ready the invitation
+  // shows its pages. Samples and previews show the sample film.
+  const film = mode === 'live' ? (props.film?.src ?? null) : SAMPLE_FILM;
+  const [stage, setStage] = useState<Stage>(film ? 'film' : 'pages');
+  const [muted, setMuted] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const hydrated = useSyncExternalStore(
     noop,
     () => true,
     () => false,
   );
-  // The couple's own film is made after payment (manifest `film`, about ten minutes); until it is ready the cover opens
-  // straight onto the pages. Samples and previews show the sample film.
-  const film = mode === 'live' ? (props.film?.src ?? null) : SAMPLE_FILM;
 
   const startMusic = music.start;
   const toPages = useCallback(() => {
+    video.current?.pause();
     setStage('pages');
     startMusic();
   }, [startMusic]);
 
-  const open = () => {
-    if (stage !== 'cover' || opening) return;
-    if (reduced || !film) {
-      music.start();
+  // Start the film as soon as the page is ready: with sound when the browser allows it, otherwise muted.
+  useEffect(() => {
+    if (stage !== 'film') return;
+    const v = video.current;
+    // (Read directly: on the first render after the server's, `useReducedMotion` can still say "no".)
+    if (reduced || !v || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setStage('pages');
       return;
     }
-    // The song waits for the film (it carries its own needle sound); the tap unlocks sound for both.
-    music.prime();
-    setOpening(true);
+    v.muted = false;
+    v.play().catch(() => {
+      v.muted = true;
+      setMuted(true);
+      v.play().catch(() => setStage('pages'));
+    });
+    // Runs once, when the page first shows.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // The guest's tap turns the needle's sound on, and lets the song start when the pages appear.
+  const soundOn = () => {
     const v = video.current;
-    if (v) {
-      v.currentTime = 0;
-      v.play().catch(() => toPages());
+    if (v && v.muted) {
+      v.muted = false;
+      setMuted(false);
     }
+    music.prime();
   };
 
+  // A browser that kept the film muted plays the song from the guest's first tap on the pages.
+  const heard = useRef(false);
   useEffect(() => {
-    if (!opening) return;
-    const id = window.setTimeout(() => {
-      setOpening(false);
-      setStage((st) => (st === 'cover' ? 'film' : st));
-    }, COVER_FADE_MS);
-    return () => window.clearTimeout(id);
-  }, [opening]);
+    if (stage !== 'pages' || !music.available) return;
+    const first = (e: PointerEvent) => {
+      if (heard.current || (e.target as Element | null)?.closest('[data-gs-audio]')) return;
+      heard.current = true;
+      if (!music.playing) startMusic();
+    };
+    document.addEventListener('pointerdown', first);
+    return () => document.removeEventListener('pointerdown', first);
+  }, [stage, music.available, music.playing, startMusic]);
 
   const showCountdown = hasFeature(props, 'countdown') && event.startsAt !== null;
   const showMap = hasFeature(props, 'map') && mapUrl !== null;
@@ -100,64 +116,43 @@ export default function GoldenStitch(props: ThemeProps) {
 
   return (
     <div className={`${fonts.fonts} ${s.root}`} dir={dir} lang={lang} data-stage={stage}>
-      {stage !== 'pages' && (
-        <div className={s.film} data-stage={stage} data-opening={opening ? '' : undefined}>
-          {film ? (
-            <video
-              ref={video}
-              className={s.filmVideo}
-              src={film}
-              poster={filmPoster.src}
-              playsInline
-              preload="auto"
-              onEnded={toPages}
-              onError={() => {
-                if (opening || stage === 'film') toPages();
-              }}
-            />
-          ) : null}
-          {stage === 'film' ? (
-            <button
-              type="button"
-              className={s.skip}
-              onClick={() => {
-                video.current?.pause();
-                toPages();
-              }}
-            >
-              {t.skipFilm}
+      {stage === 'film' && film ? (
+        <div className={s.film} onPointerDown={soundOn}>
+          <video
+            ref={video}
+            className={s.filmVideo}
+            src={film}
+            poster={filmPoster.src}
+            playsInline
+            preload="auto"
+            onEnded={toPages}
+            onError={() => setStage('pages')}
+          />
+          {muted ? (
+            <button type="button" className={s.sound} onClick={soundOn}>
+              <SpeakerIcon on={false} />
+              <span>{t.soundOn}</span>
             </button>
           ) : null}
+          <button type="button" className={s.skip} onClick={toPages}>
+            {t.skipFilm}
+          </button>
         </div>
-      )}
-
-      {stage === 'cover' && (
-        <div className={`${s.cover} ${opening ? s.coverOpening : ''}`} data-reduced={reduced ? '' : undefined}>
-          <div className={s.coverCard}>
-            <Frame />
-            <div className={s.coverInner}>
-              <Divider className={s.coverDivider} />
-              <p className={s.coverNames}>
-                <Names fields={fields} labels={labels} />
-              </p>
-              {event.date ? <p className={s.coverDate}>{event.date.full}</p> : null}
-              <button type="button" className={s.openButton} onClick={open} autoFocus>
-                {labels.openInvitation}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Without JavaScript the invitation can't open; show the pages instead. */}
+      ) : null}
+      {/* Without JavaScript the film can't play; show the pages instead. */}
       <noscript>
-        <style>{`.${s.cover},.${s.film}{display:none!important}`}</style>
+        <style>{`.${s.film}{display:none!important}`}</style>
       </noscript>
 
       {music.available && stage === 'pages' && (
         <button
           type="button"
           className={s.audio}
-          onClick={music.toggle}
+          data-gs-audio=""
+          onClick={() => {
+            heard.current = true;
+            music.toggle();
+          }}
           aria-pressed={music.playing}
           aria-label={music.playing ? labels.musicPause : labels.musicPlay}
           title={music.playing ? labels.musicPause : labels.musicPlay}
