@@ -26,7 +26,7 @@ GET  /health
 ```
 
 **Sound.** Every video has the sewing-machine sound (`make_needle_sound.py`, built into the
-image as `needle.wav`): a tick on every needle pierce, the hook and the motor, and the lift-off.
+image as `needle.wav`): a fine tick, a soft puff of linen and a thread tug on every stitch.
 Optional music plays under it (`audio_mix.py`): `"music": "song.mp3"` for a file in `music/`,
 or `"music_url"` for a link on a host listed in `MUSIC_URL_HOSTS`. Whatever the song's own
 loudness, it is set 7 LU under the needle and ducked while the needle sews (measured: the

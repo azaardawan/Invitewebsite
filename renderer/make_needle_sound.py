@@ -3,8 +3,8 @@ make_needle_sound.py - synthesise the sewing-machine sound for the save-the-date
 
 The needle pierces once every 4 frames (30 fps) over frames 1-225, then the rig lifts away
 (frames 225-255). That timing is the same for every invitation, so one track fits them all.
-Each stitch: a sharp needle tick, the hook's low thunk and the take-up lever's rattle, over a
-motor hum that spins up at the start and winds down when the stitching ends.
+Each stitch: a fine needle tick, a soft puff of the linen and a faint tug of the thread; one small
+click when the needle lifts away. No motor hum, so it sounds like a light hand needle, not a machine.
 
 Pure Python (no numpy), so it runs anywhere:  python3 make_needle_sound.py needle.wav
 """
@@ -58,45 +58,17 @@ def build(seed=435):
             return state[0] * math.exp(-t / tau)
         return fn
 
-    def tone(freqs, tau):
-        return lambda t: sum(a * math.sin(2 * math.pi * f * t) for f, a in freqs) * math.exp(-t / tau)
-
-    # --- per stitch ---------------------------------------------------------------------
+    # --- per stitch: a light needle, not a machine ------------------------------------
     for k, td in enumerate(needle_down_times()):
         jitter = rng.uniform(-0.002, 0.002)
         pan = 0.08 * math.sin(k * 0.7)
-        add(td + jitter, 0.03, burst(0.0035, 0.9), 0.55 - pan, 0.55 + pan)            # needle tick
-        add(td + 0.018 + jitter, 0.09, tone([(165, 0.5), (330, 0.22), (95, 0.3)], 0.022),
-            0.45, 0.45)                                                                  # hook thunk
-        add(td + 0.066 + jitter, 0.04, burst(0.006, 0.35), 0.18 + pan, 0.18 - pan)     # take-up lever
+        amp = 0.85 + 0.15 * rng.random()
+        add(td + jitter, 0.02, burst(0.0022, 0.95), 0.5 * amp - pan, 0.5 * amp + pan)  # fine needle tick
+        add(td + 0.004 + jitter, 0.06, burst(0.012, 0.12), 0.10 * amp, 0.10 * amp)    # soft fabric puff
+        add(td + 0.055 + jitter, 0.015, burst(0.0016, 0.9), 0.10 + pan, 0.10 - pan)   # thread tug
 
-    # --- motor hum: spins up, runs, winds down -----------------------------------------
-    t_end = t_of(STITCH_END_FRAME)
-    for i in range(n):
-        t = i / RATE
-        if t > t_end + 0.45:
-            break
-        up = min(1.0, t / 0.15)
-        down = 1.0 if t < t_end else max(0.0, 1.0 - (t - t_end) / 0.45)
-        env = up * down
-        if env <= 0.0:
-            continue
-        f0 = 120.0 * (0.7 + 0.3 * down)                     # pitch drops as it winds down
-        phase = 2 * math.pi * f0 * t
-        hum = (0.10 * math.sin(phase) + 0.05 * math.sin(2 * phase + 0.3)
-               + 0.03 * math.sin(3 * phase + 1.1) + 0.015 * math.sin(5 * phase + 0.4))
-        whir = 0.018 * rng.uniform(-1.0, 1.0)
-        v = (hum + whir) * env * (0.85 + 0.15 * math.sin(2 * math.pi * 7.5 * t))  # stitch rhythm
-        left[i] += v
-        right[i] += v * 0.96
-
-    # --- the needle and presser foot lift away --------------------------------------------
-    t_lift = t_of(STITCH_END_FRAME + 1)
-    add(t_lift, 0.05, burst(0.008, 0.6), 0.35, 0.3)                                   # release click
-    lift_len = t_of(LIFT_END_FRAME) - t_lift
-    whoosh = burst(10.0, 0.08)
-    add(t_lift + 0.02, lift_len,
-        lambda t: whoosh(t) * 0.5 * math.sin(math.pi * min(1.0, t / lift_len)) ** 2, 0.22, 0.26)
+    # --- the needle lifts away: one small click, no motor, no whoosh ---------------------
+    add(t_of(STITCH_END_FRAME + 1), 0.02, burst(0.003, 0.8), 0.12, 0.11)
 
     # --- a little room: two short reflections per side ------------------------------------
     for buf, delays in ((left, (0.011, 0.023)), (right, (0.013, 0.029))):
