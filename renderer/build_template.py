@@ -325,8 +325,20 @@ def make_linen_material():
     vor.inputs["Scale"].default_value = 520.0
     L.new(texco.outputs["Object"], vor.inputs["Vector"])
 
-    height = math("MULTIPLY_ADD", sock(grain.outputs, "Fac"), 0.35, weave)
-    height = math("MULTIPLY_ADD", sock(vor.outputs, "Distance"), 0.25, height)
+    fine = math("MULTIPLY_ADD", sock(grain.outputs, "Fac"), 0.35, weave)
+    fine = math("MULTIPLY_ADD", sock(vor.outputs, "Distance"), 0.25, fine)
+
+    # The weave is ~1.5 mm: in the full-card view that is about one pixel and would alias
+    # into a blotchy pattern, so fade the fine detail out with distance from the camera.
+    cam = N.new("ShaderNodeCameraData")
+    fade = N.new("ShaderNodeMapRange")
+    fade.clamp = True
+    L.new(sock(cam.outputs, "View Distance"), fade.inputs[0])
+    fade.inputs[1].default_value, fade.inputs[2].default_value = 0.7, 1.8
+    fade.inputs[3].default_value, fade.inputs[4].default_value = 1.0, 0.0
+    fine = math("MULTIPLY", fine, fade.outputs[0])
+    base_level = math("MULTIPLY", math("SUBTRACT", 1.0, fade.outputs[0]), 0.9)   # keep mean tone
+    height = math("ADD", fine, base_level)
     height = math("MULTIPLY_ADD", sock(slub.outputs, "Fac"), 0.5, height)
 
     bump = N.new("ShaderNodeBump")
