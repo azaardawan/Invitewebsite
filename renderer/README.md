@@ -1,0 +1,54 @@
+# Invite renderer
+
+Renders the opening "Save the Date" animation (11.5 s, 9:16, 30 fps) as an MP4 with headless
+Blender. It runs as its own Railway service (`invite-renderer`, root directory `/renderer`),
+separate from the website.
+
+| File | Purpose |
+|---|---|
+| `build_template.py` | Builds `master_template.blend` (runs during the Docker build) |
+| `render_invite.py` | Personalises the template and renders the MP4 (`blender -b … -P render_invite.py -- …`) |
+| `server.py` | FastAPI: job queue, progress, downloads |
+| `wreath.svg`, `divider.svg`, `venue.svg` | Gold ornaments |
+| `CormorantGaramond-Regular.ttf` | Lettering (SIL Open Font License, see `OFL-cormorant-garamond.txt`) |
+
+## API
+
+All endpoints except `/health` need the header `X-API-Key: $RENDER_API_KEY`.
+
+```
+POST /jobs            {"initials": "A | R", "names": "Aza & Raghad", "date": "17.07.2026", "venue": "venue.svg"}
+                      -> 202 {"id": "...", "status": "queued", ...}   (200 if an identical job already exists)
+GET  /jobs/{id}       -> {"status": "queued|rendering|done|failed", "progress": 0.42, "queue_position": 1, ...}
+GET  /jobs/{id}/video -> video/mp4 (once status is "done"; kept for RESULT_TTL seconds, default 1 h)
+POST /render          -> waits and returns video/mp4 directly (only for short test renders)
+GET  /health
+```
+
+Poll `GET /jobs/{id}` every 10–20 s. A full render takes roughly 20 minutes per 4 vCPUs at
+720×1280. The service sleeps when idle (Railway serverless), so the first request after a quiet
+period takes a few extra seconds while it wakes up. Videos live in the container only: download
+them (or copy them to the site's storage) when the job is done.
+
+From the website service, call it over the private network:
+`http://invite-renderer.railway.internal:8000`.
+
+## Settings (Railway variables)
+
+| Variable | Default | |
+|---|---|---|
+| `RENDER_API_KEY` | – | Required header value for the API |
+| `RENDER_RES` | `720x1280` | Output size |
+| `RENDER_SAMPLES` | `1` | EEVEE samples per frame |
+| `RENDER_TIMEOUT` | `2700` | Seconds before a render is stopped |
+| `MAX_CONCURRENT_RENDERS` | `1` | Each render already uses every CPU core |
+| `MAX_QUEUED_JOBS` | `20` | More waiting jobs get 429 |
+| `RESULT_TTL` | `3600` | Seconds a finished video stays downloadable |
+| `RENDER_FRAMES` | – | e.g. `1-30` for quick tests |
+
+## Local run
+
+```bash
+docker build -t invite-renderer renderer
+docker run --rm -p 8000:8000 -e RENDER_API_KEY=dev invite-renderer
+```
