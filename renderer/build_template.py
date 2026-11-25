@@ -1291,8 +1291,8 @@ def build_needle_rig(col, chrome, steel, thread_mat):
     bm = bmesh.new()
     _cyl(bm, 0.00002, 0.00085, 0.0, 0.012)
     _cyl(bm, 0.00085, 0.00085, 0.012, 0.087)
-    _cyl(bm, 0.00085, 0.0016, 0.087, 0.093)
-    _cyl(bm, 0.0016, 0.0016, 0.093, 0.135)
+    _cyl(bm, 0.00085, 0.0013, 0.087, 0.105)
+    _cyl(bm, 0.0013, 0.0018, 0.105, 0.19)
     needle = link(bpy.data.objects.new("Needle", mesh_from_bm("Needle", bm)), col)
     needle.parent = ctrl
 
@@ -1315,10 +1315,10 @@ def build_needle_rig(col, chrome, steel, thread_mat):
     # needle clamp + needle bar (the machine part reaching up out of frame)
     bm = bmesh.new()
     bm.from_mesh(applied)
-    _box(bm, (0.009, 0.008, 0.020), (0.0, 0.0, 0.146), mat_index=1)
-    _cyl(bm, 0.0021, 0.0021, 0.140, 0.152, x=0.0066, mat_index=1, segments=20,
+    _box(bm, (0.010, 0.009, 0.022), (0.0, 0.0, 0.20), mat_index=1)
+    _cyl(bm, 0.0022, 0.0022, 0.193, 0.207, x=0.0072, mat_index=1, segments=20,
          axis=Matrix.Rotation(math.radians(90), 4, "Y"))
-    _cyl(bm, 0.0034, 0.0034, 0.156, 0.70, mat_index=1, segments=28)
+    _cyl(bm, 0.0026, 0.0026, 0.211, 0.70, segments=28)
     old = needle.data
     needle.data = mesh_from_bm("Needle", bm)
     bpy.data.meshes.remove(old)
@@ -1349,7 +1349,7 @@ def build_needle_rig(col, chrome, steel, thread_mat):
     _box(bm, (0.006, 0.006, 0.050), (0.002, -0.003, 0.038), mat_index=1)       # shank
     _cyl(bm, 0.0022, 0.0022, 0.050, 0.057, x=0.0065, y=-0.003, mat_index=1, segments=24,
          axis=Matrix.Rotation(math.radians(90), 4, "Y"))                       # thumb screw
-    _cyl(bm, 0.0045, 0.0045, 0.062, 0.70, x=0.002, y=-0.003, mat_index=1, segments=24)  # bar
+    _cyl(bm, 0.0024, 0.0024, 0.062, 0.70, x=0.002, y=-0.003, segments=24)              # bar
     foot = link(bpy.data.objects.new("PresserFoot", mesh_from_bm("PresserFoot", bm)), col)
     foot.data.materials.append(chrome)
     foot.data.materials.append(steel)
@@ -1357,7 +1357,7 @@ def build_needle_rig(col, chrome, steel, thread_mat):
     bev.width, bev.segments = 0.0005, 2
     set_attr(bev, "limit_method", "ANGLE")
     foot.parent = ctrl
-    foot.location = (0.012, 0.014, 0.0045)
+    foot.location = (0.016, 0.020, 0.012)
     return {"ctrl": ctrl, "needle": needle, "foot": foot, "thread": upper, "lower": lower}
 
 
@@ -1591,8 +1591,9 @@ def main():
         linen = make_linen_material()
         ink = make_ink_material()
         thread_mat = make_thread_material()
-        chrome = make_simple_material("Needle_Chrome", (0.86, 0.87, 0.89, 1.0), 1.0, 0.14)
-        steel = make_simple_material("Machine_Steel", (0.62, 0.60, 0.57, 1.0), 1.0, 0.24)
+        # satin steel: lit by the warm pool instead of mirroring the dim studio
+        chrome = make_simple_material("Needle_Chrome", (0.86, 0.85, 0.83, 1.0), 0.6, 0.26)
+        steel = make_simple_material("Machine_Steel", (0.66, 0.64, 0.61, 1.0), 0.55, 0.32)
 
         cutter = make_deboss_cutter(col_emboss, ink)
         build_card(linen, col_card, cutter)
