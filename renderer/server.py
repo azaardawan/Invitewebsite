@@ -2,7 +2,8 @@
 server.py - HTTP front end for the headless Blender invite renderer.
 
 Recommended (asynchronous) flow - a render takes minutes, so nothing waits on one request:
-    POST /jobs              body {"initials", "names", "date", "venue"}  -> 202 {"id", "status", ...}
+    POST /jobs              body {"initials", "names", "date", "venue", "music"?, "music_url"?}
+                            -> 202 {"id", "status", ...}
     GET  /jobs/{id}         -> {"status": "queued|rendering|done|failed", "progress": 0..1, ...}
     GET  /jobs/{id}/video   -> video/mp4 once status is "done"
 
@@ -12,6 +13,10 @@ Also available:
                                (fine for short test renders; long ones may hit proxy timeouts)
 
 Identical requests share one render: a finished or running job with the same inputs is reused.
+
+Every video gets the sewing-machine sound. Optional music plays well below it:
+    "music": "song.mp3"           a file in APP_DIR/music/ (mp3, m4a, aac, wav, ogg, flac)
+    "music_url": "https://..."    downloaded first; only hosts listed in MUSIC_URL_HOSTS
 
 Environment (all optional):
     APP_DIR                 folder with the template, script and assets (default /app)
@@ -26,6 +31,8 @@ Environment (all optional):
     HEARTBEAT_URL           URL fetched every minute while working, so a sleeping-enabled
                             (serverless) Railway service is not put to sleep mid-render
     RENDER_API_KEY          if set, every endpoint except /health needs "X-API-Key: <value>"
+    MUSIC_URL_HOSTS         comma-separated hosts "music_url" may download from (default: none)
+    MAX_MUSIC_MB            largest music download accepted (default 40)
     RENDER_RES / RENDER_SAMPLES / RENDER_FRAMES are passed through to render_invite.py
 """
 
@@ -65,6 +72,10 @@ MAX_QUEUED = max(1, int(os.environ.get("MAX_QUEUED_JOBS", "20")))
 RESULT_TTL = int(os.environ.get("RESULT_TTL", "3600"))
 KEEP_AWAKE_AFTER_DONE = int(os.environ.get("KEEP_AWAKE_AFTER_DONE", "900"))
 API_KEY = os.environ.get("RENDER_API_KEY", "")
+MUSIC_DIR = APP_DIR / "music"
+MUSIC_URL_HOSTS = {h.strip().lower() for h in os.environ.get("MUSIC_URL_HOSTS", "").split(",") if h.strip()}
+MAX_MUSIC_BYTES = int(float(os.environ.get("MAX_MUSIC_MB", "40")) * 1024 * 1024)
+MUSIC_EXTENSIONS = (".mp3", ".m4a", ".aac", ".wav", ".ogg", ".flac")
 WORK_ROOT = Path(tempfile.gettempdir()) / "invite-renders"
 
 
@@ -83,6 +94,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 _CONTROL = re.compile(r"[\x00-\x1f\x7f]")
 _VENUE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,80}\.svg$")
+_MUSIC = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_. -]{0,100}\.(mp3|m4a|aac|wav|ogg|flac)$", re.I)
 _PROGRESS = re.compile(r"^\[progress\] (\d+) (\d+)")
 
 
@@ -94,6 +106,8 @@ class RenderRequest(BaseModel):
     names: str = Field(..., min_length=1, max_length=80, examples=["Yuval & Mevorah"])
     date: str = Field(..., min_length=1, max_length=24, examples=["01.06.2027"])
     venue: str = Field("venue.svg", examples=["venue.svg"])
+    music: Optional[str] = Field(None, examples=["song.mp3"])
+    music_url: Optional[str] = Field(None, examples=["https://media.example.com/music/song.mp3"])
 
     @field_validator("initials", "names", "date")
     @classmethod
@@ -111,6 +125,32 @@ class RenderRequest(BaseModel):
             raise ValueError("must be a plain .svg file name such as 'venue.svg'")
         if not (APP_DIR / v).is_file():
             raise ValueError(f"'{v}' does not exist in {APP_DIR}")
+        return v
+
+    @field_validator("music")
+    @classmethod
+    def _check_music(cls, v: Optional[str]) -> Optional[str]:
+        v = (v or "").strip()
+        if not v:
+            return None
+        if not _MUSIC.fullmatch(v):
+            raise ValueError("must be a plain audio file name such as 'song.mp3'")
+        if not (MUSIC_DIR / v).is_file():
+            raise ValueError(f"'{v}' is not in the renderer's music folder")
+        return v
+
+    @field_validator("music_url")
+    @classmethod
+    def _check_music_url(cls, v: Optional[str]) -> Optional[str]:
+        v = (v or "").strip()
+        if not v:
+            return None
+        from urllib.parse import urlparse
+        u = urlparse(v)
+        if u.scheme != "https" or not u.hostname:
+            raise ValueError("must be an https:// link")
+        if u.hostname.lower() not in MUSIC_URL_HOSTS:
+            raise ValueError("music links are only accepted from the hosts in MUSIC_URL_HOSTS")
         return v
 
     def cache_key(self) -> str:
@@ -136,6 +176,7 @@ class Job:
         self.error: Optional[dict] = None
         self.work = Path(tempfile.mkdtemp(prefix="job-", dir=WORK_ROOT))
         self.video = self.work / "invite.mp4"
+        self.music_path: Optional[Path] = (MUSIC_DIR / req.music) if req.music else None
         self.done_event = asyncio.Event()
 
     def public(self) -> dict:
@@ -197,7 +238,32 @@ def build_command(job: Job) -> list:
             # "--flag=value" keeps values that start with "-" from being read as flags
             f"--initials={req.initials}", f"--names={req.names}", f"--date={req.date}",
             f"--venue={req.venue}", f"--out={job.video}"]
+    if job.music_path:
+        cmd.append(f"--music={job.music_path}")
     return cmd
+
+
+def download_music(url: str, dest_dir: Path) -> Path:
+    """Fetch a music file from an allowed host (size-limited)."""
+    from urllib.parse import urlparse
+    ext = os.path.splitext(urlparse(url).path)[1].lower()
+    path = dest_dir / ("music" + (ext if ext in MUSIC_EXTENSIONS else ".mp3"))
+    req = urllib.request.Request(url, headers={"User-Agent": "invite-renderer"})
+    with urllib.request.urlopen(req, timeout=30) as r, open(path, "wb") as f:
+        if urlparse(r.geturl()).hostname.lower() not in MUSIC_URL_HOSTS:
+            raise RuntimeError("the music link redirected to a host that is not allowed")
+        total = 0
+        while True:
+            chunk = r.read(1 << 16)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > MAX_MUSIC_BYTES:
+                raise RuntimeError(f"the music file is larger than {MAX_MUSIC_BYTES // (1024 * 1024)} MB")
+            f.write(chunk)
+    if total == 0:
+        raise RuntimeError("the music link returned an empty file")
+    return path
 
 
 def log_tail(lines, limit: int = 4000) -> str:
@@ -234,6 +300,14 @@ async def render_job(job: Job) -> None:
     global _last_activity
     job.status, job.started = "rendering", time.time()
     log.info("job %s rendering: %s", job.id, job.req.model_dump())
+    if job.req.music_url:
+        try:
+            job.music_path = await asyncio.to_thread(download_music, job.req.music_url, job.work)
+        except Exception as exc:
+            job.error = {"message": f"Could not download the music: {exc}"}
+            job.status, job.finished = "failed", time.time()
+            job.done_event.set()
+            return
     tail = collections.deque(maxlen=400)
     proc = await asyncio.create_subprocess_exec(
         *build_command(job), cwd=str(job.work), start_new_session=True,

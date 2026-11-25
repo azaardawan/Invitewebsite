@@ -44,12 +44,16 @@ COPY requirements.txt /app/requirements.txt
 RUN python3 -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir -r /app/requirements.txt
 
-COPY build_template.py render_invite.py server.py \
+COPY build_template.py render_invite.py server.py audio_mix.py make_needle_sound.py \
      wreath.svg divider.svg venue.svg \
      CormorantGaramond-Regular.ttf CormorantGaramond-Medium.ttf \
      CormorantGaramond-SemiBold.ttf CormorantGaramond-Bold.ttf /app/
 
-# Build master_template.blend inside the image (no GPU needed for this step).
+COPY music/ /app/music/
+
+# The sewing-machine sound (same for every invitation) and master_template.blend, built in
+# the image (no GPU needed for either).
+RUN python3 /app/make_needle_sound.py /app/needle.wav
 RUN blender -b --factory-startup --python-exit-code 1 -P /app/build_template.py \
     && test -s /app/master_template.blend
 

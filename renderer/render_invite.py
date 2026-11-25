@@ -4,7 +4,10 @@ render_invite.py - personalise master_template.blend and render it to an H.264 .
 Usage (headless):
     blender -b /app/master_template.blend --python-exit-code 1 -P /app/render_invite.py -- \
         --initials "Y | M" --names "Yuval & Mevorah" --date "01.06.2027" \
-        --venue venue.svg --out /tmp/invite.mp4
+        --venue venue.svg [--music song.mp3] --out /tmp/invite.mp4
+
+The video gets the sewing-machine sound (needle.wav) and, if given, the music mixed well
+below it (audio_mix.py), so the stitching is always heard.
 
 The stitching, needle rig and camera are rebuilt with the same code that built the template
 (build_template.py, imported from this folder), so a new date stays in sync with the needle.
@@ -30,7 +33,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 os.environ.setdefault("ASSET_DIR", HERE)
+import audio_mix  # noqa: E402
 import build_template as bt  # noqa: E402
+import make_needle_sound  # noqa: E402
+
+MUSIC_EXTENSIONS = (".mp3", ".m4a", ".aac", ".wav", ".ogg", ".flac")
 
 
 def log(msg):
@@ -44,8 +51,30 @@ def parse_args():
     p.add_argument("--names", required=True, help='e.g. "Yuval & Mevorah"')
     p.add_argument("--date", required=True, help='e.g. "01.06.2027"')
     p.add_argument("--venue", default="venue.svg", help="SVG file name inside the asset folder")
+    p.add_argument("--music", default="",
+                   help="optional music: a file name in the asset folder's music/ folder, "
+                        "or an absolute path to an audio file")
     p.add_argument("--out", required=True, help="output .mp4 path")
     return p.parse_args(argv)
+
+
+def resolve_music(value):
+    if not value:
+        return None
+    path = value if os.path.isabs(value) else os.path.join(HERE, "music", os.path.basename(value))
+    if not os.path.isabs(value) and os.path.basename(value) != value:
+        raise RuntimeError("--music must be a plain file name inside music/ or an absolute path")
+    if not path.lower().endswith(MUSIC_EXTENSIONS) or not os.path.isfile(path):
+        raise RuntimeError(f"music file not found or not an audio file: {value}")
+    return path
+
+
+def needle_track(work):
+    path = os.path.join(os.environ.get("ASSET_DIR", HERE), "needle.wav")
+    if not os.path.isfile(path):                      # not pre-built: make it now (~1 s)
+        path = os.path.join(work, "needle.wav")
+        make_needle_sound.write_wav(path, *make_needle_sound.build())
+    return path
 
 
 def update_initials(initials):
@@ -164,6 +193,7 @@ def main():
     venue = os.path.basename(args.venue)
     if venue != args.venue or not venue.lower().endswith(".svg"):
         raise RuntimeError("--venue must be a plain .svg file name inside the asset folder")
+    music = resolve_music(args.music)
 
     prefs = bpy.context.preferences.edit
     old_interp = prefs.keyframe_new_interpolation_type
@@ -193,8 +223,11 @@ def main():
         if not videos:
             raise RuntimeError("Blender finished but wrote no .mp4 (is FFmpeg support missing?)")
         os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
-        shutil.move(os.path.join(work, videos[0]), out)
-        log(f"wrote {out} ({os.path.getsize(out) / 1e6:.1f} MB)")
+        frames = scene.frame_end - scene.frame_start + 1
+        audio_mix.add_sound(os.path.join(work, videos[0]), out, needle_track(work), music,
+                            duration=frames / bt.FPS, start=(scene.frame_start - bt.FRAME_START) / bt.FPS)
+        log(f"wrote {out} ({os.path.getsize(out) / 1e6:.1f} MB, sound: needle"
+            f"{' + ' + os.path.basename(music) if music else ''})")
     finally:
         prefs.keyframe_new_interpolation_type = old_interp
         shutil.rmtree(work, ignore_errors=True)
