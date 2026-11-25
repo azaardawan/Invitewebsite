@@ -73,7 +73,10 @@ test('every theme renders every designed state correctly', async ({ page }, test
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&state=${i}&names=short`);
       const open = page.getByRole('button', { name: openName(m) });
-      if (invitation) {
+      // A design that opens on its own (manifest `opening: 'auto'`, owner 2026-11-25) has no Open button.
+      const auto = (m as { opening?: string }).opening === 'auto';
+      if (auto) await expect(open, `${ref}: opens on its own, without an Open button`).toHaveCount(0);
+      if (invitation && !auto) {
         // Owner rule: every invitation starts closed and opens with an animation on the guest's tap.
         await expect(open, `${ref} state ${i + 1}: opening screen with the Open button`).toBeVisible();
         await page.evaluate(() => {
@@ -83,7 +86,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
         });
       }
       if (await open.count()) await open.click();
-      if (invitation) {
+      if (invitation && !auto) {
         const animated = await page
           .waitForFunction(() => (window as unknown as { __bahjaAnimated: number }).__bahjaAnimated > 0 || document.getAnimations().length > 0, null, { timeout: 1500 })
           .then(() => true, () => false);
@@ -143,7 +146,7 @@ test('every sellable theme looks right with any single feature switched off', as
       const fields = m.fields.filter((k) => k !== 'venue_map_url' || features.includes('map'));
       const url = `/admin/preview/ar/theme/${m.key}?v=${m.version}&names=long&features=${features.join(',')}&fields=${fields.join(',')}`;
       await renderAndCheck(page, url, 390, testInfo.outputPath(`theme-screenshots/${m.key}@${m.version}/without-${off}.png`));
-      await page.getByRole('button', { name: openName(m) }).click();
+      if ((m as { opening?: string }).opening !== 'auto') await page.getByRole('button', { name: openName(m) }).click();
       await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity), null, { timeout: 4_000 });
       await expect(page.getByText(sampleName(m.key, m.fields, 'long')).first()).toBeVisible();
       await expect(page.getByRole('link', { name: ar.invitation.openMap }), `${m.key} without ${off}: map`).toHaveCount(features.includes('map') ? 1 : 0);
@@ -162,7 +165,7 @@ test('with reduced motion the opening is skipped and the invitation shows at onc
   await page.setViewportSize({ width: 390, height: 844 });
   for (const m of generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
     await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&names=short`);
-    await page.getByRole('button', { name: openName(m) }).click();
+    if ((m as { opening?: string }).opening !== 'auto') await page.getByRole('button', { name: openName(m) }).click();
     await expect(page.getByText(sampleName(m.key, m.fields, 'short')).first(), `${m.key}@${m.version}`).toBeVisible({ timeout: 1_000 });
   }
 });

@@ -95,6 +95,12 @@ export type ThemeManifest = {
    */
   film?: boolean;
   /**
+   * `'auto'` (owner, 2026-11-25, #32 Golden Stitch): the invitation opens on its own, with no Open button, straight into
+   * its opening (a film that starts muted until the guest taps). Every other design starts closed and opens on the
+   * guest's tap (the default, `'tap'`).
+   */
+  opening?: 'tap' | 'auto';
+  /**
    * The platform's words around a design that is not an invitation (e.g. a museum of the couple's photos), replacing
    * "Open invitation" on the button (`labels.openInvitation`), the text under the link when it is shared, and the page
    * shown once the link has ended. Each is optional (the invitation's words otherwise).
@@ -309,6 +315,7 @@ export const manifestSchema = z
       .optional(),
     onlineInvitation: z.boolean().optional(),
     film: z.boolean().optional(),
+    opening: z.enum(['tap', 'auto']).optional(),
     sample: z.object({ locale: z.enum(['ar', 'en', 'ckb', 'bdn']).optional(), names: z.literal('kurdish').optional() }).optional(),
     wording: z
       .array(

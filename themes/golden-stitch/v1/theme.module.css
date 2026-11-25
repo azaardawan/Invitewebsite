@@ -325,7 +325,6 @@
   background: rgba(138, 92, 37, 0.08);
 }
 .mapButton:focus-visible,
-.openButton:focus-visible,
 .submit:focus-visible,
 .skip:focus-visible,
 .audio:focus-visible {
@@ -696,89 +695,7 @@
   margin-top: 14px;
 }
 
-/* ------------------------------------------------------------------ opening: cover, then the film */
-
-.cover {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  display: flex;
-  justify-content: center;
-  background: #e9d6bf;
-}
-.coverCard {
-  position: relative;
-  width: 100%;
-  max-width: 460px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(120% 90% at 50% 40%, var(--gs-paper-light) 0%, var(--gs-paper) 62%, #ead6bd 100%);
-  overflow: hidden;
-}
-.coverInner {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  padding: 60px 36px;
-  text-align: center;
-}
-.coverInner p {
-  margin: 0;
-}
-.coverDivider {
-  width: 200px;
-}
-.coverNames {
-  font-size: 34px;
-  font-weight: 500;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-.root:lang(ar) .coverNames,
-.root:lang(ckb) .coverNames,
-.root:lang(bdn) .coverNames {
-  font-family: var(--gs-heading);
-}
-.coverDate {
-  font-style: italic;
-  font-size: 17px;
-}
-.openButton {
-  margin-top: 22px;
-  min-height: 48px;
-  padding: 10px 34px;
-  border: 1px solid var(--gs-ink);
-  border-radius: 999px;
-  background: var(--gs-ink);
-  color: var(--gs-paper-light);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(110, 74, 30, 0.22);
-}
-.root:lang(ar) .openButton,
-.root:lang(ckb) .openButton,
-.root:lang(bdn) .openButton {
-  font-size: 17px;
-  letter-spacing: 0;
-}
-.coverOpening {
-  animation: coverOut 0.9s ease-in forwards;
-  pointer-events: none;
-}
-@keyframes coverOut {
-  to {
-    opacity: 0;
-  }
-}
+/* ------------------------------------------------------------------ opening: the film plays by itself */
 
 .film {
   position: fixed;
@@ -812,6 +729,28 @@
   cursor: pointer;
 }
 
+.sound {
+  position: absolute;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  inset-inline-start: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 16px 6px 12px;
+  border: 1px solid rgba(247, 236, 222, 0.7);
+  border-radius: 999px;
+  background: rgba(42, 32, 23, 0.45);
+  color: #f7ecde;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sound:focus-visible {
+  outline: 2px solid #f7ecde;
+  outline-offset: 3px;
+}
+
 .audio {
   position: fixed;
   z-index: 20;
@@ -829,8 +768,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root[data-stage='pages'] .pages,
-  .coverOpening {
+  .root[data-stage='pages'] .pages {
     animation: none;
   }
 }

@@ -27,6 +27,8 @@ export default defineTheme({
   experience: 'INVITATION',
   // The couple's own stitched film, made by the invite renderer after payment (props.film).
   film: true,
+  // Owner, 2026-11-25: no Open button: the invitation goes straight into the film.
+  opening: 'auto',
   sections: ['wedding'],
   fields: [...allFields],
   // The families' names and the personal note are the design's own pages: each is left out whole when empty.

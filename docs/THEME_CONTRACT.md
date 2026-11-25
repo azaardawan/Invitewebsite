@@ -108,6 +108,12 @@ calls `useMusic().start()` (or `prime()`, with `start()` when the opening ends) 
 (looping idle effects are allowed). When `useReducedMotion()` is true, the cover fades and the invitation is
 visible within **1 s**. `e2e/themes.spec.ts` enforces all three.
 
+**Exception (owner, 2026-11-25): manifest `opening: 'auto'`** (#32 Golden Stitch). The design has no cover and no Open
+button: it goes straight into its film, which starts muted (browsers allow no sound before a tap) with a sound button;
+a tap anywhere on the film turns the sound on and `prime()`s the song, which `start()`s when the pages show (or on the
+guest's first tap there). Reduced motion, or no film: the pages at once. `e2e/themes.spec.ts` checks there is no Open
+button and that the invitation shows.
+
 ## 4B. One border for invitation, card and keepsake (required for sellable themes)
 
 Each theme exports one `ThemeBorderSpec` (`{ kind: 'strips' | 'corners', src, size, inset? }`, usually in

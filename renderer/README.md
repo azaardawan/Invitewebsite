@@ -19,7 +19,7 @@ separate from the website.
 All endpoints except `/health` need the header `X-API-Key: $RENDER_API_KEY`.
 
 ```
-POST /jobs            {"initials": "A | R", "names": "Aza & Raghad", "date": "17.07.2026", "venue": "venue.svg"}
+POST /jobs            {"initials": "R | H", "names": "Rami & Hiba", "date": "17.07.2027", "venue": "venue.svg"}
                       -> 202 {"id": "...", "status": "queued", ...}   (200 if an identical job already exists)
 GET  /jobs/{id}       -> {"status": "queued|rendering|done|failed", "progress": 0.42, "queue_position": 1, ...}
 GET  /jobs/{id}/video -> video/mp4 (once status is "done"; kept for RESULT_TTL seconds, default 1 h)
