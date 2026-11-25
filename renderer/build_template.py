@@ -557,7 +557,10 @@ def rebuild_deboss(ink_mat=None):
     dg = bpy.context.evaluated_depsgraph_get()
     bm = bmesh.new()
     for ob in bpy.data.objects:
-        if ob.type != "FONT" or not ob.get("deboss") or not ob.data.body.strip():
+        # Texts, and the shaped Arabic lettering that replaces some of them (render_invite.apply_shaped).
+        if not ob.get("deboss") or ob.type not in ("FONT", "MESH"):
+            continue
+        if ob.type == "FONT" and not ob.data.body.strip():
             continue
         me = bpy.data.meshes.new_from_object(ob.evaluated_get(dg))
         me.transform(ob.matrix_world)
@@ -595,6 +598,7 @@ def set_text_body(name, body, max_width=None, align=None):
     if align:
         ob.data.align_x = align
     ob.scale = (1.0, 1.0, 1.0)
+    ob["max_width"] = max_width or 0.0
     if max_width and body.strip():
         bpy.context.view_layer.update()
         width = ob.dimensions.x

@@ -55,8 +55,9 @@ export default function GoldenStitch(props: ThemeProps) {
     () => true,
     () => false,
   );
-  // The couple's own film arrives with payment (the platform renders it); samples and previews show the sample film.
-  const film = mode === 'live' ? null : SAMPLE_FILM;
+  // The couple's own film is made after payment (manifest `film`, about ten minutes); until it is ready the cover opens
+  // straight onto the pages. Samples and previews show the sample film.
+  const film = mode === 'live' ? (props.film?.src ?? null) : SAMPLE_FILM;
 
   const startMusic = music.start;
   const toPages = useCallback(() => {

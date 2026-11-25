@@ -50,7 +50,9 @@ themes/<key>/v<N>/
 - `pageTexts` (owner, 2026-11-13): a design that is **not an invitation** (e.g. #27 Memory Museum) gives the platform's
   words around it in `{ar, en, ckb?, bdn?}`: `open` (the Open button, given to the theme as `labels.openInvitation`, so
   the theme keeps drawing that label), `share` (the text under the shared link), `endedTitle` / `endedBody` (the page once
-  the link has ended). Each is optional; Kurdish needs the owner's approval like the rest.
+  the link has ended). Each is optional; Kurdish needs the owner's approval like the rest. Any design may also give a
+  `notice` (owner, 2026-11-25): a short note for its customers shown on its order form and receipt (e.g. Golden Stitch:
+  the couple's film takes about ten minutes after payment).
 - `switches`: yes/no questions for the customer on the order form, each `{ key, label: {ar, en}, default }`
   (e.g. "show the father's name on the stickers"). The theme reads `props.switches[key]` (always filled).
 - Every design has an online invitation, newborn designs included (owner, 2026-10-28): a newborn invitation shows
@@ -83,6 +85,7 @@ Defined in `src/theme-sdk/types.ts`. The data is already validated, filtered to 
 | `photoPlaces` | How many photo places this invitation has: the design's `photos.max`, or fewer when its package sells fewer (Admin → package "Photos in this package"). 0 without `photos`. Template designs show that many frames in the editor; everywhere else draw only `photos`. |
 | `video` | The customer's one video (feature `video`): `{ src, poster, width, height }`, an MP4 of at most a minute (720p, sound as AAC) and a still from it, or null (none yet, samples, or a package without it). Play it with `<VideoSlot>`; show `fallback` (e.g. a photo) when null. |
 | `videos` | Every video place, in order: the customer's video there or null. Designs with several screens declare manifest `videos: { max: 2\|3, labels }` (each screen's name, shown in the editor); a package sells 1…max (Admin, `packages.video_limit`). One place for other designs; `videos[0]` is `video`. Draw each with `<VideoSlot video={props.videos[n]} place={n}>`. |
+| `film` | The couple's own opening film (manifest `film: true`, owner 2026-11-25, e.g. #32 Golden Stitch): `{ src }`, an MP4 the invite renderer (`renderer/`) makes after payment and again when the names or date change (`src/server/film/film.ts`, about ten minutes), or null (samples, previews, not ready yet). Show the design's own sample film in samples and previews; while it is null on a live invitation, open straight onto the pages. |
 | `birthDate` | Newborn designs: the date of birth (`fields.birth_date`) in the invitation's language (`full`, parts) plus `lines`: the date written in the style the customer chose on the order form (Gregorian, numeric, Hijri, or Gregorian + Hijri; Arabic-Indic or Western digits), one or two lines; null when absent. Print the `lines`. With it come `fields.baby_name`, `fields.baby_gender` (`boy` / `girl`; show `labels.itsABoy` / `labels.itsAGirl`), `fields.mother_name`, `fields.father_name` and `fields.baby_quote`. The story, chocolate stickers and bottle label are platform extras drawn on the owner's artwork (Admin), unless the design draws its own (§6, "Newborn extras drawn by the design"). |
 
 ## 4. What the theme may use: `@/theme-sdk`
@@ -161,7 +164,10 @@ animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/the
 - `fields`, `event.date` / `event.time` (localized), `locale`, `dir`, `lang`;
 - `labels` (`date`, `time`, `venue`, `and`, `scanToOpen`, `keepsakeTitle`, `keepsakeEmpty`); never hard-code text;
 - the card gets `qrDataUrl` (null when `print.card.qr` is false or the team hid it) and `extraLine`
-  (one line the team added, or null); the keepsake gets the visible
+  (one line the team added, or null); front, back and shapes also get `photoQrDataUrl` (owner, 2026-11-25): a second
+  QR code for guests to send the couple their photos, when the customer bought guest photo sharing (else null),
+  captioned `labels.scanToSharePhotos`. A customer has one QR code or two: print them side by side where the design
+  keeps its QR (e.g. the bottom of the back); the keepsake gets the visible
   `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`). Print each
   message's `guestName` under it: it already says whether the guest is coming and, for more than one person, how many
   ("Sara · Coming · 4 people"), which the couple must see; `name`, `attending` and `partySize` are there for a

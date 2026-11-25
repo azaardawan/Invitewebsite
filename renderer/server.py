@@ -60,6 +60,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
+from shape_text import FONT_FILE as ARABIC_FONT, has_arabic, shape_to_svg
+
 APP_DIR = Path(os.environ.get("APP_DIR", "/app"))
 TEMPLATE = APP_DIR / "master_template.blend"
 SCRIPT = APP_DIR / "render_invite.py"
@@ -177,6 +179,7 @@ class Job:
         self.work = Path(tempfile.mkdtemp(prefix="job-", dir=WORK_ROOT))
         self.video = self.work / "invite.mp4"
         self.music_path: Optional[Path] = (MUSIC_DIR / req.music) if req.music else None
+        self.shaped: Optional[Path] = None
         self.done_event = asyncio.Event()
 
     def public(self) -> dict:
@@ -240,7 +243,26 @@ def build_command(job: Job) -> list:
             f"--venue={req.venue}", f"--out={job.video}"]
     if job.music_path:
         cmd.append(f"--music={job.music_path}")
+    if job.shaped:
+        cmd.append(f"--shaped={job.shaped}")
     return cmd
+
+
+def shape_texts(job: Job) -> Optional[Path]:
+    """Arabic and Kurdish names and initials: shaped here (Blender can't join Arabic letters)."""
+    req = job.req
+    if not (has_arabic(req.names) or has_arabic(req.initials)):
+        return None
+    # Every text render_invite.py may set on a text object: each name, the "and", each initial.
+    texts = {s.strip() for s in req.names.split("&")} | {"و"}
+    texts |= {s.strip() for s in req.initials.split("|")} | set(req.initials.replace("|", " ").split())
+    texts |= {c for c in req.initials if has_arabic(c)}
+    shaped = {}
+    for i, text in enumerate(sorted(t for t in texts if t and has_arabic(t))):
+        shaped[text] = shape_to_svg(text, str(job.work / f"shaped-{i}.svg"), str(APP_DIR / ARABIC_FONT))
+    path = job.work / "shaped.json"
+    path.write_text(json.dumps(shaped, ensure_ascii=False), encoding="utf-8")
+    return path
 
 
 def download_music(url: str, dest_dir: Path) -> Path:
@@ -308,6 +330,13 @@ async def render_job(job: Job) -> None:
             job.status, job.finished = "failed", time.time()
             job.done_event.set()
             return
+    try:
+        job.shaped = await asyncio.to_thread(shape_texts, job)
+    except Exception as exc:
+        job.error = {"message": f"Could not shape the Arabic lettering: {exc}"}
+        job.status, job.finished = "failed", time.time()
+        job.done_event.set()
+        return
     tail = collections.deque(maxlen=400)
     proc = await asyncio.create_subprocess_exec(
         *build_command(job), cwd=str(job.work), start_new_session=True,

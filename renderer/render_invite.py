@@ -20,6 +20,7 @@ Environment:
 """
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -36,6 +37,7 @@ os.environ.setdefault("ASSET_DIR", HERE)
 import audio_mix  # noqa: E402
 import build_template as bt  # noqa: E402
 import make_needle_sound  # noqa: E402
+from shape_text import has_arabic  # noqa: E402
 
 MUSIC_EXTENSIONS = (".mp3", ".m4a", ".aac", ".wav", ".ogg", ".flac")
 
@@ -55,6 +57,8 @@ def parse_args():
                    help="optional music: a file name in the asset folder's music/ folder, "
                         "or an absolute path to an audio file")
     p.add_argument("--out", required=True, help="output .mp4 path")
+    p.add_argument("--shaped", default="",
+                   help="JSON from the server: texts with Arabic letters, shaped (shape_text.py)")
     return p.parse_args(argv)
 
 
@@ -85,6 +89,8 @@ def update_initials(initials):
         left, right = text.replace(" ", "")
     else:
         left, right = text, ""
+    if has_arabic(text):                     # read right to left: the first initial on the right
+        left, right = right, left
     if left and right:
         bt.set_text_body("Mono_Y", left, 0.14, "RIGHT").location.x = -0.03
         bt.set_text_body("Mono_Bar", "|")
@@ -100,13 +106,51 @@ def update_names(names):
     first, second = [s.strip() for s in text.split("&", 1)] if "&" in text else [text, ""]
     if first and second:
         bt.set_text_body("Name_Yuval", first, 0.92)
-        bt.set_text_body("Name_Amp", "&")
+        bt.set_text_body("Name_Amp", "و" if has_arabic(text) else "&")
         bt.set_text_body("Name_Mevorah", second, 0.92)
     else:
         bt.set_text_body("Name_Yuval", "")
         bt.set_text_body("Name_Amp", "")
         ob = bt.set_text_body("Name_Mevorah", first or second, 0.92)
         ob.location.y = 0.03                  # one name line sits in the middle of the block
+
+
+# Amiri's letters look smaller than Cormorant's at the same size: shaped Arabic is set this much larger.
+ARABIC_SCALE = 1.05
+
+
+def apply_shaped(shaped):
+    """Swap texts with Arabic letters for their shaped outlines (shape_text.py, made by the server).
+
+    `shaped` maps a text (as set on a text object) to its SVG and ink width in ems. The outline is
+    pressed in where the text object sat, at its size, aligned the same way and no wider than it
+    was allowed to be; the text object itself is emptied."""
+    for ob in list(bpy.data.objects):
+        if ob.type != "FONT" or not ob.get("deboss"):
+            continue
+        info = shaped.get(ob.data.body.strip())
+        if not info:
+            continue
+        width = info["width_em"] * ob.data.size * ARABIC_SCALE
+        max_width = ob.get("max_width") or 0.0
+        if max_width and width > max_width:
+            width = max_width
+        x, y = ob.location.x, ob.location.y
+        if ob.data.align_x == "RIGHT":
+            x -= width / 2
+        elif ob.data.align_x == "LEFT":
+            x += width / 2
+        col = ob.users_collection[0] if ob.users_collection else None
+        mesh = bt.import_svg_as_gold_mesh(info["svg"], f"{ob.name}_shaped", (x, y), width, None, col,
+                                          extrude=ob.data.extrude)
+        if mesh is None:
+            raise RuntimeError(f"could not draw the shaped text for {ob.name}")
+        mesh.location.z = ob.location.z
+        mesh["deboss"] = True
+        mesh.hide_render = True
+        mesh.display_type = "WIRE"
+        ob.data.body = ""
+        log(f"{ob.name}: shaped Arabic lettering, {width:.3f} m wide")
 
 
 def refresh_fonts():
@@ -204,6 +248,9 @@ def main():
         refresh_fonts()
         update_initials(args.initials)
         update_names(args.names)
+        if args.shaped:
+            with open(args.shaped, encoding="utf-8") as fh:
+                apply_shaped(json.load(fh))
         bt.rebuild_deboss()                   # cut the new lettering into the card
         paths, sampler = bt.restitch(args.date)
         log(f"date '{args.date}': {len(paths)} stitch rows, "

@@ -10,7 +10,9 @@ separate from the website.
 | `render_invite.py` | Personalises the template and renders the MP4 (`blender -b … -P render_invite.py -- …`) |
 | `server.py` | FastAPI: job queue, progress, downloads |
 | `wreath.svg`, `divider.svg`, `venue.svg` | Gold ornaments |
-| `CormorantGaramond-Regular.ttf` | Lettering (SIL Open Font License, see `OFL-cormorant-garamond.txt`) |
+| `shape_text.py` | Arabic and Kurdish names and initials: shaped with HarfBuzz in Amiri and merged into one outline, which Blender presses into the card in place of the text (Blender can't join Arabic letters) |
+| `CormorantGaramond-*.ttf` | Lettering (SIL Open Font License, see `OFL-cormorant-garamond.txt`) |
+| `Amiri-Regular.ttf` | Arabic lettering (SIL Open Font License, see `OFL-amiri.txt`) |
 
 ## API
 
@@ -39,6 +41,10 @@ them (or copy them to the site's storage) when the job is done.
 
 From the website service, call it over the private network:
 `http://invite-renderer.railway.internal:8000`.
+
+**The website** (designs with manifest `film`, e.g. Golden Stitch) asks for each couple's film after payment and
+again when the names or date change, and collects it when done (`src/server/film/film.ts`, every minute). Names in
+Arabic letters get "و" between them and the monogram reads right to left.
 
 ## Settings (Railway variables)
 

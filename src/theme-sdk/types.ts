@@ -162,6 +162,12 @@ export type ThemeProps = {
    * designs draw each with `<VideoSlot place={n}>`.
    */
   videos: readonly (ThemeVideo | null)[];
+  /**
+   * The couple's own opening film (designs with manifest `film`): an MP4 made for them after payment, or null (samples
+   * and previews, or not ready yet: it takes about ten minutes, and again after the names or date change). A design
+   * with a sample film shows that in samples and previews, and opens straight onto its pages while this is null.
+   */
+  film: { src: string } | null;
 };
 
 /** The customer's video: where it is, its still, and its pixel size. */

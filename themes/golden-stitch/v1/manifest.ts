@@ -25,6 +25,8 @@ export default defineTheme({
   version: 1,
   title: { ar: 'الغرزة الذهبية', en: 'Golden Stitch', ckb: 'دروومانی زێڕین', bdn: 'دروومانا زێڕین' },
   experience: 'INVITATION',
+  // The couple's own stitched film, made by the invite renderer after payment (props.film).
+  film: true,
   sections: ['wedding'],
   fields: [...allFields],
   // The families' names and the personal note are the design's own pages: each is left out whole when empty.

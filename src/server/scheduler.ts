@@ -4,6 +4,7 @@ import { runHousekeeping } from '@/server/housekeeping';
 import { reconcilePayments } from '@/server/payments/service';
 import { onlinePaymentsEnabled } from '@/server/payments/wayl';
 import { deliverPaidOrders } from '@/server/notify/customer';
+import { syncFilms } from '@/server/film/film';
 
 const MINUTE = 60_000;
 let started = false;
@@ -27,6 +28,9 @@ async function deliver() {
   try {
     const r = await deliverPaidOrders(db());
     if (r.delivered) log('scheduler.deliver', { result: r });
+    // The couples' opening films (designs with manifest `film`): asked for after payment, collected when made.
+    const f = await syncFilms(db());
+    if (f.started || f.finished || f.failed) log('scheduler.films', { result: f });
   } catch (e) {
     console.error(JSON.stringify({ level: 'error', msg: 'scheduler.deliver_failed', error: String(e) }));
   } finally {

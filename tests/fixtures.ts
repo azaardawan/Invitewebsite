@@ -32,13 +32,13 @@ export function testManifest(key: string, version = 1, overrides: Partial<ThemeM
 }
 
 /** A theme on sale in the Wedding section with one basic (25,000 IQD) and one full (60,000 IQD) package. */
-export async function activeTheme() {
+export async function activeTheme(overrides: Partial<ThemeManifest> = {}) {
   await ensureSeeded();
   await seedCatalog(db());
   const admin = await makeAdmin();
   const actor = { adminId: admin.id, ipHash: null };
   const key = uniqueKey('shop');
-  await syncThemesFromRegistry(db(), [testManifest(key)], actor, { complete: false });
+  await syncThemesFromRegistry(db(), [testManifest(key, 1, overrides)], actor, { complete: false });
   const [t] = await db().select().from(themes).where(eq(themes.key, key));
   const png = await sharp({ create: { width: 300 + Math.floor(Math.random() * 900), height: 400, channels: 3, background: '#a67' } }).png().toBuffer();
   const cover = await storeImage(db(), png, { uploadedBy: null });

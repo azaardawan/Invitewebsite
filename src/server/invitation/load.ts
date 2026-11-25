@@ -10,6 +10,7 @@ import { attendanceCounts } from '@/server/guests/attendance';
 import { listPhotos } from '@/server/photos/photos';
 import { customSong } from '@/server/music/custom';
 import { customerVideos, videoPlaces } from '@/server/video/video';
+import { filmSrc } from '@/server/film/film';
 import { pageText, type ThemeManifest } from '@/theme-sdk/manifest';
 import type { SignatureStrokes } from '@/lib/signature-strokes';
 
@@ -63,6 +64,7 @@ export async function invitationRenderData(db: DbOrTx, inv: InvitationRow, mode:
       videos,
       videoPlaces: places,
       openLabel: pageText(version!.manifest as ThemeManifest, 'open', inv.locale),
+      filmSrc: mode === 'live' ? await filmSrc(db, inv) : null,
     }),
   };
 }

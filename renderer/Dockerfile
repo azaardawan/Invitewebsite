@@ -44,10 +44,10 @@ COPY requirements.txt /app/requirements.txt
 RUN python3 -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir -r /app/requirements.txt
 
-COPY build_template.py render_invite.py server.py audio_mix.py make_needle_sound.py \
+COPY build_template.py render_invite.py server.py audio_mix.py make_needle_sound.py shape_text.py \
      wreath.svg divider.svg venue.svg \
      CormorantGaramond-Regular.ttf CormorantGaramond-Medium.ttf \
-     CormorantGaramond-SemiBold.ttf CormorantGaramond-Bold.ttf /app/
+     CormorantGaramond-SemiBold.ttf CormorantGaramond-Bold.ttf Amiri-Regular.ttf OFL-amiri.txt /app/
 
 COPY music/ /app/music/
 

@@ -45,6 +45,13 @@ const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   /** Public CDN base URL for media in the bucket (e.g. https://media.example.com). */
   MEDIA_PUBLIC_BASE_URL: z.url().optional(),
+  /**
+   * The invite renderer (renderer/, its own Railway service): makes each couple's opening film for designs with
+   * manifest `film`. Both set = on; otherwise those designs open without a film of their own.
+   * On Railway: `http://invite-renderer.railway.internal:8000` and the renderer's `RENDER_API_KEY`.
+   */
+  RENDERER_URL: z.url().optional(),
+  RENDER_API_KEY: z.string().min(8).optional(),
   /** WAYL merchant API key. Without it, checkout creates the order and the team collects payment manually. */
   WAYL_API_KEY: z.string().min(8).optional(),
   WAYL_API_BASE_URL: z.url().default('https://api.thewayl.com'),

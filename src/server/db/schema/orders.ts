@@ -145,6 +145,16 @@ export const invitations = pgTable(
      */
     videoAssetId: uuid('video_asset_id').references(() => assets.id, { onDelete: 'set null' }),
     videoPosterAssetId: uuid('video_poster_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    /**
+     * The couple's own opening film (designs with manifest `film`, src/server/film/film.ts): the MP4 once made,
+     * `film_for` the names/initials/date it shows; while one is being made, the renderer's job and what it is for;
+     * `film_tries` failed attempts for the current names (it stops after three). Personal data: deleted with the photos.
+     */
+    filmAssetId: uuid('film_asset_id').references(() => assets.id, { onDelete: 'set null' }),
+    filmFor: text('film_for'),
+    filmJobId: text('film_job_id'),
+    filmJobFor: text('film_job_for'),
+    filmTries: integer('film_tries').notNull().default(0),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
     /** The customer chose no background music (packages with `music`): the design plays none and shows no sound button. */
