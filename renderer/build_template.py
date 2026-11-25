@@ -6,18 +6,19 @@ master_template.blend next to this script. render_invite.py imports this module 
 reuses its functions to personalise the template, so both always agree.
 
   * 1080 x 1920 (9:16), 30 fps, frames 1-345 (11.5 s), BLENDER_EEVEE
-  * Warm oatmeal linen card under a low raking key light
-  * Heavy embossed gold lettering (Cormorant Garamond SemiBold) with a pressed-in shadow rim
-  * Gold-thread embroidery: a satin-filled bold date and a plump domed satin heart, grown by
-    one Geometry Nodes Trim Curve driven by a single progress value (frames 1-225)
+  * Warm oatmeal linen card (matte, woven) under a low raking key light
+  * Letterpress lettering (Cormorant Garamond Medium) debossed into the linen in matte
+    antique-bronze ink; ornaments printed flush in the same ink
+  * Gold-thread embroidery: a twisted champagne-gold cord date and a plump domed satin heart,
+    grown by one Geometry Nodes Trim Curve driven by a single progress value (frames 1-225)
   * Needle (thread through its eye, down to the stitch) + presser foot locked to the
     active stitch point every frame; they lift away over frames 225-255
-  * Low diagonal macro camera (~25 deg) with shallow DOF over frames 1-220, then a smooth
+  * Low diagonal camera (~30 deg, date line in view) with shallow DOF over frames 1-220, then a smooth
     pull-back and tilt to the full card (220-305), holding to frame 345
 
 Files expected next to this script:
     wreath.svg, divider.svg, venue.svg,
-    CormorantGaramond-Regular.ttf, CormorantGaramond-SemiBold.ttf, CormorantGaramond-Bold.ttf
+    CormorantGaramond-Regular.ttf, CormorantGaramond-Medium.ttf (also -SemiBold, -Bold)
 
 Run headless:   blender -b --factory-startup -P build_template.py
 WARNING: running it as a script clears the current scene before building.
@@ -44,33 +45,38 @@ CAM_CLOSE_END = 220       # camera leaves the macro view
 PULLBACK_END = 305        # camera settles on the full card
 
 CARD_W, CARD_H = 1.08, 1.92
-GOLD_HEX = "#B89356"
-LINEN_HEX = "#CDBB9C"     # warm oatmeal / sand
-TABLE_HEX = "#A8936F"     # close to the card, so no dark band around it
+# Owner's palette (2026-11-25)
+LINEN_SHADOW, LINEN_MID, LINEN_LIT = "#A99070", "#C9B599", "#DFD0BA"
+INK_SHADOW, INK_MID, INK_EDGE = "#6E4E24", "#9E7339", "#B5894C"        # letterpress bronze
+THREAD_SHADOW, THREAD_BODY, THREAD_HIGH = "#7A5622", "#B0833E", "#CFA25A"  # champagne gold
+TABLE_HEX = "#B09A7A"     # close to the card, so no dark band around it
 
 FONT_FILES = {
     "regular": "CormorantGaramond-Regular.ttf",
+    "medium": "CormorantGaramond-Medium.ttf",
     "semibold": "CormorantGaramond-SemiBold.ttf",
     "bold": "CormorantGaramond-Bold.ttf",
 }
 SVG_WREATH, SVG_DIVIDER, SVG_VENUE = "wreath.svg", "divider.svg", "venue.svg"
 
 # Layout (metres, card centred on the origin, facing +Z)
-DATE_CENTER, DATE_SIZE, DATE_MAX_WIDTH = (0.0, -0.255), 0.105, 0.80
-HEART_CENTER, HEART_WIDTH = (0.0, -0.362), 0.085
+DATE_CENTER, DATE_SIZE, DATE_MAX_WIDTH = (0.0, -0.255), 0.052, 0.80   # size = digit height
+HEART_CENTER, HEART_WIDTH = (0.0, -0.345), 0.068
+DEBOSS_DEPTH = 0.0007     # letterpress depth of the pressed-in lettering
 
 # Embroidery
 THREAD_RADIUS = 0.00065   # base radius of the gold thread tube
-STITCH_LENGTH = 0.0040    # running-stitch length on outline cords
+CORD_TWIST = 0.0016       # length of one twist of the gold cord
 SAMPLE_STEP = 0.0007      # point spacing along stitch paths
-KIND_DATE_SATIN, KIND_HEART_SATIN, KIND_CORD = 1.0, 2.0, 3.0   # stored in point radius
+KIND_HEART_SATIN, KIND_CORD = 2.0, 3.0   # stitch kind, stored in point radius
 
 # Camera
 LENS_MM = 65.0
-CLOSE_DIST = 0.30
-CLOSE_ELEVATION = math.radians(28.0)
+CLOSE_DIST = 0.58                       # the date line, divider, heart and nearby text in view
+CLOSE_ELEVATION = math.radians(30.0)
 CLOSE_AZIMUTH = math.radians(50.0)      # camera sits front-left of the stitch
-CLOSE_ROLL = math.radians(-16.0)        # slight dutch angle: text and needle run diagonally
+CLOSE_ROLL = math.radians(-14.0)        # slight dutch angle: text and needle run diagonally
+CAMERA_SMOOTHING = 24                   # frames either side: a calm pan that follows the needle
 FINAL_DIST = CARD_H * 1.025 / (2 * math.tan(math.atan(18.0 / LENS_MM)))
 
 
@@ -337,7 +343,11 @@ def make_linen_material():
     fade.inputs[1].default_value, fade.inputs[2].default_value = 0.7, 1.8
     fade.inputs[3].default_value, fade.inputs[4].default_value = 1.0, 0.0
     fine = math("MULTIPLY", fine, fade.outputs[0])
-    base_level = math("MULTIPLY", math("SUBTRACT", 1.0, fade.outputs[0]), 0.9)   # keep mean tone
+    # Far away, a softer and larger cross-hatch keeps the card reading as linen.
+    warp2, weft2 = wave("X", 55.0, 1.5), wave("Y", 52.0, 1.8)
+    coarse = math("MULTIPLY_ADD", math("MAXIMUM", sock(warp2.outputs, "Fac"), sock(weft2.outputs, "Fac")),
+                  0.35, 0.72)
+    base_level = math("MULTIPLY", math("SUBTRACT", 1.0, fade.outputs[0]), coarse)
     height = math("ADD", fine, base_level)
     height = math("MULTIPLY_ADD", sock(slub.outputs, "Fac"), 0.5, height)
 
@@ -347,61 +357,54 @@ def make_linen_material():
     L.new(height, bump.inputs["Height"])
     L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
 
-    base = hex_to_linear(LINEN_HEX)
-    dark = tuple(c * 0.66 for c in base[:3]) + (1.0,)
-    light = tuple(min(1.0, c * 1.08) for c in base[:3]) + (1.0,)
-    col = ramp(nt, dark, light, 0.35, 1.45)
+    col = ramp(nt, hex_to_linear(LINEN_SHADOW), hex_to_linear(LINEN_LIT), 0.25, 1.5)
+    mid = col.color_ramp.elements.new(0.85)
+    mid.color = hex_to_linear(LINEN_MID)
     L.new(height, sock(col.inputs, "Fac"))
-    L.new(col.outputs["Color"], bsdf.inputs["Base Color"])
+    warm = N.new("ShaderNodeHueSaturation")          # the view transform mutes warm tones
+    warm.inputs["Saturation"].default_value = 1.35
+    warm.inputs["Value"].default_value = 1.0
+    L.new(col.outputs["Color"], warm.inputs["Color"])
+    L.new(warm.outputs["Color"], bsdf.inputs["Base Color"])
 
     rough = N.new("ShaderNodeMapRange")
     L.new(sock(grain.outputs, "Fac"), rough.inputs[0])
-    rough.inputs[3].default_value, rough.inputs[4].default_value = 0.80, 0.92
+    rough.inputs[3].default_value, rough.inputs[4].default_value = 0.85, 0.92
     L.new(rough.outputs[0], bsdf.inputs["Roughness"])
     bsdf.inputs["Metallic"].default_value = 0.0
+    for name, value in (("Specular IOR Level", 0.25), ("Specular", 0.25),     # matte, no sheen
+                        ("Sheen Weight", 0.25), ("Sheen", 0.25)):          # soft fabric rim
+        if name in bsdf.inputs:
+            bsdf.inputs[name].default_value = value
     return mat
 
 
-def make_gold_material():
-    """Brushed gold foil for the embossed type and ornaments."""
-    mat = bpy.data.materials.new("Gold_Brushed")
+def make_ink_material():
+    """Matte antique-bronze letterpress ink: lettering floors, walls and printed ornaments."""
+    mat = bpy.data.materials.new("Bronze_Ink")
     nt, bsdf, _ = principled(mat)
     N, L = nt.nodes, nt.links
     texco = N.new("ShaderNodeTexCoord")
-    mapping = N.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (6.0, 900.0, 6.0)   # streaks along X
-    L.new(texco.outputs["Object"], mapping.inputs["Vector"])
-    brush = N.new("ShaderNodeTexNoise")
-    brush.inputs["Scale"].default_value = 2.0
-    brush.inputs["Detail"].default_value = 8.0
-    L.new(mapping.outputs["Vector"], brush.inputs["Vector"])
-
-    rough = N.new("ShaderNodeMapRange")
-    L.new(sock(brush.outputs, "Fac"), rough.inputs[0])
-    rough.inputs[3].default_value, rough.inputs[4].default_value = 0.24, 0.36
-    L.new(rough.outputs[0], bsdf.inputs["Roughness"])
-
+    mottle = N.new("ShaderNodeTexNoise")              # uneven ink lay-down
+    mottle.inputs["Scale"].default_value = 260.0
+    mottle.inputs["Detail"].default_value = 6.0
+    L.new(texco.outputs["Object"], mottle.inputs["Vector"])
+    col = ramp(nt, hex_to_linear(INK_SHADOW), hex_to_linear(INK_EDGE), 0.25, 0.8)
+    mid = col.color_ramp.elements.new(0.5)
+    mid.color = hex_to_linear(INK_MID)
+    L.new(sock(mottle.outputs, "Fac"), sock(col.inputs, "Fac"))
+    tone = N.new("ShaderNodeHueSaturation")      # calibrated so the render lands on the palette
+    tone.inputs["Saturation"].default_value = 0.92
+    tone.inputs["Value"].default_value = 0.72
+    L.new(col.outputs["Color"], tone.inputs["Color"])
+    L.new(tone.outputs["Color"], bsdf.inputs["Base Color"])
     bump = N.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.06
-    bump.inputs["Distance"].default_value = 0.0002
-    L.new(sock(brush.outputs, "Fac"), bump.inputs["Height"])
+    bump.inputs["Strength"].default_value = 0.25
+    bump.inputs["Distance"].default_value = 0.0003
+    L.new(sock(mottle.outputs, "Fac"), bump.inputs["Height"])
     L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-
-    gold = hex_to_linear(GOLD_HEX)
-    col = ramp(nt, tuple(c * 0.78 for c in gold[:3]) + (1,), gold, 0.3, 0.7)
-    L.new(sock(brush.outputs, "Fac"), sock(col.inputs, "Fac"))
-    L.new(col.outputs["Color"], bsdf.inputs["Base Color"])
-    bsdf.inputs["Metallic"].default_value = 0.9
-    return mat
-
-
-def make_deboss_material():
-    """Darkened linen for the pressed-in rim around the gold letters."""
-    mat = bpy.data.materials.new("Deboss_Shadow")
-    _, bsdf, _ = principled(mat)
-    bsdf.inputs["Base Color"].default_value = tuple(c * 0.42 for c in hex_to_linear(LINEN_HEX)[:3]) + (1,)
-    bsdf.inputs["Roughness"].default_value = 0.95
-    bsdf.inputs["Metallic"].default_value = 0.0
+    bsdf.inputs["Metallic"].default_value = 0.35      # a soft bronze glint, never mirror-like
+    bsdf.inputs["Roughness"].default_value = 0.52
     return mat
 
 
@@ -414,7 +417,7 @@ def make_thread_material():
     twist = N.new("ShaderNodeTexWave")
     twist.wave_type = "BANDS"
     twist.bands_direction = "DIAGONAL"
-    twist.inputs["Scale"].default_value = 1300.0
+    twist.inputs["Scale"].default_value = 900.0
     twist.inputs["Distortion"].default_value = 0.5
     L.new(texco.outputs["Object"], twist.inputs["Vector"])
     bump = N.new("ShaderNodeBump")
@@ -426,12 +429,13 @@ def make_thread_material():
     attr = N.new("ShaderNodeAttribute")          # 0 where thread dives into the linen
     attr.attribute_name = "stitch_bump"
     set_attr(attr, "attribute_type", "GEOMETRY")
-    gold = hex_to_linear("#C9A55E")
-    col = ramp(nt, tuple(c * 0.40 for c in gold[:3]) + (1,), gold, 0.0, 0.55)
+    col = ramp(nt, hex_to_linear(THREAD_SHADOW), hex_to_linear(THREAD_HIGH), 0.0, 1.0)
+    body = col.color_ramp.elements.new(0.55)
+    body.color = hex_to_linear(THREAD_BODY)
     L.new(sock(attr.outputs, "Fac"), sock(col.inputs, "Fac"))
     L.new(col.outputs["Color"], bsdf.inputs["Base Color"])
-    bsdf.inputs["Metallic"].default_value = 1.0
-    bsdf.inputs["Roughness"].default_value = 0.26
+    bsdf.inputs["Metallic"].default_value = 0.85
+    bsdf.inputs["Roughness"].default_value = 0.33
     return mat
 
 
@@ -448,7 +452,7 @@ def make_simple_material(name, hex_or_rgb, metallic, roughness):
 # --------------------------------------------------------------------------------------
 # Card, table
 # --------------------------------------------------------------------------------------
-def build_card(mat_linen, col):
+def build_card(mat_linen, col, cutter=None):
     me = bpy.data.meshes.new("Card")
     hw, hh = CARD_W / 2, CARD_H / 2
     me.from_pydata([(-hw, -hh, 0), (hw, -hh, 0), (hw, hh, 0), (-hw, hh, 0)], [], [(0, 1, 2, 3)])
@@ -458,6 +462,12 @@ def build_card(mat_linen, col):
     sol.thickness, sol.offset = 0.003, -1.0
     bev = card.modifiers.new("SoftEdge", "BEVEL")
     bev.width, bev.segments = 0.0008, 2
+    if cutter is not None:                       # letterpress: the lettering is cut into the card
+        boolean = card.modifiers.new("Deboss", "BOOLEAN")
+        boolean.operation = "DIFFERENCE"
+        boolean.object = cutter
+        set_attr(boolean, "solver", "EXACT")
+        set_attr(boolean, "material_mode", "TRANSFER")
 
     table = bpy.data.meshes.new("Table")
     s = 6.0
@@ -469,7 +479,8 @@ def build_card(mat_linen, col):
 
 
 # --------------------------------------------------------------------------------------
-# Text (gold letters + a darker pressed-in rim, parented so both move/scale together)
+# Text: hidden text objects are the editable source; one mesh made from them cuts the
+# letters into the card (letterpress). Call rebuild_deboss() after changing any text.
 # --------------------------------------------------------------------------------------
 _FONTS = {}
 
@@ -502,46 +513,64 @@ def _font_curve(name, body, size, weight, spacing):
     return cu
 
 
-def add_text(name, body, x, y, size, mat, col, weight="semibold", spacing=1.0,
-             extrude=0.0018, bevel=0.00045, deboss_mat=None):
+def add_text(name, body, x, y, size, col, weight="medium", spacing=1.0):
     cu = _font_curve(name, body, size, weight, spacing)
-    cu.extrude = extrude
-    cu.bevel_depth = bevel
-    cu.bevel_resolution = 3
-    if mat:
-        cu.materials.append(mat)
+    cu.extrude = 0.003
     ob = link(bpy.data.objects.new(name, cu), col)
-    ob.location = (x, y, extrude * 0.55)      # partly pressed into the paper
+    ob.location = (x, y, cu.extrude - DEBOSS_DEPTH)    # bottom of the letters = deboss floor
     ob["weight"] = weight
-    if deboss_mat:
-        rim = _font_curve(name + "_Deboss", body, size, weight, spacing)
-        rim.offset = max(0.0004, size * 0.0065)
-        rim.extrude = 0.00004
-        rim.materials.append(deboss_mat)
-        rob = link(bpy.data.objects.new(name + "_Deboss", rim), col)
-        rob.parent = ob
-        rob.location = (0.0, 0.0, -ob.location.z + 0.00008)
-        rob["weight"] = weight
+    ob["deboss"] = True
+    ob.hide_render = True
+    ob.display_type = "WIRE"
     return ob
 
 
-def text_parts(ob):
-    return [ob] + [c for c in ob.children if c.type == "FONT"]
+def rebuild_deboss(ink_mat=None):
+    """Join every deboss text into the cutter mesh the card's Boolean modifier uses."""
+    cutter = bpy.data.objects.get("Deboss_Cutter")
+    if cutter is None:
+        return None
+    bpy.context.view_layer.update()
+    dg = bpy.context.evaluated_depsgraph_get()
+    bm = bmesh.new()
+    for ob in bpy.data.objects:
+        if ob.type != "FONT" or not ob.get("deboss") or not ob.data.body.strip():
+            continue
+        me = bpy.data.meshes.new_from_object(ob.evaluated_get(dg))
+        me.transform(ob.matrix_world)
+        bm.from_mesh(me)
+        bpy.data.meshes.remove(me)
+    old = cutter.data
+    new = bpy.data.meshes.new("Deboss_Cutter")
+    bm.to_mesh(new)
+    bm.free()
+    for poly in new.polygons:
+        poly.material_index = 0
+    new.materials.append(ink_mat or (old.materials[0] if old.materials else None))
+    cutter.data = new
+    bpy.data.meshes.remove(old)
+    return cutter
+
+
+def make_deboss_cutter(col, ink_mat):
+    cutter = link(bpy.data.objects.new("Deboss_Cutter", bpy.data.meshes.new("Deboss_Cutter")), col)
+    cutter.data.materials.append(ink_mat)
+    cutter.hide_render = True
+    cutter.display_type = "WIRE"
+    return cutter
 
 
 def set_text_body(name, body, max_width=None, align=None):
-    """Change a text (and its pressed-in rim) in place; shrink it to max_width if needed."""
+    """Change a text in place (shrunk to max_width if needed). Call rebuild_deboss() after."""
     ob = bpy.data.objects.get(name)
     if ob is None:
         raise RuntimeError(f"master_template.blend has no object named '{name}'")
-    for part in text_parts(ob):
-        part.data.body = body
-        font = get_font(part.get("weight", "regular"))
-        if font:
-            part.data.font = font
-        if align:
-            part.data.align_x = align
-        part.hide_render = part.hide_viewport = not body.strip()
+    ob.data.body = body
+    font = get_font(ob.get("weight", "regular"))
+    if font:
+        ob.data.font = font
+    if align:
+        ob.data.align_x = align
     ob.scale = (1.0, 1.0, 1.0)
     if max_width and body.strip():
         bpy.context.view_layer.update()
@@ -641,8 +670,11 @@ def parse_svg_path(d):
     return subpaths
 
 
+ORNAMENT = dict(extrude=0.00025, bevel=0.0, bevel_res=0)   # printed flush with the linen
+
+
 def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
-                            extrude=0.0007, bevel=0.0002, bevel_res=1):
+                            extrude=0.00025, bevel=0.0, bevel_res=0):
     path = os.path.join(BASE_DIR, filename)
     if not os.path.isfile(path):
         log(f"WARNING: {filename} not found in {BASE_DIR}; skipped")
@@ -740,7 +772,7 @@ def import_svg_as_gold_mesh(filename, name, center_xy, width_m, mat, col,
 
     final.materials.append(mat)
     obj = link(bpy.data.objects.new(name, final), col)
-    obj.location.z = extrude * 0.6
+    obj.location.z = 0.00006 - extrude - bevel        # ink stands ~0.06 mm proud of the linen
     log(f"{filename}: {len(temp_objs)} paths -> {len(final.vertices)} vertices")
     return obj
 
@@ -830,31 +862,6 @@ def glyph_contours(text, center, size, weight="bold"):
     return contours
 
 
-def group_glyphs(contours):
-    """Group outer contours with the holes they contain; order glyphs left to right."""
-    info = sorted(((abs(_signed_area(c)), c) for c in contours), key=lambda t: -t[0])
-    parent = {}
-    for i, (_, c) in enumerate(info):
-        parent[i] = None
-        for j in range(i - 1, -1, -1):                 # smallest larger contour containing it
-            if _inside(c[0], info[j][1]):
-                parent[i] = j
-                break
-    depth = {}
-    for i in range(len(info)):
-        d, p = 0, parent[i]
-        while p is not None:
-            d, p = d + 1, parent[p]
-        depth[i] = d
-    glyphs = {}
-    for i, (_, c) in enumerate(info):
-        root = i if depth[i] % 2 == 0 else parent[i]
-        glyphs.setdefault(root, []).append(c)
-    out = list(glyphs.values())
-    out.sort(key=lambda g: min(p.x for p in g[0]))
-    return out
-
-
 def satin_rows(contours, angle_deg, spacing, inset):
     """Parallel stitch rows across a shape (even-odd fill), alternating direction."""
     a = math.radians(angle_deg)
@@ -891,16 +898,69 @@ def _domed(points, contours, height, reach):
     return points
 
 
+# Single-stroke digits for the couched gold cord, drawn in a unit box (x 0..0.56, y 0..1).
+def _arc(cx, cy, rx, ry, a0, a1, n=48):
+    return [(cx + rx * math.cos(math.radians(a0 + (a1 - a0) * k / n)),
+             cy + ry * math.sin(math.radians(a0 + (a1 - a0) * k / n))) for k in range(n + 1)]
+
+
+def _bez(p0, c1, c2, p3, n=24):
+    out = []
+    for k in range(n + 1):
+        t = k / n
+        u = 1 - t
+        out.append((u ** 3 * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t ** 3 * p3[0],
+                    u ** 3 * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t ** 3 * p3[1]))
+    return out
+
+
+def _six():
+    hook = _bez((0.50, 0.93), (0.36, 1.05), (0.02, 0.92), (0.02, 0.32))
+    return [hook + _arc(0.28, 0.30, 0.26, 0.30, 180, 540)[1:]]
+
+
+CORD_GLYPHS = {   # char -> (advance, [strokes]); advances include generous letter-spacing
+    "0": (0.86, [_arc(0.28, 0.5, 0.26, 0.5, 90, 450, 64)]),
+    "1": (0.62, [[(0.06, 0.80), (0.24, 1.0), (0.24, 0.0)], [(0.06, 0.0), (0.42, 0.0)]]),
+    "2": (0.86, [_arc(0.28, 0.73, 0.25, 0.27, 165, -12)
+                 + _bez((0.525, 0.674), (0.48, 0.42), (0.10, 0.22), (0.02, 0.0))[1:]
+                 + [(0.56, 0.0)]]),
+    "3": (0.86, [_arc(0.27, 0.76, 0.22, 0.24, 150, -90) + _arc(0.28, 0.27, 0.27, 0.27, 90, -150)[1:]]),
+    "4": (0.86, [[(0.42, 0.0), (0.42, 1.0), (0.0, 0.30), (0.56, 0.30)]]),
+    "5": (0.86, [[(0.52, 1.0), (0.13, 1.0), (0.10, 0.57)] + _arc(0.28, 0.31, 0.27, 0.31, 125, -150)]),
+    "6": (0.86, _six()),
+    "7": (0.86, [[(0.0, 1.0), (0.56, 1.0)] + _bez((0.56, 1.0), (0.40, 0.66), (0.24, 0.34), (0.20, 0.0))[1:]]),
+    "8": (0.86, [_arc(0.28, 0.76, 0.21, 0.24, 270, 630), _arc(0.28, 0.27, 0.26, 0.27, 90, 450)]),
+    "9": (0.86, [[(0.56 - x, 1.0 - y) for x, y in _six()[0]]]),
+    ".": (0.40, [[(0.06 + r * math.cos(a), 0.05 + r * math.sin(a))
+                  for k in range(40) for r, a in [(0.055 * (1 - k / 48), k * math.pi / 8)]]]),
+    "/": (0.62, [[(0.02, 0.0), (0.42, 1.0)]]),
+    "-": (0.56, [[(0.04, 0.46), (0.40, 0.46)]]),
+    " ": (0.50, []),
+}
+
+
 def date_stitch_paths(text, center=DATE_CENTER, size=DATE_SIZE):
-    """Solid satin-stitched date: each glyph filled with diagonal rows, then outlined."""
+    """The date as a twisted gold cord couched along single-stroke digits, left to right.
+    Characters without a cord drawing fall back to their font outline."""
+    strokes, x = [], 0.0
+    for ch in text:
+        if ch in CORD_GLYPHS:
+            adv, glyph = CORD_GLYPHS[ch]
+            strokes += [[(x + gx, gy) for gx, gy in st] for st in glyph]
+        else:
+            adv = 0.86
+            for c in glyph_contours(ch, (0.0, 0.0), 1.35, "medium"):
+                strokes.append([(x + p.x + 0.3, p.y + 0.5) for p in c] + [(x + c[0].x + 0.3, c[0].y + 0.5)])
+        x += adv
+    width = x - 0.30                                   # drop the trailing letter-space
     paths = []
-    for glyph in group_glyphs(glyph_contours(text, center, size, "bold")):
-        for row in satin_rows(glyph, 52.0, 0.00105, 0.00025):
-            length = (row[1] - row[0]).length
-            pts = resample_polyline(row, min(SAMPLE_STEP, max(length / 8, 0.0002)), closed=False)
-            paths.append((_domed(pts, glyph, 0.0007, 0.0016), KIND_DATE_SATIN))
-        for c in glyph:
-            paths.append((resample_polyline(c, SAMPLE_STEP, closed=True), KIND_CORD))
+    for st in strokes:
+        if len(st) < 2:
+            continue
+        pts = [Vector((center[0] + (px - width / 2) * size, center[1] + (py - 0.5) * size, 0.0))
+               for px, py in st]
+        paths.append((resample_polyline(pts, SAMPLE_STEP, closed=False), KIND_CORD))
     return paths
 
 
@@ -922,20 +982,38 @@ def heart_stitch_paths(center=HEART_CENTER, width=HEART_WIDTH):
 
 
 def fit_date_paths(text):
-    paths = date_stitch_paths(text)
+    paths = date_stitch_paths(" ".join(text.split()))
     xs = [p.x for pts, _ in paths for p in pts]
     if xs and max(xs) - min(xs) > DATE_MAX_WIDTH:
-        paths = date_stitch_paths(text, DATE_CENTER, DATE_SIZE * DATE_MAX_WIDTH / (max(xs) - min(xs)))
+        paths = date_stitch_paths(" ".join(text.split()), DATE_CENTER,
+                                  DATE_SIZE * DATE_MAX_WIDTH / (max(xs) - min(xs)))
     if not paths:
         raise RuntimeError(f"the date '{text}' produced no stitchable outline")
     return paths
 
 
+DATE_TIME_SHARE = 0.6     # share of the stitching time spent on the date (the rest: the heart)
+
+
+def _length(pts):
+    return sum((b - a).length for a, b in zip(pts, pts[1:]))
+
+
+def assemble_paths(date_paths, heart_paths):
+    """(points, kind, timing weight) in stitching order. The weights make the date take
+    DATE_TIME_SHARE of the stitching time however long its thread is compared to the heart."""
+    d = sum(_length(p) for p, _ in date_paths) or 1.0
+    h = sum(_length(p) for p, _ in heart_paths) or 1.0
+    w_heart = (d * (1.0 - DATE_TIME_SHARE)) / (h * DATE_TIME_SHARE)
+    return [(p, k, 1.0) for p, k in date_paths] + [(p, k, w_heart) for p, k in heart_paths]
+
+
 def make_stitch_curve_data(paths, materials=()):
-    """One curve; spline order = stitching order; point radius = stitch kind."""
+    """One curve; spline order = stitching order; point radius = stitch kind,
+    point tilt = timing weight (read by the Geometry Nodes timing, reset before meshing)."""
     cu = bpy.data.curves.new("Stitch_Date_Heart", "CURVE")
     cu.dimensions = "3D"
-    for pts, kind in paths:
+    for pts, kind, weight in paths:
         sp = cu.splines.new("POLY")
         sp.points.add(len(pts) - 1)
         flat = []
@@ -943,6 +1021,7 @@ def make_stitch_curve_data(paths, materials=()):
             flat += [p.x, p.y, p.z, 1.0]
         sp.points.foreach_set("co", flat)
         sp.points.foreach_set("radius", [kind] * len(pts))
+        sp.points.foreach_set("tilt", [weight] * len(pts))
         sp.use_cyclic_u = False
     for m in materials:
         cu.materials.append(m)
@@ -950,15 +1029,15 @@ def make_stitch_curve_data(paths, materials=()):
 
 
 class PathSampler:
-    """Arc-length lookup over the ordered splines (matches the GN Trim timing exactly)."""
+    """Weighted arc-length lookup over the ordered splines (matches the GN timing exactly)."""
 
     def __init__(self, paths):
         self.pts, self.cum = [], []
         total = 0.0
-        for pts, _ in paths:
+        for pts, _, weight in paths:
             for k, p in enumerate(pts):
                 if k > 0:
-                    total += (p - pts[k - 1]).length
+                    total += (p - pts[k - 1]).length * weight
                 self.pts.append(p)
                 self.cum.append(total)
         self.total = total
@@ -1044,7 +1123,8 @@ def build_stitch_node_group(thread_mat):
     acc = node("GeometryNodeAccumulateField", -1300, -300)
     set_attr(acc, "data_type", "FLOAT")
     set_attr(acc, "domain", "CURVE")
-    L.new(sock(slen.outputs, "Length"), sock(acc.inputs, "Value", "VALUE"))
+    tilt = node("GeometryNodeInputCurveTilt", -1500, -450).outputs[0]       # tilt = timing weight
+    L.new(math_node("MULTIPLY", sock(slen.outputs, "Length"), tilt), sock(acc.inputs, "Value", "VALUE"))
     total = sock(acc.outputs, "Total", "VALUE")
     t0 = math_node("DIVIDE", sock(acc.outputs, "Trailing", "VALUE"), total)
     t1 = math_node("DIVIDE", sock(acc.outputs, "Leading", "VALUE"), total)
@@ -1077,20 +1157,24 @@ def build_stitch_node_group(thread_mat):
     L.new(sock(trim.outputs, "Curve"), delete.inputs[0])
     L.new(cmp.outputs[0], sock(delete.inputs, "Selection"))
 
-    # --- stitch shape: satin rows arch end to end; cords show running stitches ---------
+    # --- stitch shape: satin rows arch end to end; cords are twisted and dive at the ends --
     kind = read("stitch_kind", -250, -400)
     is_cord = math_node("COMPARE", kind, KIND_CORD, 0.5)
     is_heart = math_node("COMPARE", kind, KIND_HEART_SATIN, 0.5)
     sparam = node("GeometryNodeSplineParameter", -250, -600)
 
-    b_len = math_node("DIVIDE", sock(sparam.outputs, "Length"), STITCH_LENGTH)
-    b_len = math_node("FRACT", b_len)
-    b_len = math_node("SINE", math_node("MULTIPLY", b_len, math.pi))
-    b_len = math_node("POWER", b_len, 0.45)
+    s_len = sock(node("GeometryNodeSplineLength", -250, -800).outputs, "Length")
+    along = sock(sparam.outputs, "Length")
+    twist = math_node("SINE", math_node("MULTIPLY", math_node("DIVIDE", along, CORD_TWIST), math.pi))
+    twist = math_node("MULTIPLY_ADD", math_node("ABSOLUTE", twist), 0.18, 0.82)
+    ends = math_node("MINIMUM", along, math_node("SUBTRACT", s_len, along))
+    ends = math_node("MINIMUM", math_node("DIVIDE", ends, 0.0018), 1.0)
+    ends = math_node("POWER", math_node("MAXIMUM", ends, 0.0), 0.5)
+    b_len = math_node("MULTIPLY", twist, ends)
     b_fac = math_node("SINE", math_node("MULTIPLY", sock(sparam.outputs, "Factor"), math.pi))
     b_fac = math_node("POWER", b_fac, 0.3)
     bump = math_node("MULTIPLY_ADD", is_cord, math_node("SUBTRACT", b_len, b_fac), b_fac)
-    mult = math_node("MULTIPLY_ADD", is_heart, 0.35, math_node("MULTIPLY_ADD", is_cord, 0.2, 1.0))
+    mult = math_node("MULTIPLY_ADD", is_heart, 0.35, math_node("MULTIPLY_ADD", is_cord, 0.55, 1.0))
 
     geo = store(delete.outputs[0], "stitch_bump", bump, "POINT", 0)
 
@@ -1112,8 +1196,11 @@ def build_stitch_node_group(thread_mat):
     sock(profile.inputs, "Resolution").default_value = 8
     sock(profile.inputs, "Radius").default_value = THREAD_RADIUS
 
+    untilt = node("GeometryNodeSetCurveTilt", 620, 0)                      # no profile twist
+    L.new(setpos.outputs[0], untilt.inputs[0])
+    sock(untilt.inputs, "Tilt").default_value = 0.0
     c2m = node("GeometryNodeCurveToMesh", 750, 0)
-    L.new(setpos.outputs[0], c2m.inputs[0])
+    L.new(untilt.outputs[0], c2m.inputs[0])
     L.new(profile.outputs[0], sock(c2m.inputs, "Profile Curve"))
     try:
         sock(c2m.inputs, "Fill Caps").default_value = True
@@ -1396,7 +1483,7 @@ def bake_animation(scene, sampler, stitch_obj, mod, ident, rig, cam, focus):
         ob.hide_render = ob.hide_viewport = False
 
     # --- camera: low diagonal macro (1-220) -> pull back & tilt (220-305) -> hold -------
-    half = 6
+    half = CAMERA_SMOOTHING
     smooth = {}
     for f in range(FRAME_START, STITCH_END + 1):
         acc = Vector((0, 0, 0))
@@ -1435,7 +1522,7 @@ def stitch_modifier(stitch_obj):
 
 def restitch(date_text):
     """Rebuild the date + heart path and re-bake the rig and camera (used by render_invite)."""
-    paths = fit_date_paths(date_text) + heart_stitch_paths()
+    paths = assemble_paths(fit_date_paths(date_text), heart_stitch_paths())
     stitch = bpy.data.objects["Stitch_Date_Heart"]
     old = stitch.data
     stitch.data = make_stitch_curve_data(paths, list(old.materials))
@@ -1463,43 +1550,39 @@ def main():
         setup_render(scene)
 
         col_card = new_collection("Card")
-        col_emboss = new_collection("Embossed_Gold")
+        col_emboss = new_collection("Letterpress")
         col_stitch = new_collection("Embroidery")
         col_rig = new_collection("Needle_Rig")
         col_light = new_collection("Camera_Lights")
 
         linen = make_linen_material()
-        gold = make_gold_material()
-        deboss = make_deboss_material()
+        ink = make_ink_material()
         thread_mat = make_thread_material()
         chrome = make_simple_material("Needle_Chrome", (0.86, 0.87, 0.89, 1.0), 1.0, 0.14)
         steel = make_simple_material("Machine_Steel", (0.66, 0.64, 0.61, 1.0), 1.0, 0.28)
 
-        build_card(linen, col_card)
+        cutter = make_deboss_cutter(col_emboss, ink)
+        build_card(linen, col_card, cutter)
 
-        # --- static embossed elements (top to bottom) ---------------------------------
-        import_svg_as_gold_mesh(SVG_WREATH, "Wreath", (0.0, 0.58), 0.60, gold, col_emboss,
-                                extrude=0.0010, bevel=0.0003, bevel_res=1)
-        heavy = dict(extrude=0.0024, bevel=0.0006, deboss_mat=deboss)
-        add_text("Mono_Y", "Y", -0.075, 0.585, 0.15, gold, col_emboss, **heavy)
-        add_text("Mono_Bar", "|", 0.0, 0.585, 0.15, gold, col_emboss, **heavy)
-        add_text("Mono_M", "M", 0.078, 0.585, 0.15, gold, col_emboss, **heavy)
-        add_text("SaveTheDate", "SAVE THE DATE", 0.0, 0.25, 0.034, gold, col_emboss, spacing=1.8,
-                 weight="bold", extrude=0.0012, bevel=0.0003, deboss_mat=deboss)
-        add_text("Name_Yuval", "Yuval", 0.0, 0.135, 0.13, gold, col_emboss, **heavy)
-        add_text("Name_Amp", "&", 0.0, 0.035, 0.085, gold, col_emboss, **heavy)
-        add_text("Name_Mevorah", "Mevorah", 0.0, -0.07, 0.13, gold, col_emboss, **heavy)
-        import_svg_as_gold_mesh(SVG_DIVIDER, "Divider", (0.0, -0.165), 0.56, gold, col_emboss,
-                                extrude=0.0009, bevel=0.00025, bevel_res=1)
-        add_text("OurForeverBegins", "OUR FOREVER BEGINS", 0.0, -0.458, 0.036, gold, col_emboss,
-                 weight="bold", spacing=1.7, extrude=0.0014, bevel=0.00035, deboss_mat=deboss)
-        import_svg_as_gold_mesh(SVG_VENUE, "Venue", (0.0, -CARD_H / 2 + 0.225), CARD_W, gold,
-                                col_emboss, extrude=0.0006, bevel=0.0001, bevel_res=0)
+        # --- letterpress lettering (debossed) and printed ornaments, top to bottom ------
+        import_svg_as_gold_mesh(SVG_WREATH, "Wreath", (0.0, 0.58), 0.60, ink, col_emboss, **ORNAMENT)
+        add_text("Mono_Y", "Y", -0.075, 0.585, 0.15, col_emboss)
+        add_text("Mono_Bar", "|", 0.0, 0.585, 0.15, col_emboss)
+        add_text("Mono_M", "M", 0.078, 0.585, 0.15, col_emboss)
+        add_text("SaveTheDate", "SAVE THE DATE", 0.0, 0.25, 0.034, col_emboss, spacing=1.8)
+        add_text("Name_Yuval", "Yuval", 0.0, 0.135, 0.13, col_emboss)
+        add_text("Name_Amp", "&", 0.0, 0.035, 0.085, col_emboss)
+        add_text("Name_Mevorah", "Mevorah", 0.0, -0.07, 0.13, col_emboss)
+        import_svg_as_gold_mesh(SVG_DIVIDER, "Divider", (0.0, -0.165), 0.56, ink, col_emboss, **ORNAMENT)
+        add_text("OurForeverBegins", "OUR FOREVER BEGINS", 0.0, -0.458, 0.034, col_emboss, spacing=1.8)
+        import_svg_as_gold_mesh(SVG_VENUE, "Venue", (0.0, -CARD_H / 2 + 0.225), CARD_W, ink,
+                                col_emboss, **ORNAMENT)
+        rebuild_deboss(ink)
 
         # --- gold thread embroidery ---------------------------------------------------
-        paths = fit_date_paths("01.06.2027")
-        n_date = len(paths)
-        paths += heart_stitch_paths()
+        date_paths = fit_date_paths("01.06.2027")
+        n_date = len(date_paths)
+        paths = assemble_paths(date_paths, heart_stitch_paths())
         stitch = link(bpy.data.objects.new(
             "Stitch_Date_Heart", make_stitch_curve_data(paths, [thread_mat])), col_stitch)
         ng = build_stitch_node_group(thread_mat)
@@ -1507,8 +1590,8 @@ def main():
         mod.node_group = ng
         ident = progress_identifier(ng)
         sampler = PathSampler(paths)
-        log(f"stitch path: {n_date} date rows/cords + {len(paths) - n_date} heart rows, "
-            f"{sampler.total:.2f} m of thread")
+        log(f"stitch path: {n_date} date cords + {len(paths) - n_date} heart rows, "
+            f"{sum(_length(p) for p, _, _ in paths):.2f} m of thread")
 
         # --- rig, lights, camera, animation -------------------------------------------
         rig = build_needle_rig(col_rig, chrome, steel, thread_mat)

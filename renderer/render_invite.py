@@ -94,8 +94,7 @@ def update_venue(venue):
     if venue_ob is None:
         raise RuntimeError("master_template.blend has no object named 'Venue'")
     new = bt.import_svg_as_gold_mesh(venue, "Venue_new", (0.0, -bt.CARD_H / 2 + 0.225), bt.CARD_W,
-                                     venue_ob.active_material, None,
-                                     extrude=0.0006, bevel=0.0001, bevel_res=0)
+                                     venue_ob.active_material, None, **bt.ORNAMENT)
     if new is None:
         raise RuntimeError(f"venue graphic '{venue}' could not be loaded")
     old = venue_ob.data
@@ -175,8 +174,10 @@ def main():
         refresh_fonts()
         update_initials(args.initials)
         update_names(args.names)
+        bt.rebuild_deboss()                   # cut the new lettering into the card
         paths, sampler = bt.restitch(args.date)
-        log(f"date '{args.date}': {len(paths)} stitch rows, {sampler.total:.2f} m of thread")
+        log(f"date '{args.date}': {len(paths)} stitch rows, "
+            f"{sum(bt._length(p) for p, _, _ in paths):.2f} m of thread")
         update_venue(venue)
         configure_render(scene, work)
 
