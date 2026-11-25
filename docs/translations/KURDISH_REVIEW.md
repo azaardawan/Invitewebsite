@@ -2291,3 +2291,12 @@ Replaces `tour.getCoffee`, `tour.getCookie`, `tour.makingCoffee`, `tour.makingCo
 | `tour.waiterBrings` | The waiter will bring it to your table | گارسۆنەکە بۆ سەر مێزەکەت دەیهێنێت | گارسۆن دێ بۆ سەر مێزا تە ئینیت |
 | `tour.putCoffee` | Put the drink down | خواردنەوەکە دابنێ | ڤەخوارنێ دانە |
 | `tour.pickCoffee` | Pick up the drink | خواردنەوەکە هەڵبگرە | ڤەخوارنێ هلگرە |
+
+## Batch 73 — Royal Rose Crest (#31): the design's name — ✅ AUTO-APPROVED (2026-11-25, owner checks in Admin → Translations)
+
+Royal Olive Crest in baby pink and rose gold (`themes/royal-rose-crest/v1/manifest.ts`); every other text is Royal
+Olive Crest's, already reviewed.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #31: the design's name | الشعار الملكي الوردي | Royal Rose Crest | دروشمی شاهانەی پەمەیی | نیشانا شاهانە یا پەمبەیی |
