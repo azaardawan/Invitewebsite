@@ -45,7 +45,8 @@ RUN python3 -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir -r /app/requirements.txt
 
 COPY build_template.py render_invite.py server.py \
-     wreath.svg divider.svg venue.svg CormorantGaramond-Regular.ttf /app/
+     wreath.svg divider.svg venue.svg \
+     CormorantGaramond-Regular.ttf CormorantGaramond-SemiBold.ttf CormorantGaramond-Bold.ttf /app/
 
 # Build master_template.blend inside the image (no GPU needed for this step).
 RUN blender -b --factory-startup --python-exit-code 1 -P /app/build_template.py \
