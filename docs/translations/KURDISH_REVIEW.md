@@ -2377,3 +2377,13 @@ The owner's newer artwork for the families, verse, letter, details and countdown
 | Key | English | Sorani (ckb) | Badini (bdn) |
 | --- | --- | --- | --- |
 | `tour.padSide` | Move the pad to the other side | بازنەکە بگوازەرەوە بۆ لایەکەی تر | بازنێ بگوهێزە بۆ لایێ دی |
+
+## Batch 79 — Golden Stitch (#32): the two burgundy cards — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+Two more card styles the customer can choose with the arch card (`themes/golden-stitch/v1/manifest.ts`, `print.shapes`).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: card name | بطاقة الورد العنّابي | Burgundy floral card | کارتی گوڵی شەرابی | کارتا گولێن شەرابی |
+| 2 | #32: card name | بطاقة القنديل | Lantern arch card | کارتی کەوانەی چرا | کارتا کەڤانا چرایێ |
+| 3 | #32: `withLoveShort` (the cards' backs) | مع الحب | With love | بە خۆشەویستییەوە | ب ڤیان |

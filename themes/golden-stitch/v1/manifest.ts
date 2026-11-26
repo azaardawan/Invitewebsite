@@ -1,5 +1,5 @@
 import { defineTheme } from '@/theme-sdk/manifest';
-import { ARCH_HEIGHT_MM, ARCH_OUTLINE, ARCH_WIDTH_MM } from './outlines';
+import { ARCH_HEIGHT_MM, ARCH_OUTLINE, ARCH_WIDTH_MM, FRAME_HEIGHT_MM, FRAME_OUTLINE, FRAME_WIDTH_MM, LANTERN_HEIGHT_MM, LANTERN_OUTLINE, LANTERN_WIDTH_MM } from './outlines';
 
 /**
  * Golden Stitch (owner, 2026-11-25): a gold-thread needle stitches the couple's date and a heart onto warm linen (a film
@@ -97,6 +97,22 @@ export default defineTheme({
         widthMm: ARCH_WIDTH_MM,
         heightMm: ARCH_HEIGHT_MM,
         outline: ARCH_OUTLINE,
+      },
+      // Owner, 2026-11-26: two more card styles in burgundy and gold, sold with the arch card (feature card_arch):
+      // the customer chooses. The rectangle is an "arch-" shape only so it is sold by the same feature.
+      {
+        key: 'arch-frame',
+        label: { ar: 'بطاقة الورد العنّابي', en: 'Burgundy floral card', ckb: 'کارتی گوڵی شەرابی', bdn: 'کارتا گولێن شەرابی' },
+        widthMm: FRAME_WIDTH_MM,
+        heightMm: FRAME_HEIGHT_MM,
+        outline: FRAME_OUTLINE,
+      },
+      {
+        key: 'arch-lantern',
+        label: { ar: 'بطاقة القنديل', en: 'Lantern arch card', ckb: 'کارتی کەوانەی چرا', bdn: 'کارتا کەڤانا چرایێ' },
+        widthMm: LANTERN_WIDTH_MM,
+        heightMm: LANTERN_HEIGHT_MM,
+        outline: LANTERN_OUTLINE,
       },
     ],
   },

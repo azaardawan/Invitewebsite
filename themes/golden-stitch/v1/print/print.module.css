@@ -468,6 +468,183 @@
   width: 21.4%;
 }
 
+/* ---------------------------------------------------------------- burgundy cards (owner, 2026-11-26) */
+
+.burg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #7b1d2c;
+  text-align: center;
+}
+.burgFront,
+.burgBack {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.burgWeddingOf {
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6e2a2a;
+}
+.burg:lang(ar) .burgWeddingOf,
+.burg:lang(ckb) .burgWeddingOf,
+.burg:lang(bdn) .burgWeddingOf {
+  font-family: var(--gs-heading);
+  font-size: 15pt;
+  letter-spacing: 0;
+}
+.burgNames {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 46pt;
+  line-height: 1.12;
+  white-space: nowrap;
+  color: #7b1d2c;
+}
+.burgAnd {
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-size: 0.95em;
+  line-height: 1;
+  color: #b0843f;
+}
+.burg:lang(ar) .burgNames,
+.burg:lang(ckb) .burgNames,
+.burg:lang(bdn) .burgNames {
+  font-family: var(--gs-heading);
+  font-size: 38pt;
+  line-height: 1.35;
+}
+.burgDate {
+  font-size: 23pt;
+  font-weight: 600;
+  font-variant-numeric: oldstyle-nums;
+  color: #7b1d2c;
+}
+.burgExtra {
+  font-style: italic;
+  font-size: 10pt;
+}
+.burgTitle {
+  margin: 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22pt;
+  line-height: 1.4;
+  color: #7b1d2c;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.burgTitle[data-long] {
+  font-size: 17pt;
+}
+.burg:lang(ar) .burgTitle,
+.burg:lang(ckb) .burgTitle,
+.burg:lang(bdn) .burgTitle {
+  font-style: normal;
+  font-size: 19pt;
+  line-height: 1.6;
+}
+.burgMessage {
+  margin: 0;
+  font-style: italic;
+  font-size: 11pt;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.burgMessage[data-long] {
+  font-size: 9pt;
+}
+.burgWithLove {
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a7337;
+}
+.burg:lang(ar) .burgWithLove,
+.burg:lang(ckb) .burgWithLove,
+.burg:lang(bdn) .burgWithLove {
+  font-size: 11pt;
+  letter-spacing: 0;
+}
+.burgQrs {
+  gap: 4mm;
+}
+.burgQrs .qr {
+  width: 24mm;
+}
+.burgQrs .qr img {
+  width: 12.5mm;
+  height: 12.5mm;
+}
+.burgQrs .qr figcaption {
+  font-size: 5.8pt;
+  color: #6e2a2a;
+}
+
+/* The rectangle: flowers top left and bottom right; the artwork's small divider sits at 31 % down. */
+.burgFrame .burgFront {
+  left: 16%;
+  right: 16%;
+  top: 23%;
+  height: 50%;
+}
+.burgFrame .burgWeddingOf {
+  height: 8%;
+}
+.burgFrame .burgNames {
+  margin-top: 6.5%;
+}
+.burgFrame .burgDate {
+  margin-top: 2%;
+}
+.burgFrame .burgBack {
+  inset: 0;
+  padding: 34% 16% 0;
+  gap: 4mm;
+}
+/* QR codes in the free bottom-left area of the rectangle, clear of the bottom-right flowers. */
+.burgFrame .burgQrs {
+  position: absolute;
+  left: 8%;
+  width: 44%;
+  top: 67%;
+}
+
+/* The lantern arch: the lantern above, the flower garland below (from 78 % down). */
+.burgLantern .burgFront {
+  left: 13%;
+  right: 13%;
+  top: 37%;
+  height: 39%;
+  justify-content: center;
+  gap: 2.5mm;
+}
+.burgLantern .burgBack {
+  left: 14%;
+  right: 14%;
+  top: 41%;
+  height: 37%;
+  justify-content: flex-start;
+  gap: 3.5mm;
+}
+.burgLantern .burgNames {
+  font-size: 42pt;
+}
+
 /* ---------------------------------------------------------------- keepsake, A4 */
 
 /* The owner's lined flower paper behind every page (fixed: repeated on each printed page). */
