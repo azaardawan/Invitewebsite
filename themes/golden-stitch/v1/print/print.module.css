@@ -132,67 +132,94 @@
   text-wrap: balance;
 }
 
-/* ---------------------------------------------------------------- A5 card, front and back */
+/* ---------------------------------------------------------------- A5 card, front and back (owner's design, 2026-11-26) */
 
 .card {
   position: relative;
   width: 154mm;
   height: 216mm;
   overflow: hidden;
-  background: radial-gradient(120% 90% at 50% 42%, #f7ecde 0%, #f2e2ce 62%, #ead6bd 100%);
 }
-.cardSafe {
+/* Warm paper, lighter in the middle (as on the owner's card). */
+.cardPaper {
+  background: radial-gradient(120% 90% at 50% 45%, #f8ebd7 0%, #f2e2ca 65%, #e9d5bb 100%);
+  color: #8a6128;
+}
+
+/* Front: the fine gold arch (round top, straight sides), 12.6 mm inside the trim. */
+.cardArch {
   position: absolute;
-  z-index: 2;
-  /* inside the frame, clear of the corner sprigs (which reach about 41 mm in from the page's corners) */
-  inset: 27mm 19mm 22mm;
+  left: 15.6mm;
+  right: 15.6mm;
+  top: 12.3mm;
+  bottom: 16.5mm;
+  border: 0.3mm solid #b8904f;
+  border-bottom: 0;
+  border-radius: 61.4mm 61.4mm 0 0;
+}
+.cardFlower {
+  position: absolute;
+  left: 50%;
+  top: 30mm;
+  width: 78mm;
+  height: auto;
+  transform: translateX(-50%);
+}
+.cardNames {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  top: 92mm;
+  height: 60mm;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4mm;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 62pt;
+  line-height: 1.05;
+  color: #8a6128;
+  white-space: nowrap;
 }
-.cardStar {
-  margin-bottom: 1mm;
+.card:lang(ar) .cardNames,
+.card:lang(ckb) .cardNames,
+.card:lang(bdn) .cardNames {
+  font-family: var(--gs-heading);
+  font-style: normal;
+  font-size: 50pt;
+  line-height: 1.35;
 }
-.laurels {
-  position: relative;
-  width: 92mm;
-  height: 46mm;
+.cardDate {
+  position: absolute;
+  left: 15.6mm;
+  right: 15.6mm;
+  top: 156mm;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: -16mm;
-}
-.laurelLeft,
-.laurelRight {
-  position: absolute;
-  top: 0;
-  width: 26mm;
-  height: auto;
-}
-.laurelLeft {
-  left: 0;
-}
-.laurelRight {
-  right: 0;
-}
-.weddingOf {
-  position: relative;
-  max-width: 54mm;
-  font-size: 8.5pt;
+  gap: 6mm;
+  font-size: 17pt;
   font-weight: 500;
-  letter-spacing: var(--gs-track);
-  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-variant-numeric: lining-nums;
+  color: #7a5426;
 }
-.card:lang(ar) .weddingOf,
-.card:lang(ckb) .weddingOf,
-.card:lang(bdn) .weddingOf {
-  font-family: var(--gs-heading);
-  font-size: 12pt;
+.cardRule {
+  width: 18mm;
+  height: 0.3mm;
+  background: #b8904f;
 }
-.cardDivider {
-  margin-top: 3mm;
+.cardExtraLine {
+  position: absolute;
+  left: 22mm;
+  right: 22mm;
+  top: 168mm;
+  margin: 0;
+  font-style: italic;
+  font-size: 11pt;
 }
 .cardLine {
   font-size: 11pt;
@@ -200,60 +227,89 @@
   max-width: 105mm;
   overflow-wrap: anywhere;
 }
-.cardSprig {
-  width: 30mm;
+.cardLotus {
+  position: absolute;
+  left: 50%;
+  top: 180mm;
+  width: 24mm;
   height: auto;
-  margin-top: 4mm;
+  transform: translateX(-50%);
 }
 
-.backSafe {
+/* Back: one column, centred, from the top divider to the QR code(s). */
+.backFlow {
   position: absolute;
-  z-index: 2;
-  inset: 36mm 24mm 52mm;
+  left: 18mm;
+  right: 18mm;
+  top: 30mm;
+  bottom: 14mm;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7mm;
+  text-align: center;
 }
-.backDivider {
-  width: 62mm;
+.backStar {
+  width: 56mm;
+  height: auto;
+  flex: none;
 }
 .backTitle {
+  margin: 13mm 0 0;
+  max-width: 100mm;
   font-style: italic;
   font-weight: 500;
-  font-size: 21pt;
-  line-height: 1.5;
-  max-width: 96mm;
+  font-size: 25pt;
+  line-height: 1.42;
+  color: #8a6128;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
 .backTitle[data-long] {
-  font-size: 16pt;
+  font-size: 19pt;
+}
+.card:lang(ar) .backTitle,
+.card:lang(ckb) .backTitle,
+.card:lang(bdn) .backTitle {
+  font-style: normal;
+  font-size: 22pt;
+  line-height: 1.6;
 }
 .backMessage {
+  margin: 4mm 0 0;
+  max-width: 100mm;
   font-style: italic;
-  font-size: 12.5pt;
+  font-size: 12pt;
   line-height: 1.6;
-  max-width: 98mm;
   white-space: pre-line;
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 .backMessage[data-long] {
-  font-size: 10.5pt;
+  font-size: 10pt;
 }
+.backFlower {
+  margin: 17mm 0 0;
+  width: 62mm;
+  height: auto;
+  flex: none;
+}
+.backFlower + .backStar {
+  margin-top: 6mm;
+}
+.backQrRow {
+  margin-top: 6mm;
+}
+/* The keepsake cover's heart. */
 .backHeart {
   width: 13mm;
   height: auto;
 }
-/* Between the bottom corner sprigs (they reach about 41 mm in from each side). */
-.backQrs {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 17mm;
+.cardStar {
+  margin-bottom: 1mm;
+}
+.cardDivider {
+  margin-top: 3mm;
 }
 
 /* ---------------------------------------------------------------- the arch card (120 × 193.3 mm) */
