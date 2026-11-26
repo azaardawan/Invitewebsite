@@ -312,106 +312,160 @@
   margin-top: 3mm;
 }
 
-/* ---------------------------------------------------------------- the arch card (120 × 193.3 mm) */
+/* ---------------------------------------------------------------- the arch card (120 × 193.3 mm), owner's design 2026-11-26 */
 
 .arch {
   position: relative;
   width: 100%;
   height: 100%;
+  color: #8a6128;
   background: url(../assets/arch-card.webp) center / 100% 100% no-repeat;
 }
-.archFront,
-.archBack {
+.arch img {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  height: auto;
+  transform: translateX(-50%);
+}
+.archFrontTop {
+  top: 11.8%;
+  width: 60.5%;
+}
+.archNames {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 28.5%;
+  height: 25.5%;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-.archFront {
-  /* between the top sprigs (to 30 % down) and the bottom ones (from 72 %) */
-  padding: 28% 15% 25%;
   justify-content: center;
-  gap: 3.5mm;
+  font-weight: 500;
+  font-size: 50pt;
+  line-height: 1.05;
+  white-space: nowrap;
+  color: #8a6128;
 }
-.archNames {
-  font-size: 46pt;
-  max-width: 88mm;
+.archAnd {
+  font-size: 0.62em;
+  line-height: 1.15;
 }
 .arch:lang(ar) .archNames,
 .arch:lang(ckb) .archNames,
 .arch:lang(bdn) .archNames {
-  font-size: 38pt;
+  font-family: var(--gs-heading);
+  font-size: 40pt;
+  line-height: 1.35;
 }
-.archDivider {
-  width: 66mm;
-  margin-top: 2mm;
+.archFrontDivider {
+  top: 58.1%;
+  width: 56%;
 }
 .archDate {
-  font-size: 13.5pt;
-  max-width: 88mm;
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 63.6%;
+  margin: 0;
+  text-align: center;
+  font-size: 16pt;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  font-variant-numeric: lining-nums;
+  color: #7a5426;
 }
-.archHeart {
-  width: 10mm;
-  height: auto;
-  margin-top: 1.5mm;
+.archExtra {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 70%;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+  font-size: 10pt;
 }
-.archBack {
-  padding: 30% 14% 26%;
-  gap: 5mm;
+.archFrontBottom {
+  top: 75.1%;
+  width: 8.9%;
 }
-.archBack > :first-child {
-  margin-top: auto;
+.archBackTop {
+  top: 10.8%;
+  width: 28.6%;
+  left: 51% !important;
+}
+/* The title and message, centred between the branch and the divider. */
+.archWords {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 31%;
+  height: 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  text-align: center;
 }
 .archTitle {
+  margin: 0;
   font-style: italic;
   font-weight: 500;
-  font-size: 19pt;
+  font-size: 21pt;
   line-height: 1.45;
-  max-width: 88mm;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
 .archTitle[data-long] {
-  font-size: 15pt;
+  font-size: 16pt;
+}
+.arch:lang(ar) .archTitle,
+.arch:lang(ckb) .archTitle,
+.arch:lang(bdn) .archTitle {
+  font-style: normal;
+  font-size: 19pt;
+  line-height: 1.6;
 }
 .archMessage {
+  margin: 0;
   font-style: italic;
-  font-size: 11.5pt;
-  line-height: 1.55;
-  max-width: 86mm;
+  font-size: 11pt;
+  line-height: 1.5;
   white-space: pre-line;
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 .archMessage[data-long] {
-  font-size: 9.5pt;
+  font-size: 9pt;
 }
-.heartRule {
-  display: flex;
-  align-items: center;
-  gap: 3mm;
-  color: #8a5c25;
+.archBackDivider {
+  top: 56.2%;
+  width: 46.8%;
 }
-.heartRule span {
-  width: 20mm;
-  height: 0.25mm;
-  background: #8a5c25;
-}
-/* Between the bottom sprigs, a little smaller than on the A5 card. */
 .archQrs {
-  margin-top: auto;
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 60.2%;
   gap: 4mm;
 }
 .archQrs .qr {
   width: 24mm;
 }
 .archQrs .qr img {
-  width: 14mm;
-  height: 14mm;
+  position: static;
+  transform: none;
+  width: 12.5mm;
+  height: 12.5mm;
 }
 .archQrs .qr figcaption {
-  font-size: 6pt;
+  font-size: 5.8pt;
+}
+.archBackBottom {
+  top: 71.2%;
+  width: 21.4%;
 }
 
 /* ---------------------------------------------------------------- keepsake, A4 */

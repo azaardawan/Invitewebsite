@@ -1,53 +1,71 @@
 import type { PrintShapeProps } from '@/theme-sdk';
 import fonts from '../fonts.module.css';
-import heart from '../assets/heart-sketch.webp';
-import { PrintDivider, QrCodes, StackedNames } from './Ornaments';
+import frontTop from '../assets/arch-front-top.webp';
+import frontDivider from '../assets/arch-front-divider.webp';
+import frontBottom from '../assets/arch-front-bottom.webp';
+import backTop from '../assets/arch-back-top.webp';
+import backDivider from '../assets/arch-back-divider.webp';
+import backBottom from '../assets/arch-back-bottom.webp';
+import { QrCodes, numericDate } from './Ornaments';
 import p from './print.module.css';
 
 /**
- * The arch card (manifest `print.shapes`, feature `card_arch`), on the owner's scalloped arch artwork (the same on both
- * sides; the outline is symmetric). Front: the names stacked, the divider, the date and the sketched heart. Back: the
- * customer's title and message in italics, a heart between two short rules, and at the bottom the QR code (two side
- * by side when the customer bought guest photo sharing). Transparent outside the arch.
+ * The arch card (manifest `print.shapes`, feature `card_arch`), as the owner drew it (2026-11-26): the scalloped card
+ * with its double gold line (the same on both sides; the outline is symmetric).
+ * Front: a flowering branch, the names stacked ("Aza", "&", "Raghad"), a star divider, the date and a small sprig.
+ * Back: a branch of tiny blossoms, the customer's title and message in italics, an arrow divider, the QR code(s) and a
+ * sprig. Transparent outside the arch.
  */
-export default function Shape({ side, dir, lang, fields, event, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine }: PrintShapeProps) {
+export default function Shape({ side, dir, lang, locale, fields, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine }: PrintShapeProps) {
+  const one = fields.person_1_name;
+  const two = fields.person_2_name;
+  const date = numericDate(fields.event_date, locale);
   return (
     <div className={`${fonts.fonts} ${p.arch}`} dir={dir} lang={lang}>
       {side === 'front' ? (
-        <div className={p.archFront}>
-          <StackedNames one={fields.person_1_name} two={fields.person_2_name} and={labels.and} className={`${p.names} ${p.archNames}`} />
-          <PrintDivider className={p.archDivider} />
-          {event.date ? <p className={`${p.date} ${p.archDate}`}>{event.date.full}</p> : null}
-          {extraLine ? <p className={p.cardLine}>{extraLine}</p> : null}
-          {/* eslint-disable-next-line @next/next/no-img-element -- print document */}
-          <img className={p.archHeart} src={heart.src} alt="" />
-        </div>
-      ) : (
-        <div className={p.archBack}>
-          <h1 className={p.archTitle} data-long={title.length > 40 ? '' : undefined}>
-            {title}
+        <>
+          {/* eslint-disable @next/next/no-img-element -- print document */}
+          <img className={p.archFrontTop} src={frontTop.src} alt="" />
+          <h1 className={p.archNames}>
+            {one ? <span style={{ fontSize: `${archScale(one)}em` }}>{one}</span> : null}
+            {one && two ? <span className={p.archAnd}>{labels.and}</span> : null}
+            {two ? <span style={{ fontSize: `${archScale(two)}em` }}>{two}</span> : null}
           </h1>
-          {message ? (
-            <p className={p.archMessage} data-long={message.length > 120 ? '' : undefined}>
-              {message}
+          <img className={p.archFrontDivider} src={frontDivider.src} alt="" />
+          {date ? (
+            <p className={p.archDate} dir="ltr">
+              {date}
             </p>
           ) : null}
-          <p className={p.heartRule} aria-hidden="true">
-            <span />
-            <HeartOutline />
-            <span />
-          </p>
+          {extraLine ? <p className={p.archExtra}>{extraLine}</p> : null}
+          <img className={p.archFrontBottom} src={frontBottom.src} alt="" />
+          {/* eslint-enable @next/next/no-img-element */}
+        </>
+      ) : (
+        <>
+          {/* eslint-disable @next/next/no-img-element -- print document */}
+          <img className={p.archBackTop} src={backTop.src} alt="" />
+          <div className={p.archWords}>
+            <h1 className={p.archTitle} data-long={title.length > 44 ? '' : undefined}>
+              {title}
+            </h1>
+            {message ? (
+              <p className={p.archMessage} data-long={message.length > 110 ? '' : undefined}>
+                {message}
+              </p>
+            ) : null}
+          </div>
+          <img className={p.archBackDivider} src={backDivider.src} alt="" />
           <QrCodes qr={qrDataUrl} photoQr={photoQrDataUrl} labels={labels} className={p.archQrs} />
-        </div>
+          <img className={p.archBackBottom} src={backBottom.src} alt="" />
+          {/* eslint-enable @next/next/no-img-element */}
+        </>
       )}
     </div>
   );
 }
 
-function HeartOutline() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth={1.2} strokeLinejoin="round">
-      <path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z" />
-    </svg>
-  );
+/** A long name is written smaller so it stays on one line inside the arch (up to 30 letters). */
+function archScale(name: string): number {
+  return Math.min(1, 9 / Math.max(1, Array.from(name).length));
 }
