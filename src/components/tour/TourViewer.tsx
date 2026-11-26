@@ -40,6 +40,7 @@ export type TourWords = {
   currency: string;
   close: string;
   waiterBrings: string;
+  padSide: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -162,7 +163,8 @@ export function TourViewer({
       <div ref={box} data-testid="tour-canvas" data-state={state} style={{ position: 'absolute', inset: 0 }} onPointerDown={() => setHint(false)}>
         {touch && state === 'ready' ? (
           <Joystick
-            style={{ insetInlineStart: 'auto', insetInlineEnd: 'auto', left: 'auto', right: 'max(24px, env(safe-area-inset-right))', bottom: 'max(28px, env(safe-area-inset-bottom))' }}
+            style={{ bottom: 'max(28px, env(safe-area-inset-bottom))' }}
+            switchLabel={words.padSide}
             onMove={(x, y) => {
               setHint(false);
               engine.current?.setStick(x, y);

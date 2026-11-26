@@ -75,6 +75,13 @@ test('on a phone the museum is walked sideways: held upright, it asks to turn th
   expect(overflow).toBeLessThanOrEqual(1);
   await page.waitForTimeout(1500);
   await page.screenshot({ path: testInfo.outputPath('phone-sideways.png') });
+  // the walking pad on the left; its little button moves it to the right (left-handed visitors), remembered
+  const padSide = page.getByTestId('pad-side');
+  expect((await padSide.boundingBox())!.x).toBeLessThan(844 / 2);
+  await page.screenshot({ path: testInfo.outputPath('phone-pad-left.png') });
+  await padSide.click();
+  await expect.poll(async () => (await padSide.boundingBox())!.x).toBeGreaterThan(844 / 2);
+  await page.screenshot({ path: testInfo.outputPath('phone-pad-right.png') });
   expect(errors).toEqual([]);
   await context.close();
 });

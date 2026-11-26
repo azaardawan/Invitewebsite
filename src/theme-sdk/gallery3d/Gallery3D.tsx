@@ -184,22 +184,75 @@ export const Gallery3D = forwardRef<Gallery3DHandle, Gallery3DProps>(function Ga
   );
 });
 
-/** The on-screen joystick for walking on a touch screen (drag the knob; let go to stop). */
+/**
+ * Which side of the screen the walking pad is on, for every 3D space of the site (owner, 2026-11-26: the left; a small
+ * button moves it to the other side, for left-handed visitors). Remembered on this device, shared by all of them.
+ */
+const PAD_KEY = 'bahja.padSide';
+const PAD_EVENT = 'bahja:padside';
+const readPadSide = (): 'left' | 'right' => {
+  try {
+    return window.localStorage.getItem(PAD_KEY) === 'right' ? 'right' : 'left';
+  } catch {
+    return 'left';
+  }
+};
+const subscribePadSide = (cb: () => void) => {
+  window.addEventListener(PAD_EVENT, cb);
+  window.addEventListener('storage', cb);
+  return () => {
+    window.removeEventListener(PAD_EVENT, cb);
+    window.removeEventListener('storage', cb);
+  };
+};
+export function usePadSide() {
+  return useSyncExternalStore(subscribePadSide, readPadSide, () => 'left' as const);
+}
+const noSubscribe = () => () => {};
+/** The page's language (its `<html lang>`), for the button's words. */
+const pageLang = () => (document.documentElement.lang || 'en').toLowerCase().split('-')[0]!;
+function setPadSide(side: 'left' | 'right') {
+  try {
+    window.localStorage.setItem(PAD_KEY, side);
+  } catch {}
+  window.dispatchEvent(new Event(PAD_EVENT));
+}
+/**
+ * The switch button's words (the same as the site's `tour.padSide` in src/i18n/messages: a design's code cannot reach
+ * the site's messages), by the page's language.
+ */
+const PAD_SWITCH: Record<string, string> = {
+  en: 'Move the pad to the other side',
+  ar: 'انقل دائرة المشي إلى الجهة الأخرى',
+  ckb: 'بازنەکە بگوازەرەوە بۆ لایەکەی تر',
+  bdn: 'بازنێ بگوهێزە بۆ لایێ دی',
+};
+
+/**
+ * The on-screen joystick for walking on a touch screen (drag the knob; let go to stop), on the side the visitor chose
+ * (the left at first), with a small button above it to move it to the other side. A design's class sets its look,
+ * size and height; its side is set here.
+ */
 export function Joystick({
   className,
   knobClassName,
   onMove,
   style,
+  switchLabel,
 }: {
   className?: string;
   knobClassName?: string;
   onMove: (x: number, y: number) => void;
-  /** Where the default ring sits (e.g. the other side); ignored with `className`. */
+  /** The default ring's look and height (ignored with `className`); its side is the visitor's choice. */
   style?: CSSProperties;
+  /** The switch button's words (default: by the page's language). */
+  switchLabel?: string;
 }) {
   const ring = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const pointer = useRef<number | null>(null);
+  const side = usePadSide();
   const move = (e: ReactPointerEvent) => {
     const r = ring.current!.getBoundingClientRect();
     const R = r.width / 2;
@@ -218,31 +271,88 @@ export function Joystick({
     setKnob({ x: 0, y: 0 });
     onMove(0, 0);
   };
+  // the side: over whatever side the design's class gives (left or right, as the visitor chose)
+  const sideStyle: CSSProperties =
+    side === 'left'
+      ? { insetInlineStart: 'auto', insetInlineEnd: 'auto', left: 'max(22px, env(safe-area-inset-left))', right: 'auto' }
+      : { insetInlineStart: 'auto', insetInlineEnd: 'auto', right: 'max(22px, env(safe-area-inset-right))', left: 'auto' };
+  // the button sits just above the ring, wherever the design puts it
+  useLayoutEffect(() => {
+    const r = ring.current,
+      b = button.current;
+    if (!r || !b) return;
+    const place = () => {
+      b.style.top = `${r.offsetTop - 44}px`;
+      b.style.left = `${r.offsetLeft + r.offsetWidth / 2 - 17}px`;
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(r);
+    if (r.offsetParent) ro.observe(r.offsetParent);
+    return () => ro.disconnect();
+  }, [side]);
+  const lang = useSyncExternalStore(noSubscribe, pageLang, () => 'en');
+  const label = switchLabel ?? PAD_SWITCH[lang] ?? PAD_SWITCH.en!;
   return (
-    <div
-      ref={ring}
-      aria-hidden
-      className={className}
-      style={className ? { touchAction: 'none' } : { position: 'absolute', insetInlineStart: 20, bottom: 96, width: 116, height: 116, borderRadius: '50%', border: '1px solid rgba(255,255,255,.35)', background: 'rgba(0,0,0,.25)', touchAction: 'none', zIndex: 2, ...style }}
-      onPointerDown={(e) => {
-        pointer.current = e.pointerId;
-        e.currentTarget.setPointerCapture(e.pointerId);
-        move(e);
-      }}
-      onPointerMove={(e) => e.pointerId === pointer.current && move(e)}
-      onPointerUp={end}
-      onPointerCancel={end}
-    >
+    <>
       <div
-        className={knobClassName}
+        ref={ring}
+        aria-hidden
+        className={className}
+        data-pad-side={side}
+        style={
+          className
+            ? { touchAction: 'none', ...sideStyle }
+            : { position: 'absolute', bottom: 96, width: 116, height: 116, borderRadius: '50%', border: '1px solid rgba(255,255,255,.35)', background: 'rgba(0,0,0,.25)', touchAction: 'none', zIndex: 2, ...style, ...sideStyle }
+        }
+        onPointerDown={(e) => {
+          pointer.current = e.pointerId;
+          e.currentTarget.setPointerCapture(e.pointerId);
+          move(e);
+        }}
+        onPointerMove={(e) => e.pointerId === pointer.current && move(e)}
+        onPointerUp={end}
+        onPointerCancel={end}
+      >
+        <div
+          className={knobClassName}
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))`,
+            ...(knobClassName ? null : { width: 46, height: 46, borderRadius: '50%', background: 'rgba(255,255,255,.85)' }),
+          }}
+        />
+      </div>
+      <button
+        ref={button}
+        type="button"
+        data-testid="pad-side"
+        aria-label={label}
+        title={label}
+        onClick={() => setPadSide(side === 'left' ? 'right' : 'left')}
         style={{
           position: 'absolute',
-          left: '50%',
-          top: '50%',
-          transform: `translate(calc(-50% + ${knob.x}px), calc(-50% + ${knob.y}px))`,
-          ...(knobClassName ? null : { width: 46, height: 46, borderRadius: '50%', background: 'rgba(255,255,255,.85)' }),
+          width: 34,
+          height: 34,
+          display: 'grid',
+          placeItems: 'center',
+          padding: 0,
+          borderRadius: '50%',
+          border: '1px solid rgba(255,255,255,.35)',
+          background: 'rgba(20,16,14,.5)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          color: '#fff',
+          font: '16px/1 system-ui, sans-serif',
+          cursor: 'pointer',
+          zIndex: 3,
+          touchAction: 'manipulation',
         }}
-      />
-    </div>
+      >
+        <span aria-hidden>⇄</span>
+      </button>
+    </>
   );
 }

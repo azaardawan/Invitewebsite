@@ -2371,3 +2371,9 @@ The owner's newer artwork for the families, verse, letter, details and countdown
 | 4 | #32: `tapForMap` (above the map button) | اضغط لفتح الخريطة | Tap to open the map | بۆ کردنەوەی نەخشەکە دابگرە | بۆ ڤەکرنا نەخشەیێ پەنجێ لێ بدە |
 | 5 | #32: `countdownTitle` | اليوم الكبير بعد | The Big Day In | ڕۆژە گەورەکە دوای | رۆژا مەزن پشتی |
 | 6 | #32: the letter's greeting (order form default) | إلى عائلتنا وأصدقائنا الأعزّاء، | To our dearest family and friends, | بۆ خێزان و هاوڕێ ئازیزەکانمان، | بۆ مالباتا مە و هەڤالێن مە یێن ئازیز، |
+
+## Batch 79 — cafés' virtual tours: moving the walking pad to the other side — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.padSide` | Move the pad to the other side | بازنەکە بگوازەرەوە بۆ لایەکەی تر | بازنێ بگوهێزە بۆ لایێ دی |
