@@ -23,15 +23,15 @@ import {
 } from "@/theme-sdk";
 import { STITCH_BORDER } from "./border";
 import { copyFor, type Copy } from "./copy";
-import { Frame } from "./Frame";
 import { Divider } from "./Divider";
 import filmPoster from "./assets/film-poster.webp";
 import heartSketch from "./assets/heart-sketch.webp";
-import laurelLeft from "./assets/laurel-left.webp";
-import laurelRight from "./assets/laurel-right.webp";
-import countBox from "./assets/count-box.svg";
+import famTop from "./assets/fam-top.webp";
+import famDivider from "./assets/fam-divider.webp";
+import famBottom from "./assets/fam-bottom.webp";
+import sprigTop from "./assets/sprig-top.webp";
+import sprigBottom from "./assets/sprig-bottom.webp";
 import rings from "./assets/rings.webp";
-import sprigPair from "./assets/sprig-pair.webp";
 import fonts from "./fonts.module.css";
 import s from "./theme.module.css";
 
@@ -257,186 +257,164 @@ export default function GoldenStitch(props: ThemeProps) {
         className={s.pages}
         inert={hydrated && stage !== "pages" ? true : undefined}
       >
-        {/* 1 · The families invite you to the wedding of the couple. */}
-        <section className={s.sheet}>
-          <ThemeBorder
-            border={props.border}
-            fallback={STITCH_BORDER}
-            medium="screen"
-          />
-          <Frame skipBorderCorners />
+        {/* 1 · The families invite you to the wedding of the couple (the owner's line-art arches, 2026-11-26). */}
+        <section className={`${s.sheet} ${s.paper}`}>
           <div className={s.sheetInner}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+            <img className={s.famTop} src={famTop.src} alt="" aria-hidden="true" />
             {hasFamilies ? (
               <>
                 <p className={s.caps}>{t.togetherWith}</p>
-                <Divider />
-                {fields.person_1_family ? (
-                  <div className={s.family}>
-                    <p className={s.italic}>{t.groomFamily}</p>
-                    <p className={s.familyName}>{fields.person_1_family}</p>
-                  </div>
-                ) : null}
-                {fields.person_1_family && fields.person_2_family ? (
-                  <p className={s.amp} aria-hidden="true">
-                    <span className={s.ampRule} />
-                    <span>{labels.and}</span>
-                    <span className={s.ampRule} />
-                  </p>
-                ) : null}
-                {fields.person_2_family ? (
-                  <div className={s.family}>
-                    <p className={s.italic}>{t.brideFamily}</p>
-                    <p className={s.familyName}>{fields.person_2_family}</p>
-                  </div>
-                ) : null}
+                <div className={s.arches}>
+                  {/* The groom's family in the first arch (the left one in English, the right one in Arabic and Kurdish). */}
+                  {(
+                    [
+                      [s.archLeft, t.groomFamily, fields.person_1_family],
+                      [s.archRight, t.brideFamily, fields.person_2_family],
+                    ] as const
+                  ).map(([place, who, name]) =>
+                    name ? (
+                      <div key={place} className={`${s.arch} ${place}`}>
+                        <p className={s.archWho}>{who}</p>
+                        <p className={s.archName} data-long={Array.from(name).length > 14 ? "" : undefined}>
+                          {name}
+                        </p>
+                      </div>
+                    ) : null,
+                  )}
+                </div>
               </>
             ) : null}
-            <p className={`${s.caps} ${s.request}`}>{t.request}</p>
+            <p className={s.request}>{t.request}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+            <img className={s.famDivider} src={famDivider.src} alt="" aria-hidden="true" />
             <h1 className={s.names}>
               <Names fields={fields} labels={labels} />
             </h1>
-            <Divider />
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+            <img className={s.famBottom} src={famBottom.src} alt="" aria-hidden="true" />
           </div>
         </section>
 
-        {/* 2 · The Quran verse (Ar-Rum 21), unless the customer switched it off. */}
+        {/* 2 · The Quran verse (Ar-Rum 21) in the carved arch, unless the customer switched it off. */}
         {showVerse ? (
-          <section className={s.sheet}>
-            <Frame />
-            <div className={s.sheetInner}>
-              <Divider />
-              <h2 className={`${s.caps} ${s.wide}`}>{t.verseTitle}</h2>
+          <section className={`${s.art} ${s.quranArt}`}>
+            <div className={s.verseBox}>
               <p className={s.verse} lang="ar" dir="rtl">
-                <span className={s.verseMark} aria-hidden="true">
-                  ﴿
-                </span>
                 {t.verse}
-                <span className={s.verseMark} aria-hidden="true">
-                  ﴾
-                </span>
               </p>
-              {t.verseTranslation ? (
-                <p className={s.verseTranslation}>{t.verseTranslation}</p>
-              ) : null}
-              <Divider small />
-              <p className={`${s.capsSmall} ${s.wide}`}>{t.verseRef}</p>
             </div>
+            {t.verseTranslation ? (
+              <p className={s.verseTranslation}>{t.verseTranslation}</p>
+            ) : null}
+            <p className={s.verseRef} data-alone={t.verseTranslation ? undefined : ""}>
+              {t.verseRef}
+            </p>
           </section>
         ) : null}
 
-        {/* 3 · The couple's personal note. */}
+        {/* 3 · The couple's letter, handwritten on the owner's torn paper with the wax seal. */}
         {fields.invitation_message ? (
-          <section className={s.sheet}>
-            <Frame />
-            <div className={s.sheetInner}>
-              <h2 className={`${s.caps} ${s.wide}`}>{t.noteTitle}</h2>
-              <Divider />
-              {wording.noteGreeting ? (
-                <p className={s.greeting}>{wording.noteGreeting}</p>
-              ) : null}
-              <p className={s.note}>{fields.invitation_message}</p>
-              {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
-              <img
-                className={s.sprigPair}
-                src={sprigPair.src}
-                alt=""
-                aria-hidden="true"
-              />
-              <Divider />
+          <section className={`${s.art} ${s.letterArt}`}>
+            <div className={s.letter}>
+              <h2 className={s.letterTitle}>{t.noteTitle}</h2>
+              <div className={s.letterBody}>
+                {wording.noteGreeting ? <p>{wording.noteGreeting}</p> : null}
+                <p
+                  className={s.letterMessage}
+                  data-length={letterLength(fields.invitation_message)}
+                >
+                  {fields.invitation_message}
+                </p>
+              </div>
+              <p className={s.letterClosing}>{t.withLove}</p>
+              <p
+                className={s.letterNames}
+                data-long={
+                  Array.from(`${fields.person_1_name ?? ""}${fields.person_2_name ?? ""}`).length > 16 ? "" : undefined
+                }
+              >
+                <Names fields={fields} labels={labels} />
+              </p>
             </div>
           </section>
         ) : null}
 
         {/* 4 · Date, time and venue, with the map button. */}
         {hasDetails ? (
-          <section className={s.sheet}>
-            <Frame />
-            <div className={s.sheetInner}>
-              <h2 className={`${s.caps} ${s.wide}`}>{t.detailsTitle}</h2>
+          <section className={`${s.sheet} ${s.paper}`}>
+            <div className={`${s.sheetInner} ${s.detailsInner}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+              <img className={s.sprig} src={sprigTop.src} alt="" aria-hidden="true" />
+              <h2 className={`${s.caps} ${s.detailsTitle}`}>{t.detailsTitle}</h2>
               <Divider />
-              <dl className={s.details}>
-                {event.date ? (
-                  <div className={s.detail}>
-                    <CalendarIcon />
-                    <dt className={s.capsSmall}>{labels.date}</dt>
-                    <dd className={s.detailValue}>{event.date.full}</dd>
-                  </div>
-                ) : null}
-                {event.time ? (
-                  <div className={s.detail}>
-                    <ClockIcon />
-                    <dt className={s.capsSmall}>{labels.time}</dt>
-                    <dd className={s.detailValue}>{event.time}</dd>
-                  </div>
-                ) : null}
-                {fields.venue_name ? (
-                  <div className={s.detail}>
-                    <PinIcon />
-                    <dt className={s.capsSmall}>{labels.venue}</dt>
-                    <dd className={s.detailValue}>{fields.venue_name}</dd>
-                  </div>
-                ) : null}
-              </dl>
-              {showMap ? (
-                <a
-                  className={s.mapButton}
-                  href={mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MapIcon />
-                  <span className={s.mapRule} aria-hidden="true" />
-                  <span>{labels.openMap}</span>
-                  <ArrowIcon dir={dir} />
-                </a>
+              {event.date ? (
+                <p className={s.bigDate}>
+                  {numericDate(fields.event_date, locale) ?? event.date.full}
+                </p>
               ) : null}
-              <Divider />
+              {event.date ? <Divider /> : null}
+              {event.time || fields.venue_name ? (
+                <dl className={s.details}>
+                  {event.time ? (
+                    <div className={s.detail}>
+                      <dt>
+                        <ClockIcon label={labels.time} />
+                      </dt>
+                      <dd className={s.detailValue}>{event.time}</dd>
+                    </div>
+                  ) : null}
+                  {fields.venue_name ? (
+                    <div className={s.detail}>
+                      <dt>
+                        <PinIcon label={labels.venue} />
+                      </dt>
+                      <dd className={`${s.detailValue} ${s.venueName}`}>{fields.venue_name}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+              ) : null}
+              {showMap ? (
+                <>
+                  <Divider />
+                  <p className={s.tapForMap}>{t.tapForMap}</p>
+                  <a
+                    className={s.mapButton}
+                    href={mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MapIcon />
+                    <span className={s.mapRule} aria-hidden="true" />
+                    <span>{labels.openMap}</span>
+                    <ArrowIcon dir={dir} />
+                  </a>
+                </>
+              ) : null}
+              {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+              <img className={s.sprig} src={sprigBottom.src} alt="" aria-hidden="true" />
             </div>
           </section>
         ) : null}
 
-        {/* 5 · Countdown to the wedding. */}
+        {/* 5 · Countdown, in the arched niche with the lantern (as drawn: no line under it). */}
         {showCountdown ? (
-          <section className={s.sheet}>
-            <Frame />
-            <div className={s.sheetInner}>
-              <h2 className={s.countdownTitle}>
-                <span className={s.countdownBig}>{t.countdownTitle}</span>
-                <span className={`${s.caps} ${s.wide}`}>{t.countdownSub}</span>
-              </h2>
-              <Divider />
-              <Countdown
-                startsAt={event.startsAt}
-                labels={labels}
-                locale={locale}
-              />
-              <Divider />
-              <p className={s.specialDay}>
-                {/* eslint-disable @next/next/no-img-element -- decorative artwork */}
-                <img
-                  className={s.laurel}
-                  src={laurelLeft.src}
-                  alt=""
-                  aria-hidden="true"
-                />
-                <span dir={dir}>{t.untilSpecialDay}</span>
-                <img
-                  className={s.laurel}
-                  src={laurelRight.src}
-                  alt=""
-                  aria-hidden="true"
-                />
-                {/* eslint-enable @next/next/no-img-element */}
-              </p>
-            </div>
+          <section className={`${s.art} ${s.countdownArt}`}>
+            <h2 className={s.countdownTitle}>{t.countdownTitle}</h2>
+            <Countdown
+              startsAt={event.startsAt}
+              labels={labels}
+              locale={locale}
+            />
           </section>
         ) : null}
 
         {/* 6 · Congratulations: the guest form (name, coming or not, message) and the messages shown under it. */}
         {hasMessages ? (
-          <section className={s.sheet}>
-            <Frame />
+          <section className={`${s.sheet} ${s.paper}`}>
             <div className={s.sheetInner}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+              <img className={s.sprig} src={sprigTop.src} alt="" aria-hidden="true" />
               {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
               <img
                 className={s.rings}
@@ -480,14 +458,19 @@ export default function GoldenStitch(props: ThemeProps) {
                   </ul>
                 )
               ) : null}
-              <Divider />
+              {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
+              <img className={s.sprig} src={sprigBottom.src} alt="" aria-hidden="true" />
             </div>
           </section>
         ) : null}
 
-        {/* 7 · Thank you. */}
-        <section className={s.sheet}>
-          <Frame />
+        {/* 7 · Thank you (the design's border: its corner sprigs). */}
+        <section className={`${s.sheet} ${s.paper}`}>
+          <ThemeBorder
+            border={props.border}
+            fallback={STITCH_BORDER}
+            medium="screen"
+          />
           <div className={`${s.sheetInner} ${s.thanksInner}`}>
             <Divider />
             <p className={s.thanks}>{t.thanks}</p>
@@ -528,6 +511,20 @@ function Names({
   );
 }
 
+/** The letter's message is written smaller as it gets longer, so it always fits on the paper. */
+function letterLength(message: string): "short" | "medium" | "long" | "longer" {
+  const n = Array.from(message).length + (message.match(/\n/g)?.length ?? 0) * 40;
+  return n <= 170 ? "short" : n <= 280 ? "medium" : n <= 420 ? "long" : "longer";
+}
+
+/** The wedding date as drawn: "17 . 07 . 2026" (in the invitation's digits), or null. */
+function numericDate(value: string | undefined, locale: ThemeProps["locale"]): string | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value ?? "");
+  if (!m) return null;
+  const two = (n: string) => formatNumber(Number(n), locale).padStart(2, formatNumber(0, locale));
+  return [two(m[3]!), two(m[2]!), formatNumber(Number(m[1]), locale).replace(/[٬,.\s]/g, "")].join(" . ");
+}
+
 function Countdown({
   startsAt,
   labels,
@@ -538,8 +535,7 @@ function Countdown({
   locale: ThemeProps["locale"];
 }) {
   const left = useCountdown(startsAt);
-  if (left?.started)
-    return <p className={s.italicLarge}>{labels.eventStarted}</p>;
+  if (left?.started) return <p className={s.started}>{labels.eventStarted}</p>;
   const pad = (n: number | null) =>
     n === null
       ? "–"
@@ -553,11 +549,7 @@ function Countdown({
   return (
     <div className={s.countdown} role="timer" aria-live="off">
       {units.map(([n, label]) => (
-        <div
-          key={label}
-          className={s.unit}
-          style={{ backgroundImage: `url(${countBox.src})` }}
-        >
+        <div key={label} className={s.unit}>
           <span className={s.unitValue}>{pad(n)}</span>
           <span className={s.unitLabel}>{label}</span>
         </div>
@@ -729,29 +721,17 @@ const icon = {
   "aria-hidden": true,
 } as const;
 
-function CalendarIcon() {
+function ClockIcon({ label }: { label?: string }) {
   return (
-    <svg {...icon} className={s.icon}>
-      <rect x="3" y="5" width="18" height="15" rx="2.5" />
-      <path d="M3 9.5h18M8 3v4M16 3v4" />
-      <path
-        d="M8 13h.01M12 13h.01M16 13h.01M8 16.5h.01M12 16.5h.01M16 16.5h.01"
-        strokeWidth={2}
-      />
-    </svg>
-  );
-}
-function ClockIcon() {
-  return (
-    <svg {...icon} className={s.icon}>
+    <svg {...icon} className={s.icon} {...(label ? { role: "img", "aria-label": label, "aria-hidden": undefined } : {})}>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 7v5.2l3.4 0" />
     </svg>
   );
 }
-function PinIcon() {
+function PinIcon({ label }: { label?: string }) {
   return (
-    <svg {...icon} className={s.icon}>
+    <svg {...icon} className={s.icon} {...(label ? { role: "img", "aria-label": label, "aria-hidden": undefined } : {})}>
       <path d="M12 21.5s-6.8-6-6.8-11.3a6.8 6.8 0 0 1 13.6 0c0 5.3-6.8 11.3-6.8 11.3Z" />
       <circle cx="12" cy="10.2" r="2.4" />
     </svg>
