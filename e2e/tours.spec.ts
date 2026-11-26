@@ -116,14 +116,14 @@ test('the owner publishes a café tour with a private link, and visitors walk th
   await expect(p.locator('html')).toHaveAttribute('dir', 'rtl');
   await p.screenshot({ path: testInfo.outputPath('tour-phone.png') });
   // The walking pad on the left (owner, 2026-11-26); its little button moves it to the right (left-handed), remembered
-  const side = p.getByTestId('tour-pad-side');
+  const side = p.getByTestId('pad-side');
   expect((await side.boundingBox())!.x).toBeLessThan(844 / 2);
   await side.click();
   await expect.poll(async () => (await side.boundingBox())!.x).toBeGreaterThan(844 / 2);
   await p.screenshot({ path: testInfo.outputPath('tour-phone-pad-right.png') });
   await p.reload();
   await expect(p.locator('[data-testid="tour-canvas"][data-state="ready"]')).toBeVisible({ timeout: 60_000 });
-  await expect.poll(async () => (await p.getByTestId('tour-pad-side').boundingBox())!.x).toBeGreaterThan(844 / 2);
+  await expect.poll(async () => (await p.getByTestId('pad-side').boundingBox())!.x).toBeGreaterThan(844 / 2);
 
   // The Admin list shows it with its visits.
   await page.goto('/admin/tours');

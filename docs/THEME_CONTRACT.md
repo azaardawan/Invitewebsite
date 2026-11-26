@@ -306,7 +306,9 @@ its place (`index`), cropped as the customer placed it, with a card under it sho
 by place; default the photo's own `title` / `caption`); **a spot without a photo is left out with its frame and label**;
 a room with no photo (and nothing behind it) is walled up at its doorway; the signs show the rooms' names, the screen the
 video's still (with a play button) or a title and text. Guests walk with the arrow keys / WASD or the on-screen joystick
-(touch screens), look around by dragging, and tap a photo to walk up to it; walks go through the doorways and around the
+(touch screens; owner, 2026-11-26: on the left, with a small ⇄ button above it moving it to the right for left-handed
+visitors, remembered on the device for every 3D space; the SDK sets its side, a design's `joystickClassName` only its
+look, size and height), look around by dragging, and tap a photo to walk up to it; walks go through the doorways and around the
 obstacles. The design draws its own buttons over it and drives it through a ref (`Gallery3DHandle`: `goToPhoto`, `next`,
 `previous`, `goToStart`) and its callbacks (`onView` — the photo in front of the visitor, for its caption — `onRoom` — the
 room walked into, for its name and words — `onScreen`,

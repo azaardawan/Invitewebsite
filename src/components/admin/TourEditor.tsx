@@ -122,7 +122,7 @@ export function TourEditor({ tourId, name, model, edits: saved }: { tourId: stri
       <div ref={box} className="absolute inset-0" data-state={state} data-testid="tour-editor-canvas" />
       {/* walking on a phone or tablet: the round pad (as on the tour) */}
       {touch && state === 'ready' ? (
-        <Joystick style={{ left: 'auto', right: 'auto', insetInlineStart: 24, bottom: 'max(24px, env(safe-area-inset-bottom))', zIndex: 2 }} onMove={(x, y) => engine.current?.setStick(x, y)} />
+        <Joystick style={{ bottom: 'max(24px, env(safe-area-inset-bottom))', zIndex: 2 }} onMove={(x, y) => engine.current?.setStick(x, y)} />
       ) : null}
 
       {state !== 'ready' ? (
