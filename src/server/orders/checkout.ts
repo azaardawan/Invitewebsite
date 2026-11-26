@@ -107,7 +107,7 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
       .values({ name: c.data.name, phoneE164: phone, email: c.data.email })
       .returning();
     const { currency, guestPhotos: photoPricing } = await getSettings(tx);
-    // Guest photo sharing (add-on): priced from its total at today's rates; never discounted by a coupon.
+    // Guest photo sharing (add-on): priced from its total at today's rates.
     const addOn = inv!.guestPhotosCap ? { cap: inv!.guestPhotosCap, perGuest: inv!.guestPhotosPerGuest ?? DEFAULT_PER_GUEST, priceIqd: guestPhotoPrice(inv!.guestPhotosCap, photoPricing) } : null;
     const snapshot = {
       theme: { id: p.theme.id, key: p.theme.key, name: p.theme.name },
@@ -137,9 +137,11 @@ export async function createOrder(db: DbOrTx, input: CheckoutInput, ctx: Request
     };
 
     // Coupon: checked and counted inside this transaction; a 100% coupon leaves nothing to pay.
-    const coupon = input.couponCode?.trim() ? await redeemCoupon(tx, input.couponCode, p.pkg.priceIqd, now, p.theme.id) : null;
-    const amountIqd = p.pkg.priceIqd - (coupon?.discountIqd ?? 0) + (addOn?.priceIqd ?? 0);
-    snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: p.pkg.priceIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null, guestPhotos: addOn };
+    // A coupon is taken off the whole price, the add-ons included (owner, 2026-11-26).
+    const subtotalIqd = p.pkg.priceIqd + (addOn?.priceIqd ?? 0);
+    const coupon = input.couponCode?.trim() ? await redeemCoupon(tx, input.couponCode, subtotalIqd, now, p.theme.id) : null;
+    const amountIqd = subtotalIqd - (coupon?.discountIqd ?? 0);
+    snapshot.pricing = { ...snapshot.pricing, amountIqd, listPriceIqd: subtotalIqd, discountIqd: coupon?.discountIqd ?? 0, couponCode: coupon?.code ?? null, guestPhotos: addOn };
 
     // Newborn invitations accept their own terms (once the owner has published them).
     const [section] = inv!.sectionId ? await tx.select({ key: sections.key }).from(sections).where(eq(sections.id, inv!.sectionId)) : [];

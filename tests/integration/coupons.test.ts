@@ -16,9 +16,11 @@ beforeAll(async () => {
   actor = { adminId: shop.admin.id, ipHash: null };
 });
 
-async function checkout(couponCode?: string) {
+async function checkout(couponCode?: string, opts: { guestPhotos?: boolean } = {}) {
   const visitor = { ...ctx, ipHash: randomToken(8) };
   const d = await createDraft(db(), { themeKey: shop.theme.key, packageId: shop.full.id, locale: 'ar', values: weddingValues() }, visitor);
+  // Guest photo sharing (the add-on), chosen on the form.
+  if (opts.guestPhotos) await db().update(invitations).set({ guestPhotosCap: 750, guestPhotosPerGuest: 5 }).where(eq(invitations.id, d.invitationId));
   return createOrder(
     db(),
     { previewToken: d.previewToken, customer: { name: 'زبون', phone: '07701234567', email: 'c@example.com' }, acceptedTerms: true, idempotencyKey: randomToken(18), couponCode },
@@ -28,6 +30,22 @@ async function checkout(couponCode?: string) {
 const code = () => `T${randomToken(6).replace(/[^A-Za-z0-9]/g, 'X').toUpperCase()}`;
 
 describe('coupons', () => {
+  it('are taken off the whole price, the add-ons included (owner, 2026-11-26)', async () => {
+    const half = await createCoupon(db(), { code: code(), kind: 'PERCENT', value: 50 }, actor);
+    const o = await checkout(half.code, { guestPhotos: true });
+    const [order] = await db().select().from(orders).where(eq(orders.id, o.orderId));
+    const pricing = (order!.snapshot as { pricing: { listPriceIqd: number; guestPhotos: { priceIqd: number } } }).pricing;
+    expect(pricing.guestPhotos.priceIqd).toBeGreaterThan(0);
+    // The receipt's price before the discount is the whole price.
+    expect(pricing.listPriceIqd).toBe(shop.full.priceIqd + pricing.guestPhotos.priceIqd);
+    expect(o.amountIqd).toBe(pricing.listPriceIqd / 2);
+
+    const free = await createCoupon(db(), { code: code(), kind: 'PERCENT', value: 100 }, actor);
+    const paid = await checkout(free.code, { guestPhotos: true });
+    expect(paid.amountIqd).toBe(0);
+    expect((await db().select().from(orders).where(eq(orders.id, paid.orderId)))[0]!.status).toBe('PAID');
+  });
+
   it('computes percentage and amount discounts, never above the price', () => {
     expect(couponDiscount({ kind: 'PERCENT', value: 50 }, 75000)).toBe(37500);
     expect(couponDiscount({ kind: 'AMOUNT', value: 10000 }, 75000)).toBe(10000);
