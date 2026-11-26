@@ -722,6 +722,35 @@
   align-items: center;
   justify-content: center;
 }
+/*
+ * Once it has played, the film stays as the invitation's first page, stopped on its last frame (the card with the
+ * initials, names and date), and the pages follow below it. Its surround is the linen of the film's edges.
+ */
+.film[data-stage='pages'] {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 100%;
+  max-width: 460px;
+  height: 100svh;
+  min-height: 560px;
+  touch-action: auto;
+  overscroll-behavior: auto;
+  /* the film's own edge colours, top and bottom */
+  background: linear-gradient(#bea17c, #cfb89e);
+}
+/* The whole card shows (the film itself fills the screen). */
+.film[data-stage='pages'] .filmVideo {
+  object-fit: contain;
+}
+.root[data-stage='pages'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.root[data-stage='pages'] > .pages {
+  width: 100%;
+}
 .filmVideo {
   width: 100%;
   height: 100%;
