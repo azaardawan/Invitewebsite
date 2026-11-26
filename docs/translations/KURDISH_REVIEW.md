@@ -2349,3 +2349,11 @@ The invitation now opens straight into the film (no Open button); browsers start
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #32: `soundOn` (button on the film) | تشغيل الصوت | Tap for sound | دەنگ لێبدە | دەنگی لێبدە |
+
+## Batch 77 — Golden Stitch (#32): "Until the special day" on the countdown page — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+Replaces `untilWeSay` and `iDo` (batch 74, rows 15–16; removed at the owner's request).
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: `untilSpecialDay` (under the countdown) | حتى اليوم المميّز | Until the special day | تا ڕۆژە تایبەتەکە | هەتا رۆژا تایبەت |
