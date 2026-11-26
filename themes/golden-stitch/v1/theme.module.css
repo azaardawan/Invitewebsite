@@ -407,26 +407,34 @@
   font-size: 12px;
   letter-spacing: 0;
 }
-.iDo {
+/* "Until the special day" between the two laurels, where the owner's drawing had "Until We Say I DO". The laurels are
+   drawn facing outwards: they keep their sides in every language (the text keeps its own direction). */
+.specialDay {
+  direction: ltr;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  font-size: 40px;
+  gap: 14px;
+  font-style: italic;
+  font-size: calc(25px * var(--gs-script-scale));
   font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  line-height: 1;
-  margin-top: -6px !important;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin-top: 4px !important;
 }
-.root:lang(ar) .iDo,
-.root:lang(ckb) .iDo,
-.root:lang(bdn) .iDo {
+.specialDay span {
+  max-width: 220px;
+  text-wrap: balance;
+}
+.root:lang(ar) .specialDay,
+.root:lang(ckb) .specialDay,
+.root:lang(bdn) .specialDay {
   font-family: var(--gs-heading);
+  font-style: normal;
   letter-spacing: 0;
 }
 .laurel {
-  width: 42px;
+  width: 38px;
   height: auto;
   flex: none;
 }

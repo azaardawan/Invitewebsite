@@ -385,8 +385,7 @@ export default function GoldenStitch(props: ThemeProps) {
                 locale={locale}
               />
               <Divider />
-              <p className={s.italicLarge}>{t.untilWeSay}</p>
-              <p className={s.iDo}>
+              <p className={s.specialDay}>
                 {/* eslint-disable @next/next/no-img-element -- decorative artwork */}
                 <img
                   className={s.laurel}
@@ -394,7 +393,7 @@ export default function GoldenStitch(props: ThemeProps) {
                   alt=""
                   aria-hidden="true"
                 />
-                <span>{t.iDo}</span>
+                <span dir={dir}>{t.untilSpecialDay}</span>
                 <img
                   className={s.laurel}
                   src={laurelRight.src}
