@@ -166,51 +166,139 @@
   width: 150px;
 }
 
-/* ------------------------------------------------------------------ 1 · families */
+/* ------------------------------------------------------------------ plain paper pages (owner, 2026-11-26: no frame) */
 
-.family {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin-top: 6px;
+.paper {
+  container-type: inline-size;
+  background: radial-gradient(120% 90% at 50% 40%, #f2e2d0 0%, #ecdac6 62%, #e3ccb5 100%);
 }
-.familyName {
-  font-size: 21px;
+.paper .sheetInner {
+  padding: 64px 24px;
+}
+.sprig {
+  width: 124px;
+  height: auto;
+}
+
+/* ------------------------------------------------------------------ painted pages: the owner's artwork, text on top */
+
+.art {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  container-type: inline-size;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #7a5426;
+  overflow: hidden;
+}
+.art p,
+.art h2 {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ 1 · families (line-art arches) */
+
+.famTop {
+  width: 64%;
+  height: auto;
+}
+.famDivider {
+  width: 64%;
+  height: auto;
+}
+.famBottom {
+  width: 40%;
+  height: auto;
+}
+.arches {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1100 / 721;
+  container-type: inline-size;
+  background: url(./assets/fam-arches.webp) center / 100% 100% no-repeat;
+}
+/* Inside each arch: the family's title above the arch's little divider (64 % down), its name below it. */
+.arch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 29%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.archLeft {
+  left: 24.9%;
+}
+.archRight {
+  left: 75.9%;
+}
+.root[dir='rtl'] .archLeft {
+  left: 75.9%;
+}
+.root[dir='rtl'] .archRight {
+  left: 24.9%;
+}
+.archWho {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38.5%;
+  font-style: italic;
+  font-size: 3.9cqw;
+  line-height: 1.2;
+}
+.archName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 68%;
+  font-size: 4.1cqw;
   font-weight: 500;
-  letter-spacing: 0.09em;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--gs-ink);
+  overflow-wrap: anywhere;
 }
-.root:lang(ar) .familyName,
-.root:lang(ckb) .familyName,
-.root:lang(bdn) .familyName {
+.archName[data-long] {
+  font-size: 3.3cqw;
+}
+.root:lang(ar) .archWho,
+.root:lang(ckb) .archWho,
+.root:lang(bdn) .archWho {
+  font-style: normal;
+  font-size: 4.1cqw;
+  line-height: 1.4;
+}
+.root:lang(ar) .archName,
+.root:lang(ckb) .archName,
+.root:lang(bdn) .archName {
   font-family: var(--gs-heading);
+  font-size: 4.6cqw;
   letter-spacing: 0;
-  font-size: 23px;
+  line-height: 1.35;
 }
-.amp {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  width: 260px;
-  max-width: 82%;
-  font-size: 22px;
-  line-height: 1;
-}
-.ampRule {
-  flex: 1;
-  height: 1px;
-  background: var(--gs-ink);
-  opacity: 0.85;
+.root:lang(ar) .archName[data-long],
+.root:lang(ckb) .archName[data-long],
+.root:lang(bdn) .archName[data-long] {
+  font-size: 3.8cqw;
 }
 .request {
-  margin-top: 26px;
-  max-width: 310px;
+  margin-top: 6px !important;
+  max-width: 320px;
+  font-style: italic;
+  font-size: calc(17px * var(--gs-script-scale));
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+.root:lang(ar) .request,
+.root:lang(ckb) .request,
+.root:lang(bdn) .request {
+  letter-spacing: 0;
 }
 .names {
-  margin-top: 14px !important;
-  font-size: 35px;
+  font-size: 40px;
   font-weight: 500;
   line-height: 1.2;
   color: var(--gs-ink);
@@ -220,7 +308,7 @@
 .root:lang(ckb) .names,
 .root:lang(bdn) .names {
   font-family: var(--gs-heading);
-  font-size: 34px;
+  font-size: 36px;
   letter-spacing: 0;
 }
 .name {
@@ -230,104 +318,263 @@
   white-space: pre;
 }
 
-/* ------------------------------------------------------------------ 2 · verse */
+/* ------------------------------------------------------------------ 2 · verse (the carved arch) */
 
+.quranArt {
+  aspect-ratio: 768 / 1024;
+  background-image: url(./assets/quran-bg.webp);
+}
+.verseBox {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 23.5%;
+  height: 23%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .verse {
   font-family: 'GS Serif', serif;
-  font-size: 22px;
-  line-height: 2.05;
-  color: var(--gs-ink-deep);
-  max-width: 300px;
-  margin-top: 6px !important;
-}
-.verseMark {
-  font-size: 1.1em;
-  color: var(--gs-ink);
-  padding: 0 0.25em;
+  font-size: 4.6cqw;
+  line-height: 2;
+  text-align: center;
+  color: #6e4a1e;
 }
 .verseTranslation {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 53.5%;
   font-style: italic;
-  font-size: 15.5px;
-  line-height: 1.55;
-  max-width: 290px;
+  font-size: 2.9cqw;
+  line-height: 1.6;
+  text-align: center;
+}
+.verseRef {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 70%;
+  font-size: 2.1cqw;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.verseRef[data-alone] {
+  top: 54%;
+  font-size: 3cqw;
+  letter-spacing: 0;
 }
 
-/* ------------------------------------------------------------------ 3 · note */
+/* ------------------------------------------------------------------ 3 · the letter (handwritten on torn paper) */
 
-.greeting {
-  font-style: italic;
-  font-size: calc(20px * var(--gs-script-scale));
-  margin-top: 8px !important;
+.letterArt {
+  aspect-ratio: 820 / 1230;
+  background-image: url(./assets/letter-bg.webp);
 }
-.note {
-  font-style: italic;
-  font-size: calc(16.5px * var(--gs-script-scale));
-  line-height: 1.65;
-  max-width: 296px;
+/* The paper sits a little askew: the writing follows it. */
+.letter {
+  position: absolute;
+  left: 19.5%;
+  right: 12.5%;
+  top: 15.5%;
+  bottom: 17%;
+  display: flex;
+  flex-direction: column;
+  transform: rotate(-1.6deg);
+  color: #6f4a1f;
+}
+.letterTitle {
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-weight: 400;
+  font-size: 8cqw;
+  line-height: 1.3;
+  text-align: center;
+  padding-inline-end: 4%;
+}
+.letterBody {
+  margin-top: 9cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2cqw;
+  font-family: 'GS Hand', 'GS Serif', serif;
+  font-size: 3.35cqw;
+  line-height: 1.75;
+}
+.letterBody p {
+  margin: 0;
   white-space: pre-line;
-  color: var(--gs-ink-deep);
+  overflow-wrap: anywhere;
 }
-.sprigPair {
-  width: 112px;
-  height: auto;
-  margin: 4px 0;
+.letterMessage[data-length='medium'] {
+  font-size: 3cqw;
+}
+.letterMessage[data-length='long'] {
+  font-size: 2.65cqw;
+}
+.letterMessage[data-length='longer'] {
+  font-size: 2.3cqw;
+}
+.letterClosing {
+  margin-top: auto !important;
+  /* clear of the wax seal at the bottom left */
+  padding-left: 7%;
+  font-family: 'GS Hand', 'GS Serif', serif;
+  font-size: 3.35cqw;
+}
+.letterNames {
+  margin-top: 2cqw !important;
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-size: 7cqw;
+  line-height: 1.3;
+  /* signed on the right in every language, away from the wax seal */
+  text-align: right;
+  padding-right: 4%;
+  padding-left: 18%;
+}
+.letterNames[data-long] {
+  font-size: 5.4cqw;
+}
+.root:lang(ar) .letter,
+.root:lang(ckb) .letter,
+.root:lang(bdn) .letter {
+  font-size: 1.1em;
+}
+.root:lang(ar) .letterBody,
+.root:lang(ckb) .letterBody,
+.root:lang(bdn) .letterBody,
+.root:lang(ar) .letterClosing,
+.root:lang(ckb) .letterClosing,
+.root:lang(bdn) .letterClosing {
+  font-size: 3.7cqw;
+  line-height: 1.9;
+}
+.root:lang(ar) .letterMessage[data-length='medium'],
+.root:lang(ckb) .letterMessage[data-length='medium'],
+.root:lang(bdn) .letterMessage[data-length='medium'] {
+  font-size: 3.4cqw;
+}
+.root:lang(ar) .letterMessage[data-length='long'],
+.root:lang(ckb) .letterMessage[data-length='long'],
+.root:lang(bdn) .letterMessage[data-length='long'] {
+  font-size: 3.05cqw;
+}
+.root:lang(ar) .letterMessage[data-length='longer'],
+.root:lang(ckb) .letterMessage[data-length='longer'],
+.root:lang(bdn) .letterMessage[data-length='longer'] {
+  font-size: 2.75cqw;
+  line-height: 1.8;
+}
+.root:lang(ar) .letterTitle,
+.root:lang(ckb) .letterTitle,
+.root:lang(bdn) .letterTitle,
+.root:lang(ar) .letterNames,
+.root:lang(ckb) .letterNames,
+.root:lang(bdn) .letterNames {
+  font-size: 7cqw;
+}
+.root:lang(ar) .letterNames[data-long],
+.root:lang(ckb) .letterNames[data-long],
+.root:lang(bdn) .letterNames[data-long] {
+  font-size: 5cqw;
 }
 
 /* ------------------------------------------------------------------ 4 · details */
 
+.detailsInner {
+  gap: 20px;
+}
+.detailsTitle {
+  font-size: 15px;
+  letter-spacing: 0.32em;
+}
+.bigDate {
+  font-size: 10.6cqw;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--gs-ink);
+  white-space: nowrap;
+  font-variant-numeric: lining-nums;
+}
 .details {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 26px;
-  width: 100%;
+  margin: 4px 0;
+  display: grid;
+  gap: 24px;
+  justify-content: center;
 }
 .detail {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 34px auto;
+  column-gap: 18px;
   align-items: center;
-  gap: 6px;
+  text-align: start;
+}
+.detail dt {
+  display: flex;
+  justify-content: center;
+  color: var(--gs-ink);
 }
 .detail dd {
   margin: 0;
+  padding: 4px 0;
+  padding-inline-start: 20px;
+  border-inline-start: 1px solid rgba(138, 92, 37, 0.55);
+}
+.detailValue {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--gs-ink-deep);
+  max-width: 250px;
+  overflow-wrap: anywhere;
+}
+.venueName {
+  letter-spacing: 0.01em;
+  line-height: 1.25;
 }
 .icon {
   color: var(--gs-ink);
-  margin-bottom: 2px;
 }
-.detailValue {
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--gs-ink-deep);
-  max-width: 290px;
+.tapForMap {
+  font-style: italic;
+  font-size: calc(17px * var(--gs-script-scale));
+  letter-spacing: 0.1em;
 }
+.root:lang(ar) .tapForMap,
+.root:lang(ckb) .tapForMap,
+.root:lang(bdn) .tapForMap {
+  letter-spacing: 0;
+}
+/* The gold pill, as drawn. */
 .mapButton {
-  margin-top: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  min-height: 48px;
-  padding: 8px 22px 8px 18px;
-  border: 1px solid var(--gs-ink);
+  gap: 14px;
+  min-height: 56px;
+  padding: 10px 28px 10px 22px;
+  border: 1px solid #7a5122;
   border-radius: 999px;
-  color: var(--gs-ink);
+  color: #fbf3e6;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: var(--gs-track);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  background: rgba(255, 250, 242, 0.35);
-  transition: background-color 0.2s ease;
+  background: linear-gradient(135deg, #8c5d25 0%, #b8863f 45%, #9a6a2c 70%, #7f5420 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 238, 205, 0.22),
+    0 6px 16px rgba(110, 74, 30, 0.25);
 }
 .root:lang(ar) .mapButton,
 .root:lang(ckb) .mapButton,
 .root:lang(bdn) .mapButton {
-  font-size: 15px;
+  font-size: 16px;
+  letter-spacing: 0;
   font-family: var(--gs-heading);
 }
 .mapButton:hover {
-  background: rgba(138, 92, 37, 0.08);
+  filter: brightness(1.06);
 }
 .mapButton:focus-visible,
 .submit:focus-visible,
@@ -339,104 +586,88 @@
 .mapRule {
   width: 1px;
   align-self: stretch;
-  margin: 2px 0;
-  background: var(--gs-ink);
-  opacity: 0.6;
+  margin: 4px 0;
+  background: rgba(251, 243, 230, 0.6);
 }
 
-/* ------------------------------------------------------------------ 5 · countdown */
+/* ------------------------------------------------------------------ 5 · countdown (the arched niche) */
 
+.countdownArt {
+  aspect-ratio: 900 / 1245;
+  background-image: url(./assets/countdown-bg.webp);
+}
 .countdownTitle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.countdownBig {
-  font-size: 25px;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 37.6%;
+  font-size: 3.6cqw;
   font-weight: 500;
-  letter-spacing: 0.3em;
-  margin-inline-start: 0.3em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
+  text-align: center;
 }
-.root:lang(ar) .countdownBig,
-.root:lang(ckb) .countdownBig,
-.root:lang(bdn) .countdownBig {
+.root:lang(ar) .countdownTitle,
+.root:lang(ckb) .countdownTitle,
+.root:lang(bdn) .countdownTitle {
   font-family: var(--gs-heading);
+  font-size: 4.6cqw;
   letter-spacing: 0;
-  margin: 0;
-  font-size: 28px;
+  top: 36.6%;
 }
+/* The four arched boxes are in the artwork; each number and label sits in its box. */
 .countdown {
+  position: absolute;
+  left: 9.3%;
+  right: 7.4%;
+  top: 48%;
+  height: 23.3%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 9px;
-  width: 100%;
-  max-width: 330px;
-  margin: 10px 0;
+  gap: 1.35cqw;
 }
 .unit {
   position: relative;
-  aspect-ratio: 70 / 102;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: center / 100% 100% no-repeat;
 }
 .unitValue {
-  position: relative;
-  font-style: italic;
-  font-size: 31px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48%;
+  transform: translateY(-50%);
+  font-size: 8.6cqw;
   font-weight: 500;
   line-height: 1;
-  color: var(--gs-ink);
+  text-align: center;
+  color: #7a5426;
   font-variant-numeric: lining-nums tabular-nums;
 }
 .unitLabel {
-  position: relative;
-  font-size: 8.5px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 74%;
+  transform: translateY(-50%);
+  font-size: 2.15cqw;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: center;
 }
 .root:lang(ar) .unitLabel,
 .root:lang(ckb) .unitLabel,
 .root:lang(bdn) .unitLabel {
-  font-size: 12px;
+  font-size: 3cqw;
   letter-spacing: 0;
 }
-/* "Until the special day" between the two laurels, where the owner's drawing had "Until We Say I DO". The laurels are
-   drawn facing outwards: they keep their sides in every language (the text keeps its own direction). */
-.specialDay {
-  direction: ltr;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
+.started {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 55%;
   font-style: italic;
-  font-size: calc(25px * var(--gs-script-scale));
-  font-weight: 500;
-  line-height: 1.25;
-  letter-spacing: 0.02em;
-  margin-top: 4px !important;
-}
-.specialDay span {
-  max-width: 220px;
-  text-wrap: balance;
-}
-.root:lang(ar) .specialDay,
-.root:lang(ckb) .specialDay,
-.root:lang(bdn) .specialDay {
-  font-family: var(--gs-heading);
-  font-style: normal;
-  letter-spacing: 0;
-}
-.laurel {
-  width: 38px;
-  height: auto;
-  flex: none;
+  font-size: 5cqw;
+  text-align: center;
 }
 
 /* ------------------------------------------------------------------ 6 · congratulations */

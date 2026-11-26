@@ -2357,3 +2357,17 @@ Replaces `untilWeSay` and `iDo` (batch 74, rows 15–16; removed at the owner's 
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #32: `untilSpecialDay` (under the countdown) | حتى اليوم المميّز | Until the special day | تا ڕۆژە تایبەتەکە | هەتا رۆژا تایبەت |
+
+## Batch 78 — Golden Stitch (#32): the owner's new pages (letter, wedding details, countdown) — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+The owner's newer artwork for the families, verse, letter, details and countdown pages. Replaces `verseTitle`,
+`countdownSub` and `untilSpecialDay` (removed) and the greeting's default.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: `noteTitle` (the letter's title) | رسالة منّا | A Letter from Us | نامەیەک لە ئێمەوە | نامەیەک ژ مە |
+| 2 | #32: `withLove` (the letter's closing) | مع كلّ حبّنا، | With all our love, | بە هەموو خۆشەویستیمانەوە، | ب هەمی ڤیانا مە، |
+| 3 | #32: `detailsTitle` | تفاصيل الزفاف | Wedding Details | وردەکاریی زەماوەند | هوورگلیێن داوەتێ |
+| 4 | #32: `tapForMap` (above the map button) | اضغط لفتح الخريطة | Tap to open the map | بۆ کردنەوەی نەخشەکە دابگرە | بۆ ڤەکرنا نەخشەیێ پەنجێ لێ بدە |
+| 5 | #32: `countdownTitle` | اليوم الكبير بعد | The Big Day In | ڕۆژە گەورەکە دوای | رۆژا مەزن پشتی |
+| 6 | #32: the letter's greeting (order form default) | إلى عائلتنا وأصدقائنا الأعزّاء، | To our dearest family and friends, | بۆ خێزان و هاوڕێ ئازیزەکانمان، | بۆ مالباتا مە و هەڤالێن مە یێن ئازیز، |
