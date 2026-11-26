@@ -38,3 +38,5 @@ export type { GuestFormApi, Countdown } from './runtime';
 
 /** An `initials` field's two boxes (e.g. the seal's letters): `{ first, second, whole }`. */
 export { splitInitials } from '@/catalog/fields';
+/** What a wedding or engagement is held as (`ThemeProps.eventWording`): a Nishani, a henna night or the couple's own words. */
+export type { EventWords } from '@/catalog/occasion-wording';

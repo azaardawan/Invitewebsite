@@ -30,6 +30,9 @@ export type SampleRequest = {
   /** Admin checks: texts to try instead of the sample's (fields by key, wording lines by key). */
   values?: Record<string, string>;
   wording?: Record<string, string>;
+  /** The live preview (and admin checks): the event a wedding or engagement is held as (occasion-wording.ts). */
+  eventKind?: string | null;
+  eventName?: string | null;
 };
 
 /**
@@ -99,6 +102,8 @@ export async function resolveSample(db: DbOrTx, req: SampleRequest) {
     videoPlaces: Math.min(manifest.videos?.max ?? 1, pkg?.videoLimit ?? manifest.videos?.max ?? 1),
     openLabel: pageText(manifest, 'open', req.locale),
     occasion: (await themeOccasions(db, theme.id, theme.sectionId)).find((k) => k === req.occasion) ?? (await occasionKey(db, theme.sectionId)),
+    eventKind: req.eventKind ?? null,
+    eventName: req.eventName ?? null,
   });
   return { theme, version, manifest, props };
 }

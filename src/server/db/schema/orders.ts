@@ -169,6 +169,12 @@ export const invitations = pgTable(
     guestPhotosCap: integer('guest_photos_cap'),
     guestPhotosPerGuest: integer('guest_photos_per_guest'),
     guestPhotosToken: text('guest_photos_token').unique(),
+    /**
+     * A wedding or engagement held as another event (src/catalog/occasion-wording.ts): `nishani`, `henna` or `custom`
+     * (then `event_name`, the customer's own words); null = the section's own event.
+     */
+    eventKind: text('event_kind', { enum: ['nishani', 'henna', 'custom'] }),
+    eventName: text('event_name'),
     /** Storage key of a card PDF the team designed and uploaded; replaces the automatic card while set. */
     cardCustomKey: text('card_custom_key'),
     /** Optimistic locking for concurrent admin edits. */

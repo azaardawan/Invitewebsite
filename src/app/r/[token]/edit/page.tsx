@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { NextIntlClientProvider } from 'next-intl';
-import { signatureUrls } from '@/server/invitation/load';
+import { occasionKey, signatureUrls } from '@/server/invitation/load';
+import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { isLocale, type Locale } from '@/i18n/config';
 import { db } from '@/server/db/client';
-import { invitations, themeVersions } from '@/server/db/schema';
+import { invitations, themeVersions, themes } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
 import { posterLabels, templateLabels } from '@/components/storefront/order/template-labels';
@@ -17,7 +18,9 @@ import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { PhotoSlots } from '@/components/storefront/order/PhotoSlots';
 import { SongUpload } from '@/components/storefront/order/SongUpload';
 import { songLabels } from '@/components/storefront/order/song-labels';
-import { photoState, songState, templateState } from '@/server/storefront/order';
+import { livePreviewSpec, photoState, songState, templateState } from '@/server/storefront/order';
+import { LivePreview } from '@/components/storefront/order/LivePreview';
+import { PreviewLayout } from '@/components/storefront/order/PreviewLayout';
 import { invitationPath } from '@/lib/ids';
 import { receiptFor } from '../data';
 import { placeOptionalIn } from '@/server/catalog/occasions';
@@ -56,6 +59,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
   // …and their own song (packages with `custom_music`).
   const song = await songState(inv!);
   const ts = await getTranslations({ locale, namespace: 'store' });
+  const occasion = await occasionKey(db(), inv!.sectionId);
 
   // A template design: changed in place, like it was filled while ordering (texts, photos and video, saved one by one).
   const [version] = await db().select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv!.themeVersionId));
@@ -113,8 +117,20 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
     );
   }
 
+  // The live preview beside the form (owner, 2026-11-26: on the receipt's changes too).
+  const [design] = await db().select({ key: themes.key }).from(themes).where(eq(themes.id, inv!.themeId));
+  const preview = design ? await livePreviewSpec({ themeKey: design.key, packageId: inv!.packageId, featureKeys: inv!.featureKeys, fieldKeys: inv!.fieldKeys, occasion, locale: inv!.locale }) : null;
   return (
-    <main className="mx-auto max-w-xl px-4 py-10">
+    <main className={`mx-auto px-4 py-10 ${preview ? 'max-w-[1180px]' : 'max-w-xl'}`}>
+      <PreviewLayout
+        preview={
+          preview ? (
+            <NextIntlClientProvider locale={locale} messages={{ store: messages.store } as never}>
+              <LivePreview spec={preview} formId="order-form" initialLang={inv!.locale} />
+            </NextIntlClientProvider>
+          ) : null
+        }
+      >
       <p className="mb-6">{back}</p>
       <h1 className="text-xl font-semibold">{t('editTitle')}</h1>
       <p className="mt-2 text-sm text-muted">{t('editHelp', { left: r.invitation.selfEdit.left, total: SELF_EDIT_LIMIT })}</p>
@@ -163,7 +179,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
           <SongUpload base={`/r/${encodeURIComponent(token)}/music`} initial={song.song} hasDesignSong={song.hasDesignSong} labels={songLabels(ts, true)} />
         </div>
       ) : null}
-      <div className="mt-8">
+      <div className="mt-8" id="order-form">
         <NextIntlClientProvider locale={locale} messages={{ store: messages.store } as never}>
           <OrderForm
             action={customerEditAction.bind(null, token)}
@@ -174,10 +190,15 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
             invitationLocale={inv!.locale}
             minDate={minDate}
             submitLabel={t('editSave')}
-            extras={inv!.featureKeys.includes('signature') ? { signature: { current: await signatureUrls(db(), inv!) } } : {}}
+            extras={{
+              ...(inv!.featureKeys.includes('signature') ? { signature: { current: await signatureUrls(db(), inv!) } } : {}),
+              // A wedding or an engagement: held as a Nishani, a henna night or in their own words (owner, 2026-11-26).
+              ...((EVENT_KIND_SECTIONS as readonly string[]).includes(occasion ?? '') ? { event: { own: occasion, current: inv!.eventKind ?? '', name: inv!.eventName ?? '', max: EVENT_NAME_MAX } } : {}),
+            }}
           />
         </NextIntlClientProvider>
       </div>
+      </PreviewLayout>
     </main>
   );
 }

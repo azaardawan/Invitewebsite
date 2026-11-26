@@ -2387,3 +2387,31 @@ Two more card styles the customer can choose with the arch card (`themes/golden-
 | 1 | #32: card name | بطاقة الورد العنّابي | Burgundy floral card | کارتی گوڵی شەرابی | کارتا گولێن شەرابی |
 | 2 | #32: card name | بطاقة القنديل | Lantern arch card | کارتی کەوانەی چرا | کارتا کەڤانا چرایێ |
 | 3 | #32: `withLoveShort` (the cards' backs) | مع الحب | With love | بە خۆشەویستییەوە | ب ڤیان |
+
+## Batch 80 — Occasion wording (Nishani, Henna night, own words) and the live preview — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+Order form, «What is the occasion?» (`store.event.*`), the live preview beside the form (`store.preview.*`), and the
+phrases the designs use for a Nishani or a henna night (`src/catalog/occasion-wording.ts`).
+
+| Key | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- |
+| store.event.heading | بۆنەکە چییە؟ | بۆنە چیە؟ |
+| store.event.wedding / engagement | هاوسەرگیری / دەستگیرانی | داوەت / دەزگرانی |
+| store.event.asChosen | وەک دیزاینەکە | وەکی دیزاینێ |
+| store.event.nishani / henna | نیشانی / شەوی خەنەبەندان | نیشانی / شەڤا خەنێ |
+| store.event.custom | بە وشەی خۆمان… | ب پەیڤێن مە… |
+| store.event.help | هەموو ئەو دێڕانەی بانگهێشتنامە و کارتەکە کە ناوی بۆنەکە دەهێنن دەگۆڕێن. | هەمی ئەو دێڕێن داخوازنامێ و کارتێ یێن ناڤێ بۆنێ دئینن دێ هێنە گوهۆڕین. |
+| store.event.nameLabel / namePlaceholder | ناوی بۆنەکەتان / نموونە: ئاهەنگی مارەبڕینمان | ناڤێ بۆنا هەوە / نموونە: ئاهەنگا مارەبڕینا مە |
+| store.event.nameRequired / nameTooLong | ناوی بۆنەکە بنووسن. / لە ٤٠ پیت زیاتر نەبێت. | ناڤێ بۆنێ بنڤیسن. / ژ ٤٠ پیتان پتر نەبیت. |
+| store.preview.title / invitation | پێشبینینی ڕاستەوخۆ / بانگهێشتنامە | پێشبینینا ڕاستەوخۆ / داخوازنامە |
+| store.preview.front / back / whichCard | ڕووی کارت / پشتی کارت / کام کارت | ڕوویێ کارتێ / پشتا کارتێ / کیژ کارت |
+| store.preview.enlarge / close / smaller / show | گەورەکردن / داخستن / بچووککردنەوە / پیشاندانی پێشبینین | مەزنکرن / گرتن / بچووککرن / نیشاندانا پێشبینینێ |
+| store.preview.updating | نوێ دەکرێتەوە… | دهێتە نووکرن… |
+| store.preview.glowing | لەو شوێنەی دەردەکەوێت دەدرەوشێتەوە | ل وی جهی دیار دبیت دبریسکیت |
+| store.preview.notHere | لێرەدا دەرناکەوێت: بەشەکانی تر تاقی بکەنەوە | ل ڤێرێ دیار نابیت: بەشێن دی تاقی بکەن |
+| store.preview.sample | دەقە نموونەییەکان ئەوە پڕ دەکەنەوە کە هێشتا نەتاننووسیوە | دەقێن نموونە وی پڕ دکەن یێ هێشتا هەوە نەنڤیسی |
+| Nishani: name / invitation / details | ئاهەنگی نیشانی / بانگهێشتنامەی نیشانی / زانیارییەکانی ئاهەنگی نیشانی | ئاهەنگا نیشانیێ / داخوازناما نیشانیێ / زانیاریێن ئاهەنگا نیشانیێ |
+| Nishani: invited / on the occasion | بانگهێشتتان دەکەین بۆ بەشداریکردن لە ئاهەنگی نیشانیمان / بە بۆنەی نیشانیمان | مە هوین داخواز کرینە بۆ پشکداریێ د ئاهەنگا نیشانیا مە دا / ب بۆنا نیشانیا مە |
+| Henna: name / invitation / details | شەوی خەنەبەندان / بانگهێشتنامەی شەوی خەنەبەندان / زانیارییەکانی شەوی خەنەبەندان | شەڤا خەنێ / داخوازناما شەڤا خەنێ / زانیاریێن شەڤا خەنێ |
+| Henna: invited / on the occasion | بانگهێشتتان دەکەین بۆ بەشداریکردن لە شەوی خەنەبەندانمان / بە بۆنەی شەوی خەنەبەندانمان | مە هوین داخواز کرینە بۆ پشکداریێ د شەڤا خەنا مە دا / ب بۆنا شەڤا خەنا مە |
+| Keepsake subtitles | نامەی خێزان و خۆشەویستان لە ڕۆژی نیشانیماندا / لە شەوی خەنەبەندانماندا | نامێن مالباتێ و هەڤالان د ڕۆژا نیشانیا مە دا / د شەڤا خەنا مە دا |

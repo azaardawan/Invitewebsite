@@ -6,7 +6,9 @@ import { localized } from '@/lib/localized';
 import { isPlaceOptional } from '@/catalog/fields';
 import type { Locale } from '@/i18n/config';
 import { storefrontTheme } from '@/server/storefront/catalog';
-import { orderFormExtras } from '@/server/storefront/order';
+import { livePreviewSpec, orderFormExtras } from '@/server/storefront/order';
+import { LivePreview } from '@/components/storefront/order/LivePreview';
+import { PreviewLayout } from '@/components/storefront/order/PreviewLayout';
 import { baghdadToday } from '@/server/orders/validation';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { Price } from '@/components/storefront/currency';
@@ -37,10 +39,14 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
   const common = await getTranslations('common');
   // A template design: its texts, photos and video are filled in place on the next step; here only the language.
   const template = th.manifest.editor === 'template';
-  const extras = await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: template ? undefined : th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes, paletteIds: pkg.paletteIds }, pkg.fieldKeys);
+  const extras = await orderFormExtras(locale, th.id, pkg.featureKeys, { wordingLines: template ? undefined : th.manifest.wording, switchDefs: th.manifest.switches, cardShapes: th.manifest.print?.shapes, paletteIds: pkg.paletteIds, event: { occasion: occasion?.key ?? (th.occasions.length > 1 ? null : th.section.key), choices: th.occasions.map((o) => o.key) } }, pkg.fieldKeys);
+
+  // The live preview beside the form (owner, 2026-11-26).
+  const preview = await livePreviewSpec({ themeKey: th.key, packageId: pkg.id, featureKeys: pkg.featureKeys, fieldKeys: pkg.fieldKeys, occasion: occasion?.key ?? (th.occasions.length > 1 ? null : th.section.key), locale });
 
   return (
-    <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">
+    <div className={`mx-auto px-6 pt-10 lg:pt-16 ${preview ? 'max-w-[1180px]' : 'max-w-[640px]'}`}>
+      <PreviewLayout preview={preview ? <LivePreview spec={preview} formId="order-form" initialLang={locale} /> : null}>
       <OrderSteps current={0} />
       <h1 className="mt-8 font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('orderTitle')}</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-muted">{template ? t('template.orderSubtitle') : t('orderSubtitle')}</p>
@@ -68,7 +74,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
         </p>
       ) : null}
 
-      <div className="mt-8">
+      <div className="mt-8" id="order-form">
         <OrderForm
           action={startOrderAction}
           hidden={{ themeKey: th.key, packageId: pkg.id, siteLocale: locale, ...(occasion ? { occasion: occasion.key } : {}) }}
@@ -82,6 +88,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/[l
           extras={extras}
         />
       </div>
+      </PreviewLayout>
     </div>
   );
 }

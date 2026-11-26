@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
 import { GuestPhotosAddon } from './GuestPhotosAddon';
+import { EventChoice } from './EventChoice';
 import { fieldOptions, INITIALS_MAX, isOptionalField, PLACE_FIELDS, PLACE_TOGGLE, placeChosen, splitInitials } from '@/catalog/fields';
 
 /** `optional`: the customer may leave it empty in this design (the Field Library's optional fields and the design's own). */
@@ -48,6 +49,11 @@ export type OrderFormExtras = {
   switches?: { key: string; label: string; on: boolean }[];
   /** Colour sets (color_choice): '' = the theme's own colours. */
   palettes?: { current: string; original: string[]; options: { id: string; name: string; swatches: string[] }[] };
+  /**
+   * The event a wedding or engagement is held as (owner, 2026-11-26): the section's own (''), a Nishani, a Henna
+   * night, or the customer's own words. `own`: the section (wedding / engagement), or null while still to choose.
+   */
+  event?: { own: string | null; current: string; name: string; max: number };
   /** Guest photo sharing (add-on, while the owner offers it): the owner's prices and what is chosen so far. */
   guestPhotos?: { pricing: { basePriceIqd: number; stepPriceIqd: number; maxCap: number }; current: { cap: number; perGuest: number } | null };
 };
@@ -130,6 +136,8 @@ export function OrderForm({
           ) : null}
         </fieldset>
       ) : null}
+
+      {extras.event ? <EventChoice own={extras.event.own} current={extras.event.current} name={extras.event.name} max={extras.event.max} values={values} errors={errors} /> : null}
 
       {fields.map((f) => {
         // The place toggle sits where the place fields begin; unticked, they are not shown or sent.

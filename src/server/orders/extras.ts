@@ -1,12 +1,13 @@
 import 'server-only';
 import { validCap, validPerGuest } from '@/catalog/guest-photos';
+import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX, cleanEventName, isEventKind } from '@/catalog/occasion-wording';
 import { getSettings } from '@/server/settings/service';
 import { newUploadToken } from '@/server/guest-photos/service';
 import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import { CARD_SHAPE_FEATURES, MAIN_CARD, chosenCards, shapeIncluded } from '@/catalog/features';
 import { and, eq } from 'drizzle-orm';
 import type { DbOrTx } from '@/server/db/client';
-import { invitations, themePalettes, themes, type CardOptions } from '@/server/db/schema';
+import { invitations, sections, themePalettes, themes, type CardOptions } from '@/server/db/schema';
 import { storeSignature } from '@/server/media/assets';
 import { parseSignatureStrokes } from '@/lib/signature-strokes';
 import { MediaError } from '@/server/media/process';
@@ -53,6 +54,9 @@ export type OrderExtras = {
   birthDateDigits?: string;
   wording?: Record<string, { choice: string; text: string }>;
   switches?: Record<string, boolean>;
+  /** The event a wedding or engagement is held as ('' = the section's own), and the customer's own words. */
+  eventKind?: string;
+  eventName?: string;
   /** Guest photo sharing (add-on, src/catalog/guest-photos.ts): bought or not, its total and each guest's share. */
   guestPhotos?: { on: boolean; cap: number; perGuest: number };
 };
@@ -89,7 +93,7 @@ export async function prestoreSignatures(db: DbOrTx, featureKeys: readonly strin
 /** What to store on the invitation for these choices. Throws OrderError('invalidFields') for bad input. */
 export async function extrasUpdate(
   db: DbOrTx,
-  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> &
+  inv: Pick<InvitationRow, 'themeId' | 'featureKeys' | 'cardOptions' | 'signatureAssetId' | 'signature2AssetId' | 'colors'> & { sectionId?: string | null } &
     Partial<Pick<InvitationRow, 'signatureStrokes' | 'signature2Strokes' | 'paletteIds' | 'guestPhotosToken'>> & {
     fieldKeys?: readonly string[];
     /** For `wording`: the design's changeable lines, what is stored now, and the invitation's language. */
@@ -125,12 +129,37 @@ export async function extrasUpdate(
       | 'guestPhotosCap'
       | 'guestPhotosPerGuest'
       | 'guestPhotosToken'
+      | 'eventKind'
+      | 'eventName'
     >
   > = {};
   const errors: Record<string, string> = {};
   // The design's own limits (src/catalog/text-limits.ts); a text saved before a limit was lowered may stay as it is.
   const [design] = await db.select({ key: themes.key }).from(themes).where(eq(themes.id, inv.themeId));
   const limits = cardBackLimits(design?.key, CARD_BACK_LIMITS);
+
+  // The event (owner, 2026-11-26): a Nishani, a Henna night or the customer's own words, or the section's own ('').
+  if (extras.eventKind !== undefined) {
+    const kind = extras.eventKind;
+    // Only for a wedding or an engagement (owner: the choice is within those two, for now).
+    const [section] = inv.sectionId ? await db.select({ key: sections.key }).from(sections).where(eq(sections.id, inv.sectionId)) : [];
+    if (!kind) {
+      set.eventKind = null;
+      set.eventName = null;
+    } else if (!isEventKind(kind) || !(EVENT_KIND_SECTIONS as readonly string[]).includes(section?.key ?? '')) errors.eventKind = 'invalid';
+    else if (kind === 'custom') {
+      const name = cleanEventName(extras.eventName);
+      if (!name) errors.eventName = 'required';
+      else if ((extras.eventName ?? '').trim().length > EVENT_NAME_MAX) errors.eventName = 'tooLong';
+      else {
+        set.eventKind = 'custom';
+        set.eventName = name;
+      }
+    } else {
+      set.eventKind = kind;
+      set.eventName = null;
+    }
+  }
 
   // Guest photo sharing: only offered while the owner has it switched on; the price is worked out at checkout.
   if (extras.guestPhotos) {

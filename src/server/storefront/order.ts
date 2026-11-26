@@ -1,6 +1,7 @@
 import 'server-only';
 import { DEFAULT_PER_GUEST, guestPhotoPrice } from '@/catalog/guest-photos';
 import { getSettings } from '@/server/settings/service';
+import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
 import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
 import { posterTextDefault } from '@/lib/poster-texts';
@@ -24,6 +25,9 @@ import { signatureUrls } from '@/server/invitation/load';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { listPalettes, themeColorSlots } from '@/server/catalog/palettes';
 import type { OrderFormExtras } from '@/components/storefront/order/OrderForm';
+import type { LivePreviewSpec } from '@/components/storefront/order/LivePreview';
+import { resolveSample } from '@/server/invitation/preview';
+import { designCards } from '@/server/documents/data';
 import { findByPreviewToken } from '@/server/orders/drafts';
 import { POLICY_SLUGS, termsPolicyFor } from '@/server/legal/policies';
 import { orderFields } from './catalog';
@@ -74,6 +78,7 @@ export async function draftByToken(token: string) {
       switchDefs: (row.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
       guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, perGuest: inv.guestPhotosPerGuest ?? DEFAULT_PER_GUEST } : null,
+      event: { occasion: section?.key ?? null, kind: inv.eventKind, name: inv.eventName },
     },
     fieldKeys: inv.fieldKeys,
     /** Guest photo sharing chosen on the form (its price is added at checkout), or null. */
@@ -233,6 +238,8 @@ export async function orderFormExtras(
     switches?: Record<string, boolean>;
     /** Guest photo sharing chosen so far (null = not). */
     guestPhotos?: { cap: number; perGuest: number } | null;
+    /** The occasion (section key; null = still to choose among the design's) and the event chosen so far. */
+    event?: { occasion: string | null; kind?: string | null; name?: string | null; choices?: readonly string[] };
   } = {},
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
@@ -286,6 +293,11 @@ export async function orderFormExtras(
     const choice = await paletteChoice(themeId, current.colors ?? null, locale, current.paletteIds);
     if (choice) extras.palettes = { current: choice.current, original: choice.original, options: choice.options };
   }
+  // A wedding or engagement held as a Nishani, a Henna night or the customer's own words (owner, 2026-11-26).
+  const occasions = current.event ? (current.event.occasion ? [current.event.occasion] : (current.event.choices ?? [])) : [];
+  if (occasions.length && occasions.every((o) => (EVENT_KIND_SECTIONS as readonly string[]).includes(o))) {
+    extras.event = { own: current.event!.occasion, current: current.event!.kind ?? '', name: current.event!.name ?? '', max: EVENT_NAME_MAX };
+  }
   // Guest photo sharing: an add-on at the end of the form while the owner offers it (Admin → Settings).
   const { guestPhotos: pricing } = await getSettings(db());
   if (pricing.enabled || current.guestPhotos) {
@@ -324,4 +336,23 @@ export function cardPictures(featureKeys: readonly string[], choices: readonly s
     if (!s) return { key, ratio: 148 / 210, backRatio: backPortrait ? 148 / 210 : 210 / 148 };
     return { key, label: localized(s.label, locale), ratio: s.widthMm / s.heightMm, backRatio: s.backSideways ? s.heightMm / s.widthMm : s.widthMm / s.heightMm };
   });
+}
+
+/**
+ * What the live preview beside the form needs (owner, 2026-11-26): the design and package, the occasion, whether it
+ * has an online invitation, the printed cards the package includes (with their sizes), and the sample's texts (shown
+ * where the customer hasn't written yet). Null for a template design (filled in place) or one whose code is missing.
+ */
+export async function livePreviewSpec(input: { themeKey: string; packageId: string; featureKeys: readonly string[]; fieldKeys: readonly string[]; occasion: string | null; locale: Locale }): Promise<LivePreviewSpec | null> {
+  const sample = await resolveSample(db(), { themeKey: input.themeKey, locale: input.locale, packageId: input.packageId, occasion: input.occasion ?? undefined });
+  if (!sample) return null;
+  const manifest = manifestByCodeRef(sample.version.codeRef);
+  if (!manifest || manifest.editor === 'template') return null;
+  const cards = designCards(manifest)
+    .filter((c) => input.featureKeys.includes(c.feature))
+    .map((c) => ({ key: c.key, label: c.label ? localized(c.label, input.locale) : 'A5', front: c.front, back: c.back }));
+  const invitation = manifest.onlineInvitation !== false;
+  if (!invitation && !cards.length) return null;
+  const sampleTexts = Object.fromEntries(Object.entries(sample.props.fields).filter((e): e is [string, string] => typeof e[1] === 'string' && e[1] !== ''));
+  return { themeKey: input.themeKey, packageId: input.packageId, occasion: input.occasion, invitation, cards, sample: sampleTexts, fieldKeys: [...input.fieldKeys] };
 }

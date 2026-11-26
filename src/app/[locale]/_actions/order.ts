@@ -31,7 +31,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), ...(form.has('cardChoicesSent') ? { cardChoices: form.getAll('cardChoices').map(String).join(',') } : {}), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), ...(form.has('cardChoicesSent') ? { cardChoices: form.getAll('cardChoices').map(String).join(',') } : {}), bottleSize: str(form, 'bottleSize'), eventKind: str(form, 'eventKind'), eventName: str(form, 'eventName'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
 }
 
 /** The changeable-line choices as typed (`w.<key>`, `w.<key>.text`), so a failed submit keeps them. */
@@ -56,6 +56,10 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
   if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
   if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');
+  if (form.has('eventKind')) {
+    extras.eventKind = str(form, 'eventKind');
+    extras.eventName = str(form, 'eventName');
+  }
   if (form.has('gp.sent')) extras.guestPhotos = { on: form.get('gp.on') === '1', cap: Number(str(form, 'gp.cap')), perGuest: Number(str(form, 'gp.perGuest')) };
   // The design's changeable lines: radio `w.<key>` (ar | lang | custom) and the text `w.<key>.text`.
   for (const [k, v] of form.entries()) {

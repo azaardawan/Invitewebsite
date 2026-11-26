@@ -1,0 +1,1050 @@
+/* Golden Stitch: cream pages framed in bronze, sized for a 390 px phone (as the owner drew them, 941 px ≈ 390 px). */
+
+.root {
+  position: relative;
+  min-height: 100svh;
+  color: var(--gs-ink);
+  background: #e9d6bf;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Arabic letters must stay joined: no letter spacing, no capitals, a little larger. */
+.root:lang(ar),
+.root:lang(ckb),
+.root:lang(bdn) {
+  --gs-track: 0;
+  --gs-script-scale: 1.08;
+}
+.root {
+  --gs-track: 0.24em;
+  --gs-script-scale: 1;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ sheets */
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+/* While the film plays the invitation is one screen tall, so nothing can scroll it away from its first page. */
+.root[data-stage='film'] .pages {
+  height: 100svh;
+  overflow: hidden;
+}
+.root[data-stage='pages'] .pages {
+  animation: pagesIn 0.9s ease-out both;
+}
+@keyframes pagesIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sheet {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  min-height: max(100svh, 640px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 90% at 50% 40%, var(--gs-paper-light) 0%, var(--gs-paper) 62%, #ead6bd 100%);
+  box-shadow: 0 0 0 0.5px rgba(110, 74, 30, 0.12);
+  overflow: hidden;
+  isolation: isolate;
+}
+.sheet + .sheet {
+  border-top: 1px solid rgba(110, 74, 30, 0.14);
+}
+
+.sheetInner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 96px 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
+.sheetInner p,
+.sheetInner h1,
+.sheetInner h2,
+.sheetInner h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------ type */
+
+.caps {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: var(--gs-track);
+  text-transform: uppercase;
+  line-height: 1.75;
+  color: var(--gs-ink);
+}
+.root:lang(ar) .caps,
+.root:lang(ckb) .caps,
+.root:lang(bdn) .caps {
+  font-family: var(--gs-heading);
+  font-size: 18px;
+  line-height: 1.7;
+}
+.capsSmall {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: var(--gs-track);
+  text-transform: uppercase;
+  color: var(--gs-ink);
+}
+.root:lang(ar) .capsSmall,
+.root:lang(ckb) .capsSmall,
+.root:lang(bdn) .capsSmall {
+  font-size: 15px;
+  font-family: var(--gs-heading);
+}
+.wide {
+  max-width: 300px;
+}
+
+.italic {
+  font-style: italic;
+  font-size: calc(17px * var(--gs-script-scale));
+  color: var(--gs-ink);
+}
+.italicMedium {
+  font-style: italic;
+  font-size: calc(16px * var(--gs-script-scale));
+  line-height: 1.5;
+  max-width: 290px;
+}
+.italicLarge {
+  font-style: italic;
+  font-size: calc(20px * var(--gs-script-scale));
+  letter-spacing: 0.04em;
+}
+.root:lang(ar) .italicLarge,
+.root:lang(ckb) .italicLarge,
+.root:lang(bdn) .italicLarge {
+  letter-spacing: 0;
+}
+
+/* ------------------------------------------------------------------ divider */
+
+.divider {
+  display: block;
+  width: 246px;
+  max-width: 78%;
+  height: auto;
+  margin: 4px 0;
+  flex: none;
+}
+.dividerSmall {
+  width: 150px;
+}
+
+/* ------------------------------------------------------------------ plain paper pages (owner, 2026-11-26: no frame) */
+
+.paper {
+  container-type: inline-size;
+  background: radial-gradient(120% 90% at 50% 40%, #f2e2d0 0%, #ecdac6 62%, #e3ccb5 100%);
+}
+.paper .sheetInner {
+  padding: 64px 24px;
+}
+.sprig {
+  width: 124px;
+  height: auto;
+}
+
+/* ------------------------------------------------------------------ painted pages: the owner's artwork, text on top */
+
+.art {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  container-type: inline-size;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #7a5426;
+  overflow: hidden;
+}
+.art p,
+.art h2 {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ 1 · families (line-art arches) */
+
+.famTop {
+  width: 64%;
+  height: auto;
+}
+.famDivider {
+  width: 64%;
+  height: auto;
+}
+.famBottom {
+  width: 40%;
+  height: auto;
+}
+.arches {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1100 / 721;
+  container-type: inline-size;
+  background: url(./assets/fam-arches.webp) center / 100% 100% no-repeat;
+}
+/* Inside each arch: the family's title above the arch's little divider (64 % down), its name below it. */
+.arch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 29%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.archLeft {
+  left: 24.9%;
+}
+.archRight {
+  left: 75.9%;
+}
+.root[dir='rtl'] .archLeft {
+  left: 75.9%;
+}
+.root[dir='rtl'] .archRight {
+  left: 24.9%;
+}
+.archWho {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38.5%;
+  font-style: italic;
+  font-size: 3.9cqw;
+  line-height: 1.2;
+}
+.archName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 68%;
+  font-size: 4.1cqw;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.archName[data-long] {
+  font-size: 3.3cqw;
+}
+.root:lang(ar) .archWho,
+.root:lang(ckb) .archWho,
+.root:lang(bdn) .archWho {
+  font-style: normal;
+  font-size: 4.1cqw;
+  line-height: 1.4;
+}
+.root:lang(ar) .archName,
+.root:lang(ckb) .archName,
+.root:lang(bdn) .archName {
+  font-family: var(--gs-heading);
+  font-size: 4.6cqw;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+.root:lang(ar) .archName[data-long],
+.root:lang(ckb) .archName[data-long],
+.root:lang(bdn) .archName[data-long] {
+  font-size: 3.8cqw;
+}
+.request {
+  margin-top: 6px !important;
+  max-width: 320px;
+  font-style: italic;
+  font-size: calc(17px * var(--gs-script-scale));
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+.root:lang(ar) .request,
+.root:lang(ckb) .request,
+.root:lang(bdn) .request {
+  letter-spacing: 0;
+}
+.names {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gs-ink);
+  letter-spacing: 0.01em;
+}
+.root:lang(ar) .names,
+.root:lang(ckb) .names,
+.root:lang(bdn) .names {
+  font-family: var(--gs-heading);
+  font-size: 36px;
+  letter-spacing: 0;
+}
+.name {
+  display: inline-block;
+}
+.and {
+  white-space: pre;
+}
+
+/* ------------------------------------------------------------------ 2 · verse (the carved arch) */
+
+.quranArt {
+  aspect-ratio: 768 / 1024;
+  background-image: url(./assets/quran-bg.webp);
+}
+.verseBox {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 23.5%;
+  height: 23%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.verse {
+  font-family: 'GS Serif', serif;
+  font-size: 4.6cqw;
+  line-height: 2;
+  text-align: center;
+  color: #6e4a1e;
+}
+.verseTranslation {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 53.5%;
+  font-style: italic;
+  font-size: 2.9cqw;
+  line-height: 1.6;
+  text-align: center;
+}
+.verseRef {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 70%;
+  font-size: 2.1cqw;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.verseRef[data-alone] {
+  top: 54%;
+  font-size: 3cqw;
+  letter-spacing: 0;
+}
+
+/* ------------------------------------------------------------------ 3 · the letter (handwritten on torn paper) */
+
+.letterArt {
+  aspect-ratio: 820 / 1230;
+  background-image: url(./assets/letter-bg.webp);
+}
+/* The paper sits a little askew: the writing follows it. */
+.letter {
+  position: absolute;
+  left: 19.5%;
+  right: 12.5%;
+  top: 15.5%;
+  bottom: 17%;
+  display: flex;
+  flex-direction: column;
+  transform: rotate(-1.6deg);
+  color: #6f4a1f;
+}
+.letterTitle {
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-weight: 400;
+  font-size: 8cqw;
+  line-height: 1.3;
+  text-align: center;
+  padding-inline-end: 4%;
+}
+.letterBody {
+  margin-top: 9cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2cqw;
+  font-family: 'GS Hand', 'GS Serif', serif;
+  font-size: 3.35cqw;
+  line-height: 1.75;
+}
+.letterBody p {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.letterMessage[data-length='medium'] {
+  font-size: 3cqw;
+}
+.letterMessage[data-length='long'] {
+  font-size: 2.65cqw;
+}
+.letterMessage[data-length='longer'] {
+  font-size: 2.3cqw;
+}
+.letterClosing {
+  margin-top: auto !important;
+  /* clear of the wax seal at the bottom left */
+  padding-left: 7%;
+  font-family: 'GS Hand', 'GS Serif', serif;
+  font-size: 3.35cqw;
+}
+.letterNames {
+  margin-top: 2cqw !important;
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-size: 7cqw;
+  line-height: 1.3;
+  /* signed on the right in every language, away from the wax seal */
+  text-align: right;
+  padding-right: 4%;
+  padding-left: 18%;
+}
+.letterNames[data-long] {
+  font-size: 5.4cqw;
+}
+.root:lang(ar) .letter,
+.root:lang(ckb) .letter,
+.root:lang(bdn) .letter {
+  font-size: 1.1em;
+}
+.root:lang(ar) .letterBody,
+.root:lang(ckb) .letterBody,
+.root:lang(bdn) .letterBody,
+.root:lang(ar) .letterClosing,
+.root:lang(ckb) .letterClosing,
+.root:lang(bdn) .letterClosing {
+  font-size: 3.7cqw;
+  line-height: 1.9;
+}
+.root:lang(ar) .letterMessage[data-length='medium'],
+.root:lang(ckb) .letterMessage[data-length='medium'],
+.root:lang(bdn) .letterMessage[data-length='medium'] {
+  font-size: 3.4cqw;
+}
+.root:lang(ar) .letterMessage[data-length='long'],
+.root:lang(ckb) .letterMessage[data-length='long'],
+.root:lang(bdn) .letterMessage[data-length='long'] {
+  font-size: 3.05cqw;
+}
+.root:lang(ar) .letterMessage[data-length='longer'],
+.root:lang(ckb) .letterMessage[data-length='longer'],
+.root:lang(bdn) .letterMessage[data-length='longer'] {
+  font-size: 2.75cqw;
+  line-height: 1.8;
+}
+.root:lang(ar) .letterTitle,
+.root:lang(ckb) .letterTitle,
+.root:lang(bdn) .letterTitle,
+.root:lang(ar) .letterNames,
+.root:lang(ckb) .letterNames,
+.root:lang(bdn) .letterNames {
+  font-size: 7cqw;
+}
+.root:lang(ar) .letterNames[data-long],
+.root:lang(ckb) .letterNames[data-long],
+.root:lang(bdn) .letterNames[data-long] {
+  font-size: 5cqw;
+}
+
+/* ------------------------------------------------------------------ 4 · details */
+
+.detailsInner {
+  gap: 20px;
+}
+.detailsTitle {
+  font-size: 15px;
+  letter-spacing: 0.32em;
+}
+.bigDate {
+  font-size: 10.6cqw;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--gs-ink);
+  white-space: nowrap;
+  font-variant-numeric: lining-nums;
+}
+.details {
+  margin: 4px 0;
+  display: grid;
+  gap: 24px;
+  justify-content: center;
+}
+.detail {
+  display: grid;
+  grid-template-columns: 34px auto;
+  column-gap: 18px;
+  align-items: center;
+  text-align: start;
+}
+.detail dt {
+  display: flex;
+  justify-content: center;
+  color: var(--gs-ink);
+}
+.detail dd {
+  margin: 0;
+  padding: 4px 0;
+  padding-inline-start: 20px;
+  border-inline-start: 1px solid rgba(138, 92, 37, 0.55);
+}
+.detailValue {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--gs-ink-deep);
+  max-width: 250px;
+  overflow-wrap: anywhere;
+}
+.venueName {
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+}
+.icon {
+  color: var(--gs-ink);
+}
+.tapForMap {
+  font-style: italic;
+  font-size: calc(17px * var(--gs-script-scale));
+  letter-spacing: 0.1em;
+}
+.root:lang(ar) .tapForMap,
+.root:lang(ckb) .tapForMap,
+.root:lang(bdn) .tapForMap {
+  letter-spacing: 0;
+}
+/* The gold pill, as drawn. */
+.mapButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+  padding: 10px 28px 10px 22px;
+  border: 1px solid #7a5122;
+  border-radius: 999px;
+  color: #fbf3e6;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #8c5d25 0%, #b8863f 45%, #9a6a2c 70%, #7f5420 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 238, 205, 0.22),
+    0 6px 16px rgba(110, 74, 30, 0.25);
+}
+.root:lang(ar) .mapButton,
+.root:lang(ckb) .mapButton,
+.root:lang(bdn) .mapButton {
+  font-size: 16px;
+  letter-spacing: 0;
+  font-family: var(--gs-heading);
+}
+.mapButton:hover {
+  filter: brightness(1.06);
+}
+.mapButton:focus-visible,
+.submit:focus-visible,
+.skip:focus-visible,
+.audio:focus-visible {
+  outline: 2px solid var(--gs-ink-deep);
+  outline-offset: 3px;
+}
+.mapRule {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 0;
+  background: rgba(251, 243, 230, 0.6);
+}
+
+/* ------------------------------------------------------------------ 5 · countdown (the arched niche) */
+
+.countdownArt {
+  aspect-ratio: 900 / 1245;
+  background-image: url(./assets/countdown-bg.webp);
+}
+.countdownTitle {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 37.6%;
+  font-size: 3.6cqw;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.root:lang(ar) .countdownTitle,
+.root:lang(ckb) .countdownTitle,
+.root:lang(bdn) .countdownTitle {
+  font-family: var(--gs-heading);
+  font-size: 4.6cqw;
+  letter-spacing: 0;
+  top: 36.6%;
+}
+/* The four arched boxes are in the artwork; each number and label sits in its box. */
+.countdown {
+  position: absolute;
+  left: 9.3%;
+  right: 7.4%;
+  top: 48%;
+  height: 23.3%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.35cqw;
+}
+.unit {
+  position: relative;
+}
+.unitValue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 48%;
+  transform: translateY(-50%);
+  font-size: 8.6cqw;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  color: #7a5426;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.unitLabel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 74%;
+  transform: translateY(-50%);
+  font-size: 2.15cqw;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.root:lang(ar) .unitLabel,
+.root:lang(ckb) .unitLabel,
+.root:lang(bdn) .unitLabel {
+  font-size: 3cqw;
+  letter-spacing: 0;
+}
+.started {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 55%;
+  font-style: italic;
+  font-size: 5cqw;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ 6 · congratulations */
+
+.rings {
+  width: 64px;
+  height: auto;
+}
+.congratsTitle {
+  font-size: 14px;
+}
+.box {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: start;
+  margin-top: 4px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0;
+}
+.root:lang(ar) .label,
+.root:lang(ckb) .label,
+.root:lang(bdn) .label {
+  font-size: 15px;
+  letter-spacing: 0;
+}
+.input {
+  font: inherit;
+  font-size: 16px;
+  color: var(--gs-ink-deep);
+  background: rgba(255, 250, 242, 0.55);
+  border: 1px solid var(--gs-ink);
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-height: 44px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input::placeholder {
+  color: var(--gs-ink-soft);
+  font-style: italic;
+  opacity: 0.85;
+}
+.input:focus {
+  outline: 2px solid rgba(138, 92, 37, 0.35);
+  outline-offset: 1px;
+}
+.field[data-invalid] .input {
+  border-color: #9b2d1f;
+}
+.messageField {
+  position: relative;
+}
+.pencil {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: 12px;
+  color: var(--gs-ink);
+  pointer-events: none;
+}
+.textarea {
+  resize: vertical;
+  min-height: 96px;
+  padding-inline-start: 44px;
+  line-height: 1.5;
+}
+.fieldFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.counter {
+  font-size: 12px;
+  color: var(--gs-ink-soft);
+}
+.counter[data-over] {
+  color: #9b2d1f;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.choice {
+  flex: 1 1 130px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--gs-ink);
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  background: rgba(255, 250, 242, 0.35);
+}
+.choice[data-checked] {
+  background: rgba(138, 92, 37, 0.1);
+}
+.choiceInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.choice:focus-within {
+  outline: 2px solid var(--gs-ink-deep);
+  outline-offset: 2px;
+}
+.choiceDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--gs-ink);
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+.choice[data-checked] .choiceDot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gs-ink);
+}
+.error,
+.formError {
+  margin: 0;
+  font-size: 13px;
+  color: #9b2d1f;
+}
+.submit {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 10px 28px;
+  border: 1px solid var(--gs-ink);
+  border-radius: 999px;
+  background: var(--gs-ink);
+  color: var(--gs-paper-light);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.root:lang(ar) .submit,
+.root:lang(ckb) .submit,
+.root:lang(bdn) .submit {
+  font-size: 16px;
+  letter-spacing: 0;
+}
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.sentTitle {
+  font-style: italic;
+  font-size: 19px;
+  text-align: center;
+}
+.sentBody {
+  font-size: 14px;
+  text-align: center;
+  color: var(--gs-ink-soft);
+}
+
+.guestbook {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.guestbookEmpty {
+  font-style: italic;
+  font-size: 15px;
+  color: var(--gs-ink-soft);
+}
+.wish {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--gs-ink);
+  border-radius: 8px;
+  background: rgba(255, 250, 242, 0.4);
+  text-align: start;
+}
+.wishIcon {
+  flex: none;
+  color: var(--gs-ink);
+}
+.wishRule {
+  flex: none;
+  width: 1px;
+  align-self: stretch;
+  background: var(--gs-ink);
+  opacity: 0.5;
+}
+.wishText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wishName {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.root:lang(ar) .wishName,
+.root:lang(ckb) .wishName,
+.root:lang(bdn) .wishName {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.wishMessage {
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--gs-ink-deep);
+  overflow-wrap: anywhere;
+}
+.wishHeart {
+  flex: none;
+  color: var(--gs-ink);
+  align-self: center;
+}
+
+/* ------------------------------------------------------------------ 7 · thank you */
+
+.thanksInner {
+  gap: 26px;
+}
+.thanks {
+  font-style: italic;
+  font-size: calc(26px * var(--gs-script-scale));
+  line-height: 1.45;
+  max-width: 280px;
+  color: var(--gs-ink);
+}
+.heart {
+  width: 92px;
+  height: auto;
+  margin-top: 14px;
+}
+
+/* ------------------------------------------------------------------ opening: the film plays by itself */
+
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  /* Swipes on the film never scroll the invitation underneath. */
+  touch-action: none;
+  overscroll-behavior: contain;
+  background: #2a2017;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/*
+ * Once it has played, the film stays as the invitation's first page, stopped on its last frame (the card with the
+ * initials, names and date), and the pages follow below it. Its surround is the linen of the film's edges.
+ */
+.film[data-stage='pages'] {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 100%;
+  max-width: 460px;
+  height: 100svh;
+  min-height: 560px;
+  touch-action: auto;
+  overscroll-behavior: auto;
+  /* the film's own edge colours, top and bottom */
+  background: linear-gradient(#bea17c, #cfb89e);
+}
+/* The whole card shows (the film itself fills the screen). */
+.film[data-stage='pages'] .filmVideo {
+  object-fit: contain;
+}
+.root[data-stage='pages'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.root[data-stage='pages'] > .pages {
+  width: 100%;
+}
+.filmVideo {
+  width: 100%;
+  height: 100%;
+  max-width: calc(100svh * 9 / 16);
+  object-fit: cover;
+  display: block;
+}
+.skip {
+  position: absolute;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  inset-inline-end: 18px;
+  min-height: 40px;
+  padding: 6px 18px;
+  border: 1px solid rgba(247, 236, 222, 0.7);
+  border-radius: 999px;
+  background: rgba(42, 32, 23, 0.35);
+  color: #f7ecde;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.sound {
+  position: absolute;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  inset-inline-start: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 16px 6px 12px;
+  border: 1px solid rgba(247, 236, 222, 0.7);
+  border-radius: 999px;
+  background: rgba(42, 32, 23, 0.45);
+  color: #f7ecde;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sound:focus-visible {
+  outline: 2px solid #f7ecde;
+  outline-offset: 3px;
+}
+
+.audio {
+  position: fixed;
+  z-index: 20;
+  top: 18px;
+  inset-inline-end: 18px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--gs-ink);
+  background: rgba(247, 236, 222, 0.85);
+  color: var(--gs-ink);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-stage='pages'] .pages {
+    animation: none;
+  }
+}

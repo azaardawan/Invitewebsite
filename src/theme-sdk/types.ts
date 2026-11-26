@@ -4,6 +4,8 @@ import type { ThemeBorderSpec } from './border';
 import type { FieldKey } from '@/catalog/fields';
 
 /** `sample`: storefront/admin demo with sample data · `preview`: customer's pre-payment preview · `live`: published invitation. */
+import type { EventWords } from '@/catalog/occasion-wording';
+
 export type InvitationMode = 'sample' | 'preview' | 'live';
 
 export type InvitationLocale = 'ar' | 'en' | 'ckb' | 'bdn';
@@ -131,6 +133,12 @@ export type ThemeProps = {
    * a design for one occasion can ignore it. Null only when unknown.
    */
   occasion: string | null;
+  /**
+   * A wedding or engagement held as another event (owner, 2026-11-26): a Nishani, a Henna night, or the customer's own
+   * words. When set, every line that names the wedding (or engagement) uses these phrases instead, in the invitation's
+   * language (src/catalog/occasion-wording.ts). Null for the section's own event.
+   */
+  eventWording: EventWords | null;
   /** Newborn: the date of birth (`fields.birth_date`) in the invitation's language, or null. */
   birthDate: BirthDateParts | null;
   /**

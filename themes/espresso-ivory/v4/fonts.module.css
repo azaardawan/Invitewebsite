@@ -1,0 +1,48 @@
+/*
+ * Espresso & Ivory typefaces (the same set as Burgundy & Lace), from the designer's hand-off (docs/themes/espresso-ivory/brief.md).
+ * Licences: the owner decided to use them as supplied (2026-10-15); see the brief's font notes.
+ * BL Serif: WeddingSerif (Latin) with Amiri (Arabic script). BL Script: the calligraphy for English names.
+ * BL Ceremony: swash initials and names on the printed card. BL Ruqaa: Aref Ruqaa for Arabic names on the card.
+ * Family names are theme-prefixed so they cannot collide with other themes.
+ */
+
+@font-face {
+  font-family: 'EI Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-serif.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EI Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-arabic.woff2) format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'EI Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-script.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EI Ceremony';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-ceremony.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EI Ruqaa';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/font-ruqaa.woff2) format('woff2');
+}
+
+.fonts {
+  --ei-serif: 'EI Serif', Georgia, serif;
+}

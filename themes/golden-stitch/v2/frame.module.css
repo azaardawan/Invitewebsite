@@ -1,0 +1,112 @@
+/* The page frame, in px on a 390 px phone (print scales it with --gs-u, the length of one such px): 11 px from the page edge, two lines 3 px apart, 30 px notched corners. */
+.frame {
+  position: absolute;
+  inset: calc(11 * var(--gs-u, 1px));
+  pointer-events: none;
+  z-index: 1;
+}
+.corner {
+  position: absolute;
+  width: calc(30 * var(--gs-u, 1px));
+  height: calc(30 * var(--gs-u, 1px));
+  overflow: visible;
+}
+.corner path {
+  fill: none;
+  stroke: var(--gs-ink, #8a5c25);
+  stroke-width: 1;
+}
+.corner path + path {
+  stroke-width: 0.7;
+}
+.tl {
+  top: 0;
+  left: 0;
+}
+.tr {
+  top: 0;
+  right: 0;
+  transform: scaleX(-1);
+}
+.bl {
+  bottom: 0;
+  left: 0;
+  transform: scaleY(-1);
+}
+.br {
+  bottom: 0;
+  right: 0;
+  transform: scale(-1, -1);
+}
+/* The straight runs between the corners: the outer line (1 px) and the inner line (0.7 px, 3 px further in). */
+.line {
+  position: absolute;
+  background: var(--gs-ink, #8a5c25);
+}
+.top,
+.bottom {
+  left: calc(30 * var(--gs-u, 1px));
+  right: calc(30 * var(--gs-u, 1px));
+  height: calc(1 * var(--gs-u, 1px));
+}
+.left,
+.right {
+  top: calc(30 * var(--gs-u, 1px));
+  bottom: calc(30 * var(--gs-u, 1px));
+  width: calc(1 * var(--gs-u, 1px));
+}
+.top {
+  top: 0;
+}
+.bottom {
+  bottom: 0;
+}
+.left {
+  left: 0;
+}
+.right {
+  right: 0;
+}
+.inner.top,
+.inner.bottom {
+  height: calc(0.7 * var(--gs-u, 1px));
+}
+.inner.left,
+.inner.right {
+  width: calc(0.7 * var(--gs-u, 1px));
+}
+.inner.top {
+  top: calc(3 * var(--gs-u, 1px));
+}
+.inner.bottom {
+  bottom: calc(3 * var(--gs-u, 1px));
+}
+.inner.left {
+  left: calc(3 * var(--gs-u, 1px));
+}
+.inner.right {
+  right: calc(3 * var(--gs-u, 1px));
+}
+.sprig {
+  position: absolute;
+  width: calc(62 * var(--gs-u, 1px));
+  height: auto;
+}
+.sprigTl {
+  top: calc(6 * var(--gs-u, 1px));
+  left: calc(6 * var(--gs-u, 1px));
+}
+.sprigTr {
+  top: calc(6 * var(--gs-u, 1px));
+  right: calc(6 * var(--gs-u, 1px));
+  transform: scaleX(-1);
+}
+.sprigBl {
+  bottom: calc(6 * var(--gs-u, 1px));
+  left: calc(6 * var(--gs-u, 1px));
+}
+.sprigBr {
+  bottom: calc(6 * var(--gs-u, 1px));
+  right: calc(6 * var(--gs-u, 1px));
+  transform: scaleX(-1);
+}
