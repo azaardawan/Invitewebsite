@@ -1,5 +1,7 @@
 'use server';
 
+import { createHash } from 'node:crypto';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getPathname } from '@/i18n/navigation';
 import { isLocale, type Locale } from '@/i18n/config';
@@ -127,6 +129,12 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
   let receiptToken: string;
   let orderId: string;
   let amountIqd: number;
+  // A payment that failed or was left (owner, 2026-11-26): this browser placed the order, so pressing pay again from
+  // the preview goes back to that order and on to paying it. Only this browser holds the key (never a shared link).
+  const jar = await cookies();
+  const checkoutCookie = `bahja_co_${createHash('sha256').update(str(form, 'token')).digest('hex').slice(0, 16)}`;
+  const earlier = jar.get(checkoutCookie)?.value;
+  const idempotencyKey = earlier && /^[A-Za-z0-9_-]{16,64}$/.test(earlier) ? earlier : str(form, 'idempotencyKey');
   try {
     ({ receiptToken, orderId, amountIqd } = await createOrder(
       db(),
@@ -134,7 +142,7 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
         previewToken: str(form, 'token'),
         customer: values,
         acceptedTerms: form.get('terms') === 'on',
-        idempotencyKey: str(form, 'idempotencyKey'),
+        idempotencyKey,
         couponCode: values.coupon,
       },
       await requestContext(),
@@ -142,6 +150,7 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
   } catch (e) {
     return failure(e, values);
   }
+  jar.set(checkoutCookie, idempotencyKey, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 });
   // A 100% coupon: already paid and published, nothing to collect.
   if (amountIqd === 0) redirect(`/r/${receiptToken}`);
   // Straight on to WAYL; if that isn't possible right now, the receipt page offers "Pay now".
