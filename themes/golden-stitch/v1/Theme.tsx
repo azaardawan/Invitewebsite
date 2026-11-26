@@ -69,6 +69,8 @@ export default function GoldenStitch(props: ThemeProps) {
   const film = mode === "live" ? (props.film?.src ?? null) : SAMPLE_FILM;
   const [stage, setStage] = useState<Stage>(film ? "film" : "pages");
   const [muted, setMuted] = useState(false);
+  // The film couldn't play at all (no first page from it then).
+  const [filmFailed, setFilmFailed] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const hydrated = useSyncExternalStore(
     noop,
@@ -77,11 +79,18 @@ export default function GoldenStitch(props: ThemeProps) {
   );
 
   const startMusic = music.start;
+  // The film's last frame (the card: initials, names, date) stays as the invitation's first page (owner, 2026-11-26).
+  const toLastFrame = useCallback(() => {
+    const v = video.current;
+    if (!v) return;
+    v.pause();
+    if (Number.isFinite(v.duration) && v.duration > 0) v.currentTime = Math.max(0, v.duration - 0.05);
+  }, []);
   const toPages = useCallback(() => {
-    video.current?.pause();
+    toLastFrame();
     setStage("pages");
     startMusic();
-  }, [startMusic]);
+  }, [startMusic, toLastFrame]);
 
   // Start the film as soon as the page is ready: with sound when the browser allows it, otherwise muted.
   useEffect(() => {
@@ -93,6 +102,7 @@ export default function GoldenStitch(props: ThemeProps) {
       !v ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
+      toLastFrame();
       setStage("pages");
       return;
     }
@@ -100,13 +110,16 @@ export default function GoldenStitch(props: ThemeProps) {
     v.play().catch(() => {
       v.muted = true;
       setMuted(true);
-      v.play().catch(() => setStage("pages"));
+      v.play().catch(() => {
+        toLastFrame();
+        setStage("pages");
+      });
     });
     // Runs once, when the page first shows.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // The invitation always begins at its first page (the families), wherever the page was when the film ended.
+  // The invitation always begins at its first page (the film's last frame, then the families), wherever the page was.
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [stage]);
@@ -168,8 +181,12 @@ export default function GoldenStitch(props: ThemeProps) {
       lang={lang}
       data-stage={stage}
     >
-      {stage === "film" && film ? (
-        <div className={s.film} onClick={soundOn}>
+      {film && !filmFailed ? (
+        <div
+          className={s.film}
+          data-stage={stage}
+          onClick={stage === "film" ? soundOn : undefined}
+        >
           <video
             ref={video}
             className={s.filmVideo}
@@ -178,9 +195,16 @@ export default function GoldenStitch(props: ThemeProps) {
             playsInline
             preload="auto"
             onEnded={toPages}
-            onError={() => setStage("pages")}
+            // Opened straight onto the pages (reduced motion): show the last frame as the first page.
+            onLoadedMetadata={() => {
+              if (stage === "pages") toLastFrame();
+            }}
+            onError={() => {
+              setFilmFailed(true);
+              setStage("pages");
+            }}
           />
-          {muted ? (
+          {stage === "film" && muted ? (
             <button
               type="button"
               className={s.sound}
@@ -193,16 +217,18 @@ export default function GoldenStitch(props: ThemeProps) {
               <span>{t.soundOn}</span>
             </button>
           ) : null}
-          <button
-            type="button"
-            className={s.skip}
-            onClick={(e) => {
-              e.stopPropagation();
-              toPages();
-            }}
-          >
-            {t.skipFilm}
-          </button>
+          {stage === "film" ? (
+            <button
+              type="button"
+              className={s.skip}
+              onClick={(e) => {
+                e.stopPropagation();
+                toPages();
+              }}
+            >
+              {t.skipFilm}
+            </button>
+          ) : null}
         </div>
       ) : null}
       {/* Without JavaScript the film can't play; show the pages instead. */}

@@ -3,7 +3,8 @@ import { signInAsNewOwner } from './helpers';
 
 /**
  * #32 Golden Stitch (owner, 2026-11-25/26): no Open button, the film plays by itself; a guest's tap turns the sound on
- * without stopping it; swipes during the film never scroll the invitation, which then starts at its first page.
+ * without stopping it; swipes during the film never scroll the invitation; the film's last frame (the card with the names)
+ * then stays as the invitation's first page, with the families page below it.
  */
 test('the film plays through and the invitation starts at the families page', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-390', 'stateful flow runs once');
@@ -26,9 +27,16 @@ test('the film plays through and the invitation starts at the families page', as
   const t0 = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
   await page.waitForTimeout(1500);
   expect(await video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(t0);
-  // …to the end, then the invitation from its first page.
-  await expect(video).toHaveCount(0, { timeout: 25_000 });
+  // …to the end, which stays as the invitation's first page (its last frame), the families page right after it.
+  await expect(page.locator('[data-stage="pages"]').first()).toBeAttached({ timeout: 25_000 });
   await page.waitForTimeout(500);
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  const end = await video.evaluate((v: HTMLVideoElement) => [v.paused, v.duration - v.currentTime]);
+  expect(end[0]).toBe(true);
+  expect(end[1]).toBeLessThan(0.3);
+  const box = await video.boundingBox();
+  expect(box!.y).toBeLessThan(5);
+  // Scrolling down from it reaches the families page.
+  await page.getByText('Together with their families').scrollIntoViewIfNeeded();
   await expect(page.getByText('Together with their families')).toBeInViewport();
 });
