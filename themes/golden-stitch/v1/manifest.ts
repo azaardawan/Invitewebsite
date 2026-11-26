@@ -71,6 +71,21 @@ export default defineTheme({
     },
   ],
   wording: [
+    // Owner, 2026-11-26: what the celebration is called wherever the design says "wedding" (the families page, the
+    // details title, the cards' "The Wedding of"): the customer may write their own, e.g. engagement or henna night.
+    {
+      key: 'eventName',
+      label: {
+        ar: 'اسم المناسبة (بدل «زفاف»)',
+        en: 'The occasion (instead of "wedding")',
+        ckb: 'ناوی بۆنەکە (لە جیاتی «زەماوەند»)',
+        bdn: 'ناڤێ بۆنێ (ل جهێ «داوەت»)',
+      },
+      ar: 'زفاف',
+      versions: { en: 'wedding', ckb: 'زەماوەند', bdn: 'داوەت' },
+      defaultIn: ['en', 'ckb', 'bdn'],
+      maxLength: 24,
+    },
     // The greeting above the couple's personal note.
     {
       key: 'noteGreeting',

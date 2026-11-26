@@ -22,7 +22,7 @@ import {
   type ThemeProps,
 } from "@/theme-sdk";
 import { STITCH_BORDER } from "./border";
-import { copyFor, type Copy } from "./copy";
+import { EVENT_DEFAULT, copyFor, withEvent, type Copy } from "./copy";
 import { Divider } from "./Divider";
 import filmPoster from "./assets/film-poster.webp";
 import heartSketch from "./assets/heart-sketch.webp";
@@ -61,7 +61,7 @@ export default function GoldenStitch(props: ThemeProps) {
     wording,
     switches,
   } = props;
-  const t = copyFor(locale);
+  const t = copyFor(locale, props.eventWording);
   const reduced = useReducedMotion();
   const music = useMusic();
   // The couple's own film is made after payment (manifest `film`, about ten minutes); until it is ready the invitation
@@ -285,7 +285,7 @@ export default function GoldenStitch(props: ThemeProps) {
                 </div>
               </>
             ) : null}
-            <p className={s.request}>{t.request}</p>
+            <p className={s.request}>{withEvent(t.request, wording.eventName, EVENT_DEFAULT[locale])}</p>
             {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
             <img className={s.famDivider} src={famDivider.src} alt="" aria-hidden="true" />
             <h1 className={s.names}>
@@ -346,7 +346,7 @@ export default function GoldenStitch(props: ThemeProps) {
             <div className={`${s.sheetInner} ${s.detailsInner}`}>
               {/* eslint-disable-next-line @next/next/no-img-element -- decorative artwork */}
               <img className={s.sprig} src={sprigTop.src} alt="" aria-hidden="true" />
-              <h2 className={`${s.caps} ${s.detailsTitle}`}>{t.detailsTitle}</h2>
+              <h2 className={`${s.caps} ${s.detailsTitle}`}>{withEvent(t.detailsTitle, wording.eventName, EVENT_DEFAULT[locale])}</h2>
               <Divider />
               {event.date ? (
                 <p className={s.bigDate}>

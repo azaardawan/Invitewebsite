@@ -2388,7 +2388,20 @@ Two more card styles the customer can choose with the arch card (`themes/golden-
 | 2 | #32: card name | بطاقة القنديل | Lantern arch card | کارتی کەوانەی چرا | کارتا کەڤانا چرایێ |
 | 3 | #32: `withLoveShort` (the cards' backs) | مع الحب | With love | بە خۆشەویستییەوە | ب ڤیان |
 
-## Batch 80 — Occasion wording (Nishani, Henna night, own words) and the live preview — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+## Batch 80 — Golden Stitch (#32): the customer's own word for the occasion — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+A changeable word on the order form (wording `eventName`, default "wedding") used wherever the design said "wedding".
+The lines that hold it now read with `{event}` in place of the word; the details title in Kurdish no longer names it.
+
+| # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
+|---|---|---|---|---|---|
+| 1 | #32: order form label | اسم المناسبة (بدل «زفاف») | The occasion (instead of "wedding") | ناوی بۆنەکە (لە جیاتی «زەماوەند») | ناڤێ بۆنێ (ل جهێ «داوەت») |
+| 2 | #32: its default | زفاف | wedding | زەماوەند | داوەت |
+| 3 | #32: `request` | يتشرّفون بدعوتكم لحضور حفل {event} | Request the honor of your presence at the {event} celebration of | شانازی بە بانگهێشتکردنتان دەکەن بۆ ئاهەنگی {event} | شانازیێ ب داخوازکرنا هەوە دکەن بۆ ئاهەنگا {event} |
+| 4 | #32: `detailsTitle` | تفاصيل الحفل | {Event} Details | وردەکاریی ئاهەنگ | هوورگلیێن ئاهەنگێ |
+| 5 | #32: `weddingOf` (cards) | حفل {event} | The {Event} of | ئاهەنگی {event} | ئاهەنگا {event} |
+
+## Batch 81 — Occasion wording (Nishani, Henna night, own words) and the live preview — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
 
 Order form, «What is the occasion?» (`store.event.*`), the live preview beside the form (`store.preview.*`), and the
 phrases the designs use for a Nishani or a henna night (`src/catalog/occasion-wording.ts`).
