@@ -1488,6 +1488,11 @@
       "remove": "Remove this photo",
       "removeConfirm": "Remove this photo? It can't be brought back.",
       "none": "No photos yet. Share the photo QR code with your guests."
+    },
+    "filmStatus": {
+      "ready": "Your opening animation is ready.",
+      "making": "Your opening animation is being made. It takes about 10 minutes; refresh this page to check.",
+      "late": "Your opening animation is taking longer than usual. Our team is on it."
     }
   },
   "nav": {

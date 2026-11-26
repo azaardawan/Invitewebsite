@@ -1,7 +1,7 @@
 import 'server-only';
 import { DEFAULT_PER_GUEST, guestPhotoPrice } from '@/catalog/guest-photos';
 import { getSettings } from '@/server/settings/service';
-import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
+import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX, showsEventWording } from '@/catalog/occasion-wording';
 import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
 import { hasPosters, includedPosters, type PosterOrientation } from '@/catalog/posters';
 import { posterTextDefault } from '@/lib/poster-texts';
@@ -40,7 +40,7 @@ export async function draftByToken(token: string) {
   const inv = await findByPreviewToken(db(), token);
   if (!inv) return null;
   const [row] = await db()
-    .select({ theme: themes, pkg: packages, codeRef: themeVersions.codeRef, manifest: themeVersions.manifest })
+    .select({ theme: themes, pkg: packages, codeRef: themeVersions.codeRef, manifest: themeVersions.manifest, version: themeVersions.version })
     .from(themes)
     .innerJoin(packages, eq(packages.id, inv.packageId))
     .innerJoin(themeVersions, eq(themeVersions.id, inv.themeVersionId))
@@ -75,7 +75,7 @@ export async function draftByToken(token: string) {
       switchDefs: (row.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
       guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, perGuest: inv.guestPhotosPerGuest ?? DEFAULT_PER_GUEST } : null,
-      event: { occasion: section?.key ?? null, kind: inv.eventKind, name: inv.eventName },
+      event: { occasion: section?.key ?? null, kind: inv.eventKind, name: inv.eventName, version: row.version },
     },
     fieldKeys: inv.fieldKeys,
     /** Guest photo sharing chosen on the form (its price is added at checkout), or null. */
@@ -236,7 +236,7 @@ export async function orderFormExtras(
     /** Guest photo sharing chosen so far (null = not). */
     guestPhotos?: { cap: number; perGuest: number } | null;
     /** The occasion (section key; null = still to choose among the design's) and the event chosen so far. */
-    event?: { occasion: string | null; kind?: string | null; name?: string | null; choices?: readonly string[] };
+    event?: { occasion: string | null; kind?: string | null; name?: string | null; choices?: readonly string[]; version?: number | null };
   } = {},
   fieldKeys: readonly string[] = [],
 ): Promise<OrderFormExtras> {
@@ -292,7 +292,8 @@ export async function orderFormExtras(
   }
   // A wedding or engagement held as a Nishani, a Henna night or the customer's own words (owner, 2026-11-26).
   const occasions = current.event ? (current.event.occasion ? [current.event.occasion] : (current.event.choices ?? [])) : [];
-  if (occasions.length && occasions.every((o) => (EVENT_KIND_SECTIONS as readonly string[]).includes(o))) {
+  // Only where the design's version shows it (EVENT_WORDING_SINCE); a choice that changes nothing is never offered.
+  if (occasions.length && occasions.every((o) => (EVENT_KIND_SECTIONS as readonly string[]).includes(o)) && showsEventWording(designKey, current.event!.version)) {
     extras.event = { own: current.event!.occasion, current: current.event!.kind ?? '', name: current.event!.name ?? '', max: EVENT_NAME_MAX };
   }
   // Guest photo sharing: an add-on at the end of the form while the owner offers it (Admin → Settings).

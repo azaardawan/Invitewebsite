@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanEventName, eventWords, isEventKind, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
+import { cleanEventName, eventWords, isEventKind, showsEventWording, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
 
 describe('occasion wording (owner, 2026-11-26)', () => {
   it('names a Nishani and a henna night in each language, with the English name for lettered artwork', () => {
@@ -24,5 +24,12 @@ describe('occasion wording (owner, 2026-11-26)', () => {
   it('keeps own words to one short line without markup', () => {
     expect(cleanEventName('<b>x</b>')).toBe('bx/b');
     expect(cleanEventName('a'.repeat(60))!.length).toBe(EVENT_NAME_MAX);
+  });
+  it('is only offered on design versions that show it', () => {
+    expect(showsEventWording('espresso-ivory', 4)).toBe(true);
+    expect(showsEventWording('espresso-ivory', 5)).toBe(true);
+    expect(showsEventWording('espresso-ivory', 3)).toBe(false);
+    expect(showsEventWording('royal-olive-crest', 9)).toBe(false);
+    expect(showsEventWording(null, 4)).toBe(false);
   });
 });

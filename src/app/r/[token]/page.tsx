@@ -270,6 +270,17 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         {r.invitation.onlineInvitation ? (
           <section id="invitation" className={`${card} space-y-4`}>
             <h2 className="font-semibold">{t('invitationLink')}</h2>
+            {/* The couple's opening animation (designs with a film): ready or not yet, every time they look (owner, 2026-11-26). */}
+            {paid && r.invitation.film ? (
+              <p
+                role="status"
+                data-film-status={r.invitation.film}
+                className={`flex items-start gap-2.5 rounded-xl px-3.5 py-2.5 text-sm ${r.invitation.film === 'ready' ? 'bg-success/10 text-success' : 'bg-blush text-heading'}`}
+              >
+                <span aria-hidden className={`mt-1.5 size-2 shrink-0 rounded-full ${r.invitation.film === 'ready' ? 'bg-success' : 'animate-pulse bg-accent'}`} />
+                {t(`filmStatus.${r.invitation.film}`)}
+              </p>
+            ) : null}
             {url && r.invitation.live && r.invitation.path ? (
               // How the link looks when shared on WhatsApp: the same picture, the link under it.
               <a href={url} target="_blank" rel="noopener" className="block overflow-hidden rounded-2xl border border-line bg-canvas" data-invitation-preview>

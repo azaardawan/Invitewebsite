@@ -10,6 +10,26 @@ export const EVENT_KINDS = ['nishani', 'henna', 'custom'] as const;
 export type EventKind = (typeof EVENT_KINDS)[number];
 /** The sections whose designs offer the choice (owner: weddings and engagements only, for now). */
 export const EVENT_KIND_SECTIONS = ['wedding', 'engagement'] as const;
+/**
+ * The first version of each design that shows the event chosen (`props.eventWording`); later versions are copies of it.
+ * The choice is only offered on these (owner, 2026-11-26: offered on an older version it changed nothing).
+ */
+export const EVENT_WORDING_SINCE: Readonly<Record<string, number>> = {
+  'burgundy-lace': 5,
+  'delal-bridge': 3,
+  'erbil-hewler': 3,
+  'espresso-ivory': 4,
+  'golden-stitch': 2,
+  'vintage-love-letters': 6,
+  'winter-flower': 3,
+};
+
+/** Whether this design version shows the event chosen. */
+export function showsEventWording(themeKey: string | null | undefined, version: number | null | undefined): boolean {
+  const since = themeKey ? EVENT_WORDING_SINCE[themeKey] : undefined;
+  return since !== undefined && typeof version === 'number' && version >= since;
+}
+
 /** The customer's own event name: one short line. */
 export const EVENT_NAME_MAX = 40;
 
