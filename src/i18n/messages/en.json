@@ -1480,6 +1480,11 @@
       "remove": "Remove this photo",
       "removeConfirm": "Remove this photo? It can't be brought back.",
       "none": "No photos yet. Share the photo QR code with your guests."
+    },
+    "filmStatus": {
+      "ready": "Your opening animation is ready.",
+      "making": "Your opening animation is being made. It takes about 10 minutes; refresh this page to check.",
+      "late": "Your opening animation is taking longer than usual. Our team is on it."
     }
   },
   "nav": {
@@ -1872,21 +1877,6 @@
       "namePlaceholder": "e.g. Our Nikah ceremony",
       "nameRequired": "Write the occasion's name.",
       "nameTooLong": "Keep it to 40 letters."
-    },
-    "preview": {
-      "title": "Live preview",
-      "invitation": "Invitation",
-      "front": "Card front",
-      "back": "Card back",
-      "whichCard": "Which card",
-      "enlarge": "⤢ Enlarge",
-      "close": "✕ Close",
-      "smaller": "▴ Smaller",
-      "show": "▾ Show preview",
-      "updating": "Updating…",
-      "glowing": "Glowing where it shows",
-      "notHere": "Not on this view: try the other tabs",
-      "sample": "Example texts fill what you haven't written yet"
     }
   },
   "contact": {

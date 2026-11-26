@@ -1,5 +1,6 @@
 import 'server-only';
 import { invitationCardDetails } from '@/server/documents/data';
+import { filmStatus } from '@/server/film/film';
 import { manifestByCodeRef } from '@/theme-registry';
 import { cardBackPortrait } from '@/theme-sdk/manifest';
 import { selfEditState } from '@/server/invitation/customer-edit';
@@ -64,6 +65,12 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       cards: cardDetails.map((c) => c.key),
       /** The A5 card's back is upright like its front (manifest `print.card.back`), else landscape. */
       cardBackPortrait: cardBackPortrait(manifest),
+      /**
+       * The couple's opening film (designs with manifest `film`, src/server/film/film.ts), so the receipt can say whether
+       * it is ready (owner, 2026-11-26): `ready` (made for the names and date as they are now), `making` (being made or
+       * about to be, about ten minutes), `late` (it failed three times; the team sees it in the logs). Null without a film.
+       */
+      film: manifest?.film ? filmStatus(row.invitation) : null,
       /** The design's own note for its customers (manifest `pageTexts.notice`), in every language it has. */
       notice: manifest?.pageTexts?.notice ?? null,
       /** Each shaped card's name in the design's languages (the A5 card has none). */

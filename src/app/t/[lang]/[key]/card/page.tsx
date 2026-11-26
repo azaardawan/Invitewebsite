@@ -3,8 +3,7 @@ import { connection } from 'next/server';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
-import { sections, themePalettes, themes } from '@/server/db/schema';
-import { parseTextProbe } from '@/server/invitation/probe';
+import { sections, themes } from '@/server/db/schema';
 import { resolveSample } from '@/server/invitation/preview';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { cardData, designCards } from '@/server/documents/data';
@@ -18,9 +17,6 @@ const query = z.object({
   side: z.enum(['front', 'back']).default('front'),
   names: z.enum(['short', 'long']).optional(),
   occasion: z.string().max(40).optional(),
-  pkg: z.uuid().optional(),
-  /** The customer's live preview while they type (JSON, `parseTextProbe`): their texts, the card back's included. */
-  live: z.string().max(20000).optional(),
 });
 
 /**
@@ -39,28 +35,12 @@ export default async function PublicCardSample({ params, searchParams }: PagePro
     .innerJoin(sections, eq(sections.id, themes.sectionId))
     .where(and(eq(themes.key, key), eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE')));
   if (!live) notFound();
-  const probe = parseTextProbe(q.data.live);
-  const colors = probe.palette
-    ? (await db().select({ colors: themePalettes.colors }).from(themePalettes).where(and(eq(themePalettes.id, probe.palette), eq(themePalettes.themeId, live.id))))[0]?.colors
-    : undefined;
-  const sample = await resolveSample(db(), {
-    themeKey: key,
-    locale: lang,
-    names: q.data.names,
-    occasion: q.data.occasion,
-    packageId: q.data.pkg,
-    values: probe.values,
-    wording: probe.wording,
-    eventKind: probe.eventKind,
-    eventName: probe.eventName,
-    colors,
-  });
+  const sample = await resolveSample(db(), { themeKey: key, locale: lang, names: q.data.names, occasion: q.data.occasion });
   if (!sample) notFound();
   const card = designCards(sample.manifest).find((c) => c.key === q.data.card);
   if (!card) notFound();
   const shape = card.key === 'a5' ? null : (sample.manifest.print?.shapes?.find((s) => s.key === card.key) ?? null);
-  const back = probe.title !== undefined || probe.message !== undefined ? { backTitle: probe.title, backMessage: probe.message } : {};
-  const data = await cardData(sample.props, sample.manifest, 'card', back, null, await themeCardDesign(db(), sample.theme.id), null, shape);
+  const data = await cardData(sample.props, sample.manifest, 'card', {}, null, await themeCardDesign(db(), sample.theme.id), null, shape);
   const { print } = invitationMessages(lang) as unknown as { print: { watermark: string; watermarkNote: string } };
   return <CardPages codeRef={sample.version.codeRef} data={data} view={q.data.side} watermark={{ watermark: print.watermark, watermarkNote: print.watermarkNote }} />;
 }

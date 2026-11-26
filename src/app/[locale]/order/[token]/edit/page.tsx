@@ -3,9 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link, redirect } from '@/i18n/navigation';
 import { localized } from '@/lib/localized';
 import type { Locale } from '@/i18n/config';
-import { draftByToken, livePreviewSpec, orderFormExtras } from '@/server/storefront/order';
-import { LivePreview } from '@/components/storefront/order/LivePreview';
-import { PreviewLayout } from '@/components/storefront/order/PreviewLayout';
+import { draftByToken, orderFormExtras } from '@/server/storefront/order';
 import { baghdadToday } from '@/server/orders/validation';
 import { OrderForm } from '@/components/storefront/order/OrderForm';
 import { OrderSteps } from '@/components/storefront/order/OrderSteps';
@@ -35,17 +33,14 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
     redirect({ href: `/order/${token}`, locale });
     return null;
   }
-  // The live preview beside the form (owner, 2026-11-26).
-  const preview = await livePreviewSpec({ themeKey: draft.theme.key, packageId: draft.pkg.id, featureKeys: draft.featureKeys, fieldKeys: draft.fieldKeys, occasion: draft.current.event.occasion, locale: draft.locale });
   return (
-    <div className={`mx-auto px-6 pt-10 lg:pt-16 ${preview ? 'max-w-[1180px]' : 'max-w-[640px]'}`}>
-      <PreviewLayout preview={preview ? <LivePreview spec={preview} formId="order-form" initialLang={draft.locale} /> : null}>
+    <div className="mx-auto max-w-[640px] px-6 pt-10 lg:pt-16">
       <OrderSteps current={0} />
       <h1 className="mt-8 font-display text-[36px] leading-[1.3] font-bold text-heading lg:text-[48px]">{t('editTitle')}</h1>
       <p className="mt-2 text-sm text-muted">
         {localized(draft.theme.name, locale)} · {localized(draft.pkg.name, locale)}
       </p>
-      <div className="mt-8" id="order-form">
+      <div className="mt-8">
         <OrderForm
           action={editDraftAction}
           hidden={{ token, siteLocale: locale }}
@@ -63,7 +58,6 @@ export default async function EditDraftPage({ params }: PageProps<'/[locale]/ord
           {t('cancel')}
         </Link>
       </div>
-      </PreviewLayout>
     </div>
   );
 }

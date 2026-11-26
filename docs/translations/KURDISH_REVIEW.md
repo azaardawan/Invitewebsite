@@ -2401,9 +2401,9 @@ The lines that hold it now read with `{event}` in place of the word; the details
 | 4 | #32: `detailsTitle` | تفاصيل الحفل | {Event} Details | وردەکاریی ئاهەنگ | هوورگلیێن ئاهەنگێ |
 | 5 | #32: `weddingOf` (cards) | حفل {event} | The {Event} of | ئاهەنگی {event} | ئاهەنگا {event} |
 
-## Batch 81 — Occasion wording (Nishani, Henna night, own words) and the live preview — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+## Batch 81 — Occasion wording (Nishani, Henna night, own words) — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
 
-Order form, «What is the occasion?» (`store.event.*`), the live preview beside the form (`store.preview.*`), and the
+Order form, «What is the occasion?» (`store.event.*`), and the
 phrases the designs use for a Nishani or a henna night (`src/catalog/occasion-wording.ts`).
 
 | Key | Sorani (ckb) | Badini (bdn) |
@@ -2416,15 +2416,16 @@ phrases the designs use for a Nishani or a henna night (`src/catalog/occasion-wo
 | store.event.help | هەموو ئەو دێڕانەی بانگهێشتنامە و کارتەکە کە ناوی بۆنەکە دەهێنن دەگۆڕێن. | هەمی ئەو دێڕێن داخوازنامێ و کارتێ یێن ناڤێ بۆنێ دئینن دێ هێنە گوهۆڕین. |
 | store.event.nameLabel / namePlaceholder | ناوی بۆنەکەتان / نموونە: ئاهەنگی مارەبڕینمان | ناڤێ بۆنا هەوە / نموونە: ئاهەنگا مارەبڕینا مە |
 | store.event.nameRequired / nameTooLong | ناوی بۆنەکە بنووسن. / لە ٤٠ پیت زیاتر نەبێت. | ناڤێ بۆنێ بنڤیسن. / ژ ٤٠ پیتان پتر نەبیت. |
-| store.preview.title / invitation | پێشبینینی ڕاستەوخۆ / بانگهێشتنامە | پێشبینینا ڕاستەوخۆ / داخوازنامە |
-| store.preview.front / back / whichCard | ڕووی کارت / پشتی کارت / کام کارت | ڕوویێ کارتێ / پشتا کارتێ / کیژ کارت |
-| store.preview.enlarge / close / smaller / show | گەورەکردن / داخستن / بچووککردنەوە / پیشاندانی پێشبینین | مەزنکرن / گرتن / بچووککرن / نیشاندانا پێشبینینێ |
-| store.preview.updating | نوێ دەکرێتەوە… | دهێتە نووکرن… |
-| store.preview.glowing | لەو شوێنەی دەردەکەوێت دەدرەوشێتەوە | ل وی جهی دیار دبیت دبریسکیت |
-| store.preview.notHere | لێرەدا دەرناکەوێت: بەشەکانی تر تاقی بکەنەوە | ل ڤێرێ دیار نابیت: بەشێن دی تاقی بکەن |
-| store.preview.sample | دەقە نموونەییەکان ئەوە پڕ دەکەنەوە کە هێشتا نەتاننووسیوە | دەقێن نموونە وی پڕ دکەن یێ هێشتا هەوە نەنڤیسی |
 | Nishani: name / invitation / details | ئاهەنگی نیشانی / بانگهێشتنامەی نیشانی / زانیارییەکانی ئاهەنگی نیشانی | ئاهەنگا نیشانیێ / داخوازناما نیشانیێ / زانیاریێن ئاهەنگا نیشانیێ |
 | Nishani: invited / on the occasion | بانگهێشتتان دەکەین بۆ بەشداریکردن لە ئاهەنگی نیشانیمان / بە بۆنەی نیشانیمان | مە هوین داخواز کرینە بۆ پشکداریێ د ئاهەنگا نیشانیا مە دا / ب بۆنا نیشانیا مە |
 | Henna: name / invitation / details | شەوی خەنەبەندان / بانگهێشتنامەی شەوی خەنەبەندان / زانیارییەکانی شەوی خەنەبەندان | شەڤا خەنێ / داخوازناما شەڤا خەنێ / زانیاریێن شەڤا خەنێ |
 | Henna: invited / on the occasion | بانگهێشتتان دەکەین بۆ بەشداریکردن لە شەوی خەنەبەندانمان / بە بۆنەی شەوی خەنەبەندانمان | مە هوین داخواز کرینە بۆ پشکداریێ د شەڤا خەنا مە دا / ب بۆنا شەڤا خەنا مە |
 | Keepsake subtitles | نامەی خێزان و خۆشەویستان لە ڕۆژی نیشانیماندا / لە شەوی خەنەبەندانماندا | نامێن مالباتێ و هەڤالان د ڕۆژا نیشانیا مە دا / د شەڤا خەنا مە دا |
+
+## Batch 82 — Receipt: whether the opening animation is ready — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+| Key | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- |
+| receipt.filmStatus.ready | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان ئامادەیە. | دەستپێکا لڤۆک یا داخوازناما هەوە یا ئامادەیە. |
+| receipt.filmStatus.making | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان ئامادە دەکرێت. نزیکەی ١٠ خولەک دەخایەنێت؛ ئەم پەڕەیە نوێ بکەنەوە بۆ دڵنیابوون. | دەستپێکا لڤۆک یا داخوازناما هەوە دهێتە ئامادەکرن. نێزیکی ١٠ خولەکان دڤێت؛ ڤێ پەڕێ نووژەن بکەن دا پشتڕاست ببن. |
+| receipt.filmStatus.late | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان لە ئاسایی زیاتر کات دەخایەنێت. تیمەکەمان بەدواداچوونی بۆ دەکات. | دەستپێکا لڤۆک یا داخوازناما هەوە ژ ئاسایی پتر دەم دڤێت. تیما مە یا ل سەر کار دکەت. |
