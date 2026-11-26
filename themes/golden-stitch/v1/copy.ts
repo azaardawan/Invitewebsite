@@ -1,4 +1,4 @@
-import type { EventWords, InvitationLocale } from '@/theme-sdk';
+import type { InvitationLocale } from '@/theme-sdk';
 
 /**
  * The design's own wording, as the owner drew the pages (English), in the four invitation languages. Platform strings
@@ -10,19 +10,19 @@ const ar = {
   togetherWith: 'بحضور عائلتيهما',
   groomFamily: 'عائلة العريس',
   brideFamily: 'عائلة العروس',
-  request: 'يتشرّفون بدعوتكم لحضور حفل {event}',
+  request: 'يتشرّفون بدعوتكم لحضور حفل زفاف',
   /** Ar-Rum 30:21. Never changed by customers. */
   verse: 'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً',
   verseRef: 'سورة الروم · الآية ٢١',
   verseTranslation: '',
   noteTitle: 'رسالة منّا',
-  detailsTitle: 'تفاصيل الحفل',
+  detailsTitle: 'تفاصيل الزفاف',
   countdownTitle: 'اليوم الكبير بعد',
   congratsTitle: 'رسائل التهنئة',
   congratsIntro: 'اترك تهنئتك وأمنياتك الصادقة للعروسين',
   messagePlaceholder: 'اكتب رسالتك…',
   thanks: 'شكرًا لكونكم جزءًا من يومنا المميّز.',
-  weddingOf: 'حفل {event}',
+  weddingOf: 'حفل زفاف',
   withLoveShort: 'مع الحب',
   skipFilm: 'تخطّي',
   soundOn: 'تشغيل الصوت',
@@ -37,19 +37,19 @@ const en: Copy = {
   togetherWith: 'Together with their families',
   groomFamily: 'The Family of the Groom',
   brideFamily: 'The Family of the Bride',
-  request: 'Request the honor of your presence at the {event} celebration of',
+  request: 'Request the honor of your presence at the wedding celebration of',
   verse: ar.verse,
   verseRef: 'Surah Ar-Rum · Verse 21',
   verseTranslation:
     'And among His signs is that He created for you spouses from among yourselves so that you may find tranquility in them, and He placed between you affection and mercy.',
   noteTitle: 'A Letter from Us',
-  detailsTitle: '{Event} Details',
+  detailsTitle: 'Wedding Details',
   countdownTitle: 'The Big Day In',
   congratsTitle: 'Congratulations Messages',
   congratsIntro: 'Leave your congratulations and heartfelt wishes for the couple',
   messagePlaceholder: 'Write your message…',
   thanks: 'Thank you for being a part of our special day.',
-  weddingOf: 'The {Event} of',
+  weddingOf: 'The Wedding of',
   withLoveShort: 'With love',
   skipFilm: 'Skip',
   soundOn: 'Tap for sound',
@@ -63,18 +63,18 @@ const ckb: Copy = {
   togetherWith: 'لەگەڵ هەردوو بنەماڵەکەیان',
   groomFamily: 'بنەماڵەی زاوا',
   brideFamily: 'بنەماڵەی بووک',
-  request: 'شانازی بە بانگهێشتکردنتان دەکەن بۆ ئاهەنگی {event}',
+  request: 'شانازی بە بانگهێشتکردنتان دەکەن بۆ ئاهەنگی زەماوەندی',
   verse: ar.verse,
   verseRef: ar.verseRef,
   verseTranslation: '',
   noteTitle: 'نامەیەک لە ئێمەوە',
-  detailsTitle: 'وردەکاریی ئاهەنگ',
+  detailsTitle: 'وردەکاریی زەماوەند',
   countdownTitle: 'ڕۆژە گەورەکە دوای',
   congratsTitle: 'نامەکانی پیرۆزبایی',
   congratsIntro: 'پیرۆزبایی و هیوا دڵسۆزەکانت بۆ بووک و زاوا بنووسە',
   messagePlaceholder: 'نامەکەت بنووسە…',
   thanks: 'سوپاس بۆ ئەوەی بەشێک بوون لە ڕۆژە تایبەتەکەمان.',
-  weddingOf: 'ئاهەنگی {event}',
+  weddingOf: 'زەماوەندی',
   withLoveShort: 'بە خۆشەویستییەوە',
   skipFilm: 'تێپەڕاندن',
   soundOn: 'دەنگ لێبدە',
@@ -88,18 +88,18 @@ const bdn: Copy = {
   togetherWith: 'دگەل هەردوو مالباتێن وان',
   groomFamily: 'مالباتا زاڤای',
   brideFamily: 'مالباتا بویکێ',
-  request: 'شانازیێ ب داخوازکرنا هەوە دکەن بۆ ئاهەنگا {event}',
+  request: 'شانازیێ ب داخوازکرنا هەوە دکەن بۆ ئاهەنگا داوەتا',
   verse: ar.verse,
   verseRef: ar.verseRef,
   verseTranslation: '',
   noteTitle: 'نامەیەک ژ مە',
-  detailsTitle: 'هوورگلیێن ئاهەنگێ',
+  detailsTitle: 'هوورگلیێن داوەتێ',
   countdownTitle: 'رۆژا مەزن پشتی',
   congratsTitle: 'نامێن پیرۆزباهیێ',
   congratsIntro: 'پیرۆزباهی و هیڤیێن خۆ یێن دلسۆز بۆ بویک و زاڤای بنڤیسە',
   messagePlaceholder: 'نامەیا خۆ بنڤیسە…',
   thanks: 'سوپاس بۆ هندێ کو هوین بەشەک بوون ژ رۆژا مە یا تایبەت.',
-  weddingOf: 'ئاهەنگا {event}',
+  weddingOf: 'داوەتا',
   withLoveShort: 'ب ڤیان',
   skipFilm: 'دەرباز بکە',
   soundOn: 'دەنگی لێبدە',
@@ -111,24 +111,6 @@ const bdn: Copy = {
 
 const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb, bdn };
 
-/**
- * A Nishani, a henna night or the couple's own words chosen on the order form (`props.eventWording`, owner 2026-11-26):
- * the lines that name the wedding name that event instead (the design's own `eventName` word is then not used).
- */
-export function copyFor(locale: InvitationLocale, held?: EventWords | null): Copy {
-  if (!held) return COPY[locale];
-  return { ...COPY[locale], request: held.invitedTo, weddingOf: held.ofThe, detailsTitle: locale === 'en' ? 'The details' : held.details };
+export function copyFor(locale: InvitationLocale): Copy {
+  return COPY[locale];
 }
-
-/**
- * The occasion's name in a line (owner, 2026-11-26: the customer may call it something other than "wedding", wording
- * `eventName`): `{event}` as written, `{Event}` with capital initials (English titles).
- */
-export function withEvent(text: string, event: string | undefined, fallback: string): string {
-  const name = (event ?? '').trim() || fallback;
-  const title = name.replace(/(^|\s)(\p{Ll})/gu, (_, sp: string, c: string) => sp + c.toUpperCase());
-  return text.replaceAll('{event}', name).replaceAll('{Event}', title);
-}
-
-/** The default occasion name in each language (the manifest's `eventName` wording). */
-export const EVENT_DEFAULT: Record<InvitationLocale, string> = { ar: 'زفاف', en: 'wedding', ckb: 'زەماوەند', bdn: 'داوەت' };

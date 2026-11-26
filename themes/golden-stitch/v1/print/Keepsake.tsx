@@ -10,8 +10,8 @@ import p from './print.module.css';
  * messages are written on the owner's lined flower paper (it repeats on every page), each line sitting on a rule
  * (the rules are 11.08 mm apart), a message never split across pages.
  */
-export default function Keepsake({ locale, dir, lang, fields, event, labels, messages, border, eventWording }: KeepsakeProps) {
-  const t = copyFor(locale, eventWording);
+export default function Keepsake({ locale, dir, lang, fields, event, labels, messages, border }: KeepsakeProps) {
+  const t = copyFor(locale);
   return (
     <div className={`${fonts.fonts} ${p.keepsake}`} dir={dir} lang={lang}>
       <div className={p.paper} aria-hidden="true" />

@@ -8,7 +8,7 @@ import backDivider from '../assets/arch-back-divider.webp';
 import backBottom from '../assets/arch-back-bottom.webp';
 import burgRect from '../assets/burg-rect.webp';
 import burgArch from '../assets/burg-arch.webp';
-import { EVENT_DEFAULT, copyFor, withEvent } from '../copy';
+import { copyFor } from '../copy';
 import { QrCodes, numericDate } from './Ornaments';
 import p from './print.module.css';
 
@@ -85,8 +85,8 @@ function archScale(name: string): number {
  * uses the same artwork on both sides. Front: "The Wedding of", the names with a gold "&", the date. Back: the
  * customer's title and message in italics, "With love" and the QR code(s).
  */
-function Burgundy({ shape, side, dir, lang, locale, fields, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine, wording, eventWording }: PrintShapeProps) {
-  const t = copyFor(locale, eventWording);
+function Burgundy({ shape, side, dir, lang, locale, fields, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine }: PrintShapeProps) {
+  const t = copyFor(locale);
   const lantern = shape === 'arch-lantern';
   const one = fields.person_1_name;
   const two = fields.person_2_name;
@@ -102,7 +102,7 @@ function Burgundy({ shape, side, dir, lang, locale, fields, labels, title, messa
     >
       {side === 'front' ? (
         <div className={p.burgFront}>
-          <p className={p.burgWeddingOf}>{withEvent(t.weddingOf, wording.eventName, EVENT_DEFAULT[locale])}</p>
+          <p className={p.burgWeddingOf}>{t.weddingOf}</p>
           <h1 className={p.burgNames}>
             {one ? <span style={{ fontSize: `${archScale(one)}em` }}>{one}</span> : null}
             {one && two ? <span className={p.burgAnd}>{labels.and}</span> : null}
