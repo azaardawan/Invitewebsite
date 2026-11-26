@@ -13,7 +13,10 @@ test('one design in wedding and engagement: shown in both, once in combined list
   await page.getByRole('link', { name: 'زاخو بالألوان المائية' }).click();
   const also = page.getByRole('group', { name: 'يُعرض أيضاً في' });
   await also.getByLabel('خطوبة').check();
-  await also.locator('xpath=ancestor::form').getByRole('button', { name: 'حفظ' }).click();
+  const form = also.locator('xpath=ancestor::form');
+  await form.getByRole('button', { name: 'حفظ' }).click();
+  // The box is ticked at once; wait for the save itself before leaving the page (leaving cancels it).
+  await expect(form.getByRole('status')).toBeVisible();
   await expect(also.getByLabel('خطوبة')).toBeChecked();
 
   // The engagement page lists it; the combined list shows it once, with both occasions.
@@ -45,6 +48,7 @@ test('one design in wedding and engagement: shown in both, once in combined list
   await page.getByRole('link', { name: 'زاخو بالألوان المائية' }).click();
   await also.getByLabel('خطوبة').uncheck();
   await also.locator('xpath=ancestor::form').getByRole('button', { name: 'حفظ' }).click();
+  await expect(also.locator('xpath=ancestor::form').getByRole('status')).toBeVisible();
   await expect(also.getByLabel('خطوبة')).not.toBeChecked();
   await openOrderForm(page, 'zaxo-watercolor');
   await expect(page.getByRole('group', { name: 'لأي مناسبة هذه الدعوة؟' })).toHaveCount(0);

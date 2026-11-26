@@ -66,7 +66,7 @@ export const settingsData = z.object({
   payment: paymentSettings.default({ whatsapp: null, manualInstructions: null }),
   contact: contactSettings.default({ phone: null, email: null, instagram: null, facebook: null, tiktok: null, address: null, hours: null }),
   featured: featuredSettings.default({ themeIds: [] }),
-  guestPhotos: guestPhotoSettings.default({ enabled: false, basePriceIqd: 15_000, stepPriceIqd: 5_000, maxCap: 3_000 }),
+  guestPhotos: guestPhotoSettings.default({ enabled: true, basePriceIqd: 15_000, stepPriceIqd: 5_000, maxCap: 3_000 }),
 });
 
 export type SettingsData = z.infer<typeof settingsData>;

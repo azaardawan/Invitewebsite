@@ -158,6 +158,14 @@
     "ar: overlap:div2>div1>article1>main1>section3>div1>div4>span1|div2>div1>article1>main1>section3>div1>div4>strong1",
     "ar: overlap:div2>div1>article1>main1>section4>div1>form1>h31|div2>div1>article1>main1>section4>div1>form1>label1"
   ],
+  "delal-bridge@3": [
+    "ar: cut:div2>div1>article1>main1>section4>div1>form1>h31",
+    "ar: overlap:div2>div1>article1>main1>section3>div1>div1>span1|div2>div1>article1>main1>section3>div1>div1>strong1",
+    "ar: overlap:div2>div1>article1>main1>section3>div1>div2>span1|div2>div1>article1>main1>section3>div1>div2>strong1",
+    "ar: overlap:div2>div1>article1>main1>section3>div1>div3>span1|div2>div1>article1>main1>section3>div1>div3>strong1",
+    "ar: overlap:div2>div1>article1>main1>section3>div1>div4>span1|div2>div1>article1>main1>section3>div1>div4>strong1",
+    "ar: overlap:div2>div1>article1>main1>section4>div1>form1>h31|div2>div1>article1>main1>section4>div1>form1>label1"
+  ],
   "embroidered-garden@3": [
     "ar: cover/on-drawing:div2>div1>section1>div1>div1>p1>span1",
     "ar: on-drawing:div2>div1>div1>div1>div1>div1>p1>span1",
@@ -270,6 +278,10 @@
     "en: overlap:div2>div1>main1>section4>div1>div1>div3>span1|div2>div1>main1>section4>div1>div1>div3>span2"
   ],
   "vintage-love-letters@5": [
+    "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>em1",
+    "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>span1"
+  ],
+  "vintage-love-letters@6": [
     "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>em1",
     "ar: on-drawing:div2>div1>article1>main1>section1>header1>h11>span1>span1"
   ]

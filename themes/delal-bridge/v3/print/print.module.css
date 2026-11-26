@@ -1,0 +1,117 @@
+/*
+ * Delal Bridge keepsake, A4 (owner's artwork, 2026-11-08). Every page is the artwork without its words; the title, the
+ * «Guest Name:» rows and the dividers are drawn here at the artwork's places. Physical units only;
+ * the slot sizes are in step with LINE / HEAD / BETWEEN in Keepsake.tsx.
+ */
+
+.keepsake {
+  --ink: #3d2b1c;
+  --wine: #7d1414;
+  --rule: rgb(92 40 18 / 0.9);
+  color: var(--ink);
+  font-family: var(--db-text);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.keepsake * {
+  box-sizing: border-box;
+}
+.keepsake :is(p, h1) {
+  margin: 0;
+  font-weight: 400;
+}
+
+.page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  break-after: page;
+}
+.page:last-child {
+  break-after: auto;
+}
+.pageArt {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 210mm;
+  height: 297mm;
+}
+
+.title {
+  position: absolute;
+  top: 35.4mm;
+  left: 40mm;
+  right: 40mm;
+  height: 16mm;
+  font-family: var(--db-script);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 14.2mm;
+  line-height: 16mm;
+  text-align: center;
+  color: var(--wine);
+  white-space: nowrap;
+}
+.keepsake[data-script='arabic'] .title {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11.5mm;
+  top: 34.6mm;
+}
+
+.slots {
+  position: absolute;
+  top: 63.3mm;
+  left: 16.2mm;
+  right: 16.2mm;
+}
+.slot {
+  break-inside: avoid;
+}
+.divider {
+  display: block;
+  width: 105.9mm;
+  height: 5.97mm;
+  margin: 5.16mm auto 2.2mm;
+}
+.nameRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.4mm;
+  min-height: 7mm;
+}
+.nameLabel {
+  flex: none;
+  font-family: var(--db-script);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 15pt;
+  line-height: 1;
+  color: var(--wine);
+}
+.keepsake[data-script='arabic'] .nameLabel {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 17pt;
+}
+.name {
+  min-width: 67.3mm;
+  max-width: 100%;
+  min-height: 7mm;
+  padding-inline: 1mm;
+  border-bottom: 0.26mm solid var(--rule);
+  font-size: 13pt;
+  line-height: 6.6mm;
+  overflow-wrap: anywhere;
+}
+.lines {
+  margin-top: 1mm !important;
+  padding-inline: 1mm;
+  font-size: 14pt;
+  line-height: 8.4mm;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-align: start;
+}

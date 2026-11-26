@@ -33,7 +33,8 @@ test('the owner moves and turns an item of the café by its code, and saves it',
   await page.getByLabel('اذهب إلى القطعة').fill('#7');
   await page.getByRole('button', { name: 'اذهب إلى القطعة' }).click();
   const panel = page.getByTestId('tour-editor-panel');
-  await expect(panel.getByText('#7')).toBeVisible();
+  // The first pick loads the move/turn handles (a separate download), slow on a busy CI machine.
+  await expect(panel.getByText('#7')).toBeVisible({ timeout: 30_000 });
   // 10 cm along, 15° round
   await panel.getByRole('button', { name: '+10', exact: true }).first().click();
   await panel.getByRole('button', { name: '+15°' }).click();

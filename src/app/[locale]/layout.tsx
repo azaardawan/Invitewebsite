@@ -1,8 +1,8 @@
 import '@fontsource-variable/vazirmatn';
-import '@fontsource/aref-ruqaa/400.css';
-import '@fontsource/aref-ruqaa/700.css';
+import '../aref-ruqaa.css';
 import '../globals.css';
 import type { Metadata } from 'next';
+import { preload } from 'react-dom';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -41,6 +41,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   const t = await getTranslations({ locale, namespace: 'common' });
   const meta = localeMeta[locale];
   const [contact, newbornTerms] = await Promise.all([publicContact(), newbornTermsPublished()]);
+
+  // The display lettering arrives with the page, so a first visit never shows it in a stand-in font first.
+  for (const file of meta.dir === 'rtl' ? ['arabic-700', 'arabic-400'] : ['latin-700', 'latin-400'])
+    preload(`/fonts/aref-ruqaa/aref-ruqaa-${file}-normal.woff2`, { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' });
 
   return (
     <html lang={meta.htmlLang} dir={meta.dir}>

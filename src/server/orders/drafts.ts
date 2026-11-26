@@ -43,6 +43,7 @@ export async function createDraft(db: DbOrTx, input: DraftInput, ctx: RequestCon
     db,
     {
       themeId: p.theme.id,
+      sectionId,
       featureKeys: p.pkg.featureKeys,
       fieldKeys: p.pkg.fieldKeys,
       cardOptions: {},

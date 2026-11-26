@@ -93,6 +93,8 @@ export async function printData(db: DbOrTx, inv: InvitationRow, kind: RenderKind
     colorSlots: (version!.manifest as ThemeManifest | null)?.colors?.slots ?? manifest?.colors?.slots ?? [],
     colors: inv.colors,
     occasion: await occasionKey(db, inv.sectionId),
+    eventKind: inv.eventKind,
+    eventName: inv.eventName,
     birthDateFormat: { style: inv.birthDateStyle, digits: inv.birthDateDigits },
     wordingLines: (version!.manifest as ThemeManifest | null)?.wording ?? manifest?.wording ?? [],
     wording: inv.wording,
@@ -152,6 +154,7 @@ function printBase(theme: ThemeProps) {
     wording: theme.wording,
     switches: theme.switches,
     occasion: theme.occasion,
+    eventWording: theme.eventWording,
     photos: theme.photos,
   };
   return { base, cardBackTitle };

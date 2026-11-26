@@ -1,5 +1,7 @@
 'use server';
 
+import { createHash } from 'node:crypto';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getPathname } from '@/i18n/navigation';
 import { isLocale, type Locale } from '@/i18n/config';
@@ -31,7 +33,7 @@ function fieldValues(form: FormData): Record<string, string> {
 
 /** Everything typed, so a failed submit puts it all back (fields plus the card back). */
 function typedValues(form: FormData): Record<string, string> {
-  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), ...(form.has('cardChoicesSent') ? { cardChoices: form.getAll('cardChoices').map(String).join(',') } : {}), bottleSize: str(form, 'bottleSize'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
+  return { ...fieldValues(form), 'cb.title': str(form, 'cb.title'), 'cb.message': str(form, 'cb.message'), occasion: str(form, 'occasion'), stickerShape: str(form, 'stickerShape'), ...(form.has('cardChoicesSent') ? { cardChoices: form.getAll('cardChoices').map(String).join(',') } : {}), bottleSize: str(form, 'bottleSize'), eventKind: str(form, 'eventKind'), eventName: str(form, 'eventName'), birthDateStyle: str(form, 'birthDateStyle'), birthDateDigits: str(form, 'birthDateDigits'), ...wordingValues(form) };
 }
 
 /** The changeable-line choices as typed (`w.<key>`, `w.<key>.text`), so a failed submit keeps them. */
@@ -56,6 +58,10 @@ function orderExtras(form: FormData): OrderExtras {
   if (form.has('bottleSize')) extras.bottleSize = str(form, 'bottleSize');
   if (form.has('birthDateStyle')) extras.birthDateStyle = str(form, 'birthDateStyle');
   if (form.has('birthDateDigits')) extras.birthDateDigits = str(form, 'birthDateDigits');
+  if (form.has('eventKind')) {
+    extras.eventKind = str(form, 'eventKind');
+    extras.eventName = str(form, 'eventName');
+  }
   if (form.has('gp.sent')) extras.guestPhotos = { on: form.get('gp.on') === '1', cap: Number(str(form, 'gp.cap')), perGuest: Number(str(form, 'gp.perGuest')) };
   // The design's changeable lines: radio `w.<key>` (ar | lang | custom) and the text `w.<key>.text`.
   for (const [k, v] of form.entries()) {
@@ -123,6 +129,12 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
   let receiptToken: string;
   let orderId: string;
   let amountIqd: number;
+  // A payment that failed or was left (owner, 2026-11-26): this browser placed the order, so pressing pay again from
+  // the preview goes back to that order and on to paying it. Only this browser holds the key (never a shared link).
+  const jar = await cookies();
+  const checkoutCookie = `bahja_co_${createHash('sha256').update(str(form, 'token')).digest('hex').slice(0, 16)}`;
+  const earlier = jar.get(checkoutCookie)?.value;
+  const idempotencyKey = earlier && /^[A-Za-z0-9_-]{16,64}$/.test(earlier) ? earlier : str(form, 'idempotencyKey');
   try {
     ({ receiptToken, orderId, amountIqd } = await createOrder(
       db(),
@@ -130,7 +142,7 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
         previewToken: str(form, 'token'),
         customer: values,
         acceptedTerms: form.get('terms') === 'on',
-        idempotencyKey: str(form, 'idempotencyKey'),
+        idempotencyKey,
         couponCode: values.coupon,
       },
       await requestContext(),
@@ -138,6 +150,7 @@ export async function placeOrderAction(_prev: OrderFormState, form: FormData): P
   } catch (e) {
     return failure(e, values);
   }
+  jar.set(checkoutCookie, idempotencyKey, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 });
   // A 100% coupon: already paid and published, nothing to collect.
   if (amountIqd === 0) redirect(`/r/${receiptToken}`);
   // Straight on to WAYL; if that isn't possible right now, the receipt page offers "Pay now".

@@ -7,6 +7,7 @@
  * fetching. The platform sets the page size (`@page`) from the manifest and
  * passes plain, already-localized data.
  */
+import type { EventWords } from '@/catalog/occasion-wording';
 import type { FieldKey } from '@/catalog/fields';
 import type { ThemeBorderSpec } from './border';
 import type { BirthDateParts, EventDateParts, InvitationLocale, ThemePhoto } from './types';
@@ -57,6 +58,8 @@ type PrintBase = {
   switches: Readonly<Record<string, boolean>>;
   /** Which occasion (section key, e.g. `wedding`, `engagement`), as on the invitation (`ThemeProps.occasion`). */
   occasion: string | null;
+  /** What the wedding or engagement is held as (`ThemeProps.eventWording`): its phrases, or null for the section's own. */
+  eventWording: EventWords | null;
 };
 
 export type PrintCardProps = PrintBase & {

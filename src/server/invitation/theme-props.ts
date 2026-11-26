@@ -1,4 +1,5 @@
 import 'server-only';
+import { EVENT_KIND_SECTIONS, eventWords } from '@/catalog/occasion-wording';
 import type { SignatureStrokes } from '@/lib/signature-strokes';
 import { sampleNames, type SampleNameLists } from '@/catalog/sample-names';
 import type { ThemeBorderSpec } from '@/theme-sdk/border';
@@ -70,6 +71,9 @@ export function buildThemeProps(input: {
   colors?: Record<string, string> | null;
   /** The occasion (section key) the invitation is for. */
   occasion?: string | null;
+  /** A wedding or engagement held as a Nishani, a Henna night or the customer's own words (occasion-wording.ts). */
+  eventKind?: string | null;
+  eventName?: string | null;
   /** How the customer wants the date of birth written (newborn); omitted = Gregorian, Arabic-Indic digits. */
   birthDateFormat?: BirthDateFormat;
   /** The design's changeable lines (manifest) and the customer's choices (absent = the Arabic default). */
@@ -127,6 +131,7 @@ export function buildThemeProps(input: {
     colors: resolveColors(input.colorSlots ?? [], input.colors ?? null),
     border: input.border ?? null,
     occasion: input.occasion ?? null,
+    eventWording: (EVENT_KIND_SECTIONS as readonly string[]).includes(input.occasion ?? '') ? eventWords(input.eventKind, input.eventName, input.locale) : null,
     birthDate: birthDateParts(fields.birth_date, input.locale, cal, msgs, input.birthDateFormat ?? DEFAULT_BIRTH_DATE_FORMAT),
     wording: resolveWording(input.wordingLines ?? [], input.wording ?? null, input.locale),
     switches: resolveSwitches(input.switchDefs ?? [], input.switches ?? null),

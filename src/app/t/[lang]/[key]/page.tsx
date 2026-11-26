@@ -3,10 +3,12 @@ import { connection } from 'next/server';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/server/db/client';
-import { sections, themes } from '@/server/db/schema';
+import { sections, themePalettes, themes } from '@/server/db/schema';
 import { resolveSample } from '@/server/invitation/preview';
 import { invitationMessages } from '@/server/invitation/theme-props';
-import { isLocale } from '@/i18n/config';
+import { isLocale, type Locale } from '@/i18n/config';
+import { parseTextProbe } from '@/server/invitation/probe';
+import { PreviewRuntime } from '@/components/invitation/PreviewRuntime';
 import { manifestByCodeRef } from '@/theme-registry';
 import { InvitationView } from '@/components/invitation/InvitationView';
 
@@ -15,6 +17,8 @@ const query = z.object({
   names: z.enum(['short', 'long']).optional(),
   /** Which occasion's wording, for a design sold in several. */
   occasion: z.string().max(40).optional(),
+  /** The customer's live preview while they type (JSON, `parseTextProbe`): their texts instead of the sample's. */
+  live: z.string().max(20000).optional(),
 });
 
 /**
@@ -33,6 +37,7 @@ export default async function PublicThemeSample({ params, searchParams }: PagePr
     .where(and(eq(themes.key, key), eq(themes.status, 'ACTIVE'), eq(sections.status, 'ACTIVE')));
   if (!live) notFound();
   const q = query.safeParse(await searchParams);
+  if (q.data?.live !== undefined) return <LiveSample themeId={live.id} themeKey={key} lang={lang} pkg={q.data.pkg} occasion={q.data.occasion} live={q.data.live} />;
   const first = await resolveSample(db(), { themeKey: key, locale: lang, packageId: q.data?.pkg, names: q.data?.names, occasion: q.data?.occasion });
   if (!first || !manifestByCodeRef(first.version.codeRef)) notFound();
   // A design may show its sample in its own language and with Kurdish names (manifest `sample`); English stays English.
@@ -50,5 +55,25 @@ export default async function PublicThemeSample({ params, searchParams }: PagePr
       ribbon={msgs.sampleRibbon}
       errorText={{ message: msgs.renderError, retry: msgs.retry }}
     />
+  );
+}
+
+/**
+ * The order form's live preview (owner, 2026-11-26): the design in the invitation's language with the customer's texts
+ * so far (the sample's where they haven't written yet), already open. Nothing is stored.
+ */
+async function LiveSample({ themeId, themeKey, lang, pkg, occasion, live }: { themeId: string; themeKey: string; lang: Locale; pkg?: string; occasion?: string; live: string }) {
+  const probe = parseTextProbe(live);
+  const colors = probe.palette
+    ? (await db().select({ colors: themePalettes.colors }).from(themePalettes).where(and(eq(themePalettes.id, probe.palette), eq(themePalettes.themeId, themeId))))[0]?.colors
+    : undefined;
+  const sample = await resolveSample(db(), { themeKey, locale: lang, packageId: pkg, occasion, values: probe.values, wording: probe.wording, eventKind: probe.eventKind, eventName: probe.eventName, colors });
+  if (!sample || !manifestByCodeRef(sample.version.codeRef)) notFound();
+  const msgs = invitationMessages(lang);
+  return (
+    <>
+      <PreviewRuntime openText={sample.props.labels.openInvitation} />
+      <InvitationView codeRef={sample.version.codeRef} props={sample.props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />
+    </>
   );
 }

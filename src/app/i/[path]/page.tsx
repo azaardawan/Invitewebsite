@@ -1,4 +1,5 @@
 import { invitationNames } from '@/catalog/fields';
+import { eventWords } from '@/catalog/occasion-wording';
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { headers } from 'next/headers';
@@ -35,7 +36,9 @@ export async function generateMetadata({ params }: PageProps<'/i/[path]'>): Prom
   const msgs = invitationMessages(r.invitation.locale);
   const names = invitationNames(v).join(` ${msgs.and} `);
   // A design that is not an invitation (e.g. a museum) has its own words under the shared link.
-  const share = pageText(await versionManifest(r.invitation.themeVersionId), 'share', r.invitation.locale) ?? msgs.youreInvited;
+  // A Nishani, a henna night or the couple's own words (occasion-wording.ts) is named under the link too.
+  const held = eventWords(r.invitation.eventKind, r.invitation.eventName, r.invitation.locale);
+  const share = pageText(await versionManifest(r.invitation.themeVersionId), 'share', r.invitation.locale) ?? held?.invitation ?? msgs.youreInvited;
   const title = names || share;
   const url = `${env().APP_URL.replace(/\/$/, '')}${r.canonicalPath}`;
   return {

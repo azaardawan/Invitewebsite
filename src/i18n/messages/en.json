@@ -1858,6 +1858,35 @@
       "price": "Photo sharing",
       "includes": "Up to {base} photos at the basic price. You get the photo QR code as a picture, to share or print.",
       "invalid": "Please check the photo sharing choice."
+    },
+    "event": {
+      "heading": "What is the occasion?",
+      "wedding": "Wedding",
+      "engagement": "Engagement",
+      "asChosen": "As the design says",
+      "nishani": "Nishani",
+      "henna": "Henna night",
+      "custom": "Our own words…",
+      "help": "Changes every line of the invitation and the card that names the occasion.",
+      "nameLabel": "Your occasion's name",
+      "namePlaceholder": "e.g. Our Nikah ceremony",
+      "nameRequired": "Write the occasion's name.",
+      "nameTooLong": "Keep it to 40 letters."
+    },
+    "preview": {
+      "title": "Live preview",
+      "invitation": "Invitation",
+      "front": "Card front",
+      "back": "Card back",
+      "whichCard": "Which card",
+      "enlarge": "⤢ Enlarge",
+      "close": "✕ Close",
+      "smaller": "▴ Smaller",
+      "show": "▾ Show preview",
+      "updating": "Updating…",
+      "glowing": "Glowing where it shows",
+      "notHere": "Not on this view: try the other tabs",
+      "sample": "Example texts fill what you haven't written yet"
     }
   },
   "contact": {

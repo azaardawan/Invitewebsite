@@ -1,4 +1,4 @@
-import type { InvitationLocale } from '@/theme-sdk';
+import type { EventWords, InvitationLocale } from '@/theme-sdk';
 
 /**
  * The design's own wording, as the owner drew the pages (English), in the four invitation languages. Platform strings
@@ -111,8 +111,13 @@ const bdn: Copy = {
 
 const COPY: Record<InvitationLocale, Copy> = { ar, en, ckb, bdn };
 
-export function copyFor(locale: InvitationLocale): Copy {
-  return COPY[locale];
+/**
+ * A Nishani, a henna night or the couple's own words chosen on the order form (`props.eventWording`, owner 2026-11-26):
+ * the lines that name the wedding name that event instead (the design's own `eventName` word is then not used).
+ */
+export function copyFor(locale: InvitationLocale, held?: EventWords | null): Copy {
+  if (!held) return COPY[locale];
+  return { ...COPY[locale], request: held.invitedTo, weddingOf: held.ofThe, detailsTitle: locale === 'en' ? 'The details' : held.details };
 }
 
 /**

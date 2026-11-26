@@ -61,6 +61,17 @@ test('a customer orders an invitation from the storefront', async ({ page, reque
   await expect(page.getByRole('heading', { name: 'بانتظار الدفع' })).toBeVisible();
   await expect(page.getByText('زبون المتجر')).toBeVisible();
 
+  // Back on the preview after a failed payment, confirming again goes on to pay the same order (owner, 2026-11-26).
+  await page.goto(reviewUrl);
+  await page.locator('#c-name').fill('زبون المتجر');
+  await page.locator('#c-phone').fill('07701234567');
+  await page.locator('#c-email').fill('store@bahja.test');
+  await page.locator('input[name=terms]').check();
+  await page.getByRole('button', { name: 'تأكيد الطلب' }).click();
+  await expect(page).toHaveURL(/localhost:3101\/pay\//);
+  await page.getByRole('button', { name: 'Cancel (mock)' }).click();
+  await expect(page).toHaveURL(/\/r\/[\w-]+/);
+
   // "Pay" from the receipt reuses the same WAYL link; paying publishes the invitation.
   await page.getByRole('button', { name: /^ادفع/ }).click();
   await expect(page).toHaveURL(/localhost:3101\/pay\//);

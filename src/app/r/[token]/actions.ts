@@ -75,9 +75,11 @@ export async function customerEditAction(token: string, _prev: EditState, form: 
     signature2: form.has('signature2') ? String(form.get('signature2')) : undefined,
     signatureStrokes: form.has('signatureStrokes') ? String(form.get('signatureStrokes')) : undefined,
     signature2Strokes: form.has('signature2Strokes') ? String(form.get('signature2Strokes')) : undefined,
+    eventKind: form.has('eventKind') ? String(form.get('eventKind')) : undefined,
+    eventName: form.has('eventKind') ? String(form.get('eventName') ?? '') : undefined,
   });
   if (result.ok) redirect(`/r/${encodeURIComponent(token)}?edited=1#edit`);
-  if (result.error === 'invalidFields') return { error: 'errors.invalidFields', fieldErrors: result.fieldErrors, values };
+  if (result.error === 'invalidFields') return { error: 'errors.invalidFields', fieldErrors: result.fieldErrors, values: { ...values, eventKind: String(form.get('eventKind') ?? ''), eventName: String(form.get('eventName') ?? '') } };
   const code = { notFound: 'errors.notFound', notAllowed: 'errors.editNotAllowed', limitReached: 'errors.editLimitReached', rateLimited: 'errors.rateLimited' }[result.error];
   return { error: code, values };
 }

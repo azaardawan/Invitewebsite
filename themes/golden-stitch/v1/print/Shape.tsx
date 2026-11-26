@@ -85,8 +85,8 @@ function archScale(name: string): number {
  * uses the same artwork on both sides. Front: "The Wedding of", the names with a gold "&", the date. Back: the
  * customer's title and message in italics, "With love" and the QR code(s).
  */
-function Burgundy({ shape, side, dir, lang, locale, fields, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine, wording }: PrintShapeProps) {
-  const t = copyFor(locale);
+function Burgundy({ shape, side, dir, lang, locale, fields, labels, title, message, qrDataUrl, photoQrDataUrl, extraLine, wording, eventWording }: PrintShapeProps) {
+  const t = copyFor(locale, eventWording);
   const lantern = shape === 'arch-lantern';
   const one = fields.person_1_name;
   const two = fields.person_2_name;

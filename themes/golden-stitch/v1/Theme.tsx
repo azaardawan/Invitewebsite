@@ -61,7 +61,7 @@ export default function GoldenStitch(props: ThemeProps) {
     wording,
     switches,
   } = props;
-  const t = copyFor(locale);
+  const t = copyFor(locale, props.eventWording);
   const reduced = useReducedMotion();
   const music = useMusic();
   // The couple's own film is made after payment (manifest `film`, about ten minutes); until it is ready the invitation

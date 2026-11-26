@@ -39,7 +39,7 @@ export type CustomerEditResult =
  */
 export async function customerEditInvitation(
   db: DbOrTx,
-  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null; signature?: string; signature2?: string; signatureStrokes?: string; signature2Strokes?: string },
+  input: { receiptToken: string; values: Record<string, unknown>; locale?: string; ipHash: string | null; signature?: string; signature2?: string; signatureStrokes?: string; signature2Strokes?: string; eventKind?: string; eventName?: string },
   now = new Date(),
 ): Promise<CustomerEditResult> {
   if (input.ipHash && !(await consumeRateLimit(db, `self-edit:${input.ipHash}`, 20, 3600, now))) return { ok: false, error: 'rateLimited' };
@@ -79,7 +79,8 @@ export async function customerEditInvitation(
       signatures = await extrasUpdate(
         tx,
         inv!,
-        { signature: input.signature, signature2: input.signature2, signatureStrokes: input.signatureStrokes, signature2Strokes: input.signature2Strokes },
+        // …and what the wedding or engagement is held as (a Nishani, a henna night, their own words).
+        { signature: input.signature, signature2: input.signature2, signatureStrokes: input.signatureStrokes, signature2Strokes: input.signature2Strokes, eventKind: input.eventKind, eventName: input.eventName },
         stored,
       );
     } catch (e) {
@@ -98,13 +99,14 @@ export async function customerEditInvitation(
       action: 'invitation.customer_edited',
       objectType: 'invitation',
       objectId: inv!.id,
-      before: { values: inv!.fieldValues, locale: inv!.locale, slug: inv!.slug, signatures: [inv!.signatureAssetId, inv!.signature2AssetId] },
+      before: { values: inv!.fieldValues, locale: inv!.locale, slug: inv!.slug, signatures: [inv!.signatureAssetId, inv!.signature2AssetId], event: [inv!.eventKind, inv!.eventName] },
       after: {
         values: result.values,
         locale,
         slug,
         selfEdits: inv!.selfEdits + 1,
         signatures: [signatures.signatureAssetId ?? inv!.signatureAssetId, signatures.signature2AssetId ?? inv!.signature2AssetId],
+        event: signatures.eventKind !== undefined ? [signatures.eventKind, signatures.eventName ?? null] : [inv!.eventKind, inv!.eventName],
       },
       ipHash: input.ipHash,
     });
