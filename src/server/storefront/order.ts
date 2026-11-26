@@ -25,9 +25,6 @@ import { signatureUrls } from '@/server/invitation/load';
 import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { listPalettes, themeColorSlots } from '@/server/catalog/palettes';
 import type { OrderFormExtras } from '@/components/storefront/order/OrderForm';
-import type { LivePreviewSpec } from '@/components/storefront/order/LivePreview';
-import { resolveSample } from '@/server/invitation/preview';
-import { designCards } from '@/server/documents/data';
 import { findByPreviewToken } from '@/server/orders/drafts';
 import { POLICY_SLUGS, termsPolicyFor } from '@/server/legal/policies';
 import { orderFields } from './catalog';
@@ -338,21 +335,3 @@ export function cardPictures(featureKeys: readonly string[], choices: readonly s
   });
 }
 
-/**
- * What the live preview beside the form needs (owner, 2026-11-26): the design and package, the occasion, whether it
- * has an online invitation, the printed cards the package includes (with their sizes), and the sample's texts (shown
- * where the customer hasn't written yet). Null for a template design (filled in place) or one whose code is missing.
- */
-export async function livePreviewSpec(input: { themeKey: string; packageId: string; featureKeys: readonly string[]; fieldKeys: readonly string[]; occasion: string | null; locale: Locale }): Promise<LivePreviewSpec | null> {
-  const sample = await resolveSample(db(), { themeKey: input.themeKey, locale: input.locale, packageId: input.packageId, occasion: input.occasion ?? undefined });
-  if (!sample) return null;
-  const manifest = manifestByCodeRef(sample.version.codeRef);
-  if (!manifest || manifest.editor === 'template') return null;
-  const cards = designCards(manifest)
-    .filter((c) => input.featureKeys.includes(c.feature))
-    .map((c) => ({ key: c.key, label: c.label ? localized(c.label, input.locale) : 'A5', front: c.front, back: c.back }));
-  const invitation = manifest.onlineInvitation !== false;
-  if (!invitation && !cards.length) return null;
-  const sampleTexts = Object.fromEntries(Object.entries(sample.props.fields).filter((e): e is [string, string] => typeof e[1] === 'string' && e[1] !== ''));
-  return { themeKey: input.themeKey, packageId: input.packageId, occasion: input.occasion, invitation, cards, sample: sampleTexts, fieldKeys: [...input.fieldKeys] };
-}

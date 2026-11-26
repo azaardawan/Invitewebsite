@@ -249,3 +249,34 @@ export async function removeInvitationSong(db: DbOrTx, id: string, input: { reas
   });
   await deleteSongFiles(db, [assetId]);
 }
+
+/** At most this many text changes per invitation, each at most this long. */
+export const MAX_TEXT_OVERRIDES = 50;
+export const MAX_OVERRIDE_LENGTH = 500;
+
+/**
+ * The owner changes any text on this one invitation (owner, 2026-11-26): each text exactly as shown and what to show
+ * instead (empty = hide it). Applied on the online invitation and its printed files (rebuilt: the version changes).
+ * Rows with an empty «from» are dropped. Audited, before and after.
+ */
+export async function setInvitationTextOverrides(db: DbOrTx, id: string, input: { overrides: { from: string; to: string }[]; reason: string }, actor: Actor) {
+  const reason = requireReason(input.reason);
+  const clean = (s: string) => s.replace(/\r\n?/g, '\n').trim();
+  const overrides = input.overrides.map((o) => ({ from: clean(o.from), to: clean(o.to) })).filter((o) => o.from);
+  if (overrides.length > MAX_TEXT_OVERRIDES || overrides.some((o) => o.from.length > MAX_OVERRIDE_LENGTH || o.to.length > MAX_OVERRIDE_LENGTH)) {
+    throw new InvitationAdminError('invalidFields');
+  }
+  return db.transaction(async (tx) => {
+    const inv = await lockFor(tx, id);
+    await tx.update(invitations).set({ textOverrides: overrides, version: inv.version + 1 }).where(eq(invitations.id, id));
+    await recordAudit(tx, {
+      ...auditActor(actor),
+      action: 'invitation.texts_changed',
+      objectType: 'invitation',
+      objectId: id,
+      before: { textOverrides: inv.textOverrides },
+      after: { textOverrides: overrides },
+      reason,
+    });
+  });
+}

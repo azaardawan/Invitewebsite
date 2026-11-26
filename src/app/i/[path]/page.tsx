@@ -18,6 +18,7 @@ import { invitationMessages } from '@/server/invitation/theme-props';
 import { env } from '@/server/env';
 import { isLocale } from '@/i18n/config';
 import { InvitationView } from '@/components/invitation/InvitationView';
+import { TextOverrides } from '@/components/invitation/TextOverrides';
 import { InvitationEnded } from '@/components/invitation/InvitationEnded';
 import { submitGuestAction } from './actions';
 import { InvitationOpenBeacon } from '@/components/analytics/Beacon';
@@ -90,6 +91,7 @@ export default async function PublicInvitationPage({ params }: PageProps<'/i/[pa
         submitGuestResponse={submitGuestAction.bind(null, r.invitation.id)}
         turnstileSiteKey={env().TURNSTILE_SITE_KEY ?? null}
       />
+      <TextOverrides overrides={r.invitation.textOverrides} />
     </>
   );
 }

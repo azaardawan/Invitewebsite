@@ -69,7 +69,7 @@ export async function ensureDocument(
   // A shaped card is its own file (and stored copy), next to the A5 card when the customer wants both.
   const shapeKey = data.kind === 'card' ? (data.shape?.key ?? null) : null;
   const variant = shapeKey ?? '';
-  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null, design: artwork(data), ...(shapeKey ? { shape: data.kind === 'card' ? data.shape : null } : {}) }));
+  const sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, codeRef: data.codeRef, page: data.page, props: data.props, back: 'back' in data ? data.back : null, design: artwork(data), ...(shapeKey ? { shape: data.kind === 'card' ? data.shape : null } : {}), ...(inv.textOverrides.length ? { texts: inv.textOverrides } : {}) }));
   const fileName = `${kind === 'card' ? (shapeKey ? `invitation-card-${shapeKey}` : 'invitation-card') : 'keepsake'}-${inv.publicId}.pdf`;
 
   const [existing] = await db
@@ -137,7 +137,7 @@ export async function ensurePreview(
     // What the cover shows (not the reply counts or guest messages, which change all the time).
     const { codeRef, props } = await invitationRenderData(db, inv, 'live');
     const shown = { ...props, attendance: null, guestbook: null };
-    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, og: true, codeRef, shown }));
+    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, og: true, codeRef, shown, ...(inv.textOverrides.length ? { texts: inv.textOverrides } : {}) }));
   } else {
     const doc = kind === 'cardBack' ? 'card' : kind;
     if (!inv.featureKeys.includes(FEATURE[doc])) throw new DocumentError('notIncluded');
@@ -148,7 +148,7 @@ export async function ensurePreview(
     const design = data.kind === 'card' ? (kind === 'cardBack' ? data.design.back : data.design.front) ?? undefined : undefined;
     const shape = data.kind === 'card' ? data.shape : null;
     variant = shape?.key ?? '';
-    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown, design, ...(shape ? { shape } : {}) }));
+    sourceHash = sha256(JSON.stringify({ v: PIPELINE_VERSION, preview: kind, codeRef: data.codeRef, shown, design, ...(shape ? { shape } : {}), ...(inv.textOverrides.length ? { texts: inv.textOverrides } : {}) }));
   }
   const [existing] = await db
     .select()

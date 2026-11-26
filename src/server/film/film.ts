@@ -51,6 +51,18 @@ export function filmKey(inputs: FilmInputs): string {
   return JSON.stringify([inputs.names, inputs.initials, inputs.date]);
 }
 
+/**
+ * Whether the couple's film is ready for the names and date as they are now (the receipt shows it): `ready`, `making`
+ * (asked for or being made), or `late` after MAX_FILM_TRIES failures for these names.
+ */
+export function filmStatus(inv: Pick<InvitationRow, 'fieldValues' | 'filmAssetId' | 'filmFor' | 'filmJobFor' | 'filmTries'>): 'ready' | 'making' | 'late' {
+  const inputs = filmInputs(inv.fieldValues);
+  const want = inputs ? filmKey(inputs) : null;
+  if (inv.filmAssetId && (!want || inv.filmFor === want)) return 'ready';
+  if (inv.filmTries >= MAX_FILM_TRIES && inv.filmJobFor === want) return 'late';
+  return 'making';
+}
+
 /** The film's address for the online invitation, or null while there is none. */
 export async function filmSrc(db: DbOrTx, inv: Pick<InvitationRow, 'filmAssetId'>): Promise<string | null> {
   if (!inv.filmAssetId) return null;

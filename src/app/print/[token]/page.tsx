@@ -12,6 +12,7 @@ import { CardPages, colorVars } from '../CardPages';
 import { invitationRenderData } from '@/server/invitation/load';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { InvitationView } from '@/components/invitation/InvitationView';
+import { TextOverrides } from '@/components/invitation/TextOverrides';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,25 +35,38 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     // The live invitation's cover as a guest first sees it, for the link-preview picture (no analytics).
     const { codeRef, props } = await invitationRenderData(db(), inv, 'live');
     const msgs = invitationMessages(inv.locale);
-    return <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />;
+    return (
+      <>
+        <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />
+        <TextOverrides overrides={inv.textOverrides} />
+      </>
+    );
   }
   if ((PRODUCT_VIEWS as readonly string[]).includes(claim.kind)) {
     // `shape=square`: the square sticker set of a customer who chose both shapes.
     const shape = sp.shape === 'square' && inv.stickerShape === 'both' ? 'square' : undefined;
-    return <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />;
+    return (
+      <>
+        <ProductPages view={claim.kind as ProductView} data={await productData(db(), inv, { stickerShape: shape })} />
+        <TextOverrides overrides={inv.textOverrides} />
+      </>
+    );
   }
   // `card=`: which of the customer's printed cards (the A5 card or a shape they ticked); without it, their first.
   const data = await printData(db(), inv, claim.kind, { card: typeof sp.card === 'string' ? sp.card : null });
   // `png=1` (shaped cards): only the shape, on a transparent page, for the PNG picture.
   if (data.kind === 'card')
     return (
-      <CardPages
-        codeRef={data.codeRef}
-        data={data}
-        view={view === 'front' || view === 'back' ? view : undefined}
-        png={sp.png === '1'}
-        watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)}
-      />
+      <>
+        <CardPages
+          codeRef={data.codeRef}
+          data={data}
+          view={view === 'front' || view === 'back' ? view : undefined}
+          png={sp.png === '1'}
+          watermark={isPaid(inv) ? null : await watermarkLabels(inv.locale)}
+        />
+        <TextOverrides overrides={inv.textOverrides} />
+      </>
     );
   const loaders = printComponents[data.codeRef];
   // Keepsake: every A4 page edge to edge (no page margins), so the theme's border sits in the same place on
@@ -66,6 +80,7 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
       <div style={colorVars(data.props.colors)}>
         <Keepsake {...(data.props as KeepsakeProps)} />
       </div>
+      <TextOverrides overrides={inv.textOverrides} />
     </>
   );
 }

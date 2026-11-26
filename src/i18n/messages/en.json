@@ -939,7 +939,15 @@
       "guestPhotosPerGuest": "Photos per guest",
       "guestPhotosSave": "Save",
       "guestPhotosOff": "Take it off",
-      "guestPhotosInvalid": "The total must be 750 or more in steps of 50, up to the highest in Settings."
+      "guestPhotosInvalid": "The total must be 750 or more in steps of 50, up to the highest in Settings.",
+      "textsTitle": "Change any text",
+      "textsHelp": "Type the text exactly as it shows on the invitation, and the new text to show instead (leave it empty to hide it). Changes this invitation only: the link and the printed files.",
+      "textsFrom": "Current text",
+      "textsTo": "New text",
+      "textsAdd": "Add another text",
+      "textsRemove": "Remove",
+      "textsSave": "Save texts",
+      "textsOpen": "Open the invitation to check"
     },
     "legal": {
       "heading": "Legal policies",
@@ -1872,21 +1880,6 @@
       "namePlaceholder": "e.g. Our Nikah ceremony",
       "nameRequired": "Write the occasion's name.",
       "nameTooLong": "Keep it to 40 letters."
-    },
-    "preview": {
-      "title": "Live preview",
-      "invitation": "Invitation",
-      "front": "Card front",
-      "back": "Card back",
-      "whichCard": "Which card",
-      "enlarge": "⤢ Enlarge",
-      "close": "✕ Close",
-      "smaller": "▴ Smaller",
-      "show": "▾ Show preview",
-      "updating": "Updating…",
-      "glowing": "Glowing where it shows",
-      "notHere": "Not on this view: try the other tabs",
-      "sample": "Example texts fill what you haven't written yet"
     }
   },
   "contact": {

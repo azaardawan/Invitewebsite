@@ -18,6 +18,7 @@ import {
   removeInvitationSong,
   setInvitationPublished,
   updateInvitationValues,
+  setInvitationTextOverrides,
 } from '@/server/invitation/admin';
 import { GuestResponseError, setGuestMessageStatus } from '@/server/guests/responses';
 import { setPublicGuestbook } from '@/server/guests/guestbook';
@@ -219,4 +220,18 @@ export async function removeGuestPhotoAction(_: ActionState, form: FormData): Pr
   }
   revalidatePath(`/admin/invitations/${id.data}`);
   return { ok: true, message: 'invitations.saved', nonce: Date.now() };
+}
+
+/** «Change any text» on one invitation (owner, 2026-11-26): rows `from` / `to`, in order. */
+export async function invitationTextsAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'invitations.edit' });
+  try {
+    const id = ids(form);
+    const from = form.getAll('from').map(String);
+    const to = form.getAll('to').map(String);
+    await setInvitationTextOverrides(db(), id, { overrides: from.map((f, i) => ({ from: f, to: to[i] ?? '' })), reason: reasonOf(form) }, { adminId: user.id, ipHash: (await requestContext()).ipHash });
+    return done(id);
+  } catch (e) {
+    return fail(e);
+  }
 }
