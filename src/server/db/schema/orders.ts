@@ -155,6 +155,12 @@ export const invitations = pgTable(
     filmJobId: text('film_job_id'),
     filmJobFor: text('film_job_for'),
     filmTries: integer('film_tries').notNull().default(0),
+    /**
+     * The owner's own changes to any text on this invitation (Admin → the invitation → «Change any text», owner
+     * 2026-11-26): each text exactly as shown, and what to show instead. Applied on the online invitation and the
+     * printed files of this invitation only. Audited.
+     */
+    textOverrides: jsonb('text_overrides').$type<{ from: string; to: string }[]>().notNull().default([]),
     /** The colour set the customer picked (packages with `color_choice`), copied so later edits never change it. */
     colors: jsonb('colors').$type<Record<string, string>>(),
     /** The customer chose no background music (packages with `music`): the design plays none and shows no sound button. */

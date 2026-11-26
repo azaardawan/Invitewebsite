@@ -13,7 +13,8 @@ import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { can } from '@/server/rbac/authz';
 import { env } from '@/server/env';
-import { activeMusicTracks, EXTEND_MAX, EXTEND_UNITS, getInvitation, invitationState } from '@/server/invitation/admin';
+import { activeMusicTracks, EXTEND_MAX, EXTEND_UNITS, getInvitation, invitationState, MAX_OVERRIDE_LENGTH, MAX_TEXT_OVERRIDES } from '@/server/invitation/admin';
+import { TextOverridesRows } from '@/components/admin/TextOverridesRows';
 import { guestResponseCounts, listGuestResponses } from '@/server/guests/responses';
 import { documentAvailable } from '@/server/documents/documents';
 import { customerDelivery, keepsakeReady, whatsappLink } from '@/server/documents/delivery';
@@ -41,6 +42,7 @@ import {
   guestbookVisibilityAction,
   attendanceVisibilityAction,
   invitationMusicAction,
+  invitationTextsAction,
   publishInvitationAction,
 } from '../../../../_actions/invitations';
 
@@ -613,6 +615,32 @@ export default async function InvitationDetailPage({ params }: PageProps<'/admin
               </div>
             </ActionForm>
           </Card>
+
+          {/* Any text on this invitation, changed by the owner (owner, 2026-11-26): online and on the printed files. */}
+          {canEdit ? (
+            <Card>
+              <h2 className="mb-1 font-semibold" id="texts">
+                {t('textsTitle')}
+              </h2>
+              <p className="mb-3 text-sm text-muted">{t('textsHelp')}</p>
+              <ActionForm action={invitationTextsAction} className="space-y-3">
+                <input type="hidden" name="id" value={inv.id} />
+                <TextOverridesRows
+                  initial={inv.textOverrides}
+                  max={MAX_TEXT_OVERRIDES}
+                  maxLength={MAX_OVERRIDE_LENGTH}
+                  labels={{ from: t('textsFrom'), to: t('textsTo'), add: t('textsAdd'), remove: t('textsRemove') }}
+                />
+                {reason}
+                <div className="flex flex-wrap items-center gap-3">
+                  <SubmitButton>{t('textsSave')}</SubmitButton>
+                  <a href={path} target="_blank" rel="noopener" className="text-sm text-accent underline">
+                    {t('textsOpen')}
+                  </a>
+                </div>
+              </ActionForm>
+            </Card>
+          ) : null}
 
           <Card>
             <h2 className="mb-3 font-semibold">{t('musicTitle')}</h2>

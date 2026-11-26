@@ -939,7 +939,15 @@
       "guestPhotosPerGuest": "Photos per guest",
       "guestPhotosSave": "Save",
       "guestPhotosOff": "Take it off",
-      "guestPhotosInvalid": "The total must be 750 or more in steps of 50, up to the highest in Settings."
+      "guestPhotosInvalid": "The total must be 750 or more in steps of 50, up to the highest in Settings.",
+      "textsTitle": "Change any text",
+      "textsHelp": "Type the text exactly as it shows on the invitation, and the new text to show instead (leave it empty to hide it). Changes this invitation only: the link and the printed files.",
+      "textsFrom": "Current text",
+      "textsTo": "New text",
+      "textsAdd": "Add another text",
+      "textsRemove": "Remove",
+      "textsSave": "Save texts",
+      "textsOpen": "Open the invitation to check"
     },
     "legal": {
       "heading": "Legal policies",
@@ -1480,11 +1488,6 @@
       "remove": "Remove this photo",
       "removeConfirm": "Remove this photo? It can't be brought back.",
       "none": "No photos yet. Share the photo QR code with your guests."
-    },
-    "filmStatus": {
-      "ready": "Your opening animation is ready.",
-      "making": "Your opening animation is being made. It takes about 10 minutes; refresh this page to check.",
-      "late": "Your opening animation is taking longer than usual. Our team is on it."
     }
   },
   "nav": {

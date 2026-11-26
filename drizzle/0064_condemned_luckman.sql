@@ -1,0 +1,1 @@
+ALTER TABLE "invitations" ADD COLUMN "text_overrides" jsonb DEFAULT '[]'::jsonb NOT NULL;

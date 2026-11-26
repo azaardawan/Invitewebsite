@@ -135,7 +135,7 @@ export async function ensureProductFile(
           return d.kind === 'card' ? { props: d.props, design: item === 'card.preview' ? d.design.front : d.design.back, shape: d.shape?.key ?? null } : null;
         })()
       : await productData(db, inv, isSquareSet(item) ? { stickerShape: 'square' } : {});
-  const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid }));
+  const sourceHash = sha256(JSON.stringify({ v: PRODUCT_PIPELINE_VERSION, item, shown, watermark: !paid, ...(inv.textOverrides.length ? { texts: inv.textOverrides } : {}) }));
 
   const [existing] = await db
     .select()
