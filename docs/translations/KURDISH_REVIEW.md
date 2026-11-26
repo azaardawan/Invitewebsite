@@ -2349,3 +2349,9 @@ The invitation now opens straight into the film (no Open button); browsers start
 | # | Where | Arabic | English | Sorani (ckb) | Badini (bdn) |
 |---|---|---|---|---|---|
 | 1 | #32: `soundOn` (button on the film) | تشغيل الصوت | Tap for sound | دەنگ لێبدە | دەنگی لێبدە |
+
+## Batch 77 — cafés' virtual tours: moving the walking pad to the other side — ✅ AUTO-APPROVED (2026-11-26, owner checks in Admin → Translations)
+
+| Key | English | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- | --- |
+| `tour.padSide` | Move the pad to the other side | بازنەکە بگوازەرەوە بۆ لایەکەی تر | بازنێ بگوهێزە بۆ لایێ دی |

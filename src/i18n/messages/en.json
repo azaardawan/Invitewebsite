@@ -1951,6 +1951,7 @@
     "handsFull": "Your hands are full",
     "currency": "IQD",
     "close": "Close",
-    "waiterBrings": "The waiter will bring it to your table"
+    "waiterBrings": "The waiter will bring it to your table",
+    "padSide": "Move the pad to the other side"
   }
 }

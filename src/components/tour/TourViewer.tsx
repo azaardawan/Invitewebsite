@@ -40,6 +40,7 @@ export type TourWords = {
   currency: string;
   close: string;
   waiterBrings: string;
+  padSide: string;
 };
 
 export type TourLinks = { instagram?: string; location?: string; menu?: string; whatsapp?: string };
@@ -65,6 +66,11 @@ const ICONS: Record<keyof TourLinks, string> = {
   whatsapp:
     'M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z',
 };
+
+/** Where the walking pad (and its little side button) sits: the left or the right edge, clear of the phone's notch. */
+const PAD_KEY = 'tour.padSide';
+const padAt = (side: 'left' | 'right'): CSSProperties =>
+  side === 'left' ? { left: 'max(24px, env(safe-area-inset-left))', right: 'auto' } : { right: 'max(24px, env(safe-area-inset-right))', left: 'auto' };
 
 const GLASS: CSSProperties = { background: 'rgba(20,16,14,.58)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' };
 
@@ -107,6 +113,15 @@ export function TourViewer({
   // the café's menu (owner, 2026-11-24: KOUP's), open over the place
   const [menu, setMenu] = useState<{ menu: Menu; photos: string | null } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  // the walking pad's side: the left unless the visitor moved it (left-handed)
+  // (read once: the pad is drawn only once the place is ready, after the page has started in the browser)
+  const [padSide, setPadSide] = useState<'left' | 'right'>(() => {
+    try {
+      return typeof window !== 'undefined' && window.localStorage.getItem(PAD_KEY) === 'right' ? 'right' : 'left';
+    } catch {
+      return 'left';
+    }
+  });
 
   useEffect(() => {
     const el = box.current;
@@ -162,7 +177,7 @@ export function TourViewer({
       <div ref={box} data-testid="tour-canvas" data-state={state} style={{ position: 'absolute', inset: 0 }} onPointerDown={() => setHint(false)}>
         {touch && state === 'ready' ? (
           <Joystick
-            style={{ insetInlineStart: 'auto', insetInlineEnd: 'auto', left: 'auto', right: 'max(24px, env(safe-area-inset-right))', bottom: 'max(28px, env(safe-area-inset-bottom))' }}
+            style={{ insetInlineStart: 'auto', insetInlineEnd: 'auto', ...padAt(padSide), bottom: 'max(28px, env(safe-area-inset-bottom))' }}
             onMove={(x, y) => {
               setHint(false);
               engine.current?.setStick(x, y);
@@ -170,6 +185,44 @@ export function TourViewer({
           />
         ) : null}
       </div>
+
+      {/* The pad's side (owner, 2026-11-26: on the left; a small button moves it to the other side for left-handed
+          visitors, remembered on this phone) */}
+      {touch && state === 'ready' ? (
+        <button
+          type="button"
+          data-testid="tour-pad-side"
+          aria-label={words.padSide}
+          title={words.padSide}
+          onClick={() => {
+            const next = padSide === 'left' ? 'right' : 'left';
+            setPadSide(next);
+            try {
+              window.localStorage.setItem(PAD_KEY, next);
+            } catch {}
+          }}
+          style={{
+            ...GLASS,
+            position: 'absolute',
+            ...padAt(padSide),
+            bottom: 'calc(max(28px, env(safe-area-inset-bottom)) + 124px)',
+            width: 34,
+            height: 34,
+            display: 'grid',
+            placeItems: 'center',
+            padding: 0,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,.3)',
+            color: '#fff',
+            fontSize: 16,
+            cursor: 'pointer',
+            zIndex: 3,
+            touchAction: 'manipulation',
+          }}
+        >
+          <span aria-hidden>⇄</span>
+        </button>
+      ) : null}
 
       {/* Until the place is there (or when it can't be shown): the café's logo and name; its buttons stay below. */}
       {state !== 'ready' ? (
