@@ -1,0 +1,744 @@
+/*
+ * Golden Stitch print companions. Physical units; no animation. The A5 card is 154 × 216 mm with bleed (trim
+ * 148 × 210); the arch card's box is sized by the platform; the keepsake is A4 without page margins.
+ */
+
+.card,
+.arch,
+.keepsake {
+  color: #8a5c25;
+  text-align: center;
+  line-height: 1.3;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.card *,
+.arch *,
+.keepsake * {
+  box-sizing: border-box;
+}
+.card p,
+.arch p,
+.keepsake p,
+.card h1,
+.arch h1,
+.keepsake h1,
+.card figure,
+.arch figure {
+  margin: 0;
+}
+
+/* Arabic letters stay joined (no tracking) and take Amiri's bold for the capitals lines. */
+.card,
+.arch,
+.keepsake {
+  --gs-track: 0.3em;
+}
+.card:lang(ar),
+.card:lang(ckb),
+.card:lang(bdn),
+.arch:lang(ar),
+.arch:lang(ckb),
+.arch:lang(bdn),
+.keepsake:lang(ar),
+.keepsake:lang(ckb),
+.keepsake:lang(bdn) {
+  --gs-track: 0;
+}
+
+/* ---------------------------------------------------------------- shared ornaments */
+
+.frameBox {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.borderBox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.divider,
+.star {
+  display: block;
+  flex: none;
+  height: auto;
+}
+.divider {
+  width: 70mm;
+}
+.star {
+  width: 9mm;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 54pt;
+  line-height: 1.02;
+  color: #8a5c25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.card:lang(ar) .names,
+.card:lang(ckb) .names,
+.card:lang(bdn) .names,
+.arch:lang(ar) .names,
+.arch:lang(ckb) .names,
+.arch:lang(bdn) .names,
+.keepsake:lang(ar) .names,
+.keepsake:lang(ckb) .names,
+.keepsake:lang(bdn) .names {
+  font-family: var(--gs-heading);
+  font-size: 46pt;
+  line-height: 1.3;
+}
+.and {
+  font-size: 0.55em;
+  line-height: 1.15;
+}
+.date {
+  font-size: 15pt;
+  font-weight: 500;
+  letter-spacing: calc(var(--gs-track) * 0.5);
+  color: #8a5c25;
+}
+.qrs {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 7mm;
+}
+.qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2mm;
+  width: 28mm;
+}
+.qr img {
+  width: 17mm;
+  height: 17mm;
+  display: block;
+}
+.qr figcaption {
+  font-size: 6.8pt;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: #8a5c25;
+  text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------- A5 card, front and back (owner's design, 2026-11-26) */
+
+.card {
+  position: relative;
+  width: 154mm;
+  height: 216mm;
+  overflow: hidden;
+}
+/* Warm paper, lighter in the middle (as on the owner's card). */
+.cardPaper {
+  background: radial-gradient(120% 90% at 50% 45%, #f8ebd7 0%, #f2e2ca 65%, #e9d5bb 100%);
+  color: #8a6128;
+}
+
+/* Front: the fine gold arch (round top, straight sides), 12.6 mm inside the trim. */
+.cardArch {
+  position: absolute;
+  left: 15.6mm;
+  right: 15.6mm;
+  top: 12.3mm;
+  bottom: 16.5mm;
+  border: 0.3mm solid #b8904f;
+  border-bottom: 0;
+  border-radius: 61.4mm 61.4mm 0 0;
+}
+.cardFlower {
+  position: absolute;
+  left: 50%;
+  top: 30mm;
+  width: 78mm;
+  height: auto;
+  transform: translateX(-50%);
+}
+.cardNames {
+  position: absolute;
+  left: 20mm;
+  right: 20mm;
+  top: 92mm;
+  height: 60mm;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 62pt;
+  line-height: 1.05;
+  color: #8a6128;
+  white-space: nowrap;
+}
+.card:lang(ar) .cardNames,
+.card:lang(ckb) .cardNames,
+.card:lang(bdn) .cardNames {
+  font-family: var(--gs-heading);
+  font-style: normal;
+  font-size: 50pt;
+  line-height: 1.35;
+}
+.cardDate {
+  position: absolute;
+  left: 15.6mm;
+  right: 15.6mm;
+  top: 156mm;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6mm;
+  font-size: 17pt;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  font-variant-numeric: lining-nums;
+  color: #7a5426;
+}
+.cardRule {
+  width: 18mm;
+  height: 0.3mm;
+  background: #b8904f;
+}
+.cardExtraLine {
+  position: absolute;
+  left: 22mm;
+  right: 22mm;
+  top: 168mm;
+  margin: 0;
+  font-style: italic;
+  font-size: 11pt;
+}
+.cardLine {
+  font-size: 11pt;
+  font-style: italic;
+  max-width: 105mm;
+  overflow-wrap: anywhere;
+}
+.cardLotus {
+  position: absolute;
+  left: 50%;
+  top: 180mm;
+  width: 24mm;
+  height: auto;
+  transform: translateX(-50%);
+}
+
+/* Back: one column, centred, from the top divider to the QR code(s). */
+.backFlow {
+  position: absolute;
+  left: 18mm;
+  right: 18mm;
+  top: 30mm;
+  bottom: 14mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.backStar {
+  width: 56mm;
+  height: auto;
+  flex: none;
+}
+.backTitle {
+  margin: 13mm 0 0;
+  max-width: 100mm;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 25pt;
+  line-height: 1.42;
+  color: #8a6128;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.backTitle[data-long] {
+  font-size: 19pt;
+}
+.card:lang(ar) .backTitle,
+.card:lang(ckb) .backTitle,
+.card:lang(bdn) .backTitle {
+  font-style: normal;
+  font-size: 22pt;
+  line-height: 1.6;
+}
+.backMessage {
+  margin: 4mm 0 0;
+  max-width: 100mm;
+  font-style: italic;
+  font-size: 12pt;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.backMessage[data-long] {
+  font-size: 10pt;
+}
+.backFlower {
+  margin: 17mm 0 0;
+  width: 62mm;
+  height: auto;
+  flex: none;
+}
+.backFlower + .backStar {
+  margin-top: 6mm;
+}
+.backQrRow {
+  margin-top: 6mm;
+}
+/* The keepsake cover's heart. */
+.backHeart {
+  width: 13mm;
+  height: auto;
+}
+.cardStar {
+  margin-bottom: 1mm;
+}
+.cardDivider {
+  margin-top: 3mm;
+}
+
+/* ---------------------------------------------------------------- the arch card (120 × 193.3 mm), owner's design 2026-11-26 */
+
+.arch {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: #8a6128;
+  background: url(../assets/arch-card.webp) center / 100% 100% no-repeat;
+}
+.arch img {
+  position: absolute;
+  left: 50%;
+  height: auto;
+  transform: translateX(-50%);
+}
+.archFrontTop {
+  top: 11.8%;
+  width: 60.5%;
+}
+.archNames {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 28.5%;
+  height: 25.5%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 50pt;
+  line-height: 1.05;
+  white-space: nowrap;
+  color: #8a6128;
+}
+.archAnd {
+  font-size: 0.62em;
+  line-height: 1.15;
+}
+.arch:lang(ar) .archNames,
+.arch:lang(ckb) .archNames,
+.arch:lang(bdn) .archNames {
+  font-family: var(--gs-heading);
+  font-size: 40pt;
+  line-height: 1.35;
+}
+.archFrontDivider {
+  top: 58.1%;
+  width: 56%;
+}
+.archDate {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 63.6%;
+  margin: 0;
+  text-align: center;
+  font-size: 16pt;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  font-variant-numeric: lining-nums;
+  color: #7a5426;
+}
+.archExtra {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 70%;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+  font-size: 10pt;
+}
+.archFrontBottom {
+  top: 75.1%;
+  width: 8.9%;
+}
+.archBackTop {
+  top: 10.8%;
+  width: 28.6%;
+  left: 51% !important;
+}
+/* The title and message, centred between the branch and the divider. */
+.archWords {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 31%;
+  height: 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  text-align: center;
+}
+.archTitle {
+  margin: 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 21pt;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.archTitle[data-long] {
+  font-size: 16pt;
+}
+.arch:lang(ar) .archTitle,
+.arch:lang(ckb) .archTitle,
+.arch:lang(bdn) .archTitle {
+  font-style: normal;
+  font-size: 19pt;
+  line-height: 1.6;
+}
+.archMessage {
+  margin: 0;
+  font-style: italic;
+  font-size: 11pt;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.archMessage[data-long] {
+  font-size: 9pt;
+}
+.archBackDivider {
+  top: 56.2%;
+  width: 46.8%;
+}
+.archQrs {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 60.2%;
+  gap: 4mm;
+}
+.archQrs .qr {
+  width: 24mm;
+}
+.archQrs .qr img {
+  position: static;
+  transform: none;
+  width: 12.5mm;
+  height: 12.5mm;
+}
+.archQrs .qr figcaption {
+  font-size: 5.8pt;
+}
+.archBackBottom {
+  top: 71.2%;
+  width: 21.4%;
+}
+
+/* ---------------------------------------------------------------- burgundy cards (owner, 2026-11-26) */
+
+.burg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #7b1d2c;
+  text-align: center;
+}
+.burgFront,
+.burgBack {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.burgWeddingOf {
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6e2a2a;
+}
+.burg:lang(ar) .burgWeddingOf,
+.burg:lang(ckb) .burgWeddingOf,
+.burg:lang(bdn) .burgWeddingOf {
+  font-family: var(--gs-heading);
+  font-size: 15pt;
+  letter-spacing: 0;
+}
+.burgNames {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 46pt;
+  line-height: 1.12;
+  white-space: nowrap;
+  color: #7b1d2c;
+}
+.burgAnd {
+  font-family: 'GS Script', 'GS Serif', serif;
+  font-size: 0.95em;
+  line-height: 1;
+  color: #b0843f;
+}
+.burg:lang(ar) .burgNames,
+.burg:lang(ckb) .burgNames,
+.burg:lang(bdn) .burgNames {
+  font-family: var(--gs-heading);
+  font-size: 38pt;
+  line-height: 1.35;
+}
+.burgDate {
+  font-size: 23pt;
+  font-weight: 600;
+  font-variant-numeric: oldstyle-nums;
+  color: #7b1d2c;
+}
+.burgExtra {
+  font-style: italic;
+  font-size: 10pt;
+}
+.burgTitle {
+  margin: 0;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 22pt;
+  line-height: 1.4;
+  color: #7b1d2c;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.burgTitle[data-long] {
+  font-size: 17pt;
+}
+.burg:lang(ar) .burgTitle,
+.burg:lang(ckb) .burgTitle,
+.burg:lang(bdn) .burgTitle {
+  font-style: normal;
+  font-size: 19pt;
+  line-height: 1.6;
+}
+.burgMessage {
+  margin: 0;
+  font-style: italic;
+  font-size: 11pt;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.burgMessage[data-long] {
+  font-size: 9pt;
+}
+.burgWithLove {
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a7337;
+}
+.burg:lang(ar) .burgWithLove,
+.burg:lang(ckb) .burgWithLove,
+.burg:lang(bdn) .burgWithLove {
+  font-size: 11pt;
+  letter-spacing: 0;
+}
+.burgQrs {
+  gap: 4mm;
+}
+.burgQrs .qr {
+  width: 24mm;
+}
+.burgQrs .qr img {
+  width: 12.5mm;
+  height: 12.5mm;
+}
+.burgQrs .qr figcaption {
+  font-size: 5.8pt;
+  color: #6e2a2a;
+}
+
+/* The rectangle: flowers top left and bottom right; the artwork's small divider sits at 31 % down. */
+.burgFrame .burgFront {
+  left: 16%;
+  right: 16%;
+  top: 23%;
+  height: 50%;
+}
+.burgFrame .burgWeddingOf {
+  height: 8%;
+}
+.burgFrame .burgNames {
+  margin-top: 6.5%;
+}
+.burgFrame .burgDate {
+  margin-top: 2%;
+}
+.burgFrame .burgBack {
+  inset: 0;
+  padding: 34% 16% 0;
+  gap: 4mm;
+}
+/* QR codes in the free bottom-left area of the rectangle, clear of the bottom-right flowers. */
+.burgFrame .burgQrs {
+  position: absolute;
+  left: 8%;
+  width: 44%;
+  top: 67%;
+}
+
+/* The lantern arch: the lantern above, the flower garland below (from 78 % down). */
+.burgLantern .burgFront {
+  left: 13%;
+  right: 13%;
+  top: 37%;
+  height: 39%;
+  justify-content: center;
+  gap: 2.5mm;
+}
+.burgLantern .burgBack {
+  left: 14%;
+  right: 14%;
+  top: 41%;
+  height: 37%;
+  justify-content: flex-start;
+  gap: 3.5mm;
+}
+.burgLantern .burgNames {
+  font-size: 42pt;
+}
+
+/* ---------------------------------------------------------------- keepsake, A4 */
+
+/* The owner's lined flower paper behind every page (fixed: repeated on each printed page). */
+.paper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #f6efe6 url(../assets/letter-paper.webp) center / 100% 100% no-repeat;
+}
+.cover {
+  position: relative;
+  z-index: 1;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 42%, #f7ecde 0%, #f2e2ce 62%, #ead6bd 100%);
+  break-after: page;
+}
+.coverInner {
+  position: absolute;
+  z-index: 2;
+  inset: 48mm 30mm 44mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6mm;
+}
+.coverEyebrow {
+  font-size: 12pt;
+  font-weight: 500;
+  letter-spacing: var(--gs-track);
+  text-transform: uppercase;
+}
+.keepsake:lang(ar) .coverEyebrow,
+.keepsake:lang(ckb) .coverEyebrow,
+.keepsake:lang(bdn) .coverEyebrow {
+  font-family: var(--gs-heading);
+  font-size: 17pt;
+}
+.coverNames {
+  font-size: 64pt;
+  margin: 4mm 0;
+}
+.coverSub {
+  font-style: italic;
+  font-size: 15pt;
+}
+
+/*
+ * Messages (owner, 2026-11-27): written on the plain flower paper (no ruled lines), in a bolder, larger hand, with a short
+ * gold line centred after each message. The padding repeats on every page the messages flow onto, clear of the flowers.
+ */
+.messages {
+  position: relative;
+  z-index: 1;
+  padding: 58mm 34mm 56mm;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  text-align: start;
+  font-size: 15pt;
+  line-height: 1.6;
+  color: #4e3313;
+}
+.message {
+  margin: 0 0 9mm;
+  break-inside: avoid;
+}
+/* The line in the middle after each message. */
+.message::after {
+  content: '';
+  display: block;
+  width: 36mm;
+  height: 0.35mm;
+  margin: 7mm auto 0;
+  background: #b08848;
+}
+.messageText {
+  font-style: italic;
+  font-weight: 600;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.keepsake:lang(ar) .messageText,
+.keepsake:lang(ckb) .messageText,
+.keepsake:lang(bdn) .messageText {
+  font-style: normal;
+  font-weight: 700;
+}
+.messageFrom {
+  margin-top: 2mm !important;
+  font-size: 12pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #7a5122;
+  text-align: end;
+}
