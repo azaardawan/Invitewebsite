@@ -79,6 +79,7 @@ test('signature board: bought on the order form, arranged on the receipt, printe
   // Move a message: drag it down and to the side; it is saved.
   const note = board1.locator('[data-note]').first();
   const id = await note.getAttribute('data-note');
+  await note.scrollIntoViewIfNeeded();
   const before = (await note.boundingBox())!;
   const saved = page.waitForResponse((r) => r.url().endsWith('/board') && r.request().method() === 'PUT' && r.ok());
   await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);

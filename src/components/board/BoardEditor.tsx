@@ -222,7 +222,7 @@ export function BoardEditor({ view, saveUrl, labels }: { view: BoardView; saveUr
             </div>
           ))}
         </div>
-        <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 sm:sticky sm:bottom-2">
+        <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-4">
           <p className="font-medium text-heading">{note ? fill(labels.selected, { name: note.name }) : labels.selectHint}</p>
           <div className="flex gap-2">
             <button type="button" className={`${button} flex-1`} disabled={!spot} onClick={() => selected && spot && update(selected, { r: Math.max(-180, spot.r - 5) })}>
