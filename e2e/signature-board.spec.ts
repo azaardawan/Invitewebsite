@@ -29,9 +29,9 @@ test('signature board: bought on the order form, arranged on the receipt, printe
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(300_000);
   await signInAsNewOwner(page);
-  const made = script('e2e/scripts/make-board-order.ts') as { receiptToken: string; path: string; amountIqd: number; previewToken: string };
-  // 40,000 (package) + 25,000 (the board).
-  expect(made.amountIqd).toBe(65000);
+  const made = script('e2e/scripts/make-board-order.ts') as { receiptToken: string; path: string; amountIqd: number; previewToken: string; packagePriceIqd: number };
+  // The package + 25,000 (the board).
+  expect(made.amountIqd).toBe(made.packagePriceIqd + 25000);
 
   // The order form offers it (the design has board artwork), with its price.
   await page.setViewportSize({ width: 430, height: 900 });
@@ -79,6 +79,7 @@ test('signature board: bought on the order form, arranged on the receipt, printe
   // Move a message: drag it down and to the side; it is saved.
   const note = board1.locator('[data-note]').first();
   const id = await note.getAttribute('data-note');
+  await note.scrollIntoViewIfNeeded();
   const before = (await note.boundingBox())!;
   const saved = page.waitForResponse((r) => r.url().endsWith('/board') && r.request().method() === 'PUT' && r.ok());
   await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
@@ -121,8 +122,10 @@ test('signature board: bought on the order form, arranged on the receipt, printe
 });
 
 test('guests sign under their message; the signature reaches the board', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile-390', 'runs once, on a phone');
+  // With the desktop tests, after catalog.spec (which expects demo-wedding without a cover yet); on a phone-sized screen.
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(240_000);
+  await page.setViewportSize({ width: 390, height: 844 });
   const made = script('e2e/scripts/make-board-order.ts', { MESSAGES: '2' }) as { receiptToken: string; path: string };
   await page.goto(made.path);
   const open = page.getByRole('button', { name: /open/i });
