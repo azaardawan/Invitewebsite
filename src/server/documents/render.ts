@@ -12,6 +12,39 @@ export type PdfRenderer = (kind: RenderKind, invitationId: string, opts?: CardPi
 /** The print page's `card=` parameter (empty without one). */
 const cardParam = (opts?: CardPick, sep = '&') => (opts?.card ? `${sep}card=${encodeURIComponent(opts.card)}` : '');
 
+/**
+ * Headless Chromium for every render, at most RENDER_SLOTS at once (owner, 2026-11-26: a receipt asks for several
+ * pictures together, and as many browsers at once ran the server out of memory: «Target crashed», so cards and
+ * keepsakes failed to load). The others wait their turn; a browser that crashes anyway is started again once.
+ */
+const RENDER_SLOTS = 2;
+let busy = 0;
+const waiting: (() => void)[] = [];
+async function rendering<T>(work: (browser: Browser) => Promise<T>): Promise<T> {
+  if (busy >= RENDER_SLOTS) await new Promise<void>((go) => waiting.push(go));
+  busy += 1;
+  try {
+    for (let attempt = 1; ; attempt++) {
+      const browser = await chromium.launch({
+        executablePath: env().CHROMIUM_PATH || undefined,
+        args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+      });
+      try {
+        return await work(browser);
+      } catch (e) {
+        const crashed = e instanceof Error && /Target crashed|Target page, context or browser has been closed|Browser closed/i.test(e.message);
+        if (!crashed || attempt >= 2) throw e;
+        console.error('[render] browser crashed, starting it again', e.message);
+      } finally {
+        await browser.close().catch(() => {});
+      }
+    }
+  } finally {
+    busy -= 1;
+    waiting.shift()?.();
+  }
+}
+
 function printOrigin() {
   return (env().PRINT_ORIGIN ?? `http://127.0.0.1:${process.env.PORT ?? 3000}`).replace(/\/$/, '');
 }
@@ -24,11 +57,7 @@ function printOrigin() {
  * so each side's border is laid out for its own page shape.
  */
 export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
-  const browser = await chromium.launch({
-    executablePath: env().CHROMIUM_PATH || undefined,
-    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
-  });
-  try {
+  return rendering(async (browser) => {
     const url = `/print/${printToken(kind, invitationId)}`;
     if (kind !== 'card' && kind !== 'cardBleed') return await pdfOf(browser, url, { fillLastPage: kind === 'keepsake' });
     const merged = await PDFDocument.create();
@@ -37,9 +66,7 @@ export const renderPdf: PdfRenderer = async (kind, invitationId, opts) => {
       for (const p of await merged.copyPages(part, part.getPageIndices())) merged.addPage(p);
     }
     return Buffer.from(await merged.save());
-  } finally {
-    await browser.close();
-  }
+  });
 };
 
 /** Long texts are written smaller by the page itself once it runs (FitLongTexts): wait for it (a few seconds at most). */
@@ -107,11 +134,7 @@ export function fillPagesWithLastBackground() {
  */
 export type ShapePngRenderer = (side: 'front' | 'back', invitationId: string, opts?: CardPick) => Promise<Buffer>;
 export const renderShapePng: ShapePngRenderer = async (side, invitationId, opts) => {
-  const browser = await chromium.launch({
-    executablePath: env().CHROMIUM_PATH || undefined,
-    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
-  });
-  try {
+  return rendering(async (browser) => {
     // 300 dpi: 96 CSS px per inch × 3.125.
     const page = await browser.newPage({ viewport: { width: 1200, height: 1200 }, deviceScaleFactor: 3.125, reducedMotion: 'reduce' });
     await page.emulateMedia({ media: 'print' });
@@ -120,9 +143,7 @@ export const renderShapePng: ShapePngRenderer = async (side, invitationId, opts)
     await page.evaluate(() => document.fonts.ready);
     await textsFitted(page);
     return await page.locator('[data-card-side]').first().screenshot({ type: 'png', omitBackground: true });
-  } finally {
-    await browser.close();
-  }
+  });
 };
 
 /** One card side as a JPEG: the window is sized to the side first, so a side of any shape is pictured whole. */
@@ -149,11 +170,7 @@ const PREVIEW_VIEWPORT: Record<PreviewKind, { width: number; height: number; sca
  * instead of a PDF) or, for `og`, the invitation's cover as a guest first sees it.
  */
 export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) => {
-  const browser = await chromium.launch({
-    executablePath: env().CHROMIUM_PATH || undefined,
-    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
-  });
-  try {
+  return rendering(async (browser) => {
     const v = PREVIEW_VIEWPORT[kind];
     const page = await browser.newPage({ viewport: { width: v.width, height: v.height }, deviceScaleFactor: v.scale, reducedMotion: 'reduce' });
     if (kind !== 'og') await page.emulateMedia({ media: 'print' });
@@ -173,9 +190,7 @@ export const renderPreview: PreviewRenderer = async (kind, invitationId, opts) =
     const shaped = kind === 'og' ? null : page.locator('[data-card-side]').first();
     if (shaped && (await shaped.count())) return await shootSide(page, shaped, 82);
     return await page.screenshot({ type: 'jpeg', quality: 82 });
-  } finally {
-    await browser.close();
-  }
+  });
 };
 
 /**
@@ -240,11 +255,7 @@ const PRODUCT_SHOTS: Record<Exclude<ProductItem, 'sticker.pdf' | 'sticker-square
 };
 
 export const renderProduct: ProductRenderer = async (item, invitationId, opts = {}) => {
-  const browser = await chromium.launch({
-    executablePath: env().CHROMIUM_PATH || undefined,
-    args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
-  });
-  try {
+  return rendering(async (browser) => {
     // The square set (both shapes chosen): the same print pages, drawn square.
     const square = item.startsWith('sticker-square.') ? '?shape=square' : '';
     if (item === 'sticker.pdf' || item === 'sticker-square.pdf' || item === 'bottle.pdf') {
@@ -268,7 +279,5 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     const shaped = card ? page.locator('[data-card-side]').first() : null;
     if (shaped && (await shaped.count())) return await shootSide(page, shaped, 84);
     return await page.screenshot({ type: shot.type, ...(shot.type === 'jpeg' ? { quality: 84 } : {}), omitBackground: shot.transparent ?? false });
-  } finally {
-    await browser.close();
-  }
+  });
 };

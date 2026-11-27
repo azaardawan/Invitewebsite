@@ -96,11 +96,13 @@
     pointer-events: none;
     animation: bh-petal 17s linear infinite;
   }
+  /* The shanasheel lattice behind the hero's cards: drawn as joined lines (the old gradient tiles broke at every
+     joint), fading out towards its foot instead of ending in a hard edge (owner, 2026-11-26). */
   .bh-lattice {
-    background-image:
-      linear-gradient(45deg, transparent 47%, #ead3ca 47%, #ead3ca 53%, transparent 53%),
-      linear-gradient(-45deg, transparent 47%, #ead3ca 47%, #ead3ca 53%, transparent 53%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26'%3E%3Cpath d='M-2 -2L28 28M28 -2L-2 28' stroke='%23ead3ca' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
     background-size: 26px 26px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 96%);
+    mask-image: linear-gradient(to bottom, #000 62%, transparent 96%);
   }
   .no-scrollbar {
     scrollbar-width: none;

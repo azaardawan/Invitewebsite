@@ -2,11 +2,11 @@ import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { NextIntlClientProvider } from 'next-intl';
 import { occasionKey, signatureUrls } from '@/server/invitation/load';
-import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX } from '@/catalog/occasion-wording';
+import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX, showsEventWording } from '@/catalog/occasion-wording';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { isLocale, type Locale } from '@/i18n/config';
 import { db } from '@/server/db/client';
-import { invitations, themeVersions } from '@/server/db/schema';
+import { invitations, themeVersions, themes } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
 import { TemplateEditor } from '@/components/storefront/order/TemplateEditor';
 import { posterLabels, templateLabels } from '@/components/storefront/order/template-labels';
@@ -58,6 +58,8 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
   const song = await songState(inv!);
   const ts = await getTranslations({ locale, namespace: 'store' });
   const occasion = await occasionKey(db(), inv!.sectionId);
+  // The occasion choice only where this invitation's design version shows it.
+  const [design] = await db().select({ key: themes.key, version: themeVersions.version }).from(themeVersions).innerJoin(themes, eq(themes.id, themeVersions.themeId)).where(eq(themeVersions.id, inv!.themeVersionId));
 
   // A template design: changed in place, like it was filled while ordering (texts, photos and video, saved one by one).
   const [version] = await db().select({ manifest: themeVersions.manifest }).from(themeVersions).where(eq(themeVersions.id, inv!.themeVersionId));
@@ -179,7 +181,7 @@ export default async function CustomerEditPage({ params, searchParams }: PagePro
             extras={{
               ...(inv!.featureKeys.includes('signature') ? { signature: { current: await signatureUrls(db(), inv!) } } : {}),
               // A wedding or an engagement: held as a Nishani, a henna night or in their own words (owner, 2026-11-26).
-              ...((EVENT_KIND_SECTIONS as readonly string[]).includes(occasion ?? '') ? { event: { own: occasion, current: inv!.eventKind ?? '', name: inv!.eventName ?? '', max: EVENT_NAME_MAX } } : {}),
+              ...((EVENT_KIND_SECTIONS as readonly string[]).includes(occasion ?? '') && showsEventWording(design?.key, design?.version) ? { event: { own: occasion, current: inv!.eventKind ?? '', name: inv!.eventName ?? '', max: EVENT_NAME_MAX } } : {}),
             }}
           />
         </NextIntlClientProvider>
