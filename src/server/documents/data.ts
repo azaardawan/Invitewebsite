@@ -10,6 +10,7 @@ import { manifestByCodeRef } from '@/theme-registry';
 import type { CardShape, ThemeManifest } from '@/theme-sdk/manifest';
 import { env } from '@/server/env';
 import { invitationPath } from '@/lib/ids';
+import { signatureDrawing, type SignatureStrokes } from '@/lib/signature-strokes';
 import type { KeepsakeMessage, KeepsakeProps, PrintCardBackProps, PrintCardProps, PrintLabels } from '@/theme-sdk/print';
 import type { Locale } from '@/i18n/config';
 import { occasionKey, signatureUrls } from '@/server/invitation/load';
@@ -43,16 +44,16 @@ export function guestPhotosUrl(inv: Pick<InvitationRow, 'guestPhotosToken' | 'gu
 
 export async function visibleMessages(db: DbOrTx, invitationId: string, locale: Locale): Promise<KeepsakeMessage[]> {
   const rows = (await db
-    .select({ name: guestResponses.guestName, message: guestResponses.message, attendance: guestResponses.attendance, partySize: guestResponses.partySize })
+    .select({ name: guestResponses.guestName, message: guestResponses.message, attendance: guestResponses.attendance, partySize: guestResponses.partySize, signature: guestResponses.signature })
     .from(guestResponses)
     .where(and(eq(guestResponses.invitationId, invitationId), eq(guestResponses.messageStatus, 'VISIBLE'), isNotNull(guestResponses.message)))
-    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id))) as { name: string; message: string; attendance: 'ATTENDING' | 'NOT_ATTENDING'; partySize: number }[];
+    .orderBy(asc(guestResponses.createdAt), asc(guestResponses.id))) as { name: string; message: string; attendance: 'ATTENDING' | 'NOT_ATTENDING'; partySize: number; signature: SignatureStrokes | null }[];
   // Whether each guest is coming (and how many of them), printed beside their name so the couple sees it with the message.
   const labels = invitationMessages(locale) as unknown as { guestComing: string; guestNotComing: string; guestParty: string };
   return rows.map((r) => {
     const attending = r.attendance === 'ATTENDING';
     const party = r.partySize > 1 ? ` · ${labels.guestParty.replace('{count}', formatNumber(r.partySize, locale))}` : '';
-    return { name: r.name, message: r.message, attending, partySize: r.partySize, guestName: `${r.name} · ${attending ? labels.guestComing : labels.guestNotComing}${party}` };
+    return { name: r.name, message: r.message, attending, partySize: r.partySize, guestName: `${r.name} · ${attending ? labels.guestComing : labels.guestNotComing}${party}`, signature: signatureDrawing(r.signature) };
   });
 }
 

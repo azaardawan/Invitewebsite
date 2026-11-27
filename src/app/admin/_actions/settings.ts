@@ -5,7 +5,7 @@ import { ZodError } from 'zod';
 import { db } from '@/server/db/client';
 import { requireAdmin } from '@/server/auth/guard';
 import { requestContext } from '@/server/auth/request-context';
-import { updateContactSettings, updateCurrencySettings, updateGuestPhotoSettings, updatePaymentSettings } from '@/server/settings/service';
+import { updateContactSettings, updateCurrencySettings, updateGuestPhotoSettings, updatePaymentSettings, updateSignatureBoardSettings } from '@/server/settings/service';
 import { optionalI18nContent } from '@/server/catalog/common';
 import { normalizePhone } from '@/lib/phone';
 import { catalogFailure, readI18n } from './form-helpers';
@@ -93,6 +93,24 @@ export async function guestPhotoSettingsAction(_: ActionState, form: FormData): 
     );
   } catch (e) {
     if (e instanceof ZodError) return { error: 'settings.guestPhotosInvalid' };
+    return catalogFailure(e);
+  }
+  revalidatePath('/admin/settings');
+  return { ok: true, message: 'catalog.common.saved', nonce: Date.now() };
+}
+
+/** The signature board: offered or not, its price, and how many people go on each board. */
+export async function signatureBoardSettingsAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const { user } = await requireAdmin({ permission: 'settings.manage' });
+  const num = (k: string) => Number(String(form.get(k) ?? '').replace(/[,\s٬]/g, ''));
+  try {
+    await updateSignatureBoardSettings(
+      db(),
+      { enabled: form.get('enabled') === 'on', priceIqd: num('priceIqd'), perBoard: num('perBoard') },
+      { adminId: user.id, ipHash: (await requestContext()).ipHash },
+    );
+  } catch (e) {
+    if (e instanceof ZodError) return { error: 'settings.signatureBoardInvalid' };
     return catalogFailure(e);
   }
   revalidatePath('/admin/settings');

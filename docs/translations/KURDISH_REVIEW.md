@@ -2429,3 +2429,23 @@ phrases the designs use for a Nishani or a henna night (`src/catalog/occasion-wo
 | receipt.filmStatus.ready | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان ئامادەیە. | دەستپێکا لڤۆک یا داخوازناما هەوە یا ئامادەیە. |
 | receipt.filmStatus.making | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان ئامادە دەکرێت. نزیکەی ١٠ خولەک دەخایەنێت؛ ئەم پەڕەیە نوێ بکەنەوە بۆ دڵنیابوون. | دەستپێکا لڤۆک یا داخوازناما هەوە دهێتە ئامادەکرن. نێزیکی ١٠ خولەکان دڤێت؛ ڤێ پەڕێ نووژەن بکەن دا پشتڕاست ببن. |
 | receipt.filmStatus.late | دەستپێکە جووڵاوەکەی بانگهێشتنامەکەتان لە ئاسایی زیاتر کات دەخایەنێت. تیمەکەمان بەدواداچوونی بۆ دەکات. | دەستپێکا لڤۆک یا داخوازناما هەوە ژ ئاسایی پتر دەم دڤێت. تیما مە یا ل سەر کار دکەت. |
+
+## Batch 83 — Guest signatures and the signature board — ✅ AUTO-APPROVED (2026-11-27, owner checks in Admin → Translations)
+
+The guest form's signature pad (`invitation.sign*`), the order form's add-on (`store.signatureBoard.*`) and the
+couple's board on the receipt (`receipt.navBoard`, `receipt.board.*`).
+
+| Key | Sorani (ckb) | Badini (bdn) |
+| --- | --- | --- |
+| invitation.signHere / signClear / signHint | لێرە واژۆ بکە (ئارەزوومەندانە) / سڕینەوە / واژۆکەت بە پەنجەت بکێشە | ل ڤێرە واژۆ بکە (ب دلێ خۆ) / ژێبرن / واژۆیا خۆ ب تبلا خۆ بکێشە |
+| store.signatureBoard.addOn / title | زیادکراو / تابلۆی واژۆکان | زێدەکری / تابلۆیا واژۆیان |
+| store.signatureBoard.help | هەموو نامەکانی میوانان بە ناو و واژۆیانەوە لەسەر تابلۆیەکی گەورەی چاپکراو… | هەمی نامێن مێهڤانان ب ناڤ و واژۆیێن وان ل سەر تابلۆیەکا مەزن یا چاپکری… |
+| store.signatureBoard.error | تابلۆی واژۆکان بۆ ئەم دیزاینە بەردەست نییە. | تابلۆیا واژۆیان بۆ ڤێ دیزاینێ بەردەست نینە. |
+| receipt.navBoard / board.title | تابلۆی واژۆکان | تابلۆیا واژۆیان |
+| receipt.board.help | نامەکانی میوانەکانتان بە ناو و واژۆیانەوە. هەر نامەیەک ڕابکێشن… | نامێن مێهڤانێن هەوە ب ناڤ و واژۆیێن وان. هەر نامەکێ بکێشن… |
+| receipt.board.board / selected / moveTo | تابلۆی {n} / نامەی {name} / گواستنەوە بۆ تابلۆی {n} | تابلۆیا {n} / نامەیا {name} / ڤەگوهاستن بۆ تابلۆیا {n} |
+| receipt.board.turnLeft / turnRight / turnHandle | ⟲ سووڕاندن / سووڕاندن ⟳ / سووڕاندنی نامەکە | ⟲ زڤڕاندن / زڤڕاندن ⟳ / زڤڕاندنا نامێ |
+| receipt.board.rearrange / rearrangeConfirm / rearrangeYes / cancel | دووبارە ڕێکخستنی خۆکار / … / بەڵێ، دووبارە ڕێکی بخە / هەڵوەشاندنەوە | دووبارە رێکخستنا خۆکار / … / بەلێ، دووبارە رێک بێخە / هەلوەشاندن |
+| receipt.board.saving / saved / saveFailed | پاشەکەوت دەکرێت… / پاشەکەوت کرا / پاشەکەوت نەکرا… | پاشەکەفت دبیت… / پاشەکەفت بوو / پاشەکەفت نەبوو… |
+| receipt.board.empty / selectHint | هێشتا هیچ نامەیەک نەگەیشتووە… / لەسەر نامەیەک لە تابلۆکە دابگرن… | هێشتا چ نام نەگەهشتینە… / ل سەر نامەکێ ل تابلۆیێ بدەن… |
+| receipt.board.downloadPdf / downloadPng / filesNote | داگرتنی تابلۆکان (PDF بۆ چاپ) / داگرتنی تابلۆی یەکەم (وێنە) / فایلەکان لە تابلۆکان دروست دەکرێن… | داگرتنا تابلۆیان (PDF بۆ چاپێ) / داگرتنا تابلۆیا ئێکێ (وێنە) / فایل ژ تابلۆیان دهێنە چێکرن… |

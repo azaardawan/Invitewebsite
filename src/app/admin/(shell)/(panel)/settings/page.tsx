@@ -5,7 +5,7 @@ import { getSettings } from '@/server/settings/service';
 import { formatIqd, formatUsd } from '@/lib/currency';
 import { ActionForm, Field, SubmitButton } from '@/components/admin/forms';
 import { Card } from '@/components/admin/bits';
-import { contactSettingsAction, currencySettingsAction, guestPhotoSettingsAction, paymentSettingsAction } from '@/app/admin/_actions/settings';
+import { contactSettingsAction, currencySettingsAction, guestPhotoSettingsAction, paymentSettingsAction, signatureBoardSettingsAction } from '@/app/admin/_actions/settings';
 import { BASE_CAP, STEP } from '@/catalog/guest-photos';
 import { I18nInputs } from '@/components/admin/I18nInputs';
 
@@ -13,7 +13,7 @@ export default async function SettingsPage() {
   await requireAdmin({ permission: 'settings.manage' });
   const t = await getTranslations('admin.settings');
   const locale = (await getLocale()) === 'ar' ? 'ar-IQ' : 'en-US';
-  const { currency, payment, contact, guestPhotos } = await getSettings(db());
+  const { currency, payment, contact, guestPhotos, signatureBoard } = await getSettings(db());
   const example = 75000;
 
   return (
@@ -64,6 +64,21 @@ export default async function SettingsPage() {
               price: formatIqd(guestPhotos.basePriceIqd + 5 * guestPhotos.stepPriceIqd, locale),
             })}
           </p>
+          <SubmitButton>{t('save')}</SubmitButton>
+        </ActionForm>
+      </Card>
+      <Card className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('boardHeading')}</h2>
+        <p className="text-sm text-muted">{t('boardIntro')}</p>
+        <ActionForm action={signatureBoardSettingsAction} className="space-y-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="enabled" defaultChecked={signatureBoard.enabled} />
+            {t('boardEnabled')}
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label={t('boardPrice')} name="priceIqd" inputMode="numeric" dir="ltr" defaultValue={String(signatureBoard.priceIqd)} />
+            <Field label={t('boardPerBoard')} name="perBoard" inputMode="numeric" dir="ltr" defaultValue={String(signatureBoard.perBoard)} />
+          </div>
           <SubmitButton>{t('save')}</SubmitButton>
         </ActionForm>
       </Card>

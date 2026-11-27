@@ -282,7 +282,8 @@ def ramp(nt, c0, c1, p0=0.0, p1=1.0):
 
 
 def make_linen_material():
-    """Warm oatmeal linen: warp/weft weave, slubs and fibre grain."""
+    """Warm oatmeal linen. Close up (the stitching): a true plain weave like the Lovan reference (owner, 2026-11-27);
+    far away (the finished card): the soft cross-hatch, exactly as before. Colour, light and camera are unchanged."""
     mat = bpy.data.materials.new("Linen_Card")
     nt, bsdf, _ = principled(mat)
     N, L = nt.nodes, nt.links
@@ -300,9 +301,7 @@ def make_linen_material():
         L.new(texco.outputs["Object"], w.inputs["Vector"])
         return w
 
-    warp, weft = wave("X", 112.0, 2.0), wave("Y", 104.0, 2.4)
-
-    def math(op, a, b, c=None):
+    def math(op, a, b=None, c=None):
         m = N.new("ShaderNodeMath")
         m.operation = op
         for idx, v in enumerate((a, b, c)):
@@ -314,28 +313,63 @@ def make_linen_material():
                 L.new(v, m.inputs[idx])
         return m.outputs[0]
 
-    # woven cross-hatch: over/under pattern = max of the two thread systems + their product
-    over = math("MAXIMUM", sock(warp.outputs, "Fac"), sock(weft.outputs, "Fac"))
-    under = math("MULTIPLY", sock(warp.outputs, "Fac"), sock(weft.outputs, "Fac"))
-    weave = math("MULTIPLY_ADD", under, 0.6, over)
+    def mapping(scale):
+        mp = N.new("ShaderNodeMapping")
+        mp.inputs["Scale"].default_value = scale
+        L.new(texco.outputs["Object"], mp.inputs["Vector"])
+        return mp.outputs["Vector"]
 
-    slub = N.new("ShaderNodeTexNoise")          # thick/thin slubs along threads
-    slub.inputs["Scale"].default_value = 38.0
-    slub.inputs["Detail"].default_value = 4.0
-    L.new(texco.outputs["Object"], slub.inputs["Vector"])
+    def plain_weave(pitch):
+        """A true plain weave (like the Lovan reference): warp and weft threads, each rounded across, passing over
+        and under each other at every crossing, with uneven (slubby) thickness along the threads and small gaps."""
+        f = 1.0 / pitch
+        sep = N.new("ShaderNodeSeparateXYZ")
+        L.new(texco.outputs["Object"], sep.inputs["Vector"])
+        u = math("MULTIPLY", sep.outputs["X"], f)
+        v = math("MULTIPLY", sep.outputs["Y"], f)
+        # a thread's round profile across it: 1 in the middle, 0 at the gap
+        def profile(t):
+            frac = math("FRACT", t, 0.0)
+            d = math("ABSOLUTE", math("SUBTRACT", frac, 0.5))
+            return math("POWER", math("MAXIMUM", math("SUBTRACT", 1.0, math("MULTIPLY", d, 2.15)), 0.0), 0.6)
+        warp_p, weft_p = profile(u), profile(v)
+        # over/under: which thread is on top alternates at every crossing (a checkerboard of crossings)
+        par = math("FRACT", math("MULTIPLY", math("ADD", math("FLOOR", u), math("FLOOR", v)), 0.5), 0.0)
+        on_top = math("MULTIPLY", par, 2.0)            # 0 or 1
+        # along its length a thread rises over the crossing and dips under the next one
+        rise_u = math("MULTIPLY_ADD", math("SINE", math("MULTIPLY", v, 3.14159)), 0.0, 0.0)
+        warp_h = math("MULTIPLY", warp_p, math("MULTIPLY_ADD", on_top, 0.35, 0.45))
+        weft_h = math("MULTIPLY", weft_p, math("MULTIPLY_ADD", math("SUBTRACT", 1.0, on_top), 0.45, 0.55))
+        # slubs: some weft threads thicker for a stretch (the soft horizontal ridges), some warp threads too
+        slub_w = N.new("ShaderNodeTexNoise")
+        slub_w.inputs["Scale"].default_value = 1.0
+        slub_w.inputs["Detail"].default_value = 2.0
+        L.new(mapping((f * 0.035, f * 1.0, 1.0)), slub_w.inputs["Vector"])
+        slub_v = N.new("ShaderNodeTexNoise")
+        slub_v.inputs["Scale"].default_value = 1.0
+        slub_v.inputs["Detail"].default_value = 2.0
+        L.new(mapping((f * 1.0, f * 0.05, 1.0)), slub_v.inputs["Vector"])
+        thick_w = math("MULTIPLY_ADD", math("MAXIMUM", math("SUBTRACT", sock(slub_w.outputs, "Fac"), 0.5), 0.0), 2.6, 1.0)
+        thick_v = math("MULTIPLY_ADD", math("MAXIMUM", math("SUBTRACT", sock(slub_v.outputs, "Fac"), 0.52), 0.0), 1.8, 1.0)
+        weft_h = math("MULTIPLY", weft_h, thick_w)
+        warp_h = math("MULTIPLY", warp_h, thick_v)
+        return math("MAXIMUM", warp_h, weft_h)
+
+    weave = plain_weave(0.0036)
+
     grain = N.new("ShaderNodeTexNoise")         # fibre grain
     grain.inputs["Scale"].default_value = 1400.0
     grain.inputs["Detail"].default_value = 8.0
     L.new(texco.outputs["Object"], grain.inputs["Vector"])
-    vor = N.new("ShaderNodeTexVoronoi")
-    vor.inputs["Scale"].default_value = 520.0
-    L.new(texco.outputs["Object"], vor.inputs["Vector"])
+    slub = N.new("ShaderNodeTexNoise")          # soft unevenness of the cloth
+    slub.inputs["Scale"].default_value = 38.0
+    slub.inputs["Detail"].default_value = 4.0
+    L.new(texco.outputs["Object"], slub.inputs["Vector"])
 
-    fine = math("MULTIPLY_ADD", sock(grain.outputs, "Fac"), 0.35, weave)
-    fine = math("MULTIPLY_ADD", sock(vor.outputs, "Distance"), 0.25, fine)
+    fine = math("MULTIPLY_ADD", sock(grain.outputs, "Fac"), 0.18, weave)
 
-    # The weave is ~1.5 mm: in the full-card view that is about one pixel and would alias
-    # into a blotchy pattern, so fade the fine detail out with distance from the camera.
+    # The weave is under a millimetre: in the full-card view it would alias, so the fine weave fades with distance
+    # into a larger version of the same weave (the fine cross-hatch with faint streaks of the Lovan reference).
     cam = N.new("ShaderNodeCameraData")
     fade = N.new("ShaderNodeMapRange")
     fade.clamp = True
@@ -343,24 +377,35 @@ def make_linen_material():
     fade.inputs[1].default_value, fade.inputs[2].default_value = 1.2, 2.6
     fade.inputs[3].default_value, fade.inputs[4].default_value = 1.0, 0.0
     fine = math("MULTIPLY", fine, fade.outputs[0])
-    # Far away, a softer and larger cross-hatch keeps the card reading as linen.
+    # Far away (the finished card, owner 2026-11-27): exactly the earlier soft cross-hatch, unchanged.
+    def wave(direction, scale, distortion):
+        w = N.new("ShaderNodeTexWave")
+        w.wave_type = "BANDS"
+        w.bands_direction = direction
+        w.wave_profile = "SIN"
+        w.inputs["Scale"].default_value = scale
+        w.inputs["Distortion"].default_value = distortion
+        w.inputs["Detail"].default_value = 3.0
+        w.inputs["Detail Scale"].default_value = 2.0
+        L.new(texco.outputs["Object"], w.inputs["Vector"])
+        return w
     warp2, weft2 = wave("X", 55.0, 1.5), wave("Y", 52.0, 1.8)
-    coarse = math("MULTIPLY_ADD", math("MAXIMUM", sock(warp2.outputs, "Fac"), sock(weft2.outputs, "Fac")),
-                  0.35, 0.72)
+    coarse = math("MULTIPLY_ADD", math("MAXIMUM", sock(warp2.outputs, "Fac"), sock(weft2.outputs, "Fac")), 0.35, 0.72)
     base_level = math("MULTIPLY", math("SUBTRACT", 1.0, fade.outputs[0]), coarse)
     height = math("ADD", fine, base_level)
-    height = math("MULTIPLY_ADD", sock(slub.outputs, "Fac"), 0.5, height)
+    # close up the unevenness is softer (the weave carries the texture); far away it is exactly as before
+    height = math("MULTIPLY_ADD", sock(slub.outputs, "Fac"), math("MULTIPLY_ADD", fade.outputs[0], -0.25, 0.5), height)
 
     bump = N.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.6
     bump.inputs["Distance"].default_value = 0.0009
+    L.new(math("MULTIPLY_ADD", fade.outputs[0], 0.35, 0.6), bump.inputs["Strength"])     # 0.6 far away, as before
     L.new(height, bump.inputs["Height"])
     L.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
 
     col = ramp(nt, hex_to_linear(LINEN_SHADOW), hex_to_linear(LINEN_LIT), 0.25, 1.5)
     mid = col.color_ramp.elements.new(0.85)
     mid.color = hex_to_linear(LINEN_MID)
-    L.new(height, sock(col.inputs, "Fac"))
+    L.new(math("MULTIPLY_ADD", fade.outputs[0], 0.24, height), sock(col.inputs, "Fac"))
     warm = N.new("ShaderNodeHueSaturation")          # the view transform mutes warm tones
     warm.inputs["Saturation"].default_value = 1.35
     warm.inputs["Value"].default_value = 1.0

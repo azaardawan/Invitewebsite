@@ -18,6 +18,8 @@ const inputSchema = z.object({
   attendance: z.enum(['ATTENDING', 'NOT_ATTENDING']).nullable(),
   message: z.string().max(5000).optional(),
   partySize: z.number().optional(),
+  // Its shape only; checked in detail by parseSignatureStrokes (src/lib/signature-strokes.ts).
+  signature: z.object({ w: z.number(), h: z.number(), s: z.array(z.array(z.number())) }).nullable().optional(),
 });
 
 /** Public guest form submission, bound to one invitation id by the invitation page. */

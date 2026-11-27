@@ -16,6 +16,8 @@ import { themeNumber } from '@/theme-registry';
 import { ThemeNumber } from '@/components/admin/ThemeNumber';
 import { CardDesignSection } from './CardDesignSection';
 import { ProductDesignSection } from './ProductDesignSection';
+import { BoardDesignSection } from './BoardDesignSection';
+import { boardSection } from '@/catalog/signature-board';
 import { publicMediaUrl } from '@/server/storage';
 import type { I18nContent } from '@/server/db/schema';
 import type { ThemeManifest } from '@/theme-sdk/manifest';
@@ -332,6 +334,8 @@ export default async function ThemeDetailPage({ params }: PageProps<'/admin/them
               updatedAt={d.theme.updatedAt}
               canManage={canManage}
             /> : null}
+          {/* Weddings and newborns: the signature board's artwork (the board is sold once it is uploaded). */}
+          {boardSection(d.section?.key) ? <BoardDesignSection themeId={d.theme.id} themeKey={d.theme.key} updatedAt={d.theme.updatedAt} canManage={canManage} /> : null}
           </>
         );
       })()}

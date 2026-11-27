@@ -1,9 +1,9 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { formatNumber, GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult, type InvitationLocale, type InvitationMode, type ThemeLabels } from './types';
+import { formatNumber, GUEST_LIMITS, type GuestResponseInput, type GuestSignature, type GuestSubmitResult, type InvitationLocale, type InvitationMode, type ThemeLabels } from './types';
 
 type RuntimeValue = {
   mode: InvitationMode;
@@ -18,6 +18,8 @@ type RuntimeValue = {
     /** Public reply counts (customer's choice), or null. */
     attendance?: { attending: number; notAttending: number } | null;
     locale?: InvitationLocale;
+    /** The "how many of you" control (off for a newborn: guests just reply, owner 2026-11-27). Default on. */
+    party?: boolean;
   };
 };
 
@@ -364,7 +366,7 @@ function AttendanceSummary({ counts, labels, locale }: { counts: { attending: nu
 
 /**
  * "How many of you?" with − and +: a family that got one link answers once for everyone (owner request,
- * 2026-10-28). Drawn by the platform under every design's name field (see `usePartyHost`), in the design's own
+ * 2026-10-28). Drawn by the platform under every design's name field (see `useHostAfter`), in the design's own
  * font and colours.
  */
 function PartySize({ value, onChange, labels, locale }: { value: number; onChange: (n: number) => void; labels: ThemeLabels; locale: InvitationLocale }) {
@@ -412,24 +414,24 @@ function PartySize({ value, onChange, labels, locale }: { value: number; onChang
 }
 
 /**
- * Where the party-size control goes: a box placed right after the design's name field (`input[name=name]`, or the
- * label around it), so every design, frozen versions included, gets it without changes. Follows the form if the
- * design redraws it; gone while the form isn't shown (after sending, say).
+ * A box the platform draws into, placed right after the design's own field (`input[name=name]` for the party size,
+ * `textarea[name=message]` for the signature pad), or after the label around it, so every design, frozen versions
+ * included, gets it without changes. Follows the form if the design redraws it; gone while the field isn't shown.
  */
-function usePartyHost(area: HTMLElement | null) {
+function useHostAfter(area: HTMLElement | null, selector: string, attr: string, on = true) {
   const [host, setHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
-    if (!area) return;
+    if (!area || !on) return;
     const box = document.createElement('div');
-    box.setAttribute('data-bahja-party', '');
+    box.setAttribute(attr, '');
     const place = () => {
-      const input = area.querySelector<HTMLInputElement>('input[name="name"]');
-      if (!input) {
+      const field = area.querySelector<HTMLElement>(selector);
+      if (!field) {
         box.remove();
         setHost(null);
         return;
       }
-      const anchor = input.closest('label') ?? input;
+      const anchor = field.closest('label') ?? field;
       if (anchor.nextElementSibling !== box) anchor.after(box);
       setHost(box);
     };
@@ -439,9 +441,130 @@ function usePartyHost(area: HTMLElement | null) {
     return () => {
       watch.disconnect();
       box.remove();
+      setHost(null);
     };
-  }, [area]);
-  return host;
+  }, [area, selector, attr, on]);
+  return on ? host : null;
+}
+
+/** The pad's drawing box in CSS px (its strokes are stored in these units). */
+const SIGN_PAD_HEIGHT = 130;
+
+/**
+ * "Sign here (optional)": a guest signs under their message with a finger or the mouse (owner, 2026-11-27); the
+ * signature goes into the keepsake and the signature board. Drawn by the platform in the design's own font and
+ * colours, like the party size. Strokes are kept in the same format as the customer's signature.
+ */
+function SignaturePadBox({ onChange, labels }: { onChange: (s: GuestSignature | null) => void; labels: ThemeLabels }) {
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+  const strokes = useRef<number[][]>([]);
+  const start = useRef(0);
+  const [empty, setEmpty] = useState(true);
+
+  const fit = useCallback(() => {
+    const el = canvas.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const d = window.devicePixelRatio || 1;
+    el.width = Math.round(r.width * d);
+    el.height = Math.round(r.height * d);
+    const ctx = el.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = getComputedStyle(el).color;
+    for (const s of strokes.current) {
+      ctx.beginPath();
+      for (let i = 0; i < s.length; i += 3) (i ? ctx.lineTo : ctx.moveTo).call(ctx, s[i]!, s[i + 1]!);
+      ctx.stroke();
+    }
+  }, []);
+  useEffect(() => {
+    fit();
+    const watch = new ResizeObserver(fit);
+    if (canvas.current) watch.observe(canvas.current);
+    return () => watch.disconnect();
+  }, [fit]);
+
+  const clear = useCallback(() => {
+    strokes.current = [];
+    setEmpty(true);
+    onChange(null);
+    fit();
+  }, [fit, onChange]);
+
+  const report = () => {
+    const el = canvas.current;
+    if (!el || !strokes.current.length) return;
+    const r = el.getBoundingClientRect();
+    onChange({ w: Math.round(r.width), h: Math.round(r.height), s: strokes.current.map((x) => [...x]) });
+  };
+  const point = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10] as const;
+  };
+  const down = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (strokes.current.length >= 60) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (!strokes.current.length) start.current = performance.now();
+    const [x, y] = point(e);
+    strokes.current.push([x, y, Math.round(performance.now() - start.current)]);
+    setEmpty(false);
+  };
+  const move = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    const s = strokes.current[strokes.current.length - 1];
+    if (!s) return;
+    const [x, y] = point(e);
+    const [px, py] = [s[s.length - 3]!, s[s.length - 2]!];
+    // Points closer than about a pixel add nothing; a very long drawing stops growing.
+    if (Math.hypot(x - px, y - py) < 1.5 || strokes.current.reduce((n, t) => n + t.length, 0) > 8000) return;
+    s.push(x, y, Math.round(performance.now() - start.current));
+    const ctx = e.currentTarget.getContext('2d');
+    if (!ctx) return;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+  const up = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    report();
+  };
+
+  const small = { border: '1px solid currentColor', borderRadius: '999px', background: 'transparent', color: 'inherit', font: 'inherit', fontSize: '0.85em', padding: '0.2em 0.9em', minHeight: 0, margin: 0, cursor: 'pointer' } as const;
+  return (
+    <div data-bahja-signature-pad="" style={{ margin: '0.6em 0', display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75em' }}>
+        <span>{labels.signHere}</span>
+        {empty ? null : (
+          <button type="button" onClick={clear} style={small}>
+            {labels.signClear}
+          </button>
+        )}
+      </div>
+      <div style={{ position: 'relative', height: SIGN_PAD_HEIGHT, border: '1px dashed currentColor', borderRadius: '0.75em', opacity: 0.95 }}>
+        <canvas
+          ref={canvas}
+          role="img"
+          aria-label={labels.signHere}
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerCancel={up}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair', borderRadius: '0.75em' }}
+        />
+        <span aria-hidden="true" style={{ position: 'absolute', left: '1em', right: '1em', bottom: '1.9em', borderTop: '1px solid currentColor', opacity: 0.25, pointerEvents: 'none' }} />
+        {empty ? (
+          <span aria-hidden="true" style={{ position: 'absolute', insetInline: 0, bottom: '0.45em', textAlign: 'center', fontSize: '0.8em', opacity: 0.55, pointerEvents: 'none' }}>
+            {labels.signHint}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
 }
 
 export function GuestFormSlot({ render, summary = true }: { render: (form: GuestFormApi) => ReactNode; summary?: boolean }) {
@@ -454,8 +577,12 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
   const [bot] = useState(() => new TurnstileHandle());
   const botKey = isPreview ? null : (guest.turnstileSiteKey ?? null);
   const [party, setParty] = useState(1);
+  const [signature, setSignature] = useState<GuestSignature | null>(null);
+  const [round, setRound] = useState(0);
   const [area, setArea] = useState<HTMLDivElement | null>(null);
-  const partyHost = usePartyHost(area);
+  const withParty = guest.party !== false;
+  const partyHost = useHostAfter(area, 'input[name="name"]', 'data-bahja-party', withParty);
+  const signHost = useHostAfter(area, 'textarea[name="message"]', 'data-bahja-sign', guest.withMessage);
 
   const submit = useCallback(
     async (input: GuestResponseInput) => {
@@ -481,11 +608,15 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
         return;
       }
       const captcha = botKey ? await bot.take() : undefined;
-      const partySize = input.partySize ?? party;
-      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined, partySize }, captcha).catch(
+      const partySize = withParty ? (input.partySize ?? party) : 1;
+      const signed = guest.withMessage ? (input.signature ?? signature) : null;
+      const result = await guest.submit({ name, attendance: input.attendance, message: guest.withMessage ? message : undefined, partySize, signature: signed }, captcha).catch(
         () => ({ ok: false, error: 'failed' }) as const,
       );
       if (result.ok) {
+        // The next guest on a shared phone signs for themselves: the pad starts blank again.
+        setSignature(null);
+        setRound((n) => n + 1);
         setStatus('sent');
         // Re-render the invitation so a public guest messages list shows the new message.
         router.refresh();
@@ -495,7 +626,7 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
         setError(labels.errorGeneric);
       }
     },
-    [guest, labels, isPreview, bot, botKey, router, party],
+    [guest, labels, isPreview, bot, botKey, router, party, withParty, signature],
   );
 
   if (!guest.enabled) return null;
@@ -507,6 +638,7 @@ export function GuestFormSlot({ render, summary = true }: { render: (form: Guest
         {render({ enabled: true, withMessage: guest.withMessage, status, isPreview, fieldErrors, error, limits: GUEST_LIMITS, submit })}
       </div>
       {partyHost ? createPortal(<PartySize value={party} onChange={setParty} labels={labels} locale={guest.locale ?? 'ar'} />, partyHost) : null}
+      {signHost ? createPortal(<SignaturePadBox key={round} onChange={setSignature} labels={labels} />, signHost) : null}
       {botKey ? <TurnstileBox handle={bot} siteKey={botKey} /> : null}
     </>
   );

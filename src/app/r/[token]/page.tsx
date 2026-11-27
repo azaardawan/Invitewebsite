@@ -26,6 +26,16 @@ import { CARD_BACK_LIMITS } from '@/server/orders/extras';
 import { attendanceCounts } from '@/server/guests/attendance';
 import { listGuestResponses } from '@/server/guests/responses';
 import { SELF_EDIT_LIMIT } from '@/server/invitation/customer-edit';
+import { BoardEditor } from '@/components/board/BoardEditor';
+import { boardView } from '@/server/board/data';
+import { invitations as invitationsTable } from '@/server/db/schema';
+import { eq as eqOp } from 'drizzle-orm';
+
+/** The receipt's signature board, or null when the design has no board artwork any more. */
+async function receiptBoard(invitationId: string) {
+  const [inv] = await db().select().from(invitationsTable).where(eqOp(invitationsTable.id, invitationId));
+  return inv ? boardView(db(), inv) : null;
+}
 
 /**
  * Private receipt/confirmation page. Reachable only with its unguessable
@@ -121,6 +131,8 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
   const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? date(new Date(`${rawDate}T12:00:00Z`)) : '';
   // Guest photo sharing (add-on): the guests' photos, the ZIP and the photo QR code.
   const guestPhotos = paid ? await guestPhotoSummary(db(), r.invitation.id) : null;
+  // The signature board (add-on): the couple arrange it here and download it.
+  const board = paid && r.invitation.signatureBoard ? await receiptBoard(r.invitation.id) : null;
   const hasExtras = paid && r.invitation.featureKeys.some((k) => ['story', 'sticker', 'bottle_label'].includes(k) || k.startsWith('collage_') || (ANY_POSTER_FEATURES as readonly string[]).includes(k));
   // The sections a paid customer jumps between (a sticky row of chips; each section scrolls into place below it).
   const nav = paid
@@ -130,6 +142,7 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
         replies ? ['attendance', t('navReplies')] : null,
         r.invitation.hasMessages ? ['guestbook', t('navGuestbook')] : null,
         guestPhotos ? ['guest-photos', t('navGuestPhotos')] : null,
+        board ? ['board', t('navBoard')] : null,
         files.length ? ['files', t('navFiles')] : null,
         hasExtras ? ['extras', t('navExtras')] : null,
         ['details', t('navDetails')],
@@ -389,6 +402,47 @@ export default async function ReceiptPage({ params, searchParams }: PageProps<'/
             ) : (
               <p className="rounded-2xl border border-dashed border-line px-4 py-5 text-center text-sm text-muted">{t('guestPhotos.none')}</p>
             )}
+          </section>
+        ) : null}
+
+        {board ? (
+          <section id="board" className={`${card} space-y-4 print:hidden`} data-signature-board="">
+            <div className="space-y-1">
+              <h2 className="font-semibold">{t('board.title')}</h2>
+              <p className="text-sm text-muted">{t('board.help', { perBoard: board.perBoard })}</p>
+            </div>
+            <BoardEditor
+              view={board}
+              saveUrl={`/r/${token}/board`}
+              labels={{
+                board: t.raw('board.board') as string,
+                selectHint: t('board.selectHint'),
+                selected: t.raw('board.selected') as string,
+                turnLeft: t('board.turnLeft'),
+                turnRight: t('board.turnRight'),
+                turnHandle: t('board.turnHandle'),
+                moveTo: t.raw('board.moveTo') as string,
+                rearrange: t('board.rearrange'),
+                rearrangeConfirm: t('board.rearrangeConfirm'),
+                rearrangeYes: t('board.rearrangeYes'),
+                cancel: t('board.cancel'),
+                saving: t('board.saving'),
+                saved: t('board.saved'),
+                saveFailed: t('board.saveFailed'),
+                empty: t('board.empty'),
+              }}
+            />
+            {board.notes.length ? (
+              <div className="flex flex-wrap gap-2">
+                <a href={`/r/${token}/board?format=pdf`} className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink" data-board-download="pdf">
+                  {t('board.downloadPdf')}
+                </a>
+                <a href={`/r/${token}/board?format=png&n=0`} className="rounded-full border border-line px-5 py-2.5 text-sm font-medium text-heading" data-board-download="png">
+                  {t('board.downloadPng')}
+                </a>
+              </div>
+            ) : null}
+            <p className="text-xs text-muted">{t('board.filesNote')}</p>
           </section>
         ) : null}
 

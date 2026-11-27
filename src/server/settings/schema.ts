@@ -61,12 +61,23 @@ export const guestPhotoSettings = z.object({
   maxCap: z.number().int().min(750).max(20_000),
 });
 
+/**
+ * The signature board (src/catalog/signature-board.ts): offered at the end of the order form when `enabled`, on
+ * designs with board artwork; `perBoard` people on each board, the next ones on another board.
+ */
+export const signatureBoardSettings = z.object({
+  enabled: z.boolean(),
+  priceIqd: z.number().int().min(0).max(100_000_000),
+  perBoard: z.number().int().min(6).max(120),
+});
+
 export const settingsData = z.object({
   currency: currencySettings.default({ usdRateIqd: null }),
   payment: paymentSettings.default({ whatsapp: null, manualInstructions: null }),
   contact: contactSettings.default({ phone: null, email: null, instagram: null, facebook: null, tiktok: null, address: null, hours: null }),
   featured: featuredSettings.default({ themeIds: [] }),
   guestPhotos: guestPhotoSettings.default({ enabled: true, basePriceIqd: 15_000, stepPriceIqd: 5_000, maxCap: 3_000 }),
+  signatureBoard: signatureBoardSettings.default({ enabled: true, priceIqd: 25_000, perBoard: 30 }),
 });
 
 export type SettingsData = z.infer<typeof settingsData>;
@@ -75,3 +86,4 @@ export type PaymentSettings = z.infer<typeof paymentSettings>;
 export type ContactSettings = z.infer<typeof contactSettings>;
 export type FeaturedSettings = z.infer<typeof featuredSettings>;
 export type GuestPhotoSettings = z.infer<typeof guestPhotoSettings>;
+export type SignatureBoardSettings = z.infer<typeof signatureBoardSettings>;

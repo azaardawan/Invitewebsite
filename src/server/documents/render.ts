@@ -281,3 +281,48 @@ export const renderProduct: ProductRenderer = async (item, invitationId, opts = 
     return await page.screenshot({ type: shot.type, ...(shot.type === 'jpeg' ? { quality: 84 } : {}), omitBackground: shot.transparent ?? false });
   });
 };
+
+/** The signature board's printed picture: 150 dots per inch (a 60 × 90 cm board is about 3540 × 5310 px). */
+const BOARD_DPI = 150;
+
+/**
+ * The signature board (src/catalog/signature-board.ts): `png` one board as a picture (`board`, 0 = the first), `pdf`
+ * every board, a page each at its printed size. The print page lays the messages out itself and draws the watermark
+ * until the invitation is paid.
+ */
+export async function renderBoard(invitationId: string, format: 'png' | 'pdf', board = 0): Promise<{ file: Buffer; boards: number }> {
+  return rendering(async (browser) => {
+    const url = (n: number) => `/print/${printToken('board', invitationId)}?n=${n}`;
+    const open = async (n: number, opts: { width: number; height: number; scale: number }) => {
+      const page = await browser.newPage({ viewport: { width: opts.width, height: opts.height }, deviceScaleFactor: opts.scale, reducedMotion: 'reduce' });
+      await page.emulateMedia({ media: 'print' });
+      const res = await page.goto(`${printOrigin()}${url(n)}`, { waitUntil: 'networkidle', timeout: 60_000 });
+      if (!res?.ok()) throw new Error(`Print page answered ${res?.status() ?? 'nothing'}`);
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForFunction(() => !document.querySelector('[data-bahja-fit-pending]'), null, { timeout: 20_000 });
+      const boards = Number(await page.locator('[data-board-count]').first().getAttribute('data-board-count')) || 1;
+      return { page, boards };
+    };
+    // The page's size in CSS px, read from the board itself.
+    const probe = await open(board, { width: 800, height: 1200, scale: 1 });
+    const box = await probe.page.locator('[data-board-page]').boundingBox();
+    const boards = probe.boards;
+    await probe.page.close();
+    const size = { width: Math.round(box?.width ?? 2268), height: Math.round(box?.height ?? 3402) };
+    if (format === 'png') {
+      const { page } = await open(Math.min(board, boards - 1), { ...size, scale: BOARD_DPI / 96 });
+      const file = await page.locator('[data-board-page]').screenshot({ type: 'png' });
+      await page.close();
+      return { file, boards };
+    }
+    const merged = await PDFDocument.create();
+    for (let n = 0; n < boards; n++) {
+      const { page } = await open(n, { ...size, scale: 1 });
+      const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true });
+      await page.close();
+      const part = await PDFDocument.load(pdf);
+      for (const p of await merged.copyPages(part, part.getPageIndices())) merged.addPage(p);
+    }
+    return { file: Buffer.from(await merged.save()), boards };
+  });
+}

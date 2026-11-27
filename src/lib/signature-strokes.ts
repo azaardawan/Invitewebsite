@@ -110,3 +110,14 @@ export function strokePath(stroke: readonly number[]) {
   for (let i = 1; i < n - 1; i++) d += `Q${x(i)} ${y(i)} ${(x(i) + x(i + 1)) / 2} ${(y(i) + y(i + 1)) / 2}`;
   return `${d}L${x(n - 1)} ${y(n - 1)}`;
 }
+
+/** A signature as an SVG drawing: the box its ink fills (`viewBox`) and one path through every stroke. */
+export type SignatureDrawing = { viewBox: string; d: string; lineWidth: number };
+
+/** How to draw stored strokes as an SVG (keepsake, signature board); null when there is nothing to draw. */
+export function signatureDrawing(strokes: SignatureStrokes | null | undefined): SignatureDrawing | null {
+  if (!strokes?.s.length) return null;
+  const box = strokesBox(strokes);
+  const r = (n: number) => Math.round(n * 10) / 10;
+  return { viewBox: `${r(box.x)} ${r(box.y)} ${r(box.width)} ${r(box.height)}`, d: strokes.s.map(strokePath).join(''), lineWidth: SIGNATURE_LINE_WIDTH };
+}
