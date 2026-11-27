@@ -11,12 +11,14 @@ import {
   currencySettings,
   paymentSettings,
   guestPhotoSettings,
+  signatureBoardSettings,
   settingsData,
   type ContactSettings,
   type FeaturedSettings,
   type CurrencySettings,
   type PaymentSettings,
   type GuestPhotoSettings,
+  type SignatureBoardSettings,
   type SettingsData,
 } from './schema';
 
@@ -127,6 +129,20 @@ export async function updateGuestPhotoSettings(db: DbOrTx, input: GuestPhotoSett
     const data: SettingsData = { ...before, guestPhotos: next };
     await tx.update(websiteSettings).set({ data, updatedAt: new Date(), updatedBy: actor.adminId }).where(eq(websiteSettings.id, 1));
     await recordAudit(tx, { ...auditActor(actor), action: 'settings.guest_photos_updated', objectType: 'website_settings', objectId: '1', before: before.guestPhotos, after: next });
+    return data;
+  });
+}
+
+/** The signature board (Admin → Settings): offered or not, its price, and how many people go on one board. */
+export async function updateSignatureBoardSettings(db: DbOrTx, input: SignatureBoardSettings, actor: Actor) {
+  const next = signatureBoardSettings.parse(input);
+  return db.transaction(async (tx) => {
+    await tx.insert(websiteSettings).values({ id: 1 }).onConflictDoNothing();
+    const [row] = await tx.select().from(websiteSettings).where(eq(websiteSettings.id, 1)).for('update');
+    const before = settingsData.parse(row?.data ?? {});
+    const data: SettingsData = { ...before, signatureBoard: next };
+    await tx.update(websiteSettings).set({ data, updatedAt: new Date(), updatedBy: actor.adminId }).where(eq(websiteSettings.id, 1));
+    await recordAudit(tx, { ...auditActor(actor), action: 'settings.signature_board_updated', objectType: 'website_settings', objectId: '1', before: before.signatureBoard, after: next });
     return data;
   });
 }

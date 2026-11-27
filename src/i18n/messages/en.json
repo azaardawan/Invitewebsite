@@ -657,6 +657,36 @@
         "ownLook": "Use this item's own colours and fonts below (otherwise the shared look)",
         "paper": "Paper (background)"
       },
+      "boardDesign": {
+        "heading": "Signature board",
+        "intro": "An add-on for weddings and newborns: every guest message, with names and signatures, on one big printed board. Customers only see it once board artwork is uploaded here. The price and people per board are in Settings.",
+        "statusOn": "Offered to customers with this design",
+        "statusOff": "Hidden: no board artwork uploaded yet",
+        "preview": "Board preview",
+        "previewNote": "Sample messages on your artwork, as printed.",
+        "artwork": "Board artwork (a picture without text)",
+        "artworkHint": "A PNG or JPG at print resolution, in the board’s proportions (e.g. 60 × 90 cm). The platform writes the names and messages on it.",
+        "widthMm": "Width (mm)",
+        "heightMm": "Height (mm)",
+        "area": "Where the messages go (% from each edge)",
+        "top": "From the top",
+        "bottom": "From the bottom",
+        "right": "From the right",
+        "left": "From the left",
+        "areaHint": "The names and heading are written in the space above the messages.",
+        "inks": "Ink colours",
+        "inksDark": "Dark (for a light board)",
+        "inksLight": "Light (for a dark board)",
+        "font": "Messages font",
+        "title": "Write the names and heading at the top",
+        "titleColor": "Names colour",
+        "titleFont": "Names font",
+        "font_ruqaa": "Ruqaa",
+        "font_sans": "Modern Naskh",
+        "font_vazir": "Vazir",
+        "save": "Save",
+        "remove": "Remove the board artwork (hidden from customers)"
+      },
       "productDesign": {
         "heading": "Newborn extras design",
         "intro": "The story, chocolate stickers and water bottle label share one look with this design's card, so the set matches: the same colours and fonts (taken from the design, and the customer's colour set, until you set your own), each with its own layout. Change the shared look below, then any single item: its layout, which details it shows, its own colours, or your own artwork. Customers see watermarked previews before paying and download clean files after.",
@@ -744,7 +774,13 @@
       "guestPhotosStep": "Price for every {step} photos more (IQD)",
       "guestPhotosMax": "Most photos a customer can buy",
       "guestPhotosExample": "Example: {cap} photos cost {price}.",
-      "guestPhotosInvalid": "Please check the prices (whole numbers) and the highest total (750 to 20,000)."
+      "guestPhotosInvalid": "Please check the prices (whole numbers) and the highest total (750 to 20,000).",
+      "boardHeading": "Signature board",
+      "boardIntro": "An add-on at the end of the order form for weddings and newborns, on designs with board artwork.",
+      "boardEnabled": "Offer it to customers",
+      "boardPrice": "Price (IQD)",
+      "boardPerBoard": "People per board",
+      "signatureBoardInvalid": "Check the price and the people per board (6 to 120)."
     },
     "orders": {
       "heading": "Orders & invoices",
@@ -1305,6 +1341,9 @@
     "partySize": "How many of you?",
     "partyFewer": "One fewer",
     "partyMore": "One more",
+    "signHere": "Sign here (optional)",
+    "signClear": "Clear",
+    "signHint": "Draw your signature with your finger",
     "guestParty": "{count} people"
   },
   "invitationSamples": {
@@ -1474,6 +1513,7 @@
     "heroPending": "Your order is saved. Once paid, everything arrives here straight away.",
     "invitationPictureAlt": "The invitation picture, as it shows when shared",
     "navGuestPhotos": "Guest photos",
+    "navBoard": "Signature board",
     "guestPhotos": {
       "title": "Your guests' photos",
       "count": "{photos, plural, one {# photo} other {# photos}} from {guests, plural, one {# guest} other {# guests}} · up to {cap}",
@@ -1493,6 +1533,28 @@
       "ready": "Your opening animation is ready.",
       "making": "Your opening animation is being made. It takes about 10 minutes; refresh this page to check.",
       "late": "Your opening animation is taking longer than usual. Our team is on it."
+    },
+    "board": {
+      "title": "Signature board",
+      "help": "Your guests’ messages with their names and signatures. Drag any message to move it, and turn it with the round handle or the buttons. Each board holds {perBoard} people.",
+      "board": "Board {n}",
+      "selectHint": "Tap a message on the board to move or turn it.",
+      "selected": "{name}’s message",
+      "turnLeft": "⟲ Turn",
+      "turnRight": "Turn ⟳",
+      "turnHandle": "Turn the message",
+      "moveTo": "Move to board {n}",
+      "rearrange": "Arrange again automatically",
+      "rearrangeConfirm": "Every message goes back to the automatic arrangement and your changes are lost. Continue?",
+      "rearrangeYes": "Yes, arrange again",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "saveFailed": "Couldn’t save. Check your connection and move the message again.",
+      "empty": "No messages yet. Your guests’ messages and signatures will appear here.",
+      "downloadPdf": "Download the boards (PDF for printing)",
+      "downloadPng": "Download the first board (picture)",
+      "filesNote": "The files are made from the boards as you arranged them, at print quality. They change as new messages arrive."
     }
   },
   "nav": {
@@ -1871,6 +1933,12 @@
       "price": "Photo sharing",
       "includes": "Up to {base} photos at the basic price. You get the photo QR code as a picture, to share or print.",
       "invalid": "Please check the photo sharing choice."
+    },
+    "signatureBoard": {
+      "addOn": "Add-on",
+      "title": "Signature board",
+      "help": "Every guest message, with the guest’s name and signature, on one big printable board the size of a welcome board, each guest in their own ink. A board holds {perBoard} people; any more go on a second board. You arrange it yourselves from your receipt.",
+      "error": "The signature board isn’t available for this design."
     },
     "event": {
       "heading": "What is the occasion?",

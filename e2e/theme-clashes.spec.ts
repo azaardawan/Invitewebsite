@@ -23,7 +23,8 @@ import allowed from './theme-clashes.allow.json' with { type: 'json' };
 const LANGS = ['ar', 'en'] as const;
 const OUT = process.env.CLASH_OUT ?? 'test-results/theme-clashes';
 
-const only = process.env.CLASH_THEMES?.split(',').filter(Boolean);
+// CLASH_THEMES, or on a pull request the designs it changes (THEME_KEYS, see themes.spec.ts).
+const only = (process.env.CLASH_THEMES ?? process.env.THEME_KEYS)?.split(',').filter(Boolean);
 const latest = new Map<string, (typeof generatedManifests)[number]>();
 for (const m of generatedManifests) if (!m.internal && m.onlineInvitation !== false && (latest.get(m.key)?.version ?? 0) < m.version) latest.set(m.key, m);
 const manifests = [...latest.values()].filter((m) => !only || only.includes(m.key));

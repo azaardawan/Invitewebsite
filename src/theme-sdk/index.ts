@@ -32,7 +32,7 @@ export type { ThemeBorderSpec, BorderKind } from './border';
 export type { PhotoSpec } from './manifest';
 export { ATTACHED_PHOTO_PLACE } from './places';
 export type { PrintPosterProps } from './poster';
-export type { PrintCardProps, PrintCardBackProps, PrintShapeProps, KeepsakeProps, KeepsakeMessage, PrintLabels, PrintExtraProps } from './print';
+export type { PrintCardProps, PrintCardBackProps, PrintShapeProps, KeepsakeProps, KeepsakeMessage, SignatureDrawing, PrintLabels, PrintExtraProps } from './print';
 export { useMusic, useReducedMotion, useCountdown, useInvitationMode, GuestFormSlot, GUEST_LIMITS } from './runtime';
 export type { GuestFormApi, Countdown } from './runtime';
 

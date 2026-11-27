@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { locales, localeMeta, type Locale } from '@/i18n/config';
 import { SignaturePad } from './SignaturePad';
 import { GuestPhotosAddon } from './GuestPhotosAddon';
+import { SignatureBoardAddon } from './SignatureBoardAddon';
 import { EventChoice } from './EventChoice';
 import { fieldOptions, INITIALS_MAX, isOptionalField, PLACE_FIELDS, PLACE_TOGGLE, placeChosen, splitInitials } from '@/catalog/fields';
 
@@ -56,6 +57,8 @@ export type OrderFormExtras = {
   event?: { own: string | null; current: string; name: string; max: number };
   /** Guest photo sharing (add-on, while the owner offers it): the owner's prices and what is chosen so far. */
   guestPhotos?: { pricing: { basePriceIqd: number; stepPriceIqd: number; maxCap: number }; current: { cap: number; perGuest: number } | null };
+  /** The signature board add-on (designs with board artwork, weddings and newborns). */
+  signatureBoard?: { priceIqd: number; perBoard: number; current: boolean };
 };
 type State = { error?: string; fieldErrors?: Record<string, string>; values?: Record<string, string> };
 
@@ -99,7 +102,7 @@ export function OrderForm({
   const firstPlace = fields.find((f) => isPlace(f.key))?.key;
   // The form's parts (owner, 2026-11-21): the online invitation, then the printable card, then the add-ons; headed
   // when there is more than the invitation.
-  const sections = Boolean(extras.cardShape || extras.cardBack || extras.guestPhotos);
+  const sections = Boolean(extras.cardShape || extras.cardBack || extras.guestPhotos || extras.signatureBoard);
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
@@ -444,6 +447,9 @@ export function OrderForm({
       ) : null}
 
       {extras.guestPhotos ? <GuestPhotosAddon pricing={extras.guestPhotos.pricing} current={extras.guestPhotos.current} error={errors.guestPhotos} /> : null}
+      {extras.signatureBoard ? (
+        <SignatureBoardAddon priceIqd={extras.signatureBoard.priceIqd} perBoard={extras.signatureBoard.perBoard} current={extras.signatureBoard.current} error={errors.signatureBoard} />
+      ) : null}
 
       <button
         type="submit"

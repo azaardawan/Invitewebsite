@@ -119,12 +119,27 @@ export type PrintShapeProps = PrintBase & {
   message: string | null;
 };
 
+/** A guest's signature as an SVG drawing: the box its ink fills (`viewBox`), one path through every stroke, the line width. */
+export type SignatureDrawing = { viewBox: string; d: string; lineWidth: number };
+
 /**
  * One guest message. `guestName` is the line to print under it: the guest's name, whether they are coming and, when
  * the reply is for more than one person, how many ("Sara · Coming · 4 people"), so the couple sees it in every
  * design. `name`, `attending` and `partySize` are the parts, for a design that shows them its own way.
  */
-export type KeepsakeMessage = { guestName: string; message: string; name: string; attending: boolean; partySize: number };
+export type KeepsakeMessage = {
+  guestName: string;
+  message: string;
+  name: string;
+  attending: boolean;
+  partySize: number;
+  /**
+   * The guest's signature, when they signed (owner, 2026-11-27): draw it as `<svg viewBox={viewBox}><path d={d}
+   * fill="none" stroke="currentColor" strokeWidth={lineWidth} strokeLinecap="round" strokeLinejoin="round" /></svg>`.
+   * A design that doesn't draw it still shows it: the platform adds it under the guest's name line.
+   */
+  signature: SignatureDrawing | null;
+};
 
 export type KeepsakeProps = PrintBase & {
   /** Visible messages in the order received. Can be empty or run to several hundred. */

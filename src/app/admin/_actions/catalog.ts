@@ -25,7 +25,7 @@ import {
   type ThemeStatus,
 } from '@/server/catalog/themes';
 import { createPackage, movePackage, setPackageStatus, updatePackage, type PackageInput } from '@/server/catalog/packages';
-import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, EXTRA_SLOTS, updateThemeCardSide, updateThemeExtrasLook, type ArtworkSlot } from '@/server/catalog/card-design';
+import { ARTWORK_SLOTS, CARD_SIDE_DEFAULTS, EXTRA_SLOTS, updateThemeBoard, updateThemeCardSide, updateThemeExtrasLook, type ArtworkSlot } from '@/server/catalog/card-design';
 import { updateFeaturedThemes } from '@/server/settings/service';
 import { updateThemeBorder } from '@/server/catalog/border';
 import { themeManifests } from '@/theme-registry';
@@ -254,6 +254,35 @@ export async function themeCardSideAction(_: ActionState, form: FormData): Promi
         },
         actor,
         { remove: restore },
+      ),
+    [`/admin/themes/${themeId}`],
+  );
+}
+
+/** The design's signature board artwork (src/catalog/signature-board.ts); `remove` takes it away (the board is then not sold). */
+export async function themeBoardAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const actor = await actorWith('themes.manage');
+  const themeId = id(form);
+  const assetId = readString(form, 'assetId');
+  return run(
+    () =>
+      updateThemeBoard(
+        db(),
+        themeId,
+        form.get('remove') === '1' || !assetId
+          ? null
+          : {
+              assetId,
+              widthMm: Number(form.get('widthMm')),
+              heightMm: Number(form.get('heightMm')),
+              area: { top: Number(form.get('top')), right: Number(form.get('right')), bottom: Number(form.get('bottom')), left: Number(form.get('left')) },
+              inks: String(form.get('inks')) as never,
+              title: form.get('title') === 'on',
+              titleColor: String(form.get('titleColor') ?? ''),
+              titleFont: String(form.get('titleFont') ?? '') as never,
+              font: String(form.get('font') ?? '') as never,
+            },
+        actor,
       ),
     [`/admin/themes/${themeId}`],
   );

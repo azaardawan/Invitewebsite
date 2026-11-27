@@ -12,6 +12,11 @@ import { CardPages, colorVars } from '../CardPages';
 import { invitationRenderData } from '@/server/invitation/load';
 import { invitationMessages } from '@/server/invitation/theme-props';
 import { InvitationView } from '@/components/invitation/InvitationView';
+import { KeepsakeSignatures } from '@/components/print/KeepsakeSignatures';
+import { BoardPrint } from '@/components/board/BoardPrint';
+import { WatermarkLayer } from '@/components/print/watermark';
+import { boardView } from '@/server/board/data';
+import { MAX_BOARDS } from '@/catalog/signature-board';
 import { TextOverrides } from '@/components/invitation/TextOverrides';
 
 export const dynamic = 'force-dynamic';
@@ -38,6 +43,23 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
     return (
       <>
         <InvitationView codeRef={codeRef} props={props} ribbon={null} errorText={{ message: msgs.renderError, retry: msgs.retry }} />
+        <TextOverrides overrides={inv.textOverrides} />
+      </>
+    );
+  }
+  if (claim.kind === 'board') {
+    // The signature board: board `n` (0 = the first) at its printed size, watermarked until paid.
+    const view = await boardView(db(), inv);
+    if (!view) notFound();
+    const n = Math.max(0, Math.min(MAX_BOARDS - 1, Number(sp.n) || 0));
+    const { widthMm, heightMm } = view.design;
+    return (
+      <>
+        <style>{`@page{size:${widthMm}mm ${heightMm}mm;margin:0}html,body{margin:0;padding:0;background:#fff}`}</style>
+        <div style={{ position: 'relative', width: `${widthMm}mm`, height: `${heightMm}mm`, overflow: 'hidden' }} data-board-page="">
+          <BoardPrint view={view} board={n} />
+          {isPaid(inv) ? null : <WatermarkLayer text={await watermarkLabels(inv.locale)} />}
+        </div>
         <TextOverrides overrides={inv.textOverrides} />
       </>
     );
@@ -80,6 +102,8 @@ export default async function PrintPage({ params, searchParams }: PageProps<'/pr
       <div style={colorVars(data.props.colors)}>
         <Keepsake {...(data.props as KeepsakeProps)} />
       </div>
+      {/* Guests' signatures under their names, in every design (frozen versions too). */}
+      <KeepsakeSignatures items={(data.props as KeepsakeProps).messages.map((m) => ({ guestName: m.guestName, name: m.name, signature: m.signature }))} />
       <TextOverrides overrides={inv.textOverrides} />
     </>
   );

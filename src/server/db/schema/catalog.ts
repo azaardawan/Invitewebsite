@@ -1,4 +1,5 @@
 import type { CoverFocus } from '../../../lib/cover-focus';
+import type { BoardArea, BoardInkSet } from '../../../catalog/signature-board';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
@@ -191,6 +192,26 @@ export type CardDesign = {
   sticker?: CardSideDesign | null;
   bottle?: CardSideDesign | null;
   look?: ExtrasLook | null;
+  /** The signature board's artwork (src/catalog/signature-board.ts); the board is only sold once this exists. */
+  board?: BoardDesign | null;
+};
+
+/** The owner's signature board artwork for a design and how the platform writes the messages on it. */
+export type BoardDesign = {
+  assetId: string;
+  /** The printed size (mm). */
+  widthMm: number;
+  heightMm: number;
+  /** Where the messages go (share of the board from each edge). */
+  area: BoardArea;
+  /** Dark inks for a light board, light inks for a dark one. */
+  inks: BoardInkSet;
+  /** Write the names and the heading in the band above the messages; their colour and font. */
+  title: boolean;
+  titleColor: string;
+  titleFont: CardFont;
+  /** The messages' font. */
+  font: CardFont;
 };
 
 export const themes = pgTable(

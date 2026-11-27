@@ -1,9 +1,19 @@
 name: CI
 
 on:
+  # Once per change: pull requests run on `pull_request` only (a push to a branch no longer runs it a second time).
   push:
-    branches: [main, 'claude/**']
+    branches: [main]
   pull_request:
+  # Every night every design is checked again, whatever the day's pull requests changed (Baghdad 03:17).
+  schedule:
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+
+# A newer push to the same pull request cancels the run still going for the older one (main's runs always finish).
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -30,6 +40,9 @@ jobs:
       TOKEN_SECRET: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The pull request's merge commit and its base, to see which designs it changes.
+          fetch-depth: 2
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -46,6 +59,19 @@ jobs:
       - name: Create e2e database
         run: PGPASSWORD=bahja psql -h localhost -U bahja -d bahja_test -c "CREATE DATABASE bahja_e2e_test"
       - run: pnpm exec playwright install --with-deps chromium
+      # A pull request checks only the designs it changes (themes.spec, theme-clashes.spec); every design when it changes
+      # platform code the designs use. main, the nightly run and a manual run check every design.
+      - name: Designs to check
+        if: github.event_name == 'pull_request'
+        run: |
+          changed=$(git diff --name-only HEAD^1 HEAD)
+          if echo "$changed" | grep -vE '^src/theme-registry/([a-z]+\.)?generated\.tsx?$' | grep -qE '^(src/(theme-sdk|theme-registry|components/invitation|catalog|i18n|server/(invitation|catalog))/|src/app/admin/preview/|e2e/(themes\.spec|theme-clashes\.spec|helpers|global-setup)|package\.json|pnpm-lock\.yaml|next\.config|playwright\.config)'; then
+            echo "Platform code the designs use changed: checking every design."
+          else
+            keys=$(echo "$changed" | sed -nE 's#^themes/([^/]+)/.*#\1#p' | sort -u | paste -sd, -)
+            echo "Checking these designs only: ${keys:-none}"
+            echo "THEME_KEYS=$keys" >> "$GITHUB_ENV"
+          fi
       - run: pnpm exec playwright test
       - name: Upload theme screenshots for review
         if: always()

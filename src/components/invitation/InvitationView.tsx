@@ -44,6 +44,8 @@ export function InvitationView({
     turnstileSiteKey: turnstileSiteKey ?? null,
     attendance: props.attendance,
     locale: props.locale,
+    // A newborn's guests just reply: no "how many of you" (owner, 2026-11-27).
+    party: props.occasion !== 'newborn',
   };
   return (
     <InvitationRuntime mode={props.mode} labels={props.labels} musicSrc={props.music?.src ?? null} guest={guest}>

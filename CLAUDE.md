@@ -97,6 +97,15 @@ product spec's §74 business rules override assumptions.
   approach within reach, take, place on a surface, carry, hand over on contact). Nothing changes hands without a hand
   on it, and nothing flies; held things follow their hand's socket in the world. `?debug=1` on a tour shows sockets and
   reach targets and logs each contact's error (`window.tourContacts`); `tests/unit/tour-ik.test.ts` tests the arithmetic.
+- Guest signatures and the signature board (owner, 2026-11-27): guests may sign under their message (a pad the
+  platform adds under every design's `textarea[name=message]`, `src/theme-sdk/runtime.tsx`; strokes on
+  `guest_responses.signature`); the keepsake shows them under each name (`KeepsakeMessage.signature`, or the platform
+  adds them, `src/components/print/KeepsakeSignatures.tsx`). A newborn's guest form has no "how many of you". The
+  signature board (`src/catalog/signature-board.ts`) is an add-on for weddings and newborns, offered only on a design
+  whose board artwork the owner uploaded (Admin → the design; price and people per board in Settings): every message
+  in its guest's own ink (neighbours never share one) on welcome-board-size boards, laid out in the browser
+  (`src/components/board/layout.ts`), arranged by the couple on their receipt (`BoardEditor`, `invitations.board_arrangement`),
+  printed by `renderBoard` (PNG/PDF, watermarked until paid).
 - Every design has an online invitation, newborn included (owner, 2026-10-28). A manifest with `onlineInvitation: false`
   is files only: never link to or serve `/i/` for it.
 - A theme version that has been activated is **frozen**. Never edit its folder; copy it to `v<N+1>`.

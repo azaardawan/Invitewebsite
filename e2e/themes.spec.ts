@@ -22,6 +22,13 @@ function sampleName(key: string, fields: readonly string[], variant: 'short' | '
 }
 const WIDTHS = [360, 390, 430, 1280] as const;
 
+/**
+ * On a pull request CI checks only the designs it changes (`THEME_KEYS`, set by .github/workflows/ci.yml; empty = none, when
+ * the pull request touches no design and nothing they use). Unset: every design (main, the nightly run, local runs).
+ */
+const onlyKeys = process.env.THEME_KEYS === undefined ? null : process.env.THEME_KEYS.split(',').filter(Boolean);
+const manifests = generatedManifests.filter((m) => !onlyKeys || onlyKeys.includes(m.key));
+
 /** The design's "Open" button: its own words (manifest `pageTexts.open`, e.g. a museum) or "Open invitation". */
 function openName(m: (typeof generatedManifests)[number]): string {
   return (m as { pageTexts?: { open?: { ar: string } } }).pageTexts?.open?.ar ?? ar.invitation.openInvitation;
@@ -51,10 +58,10 @@ async function renderAndCheck(page: Page, url: string, width: number, shot: stri
 test('every theme renders every designed state correctly', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'runs once; widths are set explicitly');
   // About twelve seconds per designed state (every language and width, the opening, the checks), so the budget grows with the catalogue.
-  test.setTimeout(Math.max(10 * 60_000, generatedManifests.reduce((n, m) => n + m.validStates.length, 0) * 12_000));
+  test.setTimeout(Math.max(10 * 60_000, manifests.reduce((n, m) => n + m.validStates.length, 0) * 12_000));
   await signInAsNewOwner(page);
 
-  for (const m of generatedManifests) {
+  for (const m of manifests) {
     const ref = `${m.key}@${m.version}`;
     // A files-only design (story, card, stickers…) has no online invitation: no opening, no guest page.
     const invitation = !m.internal && m.onlineInvitation !== false;
@@ -125,7 +132,7 @@ test('every theme renders every designed state correctly', async ({ page }, test
 test('every sellable theme looks right with any single feature switched off', async ({ page }, testInfo) => {
   // Packages are built feature by feature in Admin, so a theme must handle any subset, not only its designed states.
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
-  const sellable = generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false);
+  const sellable = manifests.filter((x) => !x.internal && x.onlineInvitation !== false);
   // About ten seconds per case (open, wait for the opening, check, screenshot), so the budget grows with the catalogue.
   test.setTimeout(Math.max(5 * 60_000, sellable.reduce((n, m) => n + m.features.length, 0) * 10_000));
   await signInAsNewOwner(page);
@@ -163,7 +170,7 @@ test('with reduced motion the opening is skipped and the invitation shows at onc
   await signInAsNewOwner(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const m of generatedManifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
+  for (const m of manifests.filter((x) => !x.internal && x.onlineInvitation !== false)) {
     await page.goto(`/admin/preview/ar/theme/${m.key}?v=${m.version}&names=short`);
     if ((m as { opening?: string }).opening !== 'auto') await page.getByRole('button', { name: openName(m) }).click();
     await expect(page.getByText(sampleName(m.key, m.fields, 'short')).first(), `${m.key}@${m.version}`).toBeVisible({ timeout: 1_000 });

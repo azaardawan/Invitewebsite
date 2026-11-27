@@ -1,4 +1,5 @@
-import { check, index, pgEnum, pgTable, smallint, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, index, jsonb, pgEnum, pgTable, smallint, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import type { SignatureStrokes } from '../../../lib/signature-strokes';
 import { sql } from 'drizzle-orm';
 import { invitations } from './orders';
 
@@ -22,6 +23,8 @@ export const guestResponses = pgTable(
     attendance: guestAttendance('attendance').notNull(),
     partySize: smallint('party_size').notNull().default(1),
     message: text('message'),
+    /** How the guest signed under their message (optional, owner 2026-11-27): drawn again in the keepsake and on the signature board. */
+    signature: jsonb('signature').$type<SignatureStrokes>(),
     messageStatus: guestMessageStatus('message_status').notNull().default('VISIBLE'),
     ipHash: text('ip_hash'),
     /** SHA-256 of the per-device cookie plus the normalized guest name; never the raw token. */

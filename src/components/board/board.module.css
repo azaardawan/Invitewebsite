@@ -1,0 +1,109 @@
+/* The signature board (src/catalog/signature-board.ts): the owner's artwork with the guests' messages written on it.
+   Sizes are in `cqi` (a share of the board's width), so the board reads the same on a phone, in Admin and printed. */
+.board {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+  overflow: hidden;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.head {
+  position: absolute;
+  top: 1.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6cqi;
+}
+.names {
+  margin: 0;
+  font-size: 5.6cqi;
+  font-weight: 700;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.subtitle {
+  margin: 0;
+  font-size: 2.5cqi;
+  line-height: 1.4;
+}
+.field {
+  position: absolute;
+}
+.note {
+  position: absolute;
+  box-sizing: border-box;
+  padding: calc(0.8cqi * var(--s, 1)) calc(1cqi * var(--s, 1));
+  color: var(--c, #2a2230);
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.3cqi * var(--s, 1));
+  transform-origin: 50% 50%;
+}
+.message {
+  margin: 0;
+  font-size: calc(2.3cqi * var(--s, 1));
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: normal;
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: calc(0.3cqi * var(--s, 1)) 1cqi;
+}
+.name {
+  font-weight: 700;
+  font-size: calc(1.9cqi * var(--s, 1));
+  opacity: 0.85;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.sig {
+  height: calc(3.8cqi * var(--s, 1));
+  width: auto;
+  max-width: 58%;
+  flex: none;
+  overflow: visible;
+}
+/* The editor: notes are picked up and moved. */
+.editable .note {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.selected {
+  outline: 0.35cqi dashed currentColor;
+  outline-offset: 0.3cqi;
+  border-radius: 1cqi;
+  z-index: 5;
+}
+.handle {
+  position: absolute;
+  width: 6cqi;
+  height: 6cqi;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #8c2f55;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 3.4cqi;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+  z-index: 6;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+}

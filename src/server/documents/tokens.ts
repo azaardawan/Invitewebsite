@@ -8,7 +8,7 @@ export type DocumentKind = 'card' | 'keepsake';
  * What the print page renders: the stored documents, the card with its bleed for print shops, and
  * `og`: the live invitation's cover, pictured for link previews (WhatsApp).
  */
-export type RenderKind = DocumentKind | 'cardBleed' | 'og' | ProductView;
+export type RenderKind = DocumentKind | 'cardBleed' | 'og' | 'board' | ProductView;
 
 /**
  * Extras on the print page: the newborn story picture, one sticker / bottle label, a print-ready A4 sheet of them, or
@@ -16,7 +16,7 @@ export type RenderKind = DocumentKind | 'cardBleed' | 'og' | ProductView;
  */
 export type ProductView = 'story' | 'sticker' | 'stickerSheet' | 'bottle' | 'bottleSheet' | 'collagePolaroids' | 'collageStory' | 'collageWall' | 'posterLandscape' | 'posterPortrait';
 export const PRODUCT_VIEWS: readonly ProductView[] = ['story', 'sticker', 'stickerSheet', 'bottle', 'bottleSheet', 'collagePolaroids', 'collageStory', 'collageWall', 'posterLandscape', 'posterPortrait'];
-const RENDER_KINDS: readonly string[] = ['card', 'cardBleed', 'keepsake', 'og', ...PRODUCT_VIEWS];
+const RENDER_KINDS: readonly string[] = ['card', 'cardBleed', 'keepsake', 'og', 'board', ...PRODUCT_VIEWS];
 
 const sign = (payload: string) => createHmac('sha256', secretKey('TOKEN_SECRET')).update(`print:${payload}`).digest('base64url');
 

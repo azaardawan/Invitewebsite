@@ -178,7 +178,9 @@ animation, no fetching) receiving `PrintCardProps` / `KeepsakeProps` from `@/the
   `messages` in order (from none to several hundred: let them flow and use `break-inside: avoid`). Print each
   message's `guestName` under it: it already says whether the guest is coming and, for more than one person, how many
   ("Sara · Coming · 4 people"), which the couple must see; `name`, `attending` and `partySize` are there for a
-  design that shows them its own way.
+  design that shows them its own way. `signature` (owner, 2026-11-27) is the guest's drawn signature or null: a design
+  may draw it (an SVG with `viewBox`, one path `d`, `stroke="currentColor"`, `strokeWidth={lineWidth}`) inside an
+  element marked `data-bahja-guest-signature`; otherwise the platform adds it under the guest's name line itself.
 
 The platform sets `@page` from the manifest: the card page is the trim size plus `bleedMm` on every
 side (A5 + 3 mm = 154 × 216 mm) so the card's root fills exactly that box; the customer's PDF is exactly

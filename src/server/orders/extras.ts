@@ -1,4 +1,5 @@
 import 'server-only';
+import { boardOffered } from '@/server/board/data';
 import { validCap, validPerGuest } from '@/catalog/guest-photos';
 import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX, cleanEventName, isEventKind } from '@/catalog/occasion-wording';
 import { getSettings } from '@/server/settings/service';
@@ -59,6 +60,8 @@ export type OrderExtras = {
   eventName?: string;
   /** Guest photo sharing (add-on, src/catalog/guest-photos.ts): bought or not, its total and each guest's share. */
   guestPhotos?: { on: boolean; cap: number; perGuest: number };
+  /** The signature board (add-on, src/catalog/signature-board.ts): bought or not. */
+  signatureBoard?: { on: boolean };
 };
 
 /** One changeable line: at most this many characters, on one line, no markup characters. */
@@ -129,6 +132,7 @@ export async function extrasUpdate(
       | 'guestPhotosCap'
       | 'guestPhotosPerGuest'
       | 'guestPhotosToken'
+      | 'signatureBoard'
       | 'eventKind'
       | 'eventName'
     >
@@ -173,6 +177,18 @@ export async function extrasUpdate(
       set.guestPhotosCap = g.cap;
       set.guestPhotosPerGuest = g.perGuest;
       if (!inv.guestPhotosToken) set.guestPhotosToken = newUploadToken();
+    }
+  }
+
+  // The signature board: only where it is offered (owner's switch, a wedding or newborn design with board artwork,
+  // a package with guest messages); the price is added at checkout.
+  if (extras.signatureBoard) {
+    if (!extras.signatureBoard.on) set.signatureBoard = false;
+    else {
+      const { signatureBoard: board } = await getSettings(db);
+      const [section] = inv.sectionId ? await db.select({ key: sections.key }).from(sections).where(eq(sections.id, inv.sectionId)) : [];
+      if (board.enabled && inv.featureKeys.includes('congratulations') && (await boardOffered(db, inv.themeId, section?.key))) set.signatureBoard = true;
+      else errors.signatureBoard = 'invalid';
     }
   }
 
