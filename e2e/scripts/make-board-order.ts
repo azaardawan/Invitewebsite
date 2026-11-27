@@ -46,7 +46,8 @@ try {
     (await createMusicTrack(db(), { title: `e2e-song-${randomToken(4)}`, assetId: audio.id }, actor).catch(() => null)) ??
     (await db().select().from(musicTracks).where(eq(musicTracks.assetId, audio.id)))[0]!;
   await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, coverAssetId: t.coverAssetId ?? cover.id, musicTrackId: t.musicTrackId ?? song.id }, actor);
-  const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.featureKeys.includes('congratulations') && !p.featureKeys.includes('custom_music'));
+  // Its own package (other tests add theirs to demo-wedding, with other fields).
+  const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && (p.name as { en?: string }).en === 'Wishes');
   const packageId =
     existing?.id ??
     (await createPackage(db(), t.id, { name: { ar: 'باقة التهاني', en: 'Wishes' }, priceIqd: 40000, fieldKeys: [...FIELDS], featureKeys: ['music', 'rsvp', 'congratulations', 'keepsake_pdf'] }, actor)).id;

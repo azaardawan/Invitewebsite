@@ -122,8 +122,10 @@ test('signature board: bought on the order form, arranged on the receipt, printe
 });
 
 test('guests sign under their message; the signature reaches the board', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile-390', 'runs once, on a phone');
+  // With the desktop tests, after catalog.spec (which expects demo-wedding without a cover yet); on a phone-sized screen.
+  test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(240_000);
+  await page.setViewportSize({ width: 390, height: 844 });
   const made = script('e2e/scripts/make-board-order.ts', { MESSAGES: '2' }) as { receiptToken: string; path: string };
   await page.goto(made.path);
   const open = page.getByRole('button', { name: /open/i });
