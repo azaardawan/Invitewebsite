@@ -2,7 +2,8 @@ import 'server-only';
 import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DbOrTx } from '@/server/db/client';
-import { assets, themes, type CardDesign, type CardSideDesign, type ExtrasLook } from '@/server/db/schema';
+import { assets, themes, type BoardDesign, type CardDesign, type CardSideDesign, type ExtrasLook } from '@/server/db/schema';
+import { BOARD_MM_LIMITS, type BoardArea } from '@/catalog/signature-board';
 import { recordAudit } from '@/server/audit/audit';
 import { publicMediaUrl } from '@/server/storage';
 import type { ArtworkSide } from '@/components/print/ArtworkCard';
@@ -127,7 +128,7 @@ async function lockDesign(tx: DbOrTx, themeId: string) {
 }
 
 async function saveDesign(tx: DbOrTx, themeId: string, next: CardDesign) {
-  const empty = ARTWORK_SLOTS.every((k) => !next[k]) && !next.look;
+  const empty = ARTWORK_SLOTS.every((k) => !next[k]) && !next.look && !next.board;
   await tx.update(themes).set({ cardDesign: empty ? null : next }).where(eq(themes.id, themeId));
 }
 
@@ -171,5 +172,45 @@ export async function updateThemeExtrasLook(db: DbOrTx, themeId: string, input: 
     const before = await lockDesign(tx, themeId);
     await saveDesign(tx, themeId, { ...before, look });
     await recordAudit(tx, { ...auditActor(actor), action: 'theme.extras_look_updated', objectType: 'theme', objectId: themeId, before: { look: before.look ?? null }, after: { look } });
+  });
+}
+
+const share = z.coerce.number().min(0).max(45);
+export const boardInput = z.object({
+  assetId: z.uuid(),
+  widthMm: z.coerce.number().int().min(BOARD_MM_LIMITS.min).max(BOARD_MM_LIMITS.max),
+  heightMm: z.coerce.number().int().min(BOARD_MM_LIMITS.min).max(BOARD_MM_LIMITS.max),
+  area: z.object({ top: share, right: share, bottom: share, left: share }),
+  inks: z.enum(['dark', 'light']),
+  title: z.boolean(),
+  titleColor: hex,
+  titleFont: z.enum(CARD_FONTS),
+  font: z.enum(CARD_FONTS),
+});
+
+/** A design's signature board artwork with its picture's URL, or null (then the board isn't sold with it). */
+export type ResolvedBoard = Omit<BoardDesign, 'area'> & { area: BoardArea; src: string };
+
+export async function themeBoard(db: DbOrTx, themeId: string): Promise<ResolvedBoard | null> {
+  const [row] = await db.select({ design: themes.cardDesign }).from(themes).where(eq(themes.id, themeId));
+  const board = row?.design?.board;
+  if (!board?.assetId) return null;
+  const [a] = await db.select({ key: assets.storageKey }).from(assets).where(eq(assets.id, board.assetId));
+  return a ? { ...board, src: publicMediaUrl(a.key) } : null;
+}
+
+/** Sets (or, with null, removes) a design's signature board artwork. Audited. */
+export async function updateThemeBoard(db: DbOrTx, themeId: string, input: z.input<typeof boardInput> | null, actor: Actor) {
+  const board: BoardDesign | null = input ? boardInput.parse(input) : null;
+  if (board && board.area.top + board.area.bottom > 80) throw new CatalogError('invalid');
+  if (board && board.area.left + board.area.right > 80) throw new CatalogError('invalid');
+  await db.transaction(async (tx) => {
+    const before = await lockDesign(tx, themeId);
+    if (board) {
+      const [a] = await tx.select({ kind: assets.kind }).from(assets).where(eq(assets.id, board.assetId));
+      if (a?.kind !== 'IMAGE') throw new CatalogError('invalidAsset');
+    }
+    await saveDesign(tx, themeId, { ...before, board });
+    await recordAudit(tx, { ...auditActor(actor), action: 'theme.board_design_updated', objectType: 'theme', objectId: themeId, before: { board: before.board ?? null }, after: { board } });
   });
 }

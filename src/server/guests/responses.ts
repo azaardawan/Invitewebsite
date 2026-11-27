@@ -8,6 +8,7 @@ import { consumeRateLimit } from '@/server/rate-limit';
 import { isLive } from '@/server/orders/payment';
 import { trackEvent } from '@/server/analytics/events';
 import { sha256 } from '@/lib/crypto';
+import { parseSignatureStrokes } from '@/lib/signature-strokes';
 import { GUEST_LIMITS, type GuestResponseInput, type GuestSubmitResult } from '@/theme-sdk/types';
 
 /**
@@ -52,6 +53,8 @@ export async function submitGuestResponse(
   const message = withMessage ? String(input.response.message ?? '').trim() : '';
   const attendance = input.response.attendance;
   const partySize = input.response.partySize ?? 1;
+  // A signature only comes with a message; a malformed one is simply left out (the message still counts).
+  const signature = withMessage && input.response.signature ? parseSignatureStrokes(input.response.signature) : null;
   if (
     !Number.isInteger(partySize) ||
     partySize < 1 ||
@@ -88,6 +91,7 @@ export async function submitGuestResponse(
     attendance,
     partySize,
     message: withMessage ? message : null,
+    signature,
     ipHash: input.ipHash,
     clientTokenHash,
   };
@@ -97,7 +101,16 @@ export async function submitGuestResponse(
     .onConflictDoUpdate({
       target: [guestResponses.invitationId, guestResponses.clientTokenHash],
       // A corrected message is visible again only if it wasn't hidden by the team.
-      set: { guestName: values.guestName, attendance: values.attendance, partySize: values.partySize, message: values.message, ipHash: values.ipHash, updatedAt: now },
+      // A correction without a new signature keeps the one given before.
+      set: {
+        guestName: values.guestName,
+        attendance: values.attendance,
+        partySize: values.partySize,
+        message: values.message,
+        ...(signature ? { signature } : {}),
+        ipHash: values.ipHash,
+        updatedAt: now,
+      },
     });
   await trackEvent(db, { name: 'guest_reply', invitationId: inv.id, occurredAt: now });
   return { ok: true };

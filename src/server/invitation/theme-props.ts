@@ -25,7 +25,7 @@ const LABEL_KEYS = [
   'attendanceQuestion', 'attending', 'notAttending', 'message', 'submit', 'sending', 'sent', 'sentPreview',
   'errorRequired', 'errorTooLong', 'errorGeneric', 'guestbookTitle', 'guestbookEmpty', 'and',
   'attendanceTitle', 'attendingCount', 'notAttendingCount', 'itsABoy', 'itsAGirl', 'bornOn', 'partySize', 'partyFewer',
-  'partyMore',
+  'partyMore', 'signHere', 'signClear', 'signHint',
 ] as const satisfies readonly (keyof ThemeLabels)[];
 
 /**

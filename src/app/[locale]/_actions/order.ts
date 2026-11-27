@@ -62,6 +62,7 @@ function orderExtras(form: FormData): OrderExtras {
     extras.eventKind = str(form, 'eventKind');
     extras.eventName = str(form, 'eventName');
   }
+  if (form.has('sb.sent')) extras.signatureBoard = { on: form.get('sb.on') === '1' };
   if (form.has('gp.sent')) extras.guestPhotos = { on: form.get('gp.on') === '1', cap: Number(str(form, 'gp.cap')), perGuest: Number(str(form, 'gp.perGuest')) };
   // The design's changeable lines: radio `w.<key>` (ar | lang | custom) and the text `w.<key>.text`.
   for (const [k, v] of form.entries()) {

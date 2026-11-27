@@ -86,6 +86,8 @@ export async function getReceipt(db: DbOrTx, token: string, now = new Date()) {
       customCard: row.invitation.cardCustomKey !== null,
       cardBack: { title: row.invitation.cardOptions.backTitle ?? '', message: row.invitation.cardOptions.backMessage ?? '' },
       hasMessages: row.invitation.featureKeys.includes('congratulations'),
+      /** The signature board (add-on): the couple arrange it here and download it once paid. */
+      signatureBoard: row.invitation.signatureBoard,
       publicGuestbook: row.invitation.publicGuestbook,
       hasRsvp: row.invitation.featureKeys.includes('rsvp'),
       publicAttendance: row.invitation.publicAttendance,

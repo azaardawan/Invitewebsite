@@ -51,6 +51,10 @@ export type ThemeLabels = {
   partySize: string;
   partyFewer: string;
   partyMore: string;
+  /** The platform's signature pad under the guest form's message: its label, the button that clears it, and the hint inside. */
+  signHere: string;
+  signClear: string;
+  signHint: string;
   /** Word between two names ("و" / "&"), in the invitation's language. */
   and: string;
   /** Newborn: "It's a boy" / "It's a girl" (for `fields.baby_gender` = `boy` / `girl`). */
@@ -219,7 +223,12 @@ export type GuestAttendance = 'ATTENDING' | 'NOT_ATTENDING';
  * `partySize`: how many people the reply is for (1 when left out). Themes don't need to send it: the platform adds a
  * "how many of you" control under the form's name field and fills it in.
  */
-export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string; partySize?: number };
+/**
+ * How a guest signed (optional, with a message): the pad's size in CSS px and each stroke as `x, y, t, …` (the same
+ * format as the customer's signature, src/lib/signature-strokes.ts). Themes don't send it: the platform adds the pad.
+ */
+export type GuestSignature = { w: number; h: number; s: number[][] };
+export type GuestResponseInput = { name: string; attendance: GuestAttendance | null; message?: string; partySize?: number; signature?: GuestSignature | null };
 export type GuestSubmitResult = { ok: true } | { ok: false; error: 'invalid' | 'rateLimited' | 'closed' | 'failed' };
 
 /** Numbers in the invitation's script: Arabic-Indic digits for Arabic and Kurdish, Western for English. */

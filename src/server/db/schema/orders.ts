@@ -1,5 +1,6 @@
 import type { PosterChoices } from '../../../lib/poster-choices';
 import type { SignatureStrokes } from '../../../lib/signature-strokes';
+import type { BoardArrangement } from '../../../catalog/signature-board';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
@@ -175,6 +176,12 @@ export const invitations = pgTable(
     guestPhotosCap: integer('guest_photos_cap'),
     guestPhotosPerGuest: integer('guest_photos_per_guest'),
     guestPhotosToken: text('guest_photos_token').unique(),
+    /**
+     * The signature board (add-on, src/catalog/signature-board.ts): bought or not, and how the couple arranged the
+     * messages on it (null = laid out automatically). The price paid is in the order's snapshot.
+     */
+    signatureBoard: boolean('signature_board').notNull().default(false),
+    boardArrangement: jsonb('board_arrangement').$type<BoardArrangement>(),
     /**
      * A wedding or engagement held as another event (src/catalog/occasion-wording.ts): `nishani`, `henna` or `custom`
      * (then `event_name`, the customer's own words); null = the section's own event.

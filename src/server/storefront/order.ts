@@ -1,5 +1,7 @@
 import 'server-only';
 import { DEFAULT_PER_GUEST, guestPhotoPrice } from '@/catalog/guest-photos';
+import { boardSection } from '@/catalog/signature-board';
+import { boardOffered } from '@/server/board/data';
 import { getSettings } from '@/server/settings/service';
 import { EVENT_KIND_SECTIONS, EVENT_NAME_MAX, showsEventWording } from '@/catalog/occasion-wording';
 import { cardBackLimits, themeTextLimit } from '@/catalog/text-limits';
@@ -75,11 +77,14 @@ export async function draftByToken(token: string) {
       switchDefs: (row.manifest as ThemeManifest).switches ?? [],
       switches: inv.switches,
       guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, perGuest: inv.guestPhotosPerGuest ?? DEFAULT_PER_GUEST } : null,
+      signatureBoard: inv.signatureBoard,
       event: { occasion: section?.key ?? null, kind: inv.eventKind, name: inv.eventName, version: row.version },
     },
     fieldKeys: inv.fieldKeys,
     /** Guest photo sharing chosen on the form (its price is added at checkout), or null. */
     guestPhotos: inv.guestPhotosCap ? { cap: inv.guestPhotosCap, priceIqd: guestPhotoPrice(inv.guestPhotosCap, (await getSettings(db())).guestPhotos) } : null,
+    /** The signature board chosen on the form (its price is added at checkout), or null. */
+    signatureBoard: inv.signatureBoard ? { priceIqd: (await getSettings(db())).signatureBoard.priceIqd } : null,
     theme: { key: row.theme.key, name: row.theme.name },
     /** False for a design sold only as files (no online invitation). */
     onlineInvitation: manifestByCodeRef(row.codeRef)?.onlineInvitation !== false,
@@ -235,6 +240,8 @@ export async function orderFormExtras(
     switches?: Record<string, boolean>;
     /** Guest photo sharing chosen so far (null = not). */
     guestPhotos?: { cap: number; perGuest: number } | null;
+    /** The signature board chosen so far. */
+    signatureBoard?: boolean;
     /** The occasion (section key; null = still to choose among the design's) and the event chosen so far. */
     event?: { occasion: string | null; kind?: string | null; name?: string | null; choices?: readonly string[]; version?: number | null };
   } = {},
@@ -303,6 +310,11 @@ export async function orderFormExtras(
       pricing: { basePriceIqd: pricing.basePriceIqd, stepPriceIqd: pricing.stepPriceIqd, maxCap: pricing.maxCap },
       current: current.guestPhotos ?? null,
     };
+  }
+  // The signature board: weddings and newborns, on designs whose board artwork the owner uploaded, with guest messages.
+  const { signatureBoard: board } = await getSettings(db());
+  if ((board.enabled || current.signatureBoard) && featureKeys.includes('congratulations') && occasions.some(boardSection) && (await boardOffered(db(), themeId, occasions.find(boardSection)))) {
+    extras.signatureBoard = { priceIqd: board.priceIqd, perBoard: board.perBoard, current: current.signatureBoard ?? false };
   }
   return extras;
 }

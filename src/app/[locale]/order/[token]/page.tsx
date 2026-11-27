@@ -146,11 +146,16 @@ export default async function ReviewPage({ params, searchParams }: PageProps<'/[
                   + {t('guestPhotos.title')} ({draft.guestPhotos.cap.toLocaleString()}) · <Price iqd={draft.guestPhotos.priceIqd} />
                 </span>
               ) : null}
+              {draft.signatureBoard ? (
+                <span className="text-sm text-muted" data-signature-board-line>
+                  + {t('signatureBoard.title')} · <Price iqd={draft.signatureBoard.priceIqd} />
+                </span>
+              ) : null}
             </div>
             <div className="flex flex-col items-end">
               <span className="text-xs text-muted">{t('total')}</span>
               <span className="text-lg font-semibold text-accent">
-                <Price iqd={draft.pkg.priceIqd + (draft.guestPhotos?.priceIqd ?? 0)} />
+                <Price iqd={draft.pkg.priceIqd + (draft.guestPhotos?.priceIqd ?? 0) + (draft.signatureBoard?.priceIqd ?? 0)} />
               </span>
             </div>
           </div>
