@@ -29,9 +29,9 @@ test('signature board: bought on the order form, arranged on the receipt, printe
   test.skip(testInfo.project.name !== 'desktop', 'runs once');
   test.setTimeout(300_000);
   await signInAsNewOwner(page);
-  const made = script('e2e/scripts/make-board-order.ts') as { receiptToken: string; path: string; amountIqd: number; previewToken: string };
-  // 40,000 (package) + 25,000 (the board).
-  expect(made.amountIqd).toBe(65000);
+  const made = script('e2e/scripts/make-board-order.ts') as { receiptToken: string; path: string; amountIqd: number; previewToken: string; packagePriceIqd: number };
+  // The package + 25,000 (the board).
+  expect(made.amountIqd).toBe(made.packagePriceIqd + 25000);
 
   // The order form offers it (the design has board artwork), with its price.
   await page.setViewportSize({ width: 430, height: 900 });

@@ -2,7 +2,7 @@
  * E2E fixture: the signature board (owner, 2026-11-27). Puts demo-wedding on sale with a package that has guest
  * messages, uploads board artwork for it, offers the board in Settings (people per board from `PER_BOARD`, default 6),
  * and makes a paid order that bought it, with `MESSAGES` guest messages (default 9), most of them signed. Prints
- * { themeId, receiptToken, path, invitationId, amountIqd, previewToken } (`previewToken`: an unpaid draft of the same design).
+ * { themeId, packagePriceIqd, receiptToken, path, invitationId, amountIqd, previewToken } (`previewToken`: an unpaid draft of the same design).
  */
 import { eq } from 'drizzle-orm';
 import sharp from 'sharp';
@@ -46,11 +46,12 @@ try {
     (await createMusicTrack(db(), { title: `e2e-song-${randomToken(4)}`, assetId: audio.id }, actor).catch(() => null)) ??
     (await db().select().from(musicTracks).where(eq(musicTracks.assetId, audio.id)))[0]!;
   await updateThemeSettings(db(), t.id, { name: t.name, sectionId: t.sectionId, coverAssetId: t.coverAssetId ?? cover.id, musicTrackId: t.musicTrackId ?? song.id }, actor);
-  // Its own package (other tests add theirs to demo-wedding, with other fields).
-  const existing = (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && (p.name as { en?: string }).en === 'Wishes');
+  // A design holds at most three packages on sale and other tests add theirs to demo-wedding: use one that already has
+  // guest messages (filling whatever fields it asks for), else add our own.
   const packageId =
-    existing?.id ??
+    (await packagesWithShape(db(), t.id)).find((p) => p.status === 'ACTIVE' && p.featureKeys.includes('congratulations'))?.id ??
     (await createPackage(db(), t.id, { name: { ar: 'باقة التهاني', en: 'Wishes' }, priceIqd: 40000, fieldKeys: [...FIELDS], featureKeys: ['music', 'rsvp', 'congratulations', 'keepsake_pdf'] }, actor)).id;
+  const pkg = (await packagesWithShape(db(), t.id)).find((p) => p.id === packageId)!;
   if (t.status === 'DEVELOPMENT') await transitionTheme(db(), t.id, 'READY_FOR_REVIEW', actor);
   if (t.status !== 'ACTIVE') await transitionTheme(db(), t.id, 'ACTIVE', actor);
 
@@ -64,7 +65,20 @@ try {
   await updateSignatureBoardSettings(db(), { enabled: true, priceIqd: 25000, perBoard: PER_BOARD }, actor);
 
   const date = new Date(Date.now() + 40 * 86400_000).toISOString().slice(0, 10);
-  const values = { person_1_name: 'Dara', person_2_name: 'Ava', event_date: date, event_time: '19:30', venue_name: 'Grand Hall' };
+  const sample: Record<string, string> = {
+    person_1_name: 'Dara',
+    person_2_name: 'Ava',
+    event_date: date,
+    event_time: '19:30',
+    venue_name: 'Grand Hall',
+    venue_map_url: 'https://maps.google.com/?q=Erbil',
+    invitation_message: 'Join us to celebrate our wedding.',
+    family_names: 'The Karim and Aziz families',
+    person_1_family: 'Karim',
+    person_2_family: 'Aziz',
+    seal_initials: 'DA',
+  };
+  const values = Object.fromEntries(Object.entries(sample).filter(([k]) => (pkg.fieldKeys as readonly string[]).includes(k) || (FIELDS as readonly string[]).includes(k)));
   const ctx = { ipHash: randomToken(8), userAgent: 'e2e' };
   const d = await createDraft(db(), { themeKey: 'demo-wedding', packageId, locale: 'en', values, extras: { signatureBoard: { on: true } } }, ctx);
   const o = await createOrder(db(), { previewToken: d.previewToken, customer: { name: 'Test', phone: '07701234567', email: 'e2e@bahja.test' }, acceptedTerms: true, idempotencyKey: randomToken(18) }, ctx);
@@ -87,7 +101,7 @@ try {
   }
   const draft = await createDraft(db(), { themeKey: 'demo-wedding', packageId, locale: 'en', values }, ctx);
   const receipt = await getReceipt(db(), o.receiptToken);
-  console.log(JSON.stringify({ themeId: t.id, receiptToken: o.receiptToken, path: receipt?.invitation.path, invitationId: d.invitationId, amountIqd: o.amountIqd, previewToken: draft.previewToken }));
+  console.log(JSON.stringify({ themeId: t.id, packagePriceIqd: pkg.priceIqd, receiptToken: o.receiptToken, path: receipt?.invitation.path, invitationId: d.invitationId, amountIqd: o.amountIqd, previewToken: draft.previewToken }));
 } finally {
   await closeDb();
 }
