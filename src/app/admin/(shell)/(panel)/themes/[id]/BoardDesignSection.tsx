@@ -61,6 +61,15 @@ export async function BoardDesignSection({ themeId, themeKey, updatedAt, canMana
           <figcaption className="text-xs text-muted">{t('previewNote')}</figcaption>
         </figure>
       ) : null}
+      {board ? (
+        <figure className="space-y-1" dir="ltr" data-board-areas="">
+          {/* The decoration found on the artwork (shaded): no message or signature is placed there. */}
+          <div className="overflow-hidden rounded-md border border-line bg-white" style={{ width: 300, height: Math.round(300 * ratio) }}>
+            <iframe title={t('areas')} src={`/admin/preview/${locale}/board/${themeKey}?areas=1&t=${updatedAt.getTime()}`} style={{ width: 600, height: Math.round(600 * ratio), border: 0, transform: 'scale(0.5)', transformOrigin: '0 0' }} />
+          </div>
+          <figcaption className="max-w-[300px] text-xs text-muted">{board.keepOut ? t('areasNote') : t('areasNone')}</figcaption>
+        </figure>
+      ) : null}
       {canManage ? (
         <>
           <ActionForm action={themeBoardAction} className="grid gap-3 sm:grid-cols-2">

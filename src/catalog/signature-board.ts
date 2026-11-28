@@ -39,6 +39,34 @@ export const BOARD_INKS = {
 } as const;
 export type BoardInkSet = keyof typeof BOARD_INKS;
 
+/**
+ * Where the board's artwork is decorated (owner, 2026-11-28), found when the owner saves it
+ * (src/server/board/keep-out.ts): a grid `cols` × `rows` over the whole board, `cells` one character per cell, row by
+ * row, '1' where there is decoration. Messages and signatures are never laid over a '1'.
+ */
+export type BoardKeepOut = { cols: number; rows: number; cells: string };
+
+/**
+ * Whether a box on the message area (shares 0–100 of the area: x, y, width, height) touches the artwork's decoration.
+ * `area` places the message area on the board.
+ */
+export function touchesKeepOut(keepOut: BoardKeepOut | null | undefined, area: BoardArea, box: { x: number; y: number; w: number; h: number }): boolean {
+  if (!keepOut) return false;
+  const fw = 100 - area.left - area.right;
+  const fh = 100 - area.top - area.bottom;
+  // The box on the board (shares of the board), then the grid cells it covers.
+  const x0 = area.left + (Math.max(0, box.x) * fw) / 100;
+  const x1 = area.left + (Math.min(100, box.x + box.w) * fw) / 100;
+  const y0 = area.top + (Math.max(0, box.y) * fh) / 100;
+  const y1 = area.top + (Math.min(100, box.y + box.h) * fh) / 100;
+  const c0 = Math.max(0, Math.floor((x0 / 100) * keepOut.cols));
+  const c1 = Math.min(keepOut.cols - 1, Math.ceil((x1 / 100) * keepOut.cols) - 1);
+  const r0 = Math.max(0, Math.floor((y0 / 100) * keepOut.rows));
+  const r1 = Math.min(keepOut.rows - 1, Math.ceil((y1 / 100) * keepOut.rows) - 1);
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (keepOut.cells.charCodeAt(r * keepOut.cols + c) === 49) return true;
+  return false;
+}
+
 /** How many boards `people` messages need at `perBoard` a board (at least one). */
 export function boardsNeeded(people: number, perBoard: number): number {
   return Math.min(MAX_BOARDS, Math.max(1, Math.ceil(people / Math.max(1, perBoard))));

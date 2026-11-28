@@ -14,6 +14,8 @@ export function BoardPrint({ view, board }: { view: BoardView; board: number }) 
     saved: view.arrangement,
     inks: view.design.inks.length,
     rtl: view.dir === 'rtl',
+    keepOut: view.design.keepOut,
+    area: view.design.area,
   });
   return (
     <>

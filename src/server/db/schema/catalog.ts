@@ -1,5 +1,5 @@
 import type { CoverFocus } from '../../../lib/cover-focus';
-import type { BoardArea, BoardInkSet } from '../../../catalog/signature-board';
+import type { BoardArea, BoardInkSet, BoardKeepOut } from '../../../catalog/signature-board';
 import { PACKAGE_LIFETIMES } from '../../../catalog/lifetime';
 import { sql } from 'drizzle-orm';
 import {
@@ -212,6 +212,8 @@ export type BoardDesign = {
   titleFont: CardFont;
   /** The messages' font. */
   font: CardFont;
+  /** Where the artwork is decorated (found when saved): no message goes there. Absent on artwork saved before. */
+  keepOut?: BoardKeepOut | null;
 };
 
 export const themes = pgTable(

@@ -40,6 +40,9 @@ function seeded(seed: string, salt: number) {
 }
 
 export type DrawNote = (note: BoardNote) => HTMLElement;
+/** Whether a box on the message area (shares 0–100) lies on the artwork's decoration (`touchesKeepOut`). */
+export type Blocked = (box: { x: number; y: number; w: number; h: number }) => boolean;
+const nothingBlocked: Blocked = () => false;
 
 type Box = { x: number; y: number; w: number; h: number };
 
@@ -54,7 +57,7 @@ function measure(field: HTMLElement, el: HTMLElement, w: number, scale: number) 
 }
 
 /** Packs one board's notes in columns, shrinking the board's text until they all fit. */
-function packBoard(field: HTMLElement, notes: BoardNote[], drawNote: DrawNote, rtl: boolean): { scale: number; spots: Record<string, Omit<BoardSpot, 'c' | 'b'> & { h: number }> } {
+function packBoard(field: HTMLElement, notes: BoardNote[], drawNote: DrawNote, rtl: boolean, blocked: Blocked = nothingBlocked): { scale: number; spots: Record<string, Omit<BoardSpot, 'c' | 'b'> & { h: number }> } {
   const els = new Map(notes.map((n) => [n.id, drawNote(n)]));
   const W = 100;
   const gapX = GAP * 100;
@@ -64,8 +67,12 @@ function packBoard(field: HTMLElement, notes: BoardNote[], drawNote: DrawNote, r
   const cw = (W - gapX * (cols - 1)) / cols;
   let scale = MAX_SCALE;
   for (let pass = 0; pass < 24; pass++) {
-    const heights = Array<number>(cols).fill(0);
     const out: { id: string; x: number; y: number; w: number; h: number }[] = [];
+    // Each note takes the highest free place in any column: clear of the notes already placed (with the gap) and of
+    // the artwork's decoration, so the room beside a flower or a crest is used too.
+    const free = (box: { x: number; y: number; w: number; h: number }) =>
+      out.every((o) => box.x + box.w + gapX / 2 <= o.x || o.x + o.w + gapX / 2 <= box.x || box.y + box.h + gapY <= o.y || o.y + o.h + gapY <= box.y) &&
+      !blocked({ x: rtl ? W - box.x - box.w : box.x, y: box.y, w: box.w, h: box.h });
     for (const n of notes) {
       let span = n.message.length > WIDE_AT && cols > 2 ? 2 : 1;
       let w = cw * span + gapX * (span - 1);
@@ -76,34 +83,35 @@ function packBoard(field: HTMLElement, notes: BoardNote[], drawNote: DrawNote, r
         w = cw * 2 + gapX;
         m = measure(field, els.get(n.id)!, w, scale);
       }
-      let best = 0;
-      let top = Infinity;
-      for (let c = 0; c + span <= cols; c++) {
-        const t = Math.max(...heights.slice(c, c + span));
-        if (t < top - 0.01) {
-          top = t;
-          best = c;
-        }
+      // The columns first; with decoration on the artwork, also places a little to either side of them, so a note
+      // can fit between a vine and a crest. A column place wins a tie, which keeps the board orderly.
+      let best = { x: 0, y: Infinity };
+      const xs: number[] = [];
+      for (let c = 0; c + span <= cols; c++) xs.push(c * (cw + gapX));
+      if (blocked !== nothingBlocked) for (let x = 0; x <= W - w + 0.01; x += 2) xs.push(x);
+      for (const x of xs) {
+        let y = 0;
+        while (y < 400 && !free({ x, y, w, h: m.h })) y += 0.75;
+        if (y < best.y - 0.4) best = { x, y };
       }
-      out.push({ id: n.id, x: best * (cw + gapX), y: top, w, h: m.h });
-      for (let c = best; c < best + span; c++) heights[c] = top + m.h + gapY;
+      out.push({ id: n.id, x: best.x, y: best.y, w, h: m.h });
     }
-    const tall = Math.max(0, ...heights) - gapY;
+    const tall = Math.max(0, ...out.map((o) => o.y + o.h));
     if (tall <= 97 || scale <= MIN_SCALE) {
       // Room to spare: the rows spread down the board (never more than half again apart).
-      const k = tall > 0 ? Math.min(1.5, 97 / tall) : 1;
+      let k = tall > 0 ? Math.min(1.5, 97 / tall) : 1;
+      const place = (o: (typeof out)[number], k: number, nudge: boolean) => {
+        const nx = nudge ? (seeded(o.id, 1) - 0.5) * cw * 0.12 : 0;
+        const ny = nudge ? (seeded(o.id, 2) - 0.5) * gapY : 0;
+        const x = rtl ? W - o.x - o.w : o.x;
+        return { x: round(x + nx), y: round(Math.max(0, Math.min(100 - o.h, o.y * k + ny))), w: round(o.w), h: o.h, r: round((seeded(o.id, 3) * 2 - 1) * TURN) };
+      };
+      // Spreading the rows down must not move a note onto the decoration: then they stay where they were packed.
+      if (k > 1 && out.some((o) => blocked(place(o, k, false)))) k = 1;
       const spots: Record<string, Omit<BoardSpot, 'c' | 'b'> & { h: number }> = {};
       for (const o of out) {
-        const nx = (seeded(o.id, 1) - 0.5) * cw * 0.12;
-        const ny = (seeded(o.id, 2) - 0.5) * gapY;
-        const x = rtl ? W - o.x - o.w : o.x;
-        spots[o.id] = {
-          x: round(x + nx),
-          y: round(Math.max(0, Math.min(100 - o.h, o.y * k + ny))),
-          w: round(o.w),
-          h: o.h,
-          r: round((seeded(o.id, 3) * 2 - 1) * TURN),
-        };
+        const nudged = place(o, k, true);
+        spots[o.id] = blocked(nudged) ? place(o, k, false) : nudged;
       }
       return { scale: Math.round(scale * 1000) / 1000, spots };
     }
@@ -137,8 +145,9 @@ export function inkFor(id: string, box: Box, others: { box: Box; c: number }[], 
 export function arrange(
   field: HTMLElement,
   notes: BoardNote[],
-  opts: { perBoard: number; saved: BoardArrangement | null; inks: number; rtl: boolean; drawNote: DrawNote },
+  opts: { perBoard: number; saved: BoardArrangement | null; inks: number; rtl: boolean; drawNote: DrawNote; blocked?: Blocked },
 ): { arrangement: BoardArrangement; heights: Record<string, number> } {
+  const blocked = opts.blocked ?? nothingBlocked;
   const saved = opts.saved?.spots ?? {};
   const scales = [...(opts.saved?.scales ?? [])];
   const spots: Record<string, BoardSpot> = {};
@@ -161,7 +170,7 @@ export function arrange(
       let placed = false;
       for (let b = 0; b < boardsUsed() && !placed; b++) {
         if (count(b) >= opts.perBoard) continue;
-        const spot = freeSpot(field, n, b, scales[b] ?? 1, spots, heights, opts);
+        const spot = freeSpot(field, n, b, scales[b] ?? 1, spots, heights, { ...opts, blocked });
         if (spot) {
           spots[n.id] = spot.spot;
           heights[n.id] = spot.h;
@@ -179,7 +188,7 @@ export function arrange(
     const b = Math.min(MAX_BOARDS - 1, first + i);
     const chunk = i === need - 1 || b === MAX_BOARDS - 1 ? leftover.slice(i * opts.perBoard) : leftover.slice(i * opts.perBoard, (i + 1) * opts.perBoard);
     if (!chunk.length) break;
-    const packed = packBoard(field, chunk, opts.drawNote, opts.rtl);
+    const packed = packBoard(field, chunk, opts.drawNote, opts.rtl, blocked);
     scales[b] = packed.scale;
     for (const [id, s] of Object.entries(packed.spots)) {
       spots[id] = { b, x: s.x, y: s.y, w: s.w, r: s.r, c: -1 };
@@ -209,7 +218,7 @@ function freeSpot(
   scale: number,
   spots: Record<string, BoardSpot>,
   heights: Record<string, number>,
-  opts: { rtl: boolean; drawNote: DrawNote },
+  opts: { rtl: boolean; drawNote: DrawNote; blocked: Blocked },
 ): { spot: BoardSpot; h: number } | null {
   const cols = colsFor(Object.values(spots).filter((s) => s.b === b).length + 1);
   const cw = (100 - GAP * 100 * (cols - 1)) / cols;
@@ -222,7 +231,7 @@ function freeSpot(
     for (let i = 0; i * 2 <= 100 - w; i++) {
       const x = opts.rtl ? 100 - w - i * 2 : i * 2;
       const box = { x, y, w, h };
-      if (boxes.every((o) => box.x + box.w <= o.x || o.x + o.w <= box.x || box.y + box.h <= o.y || o.y + o.h <= box.y)) {
+      if (!opts.blocked(box) && boxes.every((o) => box.x + box.w <= o.x || o.x + o.w <= box.x || box.y + box.h <= o.y || o.y + o.h <= box.y)) {
         return { spot: { b, x: round(x), y: round(y), w: round(w), r: round((seeded(n.id, 3) * 2 - 1) * TURN), c: -1 }, h };
       }
     }

@@ -59,6 +59,7 @@ export async function boardView(db: DbOrTx, inv: InvitationRow): Promise<BoardVi
       titleColor: design.titleColor,
       titleFont: design.titleFont,
       font: design.font,
+      keepOut: design.keepOut ?? null,
     },
     heading: design.title ? boardHeading(inv) : null,
     notes,

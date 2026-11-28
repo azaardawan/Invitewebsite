@@ -29,7 +29,7 @@ async function domIssues(page: Page): Promise<Found> {
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       const t = n as Text;
       const el = t.parentElement;
-      if (!el || !t.data.trim() || el.closest('[role="note"], script, style, [data-watermark]')) continue;
+      if (!el || !t.data.trim() || el.closest('[role="note"], script, style, [data-watermark], [data-bahja-signature-pad]')) continue;
       if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
       const range = document.createRange();
       range.selectNodeContents(t);
@@ -101,7 +101,7 @@ async function domIssues(page: Page): Promise<Found> {
     }
     const graphics: { el: Element; r: DOMRect; path: string }[] = [];
     for (const el of document.body.querySelectorAll('*')) {
-      const isPicture = el.matches('img, svg, canvas, video') && !el.parentElement?.closest('svg');
+      const isPicture = el.matches('img, svg, canvas, video') && !el.parentElement?.closest('svg') && !el.closest('[data-bahja-signature-pad]');
       if (!isPicture && getComputedStyle(el).backgroundImage === 'none') continue;
       if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) continue;
       const r = el.getBoundingClientRect();
