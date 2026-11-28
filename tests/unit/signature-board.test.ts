@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOARD_INKS, boardSection, boardsNeeded, MAX_BOARDS, parseArrangement } from '@/catalog/signature-board';
+import { BOARD_INKS, boardSection, boardsNeeded, MAX_BOARDS, parseArrangement, touchesKeepOut } from '@/catalog/signature-board';
 import { inkFor, near } from '@/components/board/layout';
 import { signatureDrawing } from '@/lib/signature-strokes';
 
@@ -57,5 +57,19 @@ describe('signature board', () => {
     expect(d!.d.match(/M/g)).toHaveLength(2);
     expect(d!.viewBox.split(' ').map(Number)[2]).toBeGreaterThan(80);
     expect(signatureDrawing(null)).toBeNull();
+  });
+});
+
+describe('signature board: the artwork\'s decoration', () => {
+  const area = { top: 10, right: 10, bottom: 10, left: 10 };
+  // A 10 × 10 grid with one decorated cell in the middle (row 5, column 5).
+  const keepOut = { cols: 10, rows: 10, cells: Array.from({ length: 100 }, (_, i) => (i === 55 ? '1' : '0')).join('') };
+
+  it('tells a note on the decoration from one beside it', () => {
+    // The middle cell is 50–60% of the board; on the message area (10–90%) that is 50–62.5%.
+    expect(touchesKeepOut(keepOut, area, { x: 45, y: 45, w: 10, h: 10 })).toBe(true);
+    expect(touchesKeepOut(keepOut, area, { x: 0, y: 0, w: 30, h: 30 })).toBe(false);
+    expect(touchesKeepOut(keepOut, area, { x: 70, y: 45, w: 20, h: 10 })).toBe(false);
+    expect(touchesKeepOut(null, area, { x: 45, y: 45, w: 10, h: 10 })).toBe(false);
   });
 });
