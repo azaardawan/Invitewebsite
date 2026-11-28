@@ -1,4 +1,4 @@
-import type { BoardArea, BoardArrangement } from '@/catalog/signature-board';
+import type { BoardArea, BoardArrangement, BoardKeepOut } from '@/catalog/signature-board';
 import type { SignatureDrawing } from '@/lib/signature-strokes';
 
 export type BoardFont = 'ruqaa' | 'sans' | 'vazir';
@@ -18,6 +18,8 @@ export type BoardDesignView = {
   titleColor: string;
   titleFont: BoardFont;
   font: BoardFont;
+  /** Where the artwork is decorated: messages are never laid there (null = anywhere in the area). */
+  keepOut: BoardKeepOut | null;
 };
 
 /** Everything the board needs, from the server (src/server/board/data.ts). */

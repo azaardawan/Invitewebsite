@@ -5,7 +5,8 @@ import type { DbOrTx } from '@/server/db/client';
 import { assets, themes, type BoardDesign, type CardDesign, type CardSideDesign, type ExtrasLook } from '@/server/db/schema';
 import { BOARD_MM_LIMITS, type BoardArea } from '@/catalog/signature-board';
 import { recordAudit } from '@/server/audit/audit';
-import { publicMediaUrl } from '@/server/storage';
+import { publicMediaUrl, storage } from '@/server/storage';
+import { detectKeepOut } from '@/server/board/keep-out';
 import type { ArtworkSide } from '@/components/print/ArtworkCard';
 import { CatalogError, auditActor, type Actor } from './common';
 
@@ -204,6 +205,15 @@ export async function updateThemeBoard(db: DbOrTx, themeId: string, input: z.inp
   const board: BoardDesign | null = input ? boardInput.parse(input) : null;
   if (board && board.area.top + board.area.bottom > 80) throw new CatalogError('invalid');
   if (board && board.area.left + board.area.right > 80) throw new CatalogError('invalid');
+  // Where the artwork is decorated, so no message is laid there (owner, 2026-11-28). Read before the transaction:
+  // it takes a moment for a big picture. Without it (unreadable picture) messages go anywhere in the area.
+  if (board) {
+    const [a] = await db.select({ key: assets.storageKey }).from(assets).where(eq(assets.id, board.assetId));
+    const bytes = a ? await storage().get(a.key) : null;
+    board.keepOut = bytes ? await detectKeepOut(bytes, board.widthMm, board.heightMm).catch(() => null) : null;
+  }
+  // The audit keeps the settings, not the grid.
+  const summary = (b: BoardDesign | null | undefined) => (b ? { ...b, keepOut: b.keepOut ? `${b.keepOut.cells.split('1').length - 1} of ${b.keepOut.cells.length} cells` : null } : null);
   await db.transaction(async (tx) => {
     const before = await lockDesign(tx, themeId);
     if (board) {
@@ -211,6 +221,6 @@ export async function updateThemeBoard(db: DbOrTx, themeId: string, input: z.inp
       if (a?.kind !== 'IMAGE') throw new CatalogError('invalidAsset');
     }
     await saveDesign(tx, themeId, { ...before, board });
-    await recordAudit(tx, { ...auditActor(actor), action: 'theme.board_design_updated', objectType: 'theme', objectId: themeId, before: { board: before.board ?? null }, after: { board } });
+    await recordAudit(tx, { ...auditActor(actor), action: 'theme.board_design_updated', objectType: 'theme', objectId: themeId, before: { board: summary(before.board) }, after: { board: summary(board) } });
   });
 }

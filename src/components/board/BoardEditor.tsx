@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
-import type { BoardArrangement, BoardSpot } from '@/catalog/signature-board';
+import { touchesKeepOut, type BoardArrangement, type BoardSpot } from '@/catalog/signature-board';
 import { BoardCanvas, boardStyles, drawNote } from './BoardCanvas';
 import { arrange, inkFor } from './layout';
 import { useArrangement } from './useArrangement';
@@ -38,6 +38,8 @@ export function BoardEditor({ view, saveUrl, labels }: { view: BoardView; saveUr
     saved: view.arrangement,
     inks: view.design.inks.length,
     rtl: view.dir === 'rtl',
+    keepOut: view.design.keepOut,
+    area: view.design.area,
   });
   const [board, setBoard] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -101,8 +103,10 @@ export function BoardEditor({ view, saveUrl, labels }: { view: BoardView; saveUr
       const dy = ((ev.clientY - start.y) / rect.height) * 100;
       if (!moved && Math.hypot(dx, dy) < 0.5) return;
       moved = true;
-      // Anywhere on the board, but never wholly off it.
-      update(id, { x: clamp(start.spot.x + dx, -start.spot.w / 2, 100 - start.spot.w / 2), y: clamp(start.spot.y + dy, -h / 2, 100 - h / 2) }, { persist: false });
+      // Anywhere on the board, but never wholly off it, and never onto the artwork's decoration (it stops at its edge).
+      const next = { x: clamp(start.spot.x + dx, -start.spot.w / 2, 100 - start.spot.w / 2), y: clamp(start.spot.y + dy, -h / 2, 100 - h / 2) };
+      if (touchesKeepOut(view.design.keepOut, view.design.area, { ...next, w: start.spot.w, h })) return;
+      update(id, next, { persist: false });
     };
     const up = () => {
       el.removeEventListener('pointermove', move);
@@ -152,7 +156,12 @@ export function BoardEditor({ view, saveUrl, labels }: { view: BoardView; saveUr
   const moveTo = (b: number) => {
     if (!selected || !arrangement) return;
     // It lands in the middle of the other board, in an ink none of its new neighbours has.
-    update(selected, { b, x: 50 - (spot?.w ?? 20) / 2, y: 45 }, { reink: true });
+    // It lands in the first free place on the other board, from the middle down (never on the decoration).
+    const w = spot?.w ?? 20;
+    const h = heights[selected] ?? 10;
+    let y = 45;
+    while (y < 100 - h && touchesKeepOut(view.design.keepOut, view.design.area, { x: 50 - w / 2, y, w, h })) y += 1;
+    update(selected, { b, x: 50 - w / 2, y }, { reink: true });
     setBoard(b);
   };
 
@@ -162,7 +171,8 @@ export function BoardEditor({ view, saveUrl, labels }: { view: BoardView; saveUr
     setConfirming(false);
     setSelected(null);
     setBoard(0);
-    const out = arrange(field, view.notes, { perBoard: view.perBoard, saved: null, inks: view.design.inks.length, rtl: view.dir === 'rtl', drawNote });
+    const blocked = (box: { x: number; y: number; w: number; h: number }) => touchesKeepOut(view.design.keepOut, view.design.area, box);
+    const out = arrange(field, view.notes, { perBoard: view.perBoard, saved: null, inks: view.design.inks.length, rtl: view.dir === 'rtl', drawNote, blocked });
     setState({ ...out, ready: true });
     save(out.arrangement, true);
   };

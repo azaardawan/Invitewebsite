@@ -30,9 +30,24 @@ function mp3(seconds: number) {
   return Buffer.concat(Array.from({ length: Math.ceil((seconds * 44100) / 1152) }, () => frame));
 }
 
-/** A stand-in board: ivory paper with a gold frame (600 × 900 px). */
+/**
+ * A stand-in board (600 × 900 px): ivory paper, a gold frame, flowers in the corners, a crest in the middle and vines
+ * down the sides, so the messages must flow around decoration (`PLAIN=1`: the frame only).
+ */
 async function artwork() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect width="600" height="900" fill="#fbf6ef"/><rect x="18" y="18" width="564" height="864" fill="none" stroke="#b08a4f" stroke-width="6"/><rect x="30" y="30" width="540" height="840" fill="none" stroke="#b08a4f" stroke-width="1.5"/></svg>`;
+  const flower = (cx: number, cy: number, r: number, colour: string) =>
+    Array.from({ length: 6 }, (_, k) => {
+      const a = (k * Math.PI) / 3;
+      return `<ellipse cx="${cx + Math.cos(a) * r}" cy="${cy + Math.sin(a) * r}" rx="${r * 0.75}" ry="${r * 0.45}" transform="rotate(${(a * 180) / Math.PI} ${cx + Math.cos(a) * r} ${cy + Math.sin(a) * r})" fill="${colour}" opacity="0.85"/>`;
+    }).join('') + `<circle cx="${cx}" cy="${cy}" r="${r * 0.45}" fill="#e2b44f"/>`;
+  const vine = (x: number) =>
+    `<path d="M${x} 230 C ${x + 18} 300, ${x - 18} 360, ${x} 430 S ${x + 18} 560, ${x} 640" stroke="#7d9a6a" stroke-width="4" fill="none"/>` +
+    [270, 350, 430, 510, 590].map((y, k) => `<ellipse cx="${x + (k % 2 ? 12 : -12)}" cy="${y}" rx="11" ry="6" fill="#8fae7a"/>`).join('');
+  const decor = process.env.PLAIN
+    ? ''
+    : flower(70, 70, 26, '#d98aa0') + flower(530, 70, 26, '#d98aa0') + flower(70, 830, 26, '#d98aa0') + flower(530, 830, 26, '#d98aa0') +
+      flower(300, 470, 34, '#c9758f') + `<circle cx="300" cy="470" r="72" fill="none" stroke="#b08a4f" stroke-width="5"/>` + vine(38) + vine(562);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900"><rect width="600" height="900" fill="#fbf6ef"/><rect x="18" y="18" width="564" height="864" fill="none" stroke="#b08a4f" stroke-width="6"/><rect x="30" y="30" width="540" height="840" fill="none" stroke="#b08a4f" stroke-width="1.5"/>${decor}</svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
 
